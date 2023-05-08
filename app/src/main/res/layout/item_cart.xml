@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="woowacourse.shopping.util.PriceFormatter" />
+
+        <variable
+            name="cartProduct"
+            type="woowacourse.shopping.model.CartProductModel" />
+
+        <variable
+            name="onItemClick"
+            type="woowacourse.shopping.view.cart.CartAdapter.OnItemClick" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/back_rounded"
+        android:paddingHorizontal="13dp"
+        android:paddingVertical="18dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{cartProduct.checked}"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:onClick="@{() -> onItemClick.onSelectProduct(cartProduct)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/text_product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:layout_marginBottom="2dp"
+            android:text="@{cartProduct.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_select"
+            app:layout_constraintStart_toEndOf="@id/checkbox_select"
+            app:layout_constraintTop_toTopOf="@id/checkbox_select"
+            tools:text="동원참치" />
+
+        <ImageView
+            android:id="@+id/img_product"
+            android:layout_width="136dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="26dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/checkbox_select"
+            app:layout_constraintTop_toBottomOf="@id/checkbox_select"
+            tools:background="@color/black" />
+
+        <TextView
+            android:id="@+id/text_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/korean_won2(cartProduct.price * cartProduct.count)}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/layout_add_btns"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="99,800원" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_add_btns"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_minus"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/back_left_rounded"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.id, cartProduct.count - 1)}"
+                android:text="@string/minus"
+                android:textColor="@color/gray"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toStartOf="@id/text_count"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_count"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="@{Integer.toString(cartProduct.count)}"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_plus"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/back_right_rounded"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.id, cartProduct.count + 1)}"
+                android:text="@string/plus"
+                android:textColor="@color/gray"
+                android:textSize="22sp"
+                app:layout_constraintStart_toEndOf="@id/text_count"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/btn_close"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="@drawable/ic_close"
+            android:backgroundTint="@color/gray"
+            android:onClick="@{() -> onItemClick.onRemoveClick(cartProduct.id)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
