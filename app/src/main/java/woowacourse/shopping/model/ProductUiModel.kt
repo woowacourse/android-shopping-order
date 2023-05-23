@@ -10,7 +10,7 @@ data class ProductUiModel(
     val name: String,
     val imgUrl: String,
     val price: Int,
-    var count: Int = 0
+    var count: Int = 0,
 ) : Parcelable {
     fun toMoneyFormat() = price.toMoneyFormat()
 }

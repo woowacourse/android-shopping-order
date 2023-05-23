@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class RecentWrapperAdapter(
-    private val adapter: RecentAdapter
+    private val adapter: RecentAdapter,
 ) : RecyclerView.Adapter<RecentWrapperViewHolder>() {
     private var lastScrollX = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentWrapperViewHolder {

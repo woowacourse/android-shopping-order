@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.model.ProductUiModel
 
 class MainProductAdapter(
-    private val listener: ProductClickListener
+    private val listener: ProductClickListener,
 ) : ListAdapter<ProductUiModel, MainProductViewHolder>(ProductDiffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainProductViewHolder {
         return MainProductViewHolder.create(parent, listener)
@@ -30,14 +30,14 @@ class MainProductAdapter(
         private val ProductDiffUtil = object : DiffUtil.ItemCallback<ProductUiModel>() {
             override fun areItemsTheSame(
                 oldItem: ProductUiModel,
-                newItem: ProductUiModel
+                newItem: ProductUiModel,
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
                 oldItem: ProductUiModel,
-                newItem: ProductUiModel
+                newItem: ProductUiModel,
             ): Boolean {
                 return oldItem == newItem
             }

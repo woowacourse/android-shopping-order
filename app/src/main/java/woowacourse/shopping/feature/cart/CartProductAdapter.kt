@@ -24,14 +24,14 @@ class CartProductAdapter(private val cartProductClickListener: CartProductClickL
         private val CartDiffUtil = object : DiffUtil.ItemCallback<CartProductUiModel>() {
             override fun areItemsTheSame(
                 oldItem: CartProductUiModel,
-                newItem: CartProductUiModel
+                newItem: CartProductUiModel,
             ): Boolean {
                 return oldItem.cartId == newItem.cartId
             }
 
             override fun areContentsTheSame(
                 oldItem: CartProductUiModel,
-                newItem: CartProductUiModel
+                newItem: CartProductUiModel,
             ): Boolean {
                 return oldItem == newItem
             }

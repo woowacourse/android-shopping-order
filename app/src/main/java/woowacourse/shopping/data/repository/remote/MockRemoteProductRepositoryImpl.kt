@@ -8,11 +8,11 @@ import woowacourse.shopping.data.service.MockProductRemoteService
 
 class MockRemoteProductRepositoryImpl(
     private val service: MockProductRemoteService,
-    override val cache: ProductCache = ProductLocalCache
+    override val cache: ProductCache = ProductLocalCache,
 ) : ProductRepository {
     override fun fetchFirstProducts(
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit,
     ) {
         if (cache.productList.isEmpty()) {
             Thread {
@@ -22,7 +22,7 @@ class MockRemoteProductRepositoryImpl(
                         cache.addProducts(it)
                         onSuccess(it)
                     },
-                    onFailure = onFailure
+                    onFailure = onFailure,
                 )
             }.start()
         } else {
@@ -33,7 +33,7 @@ class MockRemoteProductRepositoryImpl(
     override fun fetchNextProducts(
         lastProductId: Long,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit,
     ) {
         Thread {
             service.request(
@@ -42,7 +42,7 @@ class MockRemoteProductRepositoryImpl(
                     cache.addProducts(it)
                     onSuccess(it)
                 },
-                onFailure = onFailure
+                onFailure = onFailure,
             )
         }.start()
     }

@@ -51,7 +51,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             this,
             RecentProductRepositoryImpl(RecentDao(this)),
             product,
-            recentProduct
+            recentProduct,
         )
         binding.presenter = presenter
         presenter.initScreen()
@@ -60,7 +60,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     private fun setFragmentResultListener() {
         supportFragmentManager.setFragmentResultListener(
             CounterDialog.CHANGE_COUNTER_APPLY_KEY,
-            this
+            this,
         ) { _, bundle ->
             val changeCount = bundle.getInt(CounterDialog.COUNT_KEY, -1)
             if (changeCount < 0) return@setFragmentResultListener
@@ -83,8 +83,8 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             getIntent(
                 this,
                 recentProductUiModel.productUiModel,
-                recentProductUiModel
-            ).apply { addFlags(FLAG_ACTIVITY_CLEAR_TOP) }
+                recentProductUiModel,
+            ).apply { addFlags(FLAG_ACTIVITY_CLEAR_TOP) },
         )
     }
 
@@ -119,7 +119,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         fun getIntent(
             context: Context,
             product: ProductUiModel,
-            recentProductUiModel: RecentProductUiModel?
+            recentProductUiModel: RecentProductUiModel?,
         ): Intent {
             return Intent(context, DetailActivity::class.java).apply {
                 putExtra(PRODUCT_KEY, product)

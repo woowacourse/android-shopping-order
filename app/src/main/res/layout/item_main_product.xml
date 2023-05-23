@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="product"
             type="woowacourse.shopping.model.ProductUiModel" />
+
         <variable
             name="listener"
             type="woowacourse.shopping.feature.main.product.ProductClickListener" />
@@ -61,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             app:layout_constraintBottom_toBottomOf="@id/main_product_img"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

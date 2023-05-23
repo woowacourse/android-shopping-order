@@ -8,7 +8,7 @@ class CounterDialogPresenter(
     private val view: CounterDialogContract.View,
     private val cartRepository: CartRepository,
     product: ProductUiModel,
-    count: Int? = null
+    count: Int? = null,
 ) : CounterDialogContract.Presenter {
     override var product: ProductUiModel = product
         private set

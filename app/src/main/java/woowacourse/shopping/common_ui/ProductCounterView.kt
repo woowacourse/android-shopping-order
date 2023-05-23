@@ -28,7 +28,7 @@ class ProductCounterView @JvmOverloads constructor(
                 object : CounterView.OnCountStateChangeListener {
                     override fun onCountChanged(
                         counterNavigationView: CounterView?,
-                        count: Int
+                        count: Int,
                     ) {
                         // 카운터 뷰한테서 받은 카운트로 뷰 상태 업데이트
                         updateViewState(count)

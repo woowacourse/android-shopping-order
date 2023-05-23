@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class RecentDao(
-    context: Context
+    context: Context,
 ) : SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -27,14 +27,14 @@ class RecentDao(
     fun selectAllRecent(): List<RecentProduct> {
         val cursor = readableDatabase.rawQuery(
             "SELECT * FROM ${RecentTableContract.TABLE_NAME} ORDER BY ${RecentTableContract.TABLE_COLUMN_DATE_TIME} desc LIMIT 10",
-            null
+            null,
         )
 
         val recentlyShownProducts = mutableListOf<RecentProduct>()
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME))
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
             val product: Product = productsDatasource.find { it.id == data.productId } ?: continue
             val shownDateTime = LocalDateTime.ofEpochSecond(data.dateTimeMills, 0, ZoneOffset.UTC)
@@ -48,14 +48,14 @@ class RecentDao(
     private fun selectAll(): List<RecentProduct> {
         val cursor = readableDatabase.rawQuery(
             "SELECT * FROM ${RecentTableContract.TABLE_NAME}",
-            null
+            null,
         )
 
         val recentlyShownProducts = mutableListOf<RecentProduct>()
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME))
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
             val product: Product = productsDatasource.find { it.id == data.productId } ?: continue
             val shownDateTime = LocalDateTime.ofEpochSecond(data.dateTimeMills, 0, ZoneOffset.UTC)

@@ -8,7 +8,7 @@ import woowacourse.shopping.model.RecentProductUiModel
 
 class RecentViewHolder private constructor(
     private val binding: ItemRecentProductBinding,
-    recentProductClickListener: RecentProductClickListener
+    recentProductClickListener: RecentProductClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
@@ -20,7 +20,10 @@ class RecentViewHolder private constructor(
     }
 
     companion object {
-        fun create(parent: ViewGroup, recentProductClickListener: RecentProductClickListener): RecentViewHolder {
+        fun create(
+            parent: ViewGroup,
+            recentProductClickListener: RecentProductClickListener,
+        ): RecentViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemRecentProductBinding.inflate(layoutInflater, parent, false)
             return RecentViewHolder(binding, recentProductClickListener)

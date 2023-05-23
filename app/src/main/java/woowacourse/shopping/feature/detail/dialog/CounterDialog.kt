@@ -25,7 +25,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DialogCounterBinding.inflate(inflater, container, false)
         return binding.root
@@ -55,7 +55,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
             this,
             CartRepositoryImpl(CartDao(requireContext())),
             product,
-            count
+            count,
         )
         presenter.initPresenter()
     }
@@ -72,9 +72,10 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
     override fun notifyChangeApplyCount(changeApplyCount: Int) {
         parentFragmentManager.setFragmentResult(
             CHANGE_COUNTER_APPLY_KEY,
-            bundleOf(COUNT_KEY to changeApplyCount)
+            bundleOf(COUNT_KEY to changeApplyCount),
         )
-        Toast.makeText(requireContext(), getString(R.string.success_add_cart), Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.success_add_cart), Toast.LENGTH_SHORT)
+            .show()
     }
 
     override fun exit() {
@@ -92,7 +93,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
         fun newInstance(product: ProductUiModel): CounterDialog {
             return CounterDialog().apply {
                 arguments = bundleOf(
-                    PRODUCT_KEY to product.copy()
+                    PRODUCT_KEY to product.copy(),
                 )
             }
         }

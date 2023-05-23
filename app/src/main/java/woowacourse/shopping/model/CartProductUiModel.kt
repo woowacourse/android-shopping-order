@@ -7,5 +7,5 @@ import kotlinx.parcelize.Parcelize
 data class CartProductUiModel(
     val cartId: Long,
     val productUiModel: ProductUiModel,
-    var checked: Boolean
+    var checked: Boolean,
 ) : Parcelable

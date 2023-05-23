@@ -58,7 +58,7 @@ class MockProductRemoteService {
     fun request(
         lastProductId: Long,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit,
     ) {
         synchronized(this) { // 동기화 시켜서 여러 응답에 대한 스레드가 순차적으로 실행될 수 있게 지정
             if (_mockWebServer == null) {
@@ -89,7 +89,7 @@ class MockProductRemoteService {
 
                         onSuccess(result)
                     }
-                }
+                },
             )
         }
     }

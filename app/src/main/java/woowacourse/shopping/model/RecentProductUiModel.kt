@@ -7,5 +7,5 @@ import java.time.LocalDateTime
 @Parcelize
 data class RecentProductUiModel(
     val productUiModel: ProductUiModel,
-    val dateTime: LocalDateTime
+    val dateTime: LocalDateTime,
 ) : Parcelable

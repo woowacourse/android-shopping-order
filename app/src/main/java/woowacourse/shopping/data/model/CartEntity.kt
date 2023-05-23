@@ -4,10 +4,13 @@ data class CartEntity(
     val cartId: Long,
     val productId: Long,
     val count: Int,
-    val checked: Boolean
+    val checked: Boolean,
 ) {
     constructor(cartId: Long, productId: Long, count: Int, checked: Int) : this(
-        cartId, productId, count, checked == CHECK
+        cartId,
+        productId,
+        count,
+        checked == CHECK,
     )
 
     companion object {

@@ -23,14 +23,14 @@ class RecentAdapter(private val recentProductClickListener: RecentProductClickLi
         private val RecentDiffCallBack = object : DiffUtil.ItemCallback<RecentProductUiModel>() {
             override fun areItemsTheSame(
                 oldItem: RecentProductUiModel,
-                newItem: RecentProductUiModel
+                newItem: RecentProductUiModel,
             ): Boolean {
                 return oldItem.productUiModel.id == newItem.productUiModel.id
             }
 
             override fun areContentsTheSame(
                 oldItem: RecentProductUiModel,
-                newItem: RecentProductUiModel
+                newItem: RecentProductUiModel,
             ): Boolean {
                 return oldItem == newItem
             }

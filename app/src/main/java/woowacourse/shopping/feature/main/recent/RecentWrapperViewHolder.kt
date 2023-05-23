@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentWrapperBinding
 
 class RecentWrapperViewHolder private constructor(
-    private val binding: ItemRecentWrapperBinding
+    private val binding: ItemRecentWrapperBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(adapter: RecentAdapter, lastScrollX: Int, onScrolled: (Int) -> Unit) {
         binding.recyclerview.adapter = adapter

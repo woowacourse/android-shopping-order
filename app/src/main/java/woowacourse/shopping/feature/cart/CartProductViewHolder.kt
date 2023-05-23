@@ -9,7 +9,7 @@ import woowacourse.shopping.model.CartProductUiModel
 
 class CartProductViewHolder private constructor(
     private val binding: ItemCartProductBinding,
-    listener: CartProductClickListener
+    listener: CartProductClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
@@ -32,7 +32,7 @@ class CartProductViewHolder private constructor(
     companion object {
         fun create(
             parent: ViewGroup,
-            cartProductClickListener: CartProductClickListener
+            cartProductClickListener: CartProductClickListener,
         ): CartProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemCartProductBinding.inflate(layoutInflater, parent, false)

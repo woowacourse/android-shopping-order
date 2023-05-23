@@ -12,6 +12,9 @@ data class PaginationUiModel(
     val pageTotalCount: Int,
 ) {
     fun toDomain(): Pagination {
-        return Pagination(CartProducts(cartProducts.map { it.toDomain() }), pageBottomNavigationUiModel.currentPageNumber)
+        return Pagination(
+            CartProducts(cartProducts.map { it.toDomain() }),
+            pageBottomNavigationUiModel.currentPageNumber,
+        )
     }
 }

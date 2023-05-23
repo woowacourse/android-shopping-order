@@ -12,7 +12,7 @@ import woowacourse.shopping.data.model.CartEntity.Companion.CHECK
 import woowacourse.shopping.data.model.CartEntity.Companion.NON_CHECK
 
 class CartDao(
-    context: Context
+    context: Context,
 ) : SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(CartTableContract.createSQL())
@@ -30,9 +30,13 @@ class CartDao(
                 CartTableContract.TABLE_COLUMN_CART_ID,
                 CartTableContract.TABLE_COLUMN_PRODUCT_ID,
                 CartTableContract.TABLE_COLUMN_PRODUCT_COUNT,
-                CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED
+                CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED,
             ),
-            null, null, null, null, null
+            null,
+            null,
+            null,
+            null,
+            null,
         )
 
         val cart = mutableListOf<CartProduct>()
@@ -41,7 +45,7 @@ class CartDao(
                 cursor.getLong(cursor.getColumnIndexOrThrow(CartTableContract.TABLE_COLUMN_CART_ID)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(CartTableContract.TABLE_COLUMN_PRODUCT_ID)),
                 cursor.getInt(cursor.getColumnIndexOrThrow(CartTableContract.TABLE_COLUMN_PRODUCT_COUNT)),
-                cursor.getInt(cursor.getColumnIndexOrThrow(CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED))
+                cursor.getInt(cursor.getColumnIndexOrThrow(CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED)),
             )
             val product: Product = productsDatasource.find { it.id == data.productId } ?: continue
             cart.add(CartProduct(data.cartId, product, data.count, data.checked))
@@ -77,40 +81,32 @@ class CartDao(
         val findCartProduct =
             selectAll().find { it.product.id == product.id } ?: return insertProduct(
                 product,
-                newCount
+                newCount,
             )
 
         if (newCount <= ZERO) return deleteCartProduct(findCartProduct)
 
-        val updateSql = "UPDATE ${CartTableContract.TABLE_NAME} " +
-            "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_COUNT}=$newCount " +
-            "WHERE ${CartTableContract.TABLE_COLUMN_PRODUCT_ID}=${product.id}"
+        val updateSql =
+            "UPDATE ${CartTableContract.TABLE_NAME} " + "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_COUNT}=$newCount " + "WHERE ${CartTableContract.TABLE_COLUMN_PRODUCT_ID}=${product.id}"
         writableDatabase.execSQL(updateSql)
     }
 
     fun updateCartProductChecked(product: Product, checked: Boolean) {
-        val findCartProduct =
-            selectAll().find { it.product.id == product.id } ?: return
+        val findCartProduct = selectAll().find { it.product.id == product.id } ?: return
         val checkedState = if (checked) CHECK else NON_CHECK
 
-        val updateSql = "UPDATE ${CartTableContract.TABLE_NAME} " +
-            "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED}=$checkedState " +
-            "WHERE ${CartTableContract.TABLE_COLUMN_CART_ID}=${findCartProduct.cartId}"
+        val updateSql =
+            "UPDATE ${CartTableContract.TABLE_NAME} " + "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED}=$checkedState " + "WHERE ${CartTableContract.TABLE_COLUMN_CART_ID}=${findCartProduct.cartId}"
         writableDatabase.execSQL(updateSql)
     }
 
     fun updateAllChecked(cartIds: List<Long>, checked: Boolean) {
         val checkedState = if (checked) CHECK else NON_CHECK
 
-        val updateSql = "UPDATE ${CartTableContract.TABLE_NAME} " +
-            "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED}=$checkedState " +
-            "WHERE ${CartTableContract.TABLE_COLUMN_CART_ID} IN ${
-            cartIds.joinToString(
-                ", ",
-                "(",
-                ")"
-            )
-            }"
+        val updateSql =
+            "UPDATE ${CartTableContract.TABLE_NAME} " +
+                "SET ${CartTableContract.TABLE_COLUMN_PRODUCT_CHECKED}=$checkedState " +
+                "WHERE ${CartTableContract.TABLE_COLUMN_CART_ID} IN ${cartIds.joinToString(", ", "(", ")")}"
         writableDatabase.execSQL(updateSql)
     }
 

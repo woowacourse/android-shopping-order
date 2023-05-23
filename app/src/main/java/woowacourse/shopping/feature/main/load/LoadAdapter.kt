@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class LoadAdapter(
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
 ) : RecyclerView.Adapter<LoadViewHolder>() {
     private lateinit var loadViewHolder: LoadViewHolder
 

@@ -10,7 +10,7 @@ class DetailPresenter(
     val view: DetailContract.View,
     private val recentProductRepository: RecentProductRepository,
     product: ProductUiModel,
-    recentProductUiModel: RecentProductUiModel?
+    recentProductUiModel: RecentProductUiModel?,
 ) : DetailContract.Presenter {
     override var product: ProductUiModel = product
         private set
@@ -31,7 +31,7 @@ class DetailPresenter(
         recentProduct?.let {
             view.setRecentScreen(
                 it.productUiModel.name,
-                it.productUiModel.toMoneyFormat()
+                it.productUiModel.toMoneyFormat(),
             )
         }
     }
@@ -47,7 +47,7 @@ class DetailPresenter(
     override fun navigateRecentProductDetail() {
         recentProduct?.let {
             recentProductRepository.addRecentProduct(
-                it.toDomain().copy(dateTime = LocalDateTime.now())
+                it.toDomain().copy(dateTime = LocalDateTime.now()),
             )
             view.showRecentProductDetailScreen(it)
         }

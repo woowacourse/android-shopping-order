@@ -9,7 +9,7 @@ import woowacourse.shopping.model.ProductUiModel
 
 class MainProductViewHolder private constructor(
     private val binding: ItemMainProductBinding,
-    listener: ProductClickListener
+    listener: ProductClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.listener = listener
