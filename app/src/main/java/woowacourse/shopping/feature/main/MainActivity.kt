@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.Menu
@@ -28,6 +30,7 @@ import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
 import woowacourse.shopping.util.getParcelableCompat
+import woowacourse.shopping.util.keyError
 
 class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var binding: ActivityMainBinding
@@ -71,11 +74,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        val serverUrl =
+            intent.getStringExtra(SERVER_URL_KEY) ?: return keyError(SERVER_URL_KEY)
+
         initAdapters()
         initLayoutManager()
         binding.productRecyclerView.adapter = concatAdapter
 
-        initPresenter()
+        initPresenter(serverUrl)
         observePresenter()
     }
 
@@ -100,9 +106,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         binding.productRecyclerView.layoutManager = layoutManager
     }
 
-    private fun initPresenter() {
+    private fun initPresenter(serverKey: String) {
         presenter = MainPresenter(
-            MockRemoteProductRepositoryImpl(MockProductRemoteService()),
+            MockRemoteProductRepositoryImpl(MockProductRemoteService(serverKey)),
             CartRepositoryImpl(CartDao(this)),
             RecentProductRepositoryImpl(RecentDao(this)),
         )
@@ -207,6 +213,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     companion object {
+        fun getIntent(context: Context, serverUrl: String): Intent {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(SERVER_URL_KEY, serverUrl)
+            return intent
+        }
+
+        private const val SERVER_URL_KEY = "server_url_key"
+
         private const val RECYCLER_VIEW_STATE_KEY = "recycler_view_state_key"
 
         private const val TOTAL_SPAN = 2

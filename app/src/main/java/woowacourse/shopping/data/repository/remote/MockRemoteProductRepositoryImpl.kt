@@ -17,7 +17,6 @@ class MockRemoteProductRepositoryImpl(
         if (cache.productList.isEmpty()) {
             Thread {
                 service.request(
-                    lastProductId = 0,
                     onSuccess = {
                         cache.addProducts(it)
                         onSuccess(it)
@@ -37,7 +36,6 @@ class MockRemoteProductRepositoryImpl(
     ) {
         Thread {
             service.request(
-                lastProductId = lastProductId,
                 onSuccess = {
                     cache.addProducts(it)
                     onSuccess(it)
