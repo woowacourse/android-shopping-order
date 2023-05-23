@@ -3,6 +3,7 @@ package woowacourse.shopping.data
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
+import java.lang.Thread.sleep
 
 class ProductRemoteMockRepositoryImpl(
     private val webServer: ProductMockWebServer,
@@ -15,6 +16,7 @@ class ProductRemoteMockRepositoryImpl(
                     page = 1,
                     onSuccess = {
                         productCache.addProducts(it)
+                        sleep(2000) // 스켈레톤 확인을 위한 일시 정지
                         onSuccess(it)
                     },
                     onFailure = { onSuccess(emptyList()) }

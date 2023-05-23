@@ -9,16 +9,68 @@
         android:paddingHorizontal="6dp"
         tools:context=".feature.main.MainActivity">
 
+        <GridLayout
+            android:id="@+id/main_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="2"
+            android:orientation="horizontal">
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+            <include
+                layout="@layout/item_main_skeleton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1" />
+
+        </GridLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/product_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
-            tools:listitem="@layout/item_main_product"
+            tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="-100dp"
-            tools:layout_editor_absoluteX="16dp" />
+            tools:listitem="@layout/item_main_product" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
