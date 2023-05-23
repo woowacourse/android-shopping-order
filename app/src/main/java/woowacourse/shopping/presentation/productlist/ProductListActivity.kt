@@ -1,9 +1,13 @@
 package woowacourse.shopping.presentation.productlist
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
@@ -43,6 +47,15 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         )
     }
 
+    private val handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            if (msg.what == 0) {
+                setLoadingUiVisible(false)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityBinding = ActivityProductListBinding.inflate(layoutInflater)
@@ -52,7 +65,22 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onStart() {
         super.onStart()
-        updateView()
+        setLoadingUiVisible(true)
+        Thread {
+            runOnUiThread {
+                updateView()
+            }
+        }.start()
+    }
+
+    private fun setLoadingUiVisible(enable: Boolean) {
+        if (enable) {
+            activityBinding.flProductList.visibility = View.VISIBLE
+            activityBinding.recyclerProduct.visibility = View.GONE
+            return
+        }
+        activityBinding.flProductList.visibility = View.GONE
+        activityBinding.recyclerProduct.visibility = View.VISIBLE
     }
 
     private fun initView() {
@@ -95,6 +123,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun loadProductModels(productModels: List<ProductModel>) {
         productListAdapter.setItems(productModels)
+        handler.sendEmptyMessage(0)
     }
 
     override fun loadRecentProductModels(productModels: List<ProductModel>) {

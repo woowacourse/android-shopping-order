@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/image_product_list_poster"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/cardview_shadow_start_color"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/text_product_list_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="7dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:background="@color/cardview_shadow_start_color"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/image_product_list_poster"
+            app:layout_constraintStart_toStartOf="@+id/image_product_list_poster"
+            app:layout_constraintTop_toBottomOf="@id/image_product_list_poster"
+            tools:text="PET보틀-정사각형정사각형" />
+
+        <TextView
+            android:background="@color/cardview_shadow_start_color"
+            android:id="@+id/text_product_list_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/text_product_list_name"
+            app:layout_constraintStart_toStartOf="@+id/text_product_list_name"
+            app:layout_constraintTop_toBottomOf="@id/text_product_list_name"
+            tools:text="10,000원" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:background="@color/cardview_shadow_start_color"
+            android:id="@+id/button_product_list_add_cart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:padding="10dp"
+            android:src="@drawable/add"
+            app:layout_constraintBottom_toBottomOf="@+id/image_product_list_poster"
+            app:layout_constraintEnd_toEndOf="@+id/image_product_list_poster" />
+
+        <woowacourse.shopping.presentation.common.CounterView
+            android:visibility="invisible"
+            android:id="@+id/counter_product_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_product_list_poster"
+            app:layout_constraintEnd_toEndOf="@+id/image_product_list_poster"
+            app:layout_constraintStart_toStartOf="@+id/image_product_list_poster" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

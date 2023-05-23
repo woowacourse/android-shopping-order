@@ -1,7 +1,12 @@
 package woowacourse.shopping.data.product
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.internal.wait
 import org.json.JSONArray
 import woowacourse.shopping.Product
 import woowacourse.shopping.data.mapper.toProduct
@@ -37,6 +42,7 @@ object ProductService : ProductRemoteDataSource {
         }
         thread.start()
         thread.join()
+
         return newProducts
     }
 
