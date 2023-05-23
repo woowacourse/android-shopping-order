@@ -14,6 +14,7 @@ import com.example.domain.Product
 import com.example.domain.RecentProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
+import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
 import woowacourse.shopping.data.cart.CartDao
@@ -46,9 +47,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         )
     }
     private val presenter: MainContract.Presenter by lazy {
+        val mockProductRemoteService = MockProductRemoteService()
         val productRepository: ProductRepository =
-            MockRemoteProductRepositoryImpl(MockProductRemoteService())
-        val recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(this))
+            MockRemoteProductRepositoryImpl(mockProductRemoteService)
+        val recentProductRepository: RecentProductRepository =
+            RecentProductRepositoryImpl(mockProductRemoteService, RecentProductDao(this))
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
     }
     private val productListAdapter: ProductListAdapter by lazy {

@@ -1,12 +1,19 @@
 package woowacourse.shopping.data.recentproduct
 
 import com.example.domain.RecentProduct
+import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
+import woowacourse.shopping.data.product.MockProductRemoteService
+import woowacourse.shopping.data.product.MockRemoteProductRepositoryImpl
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(
+    private val productMockProductRemoteService: MockProductRemoteService,
     private val recentProductDao: RecentProductDao
 ) : RecentProductRepository {
+
+//    private val productRepository: ProductRepository =
+//        MockRemoteProductRepositoryImpl(MockProductRemoteService())
 
     override fun getAll(): List<RecentProduct> {
         return recentProductDao.getAll()
@@ -21,6 +28,10 @@ class RecentProductRepositoryImpl(
     }
 
     override fun addRecentProduct(productId: Int, viewedDateTime: LocalDateTime) {
-        recentProductDao.addColumn(productId, viewedDateTime)
+        productMockProductRemoteService.requestProduct(
+            productId = productId.toLong(),
+            onSuccess = { if (it != null) recentProductDao.addColumn(it, viewedDateTime) },
+            onFailure = {}
+        )
     }
 }
