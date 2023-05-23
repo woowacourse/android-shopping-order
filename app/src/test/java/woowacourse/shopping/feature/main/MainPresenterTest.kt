@@ -44,9 +44,9 @@ internal class MainPresenterTest {
     fun `처음에 상품 목록을 불러와서 상품을 화면에 띄운다`() {
 
         every {
-            productRepository.getFirstProducts(onSuccess = any())
+            productRepository.getProducts(page = 1, onSuccess = any(), onFailure = any())
         } answers {
-            firstArg<(List<Product>) -> Unit>().invoke(mockProducts.take(20))
+            secondArg<(List<Product>) -> Unit>().invoke(mockProducts.take(20))
         }
 
         val slot = slot<List<ProductUiModel>>()
@@ -68,26 +68,6 @@ internal class MainPresenterTest {
         presenter.moveToCart()
 
         verify { view.showCartScreen() }
-    }
-
-    @Test
-    fun `상품 목록을 이어서 더 불러와서 화면에 추가로 띄운다`() {
-        every {
-            productRepository.getNextProducts(onSuccess = any())
-        } answers {
-            firstArg<(List<Product>) -> Unit>().invoke(mockProducts.subList(10, 15))
-        }
-        val slot = slot<List<ProductUiModel>>()
-        every { view.addProducts(capture(slot)) } just Runs
-        every { cartRepository.getAll() } returns emptyList()
-
-        presenter.loadMoreProduct()
-
-        val actual = slot.captured.map { it.toDomain() }
-        val expected = mockProducts.subList(10, 15)
-
-        assert(actual == expected)
-        verify { view.addProducts(any()) }
     }
 
     @Test

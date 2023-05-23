@@ -3,7 +3,7 @@ package woowacourse.shopping.data
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.Product
 import org.junit.Test
-import java.lang.Thread.sleep
+import java.util.concurrent.CountDownLatch
 
 internal class ProductRepositoryTest {
 
@@ -16,34 +16,19 @@ internal class ProductRepositoryTest {
             ProductCacheImpl.apply { clear() }
         )
 
+        val latch = CountDownLatch(1)
         var actual = emptyList<Product>()
-        productRemoteRepository.getFirstProducts(
-            onSuccess = { actual = it }
+        productRemoteRepository.getProducts(
+            page = 1,
+            onSuccess = {
+                actual = it
+                latch.countDown()
+            },
+            onFailure = {}
         )
-        sleep(1000)
+        latch.await()
 
         val expected = productsDatasource.take(20)
-        assert(actual == expected)
-    }
-
-    @Test
-    fun `두번째 페이지 상품 목록을 가져온다`() {
-        val productCache = ProductCacheImpl.apply {
-            clear()
-            addProducts(productsDatasource.take(20))
-        }
-        val productRemoteRepository = ProductRemoteMockRepositoryImpl(
-            productMockWebServer,
-            productCache
-        )
-
-        var actual = emptyList<Product>()
-        productRemoteRepository.getNextProducts {
-            actual = it
-        }
-        sleep(1000)
-
-        val expected = productsDatasource.subList(20, 40)
         assert(actual == expected)
     }
 }
