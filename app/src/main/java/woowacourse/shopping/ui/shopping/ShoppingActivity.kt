@@ -125,11 +125,16 @@ class ShoppingActivity : AppCompatActivity(), View, OnClickListener, ProductClic
     companion object {
         private const val PRODUCT_KEY = "product_key"
         private const val COUNT_KEY = "count_key"
+        private const val SERVER_URL_KEY = "server_url_key"
 
         fun getIntent(context: Context, product: UiProduct, count: Int): Intent =
             Intent(context, ShoppingActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 .putExtra(PRODUCT_KEY, product)
                 .putExtra(COUNT_KEY, count)
+
+        fun getIntent(context: Context, serverUrl: String): Intent =
+            Intent(context, ShoppingActivity::class.java)
+                .putExtra(SERVER_URL_KEY, serverUrl)
     }
 }
