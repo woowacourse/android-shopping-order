@@ -50,7 +50,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            if (msg.what == 0) {
+            if (msg.what == SHOW_SKELETON_MESSAGE_CODE) {
                 setLoadingUiVisible(false)
             }
         }
@@ -123,7 +123,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun loadProductModels(productModels: List<ProductModel>) {
         productListAdapter.setItems(productModels)
-        handler.sendEmptyMessage(0)
+        handler.sendEmptyMessage(SHOW_SKELETON_MESSAGE_CODE)
     }
 
     override fun loadRecentProductModels(productModels: List<ProductModel>) {
@@ -159,5 +159,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     companion object {
         private const val SPAN_COUNT = 2
+        private const val SHOW_SKELETON_MESSAGE_CODE = 0
     }
 }

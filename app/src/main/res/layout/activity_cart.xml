@@ -27,6 +27,8 @@
             android:id="@+id/scrollView2">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:visibility="gone"
+                android:id="@+id/container_cart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -40,10 +42,10 @@
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
+                    android:layout_width="13dp"
                     app:layout_constraintTop_toBottomOf="@id/recycler_cart"
                     android:id="@+id/text_cart_page"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="21dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -77,6 +79,27 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
 
+        <FrameLayout
+            android:id="@+id/fl_cart_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/container_order"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include layout="@layout/item_cart_shimmer" />
+                <include layout="@layout/item_cart_shimmer" />
+                <include layout="@layout/item_cart_shimmer" />
+                <include layout="@layout/item_cart_shimmer" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </FrameLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_order"
             android:background="@color/toolbar_background"

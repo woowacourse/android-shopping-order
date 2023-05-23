@@ -3,7 +3,12 @@ package woowacourse.shopping.presentation.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartDao
@@ -23,9 +28,30 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         )
     }
 
+    private val handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            if (msg.what == SHOW_SKELETON_MESSAGE_CODE) {
+                setLoadingUiVisible(false)
+                Log.d("wooseok", "wooseok")
+            }
+        }
+    }
+
+    private fun setLoadingUiVisible(enable: Boolean) {
+        if (enable) {
+            binding.containerCart.visibility = View.GONE
+            binding.flCartList.visibility = View.VISIBLE
+            return
+        }
+        binding.containerCart.visibility = View.VISIBLE
+        binding.flCartList.visibility = View.GONE
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
+        setLoadingUiVisible(true)
         initView()
         managePaging()
     }
@@ -39,7 +65,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initView() {
         initCartAdapter()
         setToolBar()
-        updateView()
+        Thread {
+            runOnUiThread {
+                updateView()
+            }
+        }.start()
         binding.presenter = presenter
     }
 
@@ -94,6 +124,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setCartItems(productModels: List<CartProductInfoModel>) {
         cartAdapter.setItems(productModels)
+        handler.sendMessage(
+            Message().apply {
+                what = SHOW_SKELETON_MESSAGE_CODE
+            }
+        )
     }
 
     override fun setUpPlusPageState(isEnable: Boolean) {
@@ -118,5 +153,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         fun getIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }
+
+        private const val SHOW_SKELETON_MESSAGE_CODE = 0
     }
 }
