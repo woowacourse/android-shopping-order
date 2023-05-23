@@ -8,7 +8,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object OkHttpModule {
-    var BASE_URL = "http://15.164.103.138:8080/"
+    var BASE_URL = "http://15.164.103.138:8080"
 
     private val encodedUserInfo =
         Base64.getEncoder().encodeToString("a@a.com:1234".toByteArray(Charsets.UTF_8))
@@ -34,7 +34,4 @@ object OkHttpModule {
             .build()
 
     val gson = Gson()
-
-    fun getOkHttpRequest(url: String): Request =
-        Request.Builder().url(url).build()
 }

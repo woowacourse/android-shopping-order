@@ -1,31 +1,32 @@
 package woowacourse.shopping.data.datasource.product.remote
 
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.Request
+import okhttp3.Response
 import woowacourse.shopping.data.datasource.product.ProductDataSource
-import woowacourse.shopping.data.mockserver.ShoppingCartMockServer
 import woowacourse.shopping.data.model.DataProduct
-import kotlin.concurrent.thread
+import woowacourse.shopping.data.remote.OkHttpModule
+import java.io.IOException
 
-class RemoteProductDataSource(private val shoppingCartMockServer: ShoppingCartMockServer) :
-    ProductDataSource.Remote {
+class RemoteProductDataSource() : ProductDataSource.Remote {
 
-    init {
-        shoppingCartMockServer.start()
-    }
+    override fun getPartially(
+        size: Int,
+        lastId: Int,
+        onReceived: (products: List<DataProduct>) -> Unit
+    ) {
+        val url = "${OkHttpModule.BASE_URL}/products"
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
 
-    override fun getPartially(size: Int, lastId: Int): List<DataProduct> {
-        shoppingCartMockServer.join()
-        val url = "${shoppingCartMockServer.BASE_URL}/product?lastId=${lastId}size=$size"
-        val request = Request.Builder().url(url).build()
-        var test: List<DataProduct> = listOf()
+        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
 
-        thread {
-            test = shoppingCartMockServer.gson.fromJson(
-                shoppingCartMockServer.okHttpClient.newCall(request).execute().body?.string(),
-                Array<DataProduct>::class.java
-            ).toList()
-        }.join()
-
-        return test
+            override fun onResponse(call: Call, response: Response) {
+            }
+        })
     }
 }
