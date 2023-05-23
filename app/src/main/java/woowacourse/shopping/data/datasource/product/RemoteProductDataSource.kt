@@ -7,6 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.model.Page
 import woowacourse.shopping.data.model.Price
 import woowacourse.shopping.data.model.Product
@@ -16,20 +17,20 @@ import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
 class RemoteProductDataSource : ProductDataSource.Remote {
-    private val shoppingService: ShoppingMockWebServer = ShoppingMockWebServer()
+    private val shoppingMockServer: ShoppingMockWebServer = ShoppingMockWebServer()
     private var BASE_URL: String
 
     init {
-        shoppingService.start()
-        shoppingService.join()
-        BASE_URL = shoppingService.baseUrl
+        shoppingMockServer.start()
+        shoppingMockServer.join()
+        BASE_URL = shoppingMockServer.baseUrl
     }
 
     override fun getProductByPage(page: Page): List<Product> {
-        shoppingService.join()
+        shoppingMockServer.join()
         val url = "${BASE_URL}/products?start=${page.start}&count=${page.sizePerPage}"
         val httpClient = OkHttpClient()
-        val request = Request.Builder().url(url).method(GET, null).build()
+        val request = buildRequest(url, GET)
         val products = mutableListOf<Product>()
         val countDownLatch = CountDownLatch(1)
 
@@ -54,10 +55,10 @@ class RemoteProductDataSource : ProductDataSource.Remote {
     }
 
     override fun findProductById(id: Int): Product? {
-        shoppingService.join()
+        shoppingMockServer.join()
         val url = "${BASE_URL}/products?productId=${id}"
         val httpClient = OkHttpClient()
-        val request = Request.Builder().url(url).method(GET, null).build()
+        val request = buildRequest(url, GET)
         val countDownLatch = CountDownLatch(1)
         var product: Product? = null
 
@@ -79,6 +80,13 @@ class RemoteProductDataSource : ProductDataSource.Remote {
         countDownLatch.await()
         return product
     }
+
+    private fun buildRequest(url: String, method: String): Request = Request
+        .Builder()
+        .header("Authorization", "Basic ${ShoppingApplication.pref.getToken()}")
+        .url(url)
+        .method(method, null)
+        .build()
 
     private fun convertToProduct(response: JSONObject): Product = Product(
         id = response.getInt("id"),
