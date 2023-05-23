@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -63,6 +64,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun changeCartProducts(newItems: List<CartProductUiModel>) {
+        binding.cartListGroup.visibility = View.VISIBLE
+        binding.skeletonLayout.visibility = View.GONE
         cartProductAdapter.setItems(newItems)
     }
 
