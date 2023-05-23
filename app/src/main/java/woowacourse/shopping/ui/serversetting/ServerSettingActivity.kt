@@ -1,37 +1,25 @@
 package woowacourse.shopping.ui.serversetting
 
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
+import woowacourse.shopping.databinding.ActivityServerSettingBinding
+import woowacourse.shopping.ui.serversetting.ServerSettingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingActivity
+import woowacourse.shopping.util.extension.setContentView
+import woowacourse.shopping.util.inject.inject
 
-class ServerSettingActivity : AppCompatActivity() {
+class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
+    private lateinit var binding: ActivityServerSettingBinding
+    private val presenter: Presenter by lazy { inject(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_server_setting)
-        setupView()
+        binding = ActivityServerSettingBinding.inflate(layoutInflater).setContentView(this)
+        binding.presenter = presenter
     }
 
-    private fun setupView() {
-        val buttonJames = findViewById<Button>(R.id.btn_james_server)
-        val buttonLeah = findViewById<Button>(R.id.btn_leah_server)
-        buttonJames.setOnClickListener {
-            startMain(SERVER_JAMES)
-        }
-        buttonLeah.setOnClickListener {
-            startMain(SERVER_LEAH)
-        }
-    }
-
-    private fun startMain(serverUrl: String) {
+    override fun navigateToShopping(serverUrl: String) {
         startActivity(ShoppingActivity.getIntent(this, serverUrl))
         finish()
-    }
-
-    companion object {
-        private const val SERVER_JAMES = "james"
-        private const val SERVER_LEAH = "leah"
     }
 }

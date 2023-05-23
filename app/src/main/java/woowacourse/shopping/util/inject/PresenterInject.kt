@@ -7,6 +7,8 @@ import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
 import woowacourse.shopping.ui.detail.ProductDetailContract
 import woowacourse.shopping.ui.detail.ProductDetailPresenter
+import woowacourse.shopping.ui.serversetting.ServerSettingContract
+import woowacourse.shopping.ui.serversetting.ServerSettingPresenter
 import woowacourse.shopping.ui.shopping.ShoppingContract
 import woowacourse.shopping.ui.shopping.ShoppingPresenter
 
@@ -44,3 +46,7 @@ fun inject(
         inject(inject(injectCartDao(database)))
     )
 }
+
+fun inject(
+    view: ServerSettingContract.View,
+): ServerSettingContract.Presenter = ServerSettingPresenter(view)
