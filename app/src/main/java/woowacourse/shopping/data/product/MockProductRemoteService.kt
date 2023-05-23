@@ -17,27 +17,55 @@ import java.io.IOException
 class MockProductRemoteService {
     private var _mockWebServer: MockWebServer? = null
     private val mockWebServer: MockWebServer get() = _mockWebServer!!
+    private val okHttpClient = OkHttpClient()
+
+    fun requestAllProducts(
+        url: String,
+        port: String = "8080",
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
+            if (_mockWebServer == null) {
+                _mockWebServer = MockWebServer()
+                _mockWebServer?.url("/")
+                _mockWebServer?.dispatcher = dispatcher
+            }
+        }
+
+        val baseUrl = "$url:${mockWebServer.port}"
+        val requestUrl = "$baseUrl/products"
+        val request = Request.Builder().url(requestUrl).build()
+
+        okHttpClient.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    onFailure()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (400 <= response.code) return onFailure()
+                    val responseBody = response.body?.string()
+                    response.close()
+
+                    val result: List<Product> = responseBody?.let {
+                        parseJsonToProductList(it)
+                    } ?: emptyList()
+
+                    onSuccess(result)
+                }
+            }
+        )
+    }
 
     private var dispatcher: Dispatcher = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
             return when (request.path) {
-                "/products?lastProductId=0" -> {
+                "/products" -> {
                     MockResponse()
                         .setHeader("Contet-Type", "application/json")
                         .setResponseCode(200)
-                        .setBody(firstJsonProducts)
-                }
-                "/products?lastProductId=20" -> {
-                    MockResponse()
-                        .setHeader("Contet-Type", "application/json")
-                        .setResponseCode(200)
-                        .setBody(secondJsonProducts)
-                }
-                "/products?lastProductId=40" -> {
-                    MockResponse()
-                        .setHeader("Contet-Type", "application/json")
-                        .setResponseCode(200)
-                        .setBody(thirdJsonProducts)
+                        .setBody(jsonAllProducts)
                 }
                 else -> {
                     if (request.path!!.startsWith("/products?id")) {
@@ -89,45 +117,6 @@ class MockProductRemoteService {
                         val result = responseBody?.let {
                             parseJsonToProductList2(it)
                         }
-
-                        onSuccess(result)
-                    }
-                }
-            )
-        }
-    }
-
-    fun requestProductsUnit(
-        lastProductId: Long,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
-    ) {
-        synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
-            if (_mockWebServer == null) {
-                _mockWebServer = MockWebServer()
-                _mockWebServer?.url("/")
-                _mockWebServer?.dispatcher = dispatcher
-            }
-
-            val baseUrl = String.format("http://localhost:%s", mockWebServer.port)
-            val okHttpClient = OkHttpClient()
-            val url = "$baseUrl/products?lastProductId=$lastProductId"
-            val request = Request.Builder().url(url).build()
-
-            okHttpClient.newCall(request).enqueue(
-                object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        onFailure()
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        if (400 <= response.code) return onFailure()
-                        val responseBody = response.body?.string()
-                        response.close()
-
-                        val result = responseBody?.let {
-                            parseJsonToProductList(it)
-                        } ?: emptyList()
 
                         onSuccess(result)
                     }

@@ -24,8 +24,7 @@ class MainPresenter(
     private var loadItemFromIndex = 0
 
     override fun loadMoreProducts() {
-        productRepository.fetchNextProducts(
-            lastProductId = loadItemFromIndex.toLong(),
+        productRepository.getAll(
             onFailure = {
                 view.showEmptyProducts()
                 view.setProducts(listOf())

@@ -4,28 +4,46 @@ import com.example.domain.Product
 import com.example.domain.repository.ProductRepository
 
 class MockRemoteProductRepositoryImpl(
+    private val url: String,
     private val service: MockProductRemoteService
 ) : ProductRepository {
 
-    override fun fetchNextProducts(
-        lastProductId: Long,
+    override fun getAll(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {
         Thread {
-            service.requestProductsUnit(
-                lastProductId = lastProductId.toLong(),
+            service.requestAllProducts(
+                url = url,
                 onSuccess = onSuccess,
                 onFailure = onFailure
             )
         }.start()
     }
 
-//    override fun getAll(): List<Product> {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override fun getProduct(productId: Int): Product? {
-//        TODO("Not yet implemented")
-//    }
+    override fun getProduct(
+        id: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+    }
+
+    override fun addProduct(
+        name: String,
+        price: Int,
+        imageUrl: String,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+    }
+
+    override fun updateProduct(
+        product: Product,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+    }
+
+    override fun deleteProduct(id: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    }
 }

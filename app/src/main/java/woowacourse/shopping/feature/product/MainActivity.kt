@@ -49,9 +49,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         )
     }
     private val presenter: MainContract.Presenter by lazy {
+        val url = intent.getStringExtra(KEY_SERVER) ?: ""
         val mockProductRemoteService = MockProductRemoteService()
         val productRepository: ProductRepository =
-            MockRemoteProductRepositoryImpl(mockProductRemoteService)
+            MockRemoteProductRepositoryImpl(url, mockProductRemoteService)
         val recentProductRepository: RecentProductRepository =
             RecentProductRepositoryImpl(mockProductRemoteService, RecentProductDao(this))
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         ProductDetailActivity.startActivity(this, productState, recentProductState)
     }
 
-    override fun showEmptyProducts() = showToast("제품이 없습니다.")
+    override fun showEmptyProducts() = runOnUiThread { showToast("제품이 없습니다.") }
 
     override fun showCartProductCount() {
         runOnUiThread { cartCountBadge?.visibility = VISIBLE }

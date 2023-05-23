@@ -3,18 +3,34 @@ package com.example.domain.repository
 import com.example.domain.Product
 
 interface ProductRepository {
-
-    fun fetchNextProducts(
-        lastProductId: Long,
+    fun getAll(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     )
 
-    fun getProduct(productId: Int): Product? = Product(0, "", "test product", 1_000)
+    fun getProduct(
+        id: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    )
 
-//    fun getProduct(productId: Int): Product?
+    fun addProduct(
+        name: String,
+        price: Int,
+        imageUrl: String,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    )
 
-//    fun getAll(): List<Product>
+    fun updateProduct(
+        product: Product,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    )
 
-//    fun get(fromIndex: Int, ToIndex: Int): List<Product>
+    fun deleteProduct(
+        id: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    )
 }
