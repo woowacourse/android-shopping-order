@@ -1,16 +1,12 @@
 package woowacourse.shopping.data.product
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.internal.wait
 import org.json.JSONArray
+import woowacourse.shopping.App
 import woowacourse.shopping.Product
 import woowacourse.shopping.data.mapper.toProduct
-import woowacourse.shopping.data.product.ProductMockWebServer.PORT
 import woowacourse.shopping.data.product.ProductMockWebServer.startServer
 
 object ProductService : ProductRemoteDataSource {
@@ -33,11 +29,13 @@ object ProductService : ProductRemoteDataSource {
         var newProducts: List<Product> = emptyList()
         val thread = Thread {
             val client = OkHttpClient()
-            val host = "http://localhost:$PORT/"
-            val path = "products?start=$start&range=$range"
+            val host = App.serverUrl
+            val path = "products"
             val request = Request.Builder().url(host + path).build()
+            Log.d("wooseok", host + path)
             val response = client.newCall(request).execute()
             val body = response.body?.string() ?: return@Thread
+            Log.d("wooseok", body)
             newProducts = parseResponse(body)
         }
         thread.start()

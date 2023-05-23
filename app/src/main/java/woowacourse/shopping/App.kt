@@ -8,4 +8,8 @@ class App : Application() {
         super.onTerminate()
         ProductMockWebServer.shutDownServer()
     }
+
+    companion object {
+        var serverUrl = "http://localhost:3345"
+    }
 }

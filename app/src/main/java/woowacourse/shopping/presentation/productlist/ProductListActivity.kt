@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.productlist
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -160,5 +162,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     companion object {
         private const val SPAN_COUNT = 2
         private const val SHOW_SKELETON_MESSAGE_CODE = 0
+
+        fun getIntent(context: Context): Intent {
+            return Intent(context, ProductListActivity::class.java)
+        }
     }
 }
