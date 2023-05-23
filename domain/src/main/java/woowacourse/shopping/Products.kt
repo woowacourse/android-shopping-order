@@ -9,4 +9,17 @@ class Products(products: List<Product> = listOf()) {
         _items.addAll(products)
         return Products(items)
     }
+
+    fun getItemsInRange(startIndex: Int, size: Int): Products {
+        return when {
+            startIndex > items.size -> Products(emptyList())
+            startIndex + size > items.size -> Products(
+                items.subList(
+                    startIndex,
+                    items.size,
+                ),
+            )
+            else -> Products(items.subList(startIndex, startIndex + size))
+        }
+    }
 }

@@ -37,7 +37,7 @@ class ProductListPresenterTest {
     @Test
     fun 상품_목록을_업데이트한다() {
         // given
-        every { productRepository.getProductsWithRange(20, 20) } returns listOf()
+        every { productRepository.getProductsWithRange(0, 20) } returns listOf()
         // when
         presenter.updateProductItems()
         // then

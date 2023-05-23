@@ -23,6 +23,7 @@ class ProductListPresenter(
 
     private val _cartProductInfoList = SafeMutableLiveData(initCartProducts)
     override val cartProductInfoList: SafeLiveData<CartProductInfoList> get() = _cartProductInfoList
+
     override fun updateProductItems() {
         val receivedProducts =
             productRepository.getProductsWithRange(products.size, PRODUCTS_SIZE)
@@ -47,6 +48,7 @@ class ProductListPresenter(
     override fun updateCartProductInfoList() {
         val cartProductInfoList = cartRepository.getAllCartProductsInfo()
         _cartProductInfoList.value = cartProductInfoList
+        view.loadProductModels(products.toPresentation())
     }
 
     private fun getRecentProducts(): Products {

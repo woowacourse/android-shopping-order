@@ -67,12 +67,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onStart() {
         super.onStart()
-        setLoadingUiVisible(true)
-        Thread {
-            runOnUiThread {
-                updateView()
-            }
-        }.start()
+        updateView()
     }
 
     private fun setLoadingUiVisible(enable: Boolean) {
@@ -86,13 +81,18 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun initView() {
+        setLoadingUiVisible(true)
         setSupportActionBar(activityBinding.toolbarProductList.toolbar)
         initRecentProductAdapter()
         initProductAdapter()
+        Thread {
+            runOnUiThread {
+                presenter.updateProductItems()
+            }
+        }.start()
     }
 
     private fun updateView() {
-        presenter.updateProductItems()
         presenter.updateRecentProductItems()
         presenter.updateCartProductInfoList()
     }
