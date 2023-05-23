@@ -5,23 +5,24 @@ import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 import java.lang.Thread.sleep
 
-class ProductRemoteMockRepositoryImpl(
-    private val webServer: ProductMockWebServer,
+class ProductRemoteRepositoryImpl(
+    private val service: ProductRemoteService,
     private val productCache: ProductCache
 ) : ProductRepository {
-
-    override fun getProducts(page: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    override fun getProducts(
+        page: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
         if (productCache.productList.isEmpty()) {
             Thread {
-                webServer.request(
+                service.request(
                     onSuccess = {
                         productCache.addProducts(it)
-                        sleep(2000) // 스켈레톤 확인을 위한 일시 정지
-                        onSuccess(
-                            productCache.getSubProducts(1, LOAD_SIZE)
-                        )
+                        sleep(2000)
+                        onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
                     },
-                    onFailure = { }
+                    onFailure = {}
                 )
             }.start()
         } else {

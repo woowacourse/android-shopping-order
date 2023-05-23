@@ -18,13 +18,17 @@ class MainPresenter(
 ) : MainContract.Presenter {
 
     private var totalCount: Int = 0
+    private var page = 1
 
     override fun loadProducts() {
-        productRepository.getFirstProducts(
+        productRepository.getProducts(
+            page = page,
             onSuccess = {
                 val productItems = matchCartProductCount(it)
                 view.addProducts(productItems)
-            }
+                ++page
+            },
+            onFailure = {}
         )
     }
 
@@ -44,15 +48,6 @@ class MainPresenter(
     override fun setCartProductCount() {
         val count = cartRepository.getAll().size
         view.updateCartProductCount(count)
-    }
-
-    override fun loadMoreProduct() {
-        productRepository.getNextProducts(
-            onSuccess = {
-                val nextProductItems = matchCartProductCount(it)
-                view.addProducts(nextProductItems)
-            }
-        )
     }
 
     override fun moveToCart() {

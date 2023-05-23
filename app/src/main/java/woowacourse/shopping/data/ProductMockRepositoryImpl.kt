@@ -6,32 +6,16 @@ import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 
 class ProductMockRepositoryImpl(
-    override val productCache: ProductCache = ProductCacheImpl
+    private val productCache: ProductCache = ProductCacheImpl
 ) : ProductRepository {
 
-    override fun getFirstProducts(onSuccess: (List<Product>) -> Unit) {
+    override fun getProducts(page: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
         if (productCache.productList.isEmpty()) {
-            val products = getProducts()
-            onSuccess(products)
-        }
-        onSuccess(productCache.productList)
-    }
-
-    private fun getProducts() = if (LOAD_SIZE > productsDatasource.size) {
-        productsDatasource
-    } else {
-        productsDatasource.subList(0, LOAD_SIZE)
-    }
-
-    override fun getNextProducts(onSuccess: (List<Product>) -> Unit) {
-        val startIndex = productCache.productList.size
-        val toIndex = (startIndex + LOAD_SIZE)
-        val products = if (toIndex > productsDatasource.size) {
-            productsDatasource.subList((startIndex), productsDatasource.size)
+            productCache.addProducts(productsDatasource)
+            onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
         } else {
-            productsDatasource.subList((startIndex), toIndex)
+            onSuccess(productCache.getSubProducts(page, LOAD_SIZE))
         }
-        onSuccess(products)
     }
 
     override fun clearCache() {
