@@ -16,4 +16,7 @@
     <color name="woowa_previous_disable">#E6E6E6</color>
     <color name="woowa_previous_enable">#04C09E</color>
     <color name="woowa_highlight">#D5D5D5</color>
+
+    <!-- Skeleton custom view -->
+    <color name="skeleton_background">#E2E2E2</color>
 </resources>
