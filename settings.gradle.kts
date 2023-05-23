@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "android-shopping-order"
 include(":app")
+include(":domain")
