@@ -1,12 +1,12 @@
-package woowacourse.shopping.database
+package woowacourse.shopping.data.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import woowacourse.shopping.database.ProductContract.CartItemEntry
-import woowacourse.shopping.database.ProductContract.DATABASE_NAME
-import woowacourse.shopping.database.ProductContract.RecentlyViewedProductEntry
+import woowacourse.shopping.data.database.ProductContract.CartItemEntry
+import woowacourse.shopping.data.database.ProductContract.DATABASE_NAME
+import woowacourse.shopping.data.database.ProductContract.RecentlyViewedProductEntry
 
 class DbHelper private constructor(
     context: Context
@@ -55,14 +55,14 @@ class DbHelper private constructor(
         private lateinit var dbInstance: SQLiteDatabase
 
         private fun getInstance(context: Context): DbHelper {
-            if (::instance.isInitialized.not()) {
+            if (Companion::instance.isInitialized.not()) {
                 instance = DbHelper(context)
             }
             return instance
         }
 
         fun getDbInstance(context: Context): SQLiteDatabase {
-            if (::dbInstance.isInitialized.not()) {
+            if (Companion::dbInstance.isInitialized.not()) {
                 dbInstance = getInstance(context).writableDatabase
             }
             return dbInstance

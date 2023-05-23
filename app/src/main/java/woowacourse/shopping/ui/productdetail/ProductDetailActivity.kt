@@ -8,14 +8,16 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.database.DbHelper
-import woowacourse.shopping.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.database.product.ProductRepositoryImpl
-import woowacourse.shopping.database.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.database.product.ProductRepositoryImpl
+import woowacourse.shopping.data.database.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.datasource.RemoteHost
+import woowacourse.shopping.data.datasource.cart.CartItemRemoteService
+import woowacourse.shopping.data.datasource.product.ProductMemoryDao
+import woowacourse.shopping.data.datasource.product.ProductRemoteService
+import woowacourse.shopping.data.datasource.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.datasource.cart.CartItemLocalDao
-import woowacourse.shopping.datasource.product.ProductMemoryDao
-import woowacourse.shopping.datasource.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
@@ -28,19 +30,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this,
-            ProductRepositoryImpl(ProductMemoryDao),
+            this, ProductRepositoryImpl(ProductMemoryDao),
             CartItemRepositoryImpl(
-                CartItemLocalDao(
-                    DbHelper.getDbInstance(this),
-                    ProductRepositoryImpl(ProductMemoryDao)
-                )
+                CartItemRemoteService(RemoteHost.GABI)
             ),
             RecentlyViewedProductRepositoryImpl(
                 RecentlyViewedProductMemoryDao(
-                    DbHelper.getDbInstance(this),
-                    ProductRepositoryImpl(ProductMemoryDao)
-                )
+                    DbHelper.getDbInstance(this)
+                ),
+                ProductRemoteService(RemoteHost.GABI)
             )
         )
     }
@@ -85,9 +83,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun setProduct(product: ProductDetailUIState) {
-        Glide.with(this)
-            .load(product.imageUrl)
-            .into(binding.ivProductDetail)
+        Glide.with(this).load(product.imageUrl).into(binding.ivProductDetail)
 
         binding.tvProductDetailName.text = product.name
         binding.tvProductDetailPrice.text =

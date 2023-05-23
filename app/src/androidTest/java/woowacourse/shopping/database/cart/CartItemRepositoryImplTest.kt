@@ -6,10 +6,10 @@ import androidx.test.core.app.ApplicationProvider
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.database.DbHelper
-import woowacourse.shopping.database.product.ProductRepositoryImpl
-import woowacourse.shopping.datasource.cart.CartItemLocalDao
-import woowacourse.shopping.datasource.product.ProductMemoryDao
+import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.database.product.ProductRepositoryImpl
+import woowacourse.shopping.data.datasource.product.ProductMemoryDao
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
 import java.time.LocalDateTime
@@ -27,7 +27,14 @@ internal class CartItemRepositoryImplTest {
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         database = DbHelper.getDbInstance(context)
-        sut = CartItemRepositoryImpl(CartItemLocalDao(database, ProductRepositoryImpl(ProductMemoryDao)))
+        sut = CartItemRepositoryImpl(
+            CartItemLocalDao(
+                database,
+                ProductRepositoryImpl(
+                    ProductMemoryDao
+                )
+            )
+        )
         database.beginTransaction()
     }
 

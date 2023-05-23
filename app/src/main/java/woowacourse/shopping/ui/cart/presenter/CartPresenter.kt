@@ -3,28 +3,15 @@ package woowacourse.shopping.ui.cart.presenter
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.CartContract
-import java.lang.IllegalStateException
-import kotlin.properties.Delegates
+import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 
 class CartPresenter(
-    view: CartContract.View,
+    private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
 ) : CartContract.Presenter {
 
-    private val showCartItems = ShowCartItems(view, cartItemRepository, PAGE_SIZE)
-    private val showPageUI = ShowPageUI(view, cartItemRepository, PAGE_SIZE)
-    private val showAllSelectionUI = ShowAllSelectionUI(view, cartItemRepository, PAGE_SIZE)
-    private val showOrderUI = ShowOrderUI(view)
-
-    private var _currentPage by Delegates.observable(0) { _, _, new ->
-        showCartItems(new, selectedCartItems, true)
-        showPageUI(new)
-        showAllSelectionUI(new, selectedCartItems)
-    }
-    private var selectedCartItems: Set<CartItem> by Delegates.observable(setOf()) { _, _, new ->
-        showAllSelectionUI(_currentPage, new)
-        showOrderUI(new)
-    }
+    private var _currentPage = 0
+    private var selectedCartItems = setOf<CartItem>()
 
     override val currentPage: Int
         get() = _currentPage
@@ -39,75 +26,153 @@ class CartPresenter(
     }
 
     override fun restoreSelectedCartItems(cartItemIds: List<Long>) {
-        this.selectedCartItems = cartItemRepository.findAllByIds(cartItemIds).toSet()
-        showCartItems(_currentPage, selectedCartItems, false)
+        cartItemRepository.findAllByIds(cartItemIds) { cartItems ->
+            this.selectedCartItems = cartItems.toSet()
+            showCartItems(_currentPage, selectedCartItems, false)
+        }
     }
 
     override fun onLoadCartItemsOfNextPage() {
         _currentPage++
+        showCartItems(_currentPage, selectedCartItems, true)
+        showPageUI(_currentPage)
+        showAllSelectionUI(_currentPage, selectedCartItems)
     }
 
     override fun onLoadCartItemsOfPreviousPage() {
         _currentPage--
+        showCartItems(_currentPage, selectedCartItems, true)
+        showPageUI(_currentPage)
+        showAllSelectionUI(_currentPage, selectedCartItems)
     }
 
     override fun onLoadCartItemsOfLastPage() {
-        _currentPage = (cartItemRepository.countAll() - 1) / PAGE_SIZE + 1
+        cartItemRepository.countAll { count ->
+            _currentPage = (count - 1) / PAGE_SIZE + 1
+            showCartItems(_currentPage, selectedCartItems, true)
+            showPageUI(_currentPage)
+            showAllSelectionUI(_currentPage, selectedCartItems)
+        }
     }
 
     override fun onDeleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId)
         selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
+        showAllSelectionUI(_currentPage, selectedCartItems)
+        showOrderUI(selectedCartItems)
         showPageUI(_currentPage)
         showCartItems(_currentPage, selectedCartItems, false)
     }
 
     override fun onChangeSelectionOfCartItem(cartItemId: Long, isSelected: Boolean) {
-        val cartItem = cartItemRepository.findById(cartItemId) ?: return
-
-        selectedCartItems = if (isSelected) {
-            selectedCartItems + cartItem
-        } else {
-            selectedCartItems - cartItem
+        cartItemRepository.findById(cartItemId) { cartItem ->
+            selectedCartItems = if (isSelected) {
+                selectedCartItems + cartItem
+            } else {
+                selectedCartItems - cartItem
+            }
+            showAllSelectionUI(_currentPage, selectedCartItems)
+            showOrderUI(selectedCartItems)
         }
     }
 
     override fun onChangeSelectionOfAllCartItems(isSelected: Boolean) {
-        fun getCartItemsOfCurrentPage(): List<CartItem> {
-            val offset = (_currentPage - 1) * PAGE_SIZE
-            return cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset)
-        }
-
-        val cartItemsOfCurrentPage = getCartItemsOfCurrentPage()
-        if (isSelected) {
-            selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
-            showCartItems(_currentPage, selectedCartItems, false)
-            return
-        }
-        if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
-            selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
-            showCartItems(_currentPage, selectedCartItems, false)
+        val offset = (_currentPage - 1) * PAGE_SIZE
+        cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset) { cartItemsOfCurrentPage ->
+            if (isSelected) {
+                selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
+                showAllSelectionUI(_currentPage, selectedCartItems)
+                showOrderUI(selectedCartItems)
+                showCartItems(_currentPage, selectedCartItems, false)
+                return@findAllOrderByAddedTime
+            }
+            if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
+                selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
+                showAllSelectionUI(_currentPage, selectedCartItems)
+                showOrderUI(selectedCartItems)
+                showCartItems(_currentPage, selectedCartItems, false)
+            }
         }
     }
 
     override fun onPlusCount(cartItemId: Long) {
-        val cartItem = cartItemRepository.findById(cartItemId) ?: return
-        cartItem.plusCount()
-        cartItemRepository.updateCountById(cartItemId, cartItem.count)
-        if (cartItem in selectedCartItems) {
-            selectedCartItems = selectedCartItems - cartItem + cartItem
+        cartItemRepository.findById(cartItemId) { cartItem ->
+            cartItem.plusCount()
+            cartItemRepository.updateCountById(cartItemId, cartItem.count)
+            if (cartItem in selectedCartItems) {
+                selectedCartItems = selectedCartItems - cartItem + cartItem
+                showAllSelectionUI(_currentPage, selectedCartItems)
+                showOrderUI(selectedCartItems)
+            }
+            showCartItems(_currentPage, selectedCartItems, false)
         }
-        showCartItems(_currentPage, selectedCartItems, false)
     }
 
     override fun onMinusCount(cartItemId: Long) {
-        val cartItem = cartItemRepository.findById(cartItemId) ?: return
-        cartItem.minusCount()
-        cartItemRepository.updateCountById(cartItemId, cartItem.count)
-        if (cartItem in selectedCartItems) {
-            selectedCartItems = selectedCartItems - cartItem + cartItem
+        cartItemRepository.findById(cartItemId) { cartItem ->
+            cartItem.minusCount()
+            cartItemRepository.updateCountById(cartItemId, cartItem.count)
+            if (cartItem in selectedCartItems) {
+                selectedCartItems = selectedCartItems - cartItem + cartItem
+                showAllSelectionUI(_currentPage, selectedCartItems)
+                showOrderUI(selectedCartItems)
+            }
+            showCartItems(_currentPage, selectedCartItems, false)
         }
-        showCartItems(_currentPage, selectedCartItems, false)
+    }
+
+    private fun showCartItems(page: Int, selectedCartItems: Set<CartItem>, initScroll: Boolean) {
+        getCartItemsOf(page) { cartItems ->
+            val cartItemUIStates =
+                cartItems.map { CartItemUIState.create(it, it in selectedCartItems) }
+            view.setCartItems(cartItemUIStates, initScroll)
+        }
+    }
+
+    private fun getCartItemsOf(page: Int, onFinish: (List<CartItem>) -> Unit) {
+        val offset = (page - 1) * PAGE_SIZE
+        return cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset, onFinish)
+    }
+
+    private fun showAllSelectionUI(currentPage: Int, selectedCartItems: Set<CartItem>) {
+        getCartItemsOf(currentPage) { cartItems ->
+            view.setStateOfAllSelection(cartItems.all { it in selectedCartItems } && cartItems.isNotEmpty())
+        }
+    }
+
+    private fun showOrderUI(selectedCartItems: Set<CartItem>) {
+        view.setOrderPrice(selectedCartItems.sumOf(CartItem::getOrderPrice))
+        view.setOrderCount(selectedCartItems.size)
+    }
+
+    private fun showPageUI(currentPage: Int) {
+        refreshStateThatCanRequestPreviousPage(currentPage)
+        refreshStateThatCanRequestNextPage(currentPage)
+        view.setPage(currentPage)
+    }
+
+    private fun refreshStateThatCanRequestPreviousPage(currentPage: Int) {
+        if (currentPage <= 1) {
+            view.setStateThatCanRequestPreviousPage(false)
+        } else {
+            view.setStateThatCanRequestPreviousPage(true)
+        }
+    }
+
+    private fun refreshStateThatCanRequestNextPage(currentPage: Int) {
+        getMaxPage { count ->
+            if (currentPage >= count) {
+                view.setStateThatCanRequestNextPage(false)
+            } else {
+                view.setStateThatCanRequestNextPage(true)
+            }
+        }
+    }
+
+    private fun getMaxPage(onFinish: (Int) -> Unit) {
+        cartItemRepository.countAll { count ->
+            onFinish((count - 1) / PAGE_SIZE + 1)
+        }
     }
 
     companion object {

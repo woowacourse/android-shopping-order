@@ -1,8 +1,11 @@
-package woowacourse.shopping.repository
+package woowacourse.shopping.data.datasource.product
 
 import woowacourse.shopping.domain.Product
 
-interface ProductRepository {
+interface ProductDataSource {
+
+    fun findAll(onFinish: (List<Product>) -> Unit)
+
     fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit)
 
     fun countAll(onFinish: (Int) -> Unit)

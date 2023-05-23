@@ -1,14 +1,14 @@
-package woowacourse.shopping.datasource.recentlyviewedproduct
+package woowacourse.shopping.data.datasource.recentlyviewedproduct
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
-import woowacourse.shopping.database.ProductContract
+import woowacourse.shopping.data.database.ProductContract
+import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.domain.RecentlyViewedProduct
-import woowacourse.shopping.repository.ProductRepository
-import java.time.LocalDateTime
 
-class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase, private val productRepository: ProductRepository) : RecentlyViewedProductDataSource {
+class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase) :
+    RecentlyViewedProductDataSource {
     override fun save(recentlyViewedProduct: RecentlyViewedProduct) {
         deleteRecentlyViewedProductIfSameProductExists(recentlyViewedProduct)
 
@@ -32,8 +32,8 @@ class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase, private val
         db.delete(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs)
     }
 
-    override fun findFirst10OrderByViewedTimeDesc(): List<RecentlyViewedProduct> {
-        val recentlyViewedProducts = mutableListOf<RecentlyViewedProduct>()
+    override fun findFirst10OrderByViewedTimeDesc(onFinish: (List<RecentlyViewedProductEntity>) -> Unit) {
+        val recentlyViewedProducts = mutableListOf<RecentlyViewedProductEntity>()
         val limit = 10
         val cursor = db.rawQuery(
             """
@@ -50,15 +50,14 @@ class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase, private val
                 cursor.getLong(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID))
             val viewedTime =
                 cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME))
-            val recentlyViewedProduct = RecentlyViewedProduct(
-                productRepository.findById(productId)
-                    ?: throw IllegalArgumentException("참조 무결성 제약조건 위반"),
-                LocalDateTime.parse(viewedTime)
-            ).apply { this.id = id }
-            recentlyViewedProducts.add(recentlyViewedProduct)
+            recentlyViewedProducts.add(
+                RecentlyViewedProductEntity(
+                    id, productId, viewedTime
+                )
+            )
         }
 
         cursor.close()
-        return recentlyViewedProducts
+        onFinish(recentlyViewedProducts)
     }
 }

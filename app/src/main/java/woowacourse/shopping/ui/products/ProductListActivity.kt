@@ -6,22 +6,22 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
-import woowacourse.shopping.database.DbHelper
-import woowacourse.shopping.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.database.product.ProductRepositoryImpl
-import woowacourse.shopping.database.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.database.product.ProductRepositoryImpl
+import woowacourse.shopping.data.database.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.datasource.cart.CartItemRemoteService
+import woowacourse.shopping.data.datasource.product.ProductRemoteService
+import woowacourse.shopping.data.datasource.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.databinding.ActivityProductListBinding
-import woowacourse.shopping.datasource.cart.CartItemLocalDao
-import woowacourse.shopping.datasource.product.ProductMemoryDao
-import woowacourse.shopping.datasource.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductListAdapter
 import woowacourse.shopping.ui.products.adapter.RecentlyViewedProductListAdapter
 import woowacourse.shopping.ui.products.uistate.ProductUIState
 import woowacourse.shopping.ui.products.uistate.RecentlyViewedProductUIState
+import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.customview.CountBadge
-import java.lang.IllegalStateException
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
@@ -29,22 +29,31 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         ActivityProductListBinding.inflate(layoutInflater)
     }
 
-    private val presenter: ProductListContract.Presenter by lazy {
-        ProductListPresenter(
-            this,
-            RecentlyViewedProductRepositoryImpl(
-                RecentlyViewedProductMemoryDao(
-                    DbHelper.getDbInstance(this),
-                    ProductRepositoryImpl(ProductMemoryDao)
-                )
-            ),
-            ProductRepositoryImpl(ProductMemoryDao),
-            CartItemRepositoryImpl(
-                CartItemLocalDao(
-                    DbHelper.getDbInstance(this),
-                    ProductRepositoryImpl(ProductMemoryDao)
-                )
-            )
+    private val presenter: ProductListContract.Presenter by lazy { createPresenter() }
+
+    private fun createPresenter(): ProductListPresenter {
+        val productRemoteService = ProductRemoteService(ServerConfiguration.host)
+        val dbHelper = DbHelper.getDbInstance(this)
+        val recentlyViewedProductMemoryDao = RecentlyViewedProductMemoryDao(dbHelper)
+        val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
+            recentlyViewedProductMemoryDao, productRemoteService
+        )
+        val cartItemRepositoryImpl = CartItemRepositoryImpl(
+            CartItemRemoteService(ServerConfiguration.host)
+        )
+        val productRepositoryImpl = ProductRepositoryImpl(productRemoteService)
+        return ProductListPresenter(
+            this, recentlyViewedProductRepositoryImpl, productRepositoryImpl, cartItemRepositoryImpl
+        )
+    }
+
+    private val productListAdapter: ProductListAdapter by lazy {
+        ProductListAdapter(
+            mutableListOf(),
+            { ProductDetailActivity.startActivity(this, it) },
+            { presenter.onAddToCart(it) },
+            { presenter.onPlusCount(it) },
+            { presenter.onMinusCount(it) }
         )
     }
 
@@ -99,13 +108,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun initProductList() {
-        binding.recyclerViewMainProduct.adapter = ProductListAdapter(
-            mutableListOf(),
-            { ProductDetailActivity.startActivity(this, it) },
-            { presenter.onAddToCart(it) },
-            { presenter.onPlusCount(it) },
-            { presenter.onMinusCount(it) }
-        )
+        binding.recyclerViewMainProduct.adapter = productListAdapter
     }
 
     private fun initLoadingButton() {
@@ -115,16 +118,18 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun setRecentlyViewedProducts(recentlyViewedProducts: List<RecentlyViewedProductUIState>) {
-        if (recentlyViewedProducts.isEmpty()) {
-            setUIAboutRecentlyViewedProductIsVisible(false)
-            return
-        }
-        setUIAboutRecentlyViewedProductIsVisible(true)
-
-        binding.recyclerViewRecentlyViewed.adapter =
-            RecentlyViewedProductListAdapter(recentlyViewedProducts) {
-                ProductDetailActivity.startActivity(this, it)
+        runOnUiThread {
+            if (recentlyViewedProducts.isEmpty()) {
+                setUIAboutRecentlyViewedProductIsVisible(false)
+                return@runOnUiThread
             }
+            setUIAboutRecentlyViewedProductIsVisible(true)
+
+            binding.recyclerViewRecentlyViewed.adapter =
+                RecentlyViewedProductListAdapter(recentlyViewedProducts) {
+                    ProductDetailActivity.startActivity(this, it)
+                }
+        }
     }
 
     private fun setUIAboutRecentlyViewedProductIsVisible(isVisible: Boolean) {
@@ -134,35 +139,39 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun addProducts(products: List<ProductUIState>) {
-        val adapter = binding.recyclerViewMainProduct.adapter as ProductListAdapter
-        adapter.addItems(products)
+        runOnUiThread {
+            productListAdapter.addItems(products)
+        }
     }
 
     override fun setProducts(products: List<ProductUIState>) {
-        binding.recyclerViewMainProduct.adapter = ProductListAdapter(
-            products.toMutableList(),
-            { ProductDetailActivity.startActivity(this, it) },
-            { presenter.onAddToCart(it) },
-            { presenter.onPlusCount(it) },
-            { presenter.onMinusCount(it) }
-        )
+        runOnUiThread {
+            productListAdapter.setItems(products)
+            binding.recyclerViewMainProduct.smoothScrollToPosition(0)
+        }
     }
 
     override fun setCanLoadMore(canLoadMore: Boolean) {
-        binding.btnLoading.isVisible = canLoadMore
+        runOnUiThread {
+            binding.btnLoading.isVisible = canLoadMore
+        }
     }
 
     override fun replaceProduct(product: ProductUIState) {
-        (binding.recyclerViewMainProduct.adapter as ProductListAdapter).replaceItem(product)
+        runOnUiThread {
+            productListAdapter.replaceItem(product)
+        }
     }
 
     override fun setCartItemCount(count: Int) {
-        if (count == 0) {
-            cartCountBadge?.isVisible = false
-            return
+        runOnUiThread {
+            if (count == 0) {
+                cartCountBadge?.isVisible = false
+                return@runOnUiThread
+            }
+            cartCountBadge?.isVisible = true
+            cartCountBadge?.count = count
         }
-        cartCountBadge?.isVisible = true
-        cartCountBadge?.count = count
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -8,29 +8,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import woowacourse.shopping.R
-import woowacourse.shopping.database.DbHelper
-import woowacourse.shopping.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.database.product.ProductRepositoryImpl
+import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.datasource.cart.CartItemRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.datasource.cart.CartItemLocalDao
-import woowacourse.shopping.datasource.product.ProductMemoryDao
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.presenter.CartPresenter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
+import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding by lazy {
         ActivityCartBinding.inflate(layoutInflater)
     }
+
+    private val cartListAdapter by lazy {
+        CartListAdapter(
+            onClickCloseButton = { presenter.onDeleteCartItem(it) },
+            onClickCheckBox = { productId, isSelected ->
+                presenter.onChangeSelectionOfCartItem(productId, isSelected)
+            },
+            onClickPlus = { presenter.onPlusCount(it) },
+            onClickMinus = { presenter.onMinusCount(it) },
+            cartItems = mutableListOf()
+        )
+    }
+
     private val presenter: CartPresenter by lazy {
         CartPresenter(
             this,
             CartItemRepositoryImpl(
-                CartItemLocalDao(
-                    DbHelper.getDbInstance(this),
-                    ProductRepositoryImpl(ProductMemoryDao)
-                )
+                CartItemRemoteService(ServerConfiguration.host)
             )
         )
     }
@@ -98,14 +106,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initCartList() {
-        binding.recyclerViewCart.adapter = CartListAdapter(
-            onClickCloseButton = { presenter.onDeleteCartItem(it) },
-            onClickCheckBox = { id, isSelected ->
-                presenter.onChangeSelectionOfCartItem(id, isSelected)
-            },
-            onClickPlus = { presenter.onPlusCount(it) },
-            onClickMinus = { presenter.onMinusCount(it) }
-        )
+        binding.recyclerViewCart.adapter = cartListAdapter
         presenter.onLoadCartItemsOfNextPage()
     }
 
@@ -119,31 +120,28 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
-        if (initScroll) {
-            binding.recyclerViewCart.adapter = CartListAdapter(
-                onClickCloseButton = { presenter.onDeleteCartItem(it) },
-                onClickCheckBox = { productId, isSelected ->
-                    presenter.onChangeSelectionOfCartItem(productId, isSelected)
-                },
-                onClickPlus = { presenter.onPlusCount(it) },
-                onClickMinus = { presenter.onMinusCount(it) },
-                cartItems = cartItems.toMutableList()
-            )
-            return
+        runOnUiThread {
+            if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
+            cartListAdapter.setCartItems(cartItems)
         }
-        (binding.recyclerViewCart.adapter as CartListAdapter).setCartItems(cartItems)
     }
 
     override fun setStateThatCanRequestNextPage(canRequest: Boolean) {
-        binding.btnPageUp.isEnabled = canRequest
+        runOnUiThread {
+            binding.btnPageUp.isEnabled = canRequest
+        }
     }
 
     override fun setStateThatCanRequestPreviousPage(canRequest: Boolean) {
-        binding.btnPageDown.isEnabled = canRequest
+        runOnUiThread {
+            binding.btnPageDown.isEnabled = canRequest
+        }
     }
 
     override fun setPage(page: Int) {
-        binding.tvCartPage.text = page.toString()
+        runOnUiThread {
+            binding.tvCartPage.text = page.toString()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -153,16 +151,22 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setStateOfAllSelection(isAllSelected: Boolean) {
-        binding.cbPageAllSelect.isChecked = isAllSelected
+        runOnUiThread {
+            binding.cbPageAllSelect.isChecked = isAllSelected
+        }
     }
 
     override fun setOrderPrice(price: Int) {
-        binding.tvOrderPrice.text =
-            getString(R.string.product_price).format(PRICE_FORMAT.format(price))
+        runOnUiThread {
+            binding.tvOrderPrice.text =
+                getString(R.string.product_price).format(PRICE_FORMAT.format(price))
+        }
     }
 
     override fun setOrderCount(count: Int) {
-        binding.tvOrder.text = getString(R.string.order_with_count).format(count)
+        runOnUiThread {
+            binding.tvOrder.text = getString(R.string.order_with_count).format(count)
+        }
     }
 
     companion object {
