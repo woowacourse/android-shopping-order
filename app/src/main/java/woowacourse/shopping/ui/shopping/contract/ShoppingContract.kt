@@ -10,6 +10,8 @@ interface ShoppingContract {
 
         fun addProducts(data: List<ProductsItemType>)
         fun showCountSize(size: Int)
+
+        fun setMainVisibility(loadState: Boolean)
     }
 
     interface Presenter {

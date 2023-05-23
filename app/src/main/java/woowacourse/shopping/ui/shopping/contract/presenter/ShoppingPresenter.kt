@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping.contract.presenter
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.domain.model.CartProduct
@@ -25,13 +26,19 @@ class ShoppingPresenter(
     val countLiveDatas: Map<Long, LiveData<Int>> get() = _countLiveDatas
 
     override fun setUpProducts() {
-        val datas = repository.getNext(PRODUCT_COUNT)
-        productsData += datas
-            .map { product: Product -> ProductItem(product.toUIModel(), getCount(product.id)) }
-        datas.forEach {
-            _countLiveDatas[it.id] = MutableLiveData(getCount(it.id))
-        }
-        view.setProducts(productsData.plus(ProductReadMore))
+        repository.getNext(PRODUCT_COUNT, onSuccess = { datas ->
+            Log.d("datas", datas.toString())
+            view.setMainVisibility(true)
+            productsData += datas.map { product: Product ->
+                ProductItem(product.toUIModel(), getCount(product.id))
+            }
+            datas.forEach {
+                _countLiveDatas[it.id] = MutableLiveData(getCount(it.id))
+            }
+            view.setProducts(productsData.plus(ProductReadMore))
+        }, onFailure = { exception ->
+            // Handle failure case
+        })
     }
 
     override fun updateProducts() {
@@ -51,14 +58,23 @@ class ShoppingPresenter(
     }
 
     override fun fetchMoreProducts() {
-        productsData += repository.getNext(PRODUCT_COUNT)
-            .map { ProductItem(it.toUIModel(), getCount(it.id)) }
-        view.addProducts(productsData.plus(ProductReadMore))
+        repository.getNext(PRODUCT_COUNT, onSuccess = { datas ->
+            productsData += datas.map { product: Product ->
+                ProductItem(product.toUIModel(), getCount(product.id))
+            }
+
+            view.addProducts(productsData.plus(ProductReadMore))
+        }, onFailure = { exception ->
+            // Handle failure case
+        })
     }
 
     override fun navigateToItemDetail(id: Long) {
-        val product = repository.findById(id)
-        view.navigateToProductDetail(product.toUIModel())
+        repository.findById(id, onSuccess = {
+            view.navigateToProductDetail(it.toUIModel())
+        }, onFailure = {
+            // Handle failure case
+        })
     }
 
     override fun updateItemCounts() {
@@ -69,9 +85,11 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(id: Long, count: Int) {
-        repository.findById(id).let {
+        repository.findById(id, onSuccess = {
             cartRepository.insert(CartProduct(it, count, true))
-        }
+        }, onFailure = {
+            // Handle failure case
+        })
         updateItemCounts()
         updateCountSize()
     }
