@@ -19,6 +19,7 @@ import woowacourse.shopping.cart.CartActivity
 import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.model.RecentProductModel
 import woowacourse.shopping.common.model.ShoppingProductModel
+import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
@@ -147,6 +148,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun addProducts(productModels: List<ShoppingProductModel>) {
+        binding.shoppingProductList.visibility = View.VISIBLE
+        binding.skeletonShoppingProductList.visibility = View.GONE
         productAdapter.addProducts(productModels)
     }
 
@@ -169,6 +172,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun updateShoppingProduct(prev: ShoppingProductModel, new: ShoppingProductModel) {
         productAdapter.updateProduct(prev, new)
+    }
+
+    override fun notifyLoadFailed() {
+        Toaster.showToast(this, "상품을 불러오는데 실패했습니다!")
     }
 
     private fun startCartActivity() {

@@ -29,9 +29,15 @@ class ShoppingPresenter(
     }
 
     override fun updateCartChange() {
-        val products = productRepository.getProducts(0, productSize)
-        view.updateProducts(products.value.map { it.toView() })
-        updateCartAmount()
+        productRepository.getProducts(
+            0,
+            productSize,
+            onSuccess = { products ->
+                view.updateProducts(products.value.map { it.toView() })
+                updateCartAmount()
+            },
+            onFailure = { view.notifyLoadFailed() }
+        )
     }
 
     override fun updateRecentProducts() {
@@ -83,9 +89,15 @@ class ShoppingPresenter(
     }
 
     override fun loadMoreProduct() {
-        val loadedProducts = productRepository.getProducts(productSize, productLoadSize)
-        productSize += loadedProducts.value.size
-        view.addProducts(loadedProducts.value.map { it.toView() })
+        productRepository.getProducts(
+            productSize,
+            productLoadSize,
+            onSuccess = { loadedProducts ->
+                productSize += loadedProducts.value.size
+                view.addProducts(loadedProducts.value.map { it.toView() })
+            },
+            onFailure = { view.notifyLoadFailed() }
+        )
     }
 
     private fun updateCartAmount() {
@@ -122,7 +134,8 @@ class ShoppingPresenter(
     }
 
     private fun getCartProduct(productModel: ProductModel): CartProduct {
-        var cartProduct: CartProduct? = cartRepository.getCartProductByProduct(productModel.toDomain())
+        var cartProduct: CartProduct? =
+            cartRepository.getCartProductByProduct(productModel.toDomain())
         if (cartProduct == null) {
             cartProduct = CartProduct(
                 time = LocalDateTime.now(),

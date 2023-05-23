@@ -1,5 +1,7 @@
 package woowacourse.shopping.server
 
+import android.os.Handler
+import android.os.Looper
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -10,27 +12,26 @@ import org.json.JSONObject
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
-import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
 class ProductRemoteDataSource {
+    private val okHttpClient: OkHttpClient
+
     init {
         thread {
             startMockWebServer()
         }
+        okHttpClient = OkHttpClient()
     }
 
-    fun getProducts(path: Int): List<Product> {
+    fun getProducts(path: Int, onSuccess: (List<Product>) -> Unit) {
         val url = "http://localhost:8080/products/$path"
-        val okHttpClient = OkHttpClient()
         val request = Request.Builder().url(url).build()
+        val handler = Handler(Looper.myLooper()!!)
         val products = mutableListOf<Product>()
 
-        val countDownLatch = CountDownLatch(1)
         okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                countDownLatch.countDown()
-            }
+            override fun onFailure(call: Call, e: IOException) {}
 
             override fun onResponse(call: Call, response: Response) {
                 val input = response.body?.string()
@@ -39,12 +40,13 @@ class ProductRemoteDataSource {
                     val jsonObject = jsonArray.getJSONObject(i)
                     products.add(createProduct(jsonObject))
                 }
-                countDownLatch.countDown()
+
+                Thread.sleep(2000)
+                handler.post {
+                    onSuccess(products)
+                }
             }
         })
-
-        countDownLatch.await()
-        return products
     }
 
     private fun createProduct(response: JSONObject): Product {
