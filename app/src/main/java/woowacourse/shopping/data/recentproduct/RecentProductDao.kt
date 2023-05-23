@@ -6,9 +6,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import com.example.domain.Product
 import com.example.domain.RecentProduct
-import com.example.domain.repository.ProductRepository
-import woowacourse.shopping.data.product.MockProductRemoteService
-import woowacourse.shopping.data.product.MockRemoteProductRepositoryImpl
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

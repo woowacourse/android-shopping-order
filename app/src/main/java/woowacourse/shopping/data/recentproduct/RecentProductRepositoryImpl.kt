@@ -1,10 +1,8 @@
 package woowacourse.shopping.data.recentproduct
 
 import com.example.domain.RecentProduct
-import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.data.product.MockProductRemoteService
-import woowacourse.shopping.data.product.MockRemoteProductRepositoryImpl
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(

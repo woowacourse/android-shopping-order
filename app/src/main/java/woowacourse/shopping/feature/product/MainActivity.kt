@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.product
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -158,5 +160,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
         binding.productRv.layoutManager = gridLayoutManager
         binding.productRv.adapter = concatAdapter
+    }
+
+    companion object {
+        private const val KEY_SERVER = "Server"
+
+        fun getIntent(context: Context, server: String): Intent {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(KEY_SERVER, server)
+            return intent
+        }
     }
 }
