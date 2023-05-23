@@ -11,4 +11,6 @@
     <color name="primary">#04C09E</color>
     <color name="toolbar">#555555</color>
     <color name="pagination_button_disabled">#D6D6D6</color>
+
+    <color name="skeleton_inner">#E2E2E2</color>
 </resources>
