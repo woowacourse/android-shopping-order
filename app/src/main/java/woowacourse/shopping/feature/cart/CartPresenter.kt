@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import android.util.Log
 import com.example.domain.CartProduct
 import com.example.domain.PaymentCalculator
 import com.example.domain.repository.CartRepository
@@ -38,7 +39,7 @@ class CartPresenter(
     }
 
     override fun plusPageNumber() {
-        (++pageNumber).coerceAtMost(maxPageNumber)
+        pageNumber = (++pageNumber).coerceAtMost(maxPageNumber)
 
         view.setCartPageNumberMinusEnable(true)
         if (pageNumber > maxPageNumber) return
@@ -48,7 +49,7 @@ class CartPresenter(
     }
 
     override fun minusPageNumber() {
-        (--pageNumber).coerceAtLeast(minPageNumber)
+        pageNumber = (--pageNumber).coerceAtLeast(minPageNumber)
 
         view.setCartPageNumberPlusEnable(true)
         if (pageNumber < minPageNumber) return
