@@ -2,12 +2,11 @@ package woowacourse.shopping.data.datasource.product
 
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.ShoppingOkHttpClient
+import woowacourse.shopping.data.ShoppingOkHttpClient.buildRequest
 import woowacourse.shopping.data.model.Page
 import woowacourse.shopping.data.model.Price
 import woowacourse.shopping.data.model.Product
@@ -29,12 +28,11 @@ class RemoteProductDataSource : ProductDataSource.Remote {
     override fun getProductByPage(page: Page): List<Product> {
         shoppingMockServer.join()
         val url = "${BASE_URL}/products?start=${page.start}&count=${page.sizePerPage}"
-        val httpClient = OkHttpClient()
-        val request = buildRequest(url, GET)
+
         val products = mutableListOf<Product>()
         val countDownLatch = CountDownLatch(1)
 
-        httpClient.newCall(request).enqueue(object : Callback {
+        ShoppingOkHttpClient.newCall(buildRequest(url, GET)).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 countDownLatch.countDown()
             }
@@ -57,12 +55,10 @@ class RemoteProductDataSource : ProductDataSource.Remote {
     override fun findProductById(id: Int): Product? {
         shoppingMockServer.join()
         val url = "${BASE_URL}/products?productId=${id}"
-        val httpClient = OkHttpClient()
-        val request = buildRequest(url, GET)
         val countDownLatch = CountDownLatch(1)
         var product: Product? = null
 
-        httpClient.newCall(request).enqueue(object : Callback {
+        ShoppingOkHttpClient.newCall(buildRequest(url, GET)).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 countDownLatch.countDown()
             }
@@ -80,13 +76,6 @@ class RemoteProductDataSource : ProductDataSource.Remote {
         countDownLatch.await()
         return product
     }
-
-    private fun buildRequest(url: String, method: String): Request = Request
-        .Builder()
-        .header("Authorization", "Basic ${ShoppingApplication.pref.getToken()}")
-        .url(url)
-        .method(method, null)
-        .build()
 
     private fun convertToProduct(response: JSONObject): Product = Product(
         id = response.getInt("id"),
