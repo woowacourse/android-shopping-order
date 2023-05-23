@@ -11,6 +11,7 @@ import woowacourse.shopping.feature.product.MainActivity
 
 class ServerSettingActivity : AppCompatActivity() {
     lateinit var binding: ActivityServerSettingBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_server_setting)
@@ -19,15 +20,15 @@ class ServerSettingActivity : AppCompatActivity() {
 
     private fun setServerClickListener() {
         binding.btSubanMockServer.setOnClickListener {
-            startMain(SUBAN_MOCK_SERVER.intentKey)
+            startMain(SUBAN_MOCK_SERVER.url)
         }
 
         binding.btMintServer.setOnClickListener {
-            startMain(MINT_SERVER.intentKey)
+            startMain(MINT_SERVER.url)
         }
 
         binding.btJoyServer.setOnClickListener {
-            startMain(JOY_SERVER.intentKey)
+            startMain(JOY_SERVER.url)
         }
     }
 
