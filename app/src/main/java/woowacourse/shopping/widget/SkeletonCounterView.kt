@@ -3,17 +3,21 @@ package woowacourse.shopping.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ViewCounterBinding
 import woowacourse.shopping.model.UiProduct
 import kotlin.properties.Delegates
 
-class ProductCounterView : ConstraintLayout {
+class SkeletonCounterView : ConstraintLayout {
     private val binding by lazy {
         ViewCounterBinding.inflate(LayoutInflater.from(context), this, true)
     }
+    private var isCountInitialized = false
     var count: Int by Delegates.observable(INITIAL_COUNT) { _, _, newCount ->
+        if (isCountInitialized) binding.skeletonLayout.visibility = View.GONE
+        isCountInitialized = true
         binding.countTextView.text = newCount.toString()
     }
     private var minCount: Int = DEFAULT_MIN_COUNT
@@ -31,11 +35,20 @@ class ProductCounterView : ConstraintLayout {
         initTypedArrayValue(attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initTypedArrayValue(attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+        defStyleRes
+    ) {
         initTypedArrayValue(attrs)
     }
 
@@ -44,17 +57,20 @@ class ProductCounterView : ConstraintLayout {
             count = it.getInt(R.styleable.ProductCounterView_count, INITIAL_COUNT)
             minCount = it.getInt(R.styleable.ProductCounterView_min_count, DEFAULT_MIN_COUNT)
             maxCount = it.getInt(R.styleable.ProductCounterView_max_count, DEFAULT_MAX_COUNT)
+
+            val isUseSkeleton = it.getBoolean(R.styleable.ProductCounterView_useSkeleton, false)
+            binding.skeletonLayout.visibility = if (isUseSkeleton) VISIBLE else GONE
         }
     }
 
-    fun setOnPlusClickListener(onPlusClick: (view: ProductCounterView, newCount: Int) -> Unit) {
+    fun setOnPlusClickListener(onPlusClick: (view: SkeletonCounterView, newCount: Int) -> Unit) {
         binding.counterPlusButton.setOnClickListener {
             plusCount()
             onPlusClick(this, count)
         }
     }
 
-    fun setOnMinusClickListener(onMinusClick: (view: ProductCounterView, newCount: Int) -> Unit) {
+    fun setOnMinusClickListener(onMinusClick: (view: SkeletonCounterView, newCount: Int) -> Unit) {
         binding.counterMinusButton.setOnClickListener {
             minusCount()
             onMinusClick(this, count)

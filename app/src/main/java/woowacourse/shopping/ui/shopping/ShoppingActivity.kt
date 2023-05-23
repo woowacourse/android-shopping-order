@@ -27,7 +27,7 @@ import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.ProductCounterView.OnClickListener
+import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
 
 class ShoppingActivity : AppCompatActivity(), View, OnClickListener, ProductClickListener {
     private lateinit var binding: ActivityShoppingBinding

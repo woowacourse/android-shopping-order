@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:paddingStart="20dp">
 
-        <ImageView
+        <woowacourse.shopping.widget.SkeletonImageView
             android:id="@+id/product_image_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -29,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
 
-        <TextView
+        <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_name_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

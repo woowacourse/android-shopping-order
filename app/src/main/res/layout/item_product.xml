@@ -18,7 +18,7 @@
 
         <variable
             name="counterClickListener"
-            type="woowacourse.shopping.widget.ProductCounterView.OnClickListener" />
+            type="woowacourse.shopping.widget.SkeletonCounterView.OnClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,7 +28,7 @@
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp">
 
-        <ImageView
+        <woowacourse.shopping.widget.SkeletonImageView
             android:id="@+id/product_image_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -58,7 +58,7 @@
             app:layout_constraintWidth_percent="0.3"
             app:tint="@color/woowa_dark_gray" />
 
-        <woowacourse.shopping.widget.ProductCounterView
+        <woowacourse.shopping.widget.SkeletonCounterView
             android:id="@+id/counter_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -67,6 +67,7 @@
             bind:onMinusClick="@{() -> counterClickListener.onClickCounterMinus(cartProduct.product)}"
             bind:onPlusClick="@{() -> counterClickListener.onClickCounterPlus(cartProduct.product)}"
             android:visibility="@{cartProduct.shouldShowCounter ? View.VISIBLE : View.GONE}"
+            app:count="@{cartProduct.selectedCount.value}"
             app:layout_constraintBottom_toBottomOf="@+id/product_image_view"
             app:layout_constraintEnd_toEndOf="@id/product_image_view"
             app:layout_constraintHeight_percent="0.2"
@@ -74,7 +75,7 @@
             app:max_count="99"
             app:min_count="1" />
 
-        <TextView
+        <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_name_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,7 +92,7 @@
             app:layout_constraintTop_toBottomOf="@+id/product_image_view"
             tools:text="PET_보틀_정사각" />
 
-        <TextView
+        <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_price_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

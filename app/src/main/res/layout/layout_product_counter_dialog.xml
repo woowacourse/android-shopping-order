@@ -54,7 +54,7 @@
             app:layout_constraintTop_toBottomOf="@+id/product_name_text_view"
             tools:text="99,800원" />
 
-        <woowacourse.shopping.widget.ProductCounterView
+        <woowacourse.shopping.widget.SkeletonCounterView
             android:id="@+id/counter_view"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -63,5 +63,12 @@
             app:layout_constraintStart_toEndOf="@id/count_text_view"
             app:layout_constraintTop_toTopOf="@+id/counter_minus_button" />
 
+        <View
+            android:id="@+id/skeleton_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/skeleton_background"
+            tools:visibility="gone" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

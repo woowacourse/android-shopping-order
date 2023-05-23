@@ -39,7 +39,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_name_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
             app:srcCompat="@drawable/ic_close"
             app:tint="@color/woowa_light_gray" />
 
-        <ImageView
+        <woowacourse.shopping.widget.SkeletonImageView
             android:id="@+id/product_image_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -86,7 +86,7 @@
             app:layout_constraintTop_toBottomOf="@+id/product_name_text_view"
             tools:srcCompat="@tools:sample/avatars" />
 
-        <TextView
+        <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_price_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -98,13 +98,14 @@
             app:layout_constraintEnd_toEndOf="@id/close_button"
             tools:text="99,800원" />
 
-        <woowacourse.shopping.widget.ProductCounterView
+        <woowacourse.shopping.widget.SkeletonCounterView
             android:id="@+id/counter_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             bind:count="@{cartProduct.selectedCount.value}"
             bind:onMinusClick="@{() -> cartClickListener.onCountChanged(cartProduct.product, 1, false)}"
             bind:onPlusClick="@{() -> cartClickListener.onCountChanged(cartProduct.product, 1, true)}"
+            app:useSkeleton="true"
             app:layout_constraintBottom_toBottomOf="@+id/product_image_view"
             app:layout_constraintEnd_toEndOf="@+id/product_price_text_view"
             app:layout_constraintHeight_percent="0.3"

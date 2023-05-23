@@ -7,7 +7,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.ProductCounterView.OnClickListener
+import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
 
 class ProductViewHolder(
     parent: ViewGroup,

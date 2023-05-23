@@ -6,7 +6,7 @@ import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.ui.shopping.ShoppingViewType
 import woowacourse.shopping.util.diffutil.ProductDiffUtil
 import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.ProductCounterView.OnClickListener
+import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
 
 class ProductAdapter(
     private val productClickListener: ProductClickListener,
