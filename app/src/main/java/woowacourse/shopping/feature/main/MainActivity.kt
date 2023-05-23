@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter = MainPresenter(
             MockRemoteProductRepositoryImpl(MockProductRemoteService()),
             CartRepositoryImpl(CartDao(this)),
-            RecentProductRepositoryImpl(RecentDao(this))
+            RecentProductRepositoryImpl(RecentDao(this)),
         )
     }
 
@@ -132,6 +133,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             }
             is MainContract.View.MainScreenEvent.HideLoadMore -> {
                 hideLoadMore()
+            }
+            is MainContract.View.MainScreenEvent.ShowLoading -> {
+                binding.skeletonMainLoadingLayout.visibility = View.VISIBLE
+                binding.productRecyclerView.visibility = View.GONE
+            }
+            is MainContract.View.MainScreenEvent.HideLoading -> {
+                binding.skeletonMainLoadingLayout.visibility = View.GONE
+                binding.productRecyclerView.visibility = View.VISIBLE
             }
         }
     }
@@ -173,7 +182,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         recentWrapperAdapter.onSaveState(outState)
         outState.putParcelable(
             RECYCLER_VIEW_STATE_KEY,
-            binding.productRecyclerView.layoutManager?.onSaveInstanceState()
+            binding.productRecyclerView.layoutManager?.onSaveInstanceState(),
         )
     }
 

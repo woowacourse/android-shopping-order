@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 class MainPresenter(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentProductRepository: RecentProductRepository
+    private val recentProductRepository: RecentProductRepository,
 ) : MainContract.Presenter {
     private val _products: MutableLiveData<List<ProductUiModel>> = MutableLiveData()
     override val products: LiveData<List<ProductUiModel>>
@@ -37,15 +37,17 @@ class MainPresenter(
         get() = _mainScreenEvent
 
     override fun loadProducts() {
+        _mainScreenEvent.value = MainScreenEvent.ShowLoading
         productRepository.fetchFirstProducts(
             onSuccess = {
                 val productUiModels = makeProductUiModels(it)
                 _products.postValue(productUiModels)
                 updateCartCountBadge()
+                _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
             },
             onFailure = {
                 _mainScreenEvent.postValue(MainScreenEvent.HideLoadMore)
-            }
+            },
         )
     }
 
@@ -75,7 +77,7 @@ class MainPresenter(
             },
             onFailure = {
                 _mainScreenEvent.postValue(MainScreenEvent.HideLoadMore)
-            }
+            },
         )
     }
 
@@ -120,7 +122,7 @@ class MainPresenter(
 
     private fun showDetailScreenEvent(
         product: ProductUiModel,
-        recentProduct: RecentProductUiModel?
+        recentProduct: RecentProductUiModel?,
     ) {
         _mainScreenEvent.value = MainScreenEvent.ShowProductDetailScreen(product, recentProduct)
     }
@@ -139,7 +141,7 @@ class MainPresenter(
 
     private fun addRecentProduct(recentProduct: RecentProductUiModel) {
         recentProductRepository.addRecentProduct(
-            recentProduct.toDomain().copy(dateTime = LocalDateTime.now())
+            recentProduct.toDomain().copy(dateTime = LocalDateTime.now()),
         )
     }
 
@@ -147,8 +149,8 @@ class MainPresenter(
         recentProductRepository.addRecentProduct(
             RecentProduct(
                 product.toDomain(),
-                LocalDateTime.now()
-            )
+                LocalDateTime.now(),
+            ),
         )
     }
 

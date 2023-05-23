@@ -10,10 +10,12 @@ interface MainContract {
             object ShowCartScreen : MainScreenEvent()
             class ShowProductDetailScreen(
                 val product: ProductUiModel,
-                val recentProduct: RecentProductUiModel?
+                val recentProduct: RecentProductUiModel?,
             ) : MainScreenEvent()
 
             object HideLoadMore : MainScreenEvent()
+            object ShowLoading : MainScreenEvent()
+            object HideLoading : MainScreenEvent()
         }
     }
 
