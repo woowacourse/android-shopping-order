@@ -8,6 +8,8 @@ import woowacourse.shopping.model.PageBottomNavigationUiModel
 interface CartContract {
     interface View {
         fun exitCartScreen()
+        fun hideLoadingView()
+        fun showLoadingView()
     }
 
     interface Presenter {

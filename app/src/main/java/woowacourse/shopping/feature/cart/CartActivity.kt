@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -85,6 +86,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun exitCartScreen() = finish()
+    override fun hideLoadingView() {
+        runOnUiThread {
+            binding.cartLayout.visibility = View.VISIBLE
+            binding.skeletonCartLoadingLayout.visibility = View.GONE
+        }
+    }
+
+    override fun showLoadingView() {
+        binding.cartLayout.visibility = View.GONE
+        binding.skeletonCartLoadingLayout.visibility = View.VISIBLE
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -101,7 +113,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         super.onSaveInstanceState(outState)
         outState.putInt(
             CURRENT_PAGE_KEY,
-            presenter.pageBottomNavigationUiModel.value?.currentPageNumber ?: 1
+            presenter.pageBottomNavigationUiModel.value?.currentPageNumber ?: 1,
         )
     }
 

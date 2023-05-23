@@ -44,7 +44,12 @@ class CartPresenter(
         get() = _cartBottomNavigationUiModel
 
     override fun loadInitCartProduct() {
+        view.showLoadingView()
         _page = Pagination(CartProducts(cartRepository.getAll()), 1).toPresentation()
+        Thread {
+            Thread.sleep(2000)
+            view.hideLoadingView()
+        }.start()
     }
 
     override fun loadPreviousPage() {
@@ -79,7 +84,7 @@ class CartPresenter(
 
         cartRepository.changeCartProductCheckedState(
             findCartProduct.productUiModel.toDomain(),
-            checked
+            checked,
         )
     }
 
