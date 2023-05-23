@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.productlist
 
+import woowacourse.shopping.R
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.cart.CartRepository
@@ -20,17 +21,39 @@ class ProductListPresenter(
     private val products = mutableListOf<ProductModel>()
     private val recentProducts = mutableListOf<RecentProductModel>()
     private var lastScroll = 0
+    private var startIndex = 0
 
     override fun initRecentProductItems() {
         val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern(LOCAL_DATE_PATTERN))
         recentProductRepository.deleteNotTodayRecentProducts(today)
     }
 
+    override fun initProductItems() {
+        productRepository.loadDatas(::onFailure) {
+            val allProducts = it.map { productEntity -> productEntity.toUIModel() }
+
+            products.addAll(allProducts)
+            loadProductItems()
+            view.setLayoutVisibility()
+        }
+    }
+
+    private fun onFailure() {
+        view.showToast(R.string.toast_message_system_error)
+    }
+
     override fun loadProductItems() {
-        val newProducts =
-            productRepository.loadData(products.size).map { productEntity -> productEntity.toUIModel() }
-        products.addAll(newProducts)
-        view.setProductItemsView(products.toList())
+        val newProducts = products.subList(0, getSubToIndex())
+        startIndex = newProducts.size
+        view.setProductItemsView(newProducts)
+    }
+
+    private fun getSubToIndex(): Int {
+        return if (products.size > startIndex + DISPLAY_PRODUCT_COUNT) {
+            startIndex + DISPLAY_PRODUCT_COUNT
+        } else {
+            products.size
+        }
     }
 
     override fun loadRecentProductItems() {
@@ -143,6 +166,7 @@ class ProductListPresenter(
 
         private const val LAST_RECENT_COUNT = 2
 
+        private const val DISPLAY_PRODUCT_COUNT = 20
         private const val UNABLE_ID = -1L
     }
 }

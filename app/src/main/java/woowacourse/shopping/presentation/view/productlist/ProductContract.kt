@@ -9,13 +9,16 @@ interface ProductContract {
         fun setRecentProductItemsView(recentProducts: List<RecentProductModel>)
         fun setVisibleToolbarCartCountView()
         fun setGoneToolbarCartCountView()
+        fun setLayoutVisibility()
         fun updateRecentProductItemsView(recentProducts: List<RecentProductModel>)
         fun updateToolbarCartCountView(count: Int)
         fun moveToCartView()
+        fun showToast(message: Int)
     }
 
     interface Presenter {
         fun initRecentProductItems()
+        fun initProductItems()
         fun loadProductItems()
         fun loadRecentProductItems()
         fun loadCartItems()

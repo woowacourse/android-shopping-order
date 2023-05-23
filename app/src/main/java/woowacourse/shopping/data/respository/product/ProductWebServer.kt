@@ -10,8 +10,6 @@ object ProductWebServer {
     private lateinit var mockWebServer: MockWebServer
     internal var PORT = 0
 
-    private const val DATA_COUNT = 20
-
     private val dispatcher = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
             val path = request.path ?: return MockResponse().setResponseCode(404)
@@ -22,11 +20,10 @@ object ProductWebServer {
                         .setResponseCode(200)
                         .setBody(getProductData(productId))
                 }
-                path.startsWith("/shopping/products?") -> {
-                    val productStartPosition = path.substringAfterLast("?").toInt()
+                path == ("/shopping/products?") -> {
                     MockResponse()
                         .setResponseCode(200)
-                        .setBody(getProductDatas(productStartPosition).toString())
+                        .setBody(dataList.toString())
                 }
                 else -> MockResponse().setResponseCode(404)
             }
@@ -41,17 +38,6 @@ object ProductWebServer {
             mockWebServer.dispatcher = dispatcher
             PORT = mockWebServer.port
         }.start()
-    }
-
-    fun getProductDatas(startPosition: Int): List<String> {
-        val subToIndex =
-            if (dataList.size > startPosition + DATA_COUNT) {
-                startPosition + DATA_COUNT
-            } else {
-                dataList.size
-            }
-
-        return dataList.subList(startPosition, subToIndex)
     }
 
     fun getProductData(dataId: Long): String {

@@ -7,8 +7,11 @@ import woowacourse.shopping.data.respository.product.source.remote.ProductRemote
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource = ProductRemoteDataSourceImpl(),
 ) : ProductRepository {
-    override fun loadData(startPosition: Int): List<ProductEntity> {
-        return productRemoteDataSource.requestDatas(startPosition)
+    override fun loadDatas(
+        onFailure: () -> Unit,
+        onSuccess: (products: List<ProductEntity>) -> Unit,
+    ) {
+        productRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
     override fun loadDataById(id: Long): ProductEntity {

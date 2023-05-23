@@ -92,7 +92,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
         initLayoutManager()
         presenter.initRecentProductItems()
-        presenter.loadProductItems()
+        presenter.initProductItems()
         presenter.loadRecentProductItems()
         presenter.loadCartItems()
         setMoreProductListAdapter()
@@ -124,6 +124,13 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         toolbarCartBinding.tvToolbarCartCount.visibility = View.GONE
     }
 
+    override fun setLayoutVisibility() {
+        runOnUiThread {
+            binding.rvProductList.visibility = View.VISIBLE
+            binding.layoutSkeletonProductList.visibility = View.GONE
+        }
+    }
+
     override fun updateToolbarCartCountView(count: Int) {
         toolbarCartBinding.tvToolbarCartCount.text = count.toString()
     }
@@ -142,13 +149,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setProductItemsView(products: List<ProductModel>) {
-        if (::productListAdapter.isInitialized) {
+        runOnUiThread {
+            if (::productListAdapter.isInitialized) {
+                productListAdapter.setItems(products)
+                return@runOnUiThread
+            }
+            productListAdapter = ProductListAdapter(productListener)
             productListAdapter.setItems(products)
-            return
+            concatAdapter.addAdapter(1, productListAdapter)
         }
-        productListAdapter = ProductListAdapter(productListener)
-        productListAdapter.setItems(products)
-        concatAdapter.addAdapter(1, productListAdapter)
     }
 
     override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
@@ -196,6 +205,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
     override fun moveToCartView() {
         cartResultLauncher.launch(CartActivity.createIntent(this))
+    }
+
+    override fun showToast(message: Int) {
+        showToast(message)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

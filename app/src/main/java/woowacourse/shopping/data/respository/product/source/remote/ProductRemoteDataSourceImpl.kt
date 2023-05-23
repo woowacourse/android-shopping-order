@@ -1,34 +1,43 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
+import android.util.Log
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.product.ProductWebServer.PORT
 import woowacourse.shopping.data.respository.product.ProductWebServer.startServer
+import java.io.IOException
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     init {
         startServer()
     }
 
-    override fun requestDatas(startPosition: Int): List<ProductEntity> {
-        var newProducts: List<ProductEntity> = emptyList()
-
-        val thread = Thread {
+    override fun requestDatas(
+        onFailure: () -> Unit,
+        onSuccess: (products: List<ProductEntity>) -> Unit,
+    ) {
+        Thread {
             val client = OkHttpClient()
             val host = "http://localhost:$PORT"
-            val path = "/shopping/products?$startPosition"
+            val path = "/shopping/products?"
             val request = Request.Builder().url(host + path).build()
-            val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: return@Thread
-            newProducts = parseProductList(body)
-        }
-        thread.start()
-        thread.join()
-
-        return newProducts
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.d("krrong", e.toString())
+                    onFailure()
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string() ?: return onFailure()
+                    onSuccess(parseProductList(body))
+                }
+            })
+        }.start()
     }
 
     override fun requestData(productId: Long): ProductEntity {
