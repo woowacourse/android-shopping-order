@@ -45,14 +45,8 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
 
         OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
-
-            override fun onResponse(call: Call, response: Response) {
-            }
+            override fun onResponse(call: Call, response: Response) {}
         })
-    }
-
-    override fun minus(basketProduct: DataBasketProduct) {
-        TODO("Not yet implemented")
     }
 
     override fun update(basketProduct: DataBasketProduct) {

@@ -34,8 +34,6 @@ interface BasketDataSource {
 
         fun add(basketProduct: DataBasketProduct)
 
-        fun minus(basketProduct: DataBasketProduct)
-
         fun update(basketProduct: DataBasketProduct)
 
         fun remove(basketProduct: DataBasketProduct)
