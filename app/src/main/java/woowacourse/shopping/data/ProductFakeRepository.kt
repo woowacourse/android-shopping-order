@@ -34,14 +34,11 @@ class ProductFakeRepository : ProductRepository {
         onSuccess: (List<Product>) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
-        getAll({ products ->
-            val nextProducts = if (products.size < count) {
-                products // If available items are less than count, return all items
-            } else {
-                products.subList(offset, offset + count) // Otherwise, return the sublist
-            }
-            onSuccess(nextProducts)
-        }, onFailure)
+        for (i in offset..offset + count) {
+            findById(i.toLong(), { product ->
+                onSuccess(listOf(product))
+            }, onFailure)
+        }
         offset += count
     }
 

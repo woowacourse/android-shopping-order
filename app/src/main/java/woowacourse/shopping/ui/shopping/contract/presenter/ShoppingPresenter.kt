@@ -47,6 +47,9 @@ class ShoppingPresenter(
         )
         if (productsData.isEmpty()) {
             productsData.add(recentProductsData)
+        }
+        if (recentProductsData.product.isEmpty()) {
+            productsData.removeIf { it is RecentProductsItem }
         } else {
             if (productsData[0] is RecentProductsItem) {
                 productsData[0] = recentProductsData
