@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import android.util.Log
 import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
@@ -83,10 +84,10 @@ class ShoppingPresenter(
     override fun addBasketProduct(product: Product) {
         basketRepository.add(product) {
             basket = basket.plus(BasketProduct(id = it, count = Count(1), product = product))
+            fetchBasketCount()
+            fetchTotalBasketCount()
+            view.updateProducts(totalProducts)
         }
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
     }
 
     override fun updateProducts() {
