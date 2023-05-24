@@ -106,7 +106,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.removeItem(productId)
         }
         override fun onItemClick(product: CartProductUIModel) {
-            presenter.navigateToItemDetail(product.id)
+            presenter.navigateToItemDetail(product.toProduct().id)
         }
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)

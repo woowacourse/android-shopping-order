@@ -10,6 +10,7 @@ fun CartProduct.toUIModel(): CartProductUIModel {
         count = this.count,
         checked = this.checked,
         price = this.price,
-        imageUrl = this.imageUrl
+        imageUrl = this.imageUrl,
+        productId = this.productId
     )
 }

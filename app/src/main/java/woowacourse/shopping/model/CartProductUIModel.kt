@@ -8,5 +8,13 @@ data class CartProductUIModel(
     val count: Int,
     val checked: Boolean,
     val price: Int,
-    val imageUrl: String
-) : Serializable
+    val imageUrl: String,
+    val productId: Int
+) : Serializable {
+    fun toProduct() = Product(
+        id = productId,
+        name = name,
+        price = price,
+        imageUrl = imageUrl
+    )
+}
