@@ -8,6 +8,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.model.page.LoadMore
 import woowacourse.shopping.domain.model.page.Page
+import woowacourse.shopping.domain.repository.CartRemoteRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -23,7 +24,7 @@ class ShoppingPresenter(
     view: View,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
+    private val cartRepository: CartRemoteRepository,
     private val recentProductSize: Int = 10,
     private var recentProducts: RecentProducts = RecentProducts(),
     cartSize: Int = 20,
@@ -31,29 +32,29 @@ class ShoppingPresenter(
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = cartSize)
     private val cartProductCount: UiProductCount
-        get() = UiProductCount(cartRepository.getProductInCartSize())
+        get() = UiProductCount(cartRepository.getAllCartProduct().size)
 
     override fun fetchAll() {
         loadMoreProducts()
         fetchRecentProducts()
     }
 
-    private fun convertToCartProduct(product: Product): DomainCartProduct {
-        val cartEntity = cartRepository.getCartEntity(product.id)
-        return DomainCartProduct(
-            cartEntity.id,
-            product,
-            ProductCount(cartEntity.count),
-            cartEntity.checked
-        )
-    }
+//    private fun convertToCartProduct(product: Product): DomainCartProduct {
+//        val cartEntity = cartRepository.getCartEntity(product.id)
+//        return DomainCartProduct(
+//            cartEntity.id,
+//            product,
+//            ProductCount(cartEntity.count),
+//            cartEntity.checked,
+//        )
+//    }
 
     override fun fetchRecentProducts() {
         updateRecentProducts(recentProductRepository.getPartially(recentProductSize))
     }
 
     override fun loadMoreProducts() {
-        updateCart(cart + loadCartProducts(currentPage))
+        updateCart(cart + loadCartProducts())
         view.updateLoadMoreVisible()
         currentPage = currentPage.next()
     }
@@ -76,13 +77,13 @@ class ShoppingPresenter(
 
     override fun increaseCartCount(product: UiProduct, count: Int) {
         val newProduct = product.toDomain()
-        cartRepository.increaseCartCount(newProduct, count)
+//        cartRepository.increaseCartCount(newProduct, count)
         updateCart(cart.increaseProductCount(newProduct, count))
     }
 
     override fun decreaseCartCount(product: UiProduct, count: Int) {
         val removingProduct = product.toDomain()
-        cartRepository.decreaseCartCount(removingProduct, count)
+//        cartRepository.decreaseCartCount(removingProduct, count)
         updateCart(cart.decreaseProductCount(removingProduct, count))
     }
 
@@ -105,7 +106,5 @@ class ShoppingPresenter(
         view.updateRecentProducts(recentProducts.getItems().toUi())
     }
 
-    private fun loadCartProducts(page: Page): List<DomainCartProduct> = productRepository
-        .getProductByPage(page)
-        .map { convertToCartProduct(it) }
+    private fun loadCartProducts(): List<DomainCartProduct> = cartRepository.getAllCartProduct()
 }

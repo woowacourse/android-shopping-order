@@ -6,12 +6,13 @@ import woowacourse.shopping.data.datasource.recentproduct.RecentProductDataSourc
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-fun inject(localDataSource: ProductDataSource.Remote): ProductRepository =
-    ProductRepositoryImpl(localDataSource)
+fun inject(productService: ProductService): ProductRepository =
+    ProductRepositoryImpl(productService)
 
 fun inject(localDataSource: RecentProductDataSource.Local): RecentProductRepository =
     RecentProductRepositoryImpl(localDataSource)

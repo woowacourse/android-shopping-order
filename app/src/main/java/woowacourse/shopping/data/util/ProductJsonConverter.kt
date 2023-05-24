@@ -1,10 +1,21 @@
 package woowacourse.shopping.data.util
 
+import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.data.model.Price
 import woowacourse.shopping.data.model.Product
 
-typealias ProductId = Int
+fun String.convertJsonToProducts(): MutableList<Product> {
+    val products = mutableListOf<Product>()
+    val jsonArray = JSONArray(this)
+
+    for (i in 0 until jsonArray.length()) {
+        val cartProductJson = jsonArray.getJSONObject(i).toString()
+        val cartProduct = cartProductJson.convertJsonToProduct()
+        products.add(cartProduct)
+    }
+    return products
+}
 
 fun String.convertJsonToProduct(): Product {
     val jsonObject = JSONObject(this)

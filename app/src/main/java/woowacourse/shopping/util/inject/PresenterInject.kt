@@ -3,7 +3,11 @@ package woowacourse.shopping.util.inject
 import android.content.Context
 import woowacourse.shopping.data.repository.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.service.CartServiceImpl
+import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.data.service.ProductServiceImpl
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartContract
@@ -22,9 +26,9 @@ fun inject(
     val database = createShoppingDatabase(context)
     return ShoppingPresenter(
         view,
-        inject(inject()),
+        ProductRepositoryImpl(ProductServiceImpl()),
         inject(inject(injectRecentProductDao(database))),
-        inject(inject(injectCartDao(database))),
+        CartRemoteRepositoryImpl(CartServiceImpl()),
     )
 }
 
@@ -42,10 +46,9 @@ fun inject(
     view: CartContract.View,
     context: Context,
 ): CartPresenter {
-    val database = createShoppingDatabase(context)
     return CartPresenter(
         view,
-        inject(inject()),
+        ProductRepositoryImpl(ProductServiceImpl()),
         CartRemoteRepositoryImpl(CartServiceImpl()),
     )
 }
