@@ -29,7 +29,7 @@ interface ShoppingContract {
 
         fun removeBasketProduct(product: Product)
 
-        fun fetchProducts()
+        fun updateProducts()
 
         fun fetchRecentProducts()
 

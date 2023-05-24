@@ -34,7 +34,7 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     }
 
     override fun add(basketProduct: DataBasketProduct) {
-        val url = "${OkHttpModule.BASE_URL}/cart_items"
+        val url = "${OkHttpModule.BASE_URL}/cart-items"
         val requestBody = "{\"productId\":\"${basketProduct.product.id}\"}"
             .toRequestBody("application/json".toMediaTypeOrNull())
 
@@ -56,7 +56,7 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     }
 
     override fun update(basketProduct: DataBasketProduct) {
-        val url = "${OkHttpModule.BASE_URL}/cart_items/${basketProduct.id}"
+        val url = "${OkHttpModule.BASE_URL}/cart-items/${basketProduct.id}"
         val requestBody = "{\"quantity\":\"${basketProduct.count.value}\"}"
             .toRequestBody("application/json".toMediaTypeOrNull())
 
@@ -67,7 +67,6 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
 
         OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
-
             override fun onResponse(call: Call, response: Response) {}
         })
     }

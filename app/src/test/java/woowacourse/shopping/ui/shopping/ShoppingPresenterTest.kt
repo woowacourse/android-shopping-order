@@ -56,7 +56,7 @@ class ShoppingPresenterTest() {
         }
 
         // when
-        presenter.fetchProducts()
+        presenter.initProducts()
 
         // then
         verify(exactly = 1) { view.updateProducts(any()) }

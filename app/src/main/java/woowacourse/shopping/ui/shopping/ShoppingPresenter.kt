@@ -48,6 +48,7 @@ class ShoppingPresenter(
             fetchBasketCount()
             fetchTotalBasketCount()
             view.updateProducts(totalProducts)
+            updateProducts()
         }
     }
 
@@ -73,7 +74,7 @@ class ShoppingPresenter(
         view.updateProducts(totalProducts)
     }
 
-    override fun fetchProducts() {
+    override fun updateProducts() {
         productRepository
             .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId) { products ->
                 var uiProducts = products.map { it.toUi() }

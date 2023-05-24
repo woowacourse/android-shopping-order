@@ -64,7 +64,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         binding.rvShopping.turnOffSupportChangeAnimation()
         initPresenter()
         initAdapter()
-        initProductData()
         initRecentProductsData()
         initButtonBasketClickListener()
         initShoppingRecyclerViewScrollListener()
@@ -129,7 +128,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             presenter::removeBasketProduct,
             presenter::addBasketProduct
         )
-        moreButtonAdapter = MoreButtonAdapter(presenter::fetchProducts)
+        moreButtonAdapter = MoreButtonAdapter(presenter::updateProducts)
         concatAdapter =
             ConcatAdapter(
                 getConcatAdapterConfig(),
@@ -141,9 +140,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         binding.rvShopping.layoutManager = getGridLayoutManager()
     }
 
-    private fun initProductData() {
-        presenter.fetchProducts()
-    }
 
     private fun initRecentProductsData() {
         presenter.fetchRecentProducts()
