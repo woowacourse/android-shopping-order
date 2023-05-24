@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.ProductFakeRepository
+import woowacourse.shopping.data.repository.ProductFakeRepository
 import woowacourse.shopping.database.cart.CartDBHelper
 import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository
 
 import android.os.Looper
 import android.util.Log
@@ -9,6 +9,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import woowacourse.shopping.data.ProductJsonParser
 import java.io.IOException
 import java.lang.Thread.sleep
 
