@@ -17,8 +17,8 @@ interface CartRepository {
     )
 
     fun updateCartProductQuantity(
-        id: Product,
-        count: Int,
+        id: Int,
+        quantity: Int,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     )

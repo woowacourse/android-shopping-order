@@ -24,7 +24,7 @@ interface ProductDetailContract {
         fun loadProduct()
         fun loadRecentProduct()
         fun selectCount()
-        fun addCartProduct(count: Int)
+        fun addCartProduct(quantity: Int)
         fun plusCount(selectCountDialogBinding: DialogSelectCountBinding)
         fun minusCount(selectCountDialogBinding: DialogSelectCountBinding)
         fun navigateProductDetail()

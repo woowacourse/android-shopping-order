@@ -43,7 +43,6 @@ class CartRemoteService {
                     val result: List<CartProduct> = responseBody?.let {
                         parseJsonToCartProductList(it)
                     } ?: emptyList()
-
                     onSuccess(result)
                 }
             }
@@ -79,6 +78,42 @@ class CartRemoteService {
                 override fun onResponse(call: Call, response: Response) {
                     if (400 <= response.code) return onFailure()
                     response.headers["Location"]?.split("/")?.last()?.let { onSuccess(it.toInt()) }
+                    response.close()
+                }
+            }
+        )
+    }
+
+    fun requestUpdateCartProductQuantity(
+        url: String,
+        port: String = "8080",
+        user: String = BANDAL,
+        id: Int,
+        quantity: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val jsonObject = JSONObject()
+        jsonObject.put("quantity", quantity.toString())
+        val body = jsonObject.toString()
+            .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+        val baseUrl = "$url:$port"
+        val requestUrl = "$baseUrl/cart-items/$id"
+        val request = Request.Builder()
+            .addHeader("Authorization", "Basic $user")
+            .patch(body)
+            .url(requestUrl).build()
+
+        okHttpClient.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    onFailure()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (400 <= response.code) return onFailure()
+
                     response.close()
                 }
             }

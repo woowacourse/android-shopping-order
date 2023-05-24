@@ -34,12 +34,15 @@ class ProductDetailPresenter(
         view.showSelectCountDialog()
     }
 
-    override fun addCartProduct(count: Int) {
+    override fun addCartProduct(quantity: Int) {
         if (!isValidProduct()) return
         product!!
 
-        // todo cartRepository
-        cartRepository.addCartProduct(product.id, { }, { })
+        cartRepository.addCartProduct(
+            product.id, onFailure = { },
+            onSuccess = { cartRepository.updateCartProductQuantity(it, quantity, {}, {}) }
+        )
+
         view.showCart()
     }
 
