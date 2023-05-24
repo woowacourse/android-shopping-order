@@ -4,6 +4,7 @@ import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.BasketProduct
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 
 class BasketRepositoryImpl(
@@ -18,20 +19,8 @@ class BasketRepositoryImpl(
         }
     }
 
-    override fun add(basketProduct: BasketProduct) {
-        localBasketDataSource.add(basketProduct.toData())
-    }
-
-    override fun add2(basketProduct: BasketProduct) {
-        remoteBasketDataSource.add(basketProduct.toData())
-    }
-
-    override fun minus(basketProduct: BasketProduct) {
-        localBasketDataSource.minus(basketProduct.toData())
-    }
-
-    override fun overWriteUpdate(basketProduct: BasketProduct) {
-        localBasketDataSource.overWriteUpdate(basketProduct.toData())
+    override fun add(product: Product, onReceived: (Int) -> Unit) {
+        remoteBasketDataSource.add(product.toData(), onReceived)
     }
 
     override fun update(basketProduct: BasketProduct) {
