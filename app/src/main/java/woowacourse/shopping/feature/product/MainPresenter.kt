@@ -66,8 +66,9 @@ class MainPresenter(
     }
 
     override fun storeCartProduct(productState: ProductState) {
-//        cartRepository.addProduct(productState.id, MIN_COUNT_VALUE)
-//        loadCartProductCountBadge()
+        cartRepository.addCartProduct(productState.id, { }, { })
+        loadCartProductCounts()
+        loadCartProductCountBadge()
     }
 
     override fun minusCartProductCount(productState: ProductState) {

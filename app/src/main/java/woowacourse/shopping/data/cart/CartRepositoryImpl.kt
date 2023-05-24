@@ -14,7 +14,7 @@ class CartRepositoryImpl(
         onFailure: () -> Unit
     ) {
         Thread {
-            service.requestAllProducts(
+            service.requestAllCartProducts(
                 url = url,
                 onSuccess = onSuccess,
                 onFailure = onFailure
@@ -27,7 +27,14 @@ class CartRepositoryImpl(
         onSuccess: (cartId: Int) -> Unit,
         onFailure: () -> Unit
     ) {
-        TODO("Not yet implemented")
+        Thread {
+            service.requestAddCartProduct(
+                url = url,
+                productId = productId,
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            )
+        }.start()
     }
 
     override fun updateCartProductQuantity(

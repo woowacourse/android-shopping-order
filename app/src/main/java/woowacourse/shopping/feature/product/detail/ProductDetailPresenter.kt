@@ -39,8 +39,8 @@ class ProductDetailPresenter(
         product!!
 
         // todo cartRepository
-//        cartRepository.addProduct(product.id, count)
-//        view.showCart()
+        cartRepository.addCartProduct(product.id, { }, { })
+        view.showCart()
     }
 
     override fun minusCount(selectCountDialogBinding: DialogSelectCountBinding) {
