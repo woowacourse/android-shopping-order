@@ -3,6 +3,7 @@ package woowacourse.shopping.data
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
+import woowacourse.shopping.data.service.ProductRemoteService
 import java.lang.Thread.sleep
 
 class ProductRemoteRepositoryImpl(

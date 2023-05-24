@@ -9,12 +9,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartRepositoryImpl
+import woowacourse.shopping.data.CartCache
+import woowacourse.shopping.data.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.ProductCacheImpl
 import woowacourse.shopping.data.ProductRemoteRepositoryImpl
-import woowacourse.shopping.data.ProductRemoteService
 import woowacourse.shopping.data.RecentProductRepositoryImpl
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.service.ProductRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             this,
             ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this)),
-            CartRepositoryImpl(CartDao(this))
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache())
         )
     }
 

@@ -8,8 +8,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartRepositoryImpl
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.CartCache
+import woowacourse.shopping.data.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.service.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
@@ -33,7 +34,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val cartPresenter = CartPresenter(this, CartRepositoryImpl(CartDao(this)))
+        val cartPresenter = CartPresenter(
+            this,
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache())
+        )
         presenter = cartPresenter
         binding.presenter = cartPresenter
         presenter.setup()

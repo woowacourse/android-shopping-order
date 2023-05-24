@@ -11,8 +11,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartRepositoryImpl
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.CartCache
+import woowacourse.shopping.data.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.service.CartRemoteService
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -30,7 +31,11 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
         val product = intent.getParcelableCompat<ProductUiModel>(PRODUCT_KEY)
             ?: return keyError(PRODUCT_KEY)
-        presenter = DetailPresenter(this, CartRepositoryImpl(CartDao(this)), product)
+        presenter = DetailPresenter(
+            this,
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache()),
+            product
+        )
         binding.presenter = presenter
 
         initRecentProduct()
