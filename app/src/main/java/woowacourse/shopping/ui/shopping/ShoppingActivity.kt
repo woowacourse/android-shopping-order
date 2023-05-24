@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.TextView
@@ -33,7 +35,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initServerURL()
         initBinding()
         initToolbar()
         initPresenter()
@@ -64,10 +65,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun initToolbar() {
         setSupportActionBar(binding.toolbar)
-    }
-
-    private fun initServerURL() {
-        ServerURL.url = "http://13.125.207.155:8080/"
     }
 
     private fun initPresenter() {
@@ -127,5 +124,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun navigateToCart() {
         startActivity(CartActivity.getIntent(this))
+    }
+
+    companion object {
+        fun getIntent(context: Context, server: String): Intent {
+            ServerURL.url = server
+            return Intent(context, ShoppingActivity::class.java)
+        }
     }
 }

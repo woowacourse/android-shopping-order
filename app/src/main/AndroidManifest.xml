@@ -23,6 +23,9 @@
             android:exported="false" />
         <activity
             android:name=".ui.shopping.ShoppingActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.serverSetting.ServerSettingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
