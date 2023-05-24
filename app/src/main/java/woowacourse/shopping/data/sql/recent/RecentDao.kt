@@ -4,11 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import woowacourse.shopping.data.model.RecentProductEntity
-import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class RecentDao(
@@ -34,9 +31,9 @@ class RecentDao(
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
-            // val shownDateTime = LocalDateTime.ofEpochSecond(data.dateTimeMills, 0, ZoneOffset.UTC)
             recentlyShownProducts.add(data)
         }
 
@@ -44,21 +41,20 @@ class RecentDao(
         return recentlyShownProducts
     }
 
-    private fun selectAll(): List<RecentProduct> {
+    private fun selectAll(): List<RecentProductEntity> {
         val cursor = readableDatabase.rawQuery(
             "SELECT * FROM ${RecentTableContract.TABLE_NAME}",
             null,
         )
 
-        val recentlyShownProducts = mutableListOf<RecentProduct>()
+        val recentlyShownProducts = mutableListOf<RecentProductEntity>()
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
-            val product: Product = productsDatasource.find { it.id == data.productId } ?: continue
-            val shownDateTime = LocalDateTime.ofEpochSecond(data.dateTimeMills, 0, ZoneOffset.UTC)
-            recentlyShownProducts.add(RecentProduct(product, shownDateTime))
+            recentlyShownProducts.add(data)
         }
 
         cursor.close()
@@ -66,7 +62,7 @@ class RecentDao(
     }
 
     fun putRecentProduct(recentProduct: RecentProduct) {
-        val findRecentProduct = selectAll().find { it.product.id == recentProduct.product.id }
+        val findRecentProduct = selectAll().find { it.productId == recentProduct.product.id }
 
         if (findRecentProduct != null) {
             updateRecentProduct(recentProduct)
@@ -79,6 +75,7 @@ class RecentDao(
         val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
         val values = ContentValues().apply {
             put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, recentProduct.product.id)
+            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, recentProduct.product.imgUrl)
             put(RecentTableContract.TABLE_COLUMN_DATE_TIME, timeSecond)
         }
         writableDatabase.insert(RecentTableContract.TABLE_NAME, null, values)
@@ -94,6 +91,6 @@ class RecentDao(
 
     companion object {
         private const val DB_NAME = "recent_db"
-        private const val VERSION = 1
+        private const val VERSION = 2
     }
 }
