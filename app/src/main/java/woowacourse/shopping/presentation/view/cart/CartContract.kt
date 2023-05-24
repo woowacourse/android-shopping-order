@@ -12,6 +12,7 @@ interface CartContract {
         fun setPageCountView(page: Int)
         fun setTotalPriceView(totalPrice: Int)
         fun updateAllChecking(startPosition: Int, count: Int)
+        fun setLayoutVisibility()
     }
 
     interface Presenter {

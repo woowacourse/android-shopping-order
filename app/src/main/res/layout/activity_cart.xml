@@ -14,10 +14,17 @@
         android:layout_height="match_parent"
         tools:context=".presentation.view.cart.CartActivity">
 
+        <include
+            android:id="@+id/layout_skeleton_cart_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/layout_skeleton_cart_list" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/linearlayout_cart_list_pager"
             app:layout_constraintEnd_toEndOf="parent"
@@ -29,6 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="25dp"
+            android:visibility="gone"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@id/cl_cart_bottom_container"
@@ -59,6 +67,8 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:visibility="gone"
+
             android:id="@+id/cl_cart_bottom_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

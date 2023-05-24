@@ -24,6 +24,7 @@ class CartPresenter(
             carts.addAll(it.map { cartEntity2 -> cartEntity2.toUIModel() })
             loadCartItems()
             calculateTotalPrice()
+            view.setLayoutVisibility()
         }
     }
 

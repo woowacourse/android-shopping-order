@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp">
+
+    <View
+        android:id="@+id/view_skeleton_cart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/skeleton_background_cart_color"
+        app:layout_constraintDimensionRatio="H,2.5:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_skeleton_product_title"
+        android:layout_width="0dp"
+        android:layout_height="26dp"
+        android:layout_marginHorizontal="14dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/skeleton_background_color"
+        app:layout_constraintEnd_toEndOf="@id/view_skeleton_cart"
+        app:layout_constraintStart_toStartOf="@id/view_skeleton_cart"
+        app:layout_constraintTop_toTopOf="@id/view_skeleton_cart" />
+
+    <View
+        android:id="@+id/iv_skeleton_cart"
+        android:layout_width="134dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/skeleton_background_color"
+        app:layout_constraintStart_toStartOf="@id/tv_skeleton_product_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_skeleton_product_title" />
+
+    <TextView
+        android:id="@+id/tv_skeleton_product_one"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="14dp"
+        android:background="@color/skeleton_background_color"
+        app:layout_constraintEnd_toEndOf="@id/view_skeleton_cart"
+        app:layout_constraintStart_toEndOf="@id/iv_skeleton_cart"
+        app:layout_constraintTop_toTopOf="@id/iv_skeleton_cart" />
+
+    <TextView
+        android:id="@+id/tv_skeleton_product_two"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="14dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/skeleton_background_color"
+        app:layout_constraintEnd_toEndOf="@id/view_skeleton_cart"
+        app:layout_constraintStart_toEndOf="@id/iv_skeleton_cart"
+        app:layout_constraintTop_toBottomOf="@id/tv_skeleton_product_one" />
+
+    <TextView
+        android:id="@+id/tv_skeleton_product_three"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="14dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/skeleton_background_color"
+        app:layout_constraintEnd_toEndOf="@id/view_skeleton_cart"
+        app:layout_constraintStart_toEndOf="@id/iv_skeleton_cart"
+        app:layout_constraintTop_toBottomOf="@id/tv_skeleton_product_two" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

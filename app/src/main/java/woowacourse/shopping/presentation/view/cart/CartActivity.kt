@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -136,6 +137,21 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setTotalPriceView(totalPrice: Int) {
         binding.totalPrice = totalPrice
+    }
+
+    override fun setLayoutVisibility() {
+        binding.layoutSkeletonCartList.post {
+            binding.layoutSkeletonCartList.visibility = View.GONE
+        }
+        binding.rvCart.post {
+            binding.rvCart.visibility = View.VISIBLE
+        }
+        binding.linearlayoutCartListPager.post {
+            binding.linearlayoutCartListPager.visibility = View.VISIBLE
+        }
+        binding.clCartBottomContainer.post {
+            binding.clCartBottomContainer.visibility = View.VISIBLE
+        }
     }
 
     companion object {

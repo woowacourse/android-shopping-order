@@ -19,6 +19,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         onSuccess: (products: List<CartEntity2>) -> Unit,
     ) {
         Thread {
+            Thread.sleep(3000)
             val client = OkHttpClient()
             val host = BASE_URL_JENNA
             val path = CART
