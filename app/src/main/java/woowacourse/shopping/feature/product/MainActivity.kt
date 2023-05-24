@@ -21,8 +21,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
 import woowacourse.shopping.data.cart.CartDao
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.MockProductRemoteService
-import woowacourse.shopping.data.product.MockRemoteProductRepositoryImpl
+import woowacourse.shopping.data.product.ProductRemoteService
+import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
@@ -44,17 +44,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val cartRepository: CartRepository by lazy {
         CartRepositoryImpl(
-            MockProductRemoteService(),
+            ProductRemoteService(),
             CartDao(this)
         )
     }
     private val presenter: MainContract.Presenter by lazy {
         val url = intent.getStringExtra(KEY_SERVER) ?: ""
-        val mockProductRemoteService = MockProductRemoteService()
+        val productRemoteService = ProductRemoteService()
         val productRepository: ProductRepository =
-            MockRemoteProductRepositoryImpl(url, mockProductRemoteService)
+            ProductRepositoryImpl(url, productRemoteService)
         val recentProductRepository: RecentProductRepository =
-            RecentProductRepositoryImpl(url, mockProductRemoteService, RecentProductDao(this))
+            RecentProductRepositoryImpl(url, productRemoteService, RecentProductDao(this))
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
     }
     private val productListAdapter: ProductListAdapter by lazy {

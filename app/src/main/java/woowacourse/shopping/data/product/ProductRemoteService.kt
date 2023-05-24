@@ -14,7 +14,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
-class MockProductRemoteService {
+class ProductRemoteService {
     private var _mockWebServer: MockWebServer? = null
     private val mockWebServer: MockWebServer get() = _mockWebServer!!
     private val okHttpClient = OkHttpClient()

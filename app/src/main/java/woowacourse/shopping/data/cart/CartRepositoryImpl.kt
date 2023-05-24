@@ -2,10 +2,10 @@ package woowacourse.shopping.data.cart
 
 import com.example.domain.CartProduct
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.product.MockProductRemoteService
+import woowacourse.shopping.data.product.ProductRemoteService
 
 class CartRepositoryImpl(
-    private val productMockProductRemoteService: MockProductRemoteService,
+    private val productProductRemoteService: ProductRemoteService,
     private val cartDao: CartDao,
 ) : CartRepository {
 

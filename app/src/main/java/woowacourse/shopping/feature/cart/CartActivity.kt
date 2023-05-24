@@ -10,7 +10,7 @@ import com.example.domain.repository.CartRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartDao
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.MockProductRemoteService
+import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.util.extension.formatPriceWon
@@ -21,7 +21,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         get() = _binding!!
 
     private val presenter: CartContract.Presenter by lazy {
-        val cartRepo: CartRepository = CartRepositoryImpl(MockProductRemoteService(), CartDao(this))
+        val cartRepo: CartRepository = CartRepositoryImpl(ProductRemoteService(), CartDao(this))
         CartPresenter(this, cartRepo)
     }
     private val adapter: CartProductListAdapter by lazy {

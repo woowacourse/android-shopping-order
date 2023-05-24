@@ -3,9 +3,9 @@ package woowacourse.shopping.data.product
 import com.example.domain.Product
 import com.example.domain.repository.ProductRepository
 
-class MockRemoteProductRepositoryImpl(
+class ProductRepositoryImpl(
     private val url: String,
-    private val service: MockProductRemoteService
+    private val service: ProductRemoteService
 ) : ProductRepository {
 
     override fun getAll(
