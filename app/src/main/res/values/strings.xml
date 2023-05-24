@@ -10,4 +10,7 @@
     <string name="order_button_message">주문하기(%d)</string>
     <string name="latest_product">마지막으로 본 상품</string>
     <string name="cart_insert_message">담기</string>
+    <string name="tv_select_server_title">환영합니다. \n사용할 서버를 선택해 주세요!</string>
+    <string name="btn_select_server_hongsil">Welcome!\nHongsil\'s \nServer</string>
+    <string name="btn_select_server_matthew">Welcome!\nMatthew\'s \nServer</string>
 </resources>
