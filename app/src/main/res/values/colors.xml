@@ -13,4 +13,5 @@
     <color name="pagination_button_disabled">#D6D6D6</color>
 
     <color name="skeleton_inner">#E2E2E2</color>
+    <color name="skeleton_outer">#F3F3F3</color>
 </resources>

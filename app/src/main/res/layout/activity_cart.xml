@@ -20,6 +20,7 @@
             app:titleTextColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
             android:id="@+id/cart_product_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -30,6 +31,68 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cart_toolbar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/skeleton_cart_product_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingTop="24dp"
+            android:paddingHorizontal="18dp"
+            app:layout_constraintBottom_toTopOf="@id/cart_bottom_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cart_toolbar">
+
+            <include
+                layout="@layout/item_cart_product_list_skeleton"
+                android:id="@+id/skeleton_cart_0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <include
+                android:layout_marginTop="24dp"
+                layout="@layout/item_cart_product_list_skeleton"
+                android:id="@+id/skeleton_cart_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/skeleton_cart_0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <include
+                android:layout_marginTop="24dp"
+                layout="@layout/item_cart_product_list_skeleton"
+                android:id="@+id/skeleton_cart_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/skeleton_cart_1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <include
+                android:layout_marginTop="24dp"
+                layout="@layout/item_cart_product_list_skeleton"
+                android:id="@+id/skeleton_cart_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/skeleton_cart_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <include
+                android:layout_marginTop="24dp"
+                layout="@layout/item_cart_product_list_skeleton"
+                android:id="@+id/skeleton_cart_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/skeleton_cart_3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cart_bottom_bar"
