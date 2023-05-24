@@ -1,8 +1,6 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.Product
-
 interface ProductRemoteDataSource {
-    val products: List<Product>
-    fun findProductById(id: Int): Product
+    val products: List<ProductDataModel>
+    fun findProductById(id: Int): ProductDataModel
 }

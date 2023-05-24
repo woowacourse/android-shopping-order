@@ -42,9 +42,9 @@ class ProductItemViewHolder(
 
     private fun setAddButtonClick() {
         binding.buttonProductListAddCart.setOnClickListener {
+            counterPresenter.updateCount(1)
             presenter.putProductInCart(productModel)
             presenter.updateCartProductInfoList()
-            counterPresenter.updateCount(1)
         }
     }
 

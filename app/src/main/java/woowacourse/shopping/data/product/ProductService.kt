@@ -5,33 +5,41 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import woowacourse.shopping.Product
 import woowacourse.shopping.data.ApiClient
-import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.mapper.toDataModel
 
 class ProductService : ProductRemoteDataSource {
-    override val products: List<Product> = getAllProducts()
-    override fun findProductById(id: Int): Product {
-        ApiClient.getApiService("products/$id")?.let {
-            return parseToProduct(it)
+    override val products: List<ProductDataModel> = getAllProducts()
+    override fun findProductById(id: Int): ProductDataModel {
+        var product: ProductDataModel? = null
+        val thread = Thread {
+            val response = ApiClient().getApiService("products/$id")
+            val responseBody = response.body?.string()
+            product = parseToProduct(responseBody)
         }
-        return Product.defaultProduct
+        thread.start()
+        thread.join()
+        return product ?: Product.defaultProduct.toDataModel()
     }
 
-    private fun getAllProducts(): List<Product> {
-        val responseBody = ApiClient.getApiService("products") ?: return emptyList()
-        return parseToProducts(responseBody)
+    private fun getAllProducts(): List<ProductDataModel> {
+        var products = emptyList<ProductDataModel>()
+        val thread = Thread {
+            val response = ApiClient().getApiService("products")
+            val responseBody = response.body?.string()
+            products = parseToProducts(responseBody)
+        }
+        thread.start()
+        thread.join()
+        return products
     }
 
-    private fun parseToProducts(responseBody: String?): List<Product> {
+    private fun parseToProducts(responseBody: String?): List<ProductDataModel> {
         val gson = GsonBuilder().create()
-        val result = gson.fromJson(responseBody, Array<ProductDataModel>::class.java)
-        return result.map {
-            it.toDomain()
-        }
+        return gson.fromJson(responseBody, Array<ProductDataModel>::class.java).toList()
     }
 
-    private fun parseToProduct(responseBody: String?): Product {
+    private fun parseToProduct(responseBody: String?): ProductDataModel {
         val jsonObject = JsonParser.parseString(responseBody).asJsonObject
-        val data = Gson().fromJson(jsonObject, ProductDataModel::class.java)
-        return data.toDomain()
+        return Gson().fromJson(jsonObject, ProductDataModel::class.java)
     }
 }

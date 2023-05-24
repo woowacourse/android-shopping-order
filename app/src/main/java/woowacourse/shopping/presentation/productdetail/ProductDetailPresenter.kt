@@ -25,13 +25,13 @@ class ProductDetailPresenter(
     override val mostRecentProduct: SafeLiveData<Product> get() = _mostRecentProduct
 
     init {
-        _productInfo.value =
-            cartRepository.getCartProductInfoById(productModel.id) ?: _productInfo.value
     }
 
     override fun checkCurrentProductIsMostRecent() {
         _mostRecentProduct.value = recentProductRepository.getMostRecentProduct()
-        if (mostRecentProduct.value == productInfo.value.product) view.hideMostRecentProduct()
+        if (mostRecentProduct.value == productInfo.value.product || mostRecentProduct.value.id
+            == -1
+        ) view.hideMostRecentProduct()
     }
 
     override fun saveRecentProduct() {

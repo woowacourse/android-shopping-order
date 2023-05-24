@@ -13,9 +13,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDao
-import woowacourse.shopping.data.cart.CartDbHelper
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.CartService
+import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.product.ProductService
@@ -43,9 +43,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             ProductRepositoryImpl(productRemoteDataSource),
             RecentProductRepositoryImpl(
                 RecentProductDao(RecentProductDbHelper(this)),
-                ProductService(),
+                productRemoteDataSource,
             ),
-            CartRepositoryImpl(CartDao(CartDbHelper(this)), productRemoteDataSource),
+            CartRepositoryImpl(CartService(PreferenceUtil(this))),
         )
     }
 

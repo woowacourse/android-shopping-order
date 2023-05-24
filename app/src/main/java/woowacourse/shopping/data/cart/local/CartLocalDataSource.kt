@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.cart.local
 
-import woowacourse.shopping.data.cart.CartDataModel
+import woowacourse.shopping.data.cart.CartLocalDataModel
 
 interface CartLocalDataSource {
     fun addProduct(productId: Int)
     fun deleteCartProduct(productId: Int)
-    fun updateProductCount(cartProductInfo: CartDataModel)
-    fun getProductsInfo(limit: Int, offset: Int): List<CartDataModel>
-    fun getAllProductsInfo(): List<CartDataModel>
-    fun getProductInfoById(id: Int): CartDataModel?
+    fun updateProductCount(cartProductInfo: CartLocalDataModel)
+    fun getProductsInfo(limit: Int, offset: Int): List<CartLocalDataModel>
+    fun getAllProductsInfo(): List<CartLocalDataModel>
+    fun getProductInfoById(id: Int): CartLocalDataModel?
 }

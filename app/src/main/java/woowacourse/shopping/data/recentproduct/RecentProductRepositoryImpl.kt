@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.recentproduct
 
 import woowacourse.shopping.Product
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.repository.RecentProductRepository
 
@@ -19,12 +20,13 @@ class RecentProductRepositoryImpl constructor(
     override fun getRecentProducts(size: Int): List<Product> {
         val recentProductIdList = recentProductLocalDataSource.getRecentProductIdList(size)
         return recentProductIdList.map {
-            productRemoteDataSource.findProductById(it)
+            productRemoteDataSource.findProductById(it).toDomain()
         }
     }
 
     override fun getMostRecentProduct(): Product {
         val mostRecentProductId = recentProductLocalDataSource.getMostRecentProductId()
-        return productRemoteDataSource.findProductById(mostRecentProductId)
+        if (mostRecentProductId == -1) return Product.defaultProduct
+        return productRemoteDataSource.findProductById(mostRecentProductId).toDomain()
     }
 }

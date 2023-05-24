@@ -8,7 +8,7 @@ data class Product(
 ) {
     companion object {
         val defaultProduct = Product(
-            id = 0,
+            id = -1,
             imageUrl = "",
             name = "상품을 불러올 수 없음",
             price = Price(0),

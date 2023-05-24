@@ -19,7 +19,8 @@ class CartOffsetPaging(
     }
 
     override fun loadPageItems(page: Page): List<CartProductInfo> {
-        return cartRepository.getCartProductsInfo(limit, page.getOffset(limit)).items
+        val cartProductList = cartRepository.getAllCartProductsInfo()
+        return cartProductList.getItemsInRange(page.getOffset(limit), limit).items
     }
 
     override fun isPlusPageAble(): Boolean {

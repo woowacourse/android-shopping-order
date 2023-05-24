@@ -9,9 +9,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDao
-import woowacourse.shopping.data.cart.CartDbHelper
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.CartService
+import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.product.ProductService
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
@@ -51,6 +51,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun initProductModel() {
+
         intent.getParcelableExtraCompat<ProductModel>(PRODUCT_KEY_VALUE)?.let { recievedProduct ->
             productModel = recievedProduct
         } ?: noIntentExceptionHandler(getString(R.string.product_model_null_error_message))
@@ -59,7 +60,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private fun initPresenter() {
         presenter = ProductDetailPresenter(
             view = this,
-            cartRepository = CartRepositoryImpl(CartDao(CartDbHelper(this)), ProductService()),
+            cartRepository = CartRepositoryImpl(
+                CartService(PreferenceUtil(this)),
+            ),
             productModel = productModel,
             recentProductRepository = RecentProductRepositoryImpl(
                 RecentProductDao(
