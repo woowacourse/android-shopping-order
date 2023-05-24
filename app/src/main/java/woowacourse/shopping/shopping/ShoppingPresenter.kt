@@ -4,7 +4,6 @@ import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.model.mapper.ProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ProductMapper.toView
-import woowacourse.shopping.common.model.mapper.RecentProductMapper.toView
 import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toView
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
@@ -41,8 +40,8 @@ class ShoppingPresenter(
     }
 
     override fun updateRecentProducts() {
-        val recentProducts = recentProductRepository.getAll()
-        view.updateRecentProducts(recentProducts.getRecentProducts(recentProductSize).value.map { it.toView() })
+        // val recentProducts = recentProductRepository.getAll()
+        // view.updateRecentProducts(recentProducts.getRecentProducts(recentProductSize).value.map { it.toView() })
     }
 
     override fun setUpCartAmount() {
@@ -64,16 +63,16 @@ class ShoppingPresenter(
         latestRecentProduct?.product == this
 
     private fun updateRecentProducts(productModel: ProductModel) {
-        val recentProducts = recentProductRepository.getAll()
-        var recentProduct = recentProductRepository.getByProduct(productModel.toDomain())
-
-        if (recentProduct == null) {
-            recentProduct = recentProducts.makeRecentProduct(productModel.toDomain())
-            addRecentProduct(recentProduct)
-        } else {
-            recentProduct = recentProduct.updateTime()
-            updateRecentProduct(recentProduct)
-        }
+        // val recentProducts = recentProductRepository.getAll()
+        // var recentProduct = recentProductRepository.getByProduct(productModel.toDomain())
+        //
+        // if (recentProduct == null) {
+        //     recentProduct = recentProducts.makeRecentProduct(productModel.toDomain())
+        //     addRecentProduct(recentProduct)
+        // } else {
+        //     recentProduct = recentProduct.updateTime()
+        //     updateRecentProduct(recentProduct)
+        // }
     }
 
     private fun addRecentProduct(recentProduct: RecentProduct) {

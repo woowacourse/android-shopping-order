@@ -9,29 +9,25 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.Storage
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
-import kotlin.concurrent.thread
 
 class ProductRemoteDataSource {
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient = OkHttpClient()
 
-    init {
-        thread {
-            startMockWebServer()
-        }
-        okHttpClient = OkHttpClient()
-    }
-
-    fun getProducts(path: Int, onSuccess: (List<Product>) -> Unit) {
-        val url = "http://localhost:8080/products/$path"
+    fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+        val baseUrl = Server.getUrl(Storage.server)
+        val url = "$baseUrl/$PATH"
         val request = Request.Builder().url(url).build()
         val handler = Handler(Looper.myLooper()!!)
         val products = mutableListOf<Product>()
 
         okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
+            override fun onFailure(call: Call, e: IOException) {
+                onFailure()
+            }
 
             override fun onResponse(call: Call, response: Response) {
                 val input = response.body?.string()
@@ -41,7 +37,6 @@ class ProductRemoteDataSource {
                     products.add(createProduct(jsonObject))
                 }
 
-                Thread.sleep(2000)
                 handler.post {
                     onSuccess(products)
                 }
@@ -51,9 +46,18 @@ class ProductRemoteDataSource {
 
     private fun createProduct(response: JSONObject): Product {
         return Product(
-            picture = URL(response.getString("imageUrl")),
-            title = response.getString("name"),
-            price = response.getInt("price")
+            id = response.getInt(KEY_ID),
+            picture = URL(response.getString(KEY_IMAGE_URL)),
+            title = response.getString(KEY_TITLE),
+            price = response.getInt(KEY_PRICE)
         )
+    }
+
+    companion object {
+        private const val PATH = "products"
+        private const val KEY_ID = "id"
+        private const val KEY_IMAGE_URL = "imageUrl"
+        private const val KEY_TITLE = "name"
+        private const val KEY_PRICE = "price"
     }
 }

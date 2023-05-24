@@ -14,7 +14,4 @@ object SqlCart : SqlTable {
         SqlColumn(PRODUCT_ID, SqlType.INTEGER),
         SqlColumn(AMOUNT, SqlType.INTEGER),
     )
-
-    override val constraint: String =
-        ", FOREIGN KEY ($PRODUCT_ID) REFERENCES ${SqlProduct.name} (${SqlProduct.ID})"
 }

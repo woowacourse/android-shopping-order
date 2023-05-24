@@ -16,5 +16,4 @@ object SqlProduct : SqlTable {
         SqlColumn(TITLE, SqlType.TEXT),
         SqlColumn(PRICE, SqlType.INTEGER)
     )
-    override val constraint: String = ""
 }

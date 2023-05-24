@@ -3,7 +3,6 @@ package woowacourse.shopping.data.database.dao
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import woowacourse.shopping.data.database.selectRowId
 import woowacourse.shopping.data.database.table.SqlCart
 import woowacourse.shopping.data.database.table.SqlProduct
 import woowacourse.shopping.domain.Cart
@@ -14,7 +13,7 @@ import java.time.LocalDateTime
 
 class CartDao(private val db: SQLiteDatabase) {
     fun insertCartProduct(cartProduct: CartProduct) {
-        val productId = getProductId(cartProduct.product)
+        val productId = cartProduct.product.id
 
         val row = ContentValues()
         row.put(SqlCart.TIME, cartProduct.time.toString())
@@ -47,6 +46,7 @@ class CartDao(private val db: SQLiteDatabase) {
         cursor.getInt(cursor.getColumnIndexOrThrow(SqlCart.AMOUNT)),
         isChecked = true,
         Product(
+            cursor.getInt((cursor.getColumnIndexOrThrow(SqlProduct.ID))),
             URL(cursor.getString(cursor.getColumnIndexOrThrow(SqlProduct.PICTURE))),
             cursor.getString(cursor.getColumnIndexOrThrow(SqlProduct.TITLE)),
             cursor.getInt(cursor.getColumnIndexOrThrow(SqlProduct.PRICE)),
@@ -75,7 +75,7 @@ class CartDao(private val db: SQLiteDatabase) {
     }
 
     fun deleteCartProduct(cartProduct: CartProduct) {
-        val productId = getProductId(cartProduct.product)
+        val productId = cartProduct.product.id
 
         db.delete(SqlCart.name, "${SqlCart.PRODUCT_ID} = ?", arrayOf(productId.toString()))
     }
@@ -92,7 +92,7 @@ class CartDao(private val db: SQLiteDatabase) {
     }
 
     fun selectCartProductByProduct(product: Product): CartProduct? {
-        val productId = getProductId(product)
+        val productId = product.id
         return selectByProductId(productId)
     }
 
@@ -115,7 +115,7 @@ class CartDao(private val db: SQLiteDatabase) {
     }
 
     fun updateCartProduct(cartProduct: CartProduct) {
-        val productId = getProductId(cartProduct.product)
+        val productId = cartProduct.product.id
 
         val row = ContentValues()
         row.put(SqlCart.TIME, cartProduct.time.toString())
@@ -128,15 +128,6 @@ class CartDao(private val db: SQLiteDatabase) {
             "${SqlCart.PRODUCT_ID} = ?",
             arrayOf(productId.toString())
         )
-    }
-
-    private fun getProductId(product: Product): Int {
-        val productRow: MutableMap<String, Any> = mutableMapOf()
-        productRow[SqlProduct.PICTURE] = product.picture.value
-        productRow[SqlProduct.TITLE] = product.title
-        productRow[SqlProduct.PRICE] = product.price
-
-        return SqlProduct.selectRowId(db, productRow)
     }
 
     fun getTotalPrice(): Int {

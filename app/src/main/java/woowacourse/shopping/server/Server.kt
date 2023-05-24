@@ -5,7 +5,9 @@ enum class Server(private val url: String) {
     GITJJANG("https://gitchan.shop"),
     HOI("");
 
-    fun getUrl(server: String): String {
-        return values().find { it.name == server }?.url ?: ""
+    companion object {
+        fun getUrl(server: String): String {
+            return values().find { it.name == server }?.url ?: ""
+        }
     }
 }
