@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import woowacourse.shopping.data.database.contract.ProductContract
 import woowacourse.shopping.data.database.contract.RecentProductContract
 import woowacourse.shopping.data.model.DataPrice
 import woowacourse.shopping.data.model.DataProduct
@@ -32,13 +31,13 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
             while (cursor.moveToNext()) {
                 val id: Int = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID))
                 val productId: Int =
-                    cursor.getInt(cursor.getColumnIndex("${ProductContract.TABLE_NAME}${BaseColumns._ID}"))
+                    cursor.getInt(cursor.getColumnIndex(RecentProductContract.PRODUCT_ID))
                 val name: String =
-                    cursor.getString(cursor.getColumnIndex(ProductContract.COLUMN_NAME))
+                    cursor.getString(cursor.getColumnIndex(RecentProductContract.COLUMN_NAME))
                 val price: DataPrice =
-                    DataPrice(cursor.getInt(cursor.getColumnIndex(ProductContract.COLUMN_PRICE)))
+                    DataPrice(cursor.getInt(cursor.getColumnIndex(RecentProductContract.COLUMN_PRICE)))
                 val imageUrl: String =
-                    cursor.getString(cursor.getColumnIndex(ProductContract.COLUMN_IMAGE_URL))
+                    cursor.getString(cursor.getColumnIndex(RecentProductContract.COLUMN_IMAGE_URL))
                 products.add(DataRecentProduct(id, DataProduct(productId, name, price, imageUrl)))
             }
             cursor.close()
@@ -50,7 +49,10 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         removeByProductId(recentProduct.id)
 
         val contentValues = ContentValues().apply {
-            put("${ProductContract.TABLE_NAME}${BaseColumns._ID}", recentProduct.id)
+            put(RecentProductContract.PRODUCT_ID, recentProduct.id)
+            put(RecentProductContract.COLUMN_NAME, recentProduct.name)
+            put(RecentProductContract.COLUMN_PRICE, recentProduct.price.value)
+            put(RecentProductContract.COLUMN_IMAGE_URL, recentProduct.imageUrl)
         }
 
         database.writableDatabase.use { db ->
@@ -62,7 +64,7 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         database.writableDatabase.use { db ->
             db.delete(
                 RecentProductContract.TABLE_NAME,
-                " ${ProductContract.TABLE_NAME}${BaseColumns._ID} = ?",
+                " ${RecentProductContract.PRODUCT_ID} = ?",
                 arrayOf(productId.toString())
             )
         }
@@ -80,9 +82,8 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         """.trimIndent()
 
         private val GET_PARTIALLY_QUERY = """
-            SELECT ${RecentProductContract.TABLE_NAME}.*, ${ProductContract.TABLE_NAME}.${ProductContract.COLUMN_NAME}, ${ProductContract.TABLE_NAME}.${ProductContract.COLUMN_PRICE}, ${ProductContract.TABLE_NAME}.${ProductContract.COLUMN_IMAGE_URL}
+            SELECT *
             FROM ${RecentProductContract.TABLE_NAME}
-            INNER JOIN ${ProductContract.TABLE_NAME} ON ${RecentProductContract.TABLE_NAME}.${ProductContract.TABLE_NAME}${BaseColumns._ID} = ${ProductContract.TABLE_NAME}.${BaseColumns._ID}
             ORDER BY ${RecentProductContract.TABLE_NAME}.${BaseColumns._ID} DESC LIMIT ?
         """.trimIndent()
 
