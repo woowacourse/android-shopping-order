@@ -102,12 +102,19 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         recentProductWrapperAdapter.notifyDataSetChanged()
     }
 
-    override fun showProductDetail(currentProduct: UiProduct, previousProduct: UiProduct?) {
+    override fun showProductDetail(
+        currentProduct: UiProduct,
+        currentProductBasketId: Int?,
+        previousProduct: UiProduct?,
+        previousProductBasketId: Int?
+    ) {
         activityResultLauncher.launch(
             ProductDetailActivity.getIntent(
                 this,
                 currentProduct,
-                previousProduct
+                currentProductBasketId,
+                previousProduct,
+                previousProductBasketId
             )
         )
     }

@@ -28,7 +28,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var dialogViewBinding: DialogProductDetailBinding
     private lateinit var alertDialog: AlertDialog
     private lateinit var currentProduct: UiProduct
+    private var currentProductBasketId: Int? = null
     private var previousProduct: UiProduct? = null
+    private var previousProductBasketId: Int? = null
     private lateinit var presenter: ProductDetailContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +83,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private fun initExtraData(): Boolean {
         currentProduct = intent.getParcelableExtraCompat(CURRENT_PRODUCT_KEY)
             ?: return intentDataNullProcess(CURRENT_PRODUCT_KEY)
+        val toConvertCurrentValue = intent.getIntExtra(CURRENT_PRODUCT_BASKET_ID, -1)
+        currentProductBasketId = if (toConvertCurrentValue == -1) null else toConvertCurrentValue
         previousProduct = intent.getParcelableExtraCompat(PREVIOUS_PRODUCT_KEY)
+        val toConvertPreviousValue = intent.getIntExtra(PREVIOUS_PRODUCT_BASKET_ID, -1)
+        previousProductBasketId = if (toConvertPreviousValue == -1) null else toConvertPreviousValue
         return true
     }
 
@@ -98,7 +104,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 RemoteBasketDataSource()
             ),
             currentProduct,
-            previousProduct
+            currentProductBasketId,
+            previousProduct,
+            previousProductBasketId
         )
     }
 
@@ -116,15 +124,28 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     companion object {
         private const val CURRENT_PRODUCT_KEY = "currentProduct"
+        private const val CURRENT_PRODUCT_BASKET_ID = "currentProductBasketId"
         private const val PREVIOUS_PRODUCT_KEY = "previousProduct"
+        private const val PREVIOUS_PRODUCT_BASKET_ID = "previousProductBasketId"
         fun getIntent(
             context: Context,
             currentProduct: UiProduct,
-            previousProduct: UiProduct?
+            currentProductBasketId: Int? = null,
+            previousProduct: UiProduct?,
+            previousProductBasketId: Int? = null
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(CURRENT_PRODUCT_KEY, currentProduct)
+                if (currentProductBasketId != null) putExtra(
+                    CURRENT_PRODUCT_BASKET_ID,
+                    currentProductBasketId
+                )
                 if (previousProduct != null) putExtra(PREVIOUS_PRODUCT_KEY, previousProduct)
+                if (previousProductBasketId != null
+                ) putExtra(
+                    PREVIOUS_PRODUCT_BASKET_ID,
+                    previousProductBasketId
+                )
             }
     }
 }

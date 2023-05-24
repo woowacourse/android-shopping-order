@@ -5,13 +5,14 @@ import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiProduct
-import kotlin.concurrent.thread
 
 class ProductDetailPresenter(
     override val view: ProductDetailContract.View,
     private val basketRepository: BasketRepository,
     private var currentProduct: UiProduct,
-    private var previousProduct: UiProduct?
+    private var currentProductBasketId: Int?,
+    private var previousProduct: UiProduct?,
+    private var previousProductBasketId: Int?
 ) : ProductDetailContract.Presenter {
 
     init {
@@ -53,20 +54,36 @@ class ProductDetailPresenter(
     }
 
     private fun updateBasketProduct() {
-        thread {
-            basketRepository.update(
-                BasketProduct(
-                    count = Count(currentProduct.basketCount),
-                    product = currentProduct.toDomain()
-                )
-            )
-            view.showBasket()
+        if (currentProductBasketId != null) {
+            updateCurrentProduct()
+        } else {
+            basketRepository.add(currentProduct.toDomain()) {
+                currentProductBasketId = it
+                if (currentProduct.basketCount > 1) {
+                    updateCurrentProduct()
+                }
+            }
         }
+        view.showBasket()
     }
+
+    private fun updateCurrentProduct() {
+        basketRepository.update(
+            getAddableCurrentProduct()
+        )
+    }
+
+    private fun getAddableCurrentProduct() = BasketProduct(
+        id = requireNotNull(currentProductBasketId),
+        count = Count(currentProduct.basketCount),
+        product = currentProduct.toDomain()
+    )
 
     override fun selectPreviousProduct() {
         currentProduct = previousProduct ?: throw IllegalStateException(NO_PREVIOUS_PRODUCT_ERROR)
+        currentProductBasketId = previousProductBasketId
         previousProduct = null
+        previousProductBasketId = null
         view.updateBindingData(currentProduct, previousProduct)
     }
 

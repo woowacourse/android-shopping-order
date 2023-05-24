@@ -115,7 +115,14 @@ class ShoppingPresenter(
     override fun inquiryProductDetail(product: UiProduct) {
         val previousProduct =
             if (recentProducts.firstOrNull()?.product == product) recentProducts.secondOrNull()?.product else recentProducts.firstOrNull()?.product
-        view.showProductDetail(currentProduct = product, previousProduct = previousProduct)
+        view.showProductDetail(
+            currentProduct = product,
+            currentProductBasketId = basket.getProductByProductId(product.id)?.id,
+            previousProduct = previousProduct,
+            previousProductBasketId = if (previousProduct != null) basket.getProductByProductId(
+                previousProduct.id
+            )?.id else null
+        )
         thread { recentProductRepository.add(product.toDomain()) }
     }
 

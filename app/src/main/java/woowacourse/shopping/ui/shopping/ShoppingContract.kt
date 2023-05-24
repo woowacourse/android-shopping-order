@@ -11,7 +11,12 @@ interface ShoppingContract {
 
         fun updateRecentProducts(recentProducts: List<UiRecentProduct>)
 
-        fun showProductDetail(currentProduct: UiProduct, previousProduct: UiProduct?)
+        fun showProductDetail(
+            currentProduct: UiProduct,
+            currentProductBasketId: Int?,
+            previousProduct: UiProduct?,
+            previousProductBasketId: Int?
+        )
 
         fun updateMoreButtonState(isVisible: Boolean)
 
