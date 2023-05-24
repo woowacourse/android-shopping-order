@@ -85,10 +85,10 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
-            android:onClick="@{()->addClickListener.invoke(product)}"
             android:visibility="@{hasBasketProduct?View.GONE:View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/iv_product"
             app:layout_constraintEnd_toEndOf="@+id/iv_product"
+            app:setThrottleFirstOnClick="@{()->addClickListener.invoke(product)}"
             app:srcCompat="@drawable/ic_plus" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
