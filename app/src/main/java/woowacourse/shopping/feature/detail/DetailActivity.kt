@@ -33,7 +33,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             ?: return keyError(PRODUCT_KEY)
         presenter = DetailPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache()),
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache),
             product
         )
         binding.presenter = presenter

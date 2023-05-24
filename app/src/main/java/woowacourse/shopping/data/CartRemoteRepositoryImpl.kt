@@ -20,17 +20,24 @@ class CartRemoteRepositoryImpl(
     override fun addProduct(product: Product, count: Int) {
         val findProduct = cartCache.cartProducts.find { it.product.id == product.id }
         if (findProduct != null) {
-            service.updateCartProductCount(product.id.toInt(), count)
+            service.updateCartProductCount(findProduct.cartProductId.toInt(), count)
         } else {
-            service.addCartProduct(product.id.toInt())
-            service.updateCartProductCount(product.id.toInt(), count)
+            val cartItemId = service.addCartProduct(product.id.toInt())
+            if (cartItemId != -1) {
+                service.updateCartProductCount(cartItemId, count)
+            }
         }
         refreshCache()
     }
 
     override fun deleteProduct(product: Product) {
-        service.deleteCartProduct(product.id.toInt())
-        refreshCache()
+        val cartId =
+            cartCache.cartProducts.find { it.product.id == product.id }?.cartProductId ?: -1
+
+        if (cartId != -1L) {
+            service.deleteCartProduct(cartId.toInt())
+            refreshCache()
+        }
     }
 
     override fun updateSelection(product: Product, isSelected: Boolean) {

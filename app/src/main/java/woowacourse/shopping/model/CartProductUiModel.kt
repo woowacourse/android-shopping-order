@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CartProductUiModel(
+    val cartProductId: Long,
     val productUiModel: ProductUiModel,
     val count: Int,
     val isSelected: Boolean

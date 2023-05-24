@@ -36,7 +36,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter() {
         val cartPresenter = CartPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache())
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache)
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter

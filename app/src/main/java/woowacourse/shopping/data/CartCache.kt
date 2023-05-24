@@ -3,7 +3,7 @@ package woowacourse.shopping.data
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 
-class CartCache {
+object CartCache {
     private val _cartProducts = mutableListOf<CartProduct>()
     val cartProducts: List<CartProduct>
         get() = _cartProducts.toList()

@@ -61,6 +61,7 @@ class CartRemoteService(private val credential: String) {
         for (i in 0 until jsonProducts.length()) {
             val jsonCartProduct = jsonProducts.getJSONObject(i)
 
+            val cartId = jsonCartProduct.getInt("id")
             val count = jsonCartProduct.getInt("quantity")
             val jsonProduct = jsonCartProduct.getJSONObject("product")
             val productId = jsonProduct.getInt("id").toLong()
@@ -69,20 +70,22 @@ class CartRemoteService(private val credential: String) {
             val productImageUrl = jsonProduct.getString("imageUrl")
 
             val product = Product(productId, productName, productImageUrl, Price(productPrice))
-            val cartProduct = CartProduct(product, count, true)
+            val cartProduct = CartProduct(cartId.toLong(), product, count, true)
             products.add(cartProduct)
         }
 
         return products
     }
 
-    fun addCartProduct(cartProductId: Int) {
+    fun addCartProduct(productId: Int): Int {
 
-        val data = JSONObject().put("productId", "$cartProductId").toString()
+        val data = JSONObject().put("productId", "$productId").toString()
         val formBody: RequestBody = data.toRequestBody("application/json".toMediaTypeOrNull())
 
         val request = Request.Builder().url(url).post(formBody)
             .header("Authorization", "Basic $credential").build()
+
+        var cartItemId = -1
 
         val latch = CountDownLatch(1)
         okHttpClient.newCall(request).enqueue(
@@ -94,11 +97,15 @@ class CartRemoteService(private val credential: String) {
                 override fun onResponse(call: Call, response: Response) {
                     if (response.code >= 400) latch.countDown()
 
+                    val location = response.headers["Location"]
+                    location?.filter { it.isDigit() }?.let { cartItemId = it.toInt() }
+
                     latch.countDown()
                 }
             }
         )
         latch.await()
+        return cartItemId
     }
 
     fun updateCartProductCount(cartProductId: Int, count: Int) {

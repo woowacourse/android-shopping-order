@@ -40,7 +40,7 @@ class CartDao(
                 cursor.getInt(cursor.getColumnIndexOrThrow(CartContract.TABLE_COLUMN_PRODUCT_IS_SELECTED))
             )
             val product: Product = productsDatasource.find { it.id == data.productId } ?: continue
-            cart.add(CartProduct(product, data.count, data.isSelected == 1))
+            cart.add(CartProduct(1, product, data.count, data.isSelected == 1))
         }
 
         cursor.close()

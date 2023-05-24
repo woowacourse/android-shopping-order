@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             this,
             ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this)),
-            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache())
+            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache)
         )
     }
 
