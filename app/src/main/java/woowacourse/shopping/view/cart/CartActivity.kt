@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping.view.cart
 
 import android.content.Context
@@ -6,9 +7,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.repository.CartDbRepository
-import woowacourse.shopping.domain.repository.ProductRemoteRepository
+import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.data.MockServer
+import woowacourse.shopping.data.MockServer
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.view.productlist.ProductListActivity
 
@@ -96,3 +97,4 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
     }
 }
+*/

@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 
 class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
@@ -30,10 +31,12 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
     }
 
     fun selectWhereId(id: Int): Int? {
-        val sql = "select * from ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id"
+        val sql =
+            "select * from ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id"
         val cursor = readableDatabase.rawQuery(sql, null)
         while (cursor.moveToNext()) {
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_ID))
+            val id =
+                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_ID))
             cursor.close()
             return id
         }
@@ -42,10 +45,11 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
 
     fun selectAll(): List<Int> {
         val viewedProducts = mutableListOf<Int>()
-        val sql = "select * from ${RecentViewedContract.TABLE_NAME}"
+        val sql = "select * from ${RecentViewedContract.TABLE_NAME} order by rowId DESC"
         val cursor = readableDatabase.rawQuery(sql, null)
         while (cursor.moveToNext()) {
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_ID))
+            val id =
+                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_ID))
             viewedProducts.add(id)
         }
         cursor.close()

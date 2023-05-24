@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.productlist
 
+import android.util.Log
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.pagination.ProductListPagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentViewedRepository
@@ -14,24 +14,33 @@ class ProductListPresenter(
     private val recentViewedRepository: RecentViewedRepository,
     private val cartRepository: CartRepository,
 ) : ProductListContract.Presenter {
-    private val productListPagination = ProductListPagination(PAGINATION_SIZE, productRepository)
+    private var mark: Int = 0
 
     private val productsListItems = mutableListOf<ProductListViewItem>()
 
     override fun fetchProducts() {
         // 최근 본 항목
-        val viewedItems = recentViewedRepository.findAll().reversed()
-        if (viewedItems.isNotEmpty()) addViewedProductsItem(viewedItems)
-        // 상품 리스트
-        val currentProducts = productListPagination.nextItems()
-        addProductsItem(convertProductsToModels(currentProducts))
-        // 더보기
-        if (productListPagination.isNextEnabled) productsListItems.add(ProductListViewItem.ShowMoreItem())
-        view.showProducts(productsListItems)
+        recentViewedRepository.findAll { viewedProducts ->
+            if (viewedProducts.isNotEmpty()) addViewedProductsItem(viewedProducts)
+            // 상품 리스트
+            productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
+                addProductsItem(products.toUiModels())
+                // 더보기
+                addShowMoreItem()
+                mark += products.size
+            }
+        }
     }
 
-    private fun addViewedProductsItem(ids: List<Int>) {
-        val viewedProductsModel = ids.map { convertIdToProductModel(it) }
+    private fun addShowMoreItem() {
+        productRepository.isExistByMark(mark) { isNextExist ->
+            if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
+            view.showProducts(productsListItems)
+        }
+    }
+
+    private fun addViewedProductsItem(products: List<Product>) {
+        val viewedProductsModel = products.map { it.toUiModel() }
         productsListItems.add(ProductListViewItem.RecentViewedItem(viewedProductsModel))
     }
 
@@ -55,16 +64,17 @@ class ProductListPresenter(
         val productsItemSize =
             productsListItems.filterIsInstance<ProductListViewItem.ProductItem>().size
 
-        val mark = productsItemSize + recentViewedItemSize
-        val nextProducts = convertProductsToModels(productListPagination.nextItems())
-
-        // RecyclerView Items 수정
-        productsListItems.removeLast()
-        addProductsItem(nextProducts)
-        if (productListPagination.isNextEnabled) productsListItems.add(ProductListViewItem.ShowMoreItem())
-
-        // Notify
-        view.notifyAddProducts(mark, PAGINATION_SIZE)
+        val position = productsItemSize + recentViewedItemSize
+        productRepository.getProductsByRange(mark, PAGINATION_SIZE) {
+            val nextProducts = it.toUiModels()
+            productsListItems.removeLast()
+            addProductsItem(nextProducts)
+            mark += nextProducts.size
+            productRepository.isExistByMark(mark) { isNextExist ->
+                if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
+                view.notifyAddProducts(position, nextProducts.size)
+            }
+        }
     }
 
     override fun addToCartProducts(id: Int, count: Int) {
@@ -116,24 +126,22 @@ class ProductListPresenter(
         if (id == -1) return
         if (isExistRecentViewed()) productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
 
-        val viewedProductModels = convertIdsToProductModels(recentViewedRepository.findAll()).reversed()
-        productsListItems.add(0, ProductListViewItem.RecentViewedItem(viewedProductModels))
-        view.notifyRecentViewedChanged()
+        recentViewedRepository.findAll {
+            productsListItems.add(
+                0,
+                ProductListViewItem.RecentViewedItem(it.toUiModels()),
+            )
+            view.notifyRecentViewedChanged()
+            Log.d("NOTIFY", true.toString())
+        }
     }
-
-    private fun convertIdToProductModel(id: Int) =
-        productRepository.find(id).toUiModel(cartRepository.find(id)?.count ?: 0)
-
-    private fun convertIdsToProductModels(ids: List<Int>) = ids.map { convertIdToProductModel(it) }
-
-    private fun convertProductToModel(product: Product) =
-        product.toUiModel(cartRepository.find(product.id)?.count ?: 0)
-
-    private fun convertProductsToModels(products: List<Product>) =
-        products.map { convertProductToModel(it) }
 
     private fun isExistRecentViewed(): Boolean =
         productsListItems[0] is ProductListViewItem.RecentViewedItem
+
+    private fun List<Product>.toUiModels(): List<ProductModel> {
+        return this.map { it.toUiModel(cartRepository.find(it.id)?.count ?: 0) }
+    }
 
     companion object {
         private const val PAGINATION_SIZE = 20

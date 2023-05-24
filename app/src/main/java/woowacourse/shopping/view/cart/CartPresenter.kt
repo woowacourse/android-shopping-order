@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
@@ -79,7 +80,7 @@ class CartPresenter(
         val product = cartPagination.currentLastItem() ?: return null
         return product.toUiModel(
             cartSystem.isSelectedProduct(product),
-            productRepository.find(product.id)
+            productRepository.getProduct(product.id)
         )
     }
 
@@ -148,7 +149,7 @@ class CartPresenter(
 
     private fun convertCartProductToModels(cartProducts: List<CartProduct>) =
         cartProducts.map {
-            it.toUiModel(cartSystem.isSelectedProduct(it), productRepository.find(it.id))
+            it.toUiModel(cartSystem.isSelectedProduct(it), productRepository.getProduct(it.id))
         }.toMutableList()
 
     private fun convertItemsToCartProducts(items: List<CartViewItem>): List<CartProduct> =
@@ -160,3 +161,4 @@ class CartPresenter(
         private const val COUNT_MAX = 100
     }
 }
+*/

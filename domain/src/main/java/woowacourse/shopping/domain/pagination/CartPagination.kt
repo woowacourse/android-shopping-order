@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping.domain.pagination
 
 import woowacourse.shopping.domain.model.CartProduct
@@ -45,3 +46,4 @@ class CartPagination(private val rangeSize: Int, private val cartRepository: Car
         return null
     }
 }
+*/

@@ -17,7 +17,7 @@ interface ProductListContract {
         fun fetchProducts()
         fun showProductDetail(product: ProductModel)
         fun loadMoreProducts()
-        fun updateRecentViewed(id: Int)
+         fun updateRecentViewed(id: Int)
         fun addToCartProducts(id: Int, count: Int)
         fun updateCartProductCount(id: Int, count: Int)
         fun fetchCartCount()

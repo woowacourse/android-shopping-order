@@ -26,15 +26,15 @@ class ProductListPresenterTest {
         view = mockk(relaxed = true)
         val productRepository = object : ProductRepository {
             private val mProducts = products
-            override fun findAll(): List<Product> {
+            override fun getAll(): List<Product> {
                 return mProducts
             }
 
-            override fun find(id: Int): Product {
+            override fun getProduct(id: Int): Product {
                 return mProducts[id]
             }
 
-            override fun findRange(mark: Int, rangeSize: Int): List<Product> {
+            override fun getProductsByRange(mark: Int, rangeSize: Int): List<Product> {
                 return mProducts.subList(mark, mark + rangeSize)
             }
 

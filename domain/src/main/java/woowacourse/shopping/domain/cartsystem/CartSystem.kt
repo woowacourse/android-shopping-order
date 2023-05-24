@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping.domain.cartsystem
 
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -18,7 +19,7 @@ class CartSystem(
 
     fun selectProduct(product: CartProduct): CartSystemResult {
         if (_selectedProducts.find { it.cartProduct.id == product.id } == null) {
-            val price = productRepository.find(product.id).price
+            val price = productRepository.getProduct(product.id).price
             _selectedProducts.add(CartSystemProduct(product, price))
             totalPrice += price * product.count
             return CartSystemResult(totalPrice.price, _selectedProducts.size)
@@ -54,3 +55,4 @@ class CartSystem(
         return CartSystemResult(totalPrice.price, _selectedProducts.size)
     }
 }
+*/

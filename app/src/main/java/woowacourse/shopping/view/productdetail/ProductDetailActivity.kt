@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartDbRepository
+import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogCountBinding
@@ -50,7 +51,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setUpPresenter() {
         presenter =
-            ProductDetailPresenter(INITIAL_COUNT, this, CartDbRepository(this), RecentViewedDbRepository(this))
+            ProductDetailPresenter(INITIAL_COUNT, this, CartDbRepository(this), RecentViewedDbRepository(this, ProductRemoteRepository("http://43.200.181.131:8080")))
     }
 
     private fun forceQuit() {
