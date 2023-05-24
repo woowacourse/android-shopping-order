@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.cart
+package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.CartItem
 
@@ -8,7 +8,7 @@ interface CartItemDataSource {
 
     fun findAll(onFinish: (List<CartItem>) -> Unit)
 
-    fun updateCountById(id: Long, count: Int)
+    fun updateCountById(id: Long, count: Int, onFinish: () -> Unit)
 
-    fun deleteById(id: Long)
+    fun deleteById(id: Long, onFinish: () -> Unit)
 }

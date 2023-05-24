@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.product
+package woowacourse.shopping.data.product
 
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.utils.MockData

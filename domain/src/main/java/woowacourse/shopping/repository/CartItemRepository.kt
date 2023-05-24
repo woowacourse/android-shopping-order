@@ -20,7 +20,7 @@ interface CartItemRepository {
 
     fun existByProductId(productId: Long, onFinish: (Boolean) -> Unit)
 
-    fun updateCountById(id: Long, count: Int)
+    fun updateCountById(id: Long, count: Int, onFinish: () -> Unit)
 
-    fun deleteById(id: Long)
+    fun deleteById(id: Long, onFinish: () -> Unit)
 }

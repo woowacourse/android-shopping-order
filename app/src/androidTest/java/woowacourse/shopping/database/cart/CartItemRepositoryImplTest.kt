@@ -6,10 +6,10 @@ import androidx.test.core.app.ApplicationProvider
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.data.database.product.ProductRepositoryImpl
-import woowacourse.shopping.data.datasource.product.ProductMemoryDao
+import woowacourse.shopping.data.product.ProductMemoryDao
+import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
 import java.time.LocalDateTime

@@ -1,34 +1,39 @@
-package woowacourse.shopping.data.datasource.recentlyviewedproduct
+package woowacourse.shopping.data.recentlyviewedproduct
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import woowacourse.shopping.data.database.ProductContract
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentlyViewedProduct
+import java.time.LocalDateTime
 
 class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase) :
     RecentlyViewedProductDataSource {
-    override fun save(recentlyViewedProduct: RecentlyViewedProduct) {
-        deleteRecentlyViewedProductIfSameProductExists(recentlyViewedProduct)
+    override fun save(
+        product: Product,
+        viewedTime: LocalDateTime,
+        onFinish: (RecentlyViewedProduct) -> Unit
+    ) {
+        deleteRecentlyViewedProductIfSameProductExists(product)
 
         val value = ContentValues().apply {
             put(
-                ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID,
-                recentlyViewedProduct.product.id
+                ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID, product.id
             )
             put(
                 ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME,
-                recentlyViewedProduct.viewedTime.toString()
+                viewedTime.toString()
             )
         }
         val id = db.insert(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, null, value)
-        recentlyViewedProduct.id = id
+        onFinish(RecentlyViewedProduct(id, product, viewedTime))
     }
 
-    private fun deleteRecentlyViewedProductIfSameProductExists(recentlyViewedProduct: RecentlyViewedProduct) {
+    private fun deleteRecentlyViewedProductIfSameProductExists(product: Product) {
         val selection = "${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID} = ?"
-        val selectionArgs = arrayOf(recentlyViewedProduct.product.id.toString())
+        val selectionArgs = arrayOf(product.id.toString())
         db.delete(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs)
     }
 

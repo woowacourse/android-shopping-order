@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
 import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.RecentlyViewedProduct
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
@@ -22,19 +21,23 @@ class ProductDetailPresenter(
                 view.setProduct(
                     ProductDetailUIState.create(product, cartItem)
                 )
-                val recentlyViewedProduct = RecentlyViewedProduct(product, LocalDateTime.now())
-                recentlyViewedProductRepository.save(recentlyViewedProduct)
+                recentlyViewedProductRepository.save(product, LocalDateTime.now()) { }
             }
         }
     }
 
     override fun onAddProductToCart(productId: Long, count: Int) {
         require(count > 0) { "장바구니에 상품을 추가하려면 개수는 1개 이상이어야 합니다." }
-        productRepository.findById(productId) {
-            it ?: return@findById
-
-            val cartItem = CartItem(it, LocalDateTime.now(), count)
-            cartItemRepository.save(cartItem) { }
+        productRepository.findById(productId) { product ->
+            product ?: return@findById
+            println(product)
+            println(count)
+            val cartItem = CartItem(-1, product, LocalDateTime.now(), count)
+            cartItemRepository.save(cartItem) { savedCartItem ->
+                cartItemRepository.updateCountById(savedCartItem.id, count) {
+                    view.showCartView()
+                }
+            }
         }
     }
 

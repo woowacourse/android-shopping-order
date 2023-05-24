@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.cart
+package woowacourse.shopping.data.cart
 
 import okhttp3.Call
 import okhttp3.Callback
@@ -8,7 +8,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.datasource.RemoteHost
+import woowacourse.shopping.data.RemoteHost
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
 import java.io.IOException
@@ -27,13 +27,15 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             .addHeader("Authorization", "Basic ${host.token}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                println(e.message)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                println(response.code)
-                cartItem.id = response.header("Location")?.removePrefix("/cart-items/")?.toLong()
-                onFinish(cartItem)
+                val id =
+                    response.header("Location")?.removePrefix("/cart-items/")?.toLong() ?: return
+                val savedCartItem = CartItem(
+                    id, cartItem.product, cartItem.addedTime, cartItem.count
+                )
+                onFinish(savedCartItem)
             }
         })
     }
@@ -48,6 +50,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.code != 200) return
                 val body = response.body?.string()
                 val jsonArray = JSONArray(body)
                 val cartItems = (0 until jsonArray.length()).map {
@@ -59,24 +62,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
-    private fun parseToCartItem(jsonObject: JSONObject): CartItem {
-        val id = jsonObject.getInt("id")
-        val quantity = jsonObject.getInt("quantity")
-        val jsonObject1 = jsonObject.getJSONObject("product")
-        val product = parseToProduct(jsonObject1)
-        return CartItem(product, LocalDateTime.now(), quantity).apply { this.id = id.toLong() }
-    }
-
-    private fun parseToProduct(jsonObject: JSONObject): Product {
-        val id = jsonObject.getLong("id")
-        val name = jsonObject.getString("name")
-        val price = jsonObject.getInt("price")
-        val imageUrl = jsonObject.getString("imageUrl")
-        return Product(id, imageUrl, name, price)
-    }
-
-    override fun updateCountById(id: Long, count: Int) {
-        println(111)
+    override fun updateCountById(id: Long, count: Int, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val jsonObject = JSONObject().apply {
             put("quantity", count)
@@ -87,16 +73,15 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             .addHeader("Authorization", "Basic ${host.token}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                println(e.message)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                println(response.code)
+                if (response.code == 200) onFinish()
             }
         })
     }
 
-    override fun deleteById(id: Long) {
+    override fun deleteById(id: Long, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val request = Request.Builder().url(host.url + path).delete()
             .addHeader("Authorization", "Basic ${host.token}").build()
@@ -105,7 +90,24 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.code == 204) onFinish()
             }
         })
+    }
+
+    private fun parseToCartItem(jsonObject: JSONObject): CartItem {
+        val id = jsonObject.getLong("id")
+        val quantity = jsonObject.getInt("quantity")
+        val jsonObject1 = jsonObject.getJSONObject("product")
+        val product = parseToProduct(jsonObject1)
+        return CartItem(id, product, LocalDateTime.now(), quantity)
+    }
+
+    private fun parseToProduct(jsonObject: JSONObject): Product {
+        val id = jsonObject.getLong("id")
+        val name = jsonObject.getString("name")
+        val price = jsonObject.getInt("price")
+        val imageUrl = jsonObject.getString("imageUrl")
+        return Product(id, imageUrl, name, price)
     }
 }

@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import woowacourse.shopping.R
-import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.data.datasource.cart.CartItemRemoteService
+import woowacourse.shopping.data.cart.CartItemRemoteService
+import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.presenter.CartPresenter

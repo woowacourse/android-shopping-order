@@ -13,5 +13,6 @@ interface ProductDetailContract {
     interface View {
         fun setProduct(product: ProductDetailUIState)
         fun setLastViewedProduct(product: LastViewedProductUIState?)
+        fun showCartView()
     }
 }

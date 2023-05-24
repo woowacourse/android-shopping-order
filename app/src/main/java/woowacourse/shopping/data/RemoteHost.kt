@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data
 
 enum class RemoteHost(val url: String, val token: String) {
     SALMON("http://13.125.224.242:8080", "YUBhLmNvbToxMjM0"),

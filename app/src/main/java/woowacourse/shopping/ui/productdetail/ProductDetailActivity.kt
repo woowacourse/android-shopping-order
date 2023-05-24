@@ -8,15 +8,14 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.data.RemoteHost
+import woowacourse.shopping.data.cart.CartItemRemoteService
+import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.database.cart.CartItemRepositoryImpl
-import woowacourse.shopping.data.database.product.ProductRepositoryImpl
-import woowacourse.shopping.data.database.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
-import woowacourse.shopping.data.datasource.RemoteHost
-import woowacourse.shopping.data.datasource.cart.CartItemRemoteService
-import woowacourse.shopping.data.datasource.product.ProductMemoryDao
-import woowacourse.shopping.data.datasource.product.ProductRemoteService
-import woowacourse.shopping.data.datasource.recentlyviewedproduct.RecentlyViewedProductMemoryDao
+import woowacourse.shopping.data.product.ProductRemoteService
+import woowacourse.shopping.data.product.ProductRepositoryImpl
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
@@ -30,7 +29,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductMemoryDao),
+            this, ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
             CartItemRepositoryImpl(
                 CartItemRemoteService(RemoteHost.GABI)
             ),
@@ -83,25 +82,28 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun setProduct(product: ProductDetailUIState) {
-        Glide.with(this).load(product.imageUrl).into(binding.ivProductDetail)
+        runOnUiThread {
+            Glide.with(this).load(product.imageUrl).into(binding.ivProductDetail)
 
-        binding.tvProductDetailName.text = product.name
-        binding.tvProductDetailPrice.text =
-            getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
-        binding.btnProductDetailAdd.isEnabled = product.isInCart.not()
-        binding.btnProductDetailAdd.setOnClickListener {
-            AddToCartDialog(product) { productId, count ->
-                presenter.onAddProductToCart(productId, count)
-                moveToCartActivity()
-            }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+            binding.tvProductDetailName.text = product.name
+            binding.tvProductDetailPrice.text =
+                getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
+            binding.btnProductDetailAdd.isEnabled = product.isInCart.not()
+            binding.btnProductDetailAdd.setOnClickListener {
+                AddToCartDialog(product) { productId, count ->
+                    presenter.onAddProductToCart(productId, count)
+                }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+            }
         }
     }
 
     override fun setLastViewedProduct(product: LastViewedProductUIState?) {
-        lastViewedProductViewHolder.bind(product)
+        runOnUiThread {
+            lastViewedProductViewHolder.bind(product)
+        }
     }
 
-    private fun moveToCartActivity() {
+    override fun showCartView() {
         finish()
         CartActivity.startActivity(this, true)
     }

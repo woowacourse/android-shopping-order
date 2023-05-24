@@ -1,16 +1,13 @@
 package woowacourse.shopping.domain
 
 import java.time.LocalDateTime
-import kotlin.properties.Delegates
 
 class CartItem(
+    val id: Long,
     val product: Product,
     val addedTime: LocalDateTime,
     count: Int
 ) {
-    var id: Long? by Delegates.vetoable(null) { _, old, new ->
-        old == null && new != null
-    }
     var count: Int = count
         private set
 

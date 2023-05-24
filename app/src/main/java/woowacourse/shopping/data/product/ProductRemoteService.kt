@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.product
+package woowacourse.shopping.data.product
 
 import okhttp3.Call
 import okhttp3.Callback
@@ -7,7 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.datasource.RemoteHost
+import woowacourse.shopping.data.RemoteHost
 import woowacourse.shopping.domain.Product
 import java.io.IOException
 

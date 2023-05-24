@@ -18,7 +18,7 @@ class CartPresenter(
 
     override val selectedCartItemIds: List<Long>
         get() = selectedCartItems.map {
-            it.id ?: throw IllegalStateException("아이디가 부여되지 않은 장바구니 아이템은 선택될 수 없습니다.")
+            it.id
         }
 
     override fun restoreCurrentPage(currentPage: Int) {
@@ -56,12 +56,11 @@ class CartPresenter(
     }
 
     override fun onDeleteCartItem(cartItemId: Long) {
-        cartItemRepository.deleteById(cartItemId)
-        selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
-        showAllSelectionUI(_currentPage, selectedCartItems)
-        showOrderUI(selectedCartItems)
-        showPageUI(_currentPage)
-        showCartItems(_currentPage, selectedCartItems, false)
+        cartItemRepository.deleteById(cartItemId) {
+            selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
+            showPageUI(_currentPage)
+            updateCartUI()
+        }
     }
 
     override fun onChangeSelectionOfCartItem(cartItemId: Long, isSelected: Boolean) {
@@ -81,43 +80,45 @@ class CartPresenter(
         cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset) { cartItemsOfCurrentPage ->
             if (isSelected) {
                 selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
-                showAllSelectionUI(_currentPage, selectedCartItems)
-                showOrderUI(selectedCartItems)
-                showCartItems(_currentPage, selectedCartItems, false)
-                return@findAllOrderByAddedTime
-            }
-            if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
+                updateCartUI()
+            } else if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
                 selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
-                showAllSelectionUI(_currentPage, selectedCartItems)
-                showOrderUI(selectedCartItems)
-                showCartItems(_currentPage, selectedCartItems, false)
+                updateCartUI()
             }
         }
+    }
+
+    private fun updateCartUI() {
+        showAllSelectionUI(_currentPage, selectedCartItems)
+        showOrderUI(selectedCartItems)
+        showCartItems(_currentPage, selectedCartItems, false)
     }
 
     override fun onPlusCount(cartItemId: Long) {
         cartItemRepository.findById(cartItemId) { cartItem ->
             cartItem.plusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count)
-            if (cartItem in selectedCartItems) {
-                selectedCartItems = selectedCartItems - cartItem + cartItem
-                showAllSelectionUI(_currentPage, selectedCartItems)
-                showOrderUI(selectedCartItems)
+            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+                if (cartItem in selectedCartItems) {
+                    selectedCartItems = selectedCartItems - cartItem + cartItem
+                    showAllSelectionUI(_currentPage, selectedCartItems)
+                    showOrderUI(selectedCartItems)
+                }
+                showCartItems(_currentPage, selectedCartItems, false)
             }
-            showCartItems(_currentPage, selectedCartItems, false)
         }
     }
 
     override fun onMinusCount(cartItemId: Long) {
         cartItemRepository.findById(cartItemId) { cartItem ->
             cartItem.minusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count)
-            if (cartItem in selectedCartItems) {
-                selectedCartItems = selectedCartItems - cartItem + cartItem
-                showAllSelectionUI(_currentPage, selectedCartItems)
-                showOrderUI(selectedCartItems)
+            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+                if (cartItem in selectedCartItems) {
+                    selectedCartItems = selectedCartItems - cartItem + cartItem
+                    showAllSelectionUI(_currentPage, selectedCartItems)
+                    showOrderUI(selectedCartItems)
+                }
+                showCartItems(_currentPage, selectedCartItems, false)
             }
-            showCartItems(_currentPage, selectedCartItems, false)
         }
     }
 

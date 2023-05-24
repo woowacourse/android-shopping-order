@@ -16,7 +16,7 @@ class ProductListPresenter(
     private val cartItemRepository: CartItemRepository
 ) : ProductListContract.Presenter {
 
-    private var currentPage = 0
+    private var currentPage = 1
     private val offset
         get() = (currentPage - 1) * PAGE_SIZE
 
@@ -53,8 +53,7 @@ class ProductListPresenter(
     }
 
     private fun createProductUIStates(
-        cartItems: List<CartItem>,
-        products: List<Product>
+        cartItems: List<CartItem>, products: List<Product>
     ): List<ProductUIState> {
         val cartItemMap = cartItems.associateBy { it.product.id }
         return products.map { product ->
@@ -71,6 +70,7 @@ class ProductListPresenter(
             cartItemRepository.findAll { cartItems ->
                 val productUIStates = createProductUIStates(cartItems, products)
                 view.setProducts(productUIStates)
+                refreshCanLoadMore()
             }
         }
     }
@@ -85,9 +85,9 @@ class ProductListPresenter(
     override fun onAddToCart(productId: Long) {
         productRepository.findById(productId) { product ->
             product ?: return@findById
-            val cartItem = CartItem(product, LocalDateTime.now(), 1)
-            cartItemRepository.save(cartItem) { cartItem ->
-                view.replaceProduct(ProductUIState.from(cartItem))
+            val cartItem = CartItem(-1, product, LocalDateTime.now(), 1)
+            cartItemRepository.save(cartItem) { savedCartItem ->
+                view.replaceProduct(ProductUIState.from(savedCartItem))
                 onLoadCartItemCount()
             }
         }
@@ -96,23 +96,25 @@ class ProductListPresenter(
     override fun onPlusCount(cartItemId: Long) {
         cartItemRepository.findById(cartItemId) { cartItem ->
             cartItem.plusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count)
-
-            view.replaceProduct(ProductUIState.from(cartItem))
+            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+                view.replaceProduct(ProductUIState.from(cartItem))
+            }
         }
     }
 
     override fun onMinusCount(cartItemId: Long) {
         cartItemRepository.findById(cartItemId) { cartItem ->
             if (cartItem.count == 1) {
-                cartItemRepository.deleteById(cartItemId)
-                view.replaceProduct(ProductUIState.from(cartItem.product))
-                onLoadCartItemCount()
+                cartItemRepository.deleteById(cartItemId) {
+                    view.replaceProduct(ProductUIState.from(cartItem.product))
+                    onLoadCartItemCount()
+                }
                 return@findById
             }
             cartItem.minusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count)
-            view.replaceProduct(ProductUIState.from(cartItem))
+            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+                view.replaceProduct(ProductUIState.from(cartItem))
+            }
         }
     }
 

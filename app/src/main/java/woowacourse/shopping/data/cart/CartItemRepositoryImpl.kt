@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.database.cart
+package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.data.datasource.cart.CartItemDataSource
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.repository.CartItemRepository
 
@@ -51,11 +50,11 @@ class CartItemRepositoryImpl(
         }
     }
 
-    override fun updateCountById(id: Long, count: Int) {
-        cartItemDataSource.updateCountById(id, count)
+    override fun updateCountById(id: Long, count: Int, onFinish: () -> Unit) {
+        cartItemDataSource.updateCountById(id, count, onFinish)
     }
 
-    override fun deleteById(id: Long) {
-        cartItemDataSource.deleteById(id)
+    override fun deleteById(id: Long, onFinish: () -> Unit) {
+        cartItemDataSource.deleteById(id, onFinish)
     }
 }

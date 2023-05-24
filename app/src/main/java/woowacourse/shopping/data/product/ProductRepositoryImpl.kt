@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.database.product
+package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.repository.ProductRepository
 
