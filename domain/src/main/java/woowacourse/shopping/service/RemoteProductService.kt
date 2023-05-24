@@ -1,10 +1,10 @@
 package woowacourse.shopping.service
 
-import java.lang.Thread.sleep
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.model.Product
@@ -14,23 +14,30 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
     private val baseUrl = baseUrl.removeSuffix("/")
     private val client = OkHttpClient()
 
-    private var offset = 0
-
     override fun getAll(): List<Product> {
         val request = Request.Builder()
             .url("$baseUrl/products")
             .build()
-        return parseProductsResponse(executeRequest(request))
+
+        var products: List<Product>? = null
+        executeRequest(
+            request,
+            onSuccess = { response ->
+                val responseBody = response.body?.string()
+                    ?: throw RuntimeException("Product get all failed")
+                products = parseProductsResponse(responseBody)
+            },
+            onFailure = { println("Product get all failed") }
+        )
+        while (products == null) {
+            Thread.sleep(10)
+        }
+        return products!!
     }
 
     override fun getNext(count: Int): List<Product> {
-        val request = Request.Builder()
-            .url("$baseUrl/products?offset=$offset&count=$count")
-            .build()
-
-        val products = parseProductsResponse(executeRequest(request))
-        offset += products.size
-        return products
+        // TODO()
+        return emptyList()
     }
 
     override fun insert(product: Product): Int {
@@ -39,9 +46,13 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
             .post(product.toJson().toRequestBody(JSON_MEDIA_TYPE))
             .build()
 
-        return executeRequest(request)
-            ?.let { JSONArray(it).getJSONObject(0).getInt("id") }
-            ?: throw RuntimeException("Product insert failed")
+        executeRequest(
+            request,
+            onSuccess = { println("Product insert success") },
+            onFailure = { println("Product insert failed") }
+        )
+
+        return 0
     }
 
     override fun findById(id: Int): Product {
@@ -49,27 +60,37 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
             .url("$baseUrl/products/$id")
             .build()
 
-        return executeRequest(request)?.let { parseProductResponse(it) }
-            ?: throw RuntimeException("Product not found with id: $id")
+        var product: Product? = null
+        executeRequest(
+            request,
+            onSuccess = {
+                val responseBody = it.body?.string()
+                    ?: throw RuntimeException("Product find by id failed")
+                product = parseProductResponse(responseBody)
+            },
+            onFailure = { println("Product find by id failed") }
+        )
+
+        while (product == null) { Thread.sleep(10) }
+        return product!!
     }
 
-    private fun executeRequest(request: Request): String? {
-        var responseBody: String? = null
+    private fun executeRequest(
+        request: Request,
+        onSuccess: (Response) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         client.newCall(request).enqueue(
             object : okhttp3.Callback {
                 override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-                    throw RuntimeException("Request failed", e)
+                    onFailure(e)
                 }
 
-                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                    responseBody = response.body?.string()
-                    response.close()
+                override fun onResponse(call: okhttp3.Call, response: Response) {
+                    onSuccess(response)
                 }
             }
         )
-
-        while (responseBody == null) { sleep(1) }
-        return responseBody
     }
 
     private fun parseProductsResponse(responseBody: String?): List<Product> {
