@@ -14,5 +14,6 @@ class LoginPresenter(
     }
 
     override fun postAuthInfo() {
+        loginRepository.postAuthInfo()
     }
 }

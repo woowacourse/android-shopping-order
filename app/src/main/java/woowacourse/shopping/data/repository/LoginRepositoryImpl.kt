@@ -9,5 +9,6 @@ class LoginRepositoryImpl(
     private val loginDataSource: LoginDataSource,
 ) : LoginRepository {
     override fun postAuthInfo() {
+        //  step2 서버 토큰 받으면 저장하기
     }
 }

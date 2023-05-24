@@ -23,7 +23,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         intent.getIntExtra(SERVER_KEY, ERROR_VALUE),
         this,
         LoginRepositoryImpl(
-            AuthInfoDataSourceImpl(),
+            AuthInfoDataSourceImpl.getInstance(this),
             LoginDataSourceImpl(),
         ),
     )
@@ -38,6 +38,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     private fun setClickEventOnLogin() {
         binding.LoginBtn.setOnClickListener {
+            // binding.inputEmail.text
+            // binding.inputPassword.text
+            // UIModel로 묶기
             loginPresenter.postAuthInfo()
         }
     }
