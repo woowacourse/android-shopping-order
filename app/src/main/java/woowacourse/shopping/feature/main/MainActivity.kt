@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         initPresenter()
 
         presenter.loadProducts()
-        presenter.loadRecent()
     }
 
     private fun initAdapters() {
@@ -127,6 +126,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             binding.mainSkeleton.visibility = View.GONE
             binding.productRv.visibility = View.VISIBLE
             mainProductAdapter.addItems(products)
+            presenter.loadRecent()
         }
     }
 
