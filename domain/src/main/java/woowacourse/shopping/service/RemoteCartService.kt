@@ -40,28 +40,6 @@ class RemoteCartService(baseUrl: String) {
         return products!!
     }
 
-    private fun parseCartProductsResponse(responseBody: String): List<CartProduct> {
-        return responseBody.let {
-            val cartJsonArray = JSONArray(it)
-            val carts = mutableListOf<CartProduct>()
-
-            for (i in 0 until cartJsonArray.length()) {
-                val cartJsonObject = cartJsonArray.getJSONObject(i)
-                val product = cartJsonObject.getJSONObject("product")
-                carts += CartProduct(
-                    id = cartJsonObject.getInt("id"),
-                    count = cartJsonObject.getInt("quantity"),
-                    productId = product.getInt("id"),
-                    name = product.getString("name"),
-                    price = product.getInt("price"),
-                    imageUrl = product.getString("imageUrl"),
-                    checked = true // TODO: 수정 !
-                )
-            }
-            carts
-        }
-    }
-
     fun postItem(itemId: Int) {
         val request = Request.Builder()
             .url("$baseUrl/cart-items")
@@ -122,6 +100,15 @@ class RemoteCartService(baseUrl: String) {
                 }
             }
         )
+    }
+
+    private fun parseCartProductsResponse(responseBody: String): List<CartProduct> {
+        val cartJsonArray = JSONArray(responseBody)
+        val carts = mutableListOf<CartProduct>()
+        for (i in 0 until cartJsonArray.length()) {
+            carts += CartProduct.fromJson(cartJsonArray.getJSONObject(i))
+        }
+        return carts
     }
 
     companion object {
