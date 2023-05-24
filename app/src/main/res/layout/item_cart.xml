@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/item_card_background"
+        android:padding="18dp">
+
+        <CheckBox
+            android:id="@+id/cb_cart_item_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_cart_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/cb_cart_item_selected"
+            app:layout_constraintTop_toTopOf="@id/cb_cart_item_selected"
+            app:layout_constraintBottom_toBottomOf="@id/cb_cart_item_selected"
+            tools:text="Product Name" />
+
+        <ImageView
+            android:id="@+id/iv_cart"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1.7"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cb_cart_item_selected"
+            tools:src="@mipmap/ic_launcher_round" />
+
+
+        <ImageButton
+            android:id="@+id/btn_cart_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/icon_close_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_cart_name"
+            app:layout_constraintBottom_toBottomOf="@id/tv_cart_name"/>
+
+        <TextView
+            android:id="@+id/tv_cart_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/counter"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="10,000원" />
+
+        <woowacourse.shopping.utils.customview.Counter
+            android:id="@+id/counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
