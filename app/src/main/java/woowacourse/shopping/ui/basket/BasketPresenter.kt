@@ -49,23 +49,23 @@ class BasketPresenter(
         view.updateCheckedProductsCount(basket.getCheckedProductsCount())
     }
 
-    override fun addBasketProduct(product: Product) {
+    override fun plusBasketProductCount(product: Product) {
         basketRepository.update(
             basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
                 NOT_EXIST_PRODUCT_ERROR
             )
         )
-        basket = basket.add(BasketProduct(count = Count(1), product = product))
+        basket = basket.plus(BasketProduct(count = Count(1), product = product))
         updateBasketProductViewData()
     }
 
-    override fun deleteBasketProduct(product: Product) {
+    override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
             basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
                 NOT_EXIST_PRODUCT_ERROR
             )
         )
-        basket = basket.delete(BasketProduct(count = Count(1), product = product))
+        basket = basket.minus(BasketProduct(count = Count(1), product = product))
         updateBasketProductViewData()
     }
 

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain
 
 data class Basket(val products: List<BasketProduct>) {
-    fun add(basketProduct: BasketProduct): Basket =
+    fun plus(basketProduct: BasketProduct): Basket =
         if (basketProduct in products) Basket(
             products.map {
                 if (it == basketProduct) BasketProduct(
@@ -13,7 +13,7 @@ data class Basket(val products: List<BasketProduct>) {
         )
         else Basket(products + basketProduct)
 
-    fun delete(basketProduct: BasketProduct): Basket =
+    fun minus(basketProduct: BasketProduct): Basket =
         if (basketProduct in products) Basket(
             products.map {
                 if (it == basketProduct) BasketProduct(
@@ -56,5 +56,4 @@ data class Basket(val products: List<BasketProduct>) {
 
     fun getProductByProductId(productId: Int): BasketProduct? =
         products.find { it.product.id == productId }
-
 }

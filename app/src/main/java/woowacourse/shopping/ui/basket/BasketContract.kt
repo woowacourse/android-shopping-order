@@ -27,9 +27,9 @@ interface BasketContract {
 
         fun updateBasketProductCheckState(basketProduct: BasketProduct)
 
-        fun addBasketProduct(product: Product)
+        fun plusBasketProductCount(product: Product)
 
-        fun deleteBasketProduct(product: Product)
+        fun minusBasketProductCount(product: Product)
 
         fun updateBasketProducts()
 
