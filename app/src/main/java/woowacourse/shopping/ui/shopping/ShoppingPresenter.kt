@@ -56,19 +56,34 @@ class ShoppingPresenter(
         view.updateTotalBasketCount(basket.products.fold(0) { acc, basketProduct -> acc + basketProduct.count.value })
     }
 
-    override fun addBasketProduct(product: Product) {
-        val addedProduct = BasketProduct(count = Count(1), product = product)
-        basketRepository.add(addedProduct)
-        basket = basket.add(addedProduct)
+    override fun plusBasketProductCount(product: Product) {
+        basketRepository.update(
+            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
+                NOT_EXIST_PRODUCT_ERROR
+            )
+        )
+        basket = basket.plus(BasketProduct(count = Count(1), product = product))
         fetchBasketCount()
         fetchTotalBasketCount()
         view.updateProducts(totalProducts)
     }
 
-    override fun removeBasketProduct(product: Product) {
-        val removedProduct = BasketProduct(count = Count(1), product = product)
-        basketRepository.minus(removedProduct)
-        basket = basket.delete(removedProduct)
+    override fun minusBasketProductCount(product: Product) {
+        basketRepository.update(
+            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
+                NOT_EXIST_PRODUCT_ERROR
+            )
+        )
+        basket = basket.minus(BasketProduct(count = Count(1), product = product))
+        fetchBasketCount()
+        fetchTotalBasketCount()
+        view.updateProducts(totalProducts)
+    }
+
+    override fun addBasketProduct(product: Product) {
+        basketRepository.add(product) {
+            basket = basket.plus(BasketProduct(id = it, count = Count(1), product = product))
+        }
         fetchBasketCount()
         fetchTotalBasketCount()
         view.updateProducts(totalProducts)
@@ -114,5 +129,7 @@ class ShoppingPresenter(
         private const val PRODUCT_SIZE_FOR_HAS_NEXT = 1
         private const val TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE =
             LOAD_PRODUCT_SIZE_AT_ONCE + PRODUCT_SIZE_FOR_HAS_NEXT
+
+        private const val NOT_EXIST_PRODUCT_ERROR = "장바구니에 담겨있지 않은 상품을 조회하였습니다."
     }
 }

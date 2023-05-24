@@ -25,9 +25,11 @@ interface ShoppingContract {
 
         fun fetchTotalBasketCount()
 
-        fun addBasketProduct(product: Product)
+        fun plusBasketProductCount(product: Product)
 
-        fun removeBasketProduct(product: Product)
+        fun minusBasketProductCount(product: Product)
+
+        fun addBasketProduct(product: Product)
 
         fun updateProducts()
 
