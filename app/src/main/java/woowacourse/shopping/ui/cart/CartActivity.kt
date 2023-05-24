@@ -46,16 +46,16 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.totalPriceTextView.text = getString(R.string.price_format, totalPrice)
     }
 
-    override fun onCountChanged(product: UiProduct, count: Int, isIncreased: Boolean) {
-        presenter.changeProductCount(product, count, isIncreased)
+    override fun onCountChanged(cartProduct: UiCartProduct, count: Int, isIncreased: Boolean) {
+        presenter.changeProductCount(cartProduct, count, isIncreased)
     }
 
-    override fun onCheckStateChanged(product: UiProduct, isChecked: Boolean) {
-        presenter.changeProductSelectState(product, isChecked)
+    override fun onCheckStateChanged(cartProduct: UiCartProduct, isChecked: Boolean) {
+        presenter.changeProductSelectState(cartProduct, isChecked)
     }
 
-    override fun onDeleteClick(product: UiProduct) {
-        presenter.removeProduct(product)
+    override fun onDeleteClick(cartProduct: UiCartProduct) {
+        presenter.removeProduct(cartProduct)
     }
 
     override fun showOrderComplete(productCount: Int) {

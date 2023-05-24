@@ -35,7 +35,7 @@
             android:checked="@{cartProduct.isChecked}"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:onCheckedChanged="@{(_, isChecked) -> cartClickListener.onCheckStateChanged(cartProduct.product, isChecked)}"
+            android:onCheckedChanged="@{(_, isChecked) -> cartClickListener.onCheckStateChanged(cartProduct, isChecked)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="24dp"
-            android:onClick="@{() -> cartClickListener.onDeleteClick(cartProduct.product)}"
+            android:onClick="@{() -> cartClickListener.onDeleteClick(cartProduct)}"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@+id/product_name_text_view"
             app:layout_constraintEnd_toEndOf="parent"
@@ -103,15 +103,15 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             bind:count="@{cartProduct.selectedCount.value}"
-            bind:onMinusClick="@{() -> cartClickListener.onCountChanged(cartProduct.product, 1, false)}"
-            bind:onPlusClick="@{() -> cartClickListener.onCountChanged(cartProduct.product, 1, true)}"
-            app:useSkeleton="true"
+            bind:onMinusClick="@{() -> cartClickListener.onCountChanged(cartProduct, 1, false)}"
+            bind:onPlusClick="@{() -> cartClickListener.onCountChanged(cartProduct, 1, true)}"
             app:layout_constraintBottom_toBottomOf="@+id/product_image_view"
             app:layout_constraintEnd_toEndOf="@+id/product_price_text_view"
             app:layout_constraintHeight_percent="0.3"
             app:layout_constraintWidth_percent="0.35"
             app:max_count="99"
-            app:min_count="1" />
+            app:min_count="1"
+            app:useSkeleton="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

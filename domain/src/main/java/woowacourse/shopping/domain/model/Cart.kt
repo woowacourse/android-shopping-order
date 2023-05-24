@@ -52,6 +52,9 @@ data class Cart(
     fun update(cartProducts: List<CartProduct>): Cart =
         copy(items = cartProducts.distinctBy { it.product.id })
 
+    fun findCartProductById(cartProductId: Int): CartProduct? =
+        items.find { it.id == cartProductId }
+
     fun getCheckedProductTotalPrice(): Int = items.sumOf { it.getTotalPrice(true) }
 
     operator fun plus(items: Cart): Cart =

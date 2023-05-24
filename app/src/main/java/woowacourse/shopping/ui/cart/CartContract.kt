@@ -17,10 +17,10 @@ interface CartContract {
 
     abstract class Presenter(protected val view: View) {
         abstract fun fetchCart(page: Int)
-        abstract fun changeProductCount(product: UiProduct, count: Int, increase: Boolean)
-        abstract fun changeProductSelectState(product: UiProduct, isSelect: Boolean)
+        abstract fun changeProductCount(cartProduct: UiCartProduct, count: Int, increase: Boolean)
+        abstract fun changeProductSelectState(cartProduct: UiCartProduct, isSelect: Boolean)
         abstract fun toggleAllCheckState()
-        abstract fun removeProduct(product: UiProduct)
+        abstract fun removeProduct(cartProduct: UiCartProduct)
         abstract fun order()
         abstract fun navigateToHome()
     }
