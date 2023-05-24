@@ -14,10 +14,8 @@ class CountBadge(
     private val binding =
         LayoutCountBadgeBinding.inflate(LayoutInflater.from(context), this, true)
 
-    var count: Int
-        get() = binding.tvCartCount.toString().toInt()
-        set(value) {
-            binding.tvCartCount.text = value.toString()
-            binding.root.isVisible = value > 0
-        }
+    fun updateCount(count: Int) {
+        binding.tvCartCount.text = count.toString()
+        binding.root.isVisible = count > 0
+    }
 }

@@ -57,7 +57,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         )
     }
 
-    private var cartCountBadge: CountBadge? = null
+    private lateinit var cartCountBadge: CountBadge
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +84,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.cart_count_badge)
                 ?: throw IllegalStateException("장바구니 아이템 개수 배지가 메뉴에 없으면 메뉴 리소스를 다시 보세요.")
+        cartCountBadge.isVisible = false
 
         presenter.onLoadCartItemCount()
 
@@ -145,6 +146,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun setProducts(products: List<ProductUIState>) {
         runOnUiThread {
+            binding.skeletonProductList.isVisible = false
+            binding.viewProductList.isVisible = true
             productListAdapter.setItems(products)
             binding.recyclerViewMainProduct.smoothScrollToPosition(0)
         }
@@ -165,11 +168,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     override fun setCartItemCount(count: Int) {
         runOnUiThread {
             if (count == 0) {
-                cartCountBadge?.isVisible = false
+                cartCountBadge.isVisible = false
                 return@runOnUiThread
             }
-            cartCountBadge?.isVisible = true
-            cartCountBadge?.count = count
+            cartCountBadge.isVisible = true
+            cartCountBadge.updateCount(count)
         }
     }
 
