@@ -13,7 +13,6 @@ import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.service.RemoteCartService
-import woowacourse.shopping.service.RemoteProductService
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -63,7 +62,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter = CartPresenter(
             this,
             CartRepositoryImpl(RemoteCartService(ServerURL.url)),
-            RemoteProductService(ServerURL.url),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
         )
         presenter.setUpView()
@@ -106,7 +104,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.removeItem(productId)
         }
         override fun onItemClick(product: CartProductUIModel) {
-            presenter.navigateToItemDetail(product.toProduct().id)
+            presenter.navigateToItemDetail(product.productId)
         }
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)

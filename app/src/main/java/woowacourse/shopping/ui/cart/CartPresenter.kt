@@ -4,14 +4,12 @@ import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.utils.NonNullLiveData
 import woowacourse.shopping.utils.NonNullMutableLiveData
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
     private val _totalPrice = NonNullMutableLiveData<Int>(0)
@@ -124,9 +122,8 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        view.navigateToItemDetail(
-            productRepository.findById(productId).toUIModel()
-        )
+        cartRepository.getAll().all().first { it.productId == productId }.toUIModel().toProduct()
+            .let { view.navigateToItemDetail(it.toUIModel()) }
     }
 
     companion object {
