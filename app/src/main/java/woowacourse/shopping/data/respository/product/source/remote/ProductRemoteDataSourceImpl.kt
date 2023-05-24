@@ -9,14 +9,9 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.data.model.ProductEntity
-import woowacourse.shopping.data.respository.product.ProductWebServer.PORT
-import woowacourse.shopping.data.respository.product.ProductWebServer.startServer
 import java.io.IOException
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
-    init {
-        startServer()
-    }
 
     override fun requestDatas(
         onFailure: () -> Unit,
@@ -24,8 +19,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = "http://localhost:$PORT"
-            val path = "/shopping/products?"
+            val host = BASE_URL_JENNA
+            val path = PRODUCT
             val request = Request.Builder().url(host + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -50,8 +45,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = "http://localhost:$PORT"
-            val path = "/shopping/products/$productId"
+            val host = BASE_URL_JENNA
+            val path = "$PRODUCT/$productId"
             val request = Request.Builder().url(host + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -89,5 +84,13 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
         val image = json.getString("imageUrl")
 
         return ProductEntity(id, name, price, image)
+    }
+
+    companion object {
+        private const val BASE_URL_POI = "http://13.125.205.46:8080"
+        private const val BASE_URL_TORI = "http://13.209.68.194:8080"
+        private const val BASE_URL_JENNA = "http://43.201.105.220:8080"
+
+        private const val PRODUCT = "/products"
     }
 }
