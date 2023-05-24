@@ -14,36 +14,43 @@ class RemoteCartDataSource(baseUrl: String) {
     private val baseUrl = baseUrl.removeSuffix("/")
     private val client = OkHttpClient()
 
-    private var credentials = ""
+    private var credentials = "YUBhLmNvbToxMjM0"
 
     fun getAll(): List<CartProduct> {
         val request = Request.Builder()
             .url("$baseUrl/cart-items")
             .header("Authorization", "Basic $credentials")
+            .get()
             .build()
-        return parseCartProductsResponse(executeRequest(request).body?.string())
+
+        return parseCartProductsResponse(executeRequest(request))
     }
 
-    private fun parseCartProductsResponse(executeRequest: String?): List<CartProduct> {
-        println(executeRequest)
-        JSONArray(executeRequest).map {
-            val item = it as JSONObject
-            val product = item.getJSONObject("product")
+    private fun parseCartProductsResponse(responseBody: String): List<CartProduct> {
+        return responseBody.let {
+            val cartJsonArray = JSONArray(it)
+            val carts = mutableListOf<CartProduct>()
 
-            CartProduct(
-                id = item.getInt("id"),
-                count = item.getInt("quantity"),
-                name = product.getString("name"),
-                price = product.getInt("price"),
-                imageUrl = product.getString("imageUrl"),
-                checked = true // TODO: 수정 !
-            )
-        }.let { return it }
+            for (i in 0 until cartJsonArray.length()) {
+                val cartJsonObject = cartJsonArray.getJSONObject(i)
+                val product = cartJsonObject.getJSONObject("product")
+                carts += CartProduct(
+                    id = cartJsonObject.getInt("id"),
+                    count = cartJsonObject.getInt("quantity"),
+                    productId = product.getInt("id"),
+                    name = product.getString("name"),
+                    price = product.getInt("price"),
+                    imageUrl = product.getString("imageUrl"),
+                    checked = true // TODO: 수정 !
+                )
+            }
+            carts
+        }
     }
 
-    fun postItem(itemId: Int): Response {
+    fun postItem(itemId: Int): String {
         val request = Request.Builder()
-            .url("$baseUrl/cart-items/$itemId")
+            .url("$baseUrl/cart-items")
             .header("Authorization", "Basic $credentials")
             .header("Content-Type", "application/json")
             .post(JSONObject().put("productId", itemId).toString().toRequestBody(JSON_MEDIA_TYPE))
@@ -52,7 +59,7 @@ class RemoteCartDataSource(baseUrl: String) {
         return executeRequest(request)
     }
 
-    fun patchItemQuantity(itemId: Int, quantity: Int): Response {
+    fun patchItemQuantity(itemId: Int, quantity: Int): String {
         val request = Request.Builder()
             .url("$baseUrl/cart-items/$itemId")
             .header("Authorization", "Basic $credentials")
@@ -63,7 +70,7 @@ class RemoteCartDataSource(baseUrl: String) {
         return executeRequest(request)
     }
 
-    fun deleteItem(itemId: Int): Response {
+    fun deleteItem(itemId: Int): String {
         val request = Request.Builder()
             .url("$baseUrl/cart-items/$itemId")
             .header("Authorization", "Basic $credentials")
@@ -73,8 +80,8 @@ class RemoteCartDataSource(baseUrl: String) {
         return executeRequest(request)
     }
 
-    private fun executeRequest(request: Request): Response {
-        var responseAll: Response? = null
+    private fun executeRequest(request: Request): String {
+        var responseBody: String? = null
         client.newCall(request).enqueue(
             object : okhttp3.Callback {
                 override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
@@ -82,14 +89,12 @@ class RemoteCartDataSource(baseUrl: String) {
                 }
 
                 override fun onResponse(call: okhttp3.Call, response: Response) {
-                    responseAll = response
+                    responseBody = response.body?.string()
                 }
             }
         )
-        while (responseAll == null) {
-            sleep(10)
-        }
-        return responseAll as Response
+        while (responseBody == null) { sleep(10) }
+        return responseBody!!
     }
 
     companion object {

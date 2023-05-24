@@ -29,6 +29,15 @@ class ProductRepositoryImpl(
     }
 
     override fun findById(id: Int): Product {
-        return localDatabase.findById(id)
+        runCatching { localDatabase.findById(id) }
+            .onSuccess { return it }
+
+        runCatching { remoteDatabase.findById(id) }
+            .onSuccess {
+                localDatabase.insert(it)
+                return it
+            }
+
+        throw RuntimeException("Product not found with id: $id")
     }
 }

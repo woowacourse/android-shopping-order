@@ -9,10 +9,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
+import woowacourse.shopping.repositoryImpl.RemoteCartDataSource
 import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
@@ -47,7 +48,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
             RemoteProductDataSource(ServerURL.url),
-            CartDatabase(this),
+            CartRepositoryImpl(RemoteCartDataSource(ServerURL.url)),
             RecentProductDatabase(this)
         )
         binding.presenter = presenter

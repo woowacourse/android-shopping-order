@@ -36,7 +36,8 @@ class CartPresenterTest {
         1,
         true,
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
+        1
     )
 
     private val fakeCartProducts = CartProducts(List(10) { fakeCartProduct })

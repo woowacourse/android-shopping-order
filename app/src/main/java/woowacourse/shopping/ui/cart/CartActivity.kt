@@ -7,11 +7,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
+import woowacourse.shopping.repositoryImpl.RemoteCartDataSource
 import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
@@ -61,7 +62,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartDatabase(this),
+            CartRepositoryImpl(RemoteCartDataSource(ServerURL.url)),
             RemoteProductDataSource(ServerURL.url),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
         )

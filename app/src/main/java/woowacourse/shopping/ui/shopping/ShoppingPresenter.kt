@@ -18,8 +18,8 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        cartRepository.getAll().toUIModel()
-            .associateBy { it.id }
+        cartRepository.getAll().all()
+            .associateBy { it.productId }
             .mapValues { it.value.count }
             .let { view.setCartProducts(it) }
     }
@@ -41,9 +41,7 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int): Int {
-        cartRepository.insert(
-            productRepository.findById(productId)
-        )
+        cartRepository.insert(productId)
         return cartRepository.updateCount(productId, count)
     }
 

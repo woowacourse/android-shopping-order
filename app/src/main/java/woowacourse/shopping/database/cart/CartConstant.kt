@@ -12,6 +12,7 @@ object CartConstant : BaseColumns {
     private const val TABLE_COLUMN_CHECKED = "product_checked"
     private const val TABLE_COLUMN_PRICE = "product_price"
     private const val TABLE_COLUMN_IMAGE_URL = "product_img_url"
+    private const val TABLE_COLUMN_PRODUCT_ID = "product_product_id"
     private const val TABLE_COLUMN_SAVE_TIME = "product_save_time"
 
     fun getCreateTableQuery(): String {
@@ -44,6 +45,7 @@ object CartConstant : BaseColumns {
                 $TABLE_COLUMN_CHECKED,
                 $TABLE_COLUMN_PRICE,
                 $TABLE_COLUMN_IMAGE_URL,
+                $TABLE_COLUMN_PRODUCT_ID,
                 $TABLE_COLUMN_SAVE_TIME) VALUES (
                 ${cartProduct.id},
                 '${cartProduct.name}',
@@ -51,6 +53,7 @@ object CartConstant : BaseColumns {
                 ${cartProduct.checked},
                 ${cartProduct.price},
                 '${cartProduct.imageUrl}',
+                ${cartProduct.productId},
                 ${System.currentTimeMillis()})
         """.trimIndent()
     }
@@ -82,7 +85,8 @@ object CartConstant : BaseColumns {
             count = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_COUNT)),
             checked = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_CHECKED)) == 1,
             price = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRICE)),
-            imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL))
+            imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL)),
+            productId = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRODUCT_ID))
         )
     }
 }

@@ -7,13 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
+import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
+import woowacourse.shopping.repositoryImpl.RemoteCartDataSource
 import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -66,7 +67,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun initServerURL() {
-        ServerURL.url = "http://43.200.169.154:8080"
+        ServerURL.url = "http://13.125.207.155:8080/"
     }
 
     private fun initPresenter() {
@@ -77,7 +78,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 RemoteProductDataSource(ServerURL.url)
             ),
             RecentProductDatabase(this),
-            CartDatabase(this)
+            CartRepositoryImpl(RemoteCartDataSource(ServerURL.url))
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

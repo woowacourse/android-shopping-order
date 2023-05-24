@@ -6,7 +6,6 @@ import android.database.Cursor
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.CartRepository
 
 class CartDatabase(context: Context) : CartRepository {
@@ -33,21 +32,12 @@ class CartDatabase(context: Context) : CartRepository {
                 count = it.count,
                 checked = it.checked,
                 price = it.price,
-                imageUrl = it.imageUrl
+                imageUrl = it.imageUrl,
+                productId = it.productId
             )
         }
     }
 
-    private fun toCartProduct(product: Product): CartProduct {
-        return CartProduct(
-            id = product.id,
-            name = product.name,
-            count = 1,
-            checked = true,
-            price = product.price,
-            imageUrl = product.imageUrl
-        )
-    }
     private fun getCartCursor(): Cursor {
         return db.rawQuery(CartConstant.getGetAllQuery(), null)
     }
@@ -76,8 +66,7 @@ class CartDatabase(context: Context) : CartRepository {
         return cartProducts.all().filter { it.checked }.sumOf { it.price * it.count }
     }
 
-    override fun insert(product: Product) {
-        db.execSQL(CartConstant.getInsertQuery(toCartProduct(product)))
+    override fun insert(productId: Int) {
         cartProducts = getAll()
     }
 
