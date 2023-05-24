@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.CartCache
 import woowacourse.shopping.data.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUiModel
@@ -34,9 +35,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
+        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
         val cartPresenter = CartPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRemoteService("YUBhLmNvbToxMjM0"), CartCache)
+            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter

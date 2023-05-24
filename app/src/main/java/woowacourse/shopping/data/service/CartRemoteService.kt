@@ -20,7 +20,7 @@ class CartRemoteService(private val credential: String) {
 
     private val okHttpClient = OkHttpClient()
 
-    private val baseUrl = "http://54.180.88.191:8080"
+    private val baseUrl = ServerInfo.currentBaseUrl
     private val url = "$baseUrl/cart-items"
 
     fun loadAll(): List<CartProduct> {

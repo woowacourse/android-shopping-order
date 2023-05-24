@@ -18,7 +18,7 @@ class ProductRemoteService {
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {
-        val baseUrl = "http://54.180.88.191:8080"
+        val baseUrl = ServerInfo.currentBaseUrl
         val url = "$baseUrl/products"
         val request = Request.Builder().url(url).build()
 
