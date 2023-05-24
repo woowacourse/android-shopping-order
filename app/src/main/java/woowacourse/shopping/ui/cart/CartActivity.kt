@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
@@ -115,12 +116,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cbPageAllSelect.setOnCheckedChangeListener { _, isChecked ->
             presenter.onChangeSelectionOfAllCartItems(isChecked)
         }
-        binding.tvOrderPrice.text = getString(R.string.product_price).format(PRICE_FORMAT.format(0))
-        binding.tvOrder.text = getString(R.string.order_with_count).format(0)
+        binding.tvOrder.text = getString(R.string.order)
     }
 
     override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
         runOnUiThread {
+            binding.layoutSkeletonCartList.isVisible = false
+            binding.layoutCartList.isVisible = true
             if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
             cartListAdapter.setCartItems(cartItems)
         }

@@ -146,7 +146,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun setProducts(products: List<ProductUIState>) {
         runOnUiThread {
-            binding.skeletonProductList.isVisible = false
+            binding.layoutSkeletonProductList.isVisible = false
             binding.viewProductList.isVisible = true
             productListAdapter.setItems(products)
             binding.recyclerViewMainProduct.smoothScrollToPosition(0)
