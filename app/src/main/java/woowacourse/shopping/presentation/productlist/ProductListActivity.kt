@@ -36,14 +36,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var recentProductAdapter: RecentProductAdapter
     private lateinit var cartMenuItem: MenuItem
     private var cartIconBinding: BadgeCartBinding? = null
-    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductService }
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductService() }
     private val presenter: ProductListPresenter by lazy {
         ProductListPresenter(
             this,
             ProductRepositoryImpl(productRemoteDataSource),
             RecentProductRepositoryImpl(
                 RecentProductDao(RecentProductDbHelper(this)),
-                ProductService,
+                ProductService(),
             ),
             CartRepositoryImpl(CartDao(CartDbHelper(this)), productRemoteDataSource),
         )

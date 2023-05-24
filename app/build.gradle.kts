@@ -54,4 +54,5 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+    implementation("com.google.code.gson:gson:2.9.0")
 }

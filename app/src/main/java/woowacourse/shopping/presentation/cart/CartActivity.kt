@@ -24,7 +24,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
-            CartRepositoryImpl(CartDao(CartDbHelper(this)), ProductService),
+            CartRepositoryImpl(CartDao(CartDbHelper(this)), ProductService()),
         )
     }
 

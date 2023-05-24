@@ -59,13 +59,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private fun initPresenter() {
         presenter = ProductDetailPresenter(
             view = this,
-            cartRepository = CartRepositoryImpl(CartDao(CartDbHelper(this)), ProductService),
+            cartRepository = CartRepositoryImpl(CartDao(CartDbHelper(this)), ProductService()),
             productModel = productModel,
             recentProductRepository = RecentProductRepositoryImpl(
                 RecentProductDao(
                     RecentProductDbHelper(this),
                 ),
-                ProductService,
+                ProductService(),
             ),
         )
     }

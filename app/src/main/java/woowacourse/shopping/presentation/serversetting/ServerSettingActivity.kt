@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.serversetting
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.App
+import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 
@@ -27,8 +27,8 @@ class ServerSettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMain(server: String) {
-        App.serverUrl = server
+    private fun startMain(baseUrl: String) {
+        ApiClient.baseUrl = baseUrl
         startActivity(ProductListActivity.getIntent(this))
         finish()
     }
