@@ -8,6 +8,7 @@ import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.ProductUiModel
+import woowacourse.shopping.model.RecentProductUiModel
 import java.time.LocalDateTime
 
 class MainPresenter(
@@ -41,8 +42,16 @@ class MainPresenter(
     }
 
     override fun loadRecent() {
-        val recent = recentProductRepository.getAll().map { it.toPresentation() }
-        view.updateRecent(recent)
+        val recentIds = recentProductRepository.getAll()
+        val recentProducts = mutableListOf<RecentProductUiModel>()
+        recentIds.forEach { recentId ->
+            productRepository.getProductById(recentId)?.let {
+                recentProducts.add(
+                    RecentProductUiModel(it.toPresentation())
+                )
+            }
+        }
+        view.updateRecent(recentProducts)
     }
 
     override fun setCartProductCount() {
@@ -57,9 +66,12 @@ class MainPresenter(
     override fun moveToDetail(product: ProductUiModel) {
         addRecentProduct(RecentProduct(product.toDomain(), LocalDateTime.now()))
         loadRecent()
+
+        val recentId = recentProductRepository.getMostRecentProduct()
+
         view.showProductDetailScreenByProduct(
             product,
-            recentProductRepository.getMostRecentProduct()?.product?.toPresentation()
+            recentId?.let { productRepository.getProductById(recentId) }?.toPresentation()
         )
     }
 

@@ -9,5 +9,7 @@ interface ProductRepository {
         onFailure: () -> Unit
     )
 
+    fun getProductById(id: Long): Product?
+
     fun clearCache()
 }

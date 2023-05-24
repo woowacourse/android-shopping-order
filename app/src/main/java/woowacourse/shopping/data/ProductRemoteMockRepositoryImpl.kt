@@ -29,6 +29,10 @@ class ProductRemoteMockRepositoryImpl(
         }
     }
 
+    override fun getProductById(id: Long): Product? {
+        return productCache.productList.find { id == it.id }
+    }
+
     override fun clearCache() {
         productCache.clear()
     }
