@@ -6,12 +6,10 @@ import woowacourse.shopping.data.product.MockProductRemoteService
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(
+    private val url: String,
     private val productMockProductRemoteService: MockProductRemoteService,
     private val recentProductDao: RecentProductDao
 ) : RecentProductRepository {
-
-//    private val productRepository: ProductRepository =
-//        MockRemoteProductRepositoryImpl(MockProductRemoteService())
 
     override fun getAll(): List<RecentProduct> {
         return recentProductDao.getAll()
@@ -27,7 +25,8 @@ class RecentProductRepositoryImpl(
 
     override fun addRecentProduct(productId: Int, viewedDateTime: LocalDateTime) {
         productMockProductRemoteService.requestProduct(
-            productId = productId.toLong(),
+            url = url,
+            id = productId,
             onSuccess = { if (it != null) recentProductDao.addColumn(it, viewedDateTime) },
             onFailure = {}
         )

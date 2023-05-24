@@ -19,6 +19,40 @@ class MockProductRemoteService {
     private val mockWebServer: MockWebServer get() = _mockWebServer!!
     private val okHttpClient = OkHttpClient()
 
+    private var dispatcher: Dispatcher = object : Dispatcher() {
+        override fun dispatch(request: RecordedRequest): MockResponse {
+            return when (request.path) {
+                "/products" -> {
+                    MockResponse()
+                        .setHeader("Contet-Type", "application/json")
+                        .setResponseCode(200)
+                        .setBody(jsonAllProducts)
+                }
+                "/products/1" -> {
+                    MockResponse()
+                        .setHeader("Contet-Type", "application/json")
+                        .setResponseCode(200)
+                        .setBody(jsonMap[1L]!!)
+                }
+                else -> {
+                    if (request.path!!.startsWith("/products/")) {
+                        val parts = request.path!!.split("/")
+                        val lastPart = parts.last()
+                        val numberParts = lastPart.split("=")
+                        val number = numberParts.last().toLong()
+
+                        MockResponse()
+                            .setHeader("Contet-Type", "application/json")
+                            .setResponseCode(200)
+                            .setBody(jsonMap[number]!!)
+                    } else {
+                        MockResponse().setResponseCode(404)
+                    }
+                }
+            }
+        }
+    }
+
     fun requestAllProducts(
         url: String,
         port: String = "8080",
@@ -58,37 +92,11 @@ class MockProductRemoteService {
         )
     }
 
-    private var dispatcher: Dispatcher = object : Dispatcher() {
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            return when (request.path) {
-                "/products" -> {
-                    MockResponse()
-                        .setHeader("Contet-Type", "application/json")
-                        .setResponseCode(200)
-                        .setBody(jsonAllProducts)
-                }
-                else -> {
-                    if (request.path!!.startsWith("/products?id")) {
-                        val parts = request.path!!.split("/")
-                        val lastPart = parts.last()
-                        val numberParts = lastPart.split("=")
-                        val number = numberParts.last().toLong()
-
-                        MockResponse()
-                            .setHeader("Contet-Type", "application/json")
-                            .setResponseCode(200)
-                            .setBody(jsonMap[number]!!)
-                    } else {
-                        MockResponse().setResponseCode(404)
-                    }
-                }
-            }
-        }
-    }
-
     fun requestProduct(
-        productId: Long,
-        onSuccess: (Product?) -> Unit,
+        url: String,
+        port: String = "8080",
+        id: Int,
+        onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     ) {
         synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
@@ -97,32 +105,31 @@ class MockProductRemoteService {
                 _mockWebServer?.url("/")
                 _mockWebServer?.dispatcher = dispatcher
             }
-
-            val baseUrl = String.format("http://localhost:%s", mockWebServer.port)
-            val okHttpClient = OkHttpClient()
-            val url = "$baseUrl/products?id=$productId"
-            val request = Request.Builder().url(url).build()
-
-            okHttpClient.newCall(request).enqueue(
-                object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        onFailure()
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        if (400 <= response.code) return onFailure()
-                        val responseBody = response.body?.string()
-                        response.close()
-
-                        val result = responseBody?.let {
-                            parseJsonToProductList2(it)
-                        }
-
-                        onSuccess(result)
-                    }
-                }
-            )
         }
+
+        val baseUrl = "$url:${mockWebServer.port}"
+        val requestUrl = "$baseUrl/products/$id"
+        val request = Request.Builder().url(requestUrl).build()
+
+        okHttpClient.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    onFailure()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (400 <= response.code) return onFailure()
+                    val responseBody = response.body?.string()
+                    response.close()
+
+                    val result: Product = responseBody?.let {
+                        parseJsonToProduct(it)
+                    } ?: Product(-1, "", "dummy", 0)
+
+                    onSuccess(result)
+                }
+            }
+        )
     }
 
     private fun parseJsonToProductList(responseString: String): List<Product> {
@@ -143,7 +150,7 @@ class MockProductRemoteService {
         return products
     }
 
-    private fun parseJsonToProductList2(responseString: String): Product {
+    private fun parseJsonToProduct(responseString: String): Product {
         val jsonObject = JSONObject(responseString)
         val id = jsonObject.getInt("id")
         val name = jsonObject.getString("name")

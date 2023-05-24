@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val productRepository: ProductRepository =
             MockRemoteProductRepositoryImpl(url, mockProductRemoteService)
         val recentProductRepository: RecentProductRepository =
-            RecentProductRepositoryImpl(mockProductRemoteService, RecentProductDao(this))
+            RecentProductRepositoryImpl(url, mockProductRemoteService, RecentProductDao(this))
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
     }
     private val productListAdapter: ProductListAdapter by lazy {

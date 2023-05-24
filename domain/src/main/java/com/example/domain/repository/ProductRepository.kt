@@ -10,7 +10,7 @@ interface ProductRepository {
 
     fun getProduct(
         id: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     )
 

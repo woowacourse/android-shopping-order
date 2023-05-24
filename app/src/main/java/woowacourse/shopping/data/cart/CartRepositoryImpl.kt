@@ -17,13 +17,14 @@ class CartRepositoryImpl(
         return cartDao.getCartProduct(productId)
     }
 
-    // todo 임시 데이터 사용, 수정 필요
+    // ToDo("카트 레포지토리 제품 URL 받도록 수정")
     override fun addProduct(productId: Int, count: Int) {
-        productMockProductRemoteService.requestProduct(
-            productId = productId.toLong(),
-            onSuccess = { if (it != null) cartDao.addColumn(it, count) },
-            onFailure = {}
-        )
+        // productMockProductRemoteService.requestProduct(
+        //
+        //     id = productId.toLong(),
+        //     onSuccess = { if (it != null) cartDao.addColumn(it, count) },
+        //     onFailure = {}
+        // )
     }
 
     override fun deleteCartProduct(productId: Int) {

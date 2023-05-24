@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.cart
 
-import android.util.Log
 import com.example.domain.CartProduct
 import com.example.domain.PaymentCalculator
 import com.example.domain.repository.CartRepository

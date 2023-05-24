@@ -23,9 +23,17 @@ class MockRemoteProductRepositoryImpl(
 
     override fun getProduct(
         id: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     ) {
+        Thread {
+            service.requestProduct(
+                url = url,
+                id = id,
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            )
+        }
     }
 
     override fun addProduct(
