@@ -125,7 +125,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         recentProductWrapperAdapter = RecentProductWrapperAdapter(recentProductAdapter)
         productAdapter = ProductAdapter(
             presenter::inquiryProductDetail,
-            presenter::removeBasketProduct,
+            presenter::minusBasketProductCount,
+            presenter::plusBasketProductCount,
             presenter::addBasketProduct
         )
         moreButtonAdapter = MoreButtonAdapter(presenter::updateProducts)
@@ -139,7 +140,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         binding.rvShopping.adapter = concatAdapter
         binding.rvShopping.layoutManager = getGridLayoutManager()
     }
-
 
     private fun initRecentProductsData() {
         presenter.fetchRecentProducts()

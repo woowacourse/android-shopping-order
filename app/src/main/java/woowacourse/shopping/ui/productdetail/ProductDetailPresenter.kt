@@ -54,7 +54,7 @@ class ProductDetailPresenter(
 
     private fun updateBasketProduct() {
         thread {
-            basketRepository.overWriteUpdate(
+            basketRepository.update(
                 BasketProduct(
                     count = Count(currentProduct.basketCount),
                     product = currentProduct.toDomain()

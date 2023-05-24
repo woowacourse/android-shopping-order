@@ -109,7 +109,7 @@ class ShoppingPresenterTest() {
         every { view.updateTotalBasketCount(any()) } just runs
         every { basketRepository.add(any()) } just runs
         // when
-        presenter.addBasketProduct(Product(1, "더미입니다만", Price(1), "url"))
+        presenter.plusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
         verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
@@ -123,7 +123,7 @@ class ShoppingPresenterTest() {
         every { view.updateTotalBasketCount(any()) } just runs
         every { basketRepository.minus(any()) } just runs
         // when
-        presenter.removeBasketProduct(Product(1, "더미입니다만", Price(1), "url"))
+        presenter.minusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
         verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }

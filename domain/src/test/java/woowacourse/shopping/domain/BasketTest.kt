@@ -10,7 +10,7 @@ class BasketTest {
         val basket = Basket(basketProducts)
         val basketProduct = BasketProduct(1, Count(5), Product(1, "새상품", Price(1000), "url"))
 
-        val actual = basket.add(basketProduct)
+        val actual = basket.plus(basketProduct)
         val expected = Basket(basketProducts + basketProduct)
 
         assertThat(actual).isEqualTo(expected)
@@ -23,7 +23,7 @@ class BasketTest {
         val basket = Basket(basketProducts)
         val basketProduct = BasketProduct(1, Count(5), Product(1, "새상품", Price(1000), "url"))
 
-        val actual = basket.add(basketProduct)
+        val actual = basket.plus(basketProduct)
         val expected = Basket(
             listOf<BasketProduct>(
                 BasketProduct(
@@ -46,7 +46,7 @@ class BasketTest {
         val basket = Basket(basketProducts)
         val basketProduct = BasketProduct(2, Count(5), Product(3, "새상품", Price(1000), "url"))
 
-        val actual = basket.add(basketProduct)
+        val actual = basket.plus(basketProduct)
         val expected = Basket(
             listOf<BasketProduct>(
                 BasketProduct(1, Count(5), Product(1, "새상품", Price(1000), "url")),
@@ -66,7 +66,7 @@ class BasketTest {
         val basket = Basket(basketProducts)
         val basketProduct = BasketProduct(2, Count(5), Product(3, "새상품", Price(1000), "url"))
 
-        val actual = basket.delete(basketProduct)
+        val actual = basket.minus(basketProduct)
         val expected = Basket(
             listOf<BasketProduct>(
                 BasketProduct(1, Count(5), Product(1, "새상품", Price(1000), "url"))
@@ -85,7 +85,7 @@ class BasketTest {
         val basket = Basket(basketProducts)
         val basketProduct = BasketProduct(2, Count(3), Product(3, "새상품", Price(1000), "url"))
 
-        val actual = basket.delete(basketProduct)
+        val actual = basket.minus(basketProduct)
         val expected = Basket(
             listOf<BasketProduct>(
                 BasketProduct(1, Count(5), Product(1, "새상품", Price(1000), "url")),
@@ -197,7 +197,7 @@ class BasketTest {
                 BasketProduct(5, Count(3), Product(5, "새상품", Price(500), "url"))
             )
         )
-        val actual = basket.delete(deleteItem)
+        val actual = basket.minus(deleteItem)
 
         // then
         assertThat(actual).isEqualTo(expected)

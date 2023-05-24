@@ -101,7 +101,7 @@ class BasketPresenterTest() {
         every { view.updateBasketProducts(any()) } just Runs
 
         // when
-        presenter.addBasketProduct(Product(1, "더미입니다만", Price(1000), "url"))
+        presenter.plusBasketProductCount(Product(1, "더미입니다만", Price(1000), "url"))
 
         // then
         verify(exactly = 1) { basketRepository.add(any()) }
@@ -129,7 +129,7 @@ class BasketPresenterTest() {
             BasketPresenter(view = view, basketRepository = basketRepository, basket = basket)
 
         // when
-        presenter.deleteBasketProduct(Product(1, "더미입니다만", Price(1000), "url"))
+        presenter.minusBasketProductCount(Product(1, "더미입니다만", Price(1000), "url"))
 
         // then
         verify(exactly = 1) { basketRepository.minus(any()) }

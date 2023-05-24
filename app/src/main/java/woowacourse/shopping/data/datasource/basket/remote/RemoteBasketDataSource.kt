@@ -8,6 +8,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.model.DataBasketProduct
+import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.OkHttpModule
 import java.io.IOException
 
@@ -33,9 +34,9 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
         })
     }
 
-    override fun add(basketProduct: DataBasketProduct) {
+    override fun add(product: DataProduct, onReceived: (Int) -> Unit) {
         val url = "${OkHttpModule.BASE_URL}/cart-items"
-        val requestBody = "{\"productId\":\"${basketProduct.product.id}\"}"
+        val requestBody = "{\"productId\":\"${product.id}\"}"
             .toRequestBody("application/json".toMediaTypeOrNull())
 
         val request = Request.Builder()
@@ -45,7 +46,13 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
 
         OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {}
+            override fun onResponse(call: Call, response: Response) {
+                val productId = response.headers.get("Location")?.split("/")?.last()?.toInt()
+
+                productId?.let {
+                    onReceived(it)
+                }
+            }
         })
     }
 

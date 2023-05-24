@@ -11,7 +11,8 @@ import woowacourse.shopping.ui.shopping.ShoppingViewType
 class ProductAdapter(
     private val onItemClick: (UiProduct) -> Unit,
     private val minusClickListener: (Product) -> Unit,
-    private val plusClickListener: (Product) -> Unit
+    private val plusClickListener: (Product) -> Unit,
+    private val addClickListener: (Product) -> Unit
 ) :
     ListAdapter<UiProduct, ProductViewHolder>(productDiffUtil) {
 
@@ -20,7 +21,8 @@ class ProductAdapter(
             parent,
             { onItemClick(currentList[it]) },
             { minusClickListener(it.toDomain()) },
-            { plusClickListener(it.toDomain()) }
+            { plusClickListener(it.toDomain()) },
+            { addClickListener(it.toDomain()) }
         )
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

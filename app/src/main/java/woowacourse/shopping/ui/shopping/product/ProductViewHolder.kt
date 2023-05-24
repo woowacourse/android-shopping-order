@@ -12,7 +12,8 @@ class ProductViewHolder(
     parent: ViewGroup,
     onItemClick: (Int) -> Unit,
     minusClickListener: (UiProduct) -> Unit,
-    plusClickListener: (UiProduct) -> Unit
+    plusClickListener: (UiProduct) -> Unit,
+    addClickListener: (UiProduct) -> Unit
 ) :
     RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_product, parent, false)
@@ -23,7 +24,7 @@ class ProductViewHolder(
         binding.root.setThrottleFirstOnClickListener { onItemClick(bindingAdapterPosition) }
         binding.counterProduct.minusClickListener = minusClickListener
         binding.counterProduct.plusClickListener = plusClickListener
-        binding.plusClickListener = plusClickListener
+        binding.addClickListener = addClickListener
     }
 
     fun bind(product: UiProduct) {
