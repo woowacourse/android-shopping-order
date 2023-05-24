@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.BasketProduct
 
 interface BasketRepository {
 
-    fun getAll(): List<BasketProduct>
+    fun getAll(onReceived: (List<BasketProduct>) -> Unit)
 
     fun getByProductId(productId: Int): BasketProduct?
 

@@ -13,10 +13,21 @@ class BasketPresenter(
     override val view: BasketContract.View,
     private val basketRepository: BasketRepository,
     private var currentPage: Int = 1,
-    private var basket: Basket = Basket(basketRepository.getAll()),
     private var startId: Int = 0
 ) : BasketContract.Presenter {
+    private lateinit var basket: Basket
     private val hasNext: Boolean get() = basket.products.lastIndex >= startId + BASKET_PAGING_SIZE
+
+    init {
+        updateBasket()
+    }
+
+    private fun updateBasket() {
+        basketRepository.getAll {
+            basket = Basket(it)
+            updateBasketProducts()
+        }
+    }
 
     override fun fetchTotalCheckToCurrentPage(totalIsChecked: Boolean) {
         basket.getSubBasketByStartId(startId, BASKET_PAGING_SIZE).toggleAllCheck(totalIsChecked)
@@ -52,7 +63,7 @@ class BasketPresenter(
         updateBasketProductViewData()
     }
 
-    override fun initBasketProducts() {
+    override fun updateBasketProducts() {
         updateBasketProductViewData()
         updateOrderInformation()
     }
@@ -83,7 +94,6 @@ class BasketPresenter(
         )
     }
 
-    // 요기
     override fun deleteBasketProduct(
         product: UiBasketProduct
     ) {

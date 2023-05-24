@@ -14,6 +14,7 @@ import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.database.dao.basket.BasketDaoImpl
 import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDaoImpl
 import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
+import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
 import woowacourse.shopping.data.datasource.product.remote.RemoteProductDataSource
 import woowacourse.shopping.data.datasource.recentproduct.local.LocalRecentProductDataSource
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
@@ -85,7 +86,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 LocalRecentProductDataSource(RecentProductDaoImpl(shoppingDatabase))
             ),
             BasketRepositoryImpl(
-                LocalBasketDataSource(BasketDaoImpl(shoppingDatabase))
+                LocalBasketDataSource(BasketDaoImpl(shoppingDatabase)),
+                RemoteBasketDataSource()
             )
         )
     }

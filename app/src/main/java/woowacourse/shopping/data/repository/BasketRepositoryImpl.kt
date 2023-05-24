@@ -6,11 +6,17 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.repository.BasketRepository
 
-class BasketRepositoryImpl(private val localBasketDataSource: BasketDataSource.Local) :
+class BasketRepositoryImpl(
+    private val localBasketDataSource: BasketDataSource.Local,
+    private val remoteBasketDataSource: BasketDataSource.Remote
+) :
     BasketRepository {
 
-    override fun getAll(): List<BasketProduct> =
-        localBasketDataSource.getAll().map { it.toDomain() }
+    override fun getAll(onReceived: (List<BasketProduct>) -> Unit) {
+        remoteBasketDataSource.getAll { dataBasketProduct ->
+            onReceived(dataBasketProduct.map { it.toDomain() })
+        }
+    }
 
     override fun getByProductId(productId: Int): BasketProduct? =
         localBasketDataSource.getByProductId(productId)?.toDomain()

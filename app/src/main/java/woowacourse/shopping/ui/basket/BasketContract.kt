@@ -31,7 +31,7 @@ interface BasketContract {
 
         fun removeBasketProduct(product: Product)
 
-        fun initBasketProducts()
+        fun updateBasketProducts()
 
         fun updatePreviousPage()
 

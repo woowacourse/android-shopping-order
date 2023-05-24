@@ -22,12 +22,12 @@ class ShoppingPresenter(
     private var hasNext: Boolean = false,
     private var lastId: Int = -1,
     private var totalProducts: List<UiProduct> = listOf(),
-    private var recentProducts: List<UiRecentProduct> = listOf(),
-    private var basket: Basket = Basket(basketRepository.getAll())
+    private var recentProducts: List<UiRecentProduct> = listOf()
 ) : ShoppingContract.Presenter {
+    private lateinit var basket: Basket
 
     init {
-        fetchTotalBasketCount()
+        updateBasket()
     }
 
     private fun fetchBasketCount() {
@@ -43,10 +43,12 @@ class ShoppingPresenter(
     }
 
     override fun updateBasket() {
-        basket = Basket(basketRepository.getAll())
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
+        basketRepository.getAll {
+            basket = Basket(it)
+            fetchBasketCount()
+            fetchTotalBasketCount()
+            view.updateProducts(totalProducts)
+        }
     }
 
     override fun fetchTotalBasketCount() {

@@ -145,7 +145,7 @@ class BasketPresenterTest() {
         every { view.updateTotalPrice(any()) } just Runs
         every { view.updateCheckedProductsCount(any()) } just Runs
         // when
-        presenter.initBasketProducts()
+        presenter.updateBasketProducts()
         // then
         verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
         verify(exactly = 1) { view.updateBasketProducts(any()) }
