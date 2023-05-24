@@ -32,13 +32,11 @@ interface BasketDataSource {
     interface Remote {
         fun getAll(onReceived: (List<DataBasketProduct>) -> Unit)
 
-        fun getByProductId(productId: Int): DataBasketProduct?
-
         fun add(basketProduct: DataBasketProduct)
 
         fun minus(basketProduct: DataBasketProduct)
 
-        fun overWriteUpdate(basketProduct: DataBasketProduct)
+        fun update(basketProduct: DataBasketProduct)
 
         fun remove(basketProduct: DataBasketProduct)
     }
