@@ -45,9 +45,11 @@ class ProductDetailPresenter(
     }
 
     override fun addCart(count: Int) {
-        cartRepository.addCart(product.id, count)
-        view.addCartSuccessView()
-        view.exitProductDetailView()
+        cartRepository.addCartProduct(product.id, ::onFailure) {
+            view.addCartSuccessView()
+            view.exitProductDetailView()
+        }
+        // cartRepository.addCart(product.id, count)
     }
 
     override fun showCount() {

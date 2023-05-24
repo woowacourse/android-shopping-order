@@ -79,6 +79,41 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         }.start()
     }
 
+    override fun requestPostCartItem(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: () -> Unit,
+    ) {
+        Thread {
+            val client = OkHttpClient()
+            val host = BASE_URL_POI
+            val path = CART
+            val mediaType = "application/json".toMediaType()
+            val json = JSONObject().put("productId", productId)
+            val body = json.toString().toRequestBody(mediaType)
+
+            val request =
+                Request.Builder()
+                    .addHeader("Authorization", "Basic $TOCKEN_POI")
+                    .post(body)
+                    .url(host + path)
+                    .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.d("krrong", e.toString())
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.code == 201) {
+                        onSuccess()
+                        return
+                    }
+                    onFailure()
+                }
+            })
+        }.start()
+    }
+
     private fun parseCartProductList(response: String): List<CartEntity2> {
         val cartProducts = mutableListOf<CartEntity2>()
         val jsonArray = JSONArray(response)

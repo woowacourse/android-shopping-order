@@ -13,6 +13,14 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private val cartDao = CartDao(context)
 
+    override fun addCartProduct(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: () -> Unit,
+    ) {
+        cartRemoteDataSource.requestPostCartItem(productId, onFailure, onSuccess)
+    }
+
     override fun loadAllCarts(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartEntity2>) -> Unit,

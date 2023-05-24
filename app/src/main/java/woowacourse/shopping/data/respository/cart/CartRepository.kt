@@ -13,6 +13,11 @@ interface CartRepository {
     fun deleteCartByCartId(cartId: Long)
     fun deleteCartByProductId(productId: Long)
     fun addCart(productId: Long, count: Int)
+    fun addCartProduct(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: () -> Unit,
+    )
     fun loadAllCarts(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartEntity2>) -> Unit,

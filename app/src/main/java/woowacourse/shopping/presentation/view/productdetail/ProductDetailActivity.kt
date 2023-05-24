@@ -96,7 +96,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun addCartSuccessView() {
-        showToast(getString(R.string.toast_message_success_add_cart))
+        runOnUiThread {
+            showToast(getString(R.string.toast_message_success_add_cart))
+        }
     }
 
     override fun handleErrorView() {
