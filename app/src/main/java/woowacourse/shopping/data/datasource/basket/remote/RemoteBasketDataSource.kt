@@ -73,6 +73,16 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     }
 
     override fun remove(basketProduct: DataBasketProduct) {
-        TODO("Not yet implemented")
+        val url = "${OkHttpModule.BASE_URL}/cart-items/${basketProduct.id}"
+        val request = Request.Builder()
+            .url(url)
+            .delete()
+            .build()
+
+        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+
+            override fun onResponse(call: Call, response: Response) {}
+        })
     }
 }

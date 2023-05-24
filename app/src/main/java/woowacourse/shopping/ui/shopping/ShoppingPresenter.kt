@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import android.util.Log
 import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
