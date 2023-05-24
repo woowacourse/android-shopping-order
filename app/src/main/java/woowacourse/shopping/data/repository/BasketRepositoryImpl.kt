@@ -18,9 +18,6 @@ class BasketRepositoryImpl(
         }
     }
 
-    override fun getByProductId(productId: Int): BasketProduct? =
-        localBasketDataSource.getByProductId(productId)?.toDomain()
-
     override fun add(basketProduct: BasketProduct) {
         localBasketDataSource.add(basketProduct.toData())
     }

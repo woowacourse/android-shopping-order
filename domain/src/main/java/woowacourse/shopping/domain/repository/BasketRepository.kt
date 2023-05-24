@@ -6,8 +6,6 @@ interface BasketRepository {
 
     fun getAll(onReceived: (List<BasketProduct>) -> Unit)
 
-    fun getByProductId(productId: Int): BasketProduct?
-
     fun add(basketProduct: BasketProduct)
 
     fun minus(basketProduct: BasketProduct)

@@ -80,7 +80,9 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     }
 
     override fun updateBasketProducts(basketProducts: List<UiBasketProduct>) {
-        basketAdapter.submitList(basketProducts)
+        runOnUiThread {
+            basketAdapter.submitList(basketProducts)
+        }
     }
 
     override fun updateNavigatorEnabled(previous: Boolean, next: Boolean) {

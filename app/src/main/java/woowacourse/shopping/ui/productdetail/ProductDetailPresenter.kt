@@ -15,12 +15,16 @@ class ProductDetailPresenter(
 ) : ProductDetailContract.Presenter {
 
     init {
-        currentProduct.basketCount =
-            basketRepository.getByProductId(currentProduct.id)?.count?.value ?: 0
+        basketRepository.getAll { basketProducts ->
+            currentProduct.basketCount =
+                basketProducts.find { it.product.id == currentProduct.id }?.count?.value ?: 0
+        }
         if (previousProduct != null) {
-            previousProduct?.basketCount =
-                basketRepository.getByProductId(requireNotNull(previousProduct).id)?.count?.value
-                    ?: 0
+            basketRepository.getAll { basketProducts ->
+                previousProduct?.basketCount =
+                    basketProducts.find { it.product.id == requireNotNull(previousProduct).id }?.count?.value
+                        ?: 0
+            }
         }
     }
 
