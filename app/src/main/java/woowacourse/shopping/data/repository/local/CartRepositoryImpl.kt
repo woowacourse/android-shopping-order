@@ -1,51 +1,48 @@
 package woowacourse.shopping.data.repository.local
 
 import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.service.CartProductRemoteService
 
 class CartRepositoryImpl(
-    private val cartDao: CartDao,
+    private val cartProductRemoteService: CartProductRemoteService,
 ) : CartRepository {
-    override fun getAll(): List<CartProduct> {
-        return cartDao.selectAll()
+    override fun getAll(
+        onSuccess: (List<CartProduct>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        cartProductRemoteService.requestCarts(
+            onSuccess = onSuccess,
+            onFailure = onFailure,
+        )
     }
 
-    override fun getAllCartProductCategorySize(): Int {
-        return cartDao.selectAll().size
+    override fun addCartProduct(
+        productId: Long,
+        onSuccess: (cartId: Long) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        cartProductRemoteService.requestAddCartProduct(
+            productId,
+            onSuccess,
+            onFailure,
+        )
     }
 
-    override fun getAllCountSize(): Int {
-        return cartDao.selectAll().sumOf { it.count }
+    override fun changeCartProductCount(
+        cartId: Long,
+        count: Int,
+        onSuccess: (cartId: Long) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        cartProductRemoteService.requestChangeCartProductCount(cartId, count, onSuccess, onFailure)
     }
 
-    override fun deleteProduct(cartProduct: CartProduct) {
-        cartDao.deleteCartProduct(cartProduct)
-    }
-
-    override fun deleteAllCheckedCartProduct() {
-        cartDao.deleteAllCheckedCartProduct()
-    }
-
-    override fun changeCartProductCount(product: Product, count: Int) {
-        cartDao.updateCartProductCount(product, count)
-    }
-
-    override fun changeCartProductCheckedState(product: Product, checked: Boolean) {
-        cartDao.updateCartProductChecked(product, checked)
-    }
-
-    override fun changeCurrentPageAllCheckedState(cartIds: List<Long>, checked: Boolean) {
-        cartDao.updateAllChecked(cartIds, checked)
-    }
-
-    override fun getCartProductsFromPage(pageSize: Int, page: Int): List<CartProduct> {
-        val all = cartDao.selectAll()
-        val firstIndexInPage = pageSize * (page - 1)
-        if (all.size > firstIndexInPage) {
-            return all.subList(firstIndexInPage, all.size).take(pageSize)
-        }
-        return emptyList()
+    override fun deleteCartProduct(
+        cartId: Long,
+        onSuccess: (cartId: Long) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        cartProductRemoteService.requestDeleteCartProduct(cartId, onSuccess, onFailure)
     }
 }

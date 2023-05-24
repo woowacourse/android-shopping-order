@@ -7,13 +7,13 @@ interface ProductRepository {
     val cache: ProductCache
     fun fetchFirstProducts(
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit,
     )
 
     fun fetchNextProducts(
         lastProductId: Long,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit,
     )
 
     fun resetCache()

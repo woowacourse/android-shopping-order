@@ -4,26 +4,28 @@ import com.example.domain.cache.ProductCache
 import com.example.domain.cache.ProductLocalCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
-import woowacourse.shopping.data.service.MockProductRemoteService
+import woowacourse.shopping.data.service.ProductRemoteService
 
-class MockRemoteProductRepositoryImpl(
-    private val service: MockProductRemoteService,
+class ProductRepositoryImpl(
+    private val service: ProductRemoteService,
     override val cache: ProductCache = ProductLocalCache,
 ) : ProductRepository {
+    private val products: MutableList<Product> = mutableListOf()
     override fun fetchFirstProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
         if (cache.productList.isEmpty()) {
-            Thread {
-                service.request(
-                    onSuccess = {
-                        cache.addProducts(it)
-                        onSuccess(it)
-                    },
-                    onFailure = onFailure,
-                )
-            }.start()
+            service.request(
+                onSuccess = {
+                    products.clear()
+                    products.addAll(it)
+                    val nextProducts = products.take(20)
+                    cache.addProducts(nextProducts)
+                    onSuccess(nextProducts)
+                },
+                onFailure = onFailure,
+            )
         } else {
             onSuccess(cache.productList)
         }
@@ -34,15 +36,9 @@ class MockRemoteProductRepositoryImpl(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        Thread {
-            service.request(
-                onSuccess = {
-                    cache.addProducts(it)
-                    onSuccess(it)
-                },
-                onFailure = onFailure,
-            )
-        }.start()
+        val nextProducts = products.filter { it.id > lastProductId }.take(20)
+        cache.addProducts(nextProducts)
+        onSuccess(nextProducts)
     }
 
     override fun resetCache() {

@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.service
 
-import com.example.domain.datasource.firstJsonProducts
-import com.example.domain.datasource.secondJsonProducts
-import com.example.domain.datasource.thirdJsonProducts
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 import okhttp3.Call
@@ -10,46 +7,11 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 
-class MockProductRemoteService(private val baseUrl: String) {
-    private val dispatcher: Dispatcher
-
-    init {
-        // 디스패쳐 모드로 응답을 결정
-        dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                return when (request.path) {
-                    "/products?lastProductId=0" -> {
-                        MockResponse()
-                            .setHeader("Content-Type", "application/json")
-                            .setResponseCode(200)
-                            .setBody(firstJsonProducts)
-                    }
-                    "/products?lastProductId=20" -> {
-                        MockResponse()
-                            .setHeader("Content-Type", "application/json")
-                            .setResponseCode(200)
-                            .setBody(secondJsonProducts)
-                    }
-                    "/products?lastProductId=40" -> {
-                        MockResponse()
-                            .setHeader("Content-Type", "application/json")
-                            .setResponseCode(200)
-                            .setBody(thirdJsonProducts)
-                    }
-                    else -> {
-                        MockResponse().setResponseCode(404)
-                    }
-                }
-            }
-        }
-    }
-
+class ProductRemoteService(private val baseUrl: String) {
     fun request(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
@@ -77,6 +39,36 @@ class MockProductRemoteService(private val baseUrl: String) {
                 }
             },
         )
+    }
+
+    fun requestProduct(
+        productId: Long,
+        onFailure: () -> Unit,
+    ): Product {
+        val request = Request.Builder().url("${baseUrl}products/$productId").build()
+
+        val response = OkHttpClient().newCall(request).execute()
+        return if (response.isSuccessful.not() || response.body?.string() == null) {
+            onFailure()
+            Product(
+                -1,
+                "",
+                "https://www.i-boss.co.kr/og-BD1486504-29771-gif",
+                Price(0),
+            )
+        } else {
+            val productObject = JSONObject(response.body!!.string())
+            parseJsonToProduct(productObject)
+        }
+    }
+
+    private fun parseJsonToProduct(jsonProduct: JSONObject): Product {
+        val id = jsonProduct.getInt("id")
+        val name = jsonProduct.getString("name")
+        val price = jsonProduct.getInt("price")
+        val imageUrl = jsonProduct.getString("imageUrl")
+
+        return Product(id.toLong(), name, imageUrl, Price(price))
     }
 
     private fun parseJsonToProductList(responseString: String): List<Product> {
