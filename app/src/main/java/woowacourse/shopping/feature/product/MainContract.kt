@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.product
 
+import com.example.domain.CartProduct
 import com.example.domain.Product
 import com.example.domain.RecentProduct
 import woowacourse.shopping.model.ProductState
@@ -10,18 +11,20 @@ interface MainContract {
     interface View {
         fun setProducts(products: List<Product>)
         fun setRecentProducts(recentProducts: List<RecentProduct>)
-        fun setCartProductCount(count: Int)
+        fun setCartProductCountBadge(count: Int)
+        fun setCartProductCounts(cartProducts: List<CartProduct>)
         fun addProductItems(products: List<ProductState>)
         fun showProductDetail(productState: ProductState, recentProductState: RecentProductState?)
         fun showEmptyProducts()
-        fun showCartProductCount()
+        fun showCartProductCountBadge()
         fun hideCartProductCount()
     }
 
     interface Presenter {
         fun loadRecentProducts()
         fun loadMoreProducts()
-        fun loadCartProductCount()
+        fun loadCartProductCountBadge()
+        fun loadCartProductCounts()
         fun addRecentProduct(product: Product)
         fun showProductDetail(productState: ProductState)
         fun storeCartProduct(productState: ProductState)

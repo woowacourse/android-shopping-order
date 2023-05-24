@@ -29,7 +29,7 @@ class ProductViewHolder(
 
         if (cartProductState != null) {
             showCounterView()
-            binding.counterView.count = cartProductState.count
+            binding.counterView.count = cartProductState.quantity
         }
 
         binding.root.setOnClickListener { onProductClick(productState) }

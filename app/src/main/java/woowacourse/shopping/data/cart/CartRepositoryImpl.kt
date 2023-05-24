@@ -1,41 +1,49 @@
 package woowacourse.shopping.data.cart
 
 import com.example.domain.CartProduct
+import com.example.domain.Product
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.product.ProductRemoteService
 
 class CartRepositoryImpl(
-    private val productProductRemoteService: ProductRemoteService,
-    private val cartDao: CartDao,
+    private val url: String,
+    private val service: CartRemoteService
 ) : CartRepository {
 
-    override fun getAll(): List<CartProduct> {
-        return cartDao.getAll()
+    override fun getAll(
+        onSuccess: (List<CartProduct>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        Thread {
+            service.requestAllProducts(
+                url = url,
+                onSuccess = onSuccess,
+                onFailure = onFailure
+            )
+        }.start()
     }
 
-    override fun getCartProduct(productId: Int): CartProduct? {
-        return cartDao.getCartProduct(productId)
+    override fun addCartProduct(
+        productId: Int,
+        onSuccess: (cartId: Int) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        TODO("Not yet implemented")
     }
 
-    // ToDo("카트 레포지토리 제품 URL 받도록 수정")
-    override fun addProduct(productId: Int, count: Int) {
-        // productMockProductRemoteService.requestProduct(
-        //
-        //     id = productId.toLong(),
-        //     onSuccess = { if (it != null) cartDao.addColumn(it, count) },
-        //     onFailure = {}
-        // )
+    override fun updateCartProductQuantity(
+        id: Product,
+        count: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        TODO("Not yet implemented")
     }
 
-    override fun deleteCartProduct(productId: Int) {
-        cartDao.deleteColumn(productId)
-    }
-
-    override fun updateCartProductCount(productId: Int, count: Int) {
-        cartDao.updateCartProductCount(productId, count)
-    }
-
-    override fun updateCartProductChecked(productId: Int, checked: Boolean) {
-        cartDao.updateCartProductChecked(productId, checked)
+    override fun deleteCartProduct(
+        id: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        TODO("Not yet implemented")
     }
 }

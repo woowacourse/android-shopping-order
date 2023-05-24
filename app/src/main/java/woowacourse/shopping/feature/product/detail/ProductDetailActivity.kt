@@ -9,9 +9,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDao
+import woowacourse.shopping.ServerType
+import woowacourse.shopping.data.cart.CartRemoteService
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -25,10 +25,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val binding: ActivityProductDetailBinding
         get() = _binding!!
 
+    private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: ProductDetailContract.Presenter by lazy {
         val product: ProductState? by lazy { intent.getParcelableExtra(PRODUCT_KEY) }
         val recentProduct: RecentProductState? by lazy { intent.getParcelableExtra(RECENT_PRODUCT_KEY) }
-        val cartRepository: CartRepository = CartRepositoryImpl(ProductRemoteService(), CartDao(this))
+        val cartRepository: CartRepository = CartRepositoryImpl(serverUrl, CartRemoteService())
         ProductDetailPresenter(this, product, recentProduct, cartRepository)
     }
 
@@ -48,7 +49,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun showCart() {
-        CartActivity.startActivity(this)
+        CartActivity.startActivity(this, serverUrl)
     }
 
     override fun setViewContent(product: ProductState) {
@@ -73,7 +74,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun showProductDetail(product: ProductState) {
-        startActivity(this, product)
+        startActivity(this, serverUrl, product)
     }
 
     override fun closeProductDetail() {
@@ -104,11 +105,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
         fun startActivity(
             context: Context,
+            serverUrl: String,
             product: ProductState,
             recentProduct: RecentProductState? = null
         ) {
             val intent = Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(PRODUCT_KEY, product)
+                putExtra(ServerType.INTENT_KEY, serverUrl)
                 putExtra(RECENT_PRODUCT_KEY, recentProduct)
             }
             context.startActivity(intent)

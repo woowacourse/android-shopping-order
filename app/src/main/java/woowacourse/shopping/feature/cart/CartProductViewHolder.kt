@@ -19,21 +19,21 @@ class CartProductViewHolder(
 
     fun bind(cartProductState: CartProductState) {
         binding.cartProduct = cartProductState
-        binding.counterView.count = cartProductState.count
+        binding.counterView.count = cartProductState.quantity
 
-        binding.cartProductCheckBox.isChecked = cartProductState.checked
+        binding.cartProductCheckBox.isChecked = cartProductState.isPicked
         binding.cartClearImageView.setOnClickListener {
             updateChecked(cartProductState.productId, false)
             onCartProductDeleteClick(cartProductState)
         }
         binding.counterView.plusClickListener = {
             binding.counterView.count = (++binding.counterView.count).coerceAtMost(MAX_COUNT_VALUE)
-            cartProductState.count = binding.counterView.count
+            cartProductState.quantity = binding.counterView.count
             updateCount(cartProductState.productId, binding.counterView.count)
         }
         binding.counterView.minusClickListener = {
             binding.counterView.count = (--binding.counterView.count).coerceAtLeast(MIN_COUNT_VALUE)
-            cartProductState.count = binding.counterView.count
+            cartProductState.quantity = binding.counterView.count
             updateCount(cartProductState.productId, binding.counterView.count)
         }
         binding.cartProductCheckBox.setOnClickListener {

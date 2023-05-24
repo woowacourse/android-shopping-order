@@ -6,52 +6,12 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
 class ProductRemoteService {
-    private var _mockWebServer: MockWebServer? = null
-    private val mockWebServer: MockWebServer get() = _mockWebServer!!
     private val okHttpClient = OkHttpClient()
-
-    private var dispatcher: Dispatcher = object : Dispatcher() {
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            return when (request.path) {
-                "/products" -> {
-                    MockResponse()
-                        .setHeader("Contet-Type", "application/json")
-                        .setResponseCode(200)
-                        .setBody(jsonAllProducts)
-                }
-                "/products/1" -> {
-                    MockResponse()
-                        .setHeader("Contet-Type", "application/json")
-                        .setResponseCode(200)
-                        .setBody(jsonMap[1L]!!)
-                }
-                else -> {
-                    if (request.path!!.startsWith("/products/")) {
-                        val parts = request.path!!.split("/")
-                        val lastPart = parts.last()
-                        val numberParts = lastPart.split("=")
-                        val number = numberParts.last().toLong()
-
-                        MockResponse()
-                            .setHeader("Contet-Type", "application/json")
-                            .setResponseCode(200)
-                            .setBody(jsonMap[number]!!)
-                    } else {
-                        MockResponse().setResponseCode(404)
-                    }
-                }
-            }
-        }
-    }
 
     fun requestAllProducts(
         url: String,
@@ -59,13 +19,6 @@ class ProductRemoteService {
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {
-        synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
-            if (_mockWebServer == null) {
-                _mockWebServer = MockWebServer()
-                _mockWebServer?.start(8080)
-                _mockWebServer?.dispatcher = dispatcher
-            }
-        }
 
         val baseUrl = "$url:$port"
         val requestUrl = "$baseUrl/products"
@@ -99,13 +52,6 @@ class ProductRemoteService {
         onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     ) {
-        synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
-            if (_mockWebServer == null) {
-                _mockWebServer = MockWebServer()
-                _mockWebServer?.url("/")
-                _mockWebServer?.dispatcher = dispatcher
-            }
-        }
 
         val baseUrl = "$url:$port"
         val requestUrl = "$baseUrl/products/$id"

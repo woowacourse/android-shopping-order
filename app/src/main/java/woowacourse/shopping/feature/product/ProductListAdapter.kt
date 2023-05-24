@@ -46,4 +46,9 @@ class ProductListAdapter(
         this.productStates = items.toList()
         notifyDataSetChanged()
     }
+
+    fun setCartProducts(items: List<CartProductState>) {
+        this.cartProductStates = items.toList()
+        notifyDataSetChanged()
+    }
 }

@@ -4,9 +4,9 @@ import com.example.domain.CartProduct
 import woowacourse.shopping.model.CartProductState
 
 fun CartProduct.toUi(): CartProductState {
-    return CartProductState(productId, productImageUrl, productName, productPrice, count, checked)
+    return CartProductState(id, productId, productImageUrl, productName, productPrice, quantity, isPicked)
 }
 
 fun CartProductState.toDomain(): CartProduct {
-    return CartProduct(productId, productImageUrl, productName, productPrice, count, checked)
+    return CartProduct(id, productId, productImageUrl, productName, productPrice, quantity, isPicked)
 }

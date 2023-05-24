@@ -1,15 +1,31 @@
 package com.example.domain.repository
 
 import com.example.domain.CartProduct
+import com.example.domain.Product
 
 interface CartRepository {
-    fun getAll(): List<CartProduct>
-    fun getCartProduct(productId: Int): CartProduct?
-    fun addProduct(productId: Int, count: Int)
-    fun deleteCartProduct(productId: Int)
-    fun updateCartProductCount(productId: Int, count: Int)
-    fun updateCartProductChecked(productId: Int, checked: Boolean)
 
-//    fun get(fromIndex: Int, ToIndex: Int): List<CartProduct>
-//    fun getAllSize(): Int
+    fun getAll(
+        onSuccess: (List<CartProduct>) -> Unit,
+        onFailure: () -> Unit
+    )
+
+    fun addCartProduct(
+        productId: Int,
+        onSuccess: (cartId: Int) -> Unit,
+        onFailure: () -> Unit
+    )
+
+    fun updateCartProductQuantity(
+        id: Product,
+        count: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    )
+
+    fun deleteCartProduct(
+        id: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit
+    )
 }

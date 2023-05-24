@@ -18,8 +18,9 @@ import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.R
+import woowacourse.shopping.ServerType
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
-import woowacourse.shopping.data.cart.CartDao
+import woowacourse.shopping.data.cart.CartRemoteService
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.data.product.ProductRepositoryImpl
@@ -42,24 +43,21 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val binding: ActivityMainBinding
         get() = _binding!!
 
+    private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(
-            ProductRemoteService(),
-            CartDao(this)
-        )
+        CartRepositoryImpl(serverUrl, CartRemoteService())
     }
     private val presenter: MainContract.Presenter by lazy {
-        val url = intent.getStringExtra(KEY_SERVER) ?: ""
         val productRemoteService = ProductRemoteService()
         val productRepository: ProductRepository =
-            ProductRepositoryImpl(url, productRemoteService)
+            ProductRepositoryImpl(serverUrl, productRemoteService)
         val recentProductRepository: RecentProductRepository =
-            RecentProductRepositoryImpl(url, productRemoteService, RecentProductDao(this))
+            RecentProductRepositoryImpl(serverUrl, productRemoteService, RecentProductDao(this))
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
     }
     private val productListAdapter: ProductListAdapter by lazy {
         ProductListAdapter(
-            cartProductStates = cartRepository.getAll().map(CartProduct::toUi),
+            cartProductStates = listOf(),
             onProductClick = presenter::showProductDetail,
             cartProductAddFab = { Thread { presenter.storeCartProduct(it) }.start() },
             cartProductCountMinus = presenter::minusCartProductCount,
@@ -91,13 +89,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         setContentView(binding.root)
         initList()
         runOnUiThread { presenter.loadMoreProducts() }
+
+        cartRepository.getAll(
+            onFailure = {}, onSuccess = { presenter.loadCartProductCounts() }
+        )
     }
 
     override fun onResume() {
         super.onResume()
         runOnUiThread {
             presenter.loadRecentProducts()
-            presenter.loadCartProductCount()
+            presenter.loadCartProductCountBadge()
         }
     }
 
@@ -110,13 +112,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         menuInflater.inflate(R.menu.actionbar_menu, menu)
         cartCountBadge =
             menu?.findItem(R.id.cart_count_badge)?.actionView?.findViewById(R.id.badge)
-        presenter.loadCartProductCount()
+        presenter.loadCartProductCountBadge()
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.item_cart -> CartActivity.startActivity(this)
+            R.id.item_cart -> CartActivity.startActivity(this, serverUrl)
         }
         return true
     }
@@ -133,20 +135,24 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         runOnUiThread { recentProductListAdapter.setItems(recentProducts.map(RecentProduct::toUi)) }
     }
 
-    override fun setCartProductCount(count: Int) {
+    override fun setCartProductCountBadge(count: Int) {
         runOnUiThread { cartCountBadge?.text = count.toString() }
+    }
+
+    override fun setCartProductCounts(cartProducts: List<CartProduct>) {
+        runOnUiThread { productListAdapter.setCartProducts(cartProducts.map(CartProduct::toUi)) }
     }
 
     override fun showProductDetail(
         productState: ProductState,
         recentProductState: RecentProductState?
     ) {
-        ProductDetailActivity.startActivity(this, productState, recentProductState)
+        ProductDetailActivity.startActivity(this, serverUrl, productState, recentProductState)
     }
 
     override fun showEmptyProducts() = runOnUiThread { showToast("제품이 없습니다.") }
 
-    override fun showCartProductCount() {
+    override fun showCartProductCountBadge() {
         runOnUiThread { cartCountBadge?.visibility = VISIBLE }
     }
 
@@ -164,11 +170,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     companion object {
-        private const val KEY_SERVER = "Server"
-
-        fun getIntent(context: Context, server: String): Intent {
+        fun getIntent(context: Context, serverUrl: String): Intent {
             val intent = Intent(context, MainActivity::class.java)
-            intent.putExtra(KEY_SERVER, server)
+            intent.putExtra(ServerType.INTENT_KEY, serverUrl)
             return intent
         }
     }

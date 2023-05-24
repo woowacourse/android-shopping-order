@@ -5,12 +5,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CartProductState(
+    val id: Int,
     val productId: Int,
     val productImageUrl: String,
     val productName: String,
     val productPrice: Int,
-    var count: Int,
-    val checked: Boolean
+    var quantity: Int,
+    val isPicked: Boolean
 ) : Parcelable {
 
     companion object {

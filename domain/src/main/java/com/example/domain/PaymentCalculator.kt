@@ -4,11 +4,11 @@ class PaymentCalculator {
     companion object {
         fun totalPaymentAmount(cartProducts: List<CartProduct>): Long {
             val countableCartProducts: List<CartProduct> =
-                cartProducts.filter { it.checked && it.count > 0 }
+                cartProducts.filter { it.isPicked && it.quantity > 0 }
             var amount: Long = 0
 
             countableCartProducts.forEach {
-                amount += it.productPrice * it.count
+                amount += it.productPrice * it.quantity
             }
 
             return amount

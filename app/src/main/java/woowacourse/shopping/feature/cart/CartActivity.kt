@@ -8,9 +8,9 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDao
+import woowacourse.shopping.ServerType
+import woowacourse.shopping.data.cart.CartRemoteService
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.util.extension.formatPriceWon
@@ -20,8 +20,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding
         get() = _binding!!
 
+    private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: CartContract.Presenter by lazy {
-        val cartRepo: CartRepository = CartRepositoryImpl(ProductRemoteService(), CartDao(this))
+        val cartRepo: CartRepository = CartRepositoryImpl(url, CartRemoteService())
         CartPresenter(this, cartRepo)
     }
     private val adapter: CartProductListAdapter by lazy {
@@ -53,11 +54,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartProducts(cartProducts: List<CartProductState>) {
-        adapter.setItems(cartProducts)
+        runOnUiThread { adapter.setItems(cartProducts) }
     }
 
     override fun setCartPageNumber(number: Int) {
-        binding.pageNumberTv.text = number.toString()
+        runOnUiThread { binding.pageNumberTv.text = number.toString() }
     }
 
     override fun setCartPageNumberPlusEnable(isEnable: Boolean) {
@@ -77,11 +78,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartProductCount(count: Int) {
-        binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count)
+        runOnUiThread { binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count) }
     }
 
     override fun setTotalCost(paymentAmount: Int) {
-        binding.totalCostTv.formatPriceWon(paymentAmount)
+        runOnUiThread { binding.totalCostTv.formatPriceWon(paymentAmount) }
     }
 
     override fun showPageSelectorView() {
@@ -93,8 +94,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-        fun startActivity(context: Context) {
+        fun startActivity(context: Context, serverUrl: String) {
             val intent = Intent(context, CartActivity::class.java)
+            intent.putExtra(ServerType.INTENT_KEY, serverUrl)
             context.startActivity(intent)
         }
     }
