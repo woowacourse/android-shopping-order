@@ -30,7 +30,7 @@
             android:id="@+id/layout_bottom_price_area"
             android:layout_width="0dp"
             android:layout_height="78dp"
-            android:background="@color/gray"
+            android:background="@color/gray_700"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
