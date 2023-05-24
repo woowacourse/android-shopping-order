@@ -8,6 +8,8 @@ interface CartItemDataSource {
 
     fun findAll(onFinish: (List<CartItem>) -> Unit)
 
+    fun findAll(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit)
+
     fun updateCountById(id: Long, count: Int, onFinish: () -> Unit)
 
     fun deleteById(id: Long, onFinish: () -> Unit)

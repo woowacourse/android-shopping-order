@@ -47,7 +47,7 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
                     val jsonObject = json.getJSONObject(it)
                     parseToProduct(jsonObject)
                 }
-                onFinish(products)
+                onFinish(products.slice(offset until products.size).take(limit))
             }
         })
     }

@@ -63,6 +63,28 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
+    override fun findAll(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit) {
+        val path = "/cart-items"
+        val request =
+            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
+                .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.code != 200) return
+                val body = response.body?.string()
+                val jsonArray = JSONArray(body)
+                val cartItems = (0 until jsonArray.length()).map {
+                    val jsonObject = jsonArray.getJSONObject(it)
+                    parseToCartItem(jsonObject)
+                }
+                onFinish(cartItems.slice(offset until cartItems.size).take(limit))
+            }
+        })
+    }
+
     override fun updateCountById(id: Long, count: Int, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val jsonObject = JSONObject().apply {
