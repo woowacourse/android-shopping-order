@@ -8,11 +8,12 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.BASE_URL_POI
 import woowacourse.shopping.data.model.ProductEntity
 import java.io.IOException
 
-class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
+class ProductRemoteDataSourceImpl(
+    private val baseUrl: String,
+) : ProductRemoteDataSource {
 
     override fun requestDatas(
         onFailure: () -> Unit,
@@ -20,9 +21,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
             val path = PRODUCT
-            val request = Request.Builder().url(host + path).build()
+            val request = Request.Builder().url(baseUrl + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())
@@ -46,9 +46,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
             val path = "$PRODUCT/$productId"
-            val request = Request.Builder().url(host + path).build()
+            val request = Request.Builder().url(baseUrl + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())

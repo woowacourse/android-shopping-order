@@ -3,13 +3,11 @@ package woowacourse.shopping.presentation.view.cart
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.presentation.model.CartModel
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepositoryImpl = ProductRepositoryImpl(),
     private var currentPage: Int = 1,
 ) : CartContract.Presenter {
     private val carts = mutableListOf<CartModel>()

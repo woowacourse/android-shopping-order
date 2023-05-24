@@ -10,24 +10,24 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.BASE_URL_POI
 import woowacourse.shopping.data.model.CartEntity2
 import woowacourse.shopping.data.model.ProductEntity
 import java.io.IOException
 
-class CartRemoteDataSourceImpl : CartRemoteDataSource {
+class CartRemoteDataSourceImpl(
+    private val baseUrl: String,
+    private val token: String
+) : CartRemoteDataSource {
     override fun requestDatas(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartEntity2>) -> Unit,
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
-            val path = CART
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $TOCKEN_POI")
-                    .url(host + path)
+                    .addHeader("Authorization", "Basic $token")
+                    .url(baseUrl + PATH_CART)
                     .build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -52,17 +52,16 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
-            val path = CART_PATCH + cartEntity.id
+            val path = PATH_CART_PATCH + cartEntity.id
             val mediaType = "application/json".toMediaType()
             val json = JSONObject().put("quantity", cartEntity.quantity)
             val body = json.toString().toRequestBody(mediaType)
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $TOCKEN_POI")
+                    .addHeader("Authorization", "Basic $token")
                     .patch(body)
-                    .url(host + path)
+                    .url(baseUrl + path)
                     .build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -86,17 +85,15 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
-            val path = CART
             val mediaType = "application/json".toMediaType()
             val json = JSONObject().put("productId", productId)
             val body = json.toString().toRequestBody(mediaType)
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $TOCKEN_POI")
+                    .addHeader("Authorization", "Basic $token")
                     .post(body)
-                    .url(host + path)
+                    .url(baseUrl + PATH_CART)
                     .build()
 
             client.newCall(request).enqueue(object : Callback {
@@ -117,14 +114,13 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
     override fun requestDeleteCartItem(cartId: Long) {
         val thread = Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_POI
-            val path = CART_DELETE + cartId
+            val path = PATH_CART_DELETE + cartId
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $TOCKEN_POI")
+                    .addHeader("Authorization", "Basic $token")
                     .delete()
-                    .url(host + path)
+                    .url(baseUrl + path)
                     .build()
 
             client.newCall(request).execute()
@@ -165,10 +161,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
     }
 
     companion object {
-        private const val TOCKEN_POI = "a2FuZ3NqOTY2NUBnbWFpbC5jb206MTIzNA=="
-        private const val TOCKEN_JENNA = "YUBhLmNvbToxMjM0"
-        private const val CART = "/cart-items"
-        private const val CART_PATCH = "/cart-items/"
-        private const val CART_DELETE = "/cart-items/"
+        private const val PATH_CART = "/cart-items"
+        private const val PATH_CART_PATCH = "/cart-items/"
+        private const val PATH_CART_DELETE = "/cart-items/"
     }
 }

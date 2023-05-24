@@ -10,9 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
+import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_BASE_URL
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -27,13 +32,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         intent.getParcelableCompat(KEY_RECENT_PRODUCT)
     }
 
-    private val presenter: ProductDetailContract.Presenter by lazy {
-        ProductDetailPresenter(
-            this,
-            productId = productId,
-            cartRepository = CartRepositoryImpl(this),
-        )
-    }
+    private lateinit var baseUrl: String
+    private lateinit var token: String
+
+    private lateinit var presenter: ProductDetailContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product_detail)
 
         supportActionBar?.title = ACTION_BAR_TITLE
+
+        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
+        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+
+        setPresenter()
 
         presenter.loadLastRecentProductInfo(recentProduct)
         setAddCart()
@@ -61,6 +68,17 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun setPresenter() {
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(baseUrl)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(baseUrl, token)
+        presenter = ProductDetailPresenter(
+            this,
+            productId = productId,
+            productRepository = ProductRepositoryImpl(productRemoteDataSource),
+            cartRepository = CartRepositoryImpl(this, cartRemoteDataSource),
+        )
+    }
+
     override fun setVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel) {
         binding.recentProduct = recentProduct
 
@@ -77,7 +95,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setLastRecentProduct() {
         binding.clLastProductInfo.setOnClickListener {
-            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null)
+            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, baseUrl, token)
             startActivity(intent)
             finish()
         }
@@ -118,9 +136,14 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             context: Context,
             id: Long,
             recentProduct: RecentProductModel?,
+            baseUrl: String,
+            token: String
         ): Intent {
             val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra(KEY_PRODUCT_ID, id)
+            intent.putExtra(KEY_SERVER_BASE_URL, baseUrl)
+            intent.putExtra(KEY_SERVER_TOKEN, token)
+
             recentProduct?.let { intent.putExtra(KEY_RECENT_PRODUCT, it) }
 
             return intent

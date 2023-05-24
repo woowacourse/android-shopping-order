@@ -3,14 +3,13 @@ package woowacourse.shopping.presentation.view.productdetail
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
-import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
     productId: Long,
-    productRepository: ProductRepository = ProductRepositoryImpl(),
+    productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
 

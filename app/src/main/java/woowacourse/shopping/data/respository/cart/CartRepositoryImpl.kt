@@ -5,11 +5,10 @@ import woowacourse.shopping.data.database.CartDao
 import woowacourse.shopping.data.model.CartEntity
 import woowacourse.shopping.data.model.CartEntity2
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSource
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 
 class CartRepositoryImpl(
     context: Context,
-    private val cartRemoteDataSource: CartRemoteDataSource = CartRemoteDataSourceImpl(),
+    private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
     private val cartDao = CartDao(context)
 

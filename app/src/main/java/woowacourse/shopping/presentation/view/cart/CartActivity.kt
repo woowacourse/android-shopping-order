@@ -10,18 +10,22 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_BASE_URL
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
+    private lateinit var baseUrl: String
+    private lateinit var token: String
+
     private lateinit var cartAdapter: CartAdapter
 
-    private val presenter: CartContract.Presenter by lazy {
-        CartPresenter(this, CartRepositoryImpl(this))
-    }
+    private lateinit var presenter: CartContract.Presenter
 
     private val cartProductListener = object : CartProductListener {
         override fun onCheckChanged(cartId: Long, checked: Boolean) {
@@ -46,12 +50,24 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
 
+        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
+        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+
+        setPresenter()
         setSupportActionBar()
         setRecyclerViewAnimator()
         presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
         setAllProduceCheckedClick()
+    }
+
+    private fun setPresenter() {
+        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(baseUrl, token)
+        presenter = CartPresenter(
+            this,
+            CartRepositoryImpl(this, cartRemoteDataSourceImpl)
+        )
     }
 
     private fun setSupportActionBar() {
@@ -157,8 +173,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-        fun createIntent(context: Context): Intent {
-            return Intent(context, CartActivity::class.java)
+        fun createIntent(context: Context, baseUrl: String, token: String): Intent {
+            val intent = Intent(context, CartActivity::class.java)
+            intent.putExtra(KEY_SERVER_BASE_URL, baseUrl)
+            intent.putExtra(KEY_SERVER_TOKEN, token)
+
+            return intent
         }
     }
 }

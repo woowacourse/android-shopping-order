@@ -98,7 +98,7 @@
                 android:id="@+id/tv_last_product_info"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/d"
+                android:text="@string/product_detail_info_text"
                 android:textColor="@color/main_color"
                 android:textSize="12sp"
                 android:textStyle="bold"

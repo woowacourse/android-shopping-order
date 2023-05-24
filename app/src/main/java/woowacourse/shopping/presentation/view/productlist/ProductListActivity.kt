@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.view.productlist
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -10,6 +12,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
+import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
@@ -22,18 +27,16 @@ import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAda
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductWrapperAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ViewType
+import woowacourse.shopping.presentation.view.util.showToast
 
 class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private lateinit var binding: ActivityProductListBinding
     private lateinit var toolbarCartBinding: LayoutToolbarCartBinding
 
-    private val presenter: ProductContract.Presenter by lazy {
-        ProductListPresenter(
-            this,
-            cartRepository = CartRepositoryImpl(this),
-            recentProductRepository = RecentProductRepositoryImpl(this),
-        )
-    }
+    private lateinit var baseUrl: String
+    private lateinit var token: String
+
+    private lateinit var presenter: ProductContract.Presenter
 
     private val recentProductResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -94,6 +97,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product_list)
         toolbarCartBinding = LayoutToolbarCartBinding.inflate(layoutInflater)
 
+        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
+        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+
+        setPresenter()
         initLayoutManager()
         presenter.initRecentProductItems()
         presenter.initProductItems()
@@ -107,8 +114,18 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
             actionView = toolbarCartBinding.root
             setToolbarCart()
         }
-
         return true
+    }
+
+    private fun setPresenter() {
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(baseUrl)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(baseUrl, token)
+        presenter = ProductListPresenter(
+            this,
+            productRepository = ProductRepositoryImpl(productRemoteDataSource),
+            cartRepository = CartRepositoryImpl(this, cartRemoteDataSource),
+            recentProductRepository = RecentProductRepositoryImpl(this),
+        )
     }
 
     private fun setToolbarCart() {
@@ -169,16 +186,16 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         val recentProduct = presenter.getLastRecentProductItem(0)
         presenter.saveRecentProduct(productId)
 
-        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct)
+        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct, baseUrl, token)
         recentProductResultLauncher.launch(intent)
     }
 
     override fun moveToCartView() {
-        cartResultLauncher.launch(CartActivity.createIntent(this))
+        cartResultLauncher.launch(CartActivity.createIntent(this, baseUrl, token))
     }
 
     override fun showToast(message: Int) {
-        showToast(message)
+        showToast(getString(message))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -197,5 +214,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         private const val SPAN_SIZE_OF_TWO_COLUMN = 1
 
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
+
+        internal const val KEY_SERVER_BASE_URL = "KEY_SERVER_BASE_URL"
+        internal const val KEY_SERVER_TOKEN = "KEY_SERVER_TOKEN"
+
+        fun createIntent(context: Context, url: String, token: String): Intent {
+            val intent = Intent(context, ProductListActivity::class.java)
+            intent.putExtra(KEY_SERVER_BASE_URL, url)
+            intent.putExtra(KEY_SERVER_TOKEN, token)
+            return intent
+        }
     }
 }

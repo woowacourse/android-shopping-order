@@ -19,6 +19,12 @@
             android:exported="true" />
         <activity
             android:name=".presentation.view.productlist.ProductListActivity"
+            android:exported="true" />
+        <activity
+            android:name=".presentation.view.productdetail.ProductDetailActivity"
+            android:exported="true" />
+        <activity
+            android:name=".presentation.view.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,9 +32,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".presentation.view.productdetail.ProductDetailActivity"
-            android:exported="true" />
     </application>
 
 </manifest>

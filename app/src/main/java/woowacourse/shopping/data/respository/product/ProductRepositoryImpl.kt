@@ -2,10 +2,9 @@ package woowacourse.shopping.data.respository.product
 
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 
 class ProductRepositoryImpl(
-    private val productRemoteDataSource: ProductRemoteDataSource = ProductRemoteDataSourceImpl(),
+    private val productRemoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override fun loadDatas(
         onFailure: () -> Unit,
