@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.datasource.cart
 
 import woowacourse.shopping.data.entity.CartEntity
+import woowacourse.shopping.data.model.CartProduct
 import woowacourse.shopping.data.model.DataCart
 import woowacourse.shopping.data.model.DataCartProduct
 import woowacourse.shopping.data.model.DataPage
@@ -19,5 +20,10 @@ interface CartDataSource {
         fun removeCheckedProducts()
     }
 
-    interface Remote
+    interface Remote {
+        fun getAllCartProduct(): List<CartProduct>
+        fun addCartProduct(item: CartProduct)
+        fun modifyProductCount(count: Int)
+        fun deleteCartProductById(id: Int)
+    }
 }
