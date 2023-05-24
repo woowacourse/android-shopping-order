@@ -3,7 +3,7 @@ package woowacourse.shoppoing.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.repositoryImpl.CartMockWeb
+import woowacourse.shopping.mockWebServer.CartMockWeb
 import woowacourse.shopping.service.RemoteCartService
 
 class RemoteCartServiceTest {

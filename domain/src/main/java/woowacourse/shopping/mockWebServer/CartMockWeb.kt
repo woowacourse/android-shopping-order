@@ -1,4 +1,4 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.mockWebServer
 
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse

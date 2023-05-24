@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.mockWebServer.MockWeb
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repositoryImpl.MockWeb
 import woowacourse.shopping.service.RemoteProductService
 
 class RemoteProductServiceTest {
