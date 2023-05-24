@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 @Parcelize
 data class RecentProductUiModel(
-    val productUiModel: ProductUiModel,
+    val productId: Long,
+    val imageUrl: String,
     val dateTime: LocalDateTime,
 ) : Parcelable

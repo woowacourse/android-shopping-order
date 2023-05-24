@@ -53,21 +53,21 @@ class CartProductRemoteService(private val baseUrl: String) {
             .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items")
             .post(body).build()
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onFailure()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code >= 400) return onFailure()
-                val responseHeader = response.headers["Location"] ?: return onFailure()
-                response.close()
-
-                val itemId = URI(responseHeader).path.substringAfterLast("/").toLong()
-
-                onSuccess(itemId)
-            }
-        })
+        val thread = Thread {
+            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
+                .onSuccess {
+                    if (it.isSuccessful) {
+                        val responseHeader = it.headers["Location"] ?: return@onSuccess onFailure()
+                        val cartId = URI(responseHeader).path.substringAfterLast("/").toLong()
+                        onSuccess(cartId)
+                    } else {
+                        onFailure()
+                    }
+                }
+                .onFailure { onFailure() }
+        }
+        thread.start()
+        thread.join()
     }
 
     fun requestChangeCartProductCount(
@@ -86,18 +86,16 @@ class CartProductRemoteService(private val baseUrl: String) {
             .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items/$cartId")
             .addHeader("Authorization", "Basic YUBhLmNvbToxMjM0").patch(body).build()
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onFailure()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code >= 400) return onFailure()
-                response.close()
-
-                onSuccess(cartId)
-            }
-        })
+        val thread = Thread {
+            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
+                .onSuccess {
+                    if (it.isSuccessful) return@onSuccess onSuccess(cartId)
+                    onFailure()
+                }
+                .onFailure { onFailure() }
+        }
+        thread.start()
+        thread.join()
     }
 
     fun requestDeleteCartProduct(
@@ -109,18 +107,16 @@ class CartProductRemoteService(private val baseUrl: String) {
             .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items/$cartId")
             .addHeader("Authorization", "Basic YUBhLmNvbToxMjM0").delete().build()
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onFailure()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code >= 400) return onFailure()
-                response.close()
-
-                onSuccess(cartId)
-            }
-        })
+        val thread = Thread {
+            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
+                .onSuccess {
+                    if (it.isSuccessful) return@onSuccess onSuccess(cartId)
+                    onFailure()
+                }
+                .onFailure { onFailure() }
+        }
+        thread.start()
+        thread.join()
     }
 
     private fun parseJsonToCartProductList(responseString: String): List<CartProduct> {

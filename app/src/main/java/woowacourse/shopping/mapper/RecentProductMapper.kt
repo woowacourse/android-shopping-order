@@ -4,7 +4,7 @@ import com.example.domain.model.RecentProduct
 import woowacourse.shopping.model.RecentProductUiModel
 
 fun RecentProduct.toPresentation(): RecentProductUiModel =
-    RecentProductUiModel(product.toPresentation(), dateTime)
+    RecentProductUiModel(productId, imageUrl, dateTime)
 
 fun RecentProductUiModel.toDomain(): RecentProduct =
-    RecentProduct(productUiModel.toDomain(), dateTime)
+    RecentProduct(productId, imageUrl, dateTime)

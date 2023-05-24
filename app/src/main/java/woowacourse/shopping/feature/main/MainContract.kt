@@ -24,9 +24,9 @@ interface MainContract {
         val recentProducts: LiveData<List<RecentProductUiModel>>
         val badgeCount: LiveData<Int>
         val mainScreenEvent: LiveData<View.MainScreenEvent>
-        fun loadProducts()
+        fun initLoadData()
+        fun initLoadProducts()
         fun loadRecent()
-        fun loadCartCountSize()
         fun moveToCart()
         fun showProductDetail(productId: Long)
         fun showRecentProductDetail(productId: Long)

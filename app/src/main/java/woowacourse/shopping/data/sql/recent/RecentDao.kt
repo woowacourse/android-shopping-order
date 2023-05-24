@@ -62,7 +62,7 @@ class RecentDao(
     }
 
     fun putRecentProduct(recentProduct: RecentProduct) {
-        val findRecentProduct = selectAll().find { it.productId == recentProduct.product.id }
+        val findRecentProduct = selectAll().find { it.productId == recentProduct.productId }
 
         if (findRecentProduct != null) {
             updateRecentProduct(recentProduct)
@@ -74,8 +74,8 @@ class RecentDao(
     private fun insertRecentProduct(recentProduct: RecentProduct) {
         val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
         val values = ContentValues().apply {
-            put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, recentProduct.product.id)
-            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, recentProduct.product.imgUrl)
+            put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, recentProduct.productId)
+            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, recentProduct.imageUrl)
             put(RecentTableContract.TABLE_COLUMN_DATE_TIME, timeSecond)
         }
         writableDatabase.insert(RecentTableContract.TABLE_NAME, null, values)
@@ -85,7 +85,7 @@ class RecentDao(
         val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
         val updateSql = "UPDATE ${RecentTableContract.TABLE_NAME} " +
             "SET ${RecentTableContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
-            "WHERE ${RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.product.id}"
+            "WHERE ${RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.productId}"
         writableDatabase.execSQL(updateSql)
     }
 
