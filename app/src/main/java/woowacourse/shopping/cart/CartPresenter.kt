@@ -18,7 +18,7 @@ class CartPresenter(
 
     init {
         view.updateNavigationVisibility(determineNavigationVisibility())
-        updateCartPage()
+        getCartInPage(onSuccess = { updateCartPage(it) })
         setupTotalPrice()
         setupTotalAmount()
     }
@@ -26,20 +26,20 @@ class CartPresenter(
     override fun removeCartProduct(cartProductModel: CartProductModel) {
         cartRepository.deleteCartProduct(cartProductModel.toDomain())
         view.updateNavigationVisibility(determineNavigationVisibility())
-        updateCartPage()
+        getCartInPage(onSuccess = { updateCartPage(it) })
         view.setResultForChange()
     }
 
     override fun goToPreviousPage() {
         currentPage--
-        updateCartPage()
+        getCartInPage(onSuccess = { updateCartPage(it) })
 
         if (currentPage == 0) view.updateNavigationVisibility(determineNavigationVisibility())
     }
 
     override fun goToNextPage() {
         currentPage++
-        updateCartPage()
+        getCartInPage(onSuccess = { updateCartPage(it) })
     }
 
     override fun changeCartProductChecked(cartProductModel: CartProductModel) {
@@ -77,7 +77,19 @@ class CartPresenter(
     }
 
     override fun updateCartProductCheckedInPage(isChecked: Boolean) {
-        val cart = cartRepository.getPage(currentPage, sizePerPage)
+        getCartInPage { updateChecked(it, isChecked) }
+    }
+
+    private fun getCartInPage(onSuccess: (Cart) -> Unit) {
+        cartRepository.getPage(
+            currentPage,
+            sizePerPage,
+            onSuccess = { onSuccess(it) },
+            onFailure = { view.notifyLoadFailed() }
+        )
+    }
+
+    private fun updateChecked(cart: Cart, isChecked: Boolean) {
         cart.cartProducts.forEach {
             if (it.isChecked != isChecked) {
                 applyCartProductCheckedChange(it, isChecked)
@@ -85,18 +97,13 @@ class CartPresenter(
         }
     }
 
-    private fun updateCartPage() {
-        val newCart = getCartInPage()
+    private fun updateCartPage(cart: Cart) {
         view.updateCart(
-            cartProducts = newCart.cartProducts.map { it.toView() },
+            cartProducts = cart.cartProducts.map { it.toView() },
             currentPage = currentPage + 1,
-            isLastPage = isLastPageCart(newCart)
+            isLastPage = isLastPageCart(cart)
         )
         updateAllChecked()
-    }
-
-    private fun getCartInPage(): Cart {
-        return cartRepository.getPage(currentPage, sizePerPage)
     }
 
     private fun setupTotalPrice() {

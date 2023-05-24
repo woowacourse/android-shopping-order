@@ -35,5 +35,7 @@ interface CartContract {
         fun updateCartProduct(prev: CartProductModel, new: CartProductModel)
 
         fun updateAllChecked(isAllChecked: Boolean)
+
+        fun notifyLoadFailed()
     }
 }

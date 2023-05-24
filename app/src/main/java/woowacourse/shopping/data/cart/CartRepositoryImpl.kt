@@ -1,10 +1,13 @@
 package woowacourse.shopping.data.cart
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.CartRepository
+import kotlin.concurrent.thread
 
 class CartRepositoryImpl(
     private val cartDao: CartDao,
@@ -23,16 +26,29 @@ class CartRepositoryImpl(
         return cartDao.selectAllCount()
     }
 
-    override fun getPage(page: Int, sizePerPage: Int): Cart {
-        val startIndex = page * sizePerPage
-        val newCart = if (startIndex < cart.cartProducts.size) {
-            cart.getSubCart(startIndex, startIndex + sizePerPage)
-        } else {
-            cartDao.selectPage(page, sizePerPage).apply {
-                cart = Cart(cart.cartProducts + cartProducts)
+    override fun getPage(
+        page: Int,
+        sizePerPage: Int,
+        onSuccess: (Cart) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val handler = Handler(Looper.myLooper()!!)
+
+        thread {
+            val startIndex = page * sizePerPage
+            val newCart = if (startIndex < cart.cartProducts.size) {
+                cart.getSubCart(startIndex, startIndex + sizePerPage)
+            } else {
+                cartDao.selectPage(page, sizePerPage).apply {
+                    cart = Cart(cart.cartProducts + cartProducts)
+                }
+            }
+
+            Thread.sleep(2000)
+            handler.post {
+                onSuccess(newCart)
             }
         }
-        return newCart
     }
 
     override fun deleteCartProduct(cartProduct: CartProduct) {

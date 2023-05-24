@@ -11,7 +11,7 @@ interface CartRepository {
 
     fun getAllCount(): Int
 
-    fun getPage(page: Int, sizePerPage: Int): Cart
+    fun getPage(page: Int, sizePerPage: Int, onSuccess: (Cart) -> Unit, onFailure: () -> Unit)
 
     fun deleteCartProduct(cartProduct: CartProduct)
 

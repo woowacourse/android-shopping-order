@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.common.model.CartProductModel
+import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
 import woowacourse.shopping.data.database.dao.CartDao
@@ -48,6 +50,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         isLastPage: Boolean
     ) {
         cartAdapter.updateCartProducts(cartProducts, currentPage, isLastPage)
+        showCart()
     }
 
     override fun updateNavigationVisibility(visibility: Boolean) {
@@ -74,11 +77,21 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cartProductAllCheckbox.isChecked = isAllChecked
     }
 
+    override fun notifyLoadFailed() {
+        Toaster.showToast(this, "장바구니 상품을 불러오는데 실패했습니다!")
+    }
+
     private fun initCartAdapter() {
         cartAdapter = CartAdapter(
             onCartItemRemoveButtonClick = { presenter.removeCartProduct(it) },
-            onPreviousButtonClick = { presenter.goToPreviousPage() },
-            onNextButtonClick = { presenter.goToNextPage() },
+            onPreviousButtonClick = {
+                showSkeleton()
+                presenter.goToPreviousPage()
+            },
+            onNextButtonClick = {
+                showSkeleton()
+                presenter.goToNextPage()
+            },
             onCheckBoxClick = { cartProductModel ->
                 presenter.changeCartProductChecked(cartProductModel)
                 presenter.updateAllChecked()
@@ -106,6 +119,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter = CartPresenter(
             this, cartRepository = CartRepositoryImpl(CartDao(db)), sizePerPage = SIZE_PER_PAGE
         )
+    }
+
+    private fun showSkeleton() {
+        binding.cartProductList.visibility = View.GONE
+        binding.skeletonCartProductList.visibility = View.VISIBLE
+    }
+
+    private fun showCart() {
+        binding.skeletonCartProductList.visibility = View.GONE
+        binding.cartProductList.visibility = View.VISIBLE
     }
 
     companion object {
