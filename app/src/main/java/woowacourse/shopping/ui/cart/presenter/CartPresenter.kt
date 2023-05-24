@@ -34,6 +34,7 @@ class CartPresenter(
 
     override fun onLoadCartItemsOfNextPage() {
         _currentPage++
+        showOrderUI(selectedCartItems)
         showCartItems(_currentPage, selectedCartItems, true)
         showPageUI(_currentPage)
         showAllSelectionUI(_currentPage, selectedCartItems)

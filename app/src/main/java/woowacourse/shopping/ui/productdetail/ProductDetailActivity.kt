@@ -8,7 +8,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.data.RemoteHost
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
@@ -21,6 +20,7 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
+import woowacourse.shopping.utils.RemoteHost
 import woowacourse.shopping.utils.customview.AddToCartDialog
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {

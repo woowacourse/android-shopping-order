@@ -50,8 +50,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         setActionBar()
 
         initPageUI()
-        initCartList()
         initOrderUI()
+        initCartList()
         loadLastPageIfFromCartItemAdd()
         restoreStateIfSavedInstanceStateIsNotNull(savedInstanceState)
     }

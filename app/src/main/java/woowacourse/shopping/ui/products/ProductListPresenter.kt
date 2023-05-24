@@ -53,7 +53,8 @@ class ProductListPresenter(
     }
 
     private fun createProductUIStates(
-        cartItems: List<CartItem>, products: List<Product>
+        cartItems: List<CartItem>,
+        products: List<Product>
     ): List<ProductUIState> {
         val cartItemMap = cartItems.associateBy { it.product.id }
         return products.map { product ->
@@ -83,6 +84,7 @@ class ProductListPresenter(
     }
 
     override fun onAddToCart(productId: Long) {
+        println(productId)
         productRepository.findById(productId) { product ->
             product ?: return@findById
             val cartItem = CartItem(-1, product, LocalDateTime.now(), 1)

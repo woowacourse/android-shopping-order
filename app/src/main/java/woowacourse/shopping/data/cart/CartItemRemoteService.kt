@@ -8,9 +8,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.RemoteHost
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.utils.RemoteHost
+import woowacourse.shopping.utils.UserData
 import java.io.IOException
 import java.time.LocalDateTime
 
@@ -24,7 +25,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val body = jsonObject.toString().toRequestBody()
         val request = Request.Builder().url(host.url + path).post(body)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${host.token}").build()
+            .addHeader("Authorization", "Basic ${UserData.credential}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
@@ -43,7 +44,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
     override fun findAll(onFinish: (List<CartItem>) -> Unit) {
         val path = "/cart-items"
         val request =
-            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${host.token}")
+            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
                 .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -70,7 +71,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val body = jsonObject.toString().toRequestBody()
         val request = Request.Builder().url(host.url + path).patch(body)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${host.token}").build()
+            .addHeader("Authorization", "Basic ${UserData.credential}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
@@ -84,7 +85,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
     override fun deleteById(id: Long, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val request = Request.Builder().url(host.url + path).delete()
-            .addHeader("Authorization", "Basic ${host.token}").build()
+            .addHeader("Authorization", "Basic ${UserData.credential}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }

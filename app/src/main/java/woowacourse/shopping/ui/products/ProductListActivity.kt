@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.products
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -167,6 +169,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun setCartItemCount(count: Int) {
         runOnUiThread {
+            if (!::cartCountBadge.isInitialized) return@runOnUiThread
             if (count == 0) {
                 cartCountBadge.isVisible = false
                 return@runOnUiThread
@@ -183,5 +186,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     companion object {
         private const val CURRENT_PAGE = "CURRENT_PAGE"
+
+        fun startActivity(context: Context) {
+            val intent = Intent(context, ProductListActivity::class.java).apply {}
+            context.startActivity(intent)
+        }
     }
 }
