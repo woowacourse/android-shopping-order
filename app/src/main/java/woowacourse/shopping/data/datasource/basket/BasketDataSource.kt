@@ -29,5 +29,17 @@ interface BasketDataSource {
         fun remove(basketProduct: DataBasketProduct)
     }
 
-    interface Remote
+    interface Remote {
+        fun getAll(): List<DataBasketProduct>
+
+        fun getByProductId(productId: Int): DataBasketProduct?
+
+        fun add(basketProduct: DataBasketProduct)
+
+        fun minus(basketProduct: DataBasketProduct)
+
+        fun overWriteUpdate(basketProduct: DataBasketProduct)
+
+        fun remove(basketProduct: DataBasketProduct)
+    }
 }
