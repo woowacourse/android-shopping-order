@@ -114,6 +114,26 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         }.start()
     }
 
+    override fun requestDeleteCartItem(cartId: Long) {
+        val thread = Thread {
+            val client = OkHttpClient()
+            val host = BASE_URL_POI
+            val path = CART_DELETE + cartId
+
+            val request =
+                Request.Builder()
+                    .addHeader("Authorization", "Basic $TOCKEN_POI")
+                    .delete()
+                    .url(host + path)
+                    .build()
+
+            client.newCall(request).execute()
+        }
+
+        thread.start()
+        thread.join()
+    }
+
     private fun parseCartProductList(response: String): List<CartEntity2> {
         val cartProducts = mutableListOf<CartEntity2>()
         val jsonArray = JSONArray(response)
@@ -149,5 +169,6 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         private const val TOCKEN_JENNA = "YUBhLmNvbToxMjM0"
         private const val CART = "/cart-items"
         private const val CART_PATCH = "/cart-items/"
+        private const val CART_DELETE = "/cart-items/"
     }
 }

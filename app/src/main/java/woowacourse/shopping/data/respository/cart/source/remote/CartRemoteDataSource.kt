@@ -19,4 +19,6 @@ interface CartRemoteDataSource {
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     )
+
+    fun requestDeleteCartItem(cartId: Long)
 }

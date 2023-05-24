@@ -27,4 +27,5 @@ interface CartRepository {
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     )
+    fun deleteCart(cartId: Long)
 }

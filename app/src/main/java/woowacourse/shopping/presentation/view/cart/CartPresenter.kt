@@ -49,10 +49,10 @@ class CartPresenter(
             carts.size
         }
 
-    // TODO : 로컬 Db 아이템 삭제
     override fun deleteCartItem(itemId: Long) {
         // cartRepository.deleteCartByCartId(itemId)
         carts.removeIf { it.id == itemId }
+        cartRepository.deleteCart(itemId)
 
         view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)
         view.setEnableRightButton(carts.size > startPosition + DISPLAY_CART_COUNT_CONDITION)

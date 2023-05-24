@@ -36,6 +36,10 @@ class CartRepositoryImpl(
         cartRemoteDataSource.requestPatchCartItem(cartEntity, onFailure, onSuccess)
     }
 
+    override fun deleteCart(cartId: Long) {
+        cartRemoteDataSource.requestDeleteCartItem(cartId)
+    }
+
     override fun updateCartByProductId(productId: Long, count: Int, checked: Int) {
         cartDao.updateCartByProductId(productId, count, checked)
     }
