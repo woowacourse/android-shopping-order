@@ -11,28 +11,21 @@ class CartPresenter(
     private val productRepository: ProductRepositoryImpl = ProductRepositoryImpl(),
     private var currentPage: Int = 1,
 ) : CartContract.Presenter {
-
-    private lateinit var carts: MutableList<CartModel>
-
-    init {
-        cartRepository.getAllCarts().map { cartEntity ->
-            productRepository.loadDataById(cartEntity.productId, ::onFailure) { productEntity ->
-                carts.add(
-                    CartModel(
-                        cartEntity.id,
-                        productEntity.toUIModel().apply { count = cartEntity.count },
-                        cartEntity.checked == 1,
-                    ),
-                )
-            }
-        }
-    }
+    private val carts = mutableListOf<CartModel>()
 
     private fun onFailure() {
     }
 
     private val startPosition: Int
         get() = (currentPage - 1) * DISPLAY_CART_COUNT_CONDITION
+
+    override fun initCartItems() {
+        cartRepository.loadAllCarts(::onFailure) {
+            carts.addAll(it.map { cartEntity2 -> cartEntity2.toUIModel() })
+            loadCartItems()
+            calculateTotalPrice()
+        }
+    }
 
     override fun loadCartItems() {
         view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)

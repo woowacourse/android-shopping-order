@@ -3,9 +3,23 @@ package woowacourse.shopping.data.respository.cart
 import android.content.Context
 import woowacourse.shopping.data.database.CartDao
 import woowacourse.shopping.data.model.CartEntity
+import woowacourse.shopping.data.model.CartEntity2
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 
-class CartRepositoryImpl(context: Context) : CartRepository {
+class CartRepositoryImpl(
+    context: Context,
+    private val cartRemoteDataSource: CartRemoteDataSource = CartRemoteDataSourceImpl(),
+) : CartRepository {
     private val cartDao = CartDao(context)
+
+    override fun loadAllCarts(
+        onFailure: () -> Unit,
+        onSuccess: (products: List<CartEntity2>) -> Unit,
+    ) {
+        cartRemoteDataSource.requestDatas(onFailure, onSuccess)
+    }
+
     override fun updateCartByProductId(productId: Long, count: Int, checked: Int) {
         cartDao.updateCartByProductId(productId, count, checked)
     }

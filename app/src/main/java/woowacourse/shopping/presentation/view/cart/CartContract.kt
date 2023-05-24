@@ -15,6 +15,7 @@ interface CartContract {
     }
 
     interface Presenter {
+        fun initCartItems()
         fun loadCartItems()
         fun deleteCartItem(itemId: Long)
         fun calculatePreviousPage()

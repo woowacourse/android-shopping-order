@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.respository.cart
 
 import woowacourse.shopping.data.model.CartEntity
+import woowacourse.shopping.data.model.CartEntity2
 
 interface CartRepository {
     fun updateCartByProductId(productId: Long, count: Int, checked: Int)
@@ -12,4 +13,8 @@ interface CartRepository {
     fun deleteCartByCartId(cartId: Long)
     fun deleteCartByProductId(productId: Long)
     fun addCart(productId: Long, count: Int)
+    fun loadAllCarts(
+        onFailure: () -> Unit,
+        onSuccess: (products: List<CartEntity2>) -> Unit,
+    )
 }

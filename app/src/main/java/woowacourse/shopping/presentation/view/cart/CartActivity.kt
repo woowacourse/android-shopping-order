@@ -47,8 +47,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         setSupportActionBar()
         setRecyclerViewAnimator()
-        presenter.loadCartItems()
-        presenter.calculateTotalPrice()
+        presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
         setAllProduceCheckedClick()
@@ -76,8 +75,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartItemsView(carts: List<CartModel>) {
-        cartAdapter = CartAdapter(carts, cartProductListener)
-        binding.rvCart.adapter = cartAdapter
+        binding.rvCart.post {
+            cartAdapter = CartAdapter(carts, cartProductListener)
+            binding.rvCart.adapter = cartAdapter
+        }
     }
 
     override fun setChangedCartItemsView(carts: List<CartModel>) {
@@ -85,11 +86,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setEnableLeftButton(isEnabled: Boolean) {
-        binding.btCartListPageLeft.isEnabled = isEnabled
+        binding.btCartListPageLeft.post {
+            binding.btCartListPageLeft.isEnabled = isEnabled
+        }
     }
 
     override fun setEnableRightButton(isEnabled: Boolean) {
-        binding.btCartListPageRight.isEnabled = isEnabled
+        binding.btCartListPageRight.post {
+            binding.btCartListPageRight.isEnabled = isEnabled
+        }
     }
 
     private fun setLeftButtonClick() {
@@ -118,9 +123,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setAllCartChecked(isChecked: Boolean) {
-        binding.cbCartAll.setOnCheckedChangeListener { _, _ -> }
-        binding.cbCartAll.isChecked = isChecked
-        setAllProduceCheckedClick()
+        binding.cbCartAll.post {
+            binding.cbCartAll.setOnCheckedChangeListener { _, _ -> }
+            binding.cbCartAll.isChecked = isChecked
+            setAllProduceCheckedClick()
+        }
     }
 
     override fun setPageCountView(page: Int) {

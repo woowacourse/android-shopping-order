@@ -8,6 +8,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.data.BASE_URL_JENNA
 import woowacourse.shopping.data.model.ProductEntity
 import java.io.IOException
 
@@ -87,10 +88,6 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     }
 
     companion object {
-        private const val BASE_URL_POI = "http://13.125.205.46:8080"
-        private const val BASE_URL_TORI = "http://13.209.68.194:8080"
-        private const val BASE_URL_JENNA = "http://43.201.105.220:8080"
-
         private const val PRODUCT = "/products"
     }
 }
