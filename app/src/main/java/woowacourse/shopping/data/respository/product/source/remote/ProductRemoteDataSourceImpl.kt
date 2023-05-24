@@ -8,7 +8,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.BASE_URL_JENNA
+import woowacourse.shopping.data.BASE_URL_POI
 import woowacourse.shopping.data.model.ProductEntity
 import java.io.IOException
 
@@ -20,7 +20,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_JENNA
+            val host = BASE_URL_POI
             val path = PRODUCT
             val request = Request.Builder().url(host + path).build()
             client.newCall(request).enqueue(object : Callback {
@@ -46,7 +46,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     ) {
         Thread {
             val client = OkHttpClient()
-            val host = BASE_URL_JENNA
+            val host = BASE_URL_POI
             val path = "$PRODUCT/$productId"
             val request = Request.Builder().url(host + path).build()
             client.newCall(request).enqueue(object : Callback {

@@ -9,3 +9,5 @@ fun CartEntity2.toUIModel(): CartModel =
         product.toUIModel().apply { count = quantity },
         checked = true,
     )
+
+fun CartModel.toEntity(): CartEntity2 = CartEntity2(id, product.count, product.toEntity())

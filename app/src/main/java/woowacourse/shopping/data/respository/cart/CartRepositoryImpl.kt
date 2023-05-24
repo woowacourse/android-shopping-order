@@ -20,6 +20,14 @@ class CartRepositoryImpl(
         cartRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
+    override fun updateCartCount(
+        cartEntity: CartEntity2,
+        onFailure: () -> Unit,
+        onSuccess: () -> Unit,
+    ) {
+        cartRemoteDataSource.requestPatchCartItem(cartEntity, onFailure, onSuccess)
+    }
+
     override fun updateCartByProductId(productId: Long, count: Int, checked: Int) {
         cartDao.updateCartByProductId(productId, count, checked)
     }

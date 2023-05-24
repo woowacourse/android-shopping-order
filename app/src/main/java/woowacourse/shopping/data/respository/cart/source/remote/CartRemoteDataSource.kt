@@ -7,4 +7,10 @@ interface CartRemoteDataSource {
         onFailure: () -> Unit,
         onSuccess: (products: List<CartEntity2>) -> Unit,
     )
+
+    fun requestPatchCartItem(
+        cartEntity: CartEntity2,
+        onFailure: () -> Unit,
+        onSuccess: () -> Unit,
+    )
 }

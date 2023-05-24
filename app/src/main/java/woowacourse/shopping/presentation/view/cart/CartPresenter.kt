@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.cart
 
+import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
@@ -48,8 +49,9 @@ class CartPresenter(
             carts.size
         }
 
+    // TODO : 로컬 Db 아이템 삭제
     override fun deleteCartItem(itemId: Long) {
-        cartRepository.deleteCartByCartId(itemId)
+        // cartRepository.deleteCartByCartId(itemId)
         carts.removeIf { it.id == itemId }
 
         view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)
@@ -78,11 +80,15 @@ class CartPresenter(
     }
 
     override fun updateProductCount(cartId: Long, count: Int) {
-        if (count == 0) {
-            deleteCartItem(cartId)
+        val cartModel = carts.find { it.id == cartId } ?: return
+        carts.find { it.id == cartId }?.apply { product.count = count }
+        val cartEntity = cartModel.toEntity()
+
+        cartRepository.updateCartCount(cartEntity, ::onFailure) {
+            if (count == 0) {
+                deleteCartItem(cartId)
+            }
         }
-        cartRepository.updateCartCountByCartId(cartId, count)
-        carts.find { it.id == cartId }?.product?.count = count
     }
 
     override fun updateProductChecked(cartId: Long, isChecked: Boolean) {
