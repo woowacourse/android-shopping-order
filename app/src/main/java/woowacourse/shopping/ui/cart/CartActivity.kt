@@ -13,7 +13,6 @@ import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
-import woowacourse.shopping.ui.cart.presenter.CartPresenter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
 import woowacourse.shopping.utils.ServerConfiguration
@@ -131,6 +130,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun setStateThatCanRequestNextPage(canRequest: Boolean) {
         runOnUiThread {
             binding.btnPageUp.isEnabled = canRequest
+        }
+    }
+
+    override fun setStateThatCanRequestPage(canRequest: Boolean) {
+        runOnUiThread {
+            binding.tvCartPage.isVisible = canRequest
+            binding.btnPageUp.isVisible = canRequest
+            binding.btnPageDown.isVisible = canRequest
         }
     }
 

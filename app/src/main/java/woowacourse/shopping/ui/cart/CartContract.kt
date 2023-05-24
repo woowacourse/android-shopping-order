@@ -35,6 +35,8 @@ interface CartContract {
 
         fun setStateThatCanRequestNextPage(canRequest: Boolean)
 
+        fun setStateThatCanRequestPage(canRequest: Boolean)
+
         fun setPage(page: Int)
 
         fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean)

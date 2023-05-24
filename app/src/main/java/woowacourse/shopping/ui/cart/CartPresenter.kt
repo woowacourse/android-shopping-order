@@ -1,8 +1,7 @@
-package woowacourse.shopping.ui.cart.presenter
+package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.repository.CartItemRepository
-import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 
 class CartPresenter(
@@ -148,26 +147,15 @@ class CartPresenter(
     }
 
     private fun showPageUI(currentPage: Int) {
-        refreshStateThatCanRequestPreviousPage(currentPage)
-        refreshStateThatCanRequestNextPage(currentPage)
+        refreshStateThatCanRequestPage(currentPage)
         view.setPage(currentPage)
     }
 
-    private fun refreshStateThatCanRequestPreviousPage(currentPage: Int) {
-        if (currentPage <= 1) {
-            view.setStateThatCanRequestPreviousPage(false)
-        } else {
-            view.setStateThatCanRequestPreviousPage(true)
-        }
-    }
-
-    private fun refreshStateThatCanRequestNextPage(currentPage: Int) {
-        getMaxPage { count ->
-            if (currentPage >= count) {
-                view.setStateThatCanRequestNextPage(false)
-            } else {
-                view.setStateThatCanRequestNextPage(true)
-            }
+    private fun refreshStateThatCanRequestPage(currentPage: Int) {
+        view.setStateThatCanRequestPreviousPage(currentPage > 1)
+        getMaxPage { maxPage ->
+            view.setStateThatCanRequestNextPage(currentPage < maxPage)
+            view.setStateThatCanRequestPage(maxPage > 1)
         }
     }
 
