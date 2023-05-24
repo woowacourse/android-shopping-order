@@ -16,4 +16,8 @@
     <string name="cart_dialog_add_to_cart_button">담기</string>
     <string name="check_all_label">전체</string>
     <string name="order_button">주문하기(%d)</string>
+    <string name="hoi_server">호이의 서버</string>
+    <string name="gitjjang_server">깃짱의 서버</string>
+    <string name="jerry_server">제리의 서버</string>
+    <string name="server_select_message">서버를 선택해주세용~♥</string>
 </resources>
