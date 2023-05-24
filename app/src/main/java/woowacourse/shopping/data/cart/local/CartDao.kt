@@ -1,8 +1,9 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.cart.local
 
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import woowacourse.shopping.data.cart.CartDataModel
 
 class CartDao(db: CartDbHelper) : CartLocalDataSource {
 

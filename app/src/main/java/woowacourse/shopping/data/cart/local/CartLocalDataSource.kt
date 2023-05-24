@@ -1,4 +1,6 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.cart.local
+
+import woowacourse.shopping.data.cart.CartDataModel
 
 interface CartLocalDataSource {
     fun addProduct(productId: Int)

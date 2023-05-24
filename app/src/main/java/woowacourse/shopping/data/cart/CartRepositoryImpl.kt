@@ -2,6 +2,7 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
+import woowacourse.shopping.data.cart.local.CartLocalDataSource
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.repository.CartRepository
 
