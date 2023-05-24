@@ -13,4 +13,7 @@
     <string name="tv_select_server_title">환영합니다. \n사용할 서버를 선택해 주세요!</string>
     <string name="btn_select_server_hongsil">Welcome!\nHongsil\'s \nServer</string>
     <string name="btn_select_server_matthew">Welcome!\nMatthew\'s \nServer</string>
+    <string name="inputEmail">이메일을 입력하세요</string>
+    <string name="inputPassword">비밀번호를 입력하세요</string>
+    <string name="tv_login_title">로그인</string>
 </resources>
