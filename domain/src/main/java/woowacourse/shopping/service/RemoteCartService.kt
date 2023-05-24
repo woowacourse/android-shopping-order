@@ -1,6 +1,5 @@
 package woowacourse.shopping.service
 
-import java.lang.Thread.sleep
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,7 +22,22 @@ class RemoteCartService(baseUrl: String) {
             .get()
             .build()
 
-        return parseCartProductsResponse(executeRequest(request))
+        var products: List<CartProduct>? = null
+        executeRequest(
+            request,
+            onSuccess = {
+                println("Cart get all success")
+                val responseBody = it.body?.string()
+                    ?: throw RuntimeException("Cart get all failed")
+                products = parseCartProductsResponse(responseBody)
+            },
+            onFailure = { println("Cart get all failed") }
+        )
+
+        while (products == null) {
+            Thread.sleep(10)
+        }
+        return products!!
     }
 
     private fun parseCartProductsResponse(responseBody: String): List<CartProduct> {
@@ -48,7 +62,7 @@ class RemoteCartService(baseUrl: String) {
         }
     }
 
-    fun postItem(itemId: Int): String {
+    fun postItem(itemId: Int) {
         val request = Request.Builder()
             .url("$baseUrl/cart-items")
             .header("Authorization", "Basic $credentials")
@@ -56,10 +70,14 @@ class RemoteCartService(baseUrl: String) {
             .post(JSONObject().put("productId", itemId).toString().toRequestBody(JSON_MEDIA_TYPE))
             .build()
 
-        return executeRequest(request)
+        executeRequest(
+            request,
+            onSuccess = { println("Cart post success") },
+            onFailure = { println("Cart post failed") }
+        )
     }
 
-    fun patchItemQuantity(itemId: Int, quantity: Int): String {
+    fun patchItemQuantity(itemId: Int, quantity: Int) {
         val request = Request.Builder()
             .url("$baseUrl/cart-items/$itemId")
             .header("Authorization", "Basic $credentials")
@@ -67,34 +85,43 @@ class RemoteCartService(baseUrl: String) {
             .patch(JSONObject().put("quantity", quantity).toString().toRequestBody(JSON_MEDIA_TYPE))
             .build()
 
-        return executeRequest(request)
+        executeRequest(
+            request,
+            onSuccess = { println("Cart patch success") },
+            onFailure = { println("Cart patch failed") }
+        )
     }
 
-    fun deleteItem(itemId: Int): String {
+    fun deleteItem(itemId: Int) {
         val request = Request.Builder()
             .url("$baseUrl/cart-items/$itemId")
             .header("Authorization", "Basic $credentials")
             .delete()
             .build()
 
-        return executeRequest(request)
+        executeRequest(
+            request,
+            onSuccess = { println("Cart delete success") },
+            onFailure = { println("Cart delete failed") }
+        )
     }
 
-    private fun executeRequest(request: Request): String {
-        var responseBody: String? = null
+    private fun executeRequest(
+        request: Request,
+        onSuccess: (Response) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         client.newCall(request).enqueue(
             object : okhttp3.Callback {
                 override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-                    println("Request failed: ${e.message}")
+                    onFailure(e)
                 }
 
                 override fun onResponse(call: okhttp3.Call, response: Response) {
-                    responseBody = response.body?.string()
+                    onSuccess(response)
                 }
             }
         )
-        while (responseBody == null) { sleep(10) }
-        return responseBody!!
     }
 
     companion object {
