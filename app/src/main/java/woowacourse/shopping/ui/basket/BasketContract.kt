@@ -29,7 +29,7 @@ interface BasketContract {
 
         fun addBasketProduct(product: Product)
 
-        fun removeBasketProduct(product: Product)
+        fun deleteBasketProduct(product: Product)
 
         fun updateBasketProducts()
 

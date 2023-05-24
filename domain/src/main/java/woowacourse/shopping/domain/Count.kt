@@ -13,7 +13,9 @@ value class Count(val value: Int) {
     fun isZero(): Boolean = value == 0
 
     operator fun plus(otherCount: Count) = Count(value + otherCount.value)
+    operator fun plus(other: Int) = Count(value + other)
     operator fun minus(otherCount: Count) = Count(value - otherCount.value)
+    operator fun minus(other: Int) = Count(value - other)
 
     companion object {
         private const val COUNT_NEGATIVE_ERROR = "상품 갯수는 음수일 수 없습니다."

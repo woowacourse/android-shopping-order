@@ -56,7 +56,7 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     }
 
     override fun update(basketProduct: DataBasketProduct) {
-        val url = "${OkHttpModule.BASE_URL}/cart_items/{${basketProduct.product.id}}"
+        val url = "${OkHttpModule.BASE_URL}/cart_items/${basketProduct.id}"
         val requestBody = "{\"quantity\":\"${basketProduct.count.value}\"}"
             .toRequestBody("application/json".toMediaTypeOrNull())
 

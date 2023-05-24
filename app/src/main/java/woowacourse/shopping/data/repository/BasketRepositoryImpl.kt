@@ -22,12 +22,20 @@ class BasketRepositoryImpl(
         localBasketDataSource.add(basketProduct.toData())
     }
 
+    override fun add2(basketProduct: BasketProduct) {
+        remoteBasketDataSource.add(basketProduct.toData())
+    }
+
     override fun minus(basketProduct: BasketProduct) {
         localBasketDataSource.minus(basketProduct.toData())
     }
 
     override fun overWriteUpdate(basketProduct: BasketProduct) {
         localBasketDataSource.overWriteUpdate(basketProduct.toData())
+    }
+
+    override fun update(basketProduct: BasketProduct) {
+        remoteBasketDataSource.update(basketProduct.toData())
     }
 
     override fun remove(basketProduct: BasketProduct) {

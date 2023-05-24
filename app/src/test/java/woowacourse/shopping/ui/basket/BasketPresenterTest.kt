@@ -129,7 +129,7 @@ class BasketPresenterTest() {
             BasketPresenter(view = view, basketRepository = basketRepository, basket = basket)
 
         // when
-        presenter.removeBasketProduct(Product(1, "더미입니다만", Price(1000), "url"))
+        presenter.deleteBasketProduct(Product(1, "더미입니다만", Price(1000), "url"))
 
         // then
         verify(exactly = 1) { basketRepository.minus(any()) }

@@ -8,6 +8,25 @@ data class BasketProduct(
 ) {
     fun getTotalPrice(): Price = product.price * count
 
+    fun plusCount(): BasketProduct =
+        BasketProduct(
+            id,
+            count + 1,
+            product,
+            checked
+        )
+
+    fun minusCount(): BasketProduct =
+        if (this.count.value == 1) this
+        else {
+            BasketProduct(
+                id,
+                count - 1,
+                product,
+                checked
+            )
+        }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

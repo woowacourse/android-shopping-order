@@ -57,7 +57,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     private fun initAdapter() {
         basketAdapter = BasketAdapter(
             presenter::deleteBasketProduct,
-            presenter::removeBasketProduct,
+            presenter::deleteBasketProduct,
             presenter::addBasketProduct,
             presenter::updateBasketProductCheckState
         )

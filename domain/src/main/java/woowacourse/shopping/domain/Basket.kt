@@ -53,4 +53,8 @@ data class Basket(val products: List<BasketProduct>) {
     fun toggleAllCheck(isChecked: Boolean) {
         products.map { it.checked = isChecked }
     }
+
+    fun getProductByProductId(productId: Int): BasketProduct? =
+        products.find { it.product.id == productId }
+
 }

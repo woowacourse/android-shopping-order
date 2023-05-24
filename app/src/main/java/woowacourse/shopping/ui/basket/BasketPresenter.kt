@@ -50,16 +50,22 @@ class BasketPresenter(
     }
 
     override fun addBasketProduct(product: Product) {
-        val addedProduct = BasketProduct(count = Count(1), product = product)
-        basketRepository.add(addedProduct)
-        basket = basket.add(addedProduct)
+        basketRepository.update(
+            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
+                NOT_EXIST_PRODUCT_ERROR
+            )
+        )
+        basket = basket.add(BasketProduct(count = Count(1), product = product))
         updateBasketProductViewData()
     }
 
-    override fun removeBasketProduct(product: Product) {
-        val removedProduct = BasketProduct(count = Count(1), product = product)
-        basketRepository.minus(removedProduct)
-        basket = basket.delete(removedProduct)
+    override fun deleteBasketProduct(product: Product) {
+        basketRepository.update(
+            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
+                NOT_EXIST_PRODUCT_ERROR
+            )
+        )
+        basket = basket.delete(BasketProduct(count = Count(1), product = product))
         updateBasketProductViewData()
     }
 
@@ -120,5 +126,7 @@ class BasketPresenter(
 
     companion object {
         private const val BASKET_PAGING_SIZE = 5
+
+        private const val NOT_EXIST_PRODUCT_ERROR = "장바구니에 담겨있지 않은 상품을 조회하였습니다."
     }
 }
