@@ -16,5 +16,11 @@ interface ProductRepository {
         onFailure: () -> Unit,
     )
 
+    fun fetchProductById(
+        productId: Long,
+        onSuccess: (Product) -> Unit,
+        onFailure: () -> Unit,
+    )
+
     fun resetCache()
 }

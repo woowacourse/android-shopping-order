@@ -4,8 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.domain.model.RecentProduct
+import com.example.domain.model.Product
 import woowacourse.shopping.data.model.RecentProductEntity
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class RecentDao(
@@ -61,31 +62,31 @@ class RecentDao(
         return recentlyShownProducts
     }
 
-    fun putRecentProduct(recentProduct: RecentProduct) {
-        val findRecentProduct = selectAll().find { it.productId == recentProduct.productId }
+    fun putRecentProduct(product: Product) {
+        val findRecentProduct = selectAll().find { it.productId == product.id }
 
         if (findRecentProduct != null) {
-            updateRecentProduct(recentProduct)
+            updateRecentProduct(product)
         } else {
-            insertRecentProduct(recentProduct)
+            insertRecentProduct(product)
         }
     }
 
-    private fun insertRecentProduct(recentProduct: RecentProduct) {
-        val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
+    private fun insertRecentProduct(product: Product) {
+        val timeSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         val values = ContentValues().apply {
-            put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, recentProduct.productId)
-            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, recentProduct.imageUrl)
+            put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, product.id)
+            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, product.imgUrl)
             put(RecentTableContract.TABLE_COLUMN_DATE_TIME, timeSecond)
         }
         writableDatabase.insert(RecentTableContract.TABLE_NAME, null, values)
     }
 
-    private fun updateRecentProduct(recentProduct: RecentProduct) {
-        val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
+    private fun updateRecentProduct(product: Product) {
+        val timeSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         val updateSql = "UPDATE ${RecentTableContract.TABLE_NAME} " +
             "SET ${RecentTableContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
-            "WHERE ${RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.productId}"
+            "WHERE ${RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${product.id}"
         writableDatabase.execSQL(updateSql)
     }
 

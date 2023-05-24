@@ -41,6 +41,14 @@ class ProductRepositoryImpl(
         onSuccess(nextProducts)
     }
 
+    override fun fetchProductById(
+        productId: Long,
+        onSuccess: (Product) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        service.requestProduct(productId, onSuccess, onFailure)
+    }
+
     override fun resetCache() {
         cache.clear()
     }

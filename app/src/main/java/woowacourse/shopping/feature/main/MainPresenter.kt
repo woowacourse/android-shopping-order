@@ -7,6 +7,7 @@ import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.feature.main.MainContract.View.MainScreenEvent
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.ProductUiModel
@@ -64,6 +65,40 @@ class MainPresenter(
     override fun loadRecent() {
         val recentProducts = recentProductRepository.getAll().map { it.toPresentation() }
         _recentProducts.value = recentProducts
+    }
+
+    override fun moveToCart() {
+        _mainScreenEvent.value = MainScreenEvent.ShowCartScreen
+    }
+
+    override fun showProductDetail(productId: Long) {
+        val product = _products.value?.find { it.id == productId } ?: return
+        showDetail(product)
+    }
+
+    private fun showDetail(productUiModel: ProductUiModel) {
+        val recentProduct = _recentProducts.value?.firstOrNull()
+        recentProductRepository.addRecentProduct(productUiModel.toDomain())
+        _mainScreenEvent.value =
+            MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct)
+    }
+
+    override fun showRecentProductDetail(productId: Long) {
+        val product = _products.value?.find { it.id == productId }
+        if (product != null) {
+            showProductDetail(productId)
+        } else {
+            productRepository.fetchProductById(
+                productId,
+                onSuccess = { product ->
+                    val productUiModel = product.toPresentation()
+                    val cartProduct = cartProducts.find { it.productUiModel.id == productId }
+                    cartProduct?.let { productUiModel.count = it.productUiModel.count }
+                    showDetail(productUiModel)
+                },
+                onFailure = {},
+            )
+        }
     }
 
     override fun changeProductCartCount(productId: Long, count: Int) {
@@ -135,6 +170,10 @@ class MainPresenter(
             },
             onFailure = {},
         )
+    }
+
+    override fun resetProducts() {
+        productRepository.resetCache()
     }
 
     private fun makeProductUiModels(products: List<Product>): List<ProductUiModel> {

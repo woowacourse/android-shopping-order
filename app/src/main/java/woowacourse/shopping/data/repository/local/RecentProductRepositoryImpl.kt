@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.local
 
+import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.data.sql.recent.RecentDao
@@ -16,7 +17,7 @@ class RecentProductRepositoryImpl(
         }
     }
 
-    override fun addRecentProduct(recentProduct: RecentProduct) {
-        recentDao.putRecentProduct(recentProduct)
+    override fun addRecentProduct(product: Product) {
+        recentDao.putRecentProduct(product)
     }
 }

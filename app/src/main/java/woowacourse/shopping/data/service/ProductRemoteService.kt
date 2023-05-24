@@ -43,23 +43,29 @@ class ProductRemoteService(private val baseUrl: String) {
 
     fun requestProduct(
         productId: Long,
+        onSuccess: (Product) -> Unit,
         onFailure: () -> Unit,
-    ): Product {
+    ) {
         val request = Request.Builder().url("${baseUrl}products/$productId").build()
 
-        val response = OkHttpClient().newCall(request).execute()
-        return if (response.isSuccessful.not() || response.body?.string() == null) {
-            onFailure()
-            Product(
-                -1,
-                "",
-                "https://www.i-boss.co.kr/og-BD1486504-29771-gif",
-                Price(0),
-            )
-        } else {
-            val productObject = JSONObject(response.body!!.string())
-            parseJsonToProduct(productObject)
-        }
+        OkHttpClient().newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    onFailure()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.code >= 400) return onFailure()
+
+                    val productObject =
+                        response.body?.string()?.let { JSONObject(it) } ?: return onFailure()
+                    response.close()
+                    val result = parseJsonToProduct(productObject)
+
+                    onSuccess(result)
+                }
+            },
+        )
     }
 
     private fun parseJsonToProduct(jsonProduct: JSONObject): Product {
