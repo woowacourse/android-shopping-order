@@ -13,31 +13,23 @@ import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.repositoryImpl.MockWeb
-import woowacourse.shopping.repositoryImpl.RemoteProductRepository
+import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
 import woowacourse.shopping.utils.ActivityUtils
+import woowacourse.shopping.utils.ServerURL
 import woowacourse.shopping.utils.SharedPreferenceUtils
 import woowacourse.shopping.utils.getSerializableExtraCompat
 
 class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.View {
     private lateinit var binding: ActivityDetailedProductBinding
     private lateinit var presenter: DetailedProductContract.Presenter
-    private lateinit var mockWeb: MockWeb
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initMockWeb()
         initBinding()
         initPresenter()
         initToolbar()
-    }
-
-    private fun initMockWeb() {
-        val thread = Thread { mockWeb = MockWeb() }
-        thread.start()
-        thread.join()
     }
 
     private fun initBinding() {
@@ -54,7 +46,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             intent.getSerializableExtraCompat(KEY_PRODUCT)
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
-            RemoteProductRepository(mockWeb.url),
+            RemoteProductDataSource(ServerURL.url),
             CartDatabase(this),
             RecentProductDatabase(this)
         )

@@ -6,11 +6,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
+import org.json.JSONObject
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.ProductRepository
 
-class RemoteProductRepository(baseUrl: String) : ProductRepository {
-    private val baseUrl = baseUrl.dropLast(1)
+class RemoteProductDataSource(baseUrl: String) : ProductRepository {
+    private val baseUrl = baseUrl.removeSuffix("/")
     private val client = OkHttpClient()
 
     private var offset = 0
@@ -19,7 +20,7 @@ class RemoteProductRepository(baseUrl: String) : ProductRepository {
         val request = Request.Builder()
             .url("$baseUrl/products")
             .build()
-        return executeRequest(request).let { parseResponse(it) }
+        return parseProductsResponse(executeRequest(request))
     }
 
     override fun getNext(count: Int): List<Product> {
@@ -27,7 +28,7 @@ class RemoteProductRepository(baseUrl: String) : ProductRepository {
             .url("$baseUrl/products?offset=$offset&count=$count")
             .build()
 
-        val products = executeRequest(request).let { parseResponse(it) }
+        val products = parseProductsResponse(executeRequest(request))
         offset += products.size
         return products
     }
@@ -48,7 +49,7 @@ class RemoteProductRepository(baseUrl: String) : ProductRepository {
             .url("$baseUrl/products/$id")
             .build()
 
-        return executeRequest(request).let { parseResponse(it) }.firstOrNull { it.id == id }
+        return executeRequest(request)?.let { parseProductResponse(it) }
             ?: throw RuntimeException("Product not found with id: $id")
     }
 
@@ -71,7 +72,7 @@ class RemoteProductRepository(baseUrl: String) : ProductRepository {
         return responseBody
     }
 
-    private fun parseResponse(responseBody: String?): List<Product> {
+    private fun parseProductsResponse(responseBody: String?): List<Product> {
         return responseBody?.let {
             val productsJsonArray = JSONArray(it)
             val products = mutableListOf<Product>()
@@ -82,6 +83,13 @@ class RemoteProductRepository(baseUrl: String) : ProductRepository {
             }
             products
         } ?: emptyList()
+    }
+
+    private fun parseProductResponse(responseBody: String?): Product {
+        return responseBody?.let {
+            val productsJSONObject = JSONObject(it)
+            Product.fromJson(productsJSONObject)
+        } ?: throw RuntimeException("Product not found")
     }
 
     companion object {

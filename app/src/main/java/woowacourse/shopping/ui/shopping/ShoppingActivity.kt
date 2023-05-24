@@ -8,31 +8,31 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.database.cart.CartDatabase
+import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
-import woowacourse.shopping.repositoryImpl.MockWeb
-import woowacourse.shopping.repositoryImpl.RemoteProductRepository
+import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
+import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
+import woowacourse.shopping.utils.ServerURL
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var presenter: ShoppingContract.Presenter
-
-    private lateinit var mockWeb: MockWeb
 
     private val adapter: ProductsAdapter = ProductsAdapter(getAdapterListener())
     private var tvCount: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initMockWeb()
+        initServerURL()
         initBinding()
         initToolbar()
         initPresenter()
@@ -65,16 +65,17 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         setSupportActionBar(binding.toolbar)
     }
 
-    private fun initMockWeb() {
-        val thread = Thread { mockWeb = MockWeb() }
-        thread.start()
-        thread.join()
+    private fun initServerURL() {
+        ServerURL.url = "http://43.200.169.154:8080"
     }
 
     private fun initPresenter() {
         presenter = ShoppingPresenter(
             this,
-            RemoteProductRepository(mockWeb.url),
+            ProductRepositoryImpl(
+                ProductDatabase(this),
+                RemoteProductDataSource(ServerURL.url)
+            ),
             RecentProductDatabase(this),
             CartDatabase(this)
         )
