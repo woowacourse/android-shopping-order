@@ -1,4 +1,4 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.service
 
 import java.lang.Thread.sleep
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -10,7 +10,7 @@ import org.json.JSONObject
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.ProductRepository
 
-class RemoteProductDataSource(baseUrl: String) : ProductRepository {
+class RemoteProductService(baseUrl: String) : ProductRepository {
     private val baseUrl = baseUrl.removeSuffix("/")
     private val client = OkHttpClient()
 

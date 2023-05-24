@@ -12,8 +12,8 @@ import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.repositoryImpl.RemoteCartDataSource
-import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
+import woowacourse.shopping.service.RemoteCartService
+import woowacourse.shopping.service.RemoteProductService
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -62,8 +62,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(RemoteCartDataSource(ServerURL.url)),
-            RemoteProductDataSource(ServerURL.url),
+            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
+            RemoteProductService(ServerURL.url),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
         )
         presenter.setUpView()

@@ -1,20 +1,20 @@
-package woowacourse.shoppoing
+package woowacourse.shoppoing.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.repositoryImpl.CartMockWeb
-import woowacourse.shopping.repositoryImpl.RemoteCartDataSource
+import woowacourse.shopping.service.RemoteCartService
 
-class RemoteCartDateSourceTest {
+class RemoteCartServiceTest {
     private lateinit var mockWebServer: CartMockWeb
-    private lateinit var remoteCartDataSource: RemoteCartDataSource
+    private lateinit var remoteCartDataSource: RemoteCartService
 
     @Before
     fun setUp() {
         // given
         mockWebServer = CartMockWeb()
-        remoteCartDataSource = RemoteCartDataSource(
+        remoteCartDataSource = RemoteCartService(
             mockWebServer.url
         )
     }

@@ -4,9 +4,10 @@ import java.lang.Integer.min
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.service.RemoteCartService
 
 class CartRepositoryImpl(
-    private val remoteDatabase: RemoteCartDataSource
+    private val remoteDatabase: RemoteCartService
 ) : CartRepository {
     private val cartItems = mutableListOf<CartProduct>()
 

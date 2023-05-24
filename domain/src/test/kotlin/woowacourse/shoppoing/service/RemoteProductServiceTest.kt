@@ -1,4 +1,4 @@
-package woowacourse.shoppoing
+package woowacourse.shoppoing.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
@@ -6,17 +6,17 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repositoryImpl.MockWeb
-import woowacourse.shopping.repositoryImpl.RemoteProductDataSource
+import woowacourse.shopping.service.RemoteProductService
 
-class RemoteProductRepositoryTest {
+class RemoteProductServiceTest {
     private lateinit var mockWebServer: MockWeb
-    private lateinit var remoteProductRepository: RemoteProductDataSource
+    private lateinit var remoteProductRepository: RemoteProductService
 
     @Before
     fun setUp() {
         // given
         mockWebServer = MockWeb()
-        remoteProductRepository = RemoteProductDataSource(
+        remoteProductRepository = RemoteProductService(
             mockWebServer.url
         )
     }

@@ -1,4 +1,4 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.service
 
 import java.lang.Thread.sleep
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -10,7 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.model.CartProduct
 
-class RemoteCartDataSource(baseUrl: String) {
+class RemoteCartService(baseUrl: String) {
     private val baseUrl = baseUrl.removeSuffix("/")
     private val client = OkHttpClient()
 
