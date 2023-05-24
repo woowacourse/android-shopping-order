@@ -1,14 +1,11 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
-import org.json.JSONObject
-import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import java.io.IOException
@@ -83,14 +80,5 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
             }
             products
         } ?: emptyList()
-    }
-
-    private fun Product.Companion.fromJson(productJSON: JSONObject): Product {
-        return Product(
-            productJSON.getInt("id"),
-            productJSON.getString("name"),
-            productJSON.getString("imageUrl"),
-            Price(productJSON.getInt("price")),
-        )
     }
 }

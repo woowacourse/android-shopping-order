@@ -191,7 +191,7 @@ class ProductListPresenterTest {
     @Test
     fun 장바구니에_상품을_추가할_수_있다() {
         presenter.fetchProducts()
-        presenter.addToCartProducts(10, 1)
+        presenter.insertCartProduct(10, 1)
 
         val actual = cartRepository.findAll().size
 

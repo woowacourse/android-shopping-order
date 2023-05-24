@@ -12,7 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartDbRepository
+import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
@@ -63,7 +63,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 this,
                 productRemoteRepository,
                 RecentViewedDbRepository(this, productRemoteRepository),
-                CartDbRepository(this),
+                CartRemoteRepository("http://43.200.181.131:8080"),
             )
     }
 
@@ -97,8 +97,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                         presenter.loadMoreProducts()
                     }
 
-                    override fun onProductClickAddFirst(id: Int, count: Int) {
-                        presenter.addToCartProducts(id, count)
+                    override fun onProductClickAddFirst(id: Int) {
+                        presenter.insertCartProduct(id)
                         presenter.fetchCartCount()
                     }
 

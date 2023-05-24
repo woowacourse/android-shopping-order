@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.productlist
 
-import android.util.Log
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -24,7 +24,9 @@ class ProductListPresenter(
             if (viewedProducts.isNotEmpty()) addViewedProductsItem(viewedProducts)
             // 상품 리스트
             productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
-                addProductsItem(products.toUiModels())
+                cartRepository.findAll {
+                    addProductsItem(products.toUiModels(it))
+                }
                 // 더보기
                 addShowMoreItem()
                 mark += products.size
@@ -65,82 +67,96 @@ class ProductListPresenter(
             productsListItems.filterIsInstance<ProductListViewItem.ProductItem>().size
 
         val position = productsItemSize + recentViewedItemSize
-        productRepository.getProductsByRange(mark, PAGINATION_SIZE) {
-            val nextProducts = it.toUiModels()
-            productsListItems.removeLast()
-            addProductsItem(nextProducts)
-            mark += nextProducts.size
-            productRepository.isExistByMark(mark) { isNextExist ->
-                if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
-                view.notifyAddProducts(position, nextProducts.size)
+        productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
+            cartRepository.findAll { cartProducts ->
+                val nextProducts = products.toUiModels(cartProducts)
+                productsListItems.removeLast()
+                addProductsItem(nextProducts)
+                mark += nextProducts.size
+                productRepository.isExistByMark(mark) { isNextExist ->
+                    if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
+                    view.notifyAddProducts(position, nextProducts.size)
+                }
             }
         }
     }
 
-    override fun addToCartProducts(id: Int, count: Int) {
-        cartRepository.add(id, count)
-        fetchProductCount(id)
+    override fun insertCartProduct(productId: Int) {
+        cartRepository.insert(productId) {
+            fetchProductCount(productId)
+        }
     }
 
     override fun updateCartProductCount(id: Int, count: Int) {
         if (count == 0) {
-            cartRepository.remove(id)
-            fetchProductCount(id)
-            fetchCartCount()
+            cartRepository.remove(id) {
+                fetchProductCount(id)
+                fetchCartCount()
+            }
             return
         }
-        cartRepository.update(id, count)
-        fetchProductCount(id)
+        cartRepository.update(id, count) {
+            fetchProductCount(id)
+        }
     }
 
     override fun fetchCartCount() {
-        view.showCartCount(cartRepository.findAll().size)
+        cartRepository.findAll { view.showCartCount(it.size) }
     }
 
     override fun fetchProductCounts() {
-        val cartProducts = cartRepository.findAll()
+        cartRepository.findAll { cartProducts ->
+            val itemsHaveCount = productsListItems
+                .asSequence()
+                .filterIsInstance<ProductListViewItem.ProductItem>()
+                .filter { it.product.count > 0 }
+                .toList()
 
-        val itemsHaveCount = productsListItems
-            .asSequence()
-            .filterIsInstance<ProductListViewItem.ProductItem>()
-            .filter { it.product.count > 0 }
-            .toList()
-
-        itemsHaveCount.forEach { item ->
-            val cartProduct = cartProducts.find { it.id == item.product.id }
-            item.product.count = cartProduct?.count ?: 0
-            view.notifyDataChanged(productsListItems.indexOf(item))
+            itemsHaveCount.forEach { item ->
+                val cartProduct = cartProducts.find { it.id == item.product.id }
+                item.product.count = cartProduct?.count ?: 0
+                view.notifyDataChanged(productsListItems.indexOf(item))
+            }
         }
     }
 
     override fun fetchProductCount(id: Int) {
         if (id == -1) return
-        val product = cartRepository.find(id)
-        val item = productsListItems.filterIsInstance<ProductListViewItem.ProductItem>()
-            .filter { it.product.id == id }[0]
-        item.product.count = product?.count ?: 0
-        view.notifyDataChanged(productsListItems.indexOf(item))
+        cartRepository.findAll { cartProducts ->
+            val product = cartProducts.find { it.product.id == id }
+            val item = productsListItems.filterIsInstance<ProductListViewItem.ProductItem>()
+                .filter { it.product.id == id }[0]
+            item.product.count = product?.count ?: 0
+            view.notifyDataChanged(productsListItems.indexOf(item))
+        }
     }
 
     override fun updateRecentViewed(id: Int) {
         if (id == -1) return
         if (isExistRecentViewed()) productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
 
-        recentViewedRepository.findAll {
-            productsListItems.add(
-                0,
-                ProductListViewItem.RecentViewedItem(it.toUiModels()),
-            )
+        recentViewedRepository.findAll { products ->
+            cartRepository.findAll { cartProducts ->
+                productsListItems.add(
+                    0,
+                    ProductListViewItem.RecentViewedItem(products.toUiModels(cartProducts)),
+                )
+            }
             view.notifyRecentViewedChanged()
-            Log.d("NOTIFY", true.toString())
         }
     }
 
     private fun isExistRecentViewed(): Boolean =
         productsListItems[0] is ProductListViewItem.RecentViewedItem
 
-    private fun List<Product>.toUiModels(): List<ProductModel> {
-        return this.map { it.toUiModel(cartRepository.find(it.id)?.count ?: 0) }
+    private fun List<Product>.toUiModels(cartProducts: List<CartProduct>): List<ProductModel> {
+        return this.map { product ->
+            val cartProduct = cartProducts.find { it.id == product.id }
+            product.toUiModel(
+                cartProduct?.id ?: 0,
+                cartProduct?.count ?: 0,
+            )
+        }
     }
 
     companion object {

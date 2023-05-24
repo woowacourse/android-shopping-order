@@ -17,7 +17,7 @@ class ProductDetailPresenter(
         get() = _count
 
     override fun putInCart(product: ProductModel) {
-        if (_count.value != null) cartRepository.add(product.id, _count.value ?: 0)
+        if (_count.value != null) cartRepository.insert(product.id) { _count.value ?: 0 }
         view.finishActivity(true)
     }
 

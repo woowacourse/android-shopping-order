@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartDbRepository
+import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
@@ -51,7 +51,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setUpPresenter() {
         presenter =
-            ProductDetailPresenter(INITIAL_COUNT, this, CartDbRepository(this), RecentViewedDbRepository(this, ProductRemoteRepository("http://43.200.181.131:8080")))
+            ProductDetailPresenter(
+                INITIAL_COUNT,
+                this,
+                CartRemoteRepository("http://43.200.181.131:8080"),
+                RecentViewedDbRepository(
+                    this,
+                    ProductRemoteRepository("http://43.200.181.131:8080"),
+                ),
+            )
     }
 
     private fun forceQuit() {
@@ -67,11 +75,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 startLastViewedDetailActivity(lastViewedProduct)
             }
         }
-        Glide.with(productDetailBinding.root.context).load(product.imageUrl).into(productDetailBinding.imgProduct)
+        Glide.with(productDetailBinding.root.context).load(product.imageUrl)
+            .into(productDetailBinding.imgProduct)
         productDetailBinding.btnPutInCart.setOnClickListener {
             dialog.show()
         }
     }
+
     private fun setUpDialog(product: ProductModel) {
         setUpDialogBinding(product)
         dialog = AlertDialog.Builder(this)
@@ -126,7 +136,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         const val LAST_VIEWED_PRODUCT = "LAST_VIEWED"
         private const val NOT_EXIST_DATA_ERROR = "데이터가 넘어오지 않았습니다."
 
-        fun newIntent(context: Context, product: ProductModel, lastViewedProduct: ProductModel?): Intent {
+        fun newIntent(
+            context: Context,
+            product: ProductModel,
+            lastViewedProduct: ProductModel?,
+        ): Intent {
             val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra(PRODUCT, product)
             intent.putExtra(LAST_VIEWED_PRODUCT, lastViewedProduct)

@@ -40,7 +40,11 @@ class MockServer {
                         val parameters = getParameters(path)
                         val offset = parameters["mark"]?.toIntOrNull()
                         val count = parameters["size"]?.toIntOrNull()
-                        if (offset == null || count == null) return MockResponse().setResponseCode(404)
+                        if (offset == null || count == null) {
+                            return MockResponse().setResponseCode(
+                                404,
+                            )
+                        }
                         MockResponse()
                             .setHeader("Content-Type", "application/json")
                             .setResponseCode(200)
@@ -78,7 +82,6 @@ class MockServer {
             }.joinToString(",", prefix = "[", postfix = "]").trimIndent()
         }
 
-
         private fun getParameters(queryString: String): Map<String, String> {
             val parameters = mutableMapOf<String, String>()
 
@@ -93,6 +96,4 @@ class MockServer {
             return parameters
         }
     }
-
-
 }

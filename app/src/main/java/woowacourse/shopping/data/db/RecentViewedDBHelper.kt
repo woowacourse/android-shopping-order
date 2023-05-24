@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 
 class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {

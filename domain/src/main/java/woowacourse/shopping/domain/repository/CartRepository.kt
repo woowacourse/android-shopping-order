@@ -3,11 +3,10 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.CartProduct
 
 interface CartRepository {
-    fun findAll(): List<CartProduct>
-    fun find(id: Int): CartProduct?
-    fun add(id: Int, count: Int)
-    fun update(id: Int, count: Int)
-    fun remove(id: Int)
-    fun findRange(mark: Int, rangeSize: Int): List<CartProduct>
-    fun isExistByMark(mark: Int): Boolean
+    fun findAll(callback: (List<CartProduct>) -> Unit)
+    fun insert(productId: Int, callback: (Boolean) -> Unit)
+    fun update(cartId: Int, count: Int, callback: (Boolean) -> Unit)
+    fun remove(cartId: Int, callback: (Boolean) -> Unit)
+    fun findRange(mark: Int, rangeSize: Int, callback: (List<CartProduct>) -> Unit)
+    fun isExistByMark(mark: Int, callback: (Boolean) -> Unit)
 }

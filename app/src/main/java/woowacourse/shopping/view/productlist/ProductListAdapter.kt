@@ -11,7 +11,7 @@ class ProductListAdapter(
     interface OnItemClick {
         fun onProductClick(product: ProductModel)
         fun onShowMoreClick()
-        fun onProductClickAddFirst(id: Int, count: Int)
+        fun onProductClickAddFirst(id: Int)
         fun onProductUpdateCount(id: Int, count: Int)
     }
 

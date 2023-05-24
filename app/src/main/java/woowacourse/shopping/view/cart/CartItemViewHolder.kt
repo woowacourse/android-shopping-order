@@ -11,7 +11,7 @@ import woowacourse.shopping.databinding.ItemCartPaginationBinding
 sealed class CartItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     class CartProductViewHolder(
         private val binding: ItemCartBinding,
-        onItemClick: CartAdapter.OnItemClick
+        onItemClick: CartAdapter.OnItemClick,
     ) :
         CartItemViewHolder(binding.root) {
         init {
@@ -26,7 +26,7 @@ sealed class CartItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     class CartPaginationViewHolder(
         private val binding: ItemCartPaginationBinding,
-        onItemClick: CartAdapter.OnItemClick
+        onItemClick: CartAdapter.OnItemClick,
     ) :
         CartItemViewHolder(binding.root) {
         init {
@@ -42,17 +42,17 @@ sealed class CartItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun of(
             parent: ViewGroup,
             type: CartViewType,
-            onItemClick: CartAdapter.OnItemClick
+            onItemClick: CartAdapter.OnItemClick,
         ): CartItemViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(type.id, parent, false)
             return when (type) {
                 CartViewType.CART_PRODUCT_ITEM -> CartProductViewHolder(
                     ItemCartBinding.bind(view),
-                    onItemClick
+                    onItemClick,
                 )
                 CartViewType.PAGINATION_ITEM -> CartPaginationViewHolder(
                     ItemCartPaginationBinding.bind(view),
-                    onItemClick
+                    onItemClick,
                 )
             }
         }
