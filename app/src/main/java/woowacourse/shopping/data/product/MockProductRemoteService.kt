@@ -62,12 +62,12 @@ class MockProductRemoteService {
         synchronized(this) { // 동기화 (여러 응답 스레드 순차적 실행)
             if (_mockWebServer == null) {
                 _mockWebServer = MockWebServer()
-                _mockWebServer?.url("/")
+                _mockWebServer?.start(8080)
                 _mockWebServer?.dispatcher = dispatcher
             }
         }
 
-        val baseUrl = "$url:${mockWebServer.port}"
+        val baseUrl = "$url:$port"
         val requestUrl = "$baseUrl/products"
         val request = Request.Builder().url(requestUrl).build()
 
@@ -107,7 +107,7 @@ class MockProductRemoteService {
             }
         }
 
-        val baseUrl = "$url:${mockWebServer.port}"
+        val baseUrl = "$url:$port"
         val requestUrl = "$baseUrl/products/$id"
         val request = Request.Builder().url(requestUrl).build()
 
