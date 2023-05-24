@@ -11,17 +11,25 @@ class CartPresenter(
     private val productRepository: ProductRepositoryImpl = ProductRepositoryImpl(),
     private var currentPage: Int = 1,
 ) : CartContract.Presenter {
-    private val carts: MutableList<CartModel> =
-        cartRepository.getAllCarts().map { cartEntity ->
-            val product = productRepository.loadDataById(cartEntity.productId).toUIModel()
-                .apply { count = cartEntity.count }
 
-            CartModel(
-                cartEntity.id,
-                product,
-                cartEntity.checked == 1,
-            )
-        }.toMutableList()
+    private lateinit var carts: MutableList<CartModel>
+
+    init {
+        cartRepository.getAllCarts().map { cartEntity ->
+            productRepository.loadDataById(cartEntity.productId, ::onFailure) { productEntity ->
+                carts.add(
+                    CartModel(
+                        cartEntity.id,
+                        productEntity.toUIModel().apply { count = cartEntity.count },
+                        cartEntity.checked == 1,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun onFailure() {
+    }
 
     private val startPosition: Int
         get() = (currentPage - 1) * DISPLAY_CART_COUNT_CONDITION

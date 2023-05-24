@@ -14,7 +14,11 @@ class ProductRepositoryImpl(
         productRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
-    override fun loadDataById(id: Long): ProductEntity {
-        return productRemoteDataSource.requestData(id)
+    override fun loadDataById(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (products: ProductEntity) -> Unit,
+    ) {
+        productRemoteDataSource.requestData(productId, onFailure, onSuccess)
     }
 }

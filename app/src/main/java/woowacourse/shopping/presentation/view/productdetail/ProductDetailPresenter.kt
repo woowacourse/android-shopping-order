@@ -12,12 +12,19 @@ class ProductDetailPresenter(
     productId: Long,
     productRepository: ProductRepository = ProductRepositoryImpl(),
     private val cartRepository: CartRepository,
-) :
-    ProductDetailContract.Presenter {
-    private var product: ProductModel = productRepository.loadDataById(productId).toUIModel()
+) : ProductDetailContract.Presenter {
+
+    private lateinit var product: ProductModel
 
     init {
-        loadProductInfo()
+        productRepository.loadDataById(productId, ::onFailure) { productEntity ->
+            product = productEntity.toUIModel()
+            loadProductInfo()
+        }
+    }
+
+    private fun onFailure() {
+        view.handleErrorView()
     }
 
     override fun loadLastRecentProductInfo(recentProduct: RecentProductModel?) {

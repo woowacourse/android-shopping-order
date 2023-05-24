@@ -37,7 +37,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
     private val recentProductResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            presenter.updateRecentProductItems()
+            presenter.loadRecentProductItems()
             presenter.loadCartItems()
         }
 
@@ -58,10 +58,20 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         }
     }
 
-    private lateinit var productListAdapter: ProductListAdapter
-    private lateinit var recentProductListAdapter: RecentProductListAdapter
-    private lateinit var recentProductWrapperAdapter: RecentProductWrapperAdapter
-    private lateinit var moreProductListAdapter: MoreProductListAdapter
+    private val productListAdapter by lazy { ProductListAdapter(productListener) }
+    private val recentProductListAdapter by lazy { RecentProductListAdapter(::onProductClickEvent) }
+    private val recentProductWrapperAdapter by lazy {
+        RecentProductWrapperAdapter(
+            presenter::getRecentProductsLastScroll,
+            presenter::updateRecentProductsLastScroll,
+            recentProductListAdapter,
+        )
+    }
+    private val moreProductListAdapter by lazy {
+        MoreProductListAdapter {
+            presenter.updateProductItems(productListAdapter.itemCount)
+        }
+    }
 
     private val concatAdapter: ConcatAdapter by lazy {
         val config = ConcatAdapter.Config.Builder().apply {
@@ -74,15 +84,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun ConcatAdapter.setConcatAdapter() {
-        if (::recentProductListAdapter.isInitialized) {
-            addAdapter(recentProductWrapperAdapter)
-        }
-        if (::productListAdapter.isInitialized) {
-            addAdapter(productListAdapter)
-        }
-        if (::moreProductListAdapter.isInitialized) {
-            addAdapter(moreProductListAdapter)
-        }
+        addAdapter(recentProductWrapperAdapter)
+        addAdapter(productListAdapter)
+        addAdapter(moreProductListAdapter)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,9 +97,6 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         initLayoutManager()
         presenter.initRecentProductItems()
         presenter.initProductItems()
-        presenter.loadRecentProductItems()
-        presenter.loadCartItems()
-        setMoreProductListAdapter()
         setConcatAdapter()
     }
 
@@ -149,50 +150,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setProductItemsView(products: List<ProductModel>) {
-        runOnUiThread {
-            if (::productListAdapter.isInitialized) {
-                productListAdapter.setItems(products)
-                return@runOnUiThread
-            }
-            productListAdapter = ProductListAdapter(productListener)
-            productListAdapter.setItems(products)
-            concatAdapter.addAdapter(1, productListAdapter)
-        }
+        runOnUiThread { productListAdapter.setItems(products) }
     }
 
     override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
-        recentProductListAdapter = RecentProductListAdapter(::onProductClickEvent)
         recentProductListAdapter.setItems(recentProducts)
-
-        recentProductWrapperAdapter = RecentProductWrapperAdapter(
-            presenter::getRecentProductsLastScroll,
-            presenter::updateRecentProductsLastScroll,
-            recentProductListAdapter,
-        )
-
-        addRecentWrapperAdapter()
-    }
-
-    private fun setMoreProductListAdapter() {
-        moreProductListAdapter = MoreProductListAdapter(presenter::loadProductItems)
-        concatAdapter.addAdapter(moreProductListAdapter)
     }
 
     private fun setConcatAdapter() {
         binding.rvProductList.adapter = concatAdapter
-    }
-
-    override fun updateRecentProductItemsView(recentProducts: List<RecentProductModel>) {
-        recentProductListAdapter.setItems(recentProducts)
-        addRecentWrapperAdapter()
-    }
-
-    private fun addRecentWrapperAdapter() {
-        if (!concatAdapter.adapters.contains(recentProductWrapperAdapter)) {
-            concatAdapter.addAdapter(RECENT_PRODUCT_ADAPTER_POSITION, recentProductWrapperAdapter)
-            binding.rvProductList.scrollToPosition(SCROLL_TOP_POSITION)
-            return
-        }
     }
 
     private fun onProductClickEvent(productId: Long) {
@@ -225,8 +191,6 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         private const val SPAN_SIZE = 2
         private const val SPAN_SIZE_OF_ONE_COLUMN = 2
         private const val SPAN_SIZE_OF_TWO_COLUMN = 1
-        private const val RECENT_PRODUCT_ADAPTER_POSITION = 0
-        private const val SCROLL_TOP_POSITION = 0
 
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
     }

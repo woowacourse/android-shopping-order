@@ -8,7 +8,7 @@ import org.json.JSONArray
 
 object ProductWebServer {
     private lateinit var mockWebServer: MockWebServer
-    internal var PORT = 0
+    internal var PORT = 1
 
     private val dispatcher = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {

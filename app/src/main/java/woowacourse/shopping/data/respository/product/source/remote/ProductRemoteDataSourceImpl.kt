@@ -30,32 +30,44 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())
-                    onFailure()
                 }
                 override fun onResponse(call: Call, response: Response) {
-                    val body = response.body?.string() ?: return onFailure()
-                    onSuccess(parseProductList(body))
+                    if (response.isSuccessful) {
+                        val body = response.body?.string() ?: return onFailure()
+                        onSuccess(parseProductList(body))
+                        return
+                    }
+                    onFailure()
                 }
             })
         }.start()
     }
 
-    override fun requestData(productId: Long): ProductEntity {
-        var newProducts: ProductEntity = ProductEntity.errorData
-
-        val thread = Thread {
+    override fun requestData(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (products: ProductEntity) -> Unit,
+    ) {
+        Thread {
             val client = OkHttpClient()
             val host = "http://localhost:$PORT"
             val path = "/shopping/products/$productId"
             val request = Request.Builder().url(host + path).build()
-            val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: return@Thread
-            newProducts = parseProduct(JSONObject(body))
-        }
-        thread.start()
-        thread.join()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.d("krrong", e.toString())
+                }
 
-        return newProducts
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        val body = response.body?.string() ?: return onFailure()
+                        onSuccess(parseProduct(JSONObject(body)))
+                        return
+                    }
+                    onFailure()
+                }
+            })
+        }.start()
     }
 
     private fun parseProductList(response: String): List<ProductEntity> {

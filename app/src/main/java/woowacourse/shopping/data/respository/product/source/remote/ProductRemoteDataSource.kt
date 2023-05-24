@@ -7,5 +7,9 @@ interface ProductRemoteDataSource {
         onFailure: () -> Unit,
         onSuccess: (products: List<ProductEntity>) -> Unit,
     )
-    fun requestData(productId: Long): ProductEntity
+    fun requestData(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (products: ProductEntity) -> Unit,
+    )
 }

@@ -7,5 +7,9 @@ interface ProductRepository {
         onFailure: () -> Unit,
         onSuccess: (products: List<ProductEntity>) -> Unit,
     )
-    fun loadDataById(id: Long): ProductEntity
+    fun loadDataById(
+        productId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (products: ProductEntity) -> Unit,
+    )
 }
