@@ -126,8 +126,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setLayoutVisibility() {
-        runOnUiThread {
+        binding.rvProductList.post {
             binding.rvProductList.visibility = View.VISIBLE
+        }
+        binding.layoutSkeletonProductList.post {
             binding.layoutSkeletonProductList.visibility = View.GONE
         }
     }
@@ -150,7 +152,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setProductItemsView(products: List<ProductModel>) {
-        runOnUiThread { productListAdapter.setItems(products) }
+        binding.rvProductList.post {
+            productListAdapter.setItems(products)
+        }
     }
 
     override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
