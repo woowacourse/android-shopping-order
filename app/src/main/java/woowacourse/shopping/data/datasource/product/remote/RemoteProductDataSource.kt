@@ -42,7 +42,7 @@ class RemoteProductDataSource() : ProductDataSource.Remote {
         allProducts: List<DataProduct>
     ): List<DataProduct> {
         if (lastId == -1) return allProducts.subList(0, min(allProducts.size, size))
-        val startIndex = allProducts.indexOfFirst { it.id == lastId }
+        val startIndex = allProducts.indexOfFirst { it.id == lastId } + 1
         return allProducts.subList(startIndex, min(allProducts.size, startIndex + size))
     }
 }

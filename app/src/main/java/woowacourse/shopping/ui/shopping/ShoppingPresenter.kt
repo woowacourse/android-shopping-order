@@ -72,16 +72,17 @@ class ShoppingPresenter(
     }
 
     override fun fetchProducts() {
-        var products = productRepository
-            .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId)
-            .map { it.toUi() }
-        lastId = products.maxOfOrNull { it.id } ?: -1
-        hasNext = checkHasNext(products)
-        lastId -= if (hasNext) 1 else 0
-        if (hasNext) products = products.dropLast(1)
-        totalProducts += products
-        fetchBasketCount()
-        view.updateProducts(totalProducts)
+        productRepository
+            .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId) { products ->
+                var uiProducts = products.map { it.toUi() }
+                lastId = uiProducts.maxOfOrNull { it.id } ?: -1
+                hasNext = checkHasNext(uiProducts)
+                lastId -= if (hasNext) 1 else 0
+                if (hasNext) uiProducts = uiProducts.dropLast(1)
+                totalProducts += uiProducts
+                fetchBasketCount()
+                view.updateProducts(totalProducts)
+            }
     }
 
     private fun checkHasNext(products: List<UiProduct>): Boolean =

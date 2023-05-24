@@ -12,15 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.database.dao.basket.BasketDaoImpl
-import woowacourse.shopping.data.database.dao.product.ProductDaoImpl
 import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDaoImpl
 import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
-import woowacourse.shopping.data.datasource.product.local.LocalProductDataSource
 import woowacourse.shopping.data.datasource.product.remote.RemoteProductDataSource
 import woowacourse.shopping.data.datasource.recentproduct.local.LocalRecentProductDataSource
-import woowacourse.shopping.data.mockserver.ShoppingCartMockServer
-import woowacourse.shopping.data.model.DataPrice
-import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -84,8 +79,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                LocalProductDataSource(ProductDaoImpl(shoppingDatabase)),
-                RemoteProductDataSource(ShoppingCartMockServer())
+                RemoteProductDataSource()
             ),
             RecentProductRepositoryImpl(
                 LocalRecentProductDataSource(RecentProductDaoImpl(shoppingDatabase))
@@ -94,21 +88,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 LocalBasketDataSource(BasketDaoImpl(shoppingDatabase))
             )
         )
-//        // DB 더미 담는로직 필요에 의해 주석처리
-//        repeat(100) {
-//            ProductDaoImpl(shoppingDatabase).add(
-//                DataProduct(
-//                    0,
-//                    "$it",
-//                    DataPrice(1000),
-//                    "https://pbs.twimg.com/media/FpFzjV-aAAAIE-v?format=jpg&name=large"
-//                )
-//            )
-//        }
     }
 
     override fun updateProducts(products: List<UiProduct>) {
-        productAdapter.submitList(products)
+        runOnUiThread {
+            productAdapter.submitList(products)
+        }
     }
 
     override fun updateRecentProducts(recentProducts: List<UiRecentProduct>) {
