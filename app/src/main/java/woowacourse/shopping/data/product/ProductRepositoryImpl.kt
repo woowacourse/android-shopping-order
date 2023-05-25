@@ -42,16 +42,14 @@ class ProductRepositoryImpl(
         imageUrl: String,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
-    ) {
-    }
+    ) = Unit
 
     override fun updateProduct(
         product: Product,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
-    ) {
-    }
+    ) = Unit
 
-    override fun deleteProduct(id: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
-    }
+    override fun deleteProduct(id: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) =
+        Unit
 }

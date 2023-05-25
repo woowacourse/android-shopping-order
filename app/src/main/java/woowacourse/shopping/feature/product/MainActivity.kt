@@ -88,7 +88,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initList()
-        runOnUiThread { presenter.loadMoreProducts() }
+        Thread {
+            presenter.loadMoreProducts()
+            Thread.sleep(2000) // 스켈레톤 UI 확인용 sleep
+            runOnUiThread { showProducts() }
+        }.start()
 
         cartRepository.getAll(
             onFailure = {}, onSuccess = { presenter.loadCartProductCounts() }
@@ -124,11 +128,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun addProductItems(products: List<ProductState>) {
-        runOnUiThread { productListAdapter.addItems(products) }
+        runOnUiThread {
+            productListAdapter.addItems(products)
+        }
     }
 
     override fun setProducts(products: List<Product>) {
-        runOnUiThread { productListAdapter.setItems(products.map(Product::toUi)) }
+        runOnUiThread {
+            productListAdapter.setItems(products.map(Product::toUi))
+        }
     }
 
     override fun setRecentProducts(recentProducts: List<RecentProduct>) {
@@ -158,6 +166,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun hideCartProductCount() {
         runOnUiThread { cartCountBadge?.visibility = GONE }
+    }
+
+    override fun showProducts() {
+        binding.productRv.visibility = VISIBLE
+        binding.skeletonGl.visibility = GONE
     }
 
     private fun initList() {

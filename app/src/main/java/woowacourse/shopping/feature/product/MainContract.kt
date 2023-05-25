@@ -17,6 +17,7 @@ interface MainContract {
         fun addProductItems(products: List<ProductState>)
         fun showProductDetail(productState: ProductState, recentProductState: RecentProductState?)
         fun showEmptyProducts()
+        fun showProducts()
         fun showCartProductCountBadge()
         fun hideCartProductCount()
     }
