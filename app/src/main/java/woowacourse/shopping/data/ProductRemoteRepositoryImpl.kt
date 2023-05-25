@@ -16,16 +16,14 @@ class ProductRemoteRepositoryImpl(
         onFailure: () -> Unit
     ) {
         if (productCache.productList.isEmpty()) {
-            Thread {
-                service.request(
-                    onSuccess = {
-                        productCache.addProducts(it)
-                        sleep(2000)
-                        onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
-                    },
-                    onFailure = {}
-                )
-            }.start()
+            service.request(
+                onSuccess = {
+                    productCache.addProducts(it)
+                    sleep(2000)
+                    onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
+                },
+                onFailure = {}
+            )
         } else {
             onSuccess(productCache.getSubProducts(page, LOAD_SIZE))
         }

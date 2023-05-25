@@ -12,8 +12,9 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class RecentDao(
-    context: Context
-) : SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
+    context: Context,
+    serverName: String
+) : SQLiteOpenHelper(context, DB_NAME + serverName, null, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(RecentContract.createSQL())
@@ -88,13 +89,13 @@ class RecentDao(
     private fun updateRecentProduct(recentProduct: RecentProduct) {
         val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
         val updateSql = "UPDATE ${RecentContract.TABLE_NAME} " +
-            "SET ${RecentContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
-            "WHERE ${RecentContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.product.id}"
+                "SET ${RecentContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
+                "WHERE ${RecentContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.product.id}"
         writableDatabase.execSQL(updateSql)
     }
 
     companion object {
-        private const val DB_NAME = "recent_db"
+        private const val DB_NAME = "recent_db_"
         private const val VERSION = 1
     }
 }

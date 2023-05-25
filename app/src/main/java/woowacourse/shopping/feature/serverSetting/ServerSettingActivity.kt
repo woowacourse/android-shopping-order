@@ -27,7 +27,15 @@ class ServerSettingActivity : AppCompatActivity() {
             thirdServerBtn.text = "제이미 서버"
 
             firstServerBtn.setOnClickListener {
-                ServerInfo.setBaseUrl("모디")
+                ServerInfo.setBaseUrl("modi")
+                startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
+            }
+            secondServerBtn.setOnClickListener {
+                ServerInfo.setBaseUrl("onekong")
+                startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
+            }
+            thirdServerBtn.setOnClickListener {
+                ServerInfo.setBaseUrl("jamie")
                 startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
             }
         }
