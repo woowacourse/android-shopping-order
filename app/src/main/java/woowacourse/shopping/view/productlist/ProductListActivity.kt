@@ -58,7 +58,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun setLoadingUi() {
-        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.anim)
+        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.skeleton_anim)
         binding.skeletonProducts.root.startAnimation(skeletonAnim)
     }
 
