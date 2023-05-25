@@ -46,8 +46,8 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val SERVER_GLAN = "http://13.125.163.216:8080/"
-        private const val SERVER_GRAY = "http://54.180.83.161:8080/"
+        private const val SERVER_GRAY = "http://13.125.163.216:8080/"
+        private const val SERVER_GLAN = "http://54.180.83.161:8080/"
         const val AUTHORIZATION_TOKEN = "AUTHORIZATION_TOKEN"
 
         private const val TEST_ID = "scott@gmail.com"
