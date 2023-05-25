@@ -22,6 +22,7 @@ class CartPresenter(
     override fun initCartItems() {
         cartRepository.loadAllCarts(::onFailure) {
             carts.addAll(it.map { cartEntity2 -> cartEntity2.toUIModel() })
+            loadLocalCartItemChecked()
             loadCartItems()
             calculateTotalPrice()
             view.setLayoutVisibility()
@@ -35,6 +36,13 @@ class CartPresenter(
         val newCarts = getCurrentPageCarts()
         view.setCartItemsView(newCarts)
         view.setAllCartChecked(isAllChecked())
+    }
+
+    private fun loadLocalCartItemChecked() {
+        cartRepository.getAllLocalCart().forEach { cart ->
+            val target = carts.find { it.id == cart.id } ?: return@forEach
+            target.checked = cart.checked == 1
+        }
     }
 
     private fun getCurrentPageCarts(): List<CartModel> {

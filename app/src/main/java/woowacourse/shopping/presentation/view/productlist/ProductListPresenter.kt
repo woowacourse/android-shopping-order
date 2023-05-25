@@ -141,6 +141,10 @@ class ProductListPresenter(
             val newCartProduct = cartProduct.copy(quantity = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+                if (count == 0) {
+                    cartRepository.deleteLocalCart(newCartProduct.id)
+                }
+
                 product.count = count
                 val allCount = products.sumOf { it.count }
 
