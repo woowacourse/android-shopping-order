@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.LoginDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.login.LoginDataSourceImpl
 import woowacourse.shopping.data.repository.LoginRepositoryImpl
 import woowacourse.shopping.databinding.ActivityLoginBinding
 import woowacourse.shopping.ui.login.contract.LoginContract
