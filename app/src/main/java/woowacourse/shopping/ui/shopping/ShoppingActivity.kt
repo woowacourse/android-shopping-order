@@ -114,20 +114,20 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val product = intent?.getParcelableExtraCompat<UiProduct>(PRODUCT_KEY) ?: return
+        val cartProduct = intent?.getParcelableExtraCompat<UiCartProduct>(CART_PRODUCT_KEY) ?: return
         val count = intent.getIntExtra(COUNT_KEY, 0)
-//        presenter.increaseCartCount(product, count)
+        presenter.addCartCount(cartProduct, count)
     }
 
     companion object {
-        private const val PRODUCT_KEY = "product_key"
+        private const val CART_PRODUCT_KEY = "product_key"
         private const val COUNT_KEY = "count_key"
         private const val SERVER_URL_KEY = "server_url_key"
 
         fun getIntent(context: Context, product: UiProduct, count: Int): Intent =
             Intent(context, ShoppingActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                .putExtra(PRODUCT_KEY, product)
+                .putExtra(CART_PRODUCT_KEY, product)
                 .putExtra(COUNT_KEY, count)
 
         fun getIntent(context: Context, serverUrl: String): Intent =

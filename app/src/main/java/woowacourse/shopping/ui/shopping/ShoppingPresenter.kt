@@ -73,6 +73,17 @@ class ShoppingPresenter(
         updateCart(newCartProducts = loadAllCartProducts())
     }
 
+    override fun addCartCount(cartProduct: UiCartProduct, addCount: Int) {
+        if (cartProduct.selectedCount.value == 0) {
+            addCartProduct(cartProduct)
+            changeCartCount(cartProduct, cartProduct.selectedCount.value + addCount - 1)
+        } else {
+            changeCartCount(cartProduct, cartProduct.selectedCount.value + addCount)
+        }
+
+        updateCart(newCartProducts = loadAllCartProducts())
+    }
+
     private fun loadAllCartProducts(): List<CartProduct> {
         val products = productRepository.getAllProducts()
         val cartProducts = cartRepository.getAllCartProducts()
