@@ -49,8 +49,8 @@ class CartPresenter(
         }
 
     override fun deleteCartItem(itemId: Long) {
-        // cartRepository.deleteCartByCartId(itemId)
         carts.removeIf { it.id == itemId }
+        cartRepository.deleteLocalCart(itemId)
         cartRepository.deleteCart(itemId)
 
         view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)
@@ -94,7 +94,7 @@ class CartPresenter(
         carts.find { it.id == cartId }?.run {
             if (checked == isChecked) return@run
             checked = isChecked
-            cartRepository.updateCartCheckedByCartId(id, checked)
+            cartRepository.updateLocalCartChecked(id, checked)
             view.setAllCartChecked(isAllChecked())
         }
     }

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
@@ -119,11 +120,12 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
     private fun setPresenter() {
         val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
         presenter = ProductListPresenter(
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
-            cartRepository = CartRepositoryImpl(this, cartRemoteDataSource),
+            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
             recentProductRepository = RecentProductRepositoryImpl(this, server),
         )
     }

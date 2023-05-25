@@ -1,18 +1,14 @@
 package woowacourse.shopping.data.respository.cart
 
-import woowacourse.shopping.data.model.CartEntity
-import woowacourse.shopping.data.model.CartEntity2
+import woowacourse.shopping.data.model.CartLocalEntity
+import woowacourse.shopping.data.model.CartRemoteEntity
 
 interface CartRepository {
-    fun updateCartByProductId(productId: Long, count: Int, checked: Int)
-    fun updateCartCountByCartId(cartId: Long, count: Int)
-    fun updateCartCheckedByCartId(cartId: Long, checked: Boolean)
-    fun getCarts(startPosition: Int): List<CartEntity>
-    fun getAllCarts(): List<CartEntity>
-    fun deleteAllCartByProductId(productId: Long)
-    fun deleteCartByCartId(cartId: Long)
-    fun deleteCartByProductId(productId: Long)
-    fun addCart(productId: Long, count: Int)
+    fun addLocalCart(cartId: Long)
+    fun deleteLocalCart(cartId: Long)
+    fun updateLocalCartChecked(cartId: Long, isChecked: Boolean)
+    fun getAllLocalCart(): List<CartLocalEntity>
+
     fun addCartProduct(
         productId: Long,
         onFailure: () -> Unit,
@@ -20,10 +16,10 @@ interface CartRepository {
     )
     fun loadAllCarts(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartEntity2>) -> Unit,
+        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     )
     fun updateCartCount(
-        cartEntity: CartEntity2,
+        cartEntity: CartRemoteEntity,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     )

@@ -121,6 +121,12 @@ class ProductListPresenter(
             cartRepository.addCartProduct(productId, ::onFailure) {
                 product.count = count
 
+                cartRepository.loadAllCarts(::onFailure) { carts ->
+                    val cartProduct =
+                        carts.find { it.product.id == product.id } ?: return@loadAllCarts
+                    cartRepository.addLocalCart(cartProduct.id)
+                }
+
                 val allCount = products.sumOf { it.count }
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)
@@ -129,6 +135,9 @@ class ProductListPresenter(
         }
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val cartProduct = (carts.find { it.product.id == productId } ?: return@loadAllCarts)
+
+            cartRepository.addLocalCart(cartProduct.id)
+
             val newCartProduct = cartProduct.copy(quantity = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
@@ -139,23 +148,6 @@ class ProductListPresenter(
                 updateVisibilityCartCount(allCount)
             }
         }
-    }
-
-    private fun updateProductCount(productId: Long, count: Int) {
-        val product = products.find { it.id == productId } ?: return
-        product.count = count
-        if (count == 0) {
-            cartRepository.deleteCartByProductId(productId)
-            return
-        }
-        cartRepository.updateCartByProductId(productId, count, 1)
-    }
-
-    private fun updateCartCount() {
-        val carts = cartRepository.getAllCarts()
-        val allCount = carts.sumOf { it.count }
-        view.updateToolbarCartCountView(allCount)
-        updateVisibilityCartCount(allCount)
     }
 
     private fun updateVisibilityCartCount(count: Int) {

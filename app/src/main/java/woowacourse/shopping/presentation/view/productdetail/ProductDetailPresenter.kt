@@ -48,6 +48,14 @@ class ProductDetailPresenter(
             if (cartProduct == null) {
                 cartRepository.addCartProduct(product.id, ::onFailure) {
                     if (count == UPDATE_COUNT_CONDITION) {
+                        cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
+                            val reCartProduct =
+                                reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
+                                    ?: return@loadAllCarts
+
+                            cartRepository.addLocalCart(reCartProduct.id)
+                        }
+
                         view.addCartSuccessView()
                         view.exitProductDetailView()
                         return@addCartProduct

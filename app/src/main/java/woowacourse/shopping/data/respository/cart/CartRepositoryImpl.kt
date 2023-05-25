@@ -1,16 +1,14 @@
 package woowacourse.shopping.data.respository.cart
 
-import android.content.Context
-import woowacourse.shopping.data.database.CartDao
-import woowacourse.shopping.data.model.CartEntity
-import woowacourse.shopping.data.model.CartEntity2
+import woowacourse.shopping.data.model.CartLocalEntity
+import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSource
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSource
 
 class CartRepositoryImpl(
-    context: Context,
+    private val cartLocalDataSource: CartLocalDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    private val cartDao = CartDao(context)
 
     override fun addCartProduct(
         productId: Long,
@@ -22,56 +20,36 @@ class CartRepositoryImpl(
 
     override fun loadAllCarts(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartEntity2>) -> Unit,
+        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
         cartRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
     override fun updateCartCount(
-        cartEntity: CartEntity2,
+        cartEntity: CartRemoteEntity,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
         cartRemoteDataSource.requestPatchCartItem(cartEntity, onFailure, onSuccess)
     }
 
+    override fun addLocalCart(cartId: Long) {
+        cartLocalDataSource.insertCart(cartId)
+    }
+
+    override fun deleteLocalCart(cartId: Long) {
+        cartLocalDataSource.deleteCart(cartId)
+    }
+
+    override fun updateLocalCartChecked(cartId: Long, isChecked: Boolean) {
+        cartLocalDataSource.updateCartChecked(cartId, isChecked)
+    }
+
+    override fun getAllLocalCart(): List<CartLocalEntity> {
+        return cartLocalDataSource.selectAllCarts()
+    }
+
     override fun deleteCart(cartId: Long) {
         cartRemoteDataSource.requestDeleteCartItem(cartId)
-    }
-
-    override fun updateCartByProductId(productId: Long, count: Int, checked: Int) {
-        cartDao.updateCartByProductId(productId, count, checked)
-    }
-
-    override fun updateCartCountByCartId(cartId: Long, count: Int) {
-        cartDao.updateCartCountByCartId(cartId, count)
-    }
-
-    override fun updateCartCheckedByCartId(cartId: Long, checked: Boolean) {
-        cartDao.updateCartCheckedByCartId(cartId, checked)
-    }
-
-    override fun getCarts(startPosition: Int): List<CartEntity> {
-        return cartDao.getItemsFromStartPositionToDisplaySize(startPosition)
-    }
-
-    override fun getAllCarts(): List<CartEntity> {
-        return cartDao.getAllItems()
-    }
-
-    override fun deleteAllCartByProductId(productId: Long) {
-        cartDao.deleteAllProduct(productId)
-    }
-
-    override fun deleteCartByCartId(cartId: Long) {
-        cartDao.deleteCart(cartId)
-    }
-
-    override fun deleteCartByProductId(productId: Long) {
-        cartDao.deleteProduct(productId)
-    }
-
-    override fun addCart(productId: Long, count: Int) {
-        cartDao.insertProduct(productId, count, 1)
     }
 }

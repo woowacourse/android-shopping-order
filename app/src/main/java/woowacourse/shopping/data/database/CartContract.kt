@@ -1,20 +1,22 @@
 package woowacourse.shopping.data.database
 
 import android.provider.BaseColumns
+import woowacourse.shopping.data.model.Server
 
 object CartContract {
-    const val CREATE_SQL = "CREATE TABLE IF NOT EXISTS ${Cart.TABLE_NAME} (" +
-        "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-        "${Cart.PRODUCT_ID} INTEGER," +
-        "${Cart.COUNT} INTEGER," +
-        "${Cart.CHECKED} INTEGER)"
+    fun getCreateSQL(server: Server): String {
+        val tableName = getTableName(server)
+        return "CREATE TABLE IF NOT EXISTS $tableName (" +
+            "${Cart.ID} INTEGER PRIMARY KEY," +
+            "${Cart.CHECKED} INTEGER)"
+    }
 
-    const val DROP_SQL = "DROP TABLE IF EXISTS ${Cart.TABLE_NAME}"
+    fun getDropSQL(server: Server): String {
+        return "DROP TABLE IF EXISTS ${getTableName(server)}"
+    }
 
     object Cart : BaseColumns {
-        const val TABLE_NAME = "Cart"
-        const val PRODUCT_ID = "ProductId"
-        const val COUNT = "Count"
+        const val ID = "Id"
         const val CHECKED = "Checked"
     }
 }

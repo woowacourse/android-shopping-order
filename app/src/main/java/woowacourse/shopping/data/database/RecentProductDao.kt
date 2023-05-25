@@ -13,7 +13,7 @@ class RecentProductDao(
     server: Server,
 ) {
     private val db = RecentProductHelper(context).writableDatabase
-    private val tableName = RecentProductContract.getTableName(server)
+    private val tableName = getTableName(server)
 
     fun insertRecentProduct(productId: Long) {
         val value = ContentValues().apply {

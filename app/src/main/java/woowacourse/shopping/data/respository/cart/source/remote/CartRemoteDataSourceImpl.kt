@@ -10,7 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.model.CartEntity2
+import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
 import java.io.IOException
@@ -20,7 +20,7 @@ class CartRemoteDataSourceImpl(
 ) : CartRemoteDataSource {
     override fun requestDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartEntity2>) -> Unit,
+        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
         Thread {
             val client = OkHttpClient()
@@ -46,7 +46,7 @@ class CartRemoteDataSourceImpl(
     }
 
     override fun requestPatchCartItem(
-        cartEntity: CartEntity2,
+        cartEntity: CartRemoteEntity,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
@@ -130,8 +130,8 @@ class CartRemoteDataSourceImpl(
         thread.join()
     }
 
-    private fun parseCartProductList(response: String): List<CartEntity2> {
-        val cartProducts = mutableListOf<CartEntity2>()
+    private fun parseCartProductList(response: String): List<CartRemoteEntity> {
+        val cartProducts = mutableListOf<CartRemoteEntity>()
         val jsonArray = JSONArray(response)
 
         for (index in 0 until jsonArray.length()) {
@@ -142,13 +142,13 @@ class CartRemoteDataSourceImpl(
         return cartProducts
     }
 
-    private fun parseCartProduct(json: JSONObject): CartEntity2 {
+    private fun parseCartProduct(json: JSONObject): CartRemoteEntity {
         val cartId = json.getLong("id")
         val quantity = json.getInt("quantity")
         val product = json.getJSONObject("product")
         val productEntity = parseProduct(product)
 
-        return CartEntity2(cartId, quantity, productEntity)
+        return CartRemoteEntity(cartId, quantity, productEntity)
     }
 
     private fun parseProduct(json: JSONObject): ProductEntity {

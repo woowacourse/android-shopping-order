@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
@@ -63,10 +64,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun setPresenter() {
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
         val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(server)
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(this, cartRemoteDataSourceImpl),
+            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSourceImpl),
         )
     }
 

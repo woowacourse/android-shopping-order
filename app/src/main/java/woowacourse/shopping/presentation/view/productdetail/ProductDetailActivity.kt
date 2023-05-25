@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
@@ -69,12 +70,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setPresenter() {
         val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
         presenter = ProductDetailPresenter(
             this,
             productId = productId,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
-            cartRepository = CartRepositoryImpl(this, cartRemoteDataSource),
+            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
         )
     }
 

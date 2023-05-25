@@ -1,8 +1,6 @@
 package woowacourse.shopping.data.model
 
-data class CartEntity(
+data class CartLocalEntity(
     val id: Long,
-    val productId: Long,
-    val count: Int,
     val checked: Int,
 )
