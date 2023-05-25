@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.ShoppingOrderSharedPreference
 import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
@@ -78,13 +79,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun setUpPresenter() {
-        val productRemoteRepository = ProductRemoteRepository("http://43.200.181.131:8080")
+        val shoppingOrderSharedPreference = ShoppingOrderSharedPreference(this)
+        val productRemoteRepository = ProductRemoteRepository(shoppingOrderSharedPreference.baseUrl)
         presenter =
             ProductListPresenter(
                 this,
                 productRemoteRepository,
                 RecentViewedDbRepository(this, productRemoteRepository),
-                CartRemoteRepository("http://43.200.181.131:8080"),
+                CartRemoteRepository(shoppingOrderSharedPreference.baseUrl),
             )
     }
 

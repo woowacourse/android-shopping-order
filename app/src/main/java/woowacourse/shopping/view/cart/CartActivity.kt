@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.ShoppingOrderSharedPreference
 import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductModel
@@ -34,8 +35,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun setUpPresenter() {
+        val shoppingOrderSharedPreference = ShoppingOrderSharedPreference(this)
         presenter =
-            CartPresenter(this, CartRemoteRepository("http://43.200.181.131:8080"))
+            CartPresenter(this, CartRemoteRepository(shoppingOrderSharedPreference.baseUrl))
     }
 
     override fun showProducts(items: List<CartViewItem>) {

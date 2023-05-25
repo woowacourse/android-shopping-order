@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.data.ShoppingOrderSharedPreference
 import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
@@ -50,14 +51,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setUpPresenter() {
+        val shoppingOrderSharedPreference = ShoppingOrderSharedPreference(this)
         presenter =
             ProductDetailPresenter(
                 INITIAL_COUNT,
                 this,
-                CartRemoteRepository("http://43.200.181.131:8080"),
+                CartRemoteRepository(shoppingOrderSharedPreference.baseUrl),
                 RecentViewedDbRepository(
                     this,
-                    ProductRemoteRepository("http://43.200.181.131:8080"),
+                    ProductRemoteRepository(shoppingOrderSharedPreference.baseUrl),
                 ),
             )
     }
