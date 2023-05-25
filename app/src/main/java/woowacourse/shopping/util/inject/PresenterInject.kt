@@ -47,11 +47,9 @@ fun inject(
 
 fun inject(
     view: CartContract.View,
-    context: Context,
 ): CartPresenter {
     return CartPresenter(
         view,
-        ProductRepositoryImpl(ProductServiceImpl()),
         CartRemoteRepositoryImpl(CartServiceImpl()),
     )
 }

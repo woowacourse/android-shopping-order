@@ -16,7 +16,7 @@ import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.inject
 
 class CartActivity : AppCompatActivity(), View, CartClickListener {
-    private val presenter: CartPresenter by lazy { inject(this, this) }
+    private val presenter: CartPresenter by lazy { inject(this) }
     private lateinit var binding: ActivityCartBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.lifecycleOwner = this
         binding.presenter = presenter
         binding.adapter = CartAdapter(this)
-        presenter.fetchCart(1)
+        presenter.fetchCart(START_PAGE)
     }
 
     override fun updateCart(cartProducts: List<UiCartProduct>) {
@@ -72,6 +72,8 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
     }
 
     companion object {
+        private const val START_PAGE = 1
+
         fun getIntent(context: Context) = Intent(context, CartActivity::class.java)
     }
 }
