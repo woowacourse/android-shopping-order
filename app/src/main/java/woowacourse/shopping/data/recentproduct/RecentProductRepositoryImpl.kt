@@ -17,6 +17,10 @@ class RecentProductRepositoryImpl constructor(
         recentProductLocalDataSource.deleteRecentProduct(recentProductId)
     }
 
+    override fun deleteAllProducts() {
+        recentProductLocalDataSource.deleteAllProduct()
+    }
+
     override fun getRecentProducts(size: Int): List<Product> {
         val recentProductIdList = recentProductLocalDataSource.getRecentProductIdList(size)
         return recentProductIdList.map {

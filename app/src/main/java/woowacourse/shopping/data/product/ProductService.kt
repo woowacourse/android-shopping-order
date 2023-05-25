@@ -8,7 +8,7 @@ import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.mapper.toDataModel
 
 class ProductService : ProductRemoteDataSource {
-    override val products: List<ProductDataModel> = getAllProducts()
+    override val products: List<ProductDataModel> by lazy { getAllProducts() }
     override fun findProductById(id: Int): ProductDataModel {
         var product: ProductDataModel? = null
         val thread = Thread {

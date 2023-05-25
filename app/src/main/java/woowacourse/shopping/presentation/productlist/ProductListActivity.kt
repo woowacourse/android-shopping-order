@@ -85,11 +85,13 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         setSupportActionBar(activityBinding.toolbarProductList.toolbar)
         initRecentProductAdapter()
         initProductAdapter()
-        Thread {
+        val thread = Thread {
             runOnUiThread {
                 presenter.updateProductItems()
             }
-        }.start()
+        }
+        thread.start()
+        thread.join()
     }
 
     private fun updateView() {

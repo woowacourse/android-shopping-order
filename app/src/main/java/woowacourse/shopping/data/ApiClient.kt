@@ -9,10 +9,6 @@ class ApiClient() {
     private val client = OkHttpClient()
     private val requestBuilder: Request.Builder =
         Request.Builder().addHeader("Content-Type", "application/json")
-
-    fun getApiService1(path: String, header: String) {
-    }
-
     fun getApiService(path: String, header: String? = null): Response {
         val request = requestBuilder
             .url(baseUrl + path)

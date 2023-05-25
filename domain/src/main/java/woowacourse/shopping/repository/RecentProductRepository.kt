@@ -8,4 +8,5 @@ interface RecentProductRepository {
     fun deleteRecentProductId(recentProductId: Int)
     fun getRecentProducts(size: Int): List<Product>
     fun getMostRecentProduct(): Product
+    fun deleteAllProducts()
 }

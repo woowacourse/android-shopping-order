@@ -37,6 +37,14 @@ class RecentProductDao(db: RecentProductDbHelper) : RecentProductLocalDataSource
         return productIds
     }
 
+    override fun deleteAllProduct() {
+        writableDb.delete(
+            RecentProductDbContract.TABLE_NAME,
+            "",
+            null
+        )
+    }
+
     override fun getMostRecentProductId(): Int {
         val list = getRecentProductIdList(1)
         if (list.isEmpty()) return -1

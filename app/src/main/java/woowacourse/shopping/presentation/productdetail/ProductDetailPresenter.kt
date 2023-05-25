@@ -23,10 +23,6 @@ class ProductDetailPresenter(
     private val _mostRecentProduct: SafeMutableLiveData<Product> =
         SafeMutableLiveData(Product.defaultProduct)
     override val mostRecentProduct: SafeLiveData<Product> get() = _mostRecentProduct
-
-    init {
-    }
-
     override fun checkCurrentProductIsMostRecent() {
         _mostRecentProduct.value = recentProductRepository.getMostRecentProduct()
         if (mostRecentProduct.value == productInfo.value.product || mostRecentProduct.value.id
@@ -41,7 +37,10 @@ class ProductDetailPresenter(
 
     override fun saveProductInRepository(count: Int) {
         if (count == 0) return
-        cartRepository.putProductInCart(productInfo.value.product.id)
+        if (cartRepository.getCartIdByProductId(productInfo.value.product.id) == -1)
+            cartRepository.putProductInCart(
+                productInfo.value.product.id
+            )
         val cartId = cartRepository.getCartIdByProductId(productInfo.value.product.id)
         cartRepository.updateCartProductCount(cartId, count)
         view.showCompleteMessage(productInfo.value.product.name)

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.cart
 import com.google.gson.GsonBuilder
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.SharedPreferencesDb
-import woowacourse.shopping.presentation.serversetting.ServerSettingActivity
+import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
 class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemoteDataSource {
     override fun addProduct(productId: Int) {
@@ -68,7 +68,7 @@ class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemo
     }
 
     private fun getAuthToken() =
-        sharedPreferences.getString(ServerSettingActivity.AUTHORIZATION_TOKEN, "")
+        sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
 
     companion object {
         private const val PATH = "cart-items"
