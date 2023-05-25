@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import woowacourse.shopping.data.database.contract.ProductContract
 import woowacourse.shopping.data.database.contract.RecentProductContract
 import woowacourse.shopping.data.model.DataPrice
 import woowacourse.shopping.data.model.DataRecentProduct
@@ -31,7 +30,7 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         while (cursor.moveToNext()) {
             val id: Int = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID))
             val productId: Int =
-                cursor.getInt(cursor.getColumnIndex("${ProductContract.TABLE_NAME}${BaseColumns._ID}"))
+                cursor.getInt(cursor.getColumnIndex(RecentProductContract.COLUMN_PRODUCT_ID))
             val name: String =
                 cursor.getString(cursor.getColumnIndex(RecentProductContract.COLUMN_NAME))
             val price: DataPrice =

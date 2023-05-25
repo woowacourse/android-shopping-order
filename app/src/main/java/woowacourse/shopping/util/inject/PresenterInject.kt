@@ -24,10 +24,12 @@ fun inject(
 ): ShoppingContract.Presenter {
     val database = createShoppingDatabase(context)
     return ShoppingPresenter(
-        view,
-        ProductRepositoryImpl(ProductServiceImpl()),
-        inject(inject(injectRecentProductDao(database))),
-        CartRemoteRepositoryImpl(CartServiceImpl()),
+        view = view,
+        productRepository = ProductRepositoryImpl(ProductServiceImpl()),
+        recentProductRepository = RecentProductRepositoryImpl(
+            LocalRecentProductDataSource(RecentProductDaoImpl(database))
+        ),
+        cartRepository = CartRemoteRepositoryImpl(CartServiceImpl()),
     )
 }
 
@@ -45,15 +47,17 @@ fun inject(
     showLastViewedProduct = showLastViewedProduct,
 )
 
-fun inject(
+fun injectCartPresenter(
     view: CartContract.View,
 ): CartPresenter {
     return CartPresenter(
-        view,
-        CartRemoteRepositoryImpl(CartServiceImpl()),
+        view = view,
+        cartRepository = CartRemoteRepositoryImpl(CartServiceImpl()),
     )
 }
 
-fun inject(
+fun injectServerSettingPresenter(
     view: ServerSettingContract.View,
-): ServerSettingContract.Presenter = ServerSettingPresenter(view)
+): ServerSettingContract.Presenter {
+    return ServerSettingPresenter(view)
+}

@@ -13,10 +13,10 @@ import woowacourse.shopping.ui.cart.listener.CartClickListener
 import woowacourse.shopping.ui.cart.recyclerview.adapter.CartAdapter
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.extension.showToast
-import woowacourse.shopping.util.inject.inject
+import woowacourse.shopping.util.inject.injectCartPresenter
 
 class CartActivity : AppCompatActivity(), View, CartClickListener {
-    private val presenter: CartPresenter by lazy { inject(this) }
+    private val presenter: CartPresenter by lazy { injectCartPresenter(this) }
     private lateinit var binding: ActivityCartBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
