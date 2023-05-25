@@ -4,9 +4,9 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 
 interface CartRepository {
-    fun addCartProduct(cartProduct: CartProduct)
+    fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit)
 
-    fun getAllCount(): Int
+    fun getAllCount(onSuccess: (Int) -> Unit, onFailure: () -> Unit)
 
     fun getAll(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit)
 
@@ -23,4 +23,6 @@ interface CartRepository {
     fun replaceCartProduct(prev: CartProduct, new: CartProduct)
 
     fun isAllCheckedInPage(page: Int, sizePerPage: Int): Boolean
+
+    fun findId(productId: Int, onSuccess: (Int?) -> Unit, onFailure: () -> Unit)
 }

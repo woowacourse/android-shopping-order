@@ -4,8 +4,10 @@ import android.os.Handler
 import android.os.Looper
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
@@ -17,6 +19,35 @@ import java.io.IOException
 
 class CartRemoteDataSource {
     private val okHttpClient: OkHttpClient = OkHttpClient()
+
+    fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        val baseUrl = Server.getUrl(Storage.server)
+        val url = "$baseUrl/$PATH"
+        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val json = JSONObject().put("productId", id)
+        val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val request = Request.Builder()
+            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .post(body)
+            .url(url)
+            .build()
+        val handler = Handler(Looper.myLooper()!!)
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onFailure()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                handler.post {
+                    val location = response.header("Location", "-1") ?: "-1"
+                    val id = location.substringAfterLast("/").toInt()
+                    onSuccess(id)
+                }
+            }
+        })
+    }
 
     fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
@@ -68,7 +99,6 @@ class CartRemoteDataSource {
 
     companion object {
         private const val PATH = "cart-items"
-        private const val HEADER_CONTENT_TYPE = "Content-Type"
         private const val HEADER_AUTHORIZATION = "Authorization"
         private const val KEY_ID = "id"
         private const val KEY_QUANTITY = "quantity"

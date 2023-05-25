@@ -5,6 +5,7 @@ import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.model.mapper.ProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ProductMapper.toView
 import woowacourse.shopping.common.model.mapper.RecentProductMapper.toView
+import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toView
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
@@ -120,7 +121,7 @@ class ShoppingPresenter(
         } else {
             removeFromCart(cartProduct)
         }
-        updateShoppingProduct(shoppingProductModel, cartProduct)
+        updateShoppingProduct(shoppingProductModel, cartProduct.quantity)
         updateCartAmount()
     }
 
@@ -129,15 +130,19 @@ class ShoppingPresenter(
     }
 
     override fun increaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {
-        var cartProduct = getCartProduct(shoppingProductModel.product)
-        cartProduct = cartProduct.increaseAmount()
-        if (cartProduct.quantity > 1) {
-            updateCartProduct(cartProduct)
-        } else {
-            addToCart(cartProduct)
-        }
-        updateShoppingProduct(shoppingProductModel, cartProduct)
-        updateCartAmount()
+        cartRepository.findId(
+            productId = shoppingProductModel.product.id,
+            onSuccess = {
+                if (it == null) {
+                    addToCart(shoppingProductModel)
+                } else {
+                    // updateCartProduct(cartProduct)
+                    // updateShoppingProduct(shoppingProductModel, cartProduct.quantity)
+                    // updateCartAmount()
+                }
+            },
+            onFailure = {}
+        )
     }
 
     private fun getCartProduct(productModel: ProductModel): CartProduct {
@@ -158,17 +163,24 @@ class ShoppingPresenter(
         cartRepository.modifyCartProduct(cartProduct)
     }
 
-    private fun addToCart(cartProduct: CartProduct) {
-        cartRepository.addCartProduct(cartProduct)
+    private fun addToCart(shoppingProductModel: ShoppingProductModel) {
+        cartRepository.addCartProduct(
+            shoppingProductModel.toDomain().product,
+            onSuccess = {
+                updateShoppingProduct(shoppingProductModel, 1)
+                updateCartAmount()
+            },
+            onFailure = {}
+        )
     }
 
     private fun updateShoppingProduct(
         shoppingProductModel: ShoppingProductModel,
-        cartProduct: CartProduct
+        quantity: Int
     ) {
         val newShoppingProductModel = ShoppingProductModel(
             shoppingProductModel.product,
-            cartProduct.quantity
+            quantity
         )
         view.updateShoppingProduct(shoppingProductModel, newShoppingProductModel)
     }

@@ -1,17 +1,15 @@
 package woowacourse.shopping.domain
 
 data class Cart(val cartProducts: List<CartProduct>) {
+    val totalPrice: Int = cartProducts.filter { it.isChecked }.sumOf { it.product.price * it.quantity }
+    val totalQuantity: Int = cartProducts.filter { it.isChecked }.sumOf { it.quantity }
+
     fun add(cartProduct: CartProduct): Cart {
         return Cart(cartProducts + cartProduct)
     }
 
     fun remove(cartProduct: CartProduct): Cart {
         return Cart(cartProducts - cartProduct)
-    }
-
-    fun getSubCart(from: Int, to: Int): Cart {
-        val to = if (to <= cartProducts.size) to else cartProducts.size
-        return Cart(cartProducts.subList(from, to))
     }
 
     fun replaceCartProduct(cartProduct: CartProduct): Cart {

@@ -11,12 +11,21 @@ class CartRepositoryImpl(
     private val cartDao: CartDao
 ) : CartRepository {
 
-    override fun addCartProduct(cartProduct: CartProduct) {
-        cartDao.insertCartProduct(cartProduct)
+    override fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        cartRemoteDataSource.addCartProduct(
+            product.id,
+            onSuccess = { onSuccess(it) },
+            onFailure = { onFailure() }
+        )
     }
 
-    override fun getAllCount(): Int {
-        return cartDao.selectAllCount()
+    override fun getAllCount(onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        cartRemoteDataSource.getCartProducts(
+            onSuccess = {
+                onSuccess(it.size)
+            },
+            onFailure = { onFailure() }
+        )
     }
 
     override fun getAll(
@@ -59,5 +68,15 @@ class CartRepositoryImpl(
         // val cartInPage = cart.getSubCart(startIndex, startIndex + sizePerPage)
         // return cartInPage.cartProducts.all { it.isChecked }
         return true
+    }
+
+    override fun findId(productId: Int, onSuccess: (Int?) -> Unit, onFailure: () -> Unit) {
+        getAll(
+            onSuccess = { products ->
+                val cartProduct = products.find { it.product.id == productId }
+                onSuccess(cartProduct?.id)
+            },
+            onFailure = { onFailure() }
+        )
     }
 }
