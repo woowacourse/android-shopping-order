@@ -6,12 +6,13 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.domain.model.Product
 import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.user.ServerInfo
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class RecentDao(
     context: Context,
-) : SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
+) : SQLiteOpenHelper(context, DB_NAME + ServerInfo.serverName, null, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(RecentTableContract.createSQL())
