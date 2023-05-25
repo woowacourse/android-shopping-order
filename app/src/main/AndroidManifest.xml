@@ -14,9 +14,12 @@
         android:theme="@style/Theme.Shopping"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <activity
+            android:screenOrientation="portrait"
             android:name=".feature.serversetting.ServerSettingActivity"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,14 +27,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".feature.cart.CartActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="LockedOrientationActivity" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".feature.detail.DetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="LockedOrientationActivity" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".feature.main.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="LockedOrientationActivity">
 
         </activity>
     </application>
