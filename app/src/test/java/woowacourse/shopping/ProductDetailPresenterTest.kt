@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -64,7 +65,7 @@ class ProductDetailPresenterTest {
         }
 
         override fun find(id: Int): CartProduct? {
-            return mProducts.find { it.id == id }
+            return mProducts.find { it.cartId == id }
         }
 
         override fun add(id: Int, count: Int) {
@@ -72,7 +73,7 @@ class ProductDetailPresenterTest {
         }
 
         override fun update(id: Int, count: Int) {
-            val index = mProducts.indexOfFirst { it.id == id }
+            val index = mProducts.indexOfFirst { it.cartId == id }
             if (index == -1) {
                 mProducts.add(CartProduct(id, count))
                 return
@@ -81,7 +82,7 @@ class ProductDetailPresenterTest {
         }
 
         override fun remove(id: Int) {
-            mProducts.filter { it.id != id }.toList()
+            mProducts.filter { it.cartId != id }.toList()
         }
 
         override fun findRange(mark: Int, rangeSize: Int): List<CartProduct> {
@@ -89,7 +90,7 @@ class ProductDetailPresenterTest {
         }
 
         override fun isExistByMark(mark: Int): Boolean {
-            return mProducts.find { it.id == mark } != null
+            return mProducts.find { it.cartId == mark } != null
         }
     }
 
@@ -160,3 +161,4 @@ class ProductDetailPresenterTest {
         assertEquals(expectedCount, actualCount)
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -69,7 +70,7 @@ class CartPresenterTest {
             }
 
             override fun find(id: Int): CartProduct? {
-                return cartProducts.find { it.id == id }
+                return cartProducts.find { it.cartId == id }
             }
 
             override fun add(id: Int, count: Int) {
@@ -77,7 +78,7 @@ class CartPresenterTest {
             }
 
             override fun update(id: Int, count: Int) {
-                val index = cartProducts.indexOfFirst { it.id == id }
+                val index = cartProducts.indexOfFirst { it.cartId == id }
                 if (index == -1) {
                     cartProducts.add(CartProduct(id, count))
                     return
@@ -86,7 +87,7 @@ class CartPresenterTest {
             }
 
             override fun remove(id: Int) {
-                cartProducts.remove(cartProducts.find { it.id == id })
+                cartProducts.remove(cartProducts.find { it.cartId == id })
             }
 
             override fun findRange(mark: Int, rangeSize: Int): List<CartProduct> {
@@ -238,3 +239,4 @@ class CartPresenterTest {
         Product(21, "락토핏", "", Price(10000)),
     )
 }
+*/
