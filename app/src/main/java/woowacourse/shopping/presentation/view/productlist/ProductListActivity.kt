@@ -200,8 +200,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         cartResultLauncher.launch(CartActivity.createIntent(this, baseUrl, token))
     }
 
-    override fun showToast(message: Int) {
-        showToast(getString(message))
+    override fun handleErrorView() {
+        binding.root.post {
+            showToast(getString(R.string.toast_message_system_error))
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

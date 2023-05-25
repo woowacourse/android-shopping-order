@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.productlist
 
-import woowacourse.shopping.R
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.cart.CartRepository
@@ -39,7 +38,7 @@ class ProductListPresenter(
     }
 
     private fun onFailure() {
-        view.showToast(R.string.toast_message_system_error)
+        view.handleErrorView()
     }
 
     override fun loadCartItems() {

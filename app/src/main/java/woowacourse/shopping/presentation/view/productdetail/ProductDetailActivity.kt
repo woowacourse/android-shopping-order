@@ -114,13 +114,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun addCartSuccessView() {
-        runOnUiThread {
+        binding.root.post {
             showToast(getString(R.string.toast_message_success_add_cart))
         }
     }
 
     override fun handleErrorView() {
-        showToast(getString(R.string.toast_message_system_error))
+        binding.root.post {
+            showToast(getString(R.string.toast_message_system_error))
+        }
     }
 
     override fun exitProductDetailView() {

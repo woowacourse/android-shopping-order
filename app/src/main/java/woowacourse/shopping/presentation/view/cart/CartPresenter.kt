@@ -13,6 +13,7 @@ class CartPresenter(
     private val carts = mutableListOf<CartModel>()
 
     private fun onFailure() {
+        view.handleErrorView()
     }
 
     private val startPosition: Int

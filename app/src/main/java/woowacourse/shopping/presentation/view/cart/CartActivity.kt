@@ -16,6 +16,7 @@ import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_BASE_URL
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
+import woowacourse.shopping.presentation.view.util.showToast
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -169,6 +170,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
         binding.clCartBottomContainer.post {
             binding.clCartBottomContainer.visibility = View.VISIBLE
+        }
+    }
+
+    override fun handleErrorView() {
+        binding.root.post {
+            showToast(getString(R.string.toast_message_system_error))
         }
     }
 
