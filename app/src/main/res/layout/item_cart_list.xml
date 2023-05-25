@@ -80,7 +80,7 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="13dp"
                 android:layout_marginBottom="18dp"
-                android:scaleType="centerCrop"
+                android:scaleType="fitXY"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="H,136:72"
                 app:layout_constraintStart_toStartOf="@id/tv_cart_list_title"
