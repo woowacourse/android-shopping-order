@@ -47,20 +47,21 @@ class ProductDetailPresenter(
             val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
             if (cartProduct == null) {
                 cartRepository.addCartProduct(product.id, ::onFailure) {
-                    view.addCartSuccessView()
-                    view.exitProductDetailView()
+                    if (count == UPDATE_COUNT_CONDITION) {
+                        view.addCartSuccessView()
+                        view.exitProductDetailView()
+                        return@addCartProduct
+                    }
 
                     cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                         val reCartProduct =
                             reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
                                 ?: return@loadAllCarts
 
-                        if (count > UPDATE_COUNT_CONDITION) {
-                            val newCartProduct = reCartProduct.copy(quantity = count)
-                            cartRepository.updateCartCount(newCartProduct, ::onFailure) {
-                                view.addCartSuccessView()
-                                view.exitProductDetailView()
-                            }
+                        val newCartProduct = reCartProduct.copy(quantity = count)
+                        cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+                            view.addCartSuccessView()
+                            view.exitProductDetailView()
                         }
                     }
                 }
