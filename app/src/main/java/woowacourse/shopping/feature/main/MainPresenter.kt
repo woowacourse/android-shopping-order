@@ -90,8 +90,7 @@ class MainPresenter(
     private fun showDetail(productUiModel: ProductUiModel) {
         val recentProduct = _recentProducts.value?.firstOrNull()
         recentProductRepository.addRecentProduct(productUiModel.toDomain())
-        _mainScreenEvent.value =
-            MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct)
+        _mainScreenEvent.postValue(MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct))
     }
 
     override fun showRecentProductDetail(productId: Long) {
