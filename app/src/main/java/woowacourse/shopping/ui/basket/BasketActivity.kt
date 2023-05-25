@@ -13,6 +13,7 @@ import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
 import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
+import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
@@ -28,11 +29,17 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         initSetResult()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_basket)
         binding.rvBasket.turnOffSupportChangeAnimation()
+        initSkeletonAdapter()
         initPresenter()
         initAdapter()
         initToolbarBackButton()
         navigatorClickListener()
         initTotalCheckBoxOnCheckedChangedListener()
+    }
+
+    private fun initSkeletonAdapter() {
+        binding.skeletonBasketProduct.rvSkeletonBasketProduct.adapter =
+            SkeletonBasketProductAdapter()
     }
 
     private fun initTotalCheckBoxOnCheckedChangedListener() {
@@ -104,6 +111,10 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     override fun updateTotalCheckBox(isChecked: Boolean) {
         binding.cbTotal.isChecked = isChecked
+    }
+
+    override fun updateSkeletonState(isLoaded: Boolean) {
+        binding.isLoaded = isLoaded
     }
 
     companion object {

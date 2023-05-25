@@ -17,8 +17,10 @@ class BasketPresenter(
 ) : BasketContract.Presenter {
     private lateinit var basket: Basket
     private val hasNext: Boolean get() = basket.products.lastIndex >= startId + BASKET_PAGING_SIZE
+    private var isLoaded: Boolean = false
 
     init {
+        view.updateSkeletonState(isLoaded)
         updateBasket()
     }
 
@@ -26,6 +28,8 @@ class BasketPresenter(
         basketRepository.getAll {
             basket = Basket(it)
             updateBasketProducts()
+            isLoaded = true
+            view.updateSkeletonState(isLoaded)
         }
     }
 
