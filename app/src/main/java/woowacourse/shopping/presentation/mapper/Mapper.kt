@@ -26,6 +26,7 @@ fun ProductModel.toDomain(): Product {
 
 fun CartProductInfo.toPresentation(): CartProductInfoModel {
     return CartProductInfoModel(
+        id = id,
         productModel = product.toPresentation(),
         count = count,
         isOrdered = isOrdered,

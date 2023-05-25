@@ -26,5 +26,7 @@ class CartAdapter(
         return items.size
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {}
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as CartItemViewHolder).bind()
+    }
 }

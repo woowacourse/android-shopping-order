@@ -1,6 +1,5 @@
 package woowacourse.shopping.data
 
-import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -19,7 +18,6 @@ class ApiClient() {
             .url(baseUrl + path)
             .header("Authorization", "Basic $header")
             .build()
-        Log.d("request", request.toString())
         return client.newCall(request).execute()
     }
 
@@ -48,7 +46,6 @@ class ApiClient() {
             .header("Authorization", "Basic $header")
             .patch(body.toRequestBody())
             .build()
-        Log.d("request", request.toString())
         return client.newCall(request).execute()
     }
 

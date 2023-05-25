@@ -14,7 +14,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
     val isAllOrdered: Boolean get() = items.all { it.isOrdered }
 
     fun add(item: CartProductInfo): CartProductInfoList {
-        if (items.none { it.product.id == item.product.id }) {
+        if (items.none { it.id == item.id }) {
             _items.add(item)
         }
         return CartProductInfoList(items)
@@ -26,7 +26,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
     }
 
     fun delete(item: CartProductInfo): CartProductInfoList {
-        _items.removeAll { it.product.id == item.product.id }
+        _items.removeAll { it.id == item.id }
         return CartProductInfoList(items)
     }
 
@@ -47,7 +47,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
 
     fun getItemsInRange(startIndex: Int, size: Int): CartProductInfoList {
         return when {
-            startIndex > items.size -> this
+            startIndex > items.size -> CartProductInfoList(emptyList())
             startIndex + size > items.size -> CartProductInfoList(
                 items.subList(
                     startIndex,
@@ -60,7 +60,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
 
     fun replaceItem(newItem: CartProductInfo): CartProductInfoList {
         _items.forEachIndexed { index, item ->
-            if (item.product.id == newItem.product.id) _items[index] = newItem
+            if (item.id == newItem.id) _items[index] = newItem
         }
         return CartProductInfoList(items)
     }
@@ -70,7 +70,11 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         return CartProductInfoList(items)
     }
 
-    fun findCountByProduct(id: Int): Int {
-        return _items.find { it.product.id == id }?.count ?: 0
+    fun findCountByProductId(productId: Int): Int {
+        return _items.find { it.product.id == productId }?.count ?: 0
+    }
+
+    fun findCartIdByProductId(productId: Int): Int {
+        return _items.find { it.product.id == productId }?.id ?: -1
     }
 }

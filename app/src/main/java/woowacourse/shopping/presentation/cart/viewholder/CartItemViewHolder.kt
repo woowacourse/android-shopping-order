@@ -14,7 +14,7 @@ class CartItemViewHolder(
     private val counterPresenter: CounterContract.Presenter =
         binding.counterCartProduct.presenter
 
-    init {
+    fun bind() {
         itemView.doOnAttach {
             setUpBinding()
             setUpView()
@@ -24,7 +24,7 @@ class CartItemViewHolder(
     private fun setUpBinding() {
         binding.lifecycleOwner = itemView.findViewTreeLifecycleOwner()
         binding.presenter = presenter
-        binding.position = adapterPosition
+        binding.position = bindingAdapterPosition
     }
 
     private fun setUpView() {

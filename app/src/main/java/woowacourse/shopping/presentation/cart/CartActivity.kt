@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +31,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             super.handleMessage(msg)
             if (msg.what == SHOW_SKELETON_MESSAGE_CODE) {
                 setLoadingUiVisible(false)
-                Log.d("wooseok", "wooseok")
             }
         }
     }

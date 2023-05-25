@@ -11,13 +11,15 @@ class CartRepositoryImpl constructor(
         cartRemoteDataSource.addProduct(productId)
     }
 
-    override fun deleteCartProductId(productId: Int) {
-        cartRemoteDataSource.deleteCartProduct(productId)
+    override fun deleteCartProductId(cartId: Int) {
+        cartRemoteDataSource.deleteCartProduct(cartId)
     }
 
-    override fun updateCartProductCount(productId: Int, count: Int) {
-        val cartLocalDataModel = CartLocalDataModel(productId, count)
-        cartRemoteDataSource.updateProductCount(cartLocalDataModel)
+    override fun updateCartProductCount(cartId: Int, count: Int) {
+        cartRemoteDataSource.updateProductCount(
+            cartId = cartId,
+            count = count
+        )
     }
 
     override fun getAllCartProductsInfo(): CartProductInfoList {
@@ -25,7 +27,13 @@ class CartRepositoryImpl constructor(
         return CartProductInfoList(
             cartDataModels.map {
                 it.toDomain()
-            }
+            },
         )
+    }
+
+    override fun getCartIdByProductId(productId: Int): Int {
+        val cartDataModels = cartRemoteDataSource.getAllCartProductsInfo()
+        val cartProductInfoList = CartProductInfoList(cartDataModels.map { it.toDomain() })
+        return cartProductInfoList.findCartIdByProductId(productId)
     }
 }

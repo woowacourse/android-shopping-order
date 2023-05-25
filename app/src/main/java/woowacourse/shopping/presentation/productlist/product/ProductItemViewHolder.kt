@@ -42,7 +42,6 @@ class ProductItemViewHolder(
 
     private fun setAddButtonClick() {
         binding.buttonProductListAddCart.setOnClickListener {
-            counterPresenter.updateCount(1)
             presenter.putProductInCart(productModel)
             presenter.updateCartProductInfoList()
         }
@@ -68,7 +67,7 @@ class ProductItemViewHolder(
         productModel = product
         setUpBinding(productModel)
         counterPresenter.updateCount(
-            presenter.cartProductInfoList.value.findCountByProduct(
+            presenter.cartProductInfoList.value.findCountByProductId(
                 productModel.id,
             ),
         )

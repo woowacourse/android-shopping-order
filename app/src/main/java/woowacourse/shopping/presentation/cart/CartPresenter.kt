@@ -59,14 +59,15 @@ class CartPresenter(
         if (position == PREVIOUS_PAGE_POSITION) return
         val index = offset + position
         _loadedCartProducts.value =
-            _loadedCartProducts.value.updateItemOrdered(index, false)
+            loadedCartProducts.value.updateItemOrdered(index, false)
         updateCurrentPageProducts()
     }
 
     override fun updateProductCount(position: Int, count: Int) {
         val productInfo = pageProducts.value.items[position]
+        val cartId = cartRepository.getCartIdByProductId(productInfo.product.id)
         cartRepository.updateCartProductCount(
-            productInfo.product.id,
+            cartId,
             count,
         )
         val index = offset + position
@@ -85,7 +86,8 @@ class CartPresenter(
 
     override fun deleteProductItem(position: Int) {
         val productInfo = pageProducts.value.items[position]
-        cartRepository.deleteCartProductId(productInfo.product.id)
+        val cartId = cartRepository.getCartIdByProductId(productInfo.product.id)
+        cartRepository.deleteCartProductId(cartId)
         _loadedCartProducts.value = _loadedCartProducts.value.delete(productInfo)
     }
 

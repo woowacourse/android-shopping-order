@@ -1,51 +1,30 @@
 package woowacourse.shopping.data.cart
 
-import android.util.Log
 import com.google.gson.GsonBuilder
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.presentation.serversetting.ServerSettingActivity
 
 class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemoteDataSource {
-
-//    override fun addProduct(productId: Int) {
-//        val requestBody = ApiClient.getRequestBody(
-//            name = "productId", value = productId.toString()
-//        )
-//        Log.d("test", "addProduct: $requestBody")
-//        val thread = Thread {
-//            val response = ApiClient.postApiService(
-//                path = PATH,
-//                body = requestBody,
-//                header = getAuthToken()
-//            )
-//            Log.d("codeAdd", response.code.toString())
-//        }
-//        thread.start()
-//        thread.join()
-//    }
-
     override fun addProduct(productId: Int) {
         val requestBody = ApiClient().getRequestBody(
             name = "productId", value = productId.toString()
         )
-        Log.d("test", "addProduct: $requestBody")
         val thread = Thread() {
-            val response = ApiClient().postApiService(
+            ApiClient().postApiService(
                 path = PATH,
                 body = requestBody,
                 header = getAuthToken()
             )
-            Log.d("codeAdd", response.code.toString())
         }
         thread.start()
         thread.join()
     }
 
-    override fun deleteCartProduct(productId: Int) {
+    override fun deleteCartProduct(cartId: Int) {
         val thread = Thread {
             ApiClient().deleteApiService(
-                path = "$PATH/$productId",
+                path = "$PATH/$cartId",
                 header = getAuthToken()
             )
         }
@@ -53,13 +32,13 @@ class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemo
         thread.join()
     }
 
-    override fun updateProductCount(cartProductInfo: CartLocalDataModel) {
+    override fun updateProductCount(cartId: Int, count: Int) {
         val requestBody = ApiClient().getRequestBody(
-            name = "quantity", value = cartProductInfo.count.toString()
+            name = "quantity", value = count.toString()
         )
         val thread = Thread() {
             ApiClient().patchApiService(
-                path = "$PATH/${cartProductInfo.productId}",
+                path = "$PATH/$cartId",
                 body = requestBody,
                 header = getAuthToken()
             )
@@ -75,9 +54,7 @@ class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemo
                 path = PATH,
                 header = getAuthToken()
             )
-            Log.d("code", response.code.toString())
             val responseBody = response.body?.string()
-            Log.d("test", "getAllProducts: $responseBody")
             cartProducts = parseToCartProducts(responseBody)
         }
         thread.start()
@@ -87,7 +64,6 @@ class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemo
 
     private fun parseToCartProducts(responseBody: String?): List<CartRemoteDataModel> {
         val gson = GsonBuilder().create()
-        Log.d("test", "parseToCartProducts: $responseBody")
         return gson.fromJson(responseBody, Array<CartRemoteDataModel>::class.java).toList()
     }
 

@@ -41,8 +41,9 @@ class ProductListPresenter(
     }
 
     override fun updateCartProductCount(productModel: ProductModel, count: Int) {
-        if (count == 0) cartRepository.deleteCartProductId(productModel.id)
-        cartRepository.updateCartProductCount(productModel.id, count)
+        val cartId = cartRepository.getCartIdByProductId(productModel.id)
+        if (count == 0) cartRepository.deleteCartProductId(cartId)
+        cartRepository.updateCartProductCount(cartId, count)
     }
 
     override fun updateCartProductInfoList() {
