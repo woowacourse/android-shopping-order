@@ -43,20 +43,22 @@ class ProductListPresenter(
     }
 
     override fun loadCartItems() {
-        val carts = cartRepository.getAllCarts()
+        cartRepository.loadAllCarts(::onFailure) { carts ->
+            val newProducts = products.map { product ->
+                product.copy(
+                    count = carts.find { cart -> cart.product.id == product.id }?.quantity ?: 0
+                )
+            }
 
-        val newProducts = products.map { product ->
-            product.copy(count = carts.find { cart -> cart.productId == product.id }?.count ?: 0)
+            products.clear()
+            products.addAll(newProducts)
+
+            val allCount = newProducts.sumOf { it.count }
+
+            view.setProductItemsView(products.subList(0, getSubToIndex()).toList())
+            view.updateToolbarCartCountView(allCount)
+            updateVisibilityCartCount(allCount)
         }
-
-        products.clear()
-        products.addAll(newProducts)
-
-        val allCount = carts.sumOf { it.count }
-
-        view.setProductItemsView(products.subList(0, getSubToIndex()).toList())
-        view.updateToolbarCartCountView(allCount)
-        updateVisibilityCartCount(allCount)
     }
 
     override fun updateProductItems(startIndex: Int) {
@@ -115,8 +117,29 @@ class ProductListPresenter(
     }
 
     override fun updateCount(productId: Long, count: Int) {
-        updateProductCount(productId, count)
-        updateCartCount()
+        val product = products.find { it.id == productId } ?: return
+        if (product.count == 0) {
+            cartRepository.addCartProduct(productId, ::onFailure) {
+                product.count = count
+
+                val allCount = products.sumOf { it.count }
+                view.updateToolbarCartCountView(allCount)
+                updateVisibilityCartCount(allCount)
+            }
+            return
+        }
+        cartRepository.loadAllCarts(::onFailure) { carts ->
+            val cartProduct = (carts.find { it.product.id == productId } ?: return@loadAllCarts)
+            val newCartProduct = cartProduct.copy(quantity = count)
+
+            cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+                product.count = count
+                val allCount = products.sumOf { it.count }
+
+                view.updateToolbarCartCountView(allCount)
+                updateVisibilityCartCount(allCount)
+            }
+        }
     }
 
     private fun updateProductCount(productId: Long, count: Int) {

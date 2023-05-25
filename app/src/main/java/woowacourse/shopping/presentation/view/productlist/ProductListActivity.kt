@@ -135,11 +135,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setVisibleToolbarCartCountView() {
-        toolbarCartBinding.tvToolbarCartCount.visibility = View.VISIBLE
+        toolbarCartBinding.tvToolbarCartCount.post {
+            toolbarCartBinding.tvToolbarCartCount.visibility = View.VISIBLE
+        }
     }
 
     override fun setGoneToolbarCartCountView() {
-        toolbarCartBinding.tvToolbarCartCount.visibility = View.GONE
+        toolbarCartBinding.tvToolbarCartCount.post {
+            toolbarCartBinding.tvToolbarCartCount.visibility = View.GONE
+        }
     }
 
     override fun setLayoutVisibility() {
@@ -152,7 +156,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun updateToolbarCartCountView(count: Int) {
-        toolbarCartBinding.tvToolbarCartCount.text = count.toString()
+        toolbarCartBinding.tvToolbarCartCount.post {
+            toolbarCartBinding.tvToolbarCartCount.text = count.toString()
+        }
     }
 
     private fun initLayoutManager() {
