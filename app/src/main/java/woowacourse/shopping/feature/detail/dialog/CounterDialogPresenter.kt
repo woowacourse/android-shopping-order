@@ -1,14 +1,13 @@
 package woowacourse.shopping.feature.detail.dialog
 
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
 
 class CounterDialogPresenter(
     private val view: CounterDialogContract.View,
     private val cartRepository: CartRepository,
     product: ProductUiModel,
-    count: Int? = null,
+    private var cartId: Long?,
 ) : CounterDialogContract.Presenter {
     override var product: ProductUiModel = product
         private set
@@ -16,12 +15,6 @@ class CounterDialogPresenter(
     // 담기 버튼을 누르기 전까지 현재까지 바뀐 값을 담고 있는 변수
     override var changeCount: Int = product.count
         private set
-
-    init {
-        count?.let {
-            changeCount = it // 만약 개수만 조정하고 담기를 아직 누르지 않은 상태로 화면 회전한 경우를 대비하기 위해
-        }
-    }
 
     override fun initPresenter() {
         view.setCountState(changeCount)
@@ -32,9 +25,65 @@ class CounterDialogPresenter(
     }
 
     override fun addCart() {
-        product.count = changeCount // 적용
-        cartRepository.changeCartProductCount(product.toDomain(), changeCount)
-        view.notifyChangeApplyCount(changeCount)
-        view.exit()
+        when {
+            product.count == 0 && changeCount == 1 -> insertProduct()
+            product.count == 0 && changeCount > 1 -> {
+                cartRepository.addCartProduct(
+                    product.id,
+                    onSuccess = {
+                        product.count = 1
+                        cartId = it
+                    },
+                    onFailure = {},
+                )
+                changeCartProductCount()
+            }
+            product.count != 0 && changeCount > 0 -> changeCartProductCount()
+            product.count != 0 && changeCount == 0 -> deleteCartProduct()
+        }
+    }
+
+    private fun insertProduct() {
+        cartRepository.addCartProduct(
+            product.id,
+            onSuccess = {
+                product.count = 1
+                cartId = it
+                view.notifyChangeApplyCount(changeCount)
+                view.exit()
+            },
+            onFailure = {},
+        )
+    }
+
+    private fun changeCartProductCount() {
+        cartId?.let {
+            cartRepository.changeCartProductCount(
+                it,
+                changeCount,
+                onSuccess = { cartId ->
+                    product.count = changeCount
+                    this.cartId = cartId
+                    view.notifyChangeApplyCount(changeCount)
+                    view.exit()
+                },
+                onFailure = {},
+            )
+        }
+    }
+
+    private fun deleteCartProduct() {
+        cartId?.let {
+            cartRepository.deleteCartProduct(
+                it,
+                onSuccess = {
+                    product.count = 0
+                    cartId = null
+                    view.notifyChangeApplyCount(changeCount)
+                    view.exit()
+                },
+                onFailure = {},
+            )
+        }
     }
 }

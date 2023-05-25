@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
 import woowacourse.shopping.common_ui.CounterView
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.service.CartProductRemoteService
 import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.util.getParcelableCompat
@@ -35,10 +35,9 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
         super.onViewCreated(view, savedInstanceState)
         val product =
             arguments?.getParcelableCompat<ProductUiModel>(PRODUCT_KEY) ?: return dismiss()
-        val count =
-            savedInstanceState?.getInt(COUNT_RESTORE_KEY)
-
-        setInitPresenter(product, count)
+        val cartId =
+            arguments?.getLong(CART_ID_KEY, 0L) ?: return dismiss()
+        setInitPresenter(product, cartId)
         binding.presenter = presenter
         binding.product = product
 
@@ -50,19 +49,14 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
             }
     }
 
-    private fun setInitPresenter(product: ProductUiModel, count: Int?) {
+    private fun setInitPresenter(product: ProductUiModel, cartId: Long?) {
         presenter = CounterDialogPresenter(
             this,
-            CartRepositoryImpl(CartDao(requireContext())),
+            CartRepositoryImpl(CartProductRemoteService()),
             product,
-            count,
+            cartId,
         )
         presenter.initPresenter()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(COUNT_RESTORE_KEY, presenter.changeCount)
     }
 
     override fun setCountState(count: Int) {
@@ -74,27 +68,33 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
             CHANGE_COUNTER_APPLY_KEY,
             bundleOf(COUNT_KEY to changeApplyCount),
         )
-        Toast.makeText(requireContext(), getString(R.string.success_add_cart), Toast.LENGTH_SHORT)
-            .show()
+        requireActivity().runOnUiThread {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.success_add_cart),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     override fun exit() {
-        dismiss()
+        requireActivity().runOnUiThread { dismiss() }
     }
 
     companion object {
-        private const val PRODUCT_KEY = "product_key"
-        private const val COUNT_RESTORE_KEY = "count_restore_key"
 
+        private const val PRODUCT_KEY = "product_key"
+        private const val CART_ID_KEY = "cart_id_key"
         const val CHANGE_COUNTER_APPLY_KEY = "change_counter_apply_key"
         const val COUNT_KEY = "change_count_key"
 
         @JvmStatic
-        fun newInstance(product: ProductUiModel): CounterDialog {
+        fun newInstance(product: ProductUiModel, cartId: Long?): CounterDialog {
             return CounterDialog().apply {
                 arguments = bundleOf(
                     PRODUCT_KEY to product.copy(),
                 )
+                cartId?.let { arguments?.putLong(CART_ID_KEY, cartId) }
             }
         }
     }

@@ -11,7 +11,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
+import woowacourse.shopping.data.service.CartProductRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -50,6 +52,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         presenter = DetailPresenter(
             this,
             RecentProductRepositoryImpl(RecentDao(this)),
+            CartRepositoryImpl(CartProductRemoteService()),
             product,
             recentProduct,
         )
@@ -90,8 +93,8 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
 
     override fun exitDetailScreen() = finish()
 
-    override fun showSelectCartProductCountScreen(product: ProductUiModel) {
-        val counterDialog = CounterDialog.newInstance(product)
+    override fun showSelectCartProductCountScreen(product: ProductUiModel, cartId: Long?) {
+        val counterDialog = CounterDialog.newInstance(product, cartId)
         counterDialog.show(supportFragmentManager, COUNTER_DIALOG_TAG)
     }
 

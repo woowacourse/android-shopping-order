@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.detail
 
+import com.example.domain.repository.CartRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
@@ -8,6 +9,7 @@ import woowacourse.shopping.model.RecentProductUiModel
 class DetailPresenter(
     val view: DetailContract.View,
     private val recentProductRepository: RecentProductRepository,
+    private val cartRepository: CartRepository,
     product: ProductUiModel,
     recentProductUiModel: RecentProductUiModel?,
 ) : DetailContract.Presenter {
@@ -40,7 +42,13 @@ class DetailPresenter(
     }
 
     override fun handleAddCartClick() {
-        view.showSelectCartProductCountScreen(product)
+        cartRepository.getAll(
+            onSuccess = {
+                val cartProductId = it.find { it.product.id == product.id }?.cartId
+                view.showSelectCartProductCountScreen(product, cartProductId)
+            },
+            onFailure = {},
+        )
     }
 
     override fun navigateRecentProductDetail() {

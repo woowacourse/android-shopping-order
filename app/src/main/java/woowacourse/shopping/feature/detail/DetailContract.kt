@@ -10,7 +10,7 @@ interface DetailContract {
         fun setRecentScreen(title: String, money: String)
         fun showRecentProductDetailScreen(recentProductUiModel: RecentProductUiModel)
         fun exitDetailScreen()
-        fun showSelectCartProductCountScreen(product: ProductUiModel)
+        fun showSelectCartProductCountScreen(product: ProductUiModel, cartId: Long?)
     }
 
     interface Presenter {

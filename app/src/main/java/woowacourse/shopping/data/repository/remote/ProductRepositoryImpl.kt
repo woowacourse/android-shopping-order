@@ -37,6 +37,7 @@ class ProductRepositoryImpl(
         onFailure: () -> Unit,
     ) {
         val nextProducts = products.filter { it.id > lastProductId }.take(20)
+        if (nextProducts.isEmpty()) onFailure()
         cache.addProducts(nextProducts)
         onSuccess(nextProducts)
     }

@@ -74,6 +74,7 @@ class MainPresenter(
             }?.productUiModel?.count ?: 0
         }
         _recentProducts.postValue(recentProducts)
+        _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
         _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
     }
 
@@ -189,7 +190,9 @@ class MainPresenter(
                 val alreadyProducts = products.value ?: emptyList()
                 _products.postValue(alreadyProducts + nextProductUiModels)
             },
-            onFailure = {},
+            onFailure = {
+                _mainScreenEvent.postValue(MainScreenEvent.HideLoadMore)
+            },
         )
     }
 
