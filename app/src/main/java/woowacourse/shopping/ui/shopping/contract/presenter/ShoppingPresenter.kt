@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping.contract.presenter
 
+import android.util.Log
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
@@ -21,7 +22,10 @@ class ShoppingPresenter(
     private var productSize: Int = 0
 
     override fun initProducts() {
-        productRepository.getAllProducts()
+        productRepository.getAllProducts(
+            onSuccess = { Log.d("123123", "123123") },
+            onFailure = { Log.d("123123", "444444") },
+        )
         val nextProduct = productRepository.getMoreProducts(PRODUCT_COUNT, productSize)
         productSize += nextProduct.size
 

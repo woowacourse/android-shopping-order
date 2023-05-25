@@ -4,7 +4,7 @@ import okhttp3.Call
 
 interface ShoppingCartDataSource {
     fun getAllProductInCart(): Call
-    fun postProductToCart(productId: Int): Call
-    fun patchProductCount(quantity: Int): Call
-    fun deleteProductInCart(productId: Int): Call
+    fun postProductToCart(productId: Long): Call
+    fun patchProductCount(productId: Long, quantity: Int): Call
+    fun deleteProductInCart(productId: Long): Call
 }
