@@ -18,8 +18,26 @@
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@color/white" />
 
+        <LinearLayout
+            android:id="@+id/skeleton_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+
+            app:layout_constraintBottom_toTopOf="@id/cart_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <include layout="@layout/item_cart_skeleton" />
+            <include layout="@layout/item_cart_skeleton" />
+        </LinearLayout>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_products"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"

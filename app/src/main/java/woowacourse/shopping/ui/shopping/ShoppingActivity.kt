@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
@@ -103,6 +104,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun addMoreProducts(products: List<ProductUIModel>) {
+        binding.mainSkeleton.isVisible = false
+        binding.rvProducts.isVisible = true
         adapter.addList(products)
     }
 

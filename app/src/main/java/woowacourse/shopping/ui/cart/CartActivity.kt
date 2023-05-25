@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -115,6 +116,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel) {
+        binding.rvProducts.isVisible = true
+        binding.skeletonLayout.isVisible = false
         adapter.submitList(page, pageUIModel)
     }
 
