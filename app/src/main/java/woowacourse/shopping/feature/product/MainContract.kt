@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.product
 import com.example.domain.CartProduct
 import com.example.domain.Product
 import com.example.domain.RecentProduct
+import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.ProductState
 import woowacourse.shopping.model.RecentProductState
 
@@ -28,7 +29,7 @@ interface MainContract {
         fun addRecentProduct(product: Product)
         fun showProductDetail(productState: ProductState)
         fun storeCartProduct(productState: ProductState)
-        fun minusCartProductCount(productState: ProductState)
-        fun plusCartProductCount(productState: ProductState)
+        fun minusCartProductCount(cartProductState: CartProductState)
+        fun plusCartProductCount(cartProductState: CartProductState)
     }
 }

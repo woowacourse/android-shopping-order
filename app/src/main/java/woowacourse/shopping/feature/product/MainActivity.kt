@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             cartProductStates = listOf(),
             onProductClick = presenter::showProductDetail,
             cartProductAddFab = { Thread { presenter.storeCartProduct(it) }.start() },
-            cartProductCountMinus = presenter::minusCartProductCount,
-            cartProductCountPlus = presenter::plusCartProductCount,
+            cartProductCountMinus = { Thread { presenter.minusCartProductCount(it) }.start() },
+            cartProductCountPlus = { Thread { presenter.plusCartProductCount(it) }.start() }
         )
     }
     private val recentProductListAdapter by lazy {

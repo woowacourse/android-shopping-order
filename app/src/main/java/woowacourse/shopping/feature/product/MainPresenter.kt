@@ -1,9 +1,12 @@
 package woowacourse.shopping.feature.product
 
+import android.util.Log
 import com.example.domain.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
+import woowacourse.shopping.model.CartProductState
+import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
 import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
 import woowacourse.shopping.model.ProductState
 import woowacourse.shopping.model.RecentProductState
@@ -71,14 +74,33 @@ class MainPresenter(
         loadCartProductCountBadge()
     }
 
-    override fun minusCartProductCount(productState: ProductState) {
+    override fun minusCartProductCount(cartProductState: CartProductState) {
+        cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
+        cartRepository.updateCartProductQuantity(
+            id = cartProductState.id, quantity = cartProductState.quantity,
+            onFailure = {}, onSuccess = {
+            loadCartProductCountBadge()
+        }
+        )
+
 //        val cartProduct: CartProduct? = cartRepository.getCartProduct(productState.id)
 //        val cartProductCount: Int = (cartProduct?.quantity ?: MIN_COUNT_VALUE) - 1
 //        cartRepository.updateCartProductCount(productState.id, cartProductCount)
 //        loadCartProductCountBadge()
     }
 
-    override fun plusCartProductCount(productState: ProductState) {
+    override fun plusCartProductCount(cartProductState: CartProductState) {
+        Log.d("otter66", "plusCartProductCount")
+        cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
+        cartRepository.updateCartProductQuantity(
+            id = cartProductState.id, quantity = cartProductState.quantity,
+            onFailure = {
+                Log.d("otter66", "onFailure")
+            }, onSuccess = {
+            Log.d("otter66", "onSuccess")
+        }
+        )
+
 //        val cartProduct: CartProduct? = cartRepository.getCartProduct(productState.id)
 //        val cartProductCount: Int = (cartProduct?.quantity ?: MIN_COUNT_VALUE) + 1
 //        cartRepository.updateCartProductCount(productState.id, cartProductCount)

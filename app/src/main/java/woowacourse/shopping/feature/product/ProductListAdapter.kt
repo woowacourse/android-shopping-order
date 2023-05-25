@@ -11,8 +11,8 @@ class ProductListAdapter(
     private var cartProductStates: List<CartProductState> = listOf(),
     private val onProductClick: (ProductState) -> Unit,
     private val cartProductAddFab: (ProductState) -> Unit,
-    private val cartProductCountMinus: (ProductState) -> Unit,
-    private val cartProductCountPlus: (ProductState) -> Unit
+    private val cartProductCountMinus: (CartProductState) -> Unit,
+    private val cartProductCountPlus: (CartProductState) -> Unit
 ) : RecyclerView.Adapter<ProductViewHolder>() {
 
     override fun getItemCount(): Int {

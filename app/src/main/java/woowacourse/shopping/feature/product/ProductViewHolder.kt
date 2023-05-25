@@ -21,8 +21,8 @@ class ProductViewHolder(
         cartProductState: CartProductState?,
         onProductClick: (ProductState) -> Unit,
         cartProductAddFab: (ProductState) -> Unit,
-        cartProductCountMinus: (ProductState) -> Unit,
-        cartProductCountPlus: (ProductState) -> Unit
+        cartProductCountMinus: (CartProductState) -> Unit,
+        cartProductCountPlus: (CartProductState) -> Unit
     ) {
         binding.product = productState
         hideCounterView()
@@ -41,11 +41,11 @@ class ProductViewHolder(
         binding.counterView.minusClickListener = {
             if (binding.counterView.count <= MIN_COUNT_VALUE) hideCounterView()
             binding.counterView.count = (--binding.counterView.count).coerceAtLeast(MIN_COUNT_VALUE)
-            cartProductCountMinus(productState)
+            cartProductCountMinus(cartProductState!!)
         }
         binding.counterView.plusClickListener = {
             binding.counterView.count = (++binding.counterView.count).coerceAtMost(MAX_COUNT_VALUE)
-            cartProductCountPlus(productState)
+            cartProductCountPlus(cartProductState!!)
         }
     }
 
