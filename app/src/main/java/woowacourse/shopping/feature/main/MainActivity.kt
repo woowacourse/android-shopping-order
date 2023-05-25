@@ -110,9 +110,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter.badgeCount.observe(this) { cartCountBadge?.count = it }
         presenter.products.observe(this) { mainProductAdapter.setItems(it) }
         presenter.recentProducts.observe(this) { recentAdapter.setItems(it) }
-        presenter.mainScreenEvent.observe(this) {
-            handleMainScreenEvent(it)
-        }
+        presenter.mainScreenEvent.observe(this) { handleMainScreenEvent(it) }
     }
 
     private fun handleMainScreenEvent(event: MainContract.View.MainScreenEvent) {
@@ -144,8 +142,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onStart() {
         super.onStart()
-        presenter.loadProducts()
-        presenter.loadRecent()
+        presenter.initLoadData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -188,8 +185,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     companion object {
         fun getIntent(context: Context): Intent {
-            val intent = Intent(context, MainActivity::class.java)
-            return intent
+            return Intent(context, MainActivity::class.java)
         }
 
         private const val TOTAL_SPAN = 2
