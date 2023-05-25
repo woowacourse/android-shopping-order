@@ -16,6 +16,7 @@ import woowacourse.shopping.ui.serversetting.ServerSettingContract
 import woowacourse.shopping.ui.serversetting.ServerSettingPresenter
 import woowacourse.shopping.ui.shopping.ShoppingContract
 import woowacourse.shopping.ui.shopping.ShoppingPresenter
+import woowacourse.shopping.util.preference.BasePreference
 
 fun inject(
     view: ShoppingContract.View,
@@ -54,8 +55,10 @@ fun injectCartPresenter(
     )
 }
 
-fun injectServerSettingPresenter(
+fun inject(
     view: ServerSettingContract.View,
-): ServerSettingContract.Presenter {
-    return ServerSettingPresenter(view)
-}
+    shoppingPreference: BasePreference,
+): ServerSettingContract.Presenter = ServerSettingPresenter(
+    view,
+    shoppingPreference,
+)

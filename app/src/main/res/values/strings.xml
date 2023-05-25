@@ -29,6 +29,6 @@
     <string name="all_select">전체</string>
     <string name="order_success_message">제품 %d개를 성공적으로 주문하였습니다!</string>
     <string name="order_failed_message">주문에 실패하였습니다!</string>
-    <string name="james_server">제임스 서버</string>
-    <string name="leah_server">레아 서버</string>
+    <string name="black_pepper_server">후추 서버</string>
+    <string name="hamad_server">하마드 서버</string>
 </resources>

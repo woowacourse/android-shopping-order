@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.service.product
 
 import okhttp3.RequestBody.Companion.toRequestBody
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.service.cart.ProductId
 import woowacourse.shopping.data.util.convertJsonToProduct
@@ -16,11 +17,12 @@ import woowacourse.shopping.server.ShoppingMockWebServer
 
 class ProductServiceImpl : ProductService {
     private val shoppingMockServer: ShoppingMockWebServer = ShoppingMockWebServer()
-    private var BASE_URL: String = "http://3.36.62.54:8080"
+    private var BASE_URL: String
 
     init {
         shoppingMockServer.start()
         shoppingMockServer.join()
+        BASE_URL = pref.getBaseUrl().toString()
     }
 
     override fun findProductById(id: ProductId): Product? {
