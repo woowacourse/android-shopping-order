@@ -63,4 +63,9 @@ class CartServiceImpl : CartService {
         )
         latch.await()
     }
+
+    override fun findCartProductByProductId(productId: Int): CartProduct? {
+        val cartProducts = getAllCartProduct()
+        return cartProducts.find { it.product.id == productId }
+    }
 }

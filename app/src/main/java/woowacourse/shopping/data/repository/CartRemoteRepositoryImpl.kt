@@ -25,4 +25,19 @@ class CartRemoteRepositoryImpl(private val service: CartService) : CartRemoteRep
     override fun deleteCartProductById(cartProductId: CartProductId) {
         service.deleteCartProductById(cartProductId)
     }
+
+    override fun findCartProductByProductId(productId: Int): CartProduct? {
+        return service.findCartProductByProductId(productId)?.toDomain()
+    }
+
+    override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount) {
+        val cartProduct = findCartProductByProductId(productId) ?: run {
+            addCartProductByProductId(productId)
+            val newCartProduct = findCartProductByProductId(productId) ?: return
+            return service.updateProductCountById(newCartProduct.id, addCount.toData())
+        }
+
+        val updatedCount = cartProduct.selectedCount + addCount
+        service.updateProductCountById(cartProduct.id, updatedCount.toData())
+    }
 }

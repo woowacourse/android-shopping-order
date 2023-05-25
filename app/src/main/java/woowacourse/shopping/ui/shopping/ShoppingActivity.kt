@@ -105,18 +105,18 @@ class ShoppingActivity : AppCompatActivity(), View,
     }
 
     override fun onAddCartProduct(cartProduct: UiCartProduct) {
-        presenter.addCartProduct(cartProduct)
+        presenter.addCartProduct(cartProduct.product)
     }
 
     override fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int) {
-        presenter.changeCartCount(cartProduct, changedCount)
+        presenter.updateCartCount(cartProduct, changedCount)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val cartProduct = intent?.getParcelableExtraCompat<UiCartProduct>(CART_PRODUCT_KEY) ?: return
+        val product = intent?.getParcelableExtraCompat<UiProduct>(CART_PRODUCT_KEY) ?: return
         val count = intent.getIntExtra(COUNT_KEY, 0)
-        presenter.addCartCount(cartProduct, count)
+        presenter.increaseCartCount(product, count)
     }
 
     companion object {

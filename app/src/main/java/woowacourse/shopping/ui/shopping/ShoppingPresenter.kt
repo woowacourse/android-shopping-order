@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUi
 import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiProductCount
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
@@ -63,24 +64,18 @@ class ShoppingPresenter(
         view.navigateToCart()
     }
 
-    override fun addCartProduct(cartProduct: UiCartProduct) {
-        cartRepository.addCartProductByProductId(cartProduct.toDomain().productId)
+    override fun addCartProduct(product: UiProduct, addCount: Int) {
+        cartRepository.addCartProductByProductId(product.toDomain().id)
         updateCart(newCartProducts = loadAllCartProducts())
     }
 
-    override fun changeCartCount(cartProduct: UiCartProduct, changedCount: Int) {
+    override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
         cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
         updateCart(newCartProducts = loadAllCartProducts())
     }
 
-    override fun addCartCount(cartProduct: UiCartProduct, addCount: Int) {
-        if (cartProduct.selectedCount.value == 0) {
-            addCartProduct(cartProduct)
-            changeCartCount(cartProduct, cartProduct.selectedCount.value + addCount - 1)
-        } else {
-            changeCartCount(cartProduct, cartProduct.selectedCount.value + addCount)
-        }
-
+    override fun increaseCartCount(product: UiProduct, addCount: Int) {
+        cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
         updateCart(newCartProducts = loadAllCartProducts())
     }
 

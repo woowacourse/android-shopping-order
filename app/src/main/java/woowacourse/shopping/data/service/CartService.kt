@@ -11,4 +11,5 @@ interface CartService {
     fun addCartProductByProductId(productId: ProductId)
     fun updateProductCountById(cartProductId: CartProductId, count: ProductCount)
     fun deleteCartProductById(cartProductId: CartProductId)
+    fun findCartProductByProductId(productId: Int): CartProduct?
 }
