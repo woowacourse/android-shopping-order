@@ -2,7 +2,9 @@ package woowacourse.shopping.feature.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
+import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
@@ -38,18 +40,17 @@ class MainPresenter(
         get() = _mainScreenEvent
 
     override fun initLoadData() {
-
+        _mainScreenEvent.value = MainScreenEvent.ShowLoading
         initLoadCarts()
     }
 
     private fun initLoadCarts() {
         cartRepository.getAll(
             onSuccess = { carts ->
-                cartProducts = carts.map { it.copy().toPresentation() }
+                cartProducts = carts.map(CartProduct::toPresentation)
                 initLoadProducts()
             },
-            onFailure = {
-            },
+            onFailure = {},
         )
     }
 
@@ -58,14 +59,22 @@ class MainPresenter(
             onSuccess = {
                 val productUiModels = makeProductUiModels(it)
                 _products.postValue(productUiModels)
+                loadRecent()
             },
             onFailure = {},
         )
     }
 
     override fun loadRecent() {
-        val recentProducts = recentProductRepository.getAll().map { it.toPresentation() }
-        _recentProducts.value = recentProducts
+        val recentProducts =
+            recentProductRepository.getAll().map(RecentProduct::toPresentation).toMutableList()
+        recentProducts.forEach { recentProduct ->
+            recentProduct.product.count = cartProducts.find { cartProduct ->
+                cartProduct.productUiModel.id == recentProduct.product.id
+            }?.productUiModel?.count ?: 0
+        }
+        _recentProducts.postValue(recentProducts)
+        _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
     }
 
     override fun moveToCart() {
@@ -112,15 +121,23 @@ class MainPresenter(
     }
 
     private fun addFirstProductToCart(productId: Long) {
-        val newCartProducts = cartProducts.map { it.copy() }.toMutableList()
         cartRepository.addCartProduct(
             productId,
             onSuccess = { cartId ->
                 val productUiModel =
                     products.value?.find { it.id == productId } ?: return@addCartProduct
-                newCartProducts.add(CartProductUiModel(cartId, productUiModel.copy(), true))
-                cartProducts = newCartProducts
                 productUiModel.count = 1
+
+                val newCartProducts = cartProducts.map(CartProductUiModel::copy).toMutableList()
+                newCartProducts.add(
+                    CartProductUiModel(
+                        cartId,
+                        productUiModel.copy(count = 1),
+                        true,
+                    ),
+                )
+                cartProducts = newCartProducts
+                _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
             },
             onFailure = {
             },
@@ -134,11 +151,14 @@ class MainPresenter(
             onSuccess = { cartId ->
                 val cartProductUiModel =
                     cartProducts.find { it.cartId == cartId } ?: return@changeCartProductCount
+
                 val productUiModel =
                     _products.value?.find { it.id == cartProductUiModel.productUiModel.id }
                         ?: return@changeCartProductCount
-
                 productUiModel.count = count
+                cartProductUiModel.productUiModel.count = count
+
+                _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
             },
             onFailure = {},
         )
@@ -147,13 +167,13 @@ class MainPresenter(
     private fun deleteCartProduct(cartId: Long) {
         cartRepository.deleteCartProduct(
             cartId,
-            onSuccess = {
+            onSuccess = { cartId ->
                 val cartProduct =
                     cartProducts.find { it.cartId == cartId } ?: return@deleteCartProduct
-                val newCartProducts = cartProducts.map { it.copy() }.toMutableList()
+                val newCartProducts = cartProducts.map(CartProductUiModel::copy).toMutableList()
                 newCartProducts.removeIf { it.cartId == cartId }
                 cartProducts = newCartProducts
-
+                _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
                 _products.value?.find { it.id == cartProduct.productUiModel.id }?.count = 0
             },
             onFailure = {},
