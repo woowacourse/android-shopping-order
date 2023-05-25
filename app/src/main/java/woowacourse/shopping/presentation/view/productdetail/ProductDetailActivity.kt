@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
@@ -16,9 +17,9 @@ import woowacourse.shopping.data.respository.product.source.remote.ProductRemote
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_BASE_URL
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
+import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -32,8 +33,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         intent.getParcelableCompat(KEY_RECENT_PRODUCT)
     }
 
-    private lateinit var baseUrl: String
-    private lateinit var token: String
+    private lateinit var server: Server
 
     private lateinit var presenter: ProductDetailContract.Presenter
 
@@ -44,8 +44,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
         supportActionBar?.title = ACTION_BAR_TITLE
 
-        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
-        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
 
         setPresenter()
 
@@ -69,8 +68,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(baseUrl)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(baseUrl, token)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
         presenter = ProductDetailPresenter(
             this,
             productId = productId,
@@ -95,7 +94,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setLastRecentProduct() {
         binding.clLastProductInfo.setOnClickListener {
-            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, baseUrl, token)
+            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, server)
             startActivity(intent)
             finish()
         }
@@ -138,13 +137,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             context: Context,
             id: Long,
             recentProduct: RecentProductModel?,
-            baseUrl: String,
-            token: String
+            server: Server,
         ): Intent {
             val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra(KEY_PRODUCT_ID, id)
-            intent.putExtra(KEY_SERVER_BASE_URL, baseUrl)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
+            intent.putExtra(KEY_SERVER_SERVER, server)
 
             recentProduct?.let { intent.putExtra(KEY_RECENT_PRODUCT, it) }
 

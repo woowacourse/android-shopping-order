@@ -9,10 +9,11 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.Server
 import java.io.IOException
 
 class ProductRemoteDataSourceImpl(
-    private val baseUrl: String,
+    private val server: Server,
 ) : ProductRemoteDataSource {
 
     override fun requestDatas(
@@ -22,7 +23,7 @@ class ProductRemoteDataSourceImpl(
         Thread {
             val client = OkHttpClient()
             val path = PRODUCT
-            val request = Request.Builder().url(baseUrl + path).build()
+            val request = Request.Builder().url(server.url + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())
@@ -47,7 +48,7 @@ class ProductRemoteDataSourceImpl(
         Thread {
             val client = OkHttpClient()
             val path = "$PRODUCT/$productId"
-            val request = Request.Builder().url(baseUrl + path).build()
+            val request = Request.Builder().url(server.url + path).build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())

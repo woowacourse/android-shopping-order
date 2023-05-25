@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
@@ -27,14 +28,14 @@ import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAda
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductWrapperAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ViewType
+import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
 class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private lateinit var binding: ActivityProductListBinding
     private lateinit var toolbarCartBinding: LayoutToolbarCartBinding
 
-    private lateinit var baseUrl: String
-    private lateinit var token: String
+    private lateinit var server: Server
 
     private lateinit var presenter: ProductContract.Presenter
 
@@ -97,8 +98,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product_list)
         toolbarCartBinding = LayoutToolbarCartBinding.inflate(layoutInflater)
 
-        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
-        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
 
         setPresenter()
         initLayoutManager()
@@ -118,13 +118,13 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(baseUrl)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(baseUrl, token)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
         presenter = ProductListPresenter(
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
             cartRepository = CartRepositoryImpl(this, cartRemoteDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(this),
+            recentProductRepository = RecentProductRepositoryImpl(this, server),
         )
     }
 
@@ -192,12 +192,12 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         val recentProduct = presenter.getLastRecentProductItem(0)
         presenter.saveRecentProduct(productId)
 
-        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct, baseUrl, token)
+        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct, server)
         recentProductResultLauncher.launch(intent)
     }
 
     override fun moveToCartView() {
-        cartResultLauncher.launch(CartActivity.createIntent(this, baseUrl, token))
+        cartResultLauncher.launch(CartActivity.createIntent(this, server))
     }
 
     override fun handleErrorView() {
@@ -222,14 +222,11 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         private const val SPAN_SIZE_OF_TWO_COLUMN = 1
 
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
+        internal const val KEY_SERVER_SERVER = "KEY_SERVER_SERVER"
 
-        internal const val KEY_SERVER_BASE_URL = "KEY_SERVER_BASE_URL"
-        internal const val KEY_SERVER_TOKEN = "KEY_SERVER_TOKEN"
-
-        fun createIntent(context: Context, url: String, token: String): Intent {
+        fun createIntent(context: Context, server: Server): Intent {
             val intent = Intent(context, ProductListActivity::class.java)
-            intent.putExtra(KEY_SERVER_BASE_URL, url)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
+            intent.putExtra(KEY_SERVER_SERVER, server)
             return intent
         }
     }

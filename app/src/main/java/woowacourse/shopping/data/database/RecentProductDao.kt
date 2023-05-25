@@ -5,10 +5,15 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns
 import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.model.Server
 import java.time.LocalDateTime
 
-class RecentProductDao(context: Context) {
+class RecentProductDao(
+    context: Context,
+    server: Server,
+) {
     private val db = RecentProductHelper(context).writableDatabase
+    private val tableName = RecentProductContract.getTableName(server)
 
     fun insertRecentProduct(productId: Long) {
         val value = ContentValues().apply {
@@ -17,19 +22,19 @@ class RecentProductDao(context: Context) {
         }
         if (checkRecentProduct(productId)) {
             db.update(
-                RecentProductContract.RecentProduct.TABLE_NAME,
+                tableName,
                 value,
                 "${RecentProductContract.RecentProduct.PRODUCT_ID} = ? ",
                 arrayOf(productId.toString()),
             )
             return
         }
-        db.insert(RecentProductContract.RecentProduct.TABLE_NAME, null, value)
+        db.insert(tableName, null, value)
     }
 
     fun deleteNotToday(today: String) {
         val sql =
-            "DELETE FROM ${RecentProductContract.RecentProduct.TABLE_NAME} WHERE ${RecentProductContract.RecentProduct.CREATE_DATE} NOT LIKE '$today%'"
+            "DELETE FROM $tableName WHERE ${RecentProductContract.RecentProduct.CREATE_DATE} NOT LIKE '$today%'"
 
         db.execSQL(sql)
     }
@@ -76,7 +81,7 @@ class RecentProductDao(context: Context) {
 
     private fun getCursor(limit: Int): Cursor {
         return db.query(
-            RecentProductContract.RecentProduct.TABLE_NAME,
+            tableName,
             null,
             null,
             null,
@@ -89,7 +94,7 @@ class RecentProductDao(context: Context) {
 
     private fun getCursorByProductId(productId: Long, limit: Int): Cursor {
         return db.query(
-            RecentProductContract.RecentProduct.TABLE_NAME,
+            tableName,
             null,
             "${RecentProductContract.RecentProduct.PRODUCT_ID} = ?",
             arrayOf(productId.toString()),

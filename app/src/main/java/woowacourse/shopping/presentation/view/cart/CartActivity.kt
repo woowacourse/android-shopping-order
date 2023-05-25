@@ -9,20 +9,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_BASE_URL
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
-    private lateinit var baseUrl: String
-    private lateinit var token: String
+    private lateinit var server: Server
 
     private lateinit var cartAdapter: CartAdapter
 
@@ -51,8 +51,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
 
-        baseUrl = intent.getStringExtra(KEY_SERVER_BASE_URL) ?: return finish()
-        token = intent.getStringExtra(KEY_SERVER_TOKEN) ?: return finish()
+        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
 
         setPresenter()
         setSupportActionBar()
@@ -64,10 +63,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun setPresenter() {
-        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(baseUrl, token)
+        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(server)
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(this, cartRemoteDataSourceImpl)
+            CartRepositoryImpl(this, cartRemoteDataSourceImpl),
         )
     }
 
@@ -180,11 +179,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-        fun createIntent(context: Context, baseUrl: String, token: String): Intent {
+        fun createIntent(context: Context, server: Server): Intent {
             val intent = Intent(context, CartActivity::class.java)
-            intent.putExtra(KEY_SERVER_BASE_URL, baseUrl)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
-
+            intent.putExtra(KEY_SERVER_SERVER, server)
             return intent
         }
     }

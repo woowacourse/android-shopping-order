@@ -3,16 +3,23 @@ package woowacourse.shopping.data.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import woowacourse.shopping.data.model.Server
 
-class RecentProductHelper(context: Context) :
+class RecentProductHelper(
+    context: Context,
+) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(RecentProductContract.CREATE_SQL)
+        Server.values().forEach { server ->
+            db.execSQL(RecentProductContract.getCreateSQL(server))
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL(RecentProductContract.DROP_SQL)
+        Server.values().forEach { server ->
+            db.execSQL(RecentProductContract.getDropSQL(server))
+        }
         onCreate(db)
     }
 

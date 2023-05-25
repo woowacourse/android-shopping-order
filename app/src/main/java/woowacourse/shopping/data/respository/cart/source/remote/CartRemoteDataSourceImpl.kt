@@ -12,11 +12,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.data.model.CartEntity2
 import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.Server
 import java.io.IOException
 
 class CartRemoteDataSourceImpl(
-    private val baseUrl: String,
-    private val token: String
+    private val server: Server,
 ) : CartRemoteDataSource {
     override fun requestDatas(
         onFailure: () -> Unit,
@@ -26,8 +26,8 @@ class CartRemoteDataSourceImpl(
             val client = OkHttpClient()
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $token")
-                    .url(baseUrl + PATH_CART)
+                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
+                    .url(server.url + PATH_CART)
                     .build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -59,9 +59,9 @@ class CartRemoteDataSourceImpl(
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $token")
+                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
                     .patch(body)
-                    .url(baseUrl + path)
+                    .url(server.url + path)
                     .build()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -91,9 +91,9 @@ class CartRemoteDataSourceImpl(
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $token")
+                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
                     .post(body)
-                    .url(baseUrl + PATH_CART)
+                    .url(server.url + PATH_CART)
                     .build()
 
             client.newCall(request).enqueue(object : Callback {
@@ -118,9 +118,9 @@ class CartRemoteDataSourceImpl(
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic $token")
+                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
                     .delete()
-                    .url(baseUrl + path)
+                    .url(server.url + path)
                     .build()
 
             client.newCall(request).execute()
