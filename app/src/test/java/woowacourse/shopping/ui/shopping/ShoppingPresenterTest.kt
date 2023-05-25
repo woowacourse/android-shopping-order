@@ -85,7 +85,7 @@ class ShoppingPresenterTest() {
         every { view.updateProducts(any()) } just runs
         every { view.updateTotalBasketCount(any()) } just runs
         // when
-        presenter.updateBasket()
+        presenter.initBasket()
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
         verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }

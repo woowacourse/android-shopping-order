@@ -29,7 +29,7 @@ class ShoppingPresenter(
 
     init {
         view.updateSkeletonState(isLoaded)
-        updateBasket()
+        initBasket()
     }
 
     private fun fetchBasketCount() {
@@ -44,14 +44,20 @@ class ShoppingPresenter(
         }
     }
 
+    override fun initBasket() {
+        basketRepository.getAll {
+            basket = Basket(it)
+            fetchTotalBasketCount()
+            updateProducts()
+        }
+    }
 
     override fun updateBasket() {
         basketRepository.getAll {
             basket = Basket(it)
-//            fetchBasketCount()
             fetchTotalBasketCount()
-//            view.updateProducts(totalProducts)
-            updateProducts()
+            fetchBasketCount()
+            view.updateProducts(totalProducts)
         }
     }
 

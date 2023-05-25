@@ -29,6 +29,8 @@ interface ShoppingContract {
 
         val view: View
 
+        fun initBasket()
+
         fun updateBasket()
 
         fun fetchTotalBasketCount()
