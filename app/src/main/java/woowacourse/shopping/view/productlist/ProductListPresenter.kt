@@ -114,11 +114,11 @@ class ProductListPresenter(
                 .toList()
 
             itemsHaveCount.forEach { item ->
-                val cartProduct = cartProducts.find { it.id == item.product.id }
+                val cartProduct = cartProducts.find { it.cartId == item.product.id }
                 val position = productsListItems.indexOf(item)
                 productsListItems[position] = ProductListViewItem.ProductItem(
                     (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                        cartId = cartProduct?.id ?: 0,
+                        cartId = cartProduct?.cartId ?: 0,
                         count = cartProduct?.count ?: 0,
                     ),
                 )
@@ -135,7 +135,7 @@ class ProductListPresenter(
                 productsListItems.indexOfFirst { it is ProductListViewItem.ProductItem && it.product.id == id }
             productsListItems[position] = ProductListViewItem.ProductItem(
                 (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                    cartId = cartProduct?.id ?: 0,
+                    cartId = cartProduct?.cartId ?: 0,
                     count = cartProduct?.count ?: 0,
                 ),
             )
@@ -165,7 +165,7 @@ class ProductListPresenter(
         return this.map { product ->
             val cartProduct = cartProducts.find { it.product.id == product.id }
             product.toUiModel(
-                cartProduct?.id ?: 0,
+                cartProduct?.cartId ?: 0,
                 cartProduct?.count ?: 0,
             )
         }

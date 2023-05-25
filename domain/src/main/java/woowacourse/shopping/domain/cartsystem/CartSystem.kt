@@ -1,58 +1,54 @@
-/*
 package woowacourse.shopping.domain.cartsystem
 
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Price
 
-class CartSystem(
-    private val productRepository: ProductRepository
-) {
-    private val _selectedProducts = mutableListOf<CartSystemProduct>()
+class CartSystem {
+    private val _selectedProducts = mutableListOf<CartProduct>()
     val selectedProducts: List<CartProduct>
-        get() = _selectedProducts.map { it.cartProduct }.toList()
+        get() = _selectedProducts.toList()
     private var totalPrice: Price = Price(0)
 
     fun isSelectedProduct(product: CartProduct): Boolean {
-        return _selectedProducts.find { it.cartProduct.id == product.id } != null
+        return _selectedProducts.find { it.product.id == product.cartId } != null
     }
 
-    fun selectProduct(product: CartProduct): CartSystemResult {
-        if (_selectedProducts.find { it.cartProduct.id == product.id } == null) {
-            val price = productRepository.getProduct(product.id).price
-            _selectedProducts.add(CartSystemProduct(product, price))
-            totalPrice += price * product.count
+    fun selectProduct(cartProduct: CartProduct): CartSystemResult {
+        if (_selectedProducts.find { it.product.id == cartProduct.product.id } == null) {
+            val price = cartProduct.product.price
+            if (price != null) {
+                _selectedProducts.add(cartProduct)
+                totalPrice += price * cartProduct.count
+            }
             return CartSystemResult(totalPrice.price, _selectedProducts.size)
         }
-        return deselectProduct(product.id)
+        return deselectProduct(cartProduct.product.id)
     }
 
     private fun deselectProduct(id: Int): CartSystemResult {
-        val product = _selectedProducts.find { it.cartProduct.id == id }
+        val product = _selectedProducts.find { it.product.id == id }
             ?: throw java.lang.IllegalArgumentException()
-        totalPrice -= product.price * product.cartProduct.count
+        totalPrice -= product.product.price * product.count
         _selectedProducts.remove(product)
         return CartSystemResult(totalPrice.price, _selectedProducts.size)
     }
 
     fun updateProduct(id: Int, count: Int): CartSystemResult {
-        val index = _selectedProducts.indexOfFirst { it.cartProduct.id == id }
-        if (index == -1) return CartSystemResult(totalPrice.price, _selectedProducts.size)
-
-        val diff = count - _selectedProducts[index].cartProduct.count
-        totalPrice += _selectedProducts[index].price.price * diff
-        _selectedProducts[index] = CartSystemProduct(CartProduct(id, count), _selectedProducts[index].price)
-
+        val index = _selectedProducts.indexOfFirst { it.product.id == id }
+        if (index != -1) {
+            val diff = count - _selectedProducts[index].count
+            totalPrice += _selectedProducts[index].product.price.price * diff
+            _selectedProducts[index] = _selectedProducts[index].copy(count = count)
+        }
         return CartSystemResult(totalPrice.price, _selectedProducts.size)
     }
 
     fun removeProduct(id: Int): CartSystemResult {
-        val item = _selectedProducts.find { it.cartProduct.id == id }
+        val item = _selectedProducts.find { it.product.id == id }
         if (item != null) {
-            totalPrice -= item.price * item.cartProduct.count
+            totalPrice -= item.product.price * item.count
             _selectedProducts.remove(item)
         }
         return CartSystemResult(totalPrice.price, _selectedProducts.size)
     }
 }
-*/

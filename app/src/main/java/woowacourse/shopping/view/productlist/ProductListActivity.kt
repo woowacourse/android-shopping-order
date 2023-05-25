@@ -21,6 +21,7 @@ import woowacourse.shopping.data.repository.ProductRemoteRepository
 import woowacourse.shopping.data.repository.RecentViewedDbRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
@@ -173,8 +174,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
             val imageButton = itemActionView.findViewById<ImageButton>(R.id.btn_cart)
             imageButton?.setOnClickListener {
-//                val intent = CartActivity.newIntent(this)
-//                resultLauncher.launch(intent)
+                val intent = CartActivity.newIntent(this)
+                resultLauncher.launch(intent)
             }
         }
         return true

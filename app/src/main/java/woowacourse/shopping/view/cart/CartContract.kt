@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
-import woowacourse.shopping.domain.cartsystem.CartPageStatus
 import woowacourse.shopping.domain.cartsystem.CartSystemResult
 import woowacourse.shopping.model.CartProductModel
 
@@ -14,7 +13,6 @@ interface CartContract {
 
     interface Presenter {
         val cartSystemResult: LiveData<CartSystemResult>
-        val cartPageStatus: LiveData<CartPageStatus>
         val isCheckedAll: LiveData<Boolean>
 
         fun fetchProducts()

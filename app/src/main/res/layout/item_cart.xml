@@ -86,7 +86,7 @@
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_left_rounded"
-                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.id, cartProduct.count - 1)}"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.count - 1)}"
                 android:text="@string/minus"
                 android:textColor="@color/gray_700"
                 android:textSize="22sp"
@@ -112,7 +112,7 @@
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_right_rounded"
-                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.id, cartProduct.count + 1)}"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.count + 1)}"
                 android:text="@string/plus"
                 android:textColor="@color/gray_700"
                 android:textSize="22sp"
@@ -127,7 +127,7 @@
             android:layout_height="26dp"
             android:background="@drawable/ic_close"
             android:backgroundTint="@color/gray_700"
-            android:onClick="@{() -> onItemClick.onRemoveClick(cartProduct.id)}"
+            android:onClick="@{() -> onItemClick.onRemoveClick(cartProduct.cartId)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
