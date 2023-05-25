@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.view.productdetail
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
-import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
@@ -13,7 +12,6 @@ class ProductDetailPresenter(
     productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
-    private val carts = mutableListOf<CartModel>()
     private lateinit var product: ProductModel
 
     init {
@@ -46,11 +44,7 @@ class ProductDetailPresenter(
 
     override fun addCart(count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            this.carts.clear()
-            this.carts.addAll(carts.map { it.toUIModel() })
-
             val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
-
             if (cartProduct == null) {
                 cartRepository.addCartProduct(product.id, ::onFailure) {
                     view.addCartSuccessView()
@@ -60,9 +54,8 @@ class ProductDetailPresenter(
                         val reCartProduct =
                             reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
                                 ?: return@loadAllCarts
-                        this.carts.add(reCartProduct.toUIModel())
 
-                        if (count > 1) {
+                        if (count > UPDATE_COUNT_CONDITION) {
                             val newCartProduct = reCartProduct.copy(quantity = count)
                             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                                 view.addCartSuccessView()
@@ -75,9 +68,6 @@ class ProductDetailPresenter(
 
             cartProduct?.let { cart ->
                 val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
-                this.carts.removeIf { it.id == newCartProduct.id }
-                this.carts.add(newCartProduct.toUIModel())
-
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()
@@ -92,5 +82,6 @@ class ProductDetailPresenter(
 
     companion object {
         private const val UNABLE_ID = -1L
+        private const val UPDATE_COUNT_CONDITION = 1
     }
 }
