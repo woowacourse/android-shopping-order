@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.service.product
 
 import okhttp3.RequestBody.Companion.toRequestBody
-import woowacourse.shopping.data.model.Page
 import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.service.cart.ProductId
 import woowacourse.shopping.data.util.convertJsonToProduct
 import woowacourse.shopping.data.util.convertJsonToProducts
 import woowacourse.shopping.data.util.okhttp.Header.Companion.JSON_MEDIA_TYPE
@@ -23,7 +23,7 @@ class ProductServiceImpl : ProductService {
         shoppingMockServer.join()
     }
 
-    override fun findProductById(id: Int): Product? {
+    override fun findProductById(id: ProductId): Product? {
         val url = "$BASE_URL/products/$id"
         var product: Product? = null
 
@@ -53,7 +53,7 @@ class ProductServiceImpl : ProductService {
         return products.toList()
     }
 
-    override fun addProduct(product: Product) {
+    override fun insertProduct(product: Product) {
         val url = "$BASE_URL/products"
 
         val latch = ShoppingOkHttpClient.enqueue(
@@ -64,7 +64,7 @@ class ProductServiceImpl : ProductService {
         latch.await()
     }
 
-    override fun adjustProduct(product: Product) {
+    override fun updateProduct(product: Product) {
         val url = "$BASE_URL/products/${product.id}"
 
         val latch = ShoppingOkHttpClient.enqueue(

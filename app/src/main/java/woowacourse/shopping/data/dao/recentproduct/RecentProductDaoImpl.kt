@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.database.dao.recentproduct
+package woowacourse.shopping.data.dao.recentproduct
 
 import android.annotation.SuppressLint
 import android.content.ContentValues

@@ -1,20 +1,24 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.recentproduct.RecentProductDataSource
+import woowacourse.shopping.data.dao.recentproduct.RecentProductDao
 import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class RecentProductRepositoryImpl(
-    private val localRecentProductDataSource: RecentProductDataSource.Local,
-) : RecentProductRepository {
-
+class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentProductRepository {
     override fun add(recentProduct: RecentProduct) {
-        localRecentProductDataSource.add(recentProduct.toData())
+        while (dao.getSize() >= STORED_DATA_SIZE) {
+            dao.removeLast()
+        }
+        dao.addRecentProduct(recentProduct.toData())
     }
 
     override fun getPartially(size: Int): RecentProducts =
-        RecentProducts(localRecentProductDataSource.getPartially(size).toDomain())
+        RecentProducts(items = dao.getRecentProductsPartially(size).toDomain())
+
+    companion object {
+        private const val STORED_DATA_SIZE = 50
+    }
 }

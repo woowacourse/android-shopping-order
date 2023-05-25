@@ -1,13 +1,12 @@
 package woowacourse.shopping.util.inject
 
 import android.content.Context
-import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDaoImpl
-import woowacourse.shopping.data.datasource.recentproduct.LocalRecentProductDataSource
-import woowacourse.shopping.data.repository.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.CartServiceImpl
-import woowacourse.shopping.data.service.ProductServiceImpl
+import woowacourse.shopping.data.service.cart.CartServiceImpl
+import woowacourse.shopping.data.service.product.ProductServiceImpl
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
@@ -22,14 +21,13 @@ fun inject(
     view: ShoppingContract.View,
     context: Context,
 ): ShoppingContract.Presenter {
-    val database = createShoppingDatabase(context)
     return ShoppingPresenter(
         view = view,
         productRepository = ProductRepositoryImpl(ProductServiceImpl()),
         recentProductRepository = RecentProductRepositoryImpl(
-            LocalRecentProductDataSource(RecentProductDaoImpl(database))
+            dao = RecentProductDaoImpl(createShoppingDatabase(context))
         ),
-        cartRepository = CartRemoteRepositoryImpl(CartServiceImpl()),
+        cartRepository = CartRepositoryImpl(CartServiceImpl()),
     )
 }
 
@@ -42,7 +40,7 @@ fun inject(
     view = view,
     product = detailProduct,
     recentProductRepository = RecentProductRepositoryImpl(
-        LocalRecentProductDataSource(RecentProductDaoImpl(createShoppingDatabase(context))),
+        dao = RecentProductDaoImpl(createShoppingDatabase(context))
     ),
     showLastViewedProduct = showLastViewedProduct,
 )
@@ -52,7 +50,7 @@ fun injectCartPresenter(
 ): CartPresenter {
     return CartPresenter(
         view = view,
-        cartRepository = CartRemoteRepositoryImpl(CartServiceImpl()),
+        cartRepository = CartRepositoryImpl(CartServiceImpl()),
     )
 }
 

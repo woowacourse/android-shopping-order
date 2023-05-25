@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.model.Page
 import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.model.UiProduct
 
 interface CartContract {
     interface View {

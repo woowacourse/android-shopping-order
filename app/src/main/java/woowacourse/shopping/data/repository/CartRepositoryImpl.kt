@@ -2,14 +2,14 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.service.CartService
+import woowacourse.shopping.data.service.cart.CartService
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.repository.CartProductId
-import woowacourse.shopping.domain.repository.CartRemoteRepository
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductId
 
-class CartRemoteRepositoryImpl(private val service: CartService) : CartRemoteRepository {
+class CartRepositoryImpl(private val service: CartService) : CartRepository {
     override fun getAllCartProducts(): List<CartProduct> {
         return service.getAllCartProduct().map { it.toDomain() }
     }

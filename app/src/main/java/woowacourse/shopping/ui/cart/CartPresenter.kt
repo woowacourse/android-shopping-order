@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
-import woowacourse.shopping.domain.repository.CartRemoteRepository
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUi
 import woowacourse.shopping.model.UiCartProduct
@@ -17,7 +17,7 @@ import woowacourse.shopping.ui.cart.CartContract.View
 
 class CartPresenter(
     view: View,
-    private val cartRepository: CartRemoteRepository,
+    private val cartRepository: CartRepository,
     cartSize: Int = 5,
 ) : Presenter(view) {
     private var cart: Cart = Cart(minProductSize = 1)

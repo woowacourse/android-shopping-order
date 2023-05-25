@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.model.page.LoadMore
 import woowacourse.shopping.domain.model.page.Page
-import woowacourse.shopping.domain.repository.CartRemoteRepository
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
@@ -24,7 +24,7 @@ class ShoppingPresenter(
     view: View,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRemoteRepository,
+    private val cartRepository: CartRepository,
     private val recentProductSize: Int = 10,
     private var recentProducts: RecentProducts = RecentProducts(),
     sizePerPage: Int = 20,

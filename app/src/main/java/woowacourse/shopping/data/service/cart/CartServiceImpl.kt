@@ -1,15 +1,11 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.service.cart
 
 import okhttp3.RequestBody.Companion.toRequestBody
 import woowacourse.shopping.data.model.CartProduct
 import woowacourse.shopping.data.model.ProductCount
 import woowacourse.shopping.data.util.convertProductIdToJson
-import woowacourse.shopping.data.util.okhttp.Header.Companion.JSON_MEDIA_TYPE
+import woowacourse.shopping.data.util.okhttp.Header
 import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient
-import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.delete
-import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.get
-import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.patch
-import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.post
 import woowacourse.shopping.data.util.toCartProducts
 import woowacourse.shopping.data.util.toJson
 import woowacourse.shopping.server.BASE_URL
@@ -20,7 +16,7 @@ class CartServiceImpl : CartService {
         val cartProducts = mutableListOf<CartProduct>()
 
         val latch = ShoppingOkHttpClient.enqueue(
-            get(url),
+            ShoppingOkHttpClient.get(url),
             onSuccess = { _, response ->
                 response.body?.string()?.let { cartProducts.addAll(it.toCartProducts()) }
             },
@@ -35,7 +31,10 @@ class CartServiceImpl : CartService {
         val url = "$BASE_URL/cart-items"
 
         val latch = ShoppingOkHttpClient.enqueue(
-            post(url, convertProductIdToJson(productId).toRequestBody(JSON_MEDIA_TYPE)),
+            ShoppingOkHttpClient.post(
+                url,
+                convertProductIdToJson(productId).toRequestBody(Header.JSON_MEDIA_TYPE)
+            ),
             onSuccess = { _, _ -> },
             onFailed = { _, _ -> },
         )
@@ -46,7 +45,7 @@ class CartServiceImpl : CartService {
         val url = "$BASE_URL/cart-items/$cartProductId"
 
         val latch = ShoppingOkHttpClient.enqueue(
-            patch(url, count.toJson().toRequestBody(JSON_MEDIA_TYPE)),
+            ShoppingOkHttpClient.patch(url, count.toJson().toRequestBody(Header.JSON_MEDIA_TYPE)),
             onSuccess = { _, _ -> },
             onFailed = { _, _ -> },
         )
@@ -57,7 +56,7 @@ class CartServiceImpl : CartService {
         val url = "$BASE_URL/cart-items/$cartProductId"
 
         val latch = ShoppingOkHttpClient.enqueue(
-            delete(url),
+            ShoppingOkHttpClient.delete(url),
             onSuccess = { _, _ -> },
             onFailed = { _, _ -> },
         )

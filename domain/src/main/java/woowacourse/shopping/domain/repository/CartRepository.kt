@@ -1,17 +1,16 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.CartEntity
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductCount
+
+typealias ProductId = Int
+typealias CartProductId = Int
 
 interface CartRepository {
-    fun getAllCartEntities(): List<CartEntity>
-    fun getCartEntity(productId: Int): CartEntity
-    fun increaseCartCount(product: Product, count: Int)
-    fun decreaseCartCount(product: Product, count: Int)
-    fun deleteByProductId(productId: Int)
-    fun getProductInCartSize(): Int
-    fun update(cartProducts: List<CartProduct>)
-    fun getCheckedProductCount(): Int
-    fun removeCheckedProducts()
+    fun getAllCartProducts(): List<CartProduct>
+    fun addCartProductByProductId(productId: ProductId)
+    fun updateProductCountById(cartProductId: CartProductId, count: ProductCount)
+    fun deleteCartProductById(cartProductId: CartProductId)
+    fun findCartProductByProductId(productId: ProductId): CartProduct?
+    fun increaseProductCountByProductId(productId: ProductId, addCount: ProductCount)
 }
