@@ -1,21 +1,24 @@
-package woowacourse.shopping.data.database
+package woowacourse.shopping.data.respository.recentproduct.source.local
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns
+import woowacourse.shopping.data.database.RecentProductContract
+import woowacourse.shopping.data.database.RecentProductHelper
+import woowacourse.shopping.data.database.getTableName
 import woowacourse.shopping.data.model.RecentProductEntity
 import woowacourse.shopping.data.model.Server
 import java.time.LocalDateTime
 
-class RecentProductDao(
+class RecentProductLocalDataSourceImpl(
     context: Context,
     server: Server,
-) {
+) : RecentProductLocalDataSource {
     private val db = RecentProductHelper(context).writableDatabase
     private val tableName = getTableName(server)
 
-    fun insertRecentProduct(productId: Long) {
+    override fun insertRecentProduct(productId: Long) {
         val value = ContentValues().apply {
             put(RecentProductContract.RecentProduct.PRODUCT_ID, productId)
             put(RecentProductContract.RecentProduct.CREATE_DATE, LocalDateTime.now().toString())
@@ -30,13 +33,6 @@ class RecentProductDao(
             return
         }
         db.insert(tableName, null, value)
-    }
-
-    fun deleteNotToday(today: String) {
-        val sql =
-            "DELETE FROM $tableName WHERE ${RecentProductContract.RecentProduct.CREATE_DATE} NOT LIKE '$today%'"
-
-        db.execSQL(sql)
     }
 
     private fun checkRecentProduct(selectProductId: Long): Boolean {
@@ -62,7 +58,14 @@ class RecentProductDao(
         return result
     }
 
-    fun getAll(limit: Int): List<RecentProductEntity> {
+    override fun deleteNotToday(today: String) {
+        val sql =
+            "DELETE FROM $tableName WHERE ${RecentProductContract.RecentProduct.CREATE_DATE} NOT LIKE '$today%'"
+
+        db.execSQL(sql)
+    }
+
+    override fun getAllRecentProducts(limit: Int): List<RecentProductEntity> {
         val result = mutableListOf<RecentProductEntity>()
         val cursor = getCursor(limit)
         with(cursor) {

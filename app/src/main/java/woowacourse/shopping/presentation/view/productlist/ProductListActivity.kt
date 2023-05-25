@@ -18,6 +18,7 @@ import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSo
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
 import woowacourse.shopping.presentation.model.ProductModel
@@ -122,11 +123,12 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+        val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, server)
         presenter = ProductListPresenter(
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(this, server),
+            recentProductRepository = RecentProductRepositoryImpl(recentProductLocalDataSource),
         )
     }
 
