@@ -29,6 +29,7 @@ import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.productdetail.ProductDetailActivity
+import woowacourse.shopping.server.CartRemoteDataSource
 import woowacourse.shopping.server.ProductRemoteDataSource
 import woowacourse.shopping.shopping.recyclerview.LoadMoreAdapter
 import woowacourse.shopping.shopping.recyclerview.ProductAdapter
@@ -197,7 +198,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             this,
             productRepository = productRepository,
             recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(db), ProductRemoteDataSource()),
-            cartRepository = CartRepositoryImpl(CartDao(db)),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSource(), CartDao(db)),
             recentProductSize = 10,
             productLoadSize = 20
         )

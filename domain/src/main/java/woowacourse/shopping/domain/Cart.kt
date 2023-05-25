@@ -14,10 +14,10 @@ data class Cart(val cartProducts: List<CartProduct>) {
         return Cart(cartProducts.subList(from, to))
     }
 
-    fun replaceCartProduct(prev: CartProduct, new: CartProduct): Cart {
+    fun replaceCartProduct(cartProduct: CartProduct): Cart {
         return Cart(
             cartProducts.map {
-                if (it == prev) new
+                if (it.id == cartProduct.id) cartProduct
                 else it
             }
         )
@@ -26,4 +26,6 @@ data class Cart(val cartProducts: List<CartProduct>) {
     fun removeCartProduct(cartProduct: CartProduct): Cart {
         return Cart(cartProducts.filter { it != cartProduct })
     }
+
+    fun findCartProduct(cartProduct: CartProduct): CartProduct? = cartProducts.find { it.id == cartProduct.id }
 }

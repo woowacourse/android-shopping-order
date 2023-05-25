@@ -12,7 +12,7 @@ internal class CartProductTest {
 
         // when
         val actualCartProduct = cartProduct.decreaseAmount()
-        val actual = actualCartProduct.amount
+        val actual = actualCartProduct.quantity
 
         // then
         val expected = 1
@@ -26,7 +26,7 @@ internal class CartProductTest {
 
         // when
         val actualCartProduct = cartProduct.increaseAmount()
-        val actual = actualCartProduct.amount
+        val actual = actualCartProduct.quantity
 
         // then
         val expected = 2

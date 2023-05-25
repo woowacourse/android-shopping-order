@@ -10,19 +10,24 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.Storage
+import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
 
-class ProductRemoteDataSource {
+class CartRemoteDataSource {
     private val okHttpClient: OkHttpClient = OkHttpClient()
 
-    fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
-        val request = Request.Builder().url(url).build()
+        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val request = Request.Builder()
+            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .url(url)
+            .build()
         val handler = Handler(Looper.myLooper()!!)
-        val products = mutableListOf<Product>()
+        val products = mutableListOf<CartProduct>()
 
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -34,7 +39,7 @@ class ProductRemoteDataSource {
                 val jsonArray = JSONArray(input)
                 for (i in 0 until jsonArray.length()) {
                     val jsonObject = jsonArray.getJSONObject(i)
-                    products.add(createProduct(jsonObject))
+                    products.add(createCartProduct(jsonObject))
                 }
 
                 handler.post {
@@ -44,41 +49,31 @@ class ProductRemoteDataSource {
         })
     }
 
-    fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
-        val baseUrl = Server.getUrl(Storage.server)
-        val url = "$baseUrl/$PATH/$id"
-        val request = Request.Builder().url(url).build()
-        val handler = Handler(Looper.myLooper()!!)
-
-        okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onFailure()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val input = response.body?.string()
-                val jsonObject = JSONObject(input)
-                val product = createProduct(jsonObject)
-
-                handler.post {
-                    onSuccess(product)
-                }
-            }
-        })
-    }
+    private fun createCartProduct(response: JSONObject) = CartProduct(
+        id = response.getInt(KEY_ID),
+        quantity = response.getInt(KEY_QUANTITY),
+        isChecked = true,
+        product = createProduct(response)
+    )
 
     private fun createProduct(response: JSONObject): Product {
+        val product = response.getJSONObject(KEY_PRODUCT)
         return Product(
-            id = response.getInt(KEY_ID),
-            picture = URL(response.getString(KEY_PICTURE)),
-            title = response.getString(KEY_TITLE),
-            price = response.getInt(KEY_PRICE)
+            id = product.getInt(KEY_PRODUCT_ID),
+            picture = URL(product.getString(KEY_PICTURE)),
+            title = product.getString(KEY_TITLE),
+            price = product.getInt(KEY_PRICE)
         )
     }
 
     companion object {
-        private const val PATH = "products"
+        private const val PATH = "cart-items"
+        private const val HEADER_CONTENT_TYPE = "Content-Type"
+        private const val HEADER_AUTHORIZATION = "Authorization"
         private const val KEY_ID = "id"
+        private const val KEY_QUANTITY = "quantity"
+        private const val KEY_PRODUCT = "product"
+        private const val KEY_PRODUCT_ID = "id"
         private const val KEY_PICTURE = "imageUrl"
         private const val KEY_TITLE = "name"
         private const val KEY_PRICE = "price"

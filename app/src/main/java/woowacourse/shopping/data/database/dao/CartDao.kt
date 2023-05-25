@@ -9,23 +9,22 @@ import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
-import java.time.LocalDateTime
 
 class CartDao(private val db: SQLiteDatabase) {
     fun insertCartProduct(cartProduct: CartProduct) {
         val productId = cartProduct.product.id
 
         val row = ContentValues()
-        row.put(SqlCart.TIME, cartProduct.time.toString())
+        row.put(SqlCart.CART_ID, cartProduct.id)
         row.put(SqlCart.PRODUCT_ID, productId)
-        row.put(SqlCart.AMOUNT, cartProduct.amount)
+        row.put(SqlCart.AMOUNT, cartProduct.quantity)
         db.insert(SqlCart.name, null, row)
     }
 
     fun selectAll(): Cart {
         val cursor = db.rawQuery(
             "SELECT * FROM ${SqlCart.name}, ${SqlProduct.name} on ${SqlCart.name}.${SqlCart.PRODUCT_ID} = ${SqlProduct.name}.${SqlProduct.ID} " +
-                "ORDER BY ${SqlCart.TIME} ASC",
+                "ORDER BY ${SqlCart.CART_ID} ASC",
             null
         )
         return createCart(cursor)
@@ -42,7 +41,7 @@ class CartDao(private val db: SQLiteDatabase) {
     )
 
     private fun createCartProduct(cursor: Cursor) = CartProduct(
-        LocalDateTime.parse(cursor.getString(cursor.getColumnIndexOrThrow(SqlCart.TIME))),
+        cursor.getInt(cursor.getColumnIndexOrThrow(SqlCart.CART_ID)),
         cursor.getInt(cursor.getColumnIndexOrThrow(SqlCart.AMOUNT)),
         isChecked = true,
         Product(
@@ -67,7 +66,7 @@ class CartDao(private val db: SQLiteDatabase) {
     fun selectPage(page: Int, sizePerPage: Int): Cart {
         val cursor = db.rawQuery(
             "SELECT * FROM ${SqlCart.name}, ${SqlProduct.name} on ${SqlCart.name}.${SqlCart.PRODUCT_ID} = ${SqlProduct.name}.${SqlProduct.ID} " +
-                "ORDER BY ${SqlCart.TIME} ASC " +
+                "ORDER BY ${SqlCart.CART_ID} ASC " +
                 "LIMIT ${page * sizePerPage}, $sizePerPage",
             null
         )
@@ -118,9 +117,8 @@ class CartDao(private val db: SQLiteDatabase) {
         val productId = cartProduct.product.id
 
         val row = ContentValues()
-        row.put(SqlCart.TIME, cartProduct.time.toString())
         row.put(SqlCart.PRODUCT_ID, productId)
-        row.put(SqlCart.AMOUNT, cartProduct.amount)
+        row.put(SqlCart.AMOUNT, cartProduct.quantity)
 
         db.update(
             SqlCart.name,

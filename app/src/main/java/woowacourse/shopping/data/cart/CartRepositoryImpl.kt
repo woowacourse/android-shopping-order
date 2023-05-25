@@ -1,59 +1,37 @@
 package woowacourse.shopping.data.cart
 
-import android.os.Handler
-import android.os.Looper
 import woowacourse.shopping.data.database.dao.CartDao
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
+import woowacourse.shopping.server.CartRemoteDataSource
 
 class CartRepositoryImpl(
-    private val cartDao: CartDao,
-    private var cart: Cart = Cart(emptyList())
+    private val cartRemoteDataSource: CartRemoteDataSource,
+    private val cartDao: CartDao
 ) : CartRepository {
 
     override fun addCartProduct(cartProduct: CartProduct) {
         cartDao.insertCartProduct(cartProduct)
     }
 
-    override fun getAll(): Cart {
-        return cartDao.selectAll()
-    }
-
     override fun getAllCount(): Int {
         return cartDao.selectAllCount()
     }
 
-    override fun getPage(
-        page: Int,
-        sizePerPage: Int,
-        onSuccess: (Cart) -> Unit,
+    override fun getAll(
+        onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit
     ) {
-        val handler = Handler(Looper.myLooper()!!)
-
-        thread {
-            val startIndex = page * sizePerPage
-            val newCart = if (startIndex < cart.cartProducts.size) {
-                cart.getSubCart(startIndex, startIndex + sizePerPage)
-            } else {
-                cartDao.selectPage(page, sizePerPage).apply {
-                    cart = Cart(cart.cartProducts + cartProducts)
-                }
-            }
-
-            Thread.sleep(2000)
-            handler.post {
-                onSuccess(newCart)
-            }
-        }
+        cartRemoteDataSource.getCartProducts(
+            onSuccess = { onSuccess(it) },
+            onFailure = { onFailure() }
+        )
     }
 
     override fun deleteCartProduct(cartProduct: CartProduct) {
-        cartDao.deleteCartProduct(cartProduct)
-        cart = cart.removeCartProduct(cartProduct)
+        // cartDao.deleteCartProduct(cartProduct)
+        // cart = cart.removeCartProduct(cartProduct)
     }
 
     override fun getTotalAmount(): Int {
@@ -73,12 +51,13 @@ class CartRepositoryImpl(
     }
 
     override fun replaceCartProduct(prev: CartProduct, new: CartProduct) {
-        cart = cart.replaceCartProduct(prev, new)
+        // cart = cart.replaceCartProduct(prev, new)
     }
 
     override fun isAllCheckedInPage(page: Int, sizePerPage: Int): Boolean {
-        val startIndex = page * sizePerPage
-        val cartInPage = cart.getSubCart(startIndex, startIndex + sizePerPage)
-        return cartInPage.cartProducts.all { it.isChecked }
+        // val startIndex = page * sizePerPage
+        // val cartInPage = cart.getSubCart(startIndex, startIndex + sizePerPage)
+        // return cartInPage.cartProducts.all { it.isChecked }
+        return true
     }
 }

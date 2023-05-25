@@ -8,8 +8,8 @@ import woowacourse.shopping.domain.CartProduct
 object CartProductMapper : Mapper<CartProduct, CartProductModel> {
     override fun CartProduct.toView(): CartProductModel {
         return CartProductModel(
-            time,
-            amount,
+            id,
+            quantity,
             isChecked,
             product.toView()
         )
@@ -17,8 +17,8 @@ object CartProductMapper : Mapper<CartProduct, CartProductModel> {
 
     override fun CartProductModel.toDomain(): CartProduct {
         return CartProduct(
-            time,
-            amount,
+            id,
+            quantity,
             isChecked,
             product.toDomain()
         )

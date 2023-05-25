@@ -4,7 +4,6 @@ import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.model.mapper.ProductMapper.toDomain
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import java.time.LocalDateTime
 
 class CartProductDialogPresenter(
     private val view: CartProductDialogContract.View,
@@ -15,12 +14,12 @@ class CartProductDialogPresenter(
     private var cartProduct: CartProduct
 
     init {
-        cartProduct = CartProduct(LocalDateTime.now(), cartProductAmount, true, productModel.toDomain())
+        cartProduct = CartProduct(-1, cartProductAmount, true, productModel.toDomain())
         updateCartProductAmount()
     }
 
     override fun decreaseCartProductAmount() {
-        if (cartProduct.amount > MINIMUM_CART_PRODUCT_AMOUNT) {
+        if (cartProduct.quantity > MINIMUM_CART_PRODUCT_AMOUNT) {
             cartProduct = cartProduct.decreaseAmount()
             updateCartProductAmount()
         }
@@ -32,7 +31,7 @@ class CartProductDialogPresenter(
     }
 
     private fun updateCartProductAmount() {
-        view.updateCartProductAmount(cartProduct.amount)
+        view.updateCartProductAmount(cartProduct.quantity)
     }
 
     override fun addToCart() {
@@ -46,7 +45,7 @@ class CartProductDialogPresenter(
     }
 
     private fun updateCartProduct(prevCartProduct: CartProduct) {
-        cartProduct = prevCartProduct.copy(amount = prevCartProduct.amount + cartProduct.amount)
+        cartProduct = prevCartProduct.copy(quantity = prevCartProduct.quantity + cartProduct.quantity)
         cartRepository.modifyCartProduct(cartProduct)
     }
 

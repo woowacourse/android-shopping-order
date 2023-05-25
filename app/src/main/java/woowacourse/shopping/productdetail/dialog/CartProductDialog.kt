@@ -13,6 +13,7 @@ import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
 import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
+import woowacourse.shopping.server.CartRemoteDataSource
 
 class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     private lateinit var binding: DialogAddCartProductBinding
@@ -62,7 +63,7 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
         presenter = CartProductDialogPresenter(
             this,
             product,
-            cartRepository = CartRepositoryImpl(CartDao(db)),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSource(), CartDao(db)),
             cartProductAmount = 1
         )
     }

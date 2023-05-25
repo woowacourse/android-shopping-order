@@ -8,16 +8,12 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.common.model.CartProductModel
-import woowacourse.shopping.createCartProduct
 import woowacourse.shopping.createCartProductModel
-import woowacourse.shopping.createProduct
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.dao.CartDao
-import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import java.time.LocalDateTime
+import woowacourse.shopping.server.CartRemoteDataSource
 
 class CartPresenterTest {
     private lateinit var presenter: CartPresenter
@@ -26,7 +22,7 @@ class CartPresenterTest {
 
     @Before
     fun setUP() {
-        every { cartRepository.getPage(any(), any(), any(), any()) } just runs
+        every { cartRepository.getAll(any(), any()) } just runs
         every { cartRepository.getAllCount() } returns 0
         every { cartRepository.getTotalPrice() } returns 0
         every { cartRepository.getTotalAmount() } returns 0
@@ -101,22 +97,19 @@ class CartPresenterTest {
 
         // then
         verify {
-            cartRepository.getPage(any(), any(), any(), any())
+            cartRepository.getAll(any(), any())
         }
     }
 
     @Test
     fun 카트의_사이즈보다_현재_페이지와_페이지당_사이즈의_곱이_작다면_캐싱되어_있는_카트를_가져온다() {
         // given
+        val cartRemoteDataSource: CartRemoteDataSource = mockk()
         val cartDao: CartDao = mockk()
-        val cart: Cart = mockk()
-        val cartRepository = CartRepositoryImpl(cartDao, cart)
+        val cartRepository = CartRepositoryImpl(cartRemoteDataSource, cartDao)
         every { cartDao.selectAllCount() } returns 0
         every { cartDao.getTotalPrice() } returns 0
         every { cartDao.getTotalAmount() } returns 0
-        every { cart.cartProducts } returns listOf(createCartProduct())
-        every { cart.cartProducts.size } returns 1
-        every { cart.getSubCart(any(), any()) } returns Cart(listOf(createCartProduct()))
 
         // when
         presenter = CartPresenter(
@@ -124,7 +117,6 @@ class CartPresenterTest {
         )
 
         // then
-        verify { cart.getSubCart(any(), any()) }
     }
 
     @Test
@@ -193,7 +185,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 0, false, createProductModel())
+        val cartProductModel = CartProductModel(0, 0, false, createProductModel())
         presenter.increaseCartProductAmount(cartProductModel)
 
         // then
@@ -212,7 +204,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 0, false, createProductModel())
+        val cartProductModel = CartProductModel(0, 0, false, createProductModel())
         presenter.increaseCartProductAmount(cartProductModel)
 
         // then
@@ -230,7 +222,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 0, true, createProductModel())
+        val cartProductModel = CartProductModel(0, 0, true, createProductModel())
         presenter.increaseCartProductAmount(cartProductModel)
 
         // then
@@ -245,7 +237,7 @@ class CartPresenterTest {
         // given
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 1, false, createProductModel())
+        val cartProductModel = CartProductModel(0, 1, false, createProductModel())
         presenter.decreaseCartProductAmount(cartProductModel)
 
         // then
@@ -264,7 +256,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 2, false, createProductModel())
+        val cartProductModel = CartProductModel(0, 2, false, createProductModel())
         presenter.decreaseCartProductAmount(cartProductModel)
 
         // then
@@ -283,7 +275,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 2, false, createProductModel())
+        val cartProductModel = CartProductModel(0, 2, false, createProductModel())
         presenter.decreaseCartProductAmount(cartProductModel)
 
         // then
@@ -301,7 +293,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any(), any()) } just runs
 
         // when
-        val cartProductModel = CartProductModel(LocalDateTime.now(), 2, true, createProductModel())
+        val cartProductModel = CartProductModel(0, 2, true, createProductModel())
         presenter.decreaseCartProductAmount(cartProductModel)
 
         // then
@@ -314,16 +306,7 @@ class CartPresenterTest {
     @Test
     fun 체크된_상품_2개와_체크되지_않은_상품_3개가_있을_때_전체_체크를_하면_체크되지_않은_3개의_상품만큼만_업데이트_된다() {
         // given
-        val cart = Cart(
-            listOf(
-                CartProduct(LocalDateTime.now(), 0, false, createProduct()),
-                CartProduct(LocalDateTime.now(), 0, true, createProduct()),
-                CartProduct(LocalDateTime.now(), 0, false, createProduct()),
-                CartProduct(LocalDateTime.now(), 0, true, createProduct()),
-                CartProduct(LocalDateTime.now(), 0, false, createProduct()),
-            )
-        )
-        val cartRepository = CartRepositoryImpl(mockk(relaxed = true), cart)
+        val cartRepository = CartRepositoryImpl(mockk(relaxed = true), mockk(relaxed = true))
         presenter = CartPresenter(
             view, cartRepository, 0, 5
         )

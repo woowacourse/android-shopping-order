@@ -4,13 +4,13 @@ import woowacourse.shopping.data.database.SqlColumn
 import woowacourse.shopping.data.database.SqlType
 
 object SqlCart : SqlTable {
-    const val TIME = "time"
+    const val CART_ID = "cart_id"
     const val PRODUCT_ID = "product_id"
     const val AMOUNT = "amount"
 
     override val name: String = "Cart"
     override val scheme: List<SqlColumn> = listOf(
-        SqlColumn(TIME, SqlType.TEXT, "PRIMARY KEY"),
+        SqlColumn(CART_ID, SqlType.TEXT, "PRIMARY KEY"),
         SqlColumn(PRODUCT_ID, SqlType.INTEGER),
         SqlColumn(AMOUNT, SqlType.INTEGER),
     )

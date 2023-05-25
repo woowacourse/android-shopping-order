@@ -115,7 +115,7 @@ class ShoppingPresenter(
     override fun decreaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {
         var cartProduct = getCartProduct(shoppingProductModel.product)
         cartProduct = cartProduct.decreaseAmount()
-        if (cartProduct.amount > 0) {
+        if (cartProduct.quantity > 0) {
             updateCartProduct(cartProduct)
         } else {
             removeFromCart(cartProduct)
@@ -131,7 +131,7 @@ class ShoppingPresenter(
     override fun increaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {
         var cartProduct = getCartProduct(shoppingProductModel.product)
         cartProduct = cartProduct.increaseAmount()
-        if (cartProduct.amount > 1) {
+        if (cartProduct.quantity > 1) {
             updateCartProduct(cartProduct)
         } else {
             addToCart(cartProduct)
@@ -145,8 +145,8 @@ class ShoppingPresenter(
             cartRepository.getCartProductByProduct(productModel.toDomain())
         if (cartProduct == null) {
             cartProduct = CartProduct(
-                time = LocalDateTime.now(),
-                amount = 0,
+                id = 0,
+                quantity = 0,
                 isChecked = true,
                 product = productModel.toDomain()
             )
@@ -168,7 +168,7 @@ class ShoppingPresenter(
     ) {
         val newShoppingProductModel = ShoppingProductModel(
             shoppingProductModel.product,
-            cartProduct.amount
+            cartProduct.quantity
         )
         view.updateShoppingProduct(shoppingProductModel, newShoppingProductModel)
     }
