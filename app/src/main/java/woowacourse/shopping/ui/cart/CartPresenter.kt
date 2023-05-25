@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.cart
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
@@ -12,6 +14,8 @@ class CartPresenter(
     private val cartRepository: CartRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
+    private val handler = Handler(Looper.getMainLooper())
+
     private val _totalPrice = NonNullMutableLiveData<Int>(0)
     override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
 
@@ -53,11 +57,15 @@ class CartPresenter(
     }
 
     override fun setUpView() {
-        fetchCartProducts()
-        setUpCarts()
-        setUPTotalPrice()
-        setUpCheckedCount()
-        setUpAllButton()
+        Thread {
+            fetchCartProducts()
+            handler.post {
+                setUpCarts()
+                setUPTotalPrice()
+                setUpCheckedCount()
+                setUpAllButton()
+            }
+        }.start()
     }
 
     override fun setUpProductsCheck(checked: Boolean) {
@@ -71,37 +79,53 @@ class CartPresenter(
 
     override fun moveToPageNext() {
         index += 1
-        fetchCartProducts()
-        setUpCarts()
-        setUpAllButton()
+        Thread {
+            fetchCartProducts()
+            handler.post {
+                setUpCarts()
+                setUpAllButton()
+            }
+        }.start()
     }
 
     override fun moveToPagePrev() {
         index -= 1
-        fetchCartProducts()
-        setUpCarts()
-        setUpAllButton()
+        Thread {
+            fetchCartProducts()
+            handler.post {
+                setUpCarts()
+                setUpAllButton()
+            }
+        }.start()
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count)
-        currentPage.indexOfFirst { it.id == productId }
-            .takeIf { it != -1 }
-            ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-        setUpCheckedCount()
-        setUPTotalPrice()
+        Thread {
+            cartRepository.updateCount(productId, count)
+            handler.post {
+                currentPage.indexOfFirst { it.id == productId }
+                    .takeIf { it != -1 }
+                    ?.let { currentPage[it] = currentPage[it].copy(count = count) }
+                setUpCheckedCount()
+                setUPTotalPrice()
+            }
+        }.start()
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
-        isChangingItemCheck = true
-        cartRepository.updateChecked(productId, checked)
-        currentPage.indexOfFirst { it.id == productId }
-            .takeIf { it != -1 }
-            ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-        setUpCheckedCount()
-        setUPTotalPrice()
-        setUpAllButton()
-        isChangingItemCheck = false
+        Thread {
+            isChangingItemCheck = true
+            cartRepository.updateChecked(productId, checked)
+            handler.post {
+                currentPage.indexOfFirst { it.id == productId }
+                    .takeIf { it != -1 }
+                    ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
+                setUpCheckedCount()
+                setUPTotalPrice()
+                setUpAllButton()
+                isChangingItemCheck = false
+            }
+        }.start()
     }
 
     override fun removeItem(productId: Int) {
@@ -110,10 +134,14 @@ class CartPresenter(
         if (currentPage.isEmpty() && index > 0) {
             moveToPagePrev()
         } else {
-            fetchCartProducts()
-            setUpCarts()
-            setUpCheckedCount()
-            setUPTotalPrice()
+            Thread {
+                fetchCartProducts()
+                handler.post {
+                    setUpCarts()
+                    setUpCheckedCount()
+                    setUPTotalPrice()
+                }
+            }.start()
         }
     }
 
