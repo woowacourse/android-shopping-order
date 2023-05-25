@@ -25,7 +25,7 @@ fun String.toCartProduct(): CartProduct {
     val productJson = jsonObject.getJSONObject("product").toString()
     val product = productJson.convertJsonToProduct()
 
-    return CartProduct(id, product, count)
+    return CartProduct(id, product, count, 1)
 }
 
 fun CartProduct.toJson(): String = JSONObject().apply {

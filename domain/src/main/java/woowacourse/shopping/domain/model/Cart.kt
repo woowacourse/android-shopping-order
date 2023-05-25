@@ -8,11 +8,9 @@ data class Cart(
     val items: List<CartProduct> = emptyList(),
     val minProductSize: Int = 0,
 ) {
-    val totalCartProductCount: Int = items.sumOf { it.selectedCount.value }
+    val checkedCount: Int = items.count { it.isChecked }
+    val productCountInCart: Int = items.sumOf { it.selectedCount.value }
     val checkedProductTotalPrice: Int = items.sumOf { it.getTotalPrice(true) }
-
-    private fun CartProduct.canDecreaseCount(product: Product): Boolean =
-        this.product.id == product.id && selectedCount.value > minProductSize
 
     fun select(product: Product): Cart =
         copy(items = items.map { item ->

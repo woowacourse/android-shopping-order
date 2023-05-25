@@ -96,6 +96,7 @@ class CartPresenter(
     }
 
     private fun fetchView() {
+        _totalCheckSize.value = cart.checkedCount
         _pageCheckSize.value = currentPage.getCheckedProductSize(cart)
         view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
         view.updateTotalPrice(cart.checkedProductTotalPrice)

@@ -32,7 +32,7 @@ class ShoppingPresenter(
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
     private val cartProductCount: UiProductCount
-        get() = UiProductCount(cart.totalCartProductCount)
+        get() = UiProductCount(cart.productCountInCart)
 
     override fun fetchAll() {
         updateCart(newCartProducts = loadAllCartProducts())
