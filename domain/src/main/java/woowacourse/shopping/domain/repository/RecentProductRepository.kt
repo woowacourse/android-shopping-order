@@ -1,17 +1,16 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.RecentProducts
 
 interface RecentProductRepository {
+    fun getAll(onSuccess: (RecentProducts) -> Unit, onFailure: () -> Unit)
+
     fun addRecentProduct(recentProduct: RecentProduct)
 
-    fun getAll(): RecentProducts
+    fun updateRecentProduct(recentProduct: RecentProduct)
 
-    fun getByProduct(product: Product): RecentProduct?
+    fun getLatestRecentProduct(onSuccess: (RecentProduct?) -> Unit, onFailure: () -> Unit)
 
-    fun modifyRecentProduct(recentProduct: RecentProduct)
-
-    fun getLatestRecentProduct(): RecentProduct?
+    fun isExist(id: Int): Boolean
 }

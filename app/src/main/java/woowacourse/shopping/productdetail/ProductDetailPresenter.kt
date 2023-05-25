@@ -35,6 +35,6 @@ class ProductDetailPresenter(
 
     private fun updateRecentProduct(productModel: ProductModel) {
         val recentProduct = RecentProduct(LocalDateTime.now(), productModel.toDomain())
-        recentProductRepository.modifyRecentProduct(recentProduct)
+        recentProductRepository.updateRecentProduct(recentProduct)
     }
 }

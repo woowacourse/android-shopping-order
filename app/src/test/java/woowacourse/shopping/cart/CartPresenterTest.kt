@@ -26,7 +26,7 @@ class CartPresenterTest {
 
     @Before
     fun setUP() {
-        every { cartRepository.getPage(any(), any()) } returns Cart(emptyList())
+        every { cartRepository.getPage(any(), any(), any(), any()) } just runs
         every { cartRepository.getAllCount() } returns 0
         every { cartRepository.getTotalPrice() } returns 0
         every { cartRepository.getTotalAmount() } returns 0
@@ -101,7 +101,7 @@ class CartPresenterTest {
 
         // then
         verify {
-            cartRepository.getPage(any(), any())
+            cartRepository.getPage(any(), any(), any(), any())
         }
     }
 

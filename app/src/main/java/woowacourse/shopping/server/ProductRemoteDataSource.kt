@@ -44,6 +44,29 @@ class ProductRemoteDataSource {
         })
     }
 
+    fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
+        val baseUrl = Server.getUrl(Storage.server)
+        val url = "$baseUrl/$PATH/$id"
+        val request = Request.Builder().url(url).build()
+        val handler = Handler(Looper.myLooper()!!)
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onFailure()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val input = response.body?.string()
+                val jsonObject = JSONObject(input)
+                val product = createProduct(jsonObject)
+
+                handler.post {
+                    onSuccess(product)
+                }
+            }
+        })
+    }
+
     private fun createProduct(response: JSONObject): Product {
         return Product(
             id = response.getInt(KEY_ID),

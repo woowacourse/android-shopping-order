@@ -3,57 +3,51 @@ package woowacourse.shopping.data.database.dao
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import woowacourse.shopping.data.database.table.SqlProduct
+import woowacourse.shopping.Storage
+import woowacourse.shopping.data.database.entity.RecentProductEntity
 import woowacourse.shopping.data.database.table.SqlRecentProduct
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.RecentProducts
-import woowacourse.shopping.domain.URL
 import java.time.LocalDateTime
 
 class RecentProductDao(private val db: SQLiteDatabase) {
-    fun insertRecentProduct(recentProduct: RecentProduct) {
+    fun insertRecentProduct(recentProduct: RecentProductEntity) {
         val row = ContentValues()
+        row.put(SqlRecentProduct.PRODUCT_ID, recentProduct.id)
+        row.put(SqlRecentProduct.SERVER_NAME, Storage.server)
         row.put(SqlRecentProduct.TIME, recentProduct.time.toString())
-        row.put(SqlRecentProduct.PRODUCT_ID, recentProduct.product.id)
         db.insert(SqlRecentProduct.name, null, row)
     }
 
-    fun selectAll(): RecentProducts {
+    fun selectAll(): List<RecentProductEntity> {
+        val server = Storage.server
         val cursor = db.rawQuery(
-            "SELECT * FROM ${SqlRecentProduct.name}, ${SqlProduct.name} ON ${SqlRecentProduct.name}.${SqlRecentProduct.PRODUCT_ID} = ${SqlProduct.name}.${SqlProduct.ID} " +
-                "ORDER BY ${SqlRecentProduct.TIME} DESC",
-            null
+            """
+                |SELECT * FROM ${SqlRecentProduct.name} 
+                |WHERE ${SqlRecentProduct.SERVER_NAME} = ?
+                |ORDER BY ${SqlRecentProduct.TIME} DESC
+            """.trimMargin(),
+            arrayOf(server)
         )
         return createRecentProducts(cursor)
     }
 
-    private fun createRecentProducts(cursor: Cursor) = RecentProducts(
-        cursor.use {
-            val recentProducts = mutableListOf<RecentProduct>()
+    private fun createRecentProducts(cursor: Cursor): List<RecentProductEntity> {
+        return cursor.use {
+            val recentProducts = mutableListOf<RecentProductEntity>()
             while (it.moveToNext()) {
                 recentProducts.add(createRecentProduct(it))
             }
             recentProducts
         }
-    )
+    }
 
-    private fun createRecentProduct(cursor: Cursor) = RecentProduct(
-        LocalDateTime.parse(cursor.getString(cursor.getColumnIndexOrThrow(SqlRecentProduct.TIME))),
-        Product(
-            cursor.getInt(cursor.getColumnIndexOrThrow(SqlProduct.ID)),
-            URL(cursor.getString(cursor.getColumnIndexOrThrow(SqlProduct.PICTURE))),
-            cursor.getString(cursor.getColumnIndexOrThrow(SqlProduct.TITLE)),
-            cursor.getInt(cursor.getColumnIndexOrThrow(SqlProduct.PRICE)),
-        )
-    )
-
-    fun selectByProduct(product: Product): RecentProduct? {
-        val productId = product.id
+    fun selectProduct(id: Int): RecentProductEntity? {
+        val server = Storage.server
         val cursor = db.rawQuery(
-            "SELECT * FROM ${SqlRecentProduct.name}, ${SqlProduct.name} ON ${SqlRecentProduct.name}.${SqlRecentProduct.PRODUCT_ID} = ${SqlProduct.name}.${SqlProduct.ID} " +
-                "WHERE ${SqlRecentProduct.PRODUCT_ID} = ?",
-            arrayOf(productId.toString())
+            """
+                |SELECT * FROM ${SqlRecentProduct.name} 
+                |WHERE ${SqlRecentProduct.PRODUCT_ID} = ? AND ${SqlRecentProduct.SERVER_NAME} = ?
+            """.trimMargin(),
+            arrayOf(id.toString(), server)
         )
         return cursor.use {
             if (it.moveToNext()) createRecentProduct(it)
@@ -61,28 +55,34 @@ class RecentProductDao(private val db: SQLiteDatabase) {
         }
     }
 
-    fun updateRecentProduct(recentProduct: RecentProduct) {
-        val productId = recentProduct.product.id
+    private fun createRecentProduct(cursor: Cursor) = RecentProductEntity(
+        cursor.getInt(cursor.getColumnIndexOrThrow(SqlRecentProduct.PRODUCT_ID)),
+        LocalDateTime.parse(cursor.getString(cursor.getColumnIndexOrThrow(SqlRecentProduct.TIME)))
+    )
+
+    fun updateRecentProduct(recentProduct: RecentProductEntity) {
         val row = ContentValues()
+        row.put(SqlRecentProduct.PRODUCT_ID, recentProduct.id)
         row.put(SqlRecentProduct.TIME, recentProduct.time.toString())
-        row.put(SqlRecentProduct.PRODUCT_ID, productId)
 
         db.update(
             SqlRecentProduct.name,
             row,
-            "${SqlRecentProduct.PRODUCT_ID} = ?",
-            arrayOf(productId.toString())
+            "${SqlRecentProduct.PRODUCT_ID} = ? AND ${SqlRecentProduct.SERVER_NAME} = ?",
+            arrayOf(recentProduct.id.toString(), Storage.server)
         )
     }
 
-    fun selectLatestRecentProduct(): RecentProduct? {
+    fun selectLatestRecentProduct(): RecentProductEntity? {
+        val server = Storage.server
         val cursor = db.rawQuery(
             """
-                |SELECT * FROM ${SqlRecentProduct.name}, ${SqlProduct.name} ON ${SqlRecentProduct.name}.${SqlRecentProduct.PRODUCT_ID} = ${SqlProduct.name}.${SqlProduct.ID} 
+                |SELECT * FROM ${SqlRecentProduct.name}
+                |WHERE ${SqlRecentProduct.SERVER_NAME} = ?
                 |ORDER BY ${SqlRecentProduct.TIME} DESC
                 |LIMIT 1
             """.trimMargin(),
-            null
+            arrayOf(server)
         )
 
         return cursor.use {

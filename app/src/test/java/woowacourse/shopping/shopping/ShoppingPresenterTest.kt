@@ -14,11 +14,6 @@ import woowacourse.shopping.createCartProduct
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.createRecentProduct
 import woowacourse.shopping.createShoppingProductModel
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.RecentProducts
-import woowacourse.shopping.domain.ShoppingProduct
-import woowacourse.shopping.domain.URL
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -32,12 +27,7 @@ class ShoppingPresenterTest {
 
     @Before
     fun setUp() {
-        val shoppingProduct = ShoppingProduct(Product(URL(""), "", 1000), 1000)
-        every { productRepository.getProducts(any(), any()) } returns Products(
-            listOf(
-                shoppingProduct
-            )
-        )
+        every { productRepository.getProductsInSize(any(), any(), any(), any()) } just runs
         every { view.addProducts(any()) } just Runs
 
         presenter = ShoppingPresenter(
@@ -54,7 +44,7 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            productRepository.getProducts(any(), any())
+            productRepository.getProductsInSize(any(), any(), any(), any())
             view.addProducts(any())
         }
     }
@@ -77,10 +67,8 @@ class ShoppingPresenterTest {
     @Test
     fun 최근_본_상품에_없는_상품을_선택하면_최근_본_상품에_추가한다() {
         // given
-        val recentProduct = createRecentProduct()
-        every { recentProductRepository.getLatestRecentProduct() } returns recentProduct
-        every { recentProductRepository.getAll() } returns RecentProducts(listOf(recentProduct))
-        every { recentProductRepository.getByProduct(any()) } returns null
+        every { recentProductRepository.getLatestRecentProduct(any(), any()) } just runs
+        every { recentProductRepository.getAll(any(), any()) } just runs
         every { recentProductRepository.addRecentProduct(any()) } just runs
         every { view.showProductDetail(any(), any()) } just runs
 
@@ -96,26 +84,24 @@ class ShoppingPresenterTest {
     fun 최근_본_상품에_있는_상품을_선택하면_최근_본_상품을_업데이트한다() {
         // given
         val recentProduct = createRecentProduct()
-        every { recentProductRepository.getByProduct(any()) } returns recentProduct
-        every { recentProductRepository.getLatestRecentProduct() } returns recentProduct
-        every { recentProductRepository.getAll() } returns RecentProducts(listOf(recentProduct))
-        every { recentProductRepository.modifyRecentProduct(any()) } just runs
+        every { recentProductRepository.getLatestRecentProduct(any(), any()) } just runs
+        every { recentProductRepository.getAll(any(), any()) } just runs
+        every { recentProductRepository.updateRecentProduct(any()) } just runs
         every { view.showProductDetail(any(), any()) } just runs
 
         // when
         presenter.openProduct(recentProduct.product.toView())
 
         // then
-        verify { recentProductRepository.modifyRecentProduct(any()) }
+        verify { recentProductRepository.updateRecentProduct(any()) }
     }
 
     @Test
     fun 마지막으로_본_상품이_아닌_상품을_선택하면_마지막으로_본_상품과_함께_상품_상세정보를_보여준다() {
         // given
         val recentProduct = createRecentProduct()
-        every { recentProductRepository.getLatestRecentProduct() } returns recentProduct
-        every { recentProductRepository.getAll() } returns RecentProducts(listOf(recentProduct))
-        every { recentProductRepository.getByProduct(any()) } returns null
+        every { recentProductRepository.getLatestRecentProduct(any(), any()) } just runs
+        every { recentProductRepository.getAll(any(), any()) } just runs
         every { recentProductRepository.addRecentProduct(any()) } just runs
         every { view.showProductDetail(any(), any()) } just runs
 
@@ -131,10 +117,9 @@ class ShoppingPresenterTest {
     fun 마지막으로_본_상품을_선택하면_최근_본_상품_없이_상품_상세정보를_보여준다() {
         // given
         val recentProduct = createRecentProduct()
-        every { recentProductRepository.getLatestRecentProduct() } returns recentProduct
-        every { recentProductRepository.getAll() } returns RecentProducts(listOf(recentProduct))
-        every { recentProductRepository.getByProduct(any()) } returns recentProduct
-        every { recentProductRepository.modifyRecentProduct(any()) } just runs
+        every { recentProductRepository.getLatestRecentProduct(any(), any()) } just runs
+        every { recentProductRepository.getAll(any(), any()) } just runs
+        every { recentProductRepository.updateRecentProduct(any()) } just runs
         every { view.showProductDetail(any(), any()) } just runs
 
         // when
@@ -168,7 +153,7 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            productRepository.getProducts(any(), any())
+            productRepository.getProductsInSize(any(), any(), any(), any())
             view.addProducts(any())
         }
     }

@@ -196,7 +196,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             productRepository = productRepository,
-            recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(db)),
+            recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(db), ProductRemoteDataSource()),
             cartRepository = CartRepositoryImpl(CartDao(db)),
             recentProductSize = 10,
             productLoadSize = 20

@@ -4,6 +4,7 @@ import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.model.mapper.ProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ProductMapper.toView
+import woowacourse.shopping.common.model.mapper.RecentProductMapper.toView
 import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toView
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
@@ -28,7 +29,7 @@ class ShoppingPresenter(
     }
 
     override fun updateCartChange() {
-        productRepository.getProducts(
+        productRepository.getProductsInSize(
             0,
             productSize,
             onSuccess = { products ->
@@ -40,8 +41,13 @@ class ShoppingPresenter(
     }
 
     override fun updateRecentProducts() {
-        // val recentProducts = recentProductRepository.getAll()
-        // view.updateRecentProducts(recentProducts.getRecentProducts(recentProductSize).value.map { it.toView() })
+        recentProductRepository.getAll(
+            onSuccess = { recentProducts ->
+                val recentProductsInSize = recentProducts.getRecentProducts(recentProductSize)
+                view.updateRecentProducts(recentProductsInSize.value.map { it.toView() })
+            },
+            onFailure = { view.notifyLoadFailed() }
+        )
     }
 
     override fun setUpCartAmount() {
@@ -49,30 +55,32 @@ class ShoppingPresenter(
     }
 
     override fun openProduct(productModel: ProductModel) {
-        val latestRecentProduct = recentProductRepository.getLatestRecentProduct()
-        updateRecentProducts(productModel)
+        recentProductRepository.getLatestRecentProduct(
+            onSuccess = {
+                updateRecentProducts(productModel)
 
-        if (productModel.toDomain().isLatestRecentProduct(latestRecentProduct)) {
-            view.showProductDetail(productModel, null)
-        } else {
-            view.showProductDetail(productModel, latestRecentProduct?.product?.toView())
-        }
+                if (productModel.toDomain().isLatestRecentProduct(it)) {
+                    view.showProductDetail(productModel, null)
+                } else {
+                    view.showProductDetail(productModel, it?.product?.toView())
+                }
+            },
+            onFailure = { view.notifyLoadFailed() }
+        )
     }
 
     private fun Product.isLatestRecentProduct(latestRecentProduct: RecentProduct?) =
         latestRecentProduct?.product == this
 
     private fun updateRecentProducts(productModel: ProductModel) {
-        // val recentProducts = recentProductRepository.getAll()
-        // var recentProduct = recentProductRepository.getByProduct(productModel.toDomain())
-        //
-        // if (recentProduct == null) {
-        //     recentProduct = recentProducts.makeRecentProduct(productModel.toDomain())
-        //     addRecentProduct(recentProduct)
-        // } else {
-        //     recentProduct = recentProduct.updateTime()
-        //     updateRecentProduct(recentProduct)
-        // }
+        val recentProduct = RecentProduct(LocalDateTime.now(), productModel.toDomain())
+        val isExist = recentProductRepository.isExist(productModel.id)
+
+        if (isExist) {
+            updateRecentProduct(recentProduct)
+        } else {
+            addRecentProduct(recentProduct)
+        }
     }
 
     private fun addRecentProduct(recentProduct: RecentProduct) {
@@ -80,7 +88,7 @@ class ShoppingPresenter(
     }
 
     private fun updateRecentProduct(recentProduct: RecentProduct) {
-        recentProductRepository.modifyRecentProduct(recentProduct)
+        recentProductRepository.updateRecentProduct(recentProduct)
     }
 
     override fun openCart() {
@@ -88,7 +96,7 @@ class ShoppingPresenter(
     }
 
     override fun loadMoreProduct() {
-        productRepository.getProducts(
+        productRepository.getProductsInSize(
             productSize,
             productLoadSize,
             onSuccess = { loadedProducts ->

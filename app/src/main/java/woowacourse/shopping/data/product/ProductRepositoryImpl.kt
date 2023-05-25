@@ -9,7 +9,7 @@ import woowacourse.shopping.server.ProductRemoteDataSource
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource
 ) : ProductRepository {
-    override fun getProducts(
+    override fun getProductsInSize(
         startIndex: Int,
         size: Int,
         onSuccess: (Products) -> Unit,
