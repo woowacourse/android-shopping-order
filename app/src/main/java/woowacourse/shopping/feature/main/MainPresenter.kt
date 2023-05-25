@@ -38,6 +38,7 @@ class MainPresenter(
         get() = _mainScreenEvent
 
     override fun initLoadData() {
+
         initLoadCarts()
     }
 

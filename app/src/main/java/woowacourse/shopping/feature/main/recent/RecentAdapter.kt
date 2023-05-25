@@ -25,7 +25,7 @@ class RecentAdapter(private val recentProductClickListener: RecentProductClickLi
                 oldItem: RecentProductUiModel,
                 newItem: RecentProductUiModel,
             ): Boolean {
-                return oldItem.productUiModel.id == newItem.productUiModel.id
+                return oldItem.product.id == newItem.product.id
             }
 
             override fun areContentsTheSame(

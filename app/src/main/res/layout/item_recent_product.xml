@@ -18,12 +18,12 @@
         android:id="@+id/recent_box"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:onClick="@{()->listner.onClick(recentProduct.productUiModel.id)}"
+        android:onClick="@{()->listner.onClick(recentProduct.product.id)}"
         android:padding="6dp">
 
         <ImageView
             android:id="@+id/recent_product_img"
-            imgUrl="@{recentProduct.productUiModel.imgUrl}"
+            imgUrl="@{recentProduct.product.imgUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
@@ -41,7 +41,7 @@
             android:layout_marginTop="10dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{recentProduct.productUiModel.name}"
+            android:text="@{recentProduct.product.name}"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
