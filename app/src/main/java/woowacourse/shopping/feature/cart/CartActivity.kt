@@ -28,7 +28,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val adapter: CartProductListAdapter by lazy {
         CartProductListAdapter(
             onCartProductDeleteClick = presenter::deleteCartProduct,
-            updateCount = { productId: Int, count: Int -> presenter.updateCount(productId, count) },
+            plusQuantity = { state -> presenter.plusQuantity(state) },
+            minusQuantity = { state -> presenter.minusQuantity(state) },
             updateChecked = { productId: Int, checked: Boolean ->
                 presenter.updateChecked(productId, checked)
                 presenter.loadCheckedCartProductCount()
@@ -51,6 +52,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
         presenter.loadCart()
         presenter.loadCheckedCartProductCount()
+    }
+
+    override fun updateItem(newItem: CartProductState) {
+        adapter.updateItem(newItem)
     }
 
     override fun setCartProducts(cartProducts: List<CartProductState>) {
@@ -78,7 +83,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartProductCount(count: Int) {
-        runOnUiThread { binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count) }
+        runOnUiThread {
+            binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count)
+        }
     }
 
     override fun setTotalCost(paymentAmount: Int) {

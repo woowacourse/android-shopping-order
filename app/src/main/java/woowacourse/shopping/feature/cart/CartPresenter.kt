@@ -3,6 +3,8 @@ package woowacourse.shopping.feature.cart
 import com.example.domain.CartProduct
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductState
+import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
+import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
 import woowacourse.shopping.model.mapper.toUi
 
 class CartPresenter(
@@ -34,7 +36,7 @@ class CartPresenter(
 //
 //        view.setCartPageNumber(pageNumber)
 //        view.setCartProducts(items)
-//        view.hidePageSelectorView()
+        view.hidePageSelectorView()
 //        if (minPageNumber < maxPageNumber) view.showPageSelectorView()
     }
 
@@ -67,9 +69,26 @@ class CartPresenter(
 //        loadCart()
     }
 
-    override fun updateCount(productId: Int, count: Int) {
-//        cartRepository.updateCartProductCount(productId, count)
-//        view.setTotalCost(PaymentCalculator.totalPaymentAmount(cartRepository.getAll()).toInt())
+    override fun plusQuantity(cartProductState: CartProductState) {
+        cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
+        cartRepository.updateCartProductQuantity(
+            id = cartProductState.id, quantity = cartProductState.quantity,
+            onFailure = {}, onSuccess = {
+            view.updateItem(cartProductState)
+            // todo 계산 로직 필요
+        }
+        )
+    }
+
+    override fun minusQuantity(cartProductState: CartProductState) {
+        cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
+        cartRepository.updateCartProductQuantity(
+            id = cartProductState.id, quantity = cartProductState.quantity,
+            onFailure = {}, onSuccess = {
+            view.updateItem(cartProductState)
+            // todo 계산 로직 필요
+        }
+        )
     }
 
     override fun updateChecked(productId: Int, checked: Boolean) {
