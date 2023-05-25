@@ -73,8 +73,11 @@ class ProductDetailPresenter(
                 }
             }
 
-            cartProduct?.let {
-                val newCartProduct = cartProduct.copy(quantity = count)
+            cartProduct?.let { cart ->
+                val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
+                this.carts.removeIf { it.id == newCartProduct.id }
+                this.carts.add(newCartProduct.toUIModel())
+
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()
