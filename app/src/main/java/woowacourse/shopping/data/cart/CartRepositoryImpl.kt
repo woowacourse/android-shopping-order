@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.cart
 
 import com.example.domain.CartProduct
-import com.example.domain.Product
 import com.example.domain.repository.CartRepository
 
 class CartRepositoryImpl(
@@ -56,9 +55,16 @@ class CartRepositoryImpl(
 
     override fun deleteCartProduct(
         id: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
-        TODO("Not yet implemented")
+        Thread {
+            service.requestDeleteCartProduct(
+                url = url,
+                id = id,
+                onSuccess = onSuccess,
+                onFailure = onFailure
+            )
+        }.start()
     }
 }

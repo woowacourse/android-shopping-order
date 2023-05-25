@@ -78,8 +78,12 @@ class CartPresenter(
     }
 
     override fun deleteCartProduct(cartProductState: CartProductState) {
-//        cartRepository.deleteCartProduct(cartProductState.productId)
-//        loadCart()
+        cartRepository.deleteCartProduct(
+            id = cartProductState.id,
+            onFailure = {},
+            onSuccess = {},
+        )
+        loadCart()
     }
 
     override fun checkAll() {

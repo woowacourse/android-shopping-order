@@ -120,6 +120,37 @@ class CartRemoteService {
         )
     }
 
+    fun requestDeleteCartProduct(
+        url: String,
+        port: String = "8080",
+        user: String = BANDAL,
+        id: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val baseUrl = "$url:$port"
+        val requestUrl = "$baseUrl/cart-items/$id"
+        val request = Request.Builder()
+            .addHeader("Authorization", "Basic $user")
+            .url(requestUrl)
+            .delete()
+            .build()
+
+        okHttpClient.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    onFailure()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (400 <= response.code) return onFailure()
+
+                    response.close()
+                }
+            }
+        )
+    }
+
     private fun parseJsonToCartProductList(responseString: String): List<CartProduct> {
         val jsonArray = JSONArray(responseString)
         val cartItems = mutableListOf<CartProduct>()

@@ -1,7 +1,6 @@
 package com.example.domain.repository
 
 import com.example.domain.CartProduct
-import com.example.domain.Product
 
 interface CartRepository {
 
@@ -25,7 +24,7 @@ interface CartRepository {
 
     fun deleteCartProduct(
         id: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: () -> Unit
     )
 }
