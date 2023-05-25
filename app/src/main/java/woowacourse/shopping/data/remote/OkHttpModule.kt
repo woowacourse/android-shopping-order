@@ -7,7 +7,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object OkHttpModule {
-    var BASE_URL = "http://15.164.103.138:8080"
+    var BASE_URL = ""
     private const val AUTHORIZATION_FORMAT = "Basic %s"
 
     private val encodedUserInfo =
