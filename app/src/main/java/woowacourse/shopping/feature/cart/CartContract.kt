@@ -24,7 +24,6 @@ interface CartContract {
         fun processOrderClick()
         fun loadPreviousPage()
         fun loadNextPage()
-        fun setPage(restorePage: Int)
         fun exit()
     }
 }

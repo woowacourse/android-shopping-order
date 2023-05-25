@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.service.CartProductRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.util.toMoneyFormat
 
@@ -40,15 +40,19 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
         cartProductAdapter = CartProductAdapter(cartProductClickListener)
         binding.cartItemRecyclerview.adapter = cartProductAdapter
-        presenter = CartPresenter(this, CartRepositoryImpl(CartDao(this)))
+        initPresenter()
         presenter.loadInitCartProduct()
         binding.presenter = presenter
-
         supportActionBar?.title = getString(R.string.cart)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         setRecyclerViewAnimator()
         observePresenter()
+    }
+
+    private fun initPresenter() {
+        val cartProductRemoteService = CartProductRemoteService()
+        presenter = CartPresenter(this, CartRepositoryImpl(cartProductRemoteService))
     }
 
     private fun setRecyclerViewAnimator() {
@@ -109,23 +113,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(
-            CURRENT_PAGE_KEY,
-            presenter.pageBottomNavigationUiModel.value?.currentPageNumber ?: 1,
-        )
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val currentPage = savedInstanceState.getInt(CURRENT_PAGE_KEY)
-        presenter.setPage(currentPage)
-    }
-
     companion object {
-        private const val CURRENT_PAGE_KEY = "CURRENT_PAGE_KEY"
-
         fun getIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.domain.model.CartProducts
 import com.example.domain.model.Pagination
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartBottomNavigationUiModel
 import woowacourse.shopping.model.CartProductUiModel
@@ -45,7 +44,13 @@ class CartPresenter(
 
     override fun loadInitCartProduct() {
         view.showLoadingView()
-        _page = Pagination(CartProducts(cartRepository.getAll()), 1).toPresentation()
+        cartRepository.getAll(
+            onSuccess = {
+                _page = Pagination(CartProducts(it), 1).toPresentation()
+                view.hideLoadingView()
+            },
+            onFailure = {},
+        )
         Thread {
             Thread.sleep(2000)
             view.hideLoadingView()
@@ -63,45 +68,37 @@ class CartPresenter(
     }
 
     override fun handleDeleteCartProductClick(cartId: Long) {
-        val cartProduct = page.currentPageCartProducts.find { it.cartId == cartId } ?: return
-        cartRepository.deleteProduct(cartProduct.toDomain())
-        _page = page.toDomain().remove(cartId).toPresentation()
+        cartRepository.deleteCartProduct(
+            cartId,
+            onSuccess = {
+                _page = page.toDomain().remove(cartId).toPresentation()
+            },
+            onFailure = {},
+        )
     }
 
     override fun handleCartProductCartCountChange(cartId: Long, count: Int) {
-        val findCartProduct =
-            page.currentPageCartProducts.find { it.cartId == cartId } ?: return
-
-        _page = page.toDomain().changeCountState(cartId, count).toPresentation()
-
-        cartRepository.changeCartProductCount(findCartProduct.productUiModel.toDomain(), count)
+        cartRepository.changeCartProductCount(
+            cartId,
+            count,
+            onSuccess = {
+                _page = page.toDomain().changeCountState(cartId, count).toPresentation()
+            },
+            onFailure = {},
+        )
     }
 
     override fun handlePurchaseSelectedCheckedChange(cartId: Long, checked: Boolean) {
-        val findCartProduct =
-            page.currentPageCartProducts.find { it.cartId == cartId } ?: return
         _page = page.toDomain().changeChecked(cartId, checked).toPresentation()
-
-        cartRepository.changeCartProductCheckedState(
-            findCartProduct.productUiModel.toDomain(),
-            checked,
-        )
     }
 
     override fun handleCurrentPageAllCheckedChange(checked: Boolean) {
         _page = page.toDomain().setCurrentPageAllChecked(checked).toPresentation()
-        val currentIds = page.currentPageCartProducts.map { it.cartId }
-        cartRepository.changeCurrentPageAllCheckedState(currentIds, checked)
     }
 
     override fun processOrderClick() {
         if (page.cartBottomNavigationUiModel.isAnyChecked.not()) return
-        cartRepository.deleteAllCheckedCartProduct()
         _page = page.toDomain().removeAllChecked().toPresentation()
-    }
-
-    override fun setPage(restorePage: Int) {
-        _page = Pagination(CartProducts(cartRepository.getAll()), restorePage).toPresentation()
     }
 
     override fun exit() {

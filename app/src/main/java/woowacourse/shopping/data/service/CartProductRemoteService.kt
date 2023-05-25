@@ -58,6 +58,7 @@ class CartProductRemoteService {
         val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
             .url("${baseUrl}cart-items")
+            .addHeader("Authorization", "Basic $token")
             .post(body).build()
 
         val thread = Thread {
