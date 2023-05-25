@@ -10,7 +10,7 @@ interface ShoppingContract {
     interface View {
         fun updateProducts(products: List<CartProduct>)
         fun updateRecentProducts(recentProducts: List<UiRecentProduct>)
-        fun navigateToProductDetail(product: UiProduct, recentProduct: UiRecentProduct?)
+        fun navigateToProductDetail(product: UiProduct)
         fun navigateToCart()
         fun showLoadMoreButton()
         fun hideLoadMoreButton()
@@ -26,7 +26,6 @@ interface ShoppingContract {
         abstract fun navigateToCart()
         abstract fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int)
         abstract fun addCartProduct(product: UiProduct, addCount: Int = 1)
-//        abstract fun addCartCount(cartProduct: UiCartProduct, addCount: Int)
         abstract fun increaseCartCount(product: UiProduct, addCount: Int)
     }
 }

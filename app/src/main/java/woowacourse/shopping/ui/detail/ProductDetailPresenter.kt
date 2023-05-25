@@ -1,19 +1,29 @@
 package woowacourse.shopping.ui.detail
 
+import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.mapper.toDomain
+import woowacourse.shopping.mapper.toUi
 import woowacourse.shopping.model.UiProduct
-import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.detail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.detail.ProductDetailContract.View
 
-class ProductDetailPresenter(
+class
+ProductDetailPresenter(
     view: View,
     private val product: UiProduct,
-    private val recentProduct: UiRecentProduct?,
+    showLastViewedProduct: Boolean,
+    recentProductRepository: RecentProductRepository,
 ) : Presenter(view) {
+    private val lastViewedProduct = recentProductRepository.getPartially(1).getLatest()
 
     init {
+        recentProductRepository.add(RecentProduct(product = product.toDomain()))
+
+        if (showLastViewedProduct) {
+            view.showLastViewedProductDetail(lastViewedProduct?.product?.toUi())
+        }
         view.showProductDetail(product)
-        view.showLastViewedProductDetail(recentProduct?.product)
     }
 
     override fun inquiryProductCounter() {
@@ -21,7 +31,7 @@ class ProductDetailPresenter(
     }
 
     override fun inquiryLastViewedProduct() {
-        recentProduct?.let { view.navigateToProductDetail(it) }
+        lastViewedProduct?.let { view.navigateToProductDetail(it.toUi()) }
     }
 
     override fun navigateToHome(count: Int) {

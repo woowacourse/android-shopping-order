@@ -76,8 +76,8 @@ class ShoppingActivity : AppCompatActivity(), View,
         recentProductWrapperAdapter.submitList(recentProducts)
     }
 
-    override fun navigateToProductDetail(product: UiProduct, recentProduct: UiRecentProduct?) {
-        startActivity(ProductDetailActivity.getIntent(this, product, recentProduct))
+    override fun navigateToProductDetail(product: UiProduct) {
+        startActivity(ProductDetailActivity.getIntent(this, product, true))
     }
 
     override fun navigateToCart() {

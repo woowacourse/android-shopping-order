@@ -50,14 +50,12 @@ class ShoppingPresenter(
 
     override fun inquiryProductDetail(cartProduct: UiCartProduct) {
         val recentProduct = RecentProduct(product = cartProduct.product.toDomain())
-        view.navigateToProductDetail(cartProduct.product, recentProducts.getLatest()?.toUi())
-        recentProductRepository.add(recentProduct)
+        view.navigateToProductDetail(cartProduct.product)
         updateRecentProducts(recentProducts + recentProduct)
     }
 
     override fun inquiryRecentProductDetail(recentProduct: UiRecentProduct) {
-        view.navigateToProductDetail(recentProduct.product, recentProducts.getLatest()?.toUi())
-        recentProductRepository.add(recentProduct.toDomain())
+        view.navigateToProductDetail(recentProduct.product)
     }
 
     override fun navigateToCart() {

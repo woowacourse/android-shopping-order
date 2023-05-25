@@ -10,9 +10,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
-import woowacourse.shopping.ui.detail.dialog.ProductCounterDialog
 import woowacourse.shopping.ui.detail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.detail.ProductDetailContract.View
+import woowacourse.shopping.ui.detail.dialog.ProductCounterDialog
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
@@ -22,9 +22,10 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
     private lateinit var binding: ActivityProductDetailBinding
     private val presenter: Presenter by lazy {
         inject(
+            context = this,
             view = this,
             detailProduct = intent.getParcelableExtraCompat(DETAIL_PRODUCT_KEY)!!,
-            recentProduct = intent.getParcelableExtraCompat(LAST_VIEWED_PRODUCT_KEY),
+            showLastViewedProduct = intent.getBooleanExtra(SHOW_LAST_VIEWED_PRODUCT_KEY, true),
         )
     }
 
@@ -56,7 +57,7 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
     }
 
     override fun navigateToProductDetail(recentProduct: UiRecentProduct) {
-        startActivity(getIntent(this, recentProduct.product, null))
+        startActivity(getIntent(this, recentProduct.product, false))
         finish()
     }
 
@@ -69,11 +70,11 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
 
     companion object {
         private const val DETAIL_PRODUCT_KEY = "detail_product_key"
-        private const val LAST_VIEWED_PRODUCT_KEY = "last_viewed_product_key"
+        private const val SHOW_LAST_VIEWED_PRODUCT_KEY = "show_last_viewed_product_key"
 
-        fun getIntent(context: Context, detail: UiProduct, recent: UiRecentProduct?): Intent =
+        fun getIntent(context: Context, detail: UiProduct, showLastViewedProduct: Boolean): Intent =
             Intent(context, ProductDetailActivity::class.java)
                 .putExtra(DETAIL_PRODUCT_KEY, detail)
-                .putExtra(LAST_VIEWED_PRODUCT_KEY, recent)
+                .putExtra(SHOW_LAST_VIEWED_PRODUCT_KEY, showLastViewedProduct)
     }
 }

@@ -1,15 +1,14 @@
 package woowacourse.shopping.util.inject
 
 import android.content.Context
+import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDaoImpl
+import woowacourse.shopping.data.datasource.recentproduct.LocalRecentProductDataSource
 import woowacourse.shopping.data.repository.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.service.CartServiceImpl
-import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.data.service.ProductServiceImpl
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.model.UiProduct
-import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
 import woowacourse.shopping.ui.detail.ProductDetailContract
@@ -33,13 +32,17 @@ fun inject(
 }
 
 fun inject(
+    context: Context,
     view: ProductDetailContract.View,
     detailProduct: UiProduct,
-    recentProduct: UiRecentProduct?,
+    showLastViewedProduct: Boolean,
 ): ProductDetailContract.Presenter = ProductDetailPresenter(
     view = view,
     product = detailProduct,
-    recentProduct = recentProduct,
+    recentProductRepository = RecentProductRepositoryImpl(
+        LocalRecentProductDataSource(RecentProductDaoImpl(createShoppingDatabase(context))),
+    ),
+    showLastViewedProduct = showLastViewedProduct,
 )
 
 fun inject(
