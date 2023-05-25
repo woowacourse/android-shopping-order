@@ -56,15 +56,16 @@ class ProductDetailPresenter(
     private fun updateBasketProduct() {
         if (currentProductBasketId != null) {
             updateCurrentProduct()
+            view.showBasket()
         } else {
             basketRepository.add(currentProduct.toDomain()) {
                 currentProductBasketId = it
                 if (currentProduct.basketCount > 1) {
                     updateCurrentProduct()
                 }
+                view.showBasket()
             }
         }
-        view.showBasket()
     }
 
     private fun updateCurrentProduct() {
