@@ -17,16 +17,15 @@ import woowacourse.shopping.server.ShoppingMockWebServer
 
 class ProductServiceImpl : ProductService {
     private val shoppingMockServer: ShoppingMockWebServer = ShoppingMockWebServer()
-    private var BASE_URL: String
+    private val baseUrl: String = pref.getBaseUrl().toString()
 
     init {
         shoppingMockServer.start()
         shoppingMockServer.join()
-        BASE_URL = pref.getBaseUrl().toString()
     }
 
     override fun findProductById(id: ProductId): Product? {
-        val url = "$BASE_URL/products/$id"
+        val url = "$baseUrl/products/$id"
         var product: Product? = null
 
         val latch = ShoppingOkHttpClient.enqueue(
@@ -41,7 +40,7 @@ class ProductServiceImpl : ProductService {
     }
 
     override fun getAllProduct(): List<Product> {
-        val url = "$BASE_URL/products"
+        val url = "$baseUrl/products"
         var products = mutableListOf<Product>()
 
         val latch = ShoppingOkHttpClient.enqueue(
@@ -56,7 +55,7 @@ class ProductServiceImpl : ProductService {
     }
 
     override fun insertProduct(product: Product) {
-        val url = "$BASE_URL/products"
+        val url = "$baseUrl/products"
 
         val latch = ShoppingOkHttpClient.enqueue(
             post(url, product.toJson().toRequestBody(JSON_MEDIA_TYPE)),
@@ -67,7 +66,7 @@ class ProductServiceImpl : ProductService {
     }
 
     override fun updateProduct(product: Product) {
-        val url = "$BASE_URL/products/${product.id}"
+        val url = "$baseUrl/products/${product.id}"
 
         val latch = ShoppingOkHttpClient.enqueue(
             put(url, product.toJson().toRequestBody(JSON_MEDIA_TYPE)),
@@ -78,7 +77,7 @@ class ProductServiceImpl : ProductService {
     }
 
     override fun deleteProduct(product: Product) {
-        val url = "$BASE_URL/products/${product.id}"
+        val url = "$baseUrl/products/${product.id}"
 
         val latch = ShoppingOkHttpClient.enqueue(
             delete(url, product.toJson().toRequestBody(JSON_MEDIA_TYPE)),

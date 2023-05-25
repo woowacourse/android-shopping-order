@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.service.cart
 
 import okhttp3.RequestBody.Companion.toRequestBody
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.model.CartProduct
 import woowacourse.shopping.data.model.ProductCount
 import woowacourse.shopping.data.util.convertProductIdToJson
@@ -8,11 +9,12 @@ import woowacourse.shopping.data.util.okhttp.Header
 import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient
 import woowacourse.shopping.data.util.toCartProducts
 import woowacourse.shopping.data.util.toJson
-import woowacourse.shopping.server.BASE_URL
 
 class CartServiceImpl : CartService {
+    private val baseUrl: String = pref.getBaseUrl().toString()
+
     override fun getAllCartProduct(): List<CartProduct> {
-        val url = "$BASE_URL/cart-items"
+        val url = "$baseUrl/cart-items"
         val cartProducts = mutableListOf<CartProduct>()
 
         val latch = ShoppingOkHttpClient.enqueue(
@@ -28,7 +30,7 @@ class CartServiceImpl : CartService {
     }
 
     override fun addCartProductByProductId(productId: ProductId) {
-        val url = "$BASE_URL/cart-items"
+        val url = "$baseUrl/cart-items"
 
         val latch = ShoppingOkHttpClient.enqueue(
             ShoppingOkHttpClient.post(
@@ -42,7 +44,7 @@ class CartServiceImpl : CartService {
     }
 
     override fun updateProductCountById(cartProductId: Int, count: ProductCount) {
-        val url = "$BASE_URL/cart-items/$cartProductId"
+        val url = "$baseUrl/cart-items/$cartProductId"
 
         val latch = ShoppingOkHttpClient.enqueue(
             ShoppingOkHttpClient.patch(url, count.toJson().toRequestBody(Header.JSON_MEDIA_TYPE)),
@@ -53,7 +55,7 @@ class CartServiceImpl : CartService {
     }
 
     override fun deleteCartProductById(cartProductId: Int) {
-        val url = "$BASE_URL/cart-items/$cartProductId"
+        val url = "$baseUrl/cart-items/$cartProductId"
 
         val latch = ShoppingOkHttpClient.enqueue(
             ShoppingOkHttpClient.delete(url),
