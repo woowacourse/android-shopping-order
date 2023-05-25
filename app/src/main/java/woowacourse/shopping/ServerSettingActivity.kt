@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.ServerType.JOY_SERVER
 import woowacourse.shopping.ServerType.MINT_SERVER
-import woowacourse.shopping.ServerType.SUBAN_MOCK_SERVER
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.feature.product.MainActivity
 
@@ -19,10 +18,6 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun setServerClickListener() {
-        binding.btSubanMockServer.setOnClickListener {
-            startMain(SUBAN_MOCK_SERVER.url)
-        }
-
         binding.btMintServer.setOnClickListener {
             startMain(MINT_SERVER.url)
         }

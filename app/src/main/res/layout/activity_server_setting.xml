@@ -9,21 +9,12 @@
         tools:context=".ServerSettingActivity">
 
         <Button
-            android:id="@+id/bt_suban_mock_server"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="수반 목서버"
-            app:layout_constraintBottom_toTopOf="@+id/bt_mint_server"
-            app:layout_constraintEnd_toEndOf="@+id/bt_joy_server"
-            app:layout_constraintStart_toStartOf="@+id/bt_mint_server" />
-
-        <Button
             android:id="@+id/bt_mint_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="민트 서버"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/bt_joy_server"
+            app:layout_constraintEnd_toStartOf="@id/bt_joy_server"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +27,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/bt_mint_server"
+            app:layout_constraintStart_toEndOf="@id/bt_mint_server"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
