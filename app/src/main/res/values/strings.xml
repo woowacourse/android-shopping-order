@@ -15,4 +15,7 @@
     <string name="all">전체</string>
     <string name="order">주문하기(%d)</string>
     <string name="most_recent_product">마지막으로 본 상품</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">sign in</string>
 </resources>

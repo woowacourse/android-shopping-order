@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.service
 
+import woowacourse.shopping.data.CartCache
+import woowacourse.shopping.data.ProductCacheImpl
+
 object ServerInfo {
 
     private lateinit var _currentBaseUrl: String
@@ -17,5 +20,7 @@ object ServerInfo {
     fun setBaseUrl(serverName: String) {
         _currentBaseUrl = baseUrlMap[serverName] ?: ""
         _serverName = serverName
+        CartCache.clear()
+        ProductCacheImpl.clear()
     }
 }

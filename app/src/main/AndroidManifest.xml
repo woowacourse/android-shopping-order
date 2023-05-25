@@ -15,6 +15,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".feature.login.LoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".feature.serverSetting.ServerSettingActivity"
             android:exported="true">
             <intent-filter>

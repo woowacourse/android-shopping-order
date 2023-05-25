@@ -89,8 +89,8 @@ class RecentDao(
     private fun updateRecentProduct(recentProduct: RecentProduct) {
         val timeSecond = recentProduct.dateTime.toEpochSecond(ZoneOffset.UTC)
         val updateSql = "UPDATE ${RecentContract.TABLE_NAME} " +
-                "SET ${RecentContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
-                "WHERE ${RecentContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.product.id}"
+            "SET ${RecentContract.TABLE_COLUMN_DATE_TIME}=$timeSecond " +
+            "WHERE ${RecentContract.TABLE_COLUMN_RECENT_PRODUCT_ID}=${recentProduct.product.id}"
         writableDatabase.execSQL(updateSql)
     }
 

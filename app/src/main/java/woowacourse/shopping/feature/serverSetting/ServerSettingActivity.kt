@@ -3,10 +3,9 @@ package woowacourse.shopping.feature.serverSetting
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.ServerInfo
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
-import woowacourse.shopping.feature.main.MainActivity
+import woowacourse.shopping.feature.login.LoginActivity
 
 class ServerSettingActivity : AppCompatActivity() {
 
@@ -17,7 +16,6 @@ class ServerSettingActivity : AppCompatActivity() {
         binding = ActivityServerSettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setUpView()
-        TokenSharedPreference.getInstance(applicationContext).setToken(userToken)
     }
 
     private fun setUpView() {
@@ -28,20 +26,16 @@ class ServerSettingActivity : AppCompatActivity() {
 
             firstServerBtn.setOnClickListener {
                 ServerInfo.setBaseUrl("modi")
-                startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
+                startActivity(Intent(this@ServerSettingActivity, LoginActivity::class.java))
             }
             secondServerBtn.setOnClickListener {
                 ServerInfo.setBaseUrl("onekong")
-                startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
+                startActivity(Intent(this@ServerSettingActivity, LoginActivity::class.java))
             }
             thirdServerBtn.setOnClickListener {
                 ServerInfo.setBaseUrl("jamie")
-                startActivity(Intent(this@ServerSettingActivity, MainActivity::class.java))
+                startActivity(Intent(this@ServerSettingActivity, LoginActivity::class.java))
             }
         }
-    }
-
-    companion object {
-        private const val userToken: String = "YUBhLmNvbToxMjM0"
     }
 }
