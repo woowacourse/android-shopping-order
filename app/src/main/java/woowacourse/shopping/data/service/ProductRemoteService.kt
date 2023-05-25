@@ -9,9 +9,13 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.user.ServerInfo
 import java.io.IOException
 
-class ProductRemoteService(private val baseUrl: String) {
+class ProductRemoteService {
+    private val baseUrl: String
+        get() = ServerInfo.url
+
     fun request(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,

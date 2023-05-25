@@ -12,13 +12,20 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.user.ServerInfo
 import java.io.IOException
 import java.net.URI
 
-class CartProductRemoteService(private val baseUrl: String) {
+class CartProductRemoteService {
+    private val baseUrl: String
+        get() = ServerInfo.url
+
+    private val token: String
+        get() = ServerInfo.token
+
     fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
         val request = Request.Builder().url("${baseUrl}cart-items")
-            .addHeader("Authorization", "Basic YUBhLmNvbToxMjM0").build()
+            .addHeader("Authorization", "Basic $token").build()
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -50,7 +57,7 @@ class CartProductRemoteService(private val baseUrl: String) {
         """.trimIndent()
         val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
-            .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items")
+            .url("${baseUrl}cart-items")
             .post(body).build()
 
         val thread = Thread {
@@ -83,8 +90,8 @@ class CartProductRemoteService(private val baseUrl: String) {
         """.trimIndent()
         val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
-            .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items/$cartId")
-            .addHeader("Authorization", "Basic YUBhLmNvbToxMjM0").patch(body).build()
+            .url("${baseUrl}cart-items/$cartId")
+            .addHeader("Authorization", "Basic $token").patch(body).build()
 
         val thread = Thread {
             kotlin.runCatching { OkHttpClient().newCall(request).execute() }
@@ -104,8 +111,8 @@ class CartProductRemoteService(private val baseUrl: String) {
         onFailure: () -> Unit,
     ) {
         val request = Request.Builder()
-            .url("http://ec2-13-209-67-35.ap-northeast-2.compute.amazonaws.com:8080/cart-items/$cartId")
-            .addHeader("Authorization", "Basic YUBhLmNvbToxMjM0").delete().build()
+            .url("${baseUrl}cart-items/$cartId")
+            .addHeader("Authorization", "Basic $token").delete().build()
 
         val thread = Thread {
             kotlin.runCatching { OkHttpClient().newCall(request).execute() }
