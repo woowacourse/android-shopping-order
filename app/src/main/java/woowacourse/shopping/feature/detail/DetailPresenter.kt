@@ -4,7 +4,6 @@ import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
-import java.time.LocalDateTime
 
 class DetailPresenter(
     val view: DetailContract.View,
@@ -21,7 +20,7 @@ class DetailPresenter(
 
     init {
         isRecentProduct = recentProduct?.let {
-            if (product.id == it.productUiModel.id) return@let true
+            if (product.id == it.product.id) return@let true
             return@let false
         } ?: false
     }
@@ -30,8 +29,8 @@ class DetailPresenter(
         if (isRecentProduct || recentProduct == null) return view.hideRecentScreen()
         recentProduct?.let {
             view.setRecentScreen(
-                it.productUiModel.name,
-                it.productUiModel.toMoneyFormat(),
+                it.product.name,
+                it.product.toMoneyFormat(),
             )
         }
     }
@@ -46,9 +45,7 @@ class DetailPresenter(
 
     override fun navigateRecentProductDetail() {
         recentProduct?.let {
-            recentProductRepository.addRecentProduct(
-                it.toDomain().copy(dateTime = LocalDateTime.now()),
-            )
+            recentProductRepository.addRecentProduct(it.product.toDomain())
             view.showRecentProductDetailScreen(it)
         }
     }

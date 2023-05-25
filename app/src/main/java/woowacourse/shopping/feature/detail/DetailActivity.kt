@@ -82,7 +82,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         startActivity(
             getIntent(
                 this,
-                recentProductUiModel.productUiModel,
+                recentProductUiModel.product,
                 recentProductUiModel,
             ).apply { addFlags(FLAG_ACTIVITY_CLEAR_TOP) },
         )
