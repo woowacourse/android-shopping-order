@@ -13,6 +13,7 @@ interface CartContract {
         fun setTotalCost(paymentAmount: Int)
         fun showPageSelectorView()
         fun hidePageSelectorView()
+        fun updateItem(newItem: CartProductState)
     }
 
     interface Presenter {
@@ -20,7 +21,8 @@ interface CartContract {
         fun loadCheckedCartProductCount()
         fun plusPageNumber()
         fun minusPageNumber()
-        fun updateCount(productId: Int, count: Int)
+        fun plusQuantity(cartProductState: CartProductState)
+        fun minusQuantity(cartProductState: CartProductState)
         fun updateChecked(productId: Int, checked: Boolean)
         fun deleteCartProduct(cartProductState: CartProductState)
         fun checkAll()

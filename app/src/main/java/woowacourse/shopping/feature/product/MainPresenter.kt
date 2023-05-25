@@ -78,15 +78,8 @@ class MainPresenter(
         cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = {
-            loadCartProductCountBadge()
-        }
+            onFailure = {}, onSuccess = { loadCartProductCountBadge() }
         )
-
-//        val cartProduct: CartProduct? = cartRepository.getCartProduct(productState.id)
-//        val cartProductCount: Int = (cartProduct?.quantity ?: MIN_COUNT_VALUE) - 1
-//        cartRepository.updateCartProductCount(productState.id, cartProductCount)
-//        loadCartProductCountBadge()
     }
 
     override fun plusCartProductCount(cartProductState: CartProductState) {
@@ -94,16 +87,8 @@ class MainPresenter(
         cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {
-                Log.d("otter66", "onFailure")
-            }, onSuccess = {
-            Log.d("otter66", "onSuccess")
-        }
+            onFailure = {}, onSuccess = {}
         )
-
-//        val cartProduct: CartProduct? = cartRepository.getCartProduct(productState.id)
-//        val cartProductCount: Int = (cartProduct?.quantity ?: MIN_COUNT_VALUE) + 1
-//        cartRepository.updateCartProductCount(productState.id, cartProductCount)
     }
 
     private fun storeRecentProduct(productId: Int, viewedDateTime: LocalDateTime) {
