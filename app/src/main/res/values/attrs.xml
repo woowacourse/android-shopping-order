@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ProductCounterView">
+    <declare-styleable name="SkeletonCounterView">
         <attr name="useSkeleton" format="boolean" />
         <attr name="count" format="integer" />
         <attr name="min_count" format="integer" />

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRemoteRepository
@@ -26,7 +25,7 @@ class CartPresenter(
     private var cart: Cart = Cart(minProductSize = 1)
     private var currentPage: Page = Pagination(sizePerPage = cartSize)
 
-    private val _totalCheckSize = MutableLiveData(cartRepository.getAllCartProduct().size)
+    private val _totalCheckSize = MutableLiveData(cartRepository.getAllCartProducts().size)
     val totalCheckSize: LiveData<Int> get() = _totalCheckSize
 
     private val _pageCheckSize = MutableLiveData(currentPage.getCheckedProductSize(cart))
@@ -43,16 +42,17 @@ class CartPresenter(
         fetchView()
     }
 
-    private fun loadCartProducts(): List<CartProduct> = cartRepository.getAllCartProduct()
+    private fun loadCartProducts(): List<CartProduct> = cartRepository.getAllCartProducts()
 //            .mapNotNull {
 //            val product = productRepository.findProductById(it.productId)
 //            product?.run { CartProduct(it.id, this, ProductCount(it.count), it.checked) }
 //        }
 
-    override fun changeProductCount(cartProduct: UiCartProduct, count: Int, increase: Boolean) {
-        val newCart = changeCount(cartProduct.product, count, increase)
-        newCart.findCartProductById(cartProduct.id)?.let {
-            cartRepository.updateProductCountById(it.id, it.selectedCount)
+    override fun changeProductCount(cartProduct: UiCartProduct, count: Int) {
+        val domainCartProduct = cartProduct.toDomain()
+        val newCart = cart.changeProductCount(domainCartProduct, count)
+        newCart.findCartProductById(domainCartProduct.productId)?.let { _cartProduct ->
+            cartRepository.updateProductCountById(_cartProduct.id, _cartProduct.selectedCount)
         }
         updateCart(newCart)
     }
@@ -105,7 +105,7 @@ class CartPresenter(
     private fun fetchView() {
 //        _totalCheckSize.value = cartRepository.getCheckedProductCount()
         _pageCheckSize.value = currentPage.getCheckedProductSize(cart)
-        view.updateTotalPrice(cart.getCheckedProductTotalPrice())
+        view.updateTotalPrice(cart.checkedProductTotalPrice)
         view.updateCart(currentPage.takeItems(cart).toUi())
     }
 }

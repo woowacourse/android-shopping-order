@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.repository.CartRemoteRepository
 import woowacourse.shopping.domain.repository.ProductId
 
 class CartRemoteRepositoryImpl(private val service: CartService) : CartRemoteRepository {
-    override fun getAllCartProduct(): List<CartProduct> {
+    override fun getAllCartProducts(): List<CartProduct> {
         return service.getAllCartProduct().map { it.toDomain() }
     }
 
@@ -23,6 +23,6 @@ class CartRemoteRepositoryImpl(private val service: CartService) : CartRemoteRep
     }
 
     override fun deleteCartProductById(cartProductId: CartProductId) {
-        TODO("Not yet implemented")
+        service.deleteCartProductById(cartProductId)
     }
 }

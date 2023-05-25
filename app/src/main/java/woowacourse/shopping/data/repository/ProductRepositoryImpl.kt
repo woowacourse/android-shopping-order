@@ -10,15 +10,13 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class ProductRepositoryImpl(
     private val remoteProductDataSource: ProductService,
 ) : ProductRepository {
-    override fun getProductByPage(page: Page): List<Product> =
-        remoteProductDataSource.getProductByPage(page.toData()).map { it.toDomain() }
-
-    override fun findProductById(id: Int): Product? =
-        remoteProductDataSource.findProductById(id)?.toDomain()
 
     override fun getAllProducts(): List<Product> {
         return remoteProductDataSource.getAllProduct().map { it.toDomain() }
     }
+
+    override fun findProductById(id: Int): Product? =
+        remoteProductDataSource.findProductById(id)?.toDomain()
 
     override fun insertProduct(product: Product) {
         remoteProductDataSource.addProduct(product.toData())

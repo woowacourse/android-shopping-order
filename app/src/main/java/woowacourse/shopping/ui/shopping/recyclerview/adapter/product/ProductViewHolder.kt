@@ -6,21 +6,21 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
+import woowacourse.shopping.util.listener.CartProductClickListener
+import woowacourse.shopping.widget.SkeletonCounterView
 
 class ProductViewHolder(
     parent: ViewGroup,
-    productClickListener: ProductClickListener,
-    counterClickListener: OnClickListener,
+    cartProductClickListener: CartProductClickListener,
+    counterListener: SkeletonCounterView.OnCountChangedListener,
 ) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.item_product, parent, false)
 ) {
     private val binding = ItemProductBinding.bind(itemView)
 
     init {
-        binding.productClickListener = productClickListener
-        binding.counterClickListener = counterClickListener
+        binding.productClickListener = cartProductClickListener
+        binding.counterListener = counterListener
     }
 
     fun bind(cartProduct: UiCartProduct) {

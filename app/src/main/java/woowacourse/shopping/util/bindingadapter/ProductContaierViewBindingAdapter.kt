@@ -3,17 +3,16 @@ package woowacourse.shopping.util.bindingadapter
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.widget.SkeletonCounterView
 
-@BindingAdapter("bind:count")
-fun SkeletonCounterView.setCount(count: Int) {
-    this.count = count
-}
-
 @BindingAdapter("bind:onPlusClick")
-fun SkeletonCounterView.setOnPlusClick(onClick: Runnable) {
-    setOnPlusClickListener { _, _ -> onClick.run() }
+fun SkeletonCounterView.setOnPlusClick(listener: CountChangedListener) {
+    setOnPlusClickListener { _, count -> listener.onCountChanged(count) }
 }
 
 @BindingAdapter("bind:onMinusClick")
-fun SkeletonCounterView.setOnMinusClick(onClick: Runnable) {
-    setOnMinusClickListener { _, _ -> onClick.run() }
+fun SkeletonCounterView.setOnMinusClick(listener: CountChangedListener) {
+    setOnMinusClickListener { _, count -> listener.onCountChanged(count) }
+}
+
+interface CountChangedListener {
+    fun onCountChanged(changedCount: Int)
 }

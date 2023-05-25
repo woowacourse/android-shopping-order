@@ -26,10 +26,11 @@ import woowacourse.shopping.util.extension.findTextView
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.inject
-import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
+import woowacourse.shopping.util.listener.CartProductClickListener
+import woowacourse.shopping.widget.SkeletonCounterView
 
-class ShoppingActivity : AppCompatActivity(), View, OnClickListener, ProductClickListener {
+class ShoppingActivity : AppCompatActivity(), View,
+    SkeletonCounterView.OnCountChangedListener, CartProductClickListener {
     private lateinit var binding: ActivityShoppingBinding
     private val presenter: Presenter by lazy { inject(this, this) }
 
@@ -99,27 +100,23 @@ class ShoppingActivity : AppCompatActivity(), View, OnClickListener, ProductClic
         productCountTextView.text = count.toText()
     }
 
-    override fun onClickProduct(product: UiProduct) {
-        presenter.inquiryProductDetail(product)
+    override fun onClickCartProduct(cartProduct: UiCartProduct) {
+        presenter.inquiryProductDetail(cartProduct)
     }
 
-    override fun onClickProductPlus(product: UiProduct) {
-        presenter.increaseCartCount(product)
+    override fun onAddCartProduct(cartProduct: UiCartProduct) {
+        presenter.addCartProduct(cartProduct)
     }
 
-    override fun onClickCounterPlus(product: UiProduct) {
-        presenter.increaseCartCount(product)
-    }
-
-    override fun onClickCounterMinus(product: UiProduct) {
-        presenter.decreaseCartCount(product)
+    override fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int) {
+        presenter.changeCartCount(cartProduct, changedCount)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val product = intent?.getParcelableExtraCompat<UiProduct>(PRODUCT_KEY) ?: return
         val count = intent.getIntExtra(COUNT_KEY, 0)
-        presenter.increaseCartCount(product, count)
+//        presenter.increaseCartCount(product, count)
     }
 
     companion object {

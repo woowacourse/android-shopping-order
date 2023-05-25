@@ -14,17 +14,17 @@
 
         <variable
             name="productClickListener"
-            type="woowacourse.shopping.util.listener.ProductClickListener" />
+            type="woowacourse.shopping.util.listener.CartProductClickListener" />
 
         <variable
-            name="counterClickListener"
-            type="woowacourse.shopping.widget.SkeletonCounterView.OnClickListener" />
+            name="counterListener"
+            type="woowacourse.shopping.widget.SkeletonCounterView.OnCountChangedListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> productClickListener.onClickProduct(cartProduct.product)}"
+        android:onClick="@{() -> productClickListener.onClickCartProduct(cartProduct)}"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp">
 
@@ -41,13 +41,13 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/plus_floating_button"
+            android:id="@+id/cart_product_add_button"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_gravity="end|bottom"
             android:layout_margin="8dp"
             android:gravity="center"
-            android:onClick="@{() -> productClickListener.onClickProductPlus(cartProduct.product)}"
+            android:onClick="@{() -> productClickListener.onAddCartProduct(cartProduct)}"
             android:visibility="@{cartProduct.shouldShowCounter ? View.GONE : View.VISIBLE}"
             app:backgroundTint="@color/white"
             app:icon="@drawable/ic_plus"
@@ -63,9 +63,8 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="8dp"
-            bind:count="@{cartProduct.selectedCount.value}"
-            bind:onMinusClick="@{() -> counterClickListener.onClickCounterMinus(cartProduct.product)}"
-            bind:onPlusClick="@{() -> counterClickListener.onClickCounterPlus(cartProduct.product)}"
+            bind:onMinusClick="@{(changedCount) -> counterListener.onCountChanged(cartProduct, changedCount)}"
+            bind:onPlusClick="@{(changedCount) -> counterListener.onCountChanged(cartProduct, changedCount)}"
             android:visibility="@{cartProduct.shouldShowCounter ? View.VISIBLE : View.GONE}"
             app:count="@{cartProduct.selectedCount.value}"
             app:layout_constraintBottom_toBottomOf="@+id/product_image_view"
@@ -73,7 +72,7 @@
             app:layout_constraintHeight_percent="0.2"
             app:layout_constraintStart_toStartOf="@id/product_image_view"
             app:max_count="99"
-            app:min_count="1" />
+            app:min_count="0" />
 
         <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_name_text_view"

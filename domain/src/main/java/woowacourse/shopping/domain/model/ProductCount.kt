@@ -15,6 +15,9 @@ data class ProductCount(
     operator fun minus(count: ProductCount): ProductCount =
         copy(value = (value - count.value).coerceAtLeast(minCount))
 
+    fun changeCount(count: Int): ProductCount =
+        copy(value = count.coerceAtLeast(minCount))
+
     companion object {
         private const val EMPTY_COUNT = 0
     }

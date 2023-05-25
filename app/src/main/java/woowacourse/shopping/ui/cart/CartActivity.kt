@@ -8,7 +8,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiPage
-import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener
 import woowacourse.shopping.ui.cart.recyclerview.adapter.CartAdapter
@@ -46,8 +45,8 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.totalPriceTextView.text = getString(R.string.price_format, totalPrice)
     }
 
-    override fun onCountChanged(cartProduct: UiCartProduct, count: Int, isIncreased: Boolean) {
-        presenter.changeProductCount(cartProduct, count, isIncreased)
+    override fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int) {
+        presenter.changeProductCount(cartProduct, changedCount)
     }
 
     override fun onCheckStateChanged(cartProduct: UiCartProduct, isChecked: Boolean) {

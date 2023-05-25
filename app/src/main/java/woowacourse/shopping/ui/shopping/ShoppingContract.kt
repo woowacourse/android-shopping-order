@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.ProductCount
+import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 
@@ -20,10 +21,12 @@ interface ShoppingContract {
         abstract fun fetchAll()
         abstract fun fetchRecentProducts()
         abstract fun loadMoreProducts()
-        abstract fun inquiryProductDetail(product: UiProduct)
+        abstract fun inquiryProductDetail(cartProduct: UiCartProduct)
         abstract fun inquiryRecentProductDetail(recentProduct: UiRecentProduct)
         abstract fun navigateToCart()
-        abstract fun increaseCartCount(product: UiProduct, count: Int = 1)
-        abstract fun decreaseCartCount(product: UiProduct, count: Int = 1)
+//        abstract fun increaseCartCount(cartProduct: UiCartProduct, count: Int = 1)
+//        abstract fun decreaseCartCount(cartProduct: UiCartProduct, count: Int = 1)
+        abstract fun changeCartCount(cartProduct: UiCartProduct, count: Int)
+        abstract fun addCartProduct(cartProduct: UiCartProduct)
     }
 }

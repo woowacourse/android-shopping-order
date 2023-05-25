@@ -6,7 +6,7 @@ data class CartProduct(
     val id: Int = 0,
     val product: Product,
     val selectedCount: ProductCount = ProductCount(0),
-    val isChecked: Boolean,
+    val isChecked: Boolean = true,
 ) {
     val productId: Int = product.id
 
@@ -15,6 +15,9 @@ data class CartProduct(
 
     fun minusCount(count: Int = 1): CartProduct =
         copy(selectedCount = selectedCount - count)
+
+    fun changeCount(count: Int): CartProduct =
+        copy(selectedCount = selectedCount.changeCount(count))
 
     fun select(): CartProduct =
         copy(isChecked = true)

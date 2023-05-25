@@ -5,19 +5,19 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.ui.shopping.ShoppingViewType
 import woowacourse.shopping.util.diffutil.ProductDiffUtil
-import woowacourse.shopping.util.listener.ProductClickListener
-import woowacourse.shopping.widget.SkeletonCounterView.OnClickListener
+import woowacourse.shopping.util.listener.CartProductClickListener
+import woowacourse.shopping.widget.SkeletonCounterView
 
 class ProductAdapter(
-    private val productClickListener: ProductClickListener,
-    private val counterClickListener: OnClickListener,
+    private val cartProductClickListener: CartProductClickListener,
+    private val counterListener: SkeletonCounterView.OnCountChangedListener,
 ) : ListAdapter<UiCartProduct, ProductViewHolder>(ProductDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder =
         ProductViewHolder(
             parent = parent,
-            productClickListener = productClickListener,
-            counterClickListener = counterClickListener,
+            cartProductClickListener = cartProductClickListener,
+            counterListener = counterListener,
         )
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

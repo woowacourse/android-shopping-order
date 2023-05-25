@@ -23,19 +23,19 @@ class ProductServiceImpl : ProductService {
         shoppingMockServer.join()
     }
 
-    override fun getProductByPage(page: Page): List<Product> {
-        val url = "$BASE_URL/products?start=${page.start}&count=${page.sizePerPage}"
-        var products = mutableListOf<Product>()
+    override fun findProductById(id: Int): Product? {
+        val url = "$BASE_URL/products/$id"
+        var product: Product? = null
 
         val latch = ShoppingOkHttpClient.enqueue(
             get(url),
             onSuccess = { _, response ->
-                response.body?.string()?.let { products = it.convertJsonToProducts() }
+                response.body?.string()?.let { product = it.convertJsonToProduct() }
             },
             onFailed = { _, _ -> },
         )
         latch.await()
-        return products.toList()
+        return product
     }
 
     override fun getAllProduct(): List<Product> {
@@ -51,21 +51,6 @@ class ProductServiceImpl : ProductService {
         )
         latch.await()
         return products.toList()
-    }
-
-    override fun findProductById(id: Int): Product? {
-        val url = "$BASE_URL/products/$id"
-        var product: Product? = null
-
-        val latch = ShoppingOkHttpClient.enqueue(
-            get(url),
-            onSuccess = { _, response ->
-                response.body?.string()?.let { product = it.convertJsonToProduct() }
-            },
-            onFailed = { _, _ -> },
-        )
-        latch.await()
-        return product
     }
 
     override fun addProduct(product: Product) {

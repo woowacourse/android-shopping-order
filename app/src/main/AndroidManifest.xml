@@ -29,10 +29,10 @@
             android:exported="true" />
         <activity
             android:name=".ui.detail.ProductDetailActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ui.shopping.ShoppingActivity"
-            android:exported="false"/>
+            android:exported="true"/>
     </application>
 
 </manifest>

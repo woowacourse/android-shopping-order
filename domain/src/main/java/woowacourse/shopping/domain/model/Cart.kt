@@ -8,6 +8,9 @@ data class Cart(
     val items: List<CartProduct> = emptyList(),
     val minProductSize: Int = 0,
 ) {
+    val totalCartProductCount: Int = items.sumOf { it.selectedCount.value }
+    val checkedProductTotalPrice: Int = items.sumOf { it.getTotalPrice(true) }
+
     fun increaseProductCount(product: Product, count: Int = 1): Cart =
         copy(items = items
             .map { item -> if (item.product.id == product.id) item.plusCount(count) else item }
@@ -50,16 +53,20 @@ data class Cart(
         copy(items = cart.items.distinctBy { it.product.id })
 
     fun update(cartProducts: List<CartProduct>): Cart =
-        copy(items = cartProducts.distinctBy { it.product.id })
+        copy(items = cartProducts.distinctBy { it.productId })
 
-    fun findCartProductById(cartProductId: Int): CartProduct? =
-        items.find { it.id == cartProductId }
+    fun findCartProductById(productId: Int): CartProduct? =
+        items.find { it.productId == productId }
 
-    fun getCheckedProductTotalPrice(): Int = items.sumOf { it.getTotalPrice(true) }
+    fun changeProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
+        return copy(items = items.map { item ->
+            if (item.productId == cartProduct.productId) item.changeCount(count) else item
+        })
+    }
 
-    operator fun plus(items: Cart): Cart =
-        copy(items = (this.items + items.items).distinctBy { it.product.id })
+    operator fun plus(cart: Cart): Cart =
+        copy(items = (this.items + cart.items).distinctBy { it.product.id })
 
-    operator fun plus(items: List<CartProduct>): Cart =
-        copy(items = (this.items + items).distinctBy { it.product.id })
+    operator fun plus(cartProducts: List<CartProduct>): Cart =
+        copy(items = (this.items + cartProducts).distinctBy { it.product.id })
 }
