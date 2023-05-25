@@ -17,8 +17,21 @@ class ProductDetailPresenter(
         get() = _count
 
     override fun putInCart(product: ProductModel) {
-        if (_count.value != null) cartRepository.insert(product.id) { _count.value ?: 0 }
-        view.finishActivity(true)
+        if (_count.value != null) {
+            if (product.cartId == 0) {
+                cartRepository.insert(product.id) { cartId ->
+                    update(cartId, product)
+                }
+                return
+            }
+            update(product.cartId, product)
+        }
+    }
+
+    private fun update(cartId: Int, product: ProductModel) {
+        cartRepository.update(cartId, product.count + (count.value ?: 0)) { success ->
+            view.finishActivity(success)
+        }
     }
 
     override fun updateRecentViewedProducts(id: Int) {

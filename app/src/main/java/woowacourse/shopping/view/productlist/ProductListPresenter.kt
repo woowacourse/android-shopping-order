@@ -26,10 +26,10 @@ class ProductListPresenter(
             productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
                 cartRepository.findAll {
                     addProductsItem(products.toUiModels(it))
+                    mark += products.size
+                    // 더보기
+                    addShowMoreItem()
                 }
-                // 더보기
-                addShowMoreItem()
-                mark += products.size
             }
         }
     }
@@ -38,6 +38,7 @@ class ProductListPresenter(
         productRepository.isExistByMark(mark) { isNextExist ->
             if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
             view.showProducts(productsListItems)
+            view.stopLoading()
         }
     }
 
@@ -87,16 +88,16 @@ class ProductListPresenter(
         }
     }
 
-    override fun updateCartProductCount(id: Int, count: Int) {
+    override fun updateCartProductCount(cartId: Int, productId: Int, count: Int) {
         if (count == 0) {
-            cartRepository.remove(id) {
-                fetchProductCount(id)
+            cartRepository.remove(cartId) {
+                fetchProductCount(productId)
                 fetchCartCount()
             }
             return
         }
-        cartRepository.update(id, count) {
-            fetchProductCount(id)
+        cartRepository.update(cartId, count) {
+            fetchProductCount(productId)
         }
     }
 
@@ -104,7 +105,7 @@ class ProductListPresenter(
         cartRepository.findAll { view.showCartCount(it.size) }
     }
 
-    override fun fetchProductCounts() {
+    override fun fetchProductsCounts() {
         cartRepository.findAll { cartProducts ->
             val itemsHaveCount = productsListItems
                 .asSequence()
@@ -114,8 +115,14 @@ class ProductListPresenter(
 
             itemsHaveCount.forEach { item ->
                 val cartProduct = cartProducts.find { it.id == item.product.id }
-                item.product.count = cartProduct?.count ?: 0
-                view.notifyDataChanged(productsListItems.indexOf(item))
+                val position = productsListItems.indexOf(item)
+                productsListItems[position] = ProductListViewItem.ProductItem(
+                    (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
+                        cartId = cartProduct?.id ?: 0,
+                        count = cartProduct?.count ?: 0,
+                    ),
+                )
+                view.notifyDataChanged(position)
             }
         }
     }
@@ -123,11 +130,16 @@ class ProductListPresenter(
     override fun fetchProductCount(id: Int) {
         if (id == -1) return
         cartRepository.findAll { cartProducts ->
-            val product = cartProducts.find { it.product.id == id }
-            val item = productsListItems.filterIsInstance<ProductListViewItem.ProductItem>()
-                .filter { it.product.id == id }[0]
-            item.product.count = product?.count ?: 0
-            view.notifyDataChanged(productsListItems.indexOf(item))
+            val cartProduct = cartProducts.find { it.product.id == id }
+            val position =
+                productsListItems.indexOfFirst { it is ProductListViewItem.ProductItem && it.product.id == id }
+            productsListItems[position] = ProductListViewItem.ProductItem(
+                (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
+                    cartId = cartProduct?.id ?: 0,
+                    count = cartProduct?.count ?: 0,
+                ),
+            )
+            view.notifyDataChanged(position)
         }
     }
 
@@ -151,7 +163,7 @@ class ProductListPresenter(
 
     private fun List<Product>.toUiModels(cartProducts: List<CartProduct>): List<ProductModel> {
         return this.map { product ->
-            val cartProduct = cartProducts.find { it.id == product.id }
+            val cartProduct = cartProducts.find { it.product.id == product.id }
             product.toUiModel(
                 cartProduct?.id ?: 0,
                 cartProduct?.count ?: 0,

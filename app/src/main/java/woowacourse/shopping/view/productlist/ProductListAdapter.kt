@@ -12,7 +12,7 @@ class ProductListAdapter(
         fun onProductClick(product: ProductModel)
         fun onShowMoreClick()
         fun onProductClickAddFirst(id: Int)
-        fun onProductUpdateCount(id: Int, count: Int)
+        fun onProductUpdateCount(cartId: Int, productId: Int, count: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {

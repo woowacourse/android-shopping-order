@@ -11,6 +11,7 @@ interface ProductListContract {
         fun notifyAddProducts(position: Int, size: Int)
         fun notifyRecentViewedChanged()
         fun notifyDataChanged(position: Int)
+        fun stopLoading()
     }
 
     interface Presenter {
@@ -19,9 +20,9 @@ interface ProductListContract {
         fun loadMoreProducts()
         fun updateRecentViewed(id: Int)
         fun insertCartProduct(id: Int)
-        fun updateCartProductCount(id: Int, count: Int)
+        fun updateCartProductCount(cartId: Int, productId: Int, count: Int)
         fun fetchCartCount()
         fun fetchProductCount(id: Int)
-        fun fetchProductCounts()
+        fun fetchProductsCounts()
     }
 }

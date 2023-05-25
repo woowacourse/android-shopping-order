@@ -2,9 +2,13 @@ package woowacourse.shopping.view.productlist
 
 // import woowacourse.shopping.view.cart.CartActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -38,7 +42,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 }
                 RESULT_VISIT_CART -> {
                     presenter.fetchCartCount()
-                    presenter.fetchProductCounts()
+                    presenter.fetchProductsCounts()
                 }
             }
         }
@@ -47,9 +51,25 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         super.onCreate(savedInstanceState)
         setUpBinding()
         setContentView(binding.root)
+        setLoadingUi()
         setUpPresenter()
         setUpActionBar()
         presenter.fetchProducts()
+    }
+
+    private fun setLoadingUi() {
+        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.anim)
+        binding.skeletonProducts.root.startAnimation(skeletonAnim)
+    }
+
+    override fun stopLoading() {
+        runOnUiThread {
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.skeletonProducts.root.visibility = View.GONE
+                binding.skeletonProducts.root.clearAnimation()
+                binding.gridProducts.visibility = View.VISIBLE
+            }, 1500L)
+        }
     }
 
     private fun setUpBinding() {
@@ -102,8 +122,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                         presenter.fetchCartCount()
                     }
 
-                    override fun onProductUpdateCount(id: Int, count: Int) {
-                        presenter.updateCartProductCount(id, count)
+                    override fun onProductUpdateCount(cartId: Int, productId: Int, count: Int) {
+                        presenter.updateCartProductCount(cartId, productId, count)
                     }
                 },
             )

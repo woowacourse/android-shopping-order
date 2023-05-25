@@ -41,6 +41,7 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             }
             binding.btnPlus.setOnClickListener {
                 onItemClick.onProductUpdateCount(
+                    item.product.cartId,
                     item.product.id,
                     Integer.parseInt(binding.textCount.text.toString()) + 1,
                 )
@@ -49,6 +50,7 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             }
             binding.btnMinus.setOnClickListener {
                 onItemClick.onProductUpdateCount(
+                    item.product.cartId,
                     item.product.id,
                     Integer.parseInt(binding.textCount.text.toString()) - 1,
                 )

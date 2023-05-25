@@ -27,7 +27,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
         executeGetRequest(request, callback)
     }
 
-    override fun insert(productId: Int, callback: (Boolean) -> Unit) {
+    override fun insert(productId: Int, callback: (cartItemId: Int) -> Unit) {
         val requestBody = JSONObject().put("productId", productId).toString()
             .toRequestBody(contentType = "application/json".toMediaType())
 
@@ -37,7 +37,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
             .addHeader("Authorization", USER_EMAIL_INFO)
             .build()
 
-        executeUpdateRequest(request, callback)
+        executeCreateRequest(request, callback)
     }
 
     override fun update(cartId: Int, count: Int, callback: (Boolean) -> Unit) {
@@ -45,7 +45,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
             .toRequestBody(contentType = "application/json".toMediaType())
 
         val request = Request.Builder()
-            .url("$baseUrl/cart-items/:$cartId")
+            .url("$baseUrl/cart-items/$cartId")
             .patch(requestBody)
             .addHeader("Authorization", USER_EMAIL_INFO)
             .build()
@@ -55,7 +55,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
 
     override fun remove(cartId: Int, callback: (Boolean) -> Unit) {
         val request = Request.Builder()
-            .url("$baseUrl/cart-items/:$cartId")
+            .url("$baseUrl/cart-items/$cartId")
             .delete()
             .addHeader("Authorization", USER_EMAIL_INFO)
             .build()
@@ -117,8 +117,27 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-//                    responseBody = response.body?.string()
-                    callBack(response.code == 200)
+                    callBack(response.isSuccessful)
+                    response.close()
+                }
+            },
+        )
+    }
+
+    private fun executeCreateRequest(
+        request: Request,
+        callBack: (returnedId: Int) -> Unit,
+    ) {
+        client.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    throw java.lang.RuntimeException("Request Failed", e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val cartItemId: Int =
+                        response.header("Location", null)?.substringAfterLast("/")?.toInt() ?: 0
+                    callBack(cartItemId)
                     response.close()
                 }
             },
