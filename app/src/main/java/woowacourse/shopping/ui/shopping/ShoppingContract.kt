@@ -18,7 +18,7 @@ interface ShoppingContract {
         fun setUpRecentProducts()
         fun setUpCartCounts()
         fun setUpTotalCount()
-        fun updateItemCount(productId: Int, count: Int): Int
+        fun updateItemCount(productId: Int, count: Int)
         fun navigateToItemDetail(productId: Int)
     }
 }

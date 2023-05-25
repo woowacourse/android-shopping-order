@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
@@ -11,6 +13,8 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun setUpProducts() {
         setUpCartCounts()
         setUpNextProducts()
@@ -18,31 +22,47 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        cartRepository.getAll().all()
-            .associateBy { it.productId }
-            .mapValues { it.value.count }
-            .let { view.setCartProducts(it) }
+        Thread {
+            val cartProducts = cartRepository.getAll().all()
+                .associateBy { it.productId }
+                .mapValues { it.value.count }
+            handler.post {
+                view.setCartProducts(cartProducts)
+            }
+        }.start()
     }
 
     override fun setUpNextProducts() {
-        view.addMoreProducts(
-            productRepository.getNext(PRODUCT_COUNT).map { it.toUIModel() }
-        )
+        Thread {
+            val products = productRepository.getNext(PRODUCT_COUNT).map { it.toUIModel() }
+            handler.post {
+                view.addMoreProducts(products)
+            }
+        }.start()
     }
 
     override fun setUpRecentProducts() {
-        view.setRecentProducts(
-            recentRepository.getRecent(RECENT_PRODUCT_COUNT).map { it.toUIModel() }
-        )
+        Thread {
+            val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
+                .map { it.toUIModel() }
+            handler.post {
+                view.setRecentProducts(recentProducts)
+            }
+        }.start()
     }
 
     override fun setUpTotalCount() {
-        view.setToolbar(cartRepository.getTotalSelectedCount())
+        Thread {
+            val totalSelectedCount = cartRepository.getTotalSelectedCount()
+            handler.post {
+                view.setToolbar(totalSelectedCount)
+            }
+        }.start()
     }
 
-    override fun updateItemCount(productId: Int, count: Int): Int {
+    override fun updateItemCount(productId: Int, count: Int) {
         cartRepository.insert(productId)
-        return cartRepository.updateCount(productId, count)
+        cartRepository.updateCount(productId, count)
     }
 
     override fun navigateToItemDetail(productId: Int) {
