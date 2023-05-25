@@ -20,10 +20,6 @@
             type="woowacourse.shopping.ui.productdetail.ProductDetailListener" />
 
         <variable
-            name="visible"
-            type="boolean" />
-
-        <variable
             name="latestProduct"
             type="woowacourse.shopping.model.ProductUIModel" />
     </data>
@@ -117,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="29dp"
             android:layout_marginBottom="33dp"
-            android:visibility="@{!visible || (latestProduct != null &amp;&amp; latestProduct.id == product.id) ? View.GONE : View.VISIBLE}"
+            android:visibility="@{ (latestProduct == null) ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toTopOf="@+id/cart_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

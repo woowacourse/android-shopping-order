@@ -16,8 +16,8 @@
             type="woowacourse.shopping.ui.shopping.viewHolder.ProductsOnClickListener" />
 
         <variable
-            name="presenter"
-            type="woowacourse.shopping.ui.shopping.contract.presenter.ShoppingPresenter" />
+            name="cartProduct"
+            type="woowacourse.shopping.model.CartProductUIModel" />
 
     </data>
 
@@ -70,7 +70,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:src="@drawable/add_cart_button"
-            android:visibility="@{presenter.countLiveDatas[product.id] == 0? View.VISIBLE : View.GONE }"
+            android:visibility="@{cartProduct.count == 0? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="@+id/productImg"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -82,8 +82,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="14dp"
             android:layout_marginBottom="11dp"
-            android:visibility="@{presenter.countLiveDatas[product.id] >= 1? View.VISIBLE : View.GONE }"
-            app:count="@{presenter.countLiveDatas[product.id]}"
+            android:visibility="@{cartProduct.count >= 1? View.VISIBLE : View.GONE }"
+            app:count="@{cartProduct.count}"
             app:layout_constraintBottom_toBottomOf="@+id/productImg"
             app:layout_constraintEnd_toEndOf="@+id/productImg"
             app:layout_constraintStart_toStartOf="parent"
