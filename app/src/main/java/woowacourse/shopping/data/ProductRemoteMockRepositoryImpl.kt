@@ -3,10 +3,11 @@ package woowacourse.shopping.data
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
+import woowacourse.shopping.data.service.ProductMockWebService
 import java.lang.Thread.sleep
 
 class ProductRemoteMockRepositoryImpl(
-    private val webServer: ProductMockWebServer,
+    private val webServer: ProductMockWebService,
     private val productCache: ProductCache
 ) : ProductRepository {
 
