@@ -11,7 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.ProductFakeRepository
+import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.database.cart.CartDBHelper
 import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
@@ -36,13 +37,14 @@ class ShoppingActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping)
         setSupportActionBar(binding.toolbar)
 
         presenter = ShoppingPresenter(
             this,
-            ProductFakeRepository(),
+            ProductRepositoryImpl(
+                ProductDataSourceImpl(),
+            ),
             RecentProductDatabase(this),
             CartDatabase(
                 CartDBHelper(this).writableDatabase,
@@ -50,12 +52,7 @@ class ShoppingActivity :
         )
 
         initLayoutManager()
-        presenter.setUpProducts()
-    }
-
-    override fun setMainVisibility(loadState: Boolean) {
-        binding.includeShoppingSkeleton.root.visibility = View.GONE
-        binding.productRecyclerview.visibility = View.VISIBLE
+        presenter.initProducts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,7 +66,6 @@ class ShoppingActivity :
 
     override fun onResume() {
         super.onResume()
-        presenter.updateItemCounts()
         presenter.updateProducts()
         presenter.updateCountSize()
     }
@@ -113,15 +109,17 @@ class ShoppingActivity :
     override fun setProducts(data: List<ProductsItemType>) {
         binding.productRecyclerview.adapter = ProductsAdapter(
             data,
-            presenter,
-            this,
+            CartDatabase(CartDBHelper(this).writableDatabase),
             this,
             presenter::fetchMoreProducts,
         )
+
+        binding.productRecyclerview.visibility = View.VISIBLE
+        binding.includeShoppingSkeleton.root.visibility = View.GONE
     }
 
-    override fun navigateToProductDetail(product: ProductUIModel) {
-        startActivity(ProductDetailActivity.from(this, product, true))
+    override fun navigateToProductDetail(product: ProductUIModel, latestProduct: ProductUIModel?) {
+        startActivity(ProductDetailActivity.from(this, product, latestProduct))
     }
 
     override fun addProducts(data: List<ProductsItemType>) {
@@ -134,6 +132,14 @@ class ShoppingActivity :
 
     override fun showCountSize(size: Int) {
         cartSize?.text = size.toString()
+    }
+
+    override fun updateItem(id: Long, count: Int) {
+        binding.productRecyclerview.adapter?.let {
+            if (it is ProductsAdapter) {
+                it.updateItemCount(id, count)
+            }
+        }
     }
 
     private fun navigateToCart() {

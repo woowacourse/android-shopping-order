@@ -3,31 +3,26 @@ package woowacourse.shopping.ui.shopping.viewHolder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
+import com.example.domain.repository.CartRepository
 import woowacourse.shopping.databinding.ProductItemBinding
+import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.ui.shopping.ProductItem
 import woowacourse.shopping.ui.shopping.ProductsItemType
-import woowacourse.shopping.ui.shopping.contract.ShoppingContract
-import woowacourse.shopping.ui.shopping.contract.presenter.ShoppingPresenter
 
 class ProductsViewHolder private constructor(
     private val binding: ProductItemBinding,
-    private val presenter: ShoppingContract.Presenter,
-    private val lifeCycleOwner: LifecycleOwner,
     private val onClickListener: ProductsOnClickListener,
 ) :
     ItemViewHolder(binding.root) {
 
-    fun bind(productItemType: ProductsItemType) {
+    fun bind(productItemType: ProductsItemType, cartRepository: CartRepository) {
         val productItem = productItemType as? ProductItem ?: return
         binding.product = productItem.product
-        binding.lifecycleOwner = lifeCycleOwner
-        binding.presenter = presenter as ShoppingPresenter?
+        binding.cartProduct = cartRepository.findById(productItem.product.id)?.toUIModel()
         binding.listener = onClickListener
 
         binding.addCartBtn.setOnClickListener {
             onClickListener.onAddCart(productItem.product.id, 1)
-            binding.presenter = presenter
             binding.addCartBtn.visibility = View.GONE
         }
     }
@@ -35,16 +30,14 @@ class ProductsViewHolder private constructor(
     companion object {
         fun from(
             parent: ViewGroup,
-            presenter: ShoppingContract.Presenter,
-            lifeCycleOwner: LifecycleOwner,
+
             onClickListener: ProductsOnClickListener,
         ): ProductsViewHolder {
             val binding = ProductItemBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false)
             return ProductsViewHolder(
                 binding,
-                presenter,
-                lifeCycleOwner,
+
                 onClickListener,
             )
         }

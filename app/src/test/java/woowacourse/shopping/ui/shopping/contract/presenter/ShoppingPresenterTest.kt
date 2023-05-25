@@ -55,7 +55,7 @@ internal class ShoppingPresenterTest {
         every { view.setProducts(capture(slot)) } answers { nothing }
 
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
 
         // then
         val capturedProducts = slot.captured
@@ -72,7 +72,7 @@ internal class ShoppingPresenterTest {
         every { view.setProducts(capture(slot)) } answers { nothing }
 
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
 
         // then
         val capturedProducts = slot.captured
@@ -89,7 +89,7 @@ internal class ShoppingPresenterTest {
         every { view.setProducts(capture(slot)) } answers { nothing }
 
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.updateProducts()
 
         // then
@@ -105,7 +105,7 @@ internal class ShoppingPresenterTest {
         every { recentRepository.getRecent(10) } returns List(10) { fakeProduct }
 
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.navigateToItemDetail(fakeProduct.id)
 
         // then
@@ -118,7 +118,7 @@ internal class ShoppingPresenterTest {
         every { productRepository.getNext(any()) } returns List(10) { fakeProduct }
         every { recentRepository.getRecent(10) } returns List(10) { fakeProduct }
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.increaseCount(fakeProduct.id)
 
         // then
@@ -131,7 +131,7 @@ internal class ShoppingPresenterTest {
         every { productRepository.getNext(any()) } returns List(10) { fakeProduct }
         every { recentRepository.getRecent(10) } returns List(10) { fakeProduct }
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.increaseCount(fakeProduct.id)
         presenter.decreaseCount(fakeProduct.id)
 
@@ -166,7 +166,7 @@ internal class ShoppingPresenterTest {
         every { view.addProducts(capture(slot)) } answers { nothing }
 
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.fetchMoreProducts()
 
         // then
@@ -185,7 +185,7 @@ internal class ShoppingPresenterTest {
             CartProduct(fakeProduct, 3, true),
         )
         // when
-        presenter.setUpProducts()
+        presenter.initProducts()
         presenter.updateItemCounts()
 
         // then

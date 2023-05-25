@@ -6,16 +6,15 @@ import woowacourse.shopping.ui.shopping.ProductsItemType
 interface ShoppingContract {
     interface View {
         fun setProducts(data: List<ProductsItemType>)
-        fun navigateToProductDetail(product: ProductUIModel)
+        fun navigateToProductDetail(product: ProductUIModel, latestProduct: ProductUIModel?)
 
         fun addProducts(data: List<ProductsItemType>)
         fun showCountSize(size: Int)
-
-        fun setMainVisibility(loadState: Boolean)
+        fun updateItem(id: Long, count: Int)
     }
 
     interface Presenter {
-        fun setUpProducts()
+        fun initProducts()
         fun updateProducts()
         fun fetchMoreProducts()
         fun navigateToItemDetail(id: Long)
@@ -23,6 +22,5 @@ interface ShoppingContract {
         fun increaseCount(id: Long)
         fun decreaseCount(id: Long)
         fun updateCountSize()
-        fun updateItemCounts()
     }
 }
