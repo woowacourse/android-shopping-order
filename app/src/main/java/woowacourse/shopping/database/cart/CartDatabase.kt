@@ -11,7 +11,7 @@ import com.example.domain.repository.CartRepository
 class CartDatabase(
     private val shoppingDb: SQLiteDatabase,
 ) : CartRepository {
-    override fun getAll(): List<CartProduct> {
+    override fun getAllProductInCart(): List<CartProduct> {
         val cartProducts = mutableListOf<CartProduct>()
         getCartCursor().use {
             while (it.moveToNext()) {
@@ -64,18 +64,18 @@ class CartDatabase(
     }
 
     override fun getSubList(offset: Int, size: Int): List<CartProduct> {
-        val allProducts = getAll().ifEmpty { emptyList() }
+        val allProducts = getAllProductInCart().ifEmpty { emptyList() }
         val lastIndex = allProducts.lastIndex
         val endIndex = (lastIndex + 1).coerceAtMost(offset + size)
         if (offset < 0) {
             return if (size > 0 && size <= lastIndex + 1) {
-                getAll().subList(0, size)
+                getAllProductInCart().subList(0, size)
             } else {
-                getAll()
+                getAllProductInCart()
             }
         }
 
-        return if (offset <= lastIndex) getAll().subList(offset, endIndex) else emptyList()
+        return if (offset <= lastIndex) getAllProductInCart().subList(offset, endIndex) else emptyList()
     }
 
     override fun remove(id: Long) {

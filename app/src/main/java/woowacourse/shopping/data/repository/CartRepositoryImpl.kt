@@ -7,7 +7,7 @@ import woowacourse.shopping.data.datasource.remote.product.ProductDataSource
 class CartRepositoryImpl(
     private val productDataSource: ProductDataSource,
 ) : CartRepository {
-    override fun getAll(): List<CartProduct> {
+    override fun getAllProductInCart(): List<CartProduct> {
         TODO("Not yet implemented")
     }
 

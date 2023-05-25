@@ -6,7 +6,9 @@ import woowacourse.shopping.data.remote.NetworkModule
 class ProductDataSourceImpl : ProductDataSource {
 
     override fun getAllProducts(): Call {
-        return NetworkModule.callRequest(GET_PRODUCT_PATH)
+        // val request = Request.Builder().url("http://3.34.134.115:8080/products").build()
+
+        return NetworkModule.getService(GET_PRODUCT_PATH)
     }
 
     companion object {

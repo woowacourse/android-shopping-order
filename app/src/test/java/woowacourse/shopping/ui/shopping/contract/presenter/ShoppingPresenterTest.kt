@@ -181,7 +181,7 @@ internal class ShoppingPresenterTest {
         // given
         every { productRepository.getNext(any()) } returns List(10) { fakeProduct }
         every { recentRepository.getRecent(10) } returns List(10) { fakeProduct }
-        every { cartRepository.getAll() } returns listOf(
+        every { cartRepository.getAllProductInCart() } returns listOf(
             CartProduct(fakeProduct, 3, true),
         )
         // when

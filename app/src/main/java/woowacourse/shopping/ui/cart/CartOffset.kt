@@ -8,7 +8,7 @@ class CartOffset(offset: Int, private val repository: CartRepository) : OffsetIn
         set(value) {
             field = when {
                 value < 0 -> 0
-                value > repository.getAll().size -> repository.getAll().size
+                value > repository.getAllProductInCart().size -> repository.getAllProductInCart().size
                 else -> value
             }
         }

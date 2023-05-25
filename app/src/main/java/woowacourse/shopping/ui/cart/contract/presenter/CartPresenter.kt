@@ -17,11 +17,11 @@ class CartPresenter(
     private var cartOffset = CartOffset(offset, repository)
 
     override fun setUpCarts() {
-        cartItems.updateItems(repository.getAll().map { it.toUIModel() })
+        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
         view.setCarts(
             repository.getSubList(cartOffset.getOffset(), STEP).map { it.toUIModel() },
             CartUIModel(
-                cartOffset.getOffset() + 5 < repository.getAll().size,
+                cartOffset.getOffset() + 5 < repository.getAllProductInCart().size,
                 0 < cartOffset.getOffset(),
                 cartOffset.getOffset() / 5 + 1,
             ),
@@ -40,7 +40,7 @@ class CartPresenter(
 
     override fun removeItem(id: Long) {
         repository.remove(id)
-        if (cartOffset.getOffset() == repository.getAll().size) {
+        if (cartOffset.getOffset() == repository.getAllProductInCart().size) {
             cartOffset = cartOffset.minus(STEP)
         }
         setUpCarts()
@@ -104,7 +104,7 @@ class CartPresenter(
 
     override fun increaseCount(id: Long) {
         repository.updateCount(id, getCount(id) + 1)
-        cartItems.updateItems(repository.getAll().map { it.toUIModel() })
+        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
         view.updateItem(id, getCount(id))
         if (cartItems.isContain(id)) {
             updateCartItems()
@@ -113,7 +113,7 @@ class CartPresenter(
 
     override fun decreaseCount(id: Long) {
         repository.updateCount(id, getCount(id) - 1)
-        cartItems.updateItems(repository.getAll().map { it.toUIModel() })
+        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
         view.updateItem(id, getCount(id))
         if (cartItems.isContain(id)) {
             updateCartItems()
