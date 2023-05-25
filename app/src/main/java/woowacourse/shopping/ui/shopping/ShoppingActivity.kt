@@ -32,6 +32,7 @@ import woowacourse.shopping.ui.shopping.morebutton.MoreButtonAdapter
 import woowacourse.shopping.ui.shopping.product.ProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductWrapperAdapter
+import woowacourse.shopping.ui.shopping.skeleton.SkeletonProductAdapter
 import woowacourse.shopping.util.setThrottleFirstOnClickListener
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
@@ -62,6 +63,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping)
         binding.rvShopping.turnOffSupportChangeAnimation()
+        initSkeletonAdapter()
         initPresenter()
         initAdapter()
         initRecentProductsData()
@@ -125,6 +127,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun updateTotalBasketCount(totalBasketCount: Int) {
         binding.totalBasketCount = totalBasketCount
+    }
+
+    override fun updateSkeletonState(isLoaded: Boolean) {
+        binding.isLoaded = isLoaded
+    }
+
+    private fun initSkeletonAdapter() {
+        binding.skeletonProduct.rvSkeletonProduct.adapter = SkeletonProductAdapter()
     }
 
     private fun initAdapter() {

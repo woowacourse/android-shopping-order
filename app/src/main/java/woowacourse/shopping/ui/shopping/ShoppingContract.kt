@@ -21,9 +21,12 @@ interface ShoppingContract {
         fun updateMoreButtonState(isVisible: Boolean)
 
         fun updateTotalBasketCount(totalBasketCount: Int)
+
+        fun updateSkeletonState(isLoaded: Boolean)
     }
 
     interface Presenter {
+
         val view: View
 
         fun updateBasket()

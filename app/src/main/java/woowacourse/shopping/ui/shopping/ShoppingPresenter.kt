@@ -25,8 +25,10 @@ class ShoppingPresenter(
     private var recentProducts: List<UiRecentProduct> = listOf()
 ) : ShoppingContract.Presenter {
     private lateinit var basket: Basket
+    private var isLoaded: Boolean = false
 
     init {
+        view.updateSkeletonState(isLoaded)
         updateBasket()
     }
 
@@ -42,12 +44,13 @@ class ShoppingPresenter(
         }
     }
 
+
     override fun updateBasket() {
         basketRepository.getAll {
             basket = Basket(it)
-            fetchBasketCount()
+//            fetchBasketCount()
             fetchTotalBasketCount()
-            view.updateProducts(totalProducts)
+//            view.updateProducts(totalProducts)
             updateProducts()
         }
     }
@@ -100,6 +103,8 @@ class ShoppingPresenter(
                 totalProducts += uiProducts
                 fetchBasketCount()
                 view.updateProducts(totalProducts)
+                isLoaded = true
+                view.updateSkeletonState(isLoaded)
             }
     }
 
