@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Shopping</string>
+    <string name="menu_cart_title">cart</string>
+    <string name="product_price">%,d원</string>
+    <string name="exit">exit</string>
+    <string name="product_list_read_more_text">더보기</string>
+    <string name="recent_product_text">최근 본 상품</string>
+    <string name="price_text">금액</string>
+    <string name="insert_cart_text">장바구니 담기</string>
+    <string name="order_button_message">주문하기(%d)</string>
+    <string name="latest_product">마지막으로 본 상품</string>
+    <string name="cart_insert_message">담기</string>
+    <string name="tv_select_server_title">환영합니다. \n사용할 서버를 선택해 주세요!</string>
+    <string name="btn_select_server_hongsil">Welcome!\nHongsil\'s \nServer</string>
+    <string name="btn_select_server_matthew">Welcome!\nMatthew\'s \nServer</string>
+    <string name="inputEmail">이메일을 입력하세요</string>
+    <string name="inputPassword">비밀번호를 입력하세요</string>
+    <string name="tv_login_title">로그인</string>
 </resources>
