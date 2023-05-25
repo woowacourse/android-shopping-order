@@ -50,7 +50,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.loadCart()
             presenter.loadCheckedCartProductCount()
         }
-        presenter.loadCart()
+
+        Thread {
+            presenter.loadCart()
+            Thread.sleep(2000) // 스켈레톤 UI 보기위한 sleep 설정
+            runOnUiThread {
+                showCartProducts()
+            }
+        }.start()
+
         presenter.loadCheckedCartProductCount()
     }
 
@@ -98,6 +106,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun hidePageSelectorView() {
         binding.pageSelectorView.visibility = GONE
+    }
+
+    override fun showCartProducts() {
+        binding.cartProductRv.visibility = VISIBLE
+        binding.skeletonLl.visibility = GONE
     }
 
     companion object {

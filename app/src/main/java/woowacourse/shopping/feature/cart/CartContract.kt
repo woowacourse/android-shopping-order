@@ -12,6 +12,7 @@ interface CartContract {
         fun setCartProductCount(count: Int)
         fun setTotalCost(paymentAmount: Int)
         fun showPageSelectorView()
+        fun showCartProducts()
         fun hidePageSelectorView()
         fun updateItem(newItem: CartProductState)
     }
