@@ -22,27 +22,26 @@ class CartRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val request =
-                Request.Builder()
-                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
-                    .url(server.url + PATH_CART)
-                    .build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        val client = OkHttpClient()
+        val request =
+            Request.Builder()
+                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                .url(server.url + PATH_CART)
+                .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Request Failed", e.toString())
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val body = response.body?.string() ?: return onFailure()
+                    onSuccess(parseCartProductList(body))
+                    return
                 }
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseCartProductList(body))
-                        return
-                    }
-                    onFailure()
-                }
-            })
-        }.start()
+                onFailure()
+            }
+        })
     }
 
     override fun requestPatchCartItem(
@@ -50,32 +49,31 @@ class CartRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val path = PATH_CART_PATCH + cartEntity.id
-            val mediaType = "application/json".toMediaType()
-            val json = JSONObject().put("quantity", cartEntity.quantity)
-            val body = json.toString().toRequestBody(mediaType)
+        val client = OkHttpClient()
+        val path = PATH_CART_PATCH + cartEntity.id
+        val mediaType = "application/json".toMediaType()
+        val json = JSONObject().put("quantity", cartEntity.quantity)
+        val body = json.toString().toRequestBody(mediaType)
 
-            val request =
-                Request.Builder()
-                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
-                    .patch(body)
-                    .url(server.url + path)
-                    .build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        val request =
+            Request.Builder()
+                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                .patch(body)
+                .url(server.url + path)
+                .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Request Failed", e.toString())
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.code == 200) {
+                    onSuccess()
+                    return
                 }
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.code == 200) {
-                        onSuccess()
-                        return
-                    }
-                    onFailure()
-                }
-            })
-        }.start()
+                onFailure()
+            }
+        })
     }
 
     override fun requestPostCartItem(
@@ -83,32 +81,31 @@ class CartRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val mediaType = "application/json".toMediaType()
-            val json = JSONObject().put("productId", productId)
-            val body = json.toString().toRequestBody(mediaType)
+        val client = OkHttpClient()
+        val mediaType = "application/json".toMediaType()
+        val json = JSONObject().put("productId", productId)
+        val body = json.toString().toRequestBody(mediaType)
 
-            val request =
-                Request.Builder()
-                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
-                    .post(body)
-                    .url(server.url + PATH_CART)
-                    .build()
+        val request =
+            Request.Builder()
+                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                .post(body)
+                .url(server.url + PATH_CART)
+                .build()
 
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Request Failed", e.toString())
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.code == 201) {
+                    onSuccess()
+                    return
                 }
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.code == 201) {
-                        onSuccess()
-                        return
-                    }
-                    onFailure()
-                }
-            })
-        }.start()
+                onFailure()
+            }
+        })
     }
 
     override fun requestDeleteCartItem(cartId: Long) {
@@ -118,14 +115,13 @@ class CartRemoteDataSourceImpl(
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic ${Server.TOKEN}")
+                    .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
                     .delete()
                     .url(server.url + path)
                     .build()
 
             client.newCall(request).execute()
         }
-
         thread.start()
         thread.join()
     }

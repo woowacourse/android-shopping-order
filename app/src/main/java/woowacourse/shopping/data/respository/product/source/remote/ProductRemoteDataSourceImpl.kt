@@ -20,24 +20,23 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: List<ProductEntity>) -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val path = PRODUCT
-            val request = Request.Builder().url(server.url + path).build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        val client = OkHttpClient()
+        val path = PRODUCT
+        val request = Request.Builder().url(server.url + path).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Request Failed", e.toString())
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val body = response.body?.string() ?: return onFailure()
+                    onSuccess(parseProductList(body))
+                    return
                 }
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseProductList(body))
-                        return
-                    }
-                    onFailure()
-                }
-            })
-        }.start()
+                onFailure()
+            }
+        })
     }
 
     override fun requestData(
@@ -45,25 +44,23 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: ProductEntity) -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val path = "$PRODUCT/$productId"
-            val request = Request.Builder().url(server.url + path).build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
-                }
+        val client = OkHttpClient()
+        val path = "$PRODUCT/$productId"
+        val request = Request.Builder().url(server.url + path).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Request Failed", e.toString())
+            }
 
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseProduct(JSONObject(body)))
-                        return
-                    }
-                    onFailure()
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val body = response.body?.string() ?: return onFailure()
+                    onSuccess(parseProduct(JSONObject(body)))
+                    return
                 }
-            })
-        }.start()
+                onFailure()
+            }
+        })
     }
 
     private fun parseProductList(response: String): List<ProductEntity> {
