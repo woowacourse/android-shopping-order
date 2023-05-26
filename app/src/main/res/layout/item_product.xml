@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="product"
+            type="woowacourse.shopping.model.ProductModel" />
+
+        <variable
+            name="onItemClick"
+            type="woowacourse.shopping.view.productlist.ProductListAdapter.OnItemClick" />
+
+        <import type="woowacourse.shopping.util.PriceFormatter" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:onClick="@{() -> onItemClick.onProductClick(product)}"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="25dp">
+
+        <ImageView
+            android:id="@+id/img_product"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/black"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@color/black" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_add_btns"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="@{product.count == 0 ? View.INVISIBLE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/btn_add"
+            app:layout_constraintEnd_toEndOf="@id/img_product"
+            app:layout_constraintStart_toStartOf="@id/img_product"
+            app:layout_constraintTop_toTopOf="@id/btn_add">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_minus"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/back_left_rounded"
+                android:text="@string/minus"
+                android:textColor="@color/gray_700"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toStartOf="@id/text_count"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_count"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="@{Integer.toString(product.count)}"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_plus"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/back_right_rounded"
+                android:text="@string/plus"
+                android:textColor="@color/gray_700"
+                android:textSize="22sp"
+                app:layout_constraintStart_toEndOf="@id/text_count"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/ic_add_circle"
+            android:visibility="@{product.count == 0 ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/img_product"
+            app:layout_constraintCircleRadius="@dimen/cardview_compat_inset_shadow"
+            app:layout_constraintEnd_toEndOf="@id/img_product" />
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:text="@{product.name}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/img_product"
+            app:layout_constraintStart_toStartOf="@id/img_product"
+            app:layout_constraintTop_toBottomOf="@id/img_product"
+            tools:text="[든든] 통조림" />
+
+        <TextView
+            android:id="@+id/text_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.format(@string/korean_won, PriceFormatter.INSTANCE.format(product.price))}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/text_name"
+            app:layout_constraintTop_toBottomOf="@id/text_name"
+            tools:text="10,000원" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
