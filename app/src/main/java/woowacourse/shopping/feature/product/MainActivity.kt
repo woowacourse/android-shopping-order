@@ -24,7 +24,6 @@ import woowacourse.shopping.data.cart.CartRemoteService
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -48,11 +47,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         CartRepositoryImpl(serverUrl, CartRemoteService())
     }
     private val presenter: MainContract.Presenter by lazy {
-        val productRemoteService = ProductRemoteService()
         val productRepository: ProductRepository =
-            ProductRepositoryImpl(serverUrl, productRemoteService)
+            ProductRepositoryImpl(serverUrl, ProductRemoteService())
         val recentProductRepository: RecentProductRepository =
-            RecentProductRepositoryImpl(serverUrl, productRemoteService, RecentProductDao(this))
+            RecentProductRepositoryImpl(this, serverUrl)
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
     }
     private val productListAdapter: ProductListAdapter by lazy {
