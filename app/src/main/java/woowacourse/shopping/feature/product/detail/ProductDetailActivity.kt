@@ -37,10 +37,12 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         super.onCreate(savedInstanceState)
         _binding = ActivityProductDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.productDetailTb)
         presenter.loadProduct()
         presenter.loadRecentProduct()
         binding.addCartProductTv.setOnClickListener { presenter.selectCount() }
         binding.mostRecentProductLayout.setOnClickListener { presenter.navigateProductDetail() }
+        binding.cancelButton.setOnClickListener { finish() }
     }
 
     override fun onDestroy() {

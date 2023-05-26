@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -41,6 +42,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         super.onCreate(savedInstanceState)
         _binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setToolBarBackButton()
 
         binding.cartProductRv.adapter = adapter
         binding.pageNumberPlusTv.setOnClickListener { presenter.plusPageNumber() }
@@ -104,6 +106,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showCartProducts() {
         runOnUiThread { binding.cartProductRv.visibility = VISIBLE }
         runOnUiThread { binding.skeletonLl.visibility = GONE }
+    }
+
+    private fun setToolBarBackButton() {
+        setSupportActionBar(binding.cartTb)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.back_24)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {
