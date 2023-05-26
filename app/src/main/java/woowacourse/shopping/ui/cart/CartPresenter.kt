@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.OrderPriceCalculator
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 
@@ -123,7 +124,7 @@ class CartPresenter(
     }
 
     private fun showOrderUI(selectedCartItems: Set<CartItem>) {
-        view.setOrderPrice(selectedCartItems.sumOf(CartItem::getOrderPrice))
+        view.setOrderPrice(OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems))
         view.setOrderCount(selectedCartItems.size)
     }
 
