@@ -7,11 +7,11 @@ import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 
 class CartPresenter(
     private val view: CartContract.View,
-    private val cartItemRepository: CartItemRepository,
+    private val cartItemRepository: CartItemRepository
 ) : CartContract.Presenter {
 
-    private var currentPage = 0
-    private var selectedCartItems = setOf<CartItem>()
+    private var currentPage: Int = 0
+    private var selectedCartItems: Set<CartItem> = setOf()
 
     override fun onLoadCartItemsOfNextPage() {
         currentPage++
@@ -137,7 +137,7 @@ class CartPresenter(
         view.setStateThatCanRequestPreviousPage(currentPage > 1)
         getMaxPage { maxPage ->
             view.setStateThatCanRequestNextPage(currentPage < maxPage)
-            view.setStateThatCanRequestPage(maxPage > 1)
+            view.setPageUIVisibility(maxPage > 1)
         }
     }
 

@@ -28,7 +28,7 @@ interface CartContract {
 
         fun setStateThatCanRequestNextPage(canRequest: Boolean)
 
-        fun setStateThatCanRequestPage(canRequest: Boolean)
+        fun setPageUIVisibility(isVisible: Boolean)
 
         fun setPage(page: Int)
 

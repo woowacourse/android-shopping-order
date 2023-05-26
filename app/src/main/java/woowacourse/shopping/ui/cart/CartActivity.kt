@@ -120,11 +120,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setStateThatCanRequestPage(canRequest: Boolean) {
+    override fun setPageUIVisibility(isVisible: Boolean) {
         runOnUiThread {
-            binding.tvCartPage.isVisible = canRequest
-            binding.btnPageUp.isVisible = canRequest
-            binding.btnPageDown.isVisible = canRequest
+            binding.tvCartPage.isVisible = isVisible
+            binding.btnPageUp.isVisible = isVisible
+            binding.btnPageDown.isVisible = isVisible
         }
     }
 
