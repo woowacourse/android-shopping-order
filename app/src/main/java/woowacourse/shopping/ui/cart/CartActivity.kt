@@ -52,24 +52,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initOrderUI()
         initCartList()
         loadLastPageIfFromCartItemAdd()
-        restoreStateIfSavedInstanceStateIsNotNull(savedInstanceState)
     }
 
     private fun loadLastPageIfFromCartItemAdd() {
         if (intent.getBooleanExtra(JUST_ADDED_CART_ITEM, false)) {
             presenter.onLoadCartItemsOfLastPage()
-        }
-    }
-
-    private fun restoreStateIfSavedInstanceStateIsNotNull(savedInstanceState: Bundle?) {
-        fun restoreSelectedCartItems(selectedCartItemIds: String) {
-            presenter.restoreSelectedCartItems(selectedCartItemIds.split(" ").map { it.toLong() })
-        }
-
-        if (savedInstanceState != null) {
-            presenter.restoreCurrentPage(savedInstanceState.getInt(CURRENT_PAGE))
-            val selectedCartItemIds = savedInstanceState.getString(SELECTED_CART_ITEMS)
-            if (!selectedCartItemIds.isNullOrBlank()) restoreSelectedCartItems(selectedCartItemIds)
         }
     }
 
@@ -153,12 +140,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURRENT_PAGE, presenter.currentPage)
-        outState.putString(SELECTED_CART_ITEMS, presenter.selectedCartItemIds.joinToString(" "))
-        super.onSaveInstanceState(outState)
-    }
-
     override fun setStateOfAllSelection(isAllSelected: Boolean) {
         runOnUiThread {
             binding.cbPageAllSelect.isChecked = isAllSelected
@@ -179,8 +160,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-        private const val CURRENT_PAGE = "CURRENT_PAGE"
-        private const val SELECTED_CART_ITEMS = "SELECTED_CART_ITEMS"
         private const val JUST_ADDED_CART_ITEM = "JUST_ADDED_CART_ITEM"
 
         fun startActivity(context: Context, justAddedCartItem: Boolean = false) {

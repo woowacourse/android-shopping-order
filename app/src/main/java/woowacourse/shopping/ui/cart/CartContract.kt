@@ -5,13 +5,6 @@ import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 interface CartContract {
 
     interface Presenter {
-        val currentPage: Int
-
-        val selectedCartItemIds: List<Long>
-
-        fun restoreCurrentPage(currentPage: Int)
-
-        fun restoreSelectedCartItems(cartItemIds: List<Long>)
 
         fun onLoadCartItemsOfNextPage()
 

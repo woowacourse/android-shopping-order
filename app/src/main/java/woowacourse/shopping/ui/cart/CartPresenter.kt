@@ -9,56 +9,37 @@ class CartPresenter(
     private val cartItemRepository: CartItemRepository,
 ) : CartContract.Presenter {
 
-    private var _currentPage = 0
+    private var currentPage = 0
     private var selectedCartItems = setOf<CartItem>()
 
-    override val currentPage: Int
-        get() = _currentPage
-
-    override val selectedCartItemIds: List<Long>
-        get() = selectedCartItems.map {
-            it.id
-        }
-
-    override fun restoreCurrentPage(currentPage: Int) {
-        this._currentPage = currentPage
-    }
-
-    override fun restoreSelectedCartItems(cartItemIds: List<Long>) {
-        cartItemRepository.findAllByIds(cartItemIds) { cartItems ->
-            this.selectedCartItems = cartItems.toSet()
-            showCartItems(_currentPage, selectedCartItems, false)
-        }
-    }
-
     override fun onLoadCartItemsOfNextPage() {
-        _currentPage++
+        currentPage++
         showOrderUI(selectedCartItems)
-        showCartItems(_currentPage, selectedCartItems, true)
-        showPageUI(_currentPage)
-        showAllSelectionUI(_currentPage, selectedCartItems)
+        showCartItems(currentPage, selectedCartItems, true)
+        showPageUI(currentPage)
+        showAllSelectionUI(currentPage, selectedCartItems)
     }
 
     override fun onLoadCartItemsOfPreviousPage() {
-        _currentPage--
-        showCartItems(_currentPage, selectedCartItems, true)
-        showPageUI(_currentPage)
-        showAllSelectionUI(_currentPage, selectedCartItems)
+        currentPage--
+        showCartItems(currentPage, selectedCartItems, true)
+        showPageUI(currentPage)
+        showAllSelectionUI(currentPage, selectedCartItems)
     }
 
     override fun onLoadCartItemsOfLastPage() {
         cartItemRepository.countAll { count ->
-            _currentPage = (count - 1) / PAGE_SIZE + 1
-            showCartItems(_currentPage, selectedCartItems, true)
-            showPageUI(_currentPage)
-            showAllSelectionUI(_currentPage, selectedCartItems)
+            currentPage = (count - 1) / PAGE_SIZE + 1
+            showCartItems(currentPage, selectedCartItems, true)
+            showPageUI(currentPage)
+            showAllSelectionUI(currentPage, selectedCartItems)
         }
     }
 
     override fun onDeleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId) {
             selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
-            showPageUI(_currentPage)
+            showPageUI(currentPage)
             updateCartUI()
         }
     }
@@ -70,13 +51,13 @@ class CartPresenter(
             } else {
                 selectedCartItems - cartItem
             }
-            showAllSelectionUI(_currentPage, selectedCartItems)
+            showAllSelectionUI(currentPage, selectedCartItems)
             showOrderUI(selectedCartItems)
         }
     }
 
     override fun onChangeSelectionOfAllCartItems(isSelected: Boolean) {
-        val offset = (_currentPage - 1) * PAGE_SIZE
+        val offset = (currentPage - 1) * PAGE_SIZE
         cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset) { cartItemsOfCurrentPage ->
             if (isSelected) {
                 selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
@@ -89,9 +70,9 @@ class CartPresenter(
     }
 
     private fun updateCartUI() {
-        showAllSelectionUI(_currentPage, selectedCartItems)
+        showAllSelectionUI(currentPage, selectedCartItems)
         showOrderUI(selectedCartItems)
-        showCartItems(_currentPage, selectedCartItems, false)
+        showCartItems(currentPage, selectedCartItems, false)
     }
 
     override fun onPlusCount(cartItemId: Long) {
@@ -100,10 +81,10 @@ class CartPresenter(
             cartItemRepository.updateCountById(cartItemId, cartItem.count) {
                 if (cartItem in selectedCartItems) {
                     selectedCartItems = selectedCartItems - cartItem + cartItem
-                    showAllSelectionUI(_currentPage, selectedCartItems)
+                    showAllSelectionUI(currentPage, selectedCartItems)
                     showOrderUI(selectedCartItems)
                 }
-                showCartItems(_currentPage, selectedCartItems, false)
+                showCartItems(currentPage, selectedCartItems, false)
             }
         }
     }
@@ -114,10 +95,10 @@ class CartPresenter(
             cartItemRepository.updateCountById(cartItemId, cartItem.count) {
                 if (cartItem in selectedCartItems) {
                     selectedCartItems = selectedCartItems - cartItem + cartItem
-                    showAllSelectionUI(_currentPage, selectedCartItems)
+                    showAllSelectionUI(currentPage, selectedCartItems)
                     showOrderUI(selectedCartItems)
                 }
-                showCartItems(_currentPage, selectedCartItems, false)
+                showCartItems(currentPage, selectedCartItems, false)
             }
         }
     }
