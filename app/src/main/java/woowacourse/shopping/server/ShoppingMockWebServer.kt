@@ -21,7 +21,7 @@ class ShoppingMockWebServer : Thread() {
     private fun getDispatcher(): Dispatcher = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
             return when (request.method) {
-                GET -> {
+                "GET" -> {
                     val path = request.path ?: return MockResponse().setResponseCode(404)
                     return processGet(path)
                 }
