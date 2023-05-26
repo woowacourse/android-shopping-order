@@ -4,36 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="product"
             type="woowacourse.shopping.model.ProductState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:padding="@dimen/margin_large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/start_guideline"
-            app:layout_constraintGuide_begin="@dimen/margin_large"
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/end_guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="@dimen/margin_large" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin_large">
 
         <ImageView
             android:id="@+id/product_image"
             loadUrl="@{product.imageUrl}"
-            android:layout_width="154dp"
-            android:layout_height="154dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,29 +28,29 @@
 
         <TextView
             android:id="@+id/product_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="@dimen/product_main_item_text_size"
-            app:layout_constraintStart_toEndOf="@id/start_guideline"
-            app:layout_constraintEnd_toStartOf="@id/end_guideline"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/product_image"
             app:layout_constraintTop_toBottomOf="@id/product_image"
-            tools:text="PET보틀-너오ㅓㄴ오ㅓ노어노ㅓ오너오ㅓ농"
-            android:text="@{product.name}"/>
+            tools:text="PET보틀-이름이 아주 기이이이이이이이이이이이이이이이인 상품-" />
 
         <TextView
             android:id="@+id/product_price"
+            formatMoneyWon="@{product.price}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/product_main_item_text_size"
-            app:layout_constraintEnd_toEndOf="@id/product_image"
-            app:layout_constraintStart_toStartOf="@id/product_image"
+            app:layout_constraintStart_toStartOf="@+id/product_name"
             app:layout_constraintTop_toBottomOf="@id/product_name"
-            tools:text="23000원"
-            formatMoneyWon="@{product.price}"/>
+            tools:text="23000원" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/product_add_fab"
@@ -80,11 +67,10 @@
 
         <woowacourse.shopping.common.view.CounterView
             android:id="@+id/counter_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:visibility="invisible"
-            android:layout_marginStart="@dimen/margin_small"
-            android:layout_marginEnd="@dimen/margin_small"
+            android:layout_marginHorizontal="10dp"
             app:layout_constraintBottom_toBottomOf="@+id/product_add_fab"
             app:layout_constraintEnd_toEndOf="@+id/product_image"
             app:layout_constraintStart_toStartOf="@+id/product_image"
