@@ -21,17 +21,17 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content">-->
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content">-->
 
-<!--        <Button-->
-<!--            android:backgroundTint="@color/white"-->
-<!--            android:id="@+id/more_button"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textColor="@color/black"-->
-<!--            android:text="더보기" />-->
+    <!--        <Button-->
+    <!--            android:backgroundTint="@color/white"-->
+    <!--            android:id="@+id/more_button"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:textColor="@color/black"-->
+    <!--            android:text="더보기" />-->
 
-<!--    </LinearLayout>-->
+    <!--    </LinearLayout>-->
 </layout>
