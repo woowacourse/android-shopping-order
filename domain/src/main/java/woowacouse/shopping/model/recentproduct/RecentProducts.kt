@@ -1,4 +1,4 @@
-package woowacouse.shopping.model
+package woowacouse.shopping.model.recentproduct
 
 class RecentProducts(
     recentProducts: List<RecentProduct>

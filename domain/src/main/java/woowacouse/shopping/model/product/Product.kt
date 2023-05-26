@@ -1,4 +1,4 @@
-package woowacouse.shopping.model
+package woowacouse.shopping.model.product
 
 data class Product(
     val id: Long,

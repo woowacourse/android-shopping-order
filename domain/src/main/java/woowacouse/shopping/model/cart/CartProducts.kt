@@ -1,4 +1,4 @@
-package woowacouse.shopping.model
+package woowacouse.shopping.model.cart
 
 class CartProducts(
     carts: List<CartProduct>
