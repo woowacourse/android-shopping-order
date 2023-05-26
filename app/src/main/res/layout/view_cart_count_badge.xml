@@ -9,7 +9,7 @@
         android:id="@+id/badge"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@drawable/bg_circle_teal_200"
+        android:background="@drawable/bg_cart_product_count_circle_"
         android:gravity="center"
         android:padding="2dp"
         tools:text="0"

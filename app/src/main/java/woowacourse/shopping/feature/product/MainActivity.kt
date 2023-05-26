@@ -3,11 +3,8 @@ package woowacourse.shopping.feature.product
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,7 +14,6 @@ import com.example.domain.RecentProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
-import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
 import woowacourse.shopping.data.cart.CartRemoteService
@@ -79,8 +75,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         ConcatAdapter(config, recentProductListWrapperAdapter, productListAdapter, loadMoreAdapter)
     }
 
-    private var cartCountBadge: TextView? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
@@ -91,6 +85,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartRepository.getAll(
             onFailure = {}, onSuccess = { presenter.loadCartProductCounts() }
         )
+
+        initToolBar()
     }
 
     override fun onResume() {
@@ -104,21 +100,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.actionbar_menu, menu)
-        cartCountBadge =
-            menu?.findItem(R.id.cart_count_badge)?.actionView?.findViewById(R.id.badge)
-        presenter.loadCartProductCountBadge()
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.item_cart -> CartActivity.startActivity(this, serverUrl)
-        }
-        return true
     }
 
     override fun addProductItems(products: List<ProductState>) {
@@ -137,10 +118,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         runOnUiThread { recentProductListAdapter.setItems(recentProducts.map(RecentProduct::toUi)) }
     }
 
-    override fun setCartProductCountBadge(count: Int) {
-        runOnUiThread { cartCountBadge?.text = count.toString() }
-    }
-
     override fun setCartProductCounts(cartProducts: List<CartProduct>) {
         runOnUiThread { productListAdapter.setCartProducts(cartProducts.map(CartProduct::toUi)) }
     }
@@ -154,12 +131,16 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun showEmptyProducts() = runOnUiThread { showToast("제품이 없습니다.") }
 
+    override fun setCartProductCountBadge(count: Int) {
+        runOnUiThread { binding.cartCountTv.text = count.toString() }
+    }
+
     override fun showCartProductCountBadge() {
-        runOnUiThread { cartCountBadge?.visibility = VISIBLE }
+        runOnUiThread { binding.cartCountTv.visibility = VISIBLE }
     }
 
     override fun hideCartProductCount() {
-        runOnUiThread { cartCountBadge?.visibility = GONE }
+        runOnUiThread { binding.cartCountTv.visibility = GONE }
     }
 
     override fun showProducts() {
@@ -176,6 +157,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
         binding.productRv.layoutManager = gridLayoutManager
         binding.productRv.adapter = concatAdapter
+    }
+
+    private fun initToolBar() {
+        setSupportActionBar(binding.mainTb)
+        binding.cartIv.setOnClickListener {
+            CartActivity.startActivity(this, serverUrl)
+        }
     }
 
     companion object {
