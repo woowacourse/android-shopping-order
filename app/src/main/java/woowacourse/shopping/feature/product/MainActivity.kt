@@ -86,12 +86,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initList()
-        Thread {
-            presenter.loadMoreProducts()
-            Thread.sleep(2000) // 스켈레톤 UI 확인용 sleep
-            runOnUiThread { showProducts() }
-        }.start()
 
+        presenter.loadMoreProducts()
         cartRepository.getAll(
             onFailure = {}, onSuccess = { presenter.loadCartProductCounts() }
         )
@@ -167,8 +163,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun showProducts() {
-        binding.productRv.visibility = VISIBLE
-        binding.skeletonGl.visibility = GONE
+        runOnUiThread {
+            binding.productRv.visibility = VISIBLE
+            binding.skeletonGl.visibility = GONE
+        }
     }
 
     private fun initList() {
