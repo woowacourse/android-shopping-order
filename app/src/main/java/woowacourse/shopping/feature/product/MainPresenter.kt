@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.product
 
-import android.util.Log
 import com.example.domain.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
@@ -32,6 +31,7 @@ class MainPresenter(
             },
             onSuccess = {
                 view.addProductItems(it.map(Product::toUi))
+                view.showProducts()
             }
         )
         loadItemFromIndex += loadItemCountUnit
@@ -83,7 +83,6 @@ class MainPresenter(
     }
 
     override fun plusCartProductCount(cartProductState: CartProductState) {
-        Log.d("otter66", "plusCartProductCount")
         cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,

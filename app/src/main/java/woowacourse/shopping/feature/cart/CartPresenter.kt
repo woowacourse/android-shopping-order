@@ -28,6 +28,7 @@ class CartPresenter(
             val items: List<CartProductState> = it.map(CartProduct::toUi)
             view.setCartPageNumber(pageNumber)
             view.setCartProducts(items)
+            view.showCartProducts()
         })
 
 //        val cartProducts: List<CartProductState> = cartRepository.getAll().map(CartProduct::toUi)
