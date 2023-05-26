@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import android.os.Handler
-import android.os.Looper
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
@@ -13,8 +11,6 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
-
     override fun setUpProducts() {
         setUpCartCounts()
         setUpNextProducts()
@@ -22,14 +18,12 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        Thread {
-            val cartProducts = cartRepository.getAll().all()
-                .associateBy { it.productId }
-                .mapValues { it.value.count }
-            handler.post {
-                view.setCartProducts(cartProducts)
-            }
-        }.start()
+        cartRepository.getAll { carts ->
+            val cartProducts = carts.all()
+                .associateBy { it.product.id }
+                .mapValues { it.value.quantity }
+            view.setCartProducts(cartProducts)
+        }
     }
 
     override fun setUpNextProducts() {
@@ -47,23 +41,24 @@ class ShoppingPresenter(
     }
 
     override fun setUpTotalCount() {
-        Thread {
-            val totalSelectedCount = cartRepository.getTotalSelectedCount()
-            handler.post {
-                view.setToolbar(totalSelectedCount)
-            }
-        }.start()
+        view.setToolbar(
+            cartRepository.getTotalSelectedCount()
+        )
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
         cartRepository.insert(productId)
-        cartRepository.updateCount(productId, count)
+        cartRepository.updateCount(productId, count) {
+            cartRepository.getAll {
+                setUpTotalCount()
+            }
+        }
     }
 
     override fun navigateToItemDetail(productId: Int) {
         productRepository.findById(productId) {
             it?.let {
-                recentRepository.insert(it)
+                view.navigateToProductDetail(it.toUIModel())
             }
         }
     }

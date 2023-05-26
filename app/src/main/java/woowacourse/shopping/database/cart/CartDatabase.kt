@@ -6,21 +6,22 @@ import android.database.Cursor
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.CartRepository
 
 class CartDatabase(context: Context) : CartRepository {
     private val db = ShoppingDBHelper(context).writableDatabase
 
-    private var cartProducts: CartProducts = getAll()
+    private lateinit var cartProducts: CartProducts
 
-    override fun getAll(): CartProducts {
+    override fun getAll(callback: (CartProducts) -> Unit) {
         val cartProducts = mutableListOf<CartProduct>()
         getCartCursor().use {
             while (it.moveToNext()) {
                 cartProducts.add(getCartProduct(it))
             }
+            callback(CartProducts(cartProducts))
         }
-        return CartProducts(cartProducts)
     }
 
     @SuppressLint("Range")
@@ -28,12 +29,14 @@ class CartDatabase(context: Context) : CartRepository {
         CartConstant.fromCursor(cursor).let {
             return CartProduct(
                 id = it.id,
-                name = it.name,
-                count = it.count,
+                quantity = it.quantity,
                 checked = it.checked,
-                price = it.price,
-                imageUrl = it.imageUrl,
-                productId = it.productId
+                product = Product(
+                    id = it.product.id,
+                    name = it.product.name,
+                    price = it.product.price,
+                    imageUrl = it.product.imageUrl
+                )
             )
         }
     }
@@ -42,8 +45,8 @@ class CartDatabase(context: Context) : CartRepository {
         return db.rawQuery(CartConstant.getGetAllQuery(), null)
     }
 
-    override fun getPage(index: Int, size: Int): CartProducts {
-        return cartProducts.subList(index * size, size)
+    override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
+        callback(cartProducts.subList(index * size, size))
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
@@ -59,35 +62,35 @@ class CartDatabase(context: Context) : CartRepository {
     }
 
     override fun getTotalSelectedCount(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.count }
+        return cartProducts.all().filter { it.checked }.sumOf { it.quantity }
     }
 
     override fun getTotalPrice(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.price * it.count }
+        return cartProducts.all().filter { it.checked }.sumOf { it.product.price * it.quantity }
     }
 
     override fun insert(productId: Int) {
-        cartProducts = getAll()
+        getAll { cartProducts = it }
     }
 
-    override fun updateCount(id: Int, count: Int): Int {
+    override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
         val sql = when {
             count < 1 -> CartConstant.getDeleteQuery(id)
             else -> CartConstant.getUpdateCountQuery(id, count)
         }
         db.execSQL(sql).let {
-            cartProducts = getAll()
-            return count
+            getAll { cartProducts = it }
+            callback(count)
         }
     }
 
     override fun updateChecked(id: Int, checked: Boolean) {
         db.execSQL(CartConstant.getUpdateCheckedQuery(id, checked))
-        cartProducts = getAll()
+        getAll { cartProducts = it }
     }
 
     override fun remove(id: Int) {
         db.execSQL(CartConstant.getDeleteQuery(id))
-        cartProducts = getAll()
+        getAll { cartProducts = it }
     }
 }

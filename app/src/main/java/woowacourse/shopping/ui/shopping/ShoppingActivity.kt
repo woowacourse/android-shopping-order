@@ -97,7 +97,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             presenter.setUpNextProducts()
         }
         override fun onAddCartOrUpdateCount(productId: Int, count: Int) {
-            adapter.updateItemCount(productId, count)
             presenter.updateItemCount(productId, count)
             presenter.setUpTotalCount()
         }

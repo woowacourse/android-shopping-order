@@ -2,6 +2,7 @@ package woowacourse.shopping.service
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import woowacourse.shopping.model.Product
 
 interface RetrofitProductService {
@@ -9,5 +10,7 @@ interface RetrofitProductService {
     fun getProducts(): Call<List<Product>>
 
     @GET("products/{productId}")
-    fun getProduct(productId: Int): Call<Product>
+    fun getProduct(
+        @Path("productId") productId: Int
+    ): Call<Product>
 }

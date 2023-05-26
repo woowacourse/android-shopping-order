@@ -3,6 +3,7 @@ package woowacourse.shopping.database.cart
 import android.database.Cursor
 import android.provider.BaseColumns
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.Product
 
 object CartConstant : BaseColumns {
     private const val TABLE_NAME = "cart_products"
@@ -48,12 +49,12 @@ object CartConstant : BaseColumns {
                 $TABLE_COLUMN_PRODUCT_ID,
                 $TABLE_COLUMN_SAVE_TIME) VALUES (
                 ${cartProduct.id},
-                '${cartProduct.name}',
-                ${cartProduct.count},
+                '${cartProduct.product.name}',
+                ${cartProduct.quantity},
                 ${cartProduct.checked},
-                ${cartProduct.price},
-                '${cartProduct.imageUrl}',
-                ${cartProduct.productId},
+                ${cartProduct.product.price},
+                '${cartProduct.product.imageUrl}',
+                ${cartProduct.product.id},
                 ${System.currentTimeMillis()})
         """.trimIndent()
     }
@@ -81,12 +82,14 @@ object CartConstant : BaseColumns {
     fun fromCursor(cursor: Cursor): CartProduct {
         return CartProduct(
             id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_ID)),
-            name = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_NAME)),
-            count = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_COUNT)),
+            quantity = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_COUNT)),
             checked = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_CHECKED)) == 1,
-            price = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRICE)),
-            imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL)),
-            productId = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRODUCT_ID))
+            product = Product(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRODUCT_ID)),
+                name = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_NAME)),
+                price = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRICE)),
+                imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL))
+            )
         )
     }
 }

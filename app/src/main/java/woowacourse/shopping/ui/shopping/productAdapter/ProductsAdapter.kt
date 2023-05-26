@@ -11,7 +11,7 @@ import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ShoppingViewHo
 
 class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Adapter<ShoppingViewHolder>() {
     private val productItems: MutableList<ProductsItemType> = mutableListOf()
-    private val cartCounts: MutableMap<Int, Int> = mutableMapOf()
+    private var cartCounts: Map<Int, Int> = emptyMap()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShoppingViewHolder {
         return when (viewType) {
@@ -56,17 +56,11 @@ class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Ada
     }
 
     fun updateCartCounts(cartCounts: Map<Int, Int>) {
+        this.cartCounts = cartCounts
         productItems.filterIsInstance<ProductsItemType.Product>()
             .forEach { it.count = cartCounts[it.product.id] ?: 0 }
 
         notifyItemRangeChanged(0, productItems.size - 1)
-    }
-
-    fun updateItemCount(productId: Int, count: Int) {
-        cartCounts[productId] = count
-        val index = productItems
-            .indexOfFirst { it is ProductsItemType.Product && it.product.id == productId }
-        productItems[index] = (productItems[index] as ProductsItemType.Product).copy(count = count)
     }
 
     private fun getCount(productId: Int): Int {

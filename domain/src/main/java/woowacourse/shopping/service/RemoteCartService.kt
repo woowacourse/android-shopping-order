@@ -1,117 +1,92 @@
 package woowacourse.shopping.service
 
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.ProductIdBody
+import woowacourse.shopping.model.QuantityBody
+import woowacourse.shopping.utils.RetrofitUtil
 
 class RemoteCartService(baseUrl: String) {
-    private val baseUrl = baseUrl.removeSuffix("/")
-    private val client = OkHttpClient()
-
     private var credentials = "YUBhLmNvbToxMjM0"
 
-    fun getAll(): List<CartProduct> {
-        val request = Request.Builder()
-            .url("$baseUrl/cart-items")
-            .header("Authorization", "Basic $credentials")
-            .get()
-            .build()
-
-        var products: List<CartProduct>? = null
-        executeRequest(
-            request,
-            onSuccess = {
-                println("Cart get all success")
-                val responseBody = it.body?.string()
-                    ?: throw RuntimeException("Cart get all failed")
-                products = parseCartProductsResponse(responseBody)
-            },
-            onFailure = { println("Cart get all failed") }
-        )
-
-        while (products == null) {
-            Thread.sleep(10)
-        }
-        return products!!
-    }
-
-    fun postItem(itemId: Int) {
-        val request = Request.Builder()
-            .url("$baseUrl/cart-items")
-            .header("Authorization", "Basic $credentials")
-            .header("Content-Type", "application/json")
-            .post(JSONObject().put("productId", itemId).toString().toRequestBody(JSON_MEDIA_TYPE))
-            .build()
-
-        executeRequest(
-            request,
-            onSuccess = { println("Cart post success") },
-            onFailure = { println("Cart post failed") }
-        )
-    }
-
-    fun patchItemQuantity(itemId: Int, quantity: Int) {
-        val request = Request.Builder()
-            .url("$baseUrl/cart-items/$itemId")
-            .header("Authorization", "Basic $credentials")
-            .header("Content-Type", "application/json")
-            .patch(JSONObject().put("quantity", quantity).toString().toRequestBody(JSON_MEDIA_TYPE))
-            .build()
-
-        executeRequest(
-            request,
-            onSuccess = { println("Cart patch success") },
-            onFailure = { println("Cart patch failed") }
-        )
-    }
-
-    fun deleteItem(itemId: Int) {
-        val request = Request.Builder()
-            .url("$baseUrl/cart-items/$itemId")
-            .header("Authorization", "Basic $credentials")
-            .delete()
-            .build()
-
-        executeRequest(
-            request,
-            onSuccess = { println("Cart delete success") },
-            onFailure = { println("Cart delete failed") }
-        )
-    }
-
-    private fun executeRequest(
-        request: Request,
-        onSuccess: (Response) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        client.newCall(request).enqueue(
-            object : okhttp3.Callback {
-                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-                    onFailure(e)
+    fun getAll(callback: (List<CartProduct>?) -> Unit) {
+        RetrofitUtil.retrofitCartService.getCarts("Basic $credentials").enqueue(
+            object : retrofit2.Callback<List<CartProduct>> {
+                override fun onResponse(
+                    call: retrofit2.Call<List<CartProduct>>,
+                    response: retrofit2.Response<List<CartProduct>>
+                ) {
+                    callback(response.body())
                 }
 
-                override fun onResponse(call: okhttp3.Call, response: Response) {
-                    onSuccess(response)
+                override fun onFailure(call: retrofit2.Call<List<CartProduct>>, t: Throwable) {
+                    callback(null)
                 }
             }
         )
     }
 
-    private fun parseCartProductsResponse(responseBody: String): List<CartProduct> {
-        val cartJsonArray = JSONArray(responseBody)
-        val carts = mutableListOf<CartProduct>()
-        for (i in 0 until cartJsonArray.length()) {
-            carts += CartProduct.fromJson(cartJsonArray.getJSONObject(i))
-        }
-        return carts
+    fun postItem(itemId: Int, callback: (Int?) -> Unit) {
+        RetrofitUtil.retrofitCartService.postCart(
+            "Basic $credentials",
+            ProductIdBody(itemId)
+        ).enqueue(
+            object : retrofit2.Callback<Int> {
+                override fun onResponse(
+                    call: retrofit2.Call<Int>,
+                    response: retrofit2.Response<Int>
+                ) {
+                    if (response.isSuccessful) {
+                        callback(response.body())
+                    } else {
+                        println("---" + response.body())
+                    }
+                }
+
+                override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                    println(t)
+                    callback(null)
+                }
+            }
+        )
     }
 
-    companion object {
-        private val JSON_MEDIA_TYPE = "application/json".toMediaTypeOrNull()
+    fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Int?) -> Unit) {
+        RetrofitUtil.retrofitCartService.patchCart(
+            itemId,
+            "Basic $credentials",
+            QuantityBody(quantity)
+        ).enqueue(
+            object : retrofit2.Callback<Int> {
+                override fun onResponse(
+                    call: retrofit2.Call<Int>,
+                    response: retrofit2.Response<Int>
+                ) {
+                    println(response.body())
+                    callback(response.body())
+                }
+
+                override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                    println(t)
+                    callback(null)
+                }
+            }
+        )
+    }
+
+    fun deleteItem(itemId: Int, callback: (Int?) -> Unit) {
+        RetrofitUtil.retrofitCartService.deleteCart(itemId, "Basic $credentials").enqueue(
+            object : retrofit2.Callback<Int> {
+                override fun onResponse(
+                    call: retrofit2.Call<Int>,
+                    response: retrofit2.Response<Int>
+                ) {
+                    callback(response.body())
+                }
+
+                override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                    callback(null)
+                }
+            }
+        )
     }
 }

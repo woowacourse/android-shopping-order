@@ -1,7 +1,5 @@
 package woowacourse.shopping.repositoryImpl
 
-import java.lang.Integer.min
-import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.service.RemoteCartService
@@ -9,15 +7,15 @@ import woowacourse.shopping.service.RemoteCartService
 class CartRepositoryImpl(
     private val remoteDatabase: RemoteCartService
 ) : CartRepository {
-    private val cartItems = mutableListOf<CartProduct>()
+    private val cartItems = CartProducts(emptyList())
 
-    override fun getPage(index: Int, size: Int): CartProducts {
+    override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
         if (cartItems.isEmpty()) {
-            cartItems.addAll(remoteDatabase.getAll())
+            remoteDatabase.getAll {
+                cartItems.replaceAll(it ?: emptyList())
+                callback(cartItems)
+            }
         }
-        return CartProducts(
-            cartItems.subList(index * size, min((index + 1) * size, cartItems.size))
-        )
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
@@ -29,52 +27,55 @@ class CartRepositoryImpl(
     }
 
     override fun getTotalCount(): Int {
-        return cartItems.sumOf { it.count }
+        return cartItems.totalQuantity
     }
 
     override fun getTotalSelectedCount(): Int {
-        return cartItems.filter { it.checked }.sumOf { it.count }
+        return cartItems.totalCheckedQuantity
     }
 
     override fun getTotalPrice(): Int {
-        return cartItems.filter { it.checked }.sumOf { it.price * it.count }
+        return cartItems.totalPrice
     }
 
     override fun insert(productId: Int) {
-        if (cartItems.firstOrNull { it.productId == productId } != null) {
+        if (cartItems.findByProductId(productId) != null) {
             return
         }
-        remoteDatabase.postItem(productId)
-        getAll()
+        remoteDatabase.postItem(productId) {
+            getAll {}
+        }
     }
 
     override fun remove(id: Int) {
-        remoteDatabase.deleteItem(id)
+        remoteDatabase.deleteItem(id) {}
     }
 
-    override fun updateCount(id: Int, count: Int): Int {
-        val cartItem = cartItems.firstOrNull { it.productId == id }
-        when {
-            cartItem == null -> remoteDatabase.postItem(id)
-            count < 1 -> remoteDatabase.deleteItem(cartItem.id)
-            else -> remoteDatabase.patchItemQuantity(cartItem.id, count)
+    override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
+        if (cartItems.isEmpty()) {
+            remoteDatabase.getAll {
+                cartItems.replaceAll(it ?: emptyList())
+            }
         }
-
-        getAll()
-        return cartItems.size
+        val cartItem = cartItems.findByProductId(id)
+        when {
+            cartItem == null -> return
+            count < 1 -> return
+            else -> remoteDatabase.patchItemQuantity(cartItem.id, count) {
+                getAll { }
+                callback(it)
+            }
+        }
     }
 
     override fun updateChecked(id: Int, checked: Boolean) {
-        cartItems.indexOfFirst { it.id == id }.let {
-            cartItems[it] = cartItems[it].copy(checked = checked)
-        }
+        cartItems.changeChecked(id, checked)
     }
 
-    override fun getAll(): CartProducts {
-        remoteDatabase.getAll().let {
-            cartItems.clear()
-            cartItems.addAll(it)
-            return CartProducts(it)
+    override fun getAll(callback: (CartProducts) -> Unit) {
+        remoteDatabase.getAll {
+            cartItems.replaceAll(it ?: emptyList())
+            callback(CartProducts(it ?: emptyList()))
         }
     }
 }
