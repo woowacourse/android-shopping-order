@@ -3,5 +3,7 @@ package woowacouse.shopping.model
 data class CartProduct(
     val id: Long,
     val product: Product,
-    var checked: Boolean
-)
+    val checked: Boolean
+) {
+    fun updateCartChecked(): CartProduct = copy(checked = !checked)
+}

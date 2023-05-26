@@ -15,7 +15,8 @@ class CartProducts(
 
     fun updateCartChecked(cartId: Long) {
         carts.find { it.id == cartId }?.apply {
-            checked = !checked
+            carts.remove(this)
+            carts.add(updateCartChecked())
         } ?: throw IllegalArgumentException(
             ERROR_NOT_EXITS_CART_ID
         )
