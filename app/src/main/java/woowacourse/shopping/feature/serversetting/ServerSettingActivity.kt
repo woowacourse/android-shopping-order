@@ -19,30 +19,18 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-        binding.btnDeetooServer.setOnClickListener {
-            ServerInfo.changeServer(DEETOO)
-            startMain(DEETOO.url)
-        }
-        binding.btnEmilServer.setOnClickListener {
-            ServerInfo.changeServer(EMIL)
-            startMain(EMIL.url)
-        }
-        binding.btnRoiseServer.setOnClickListener {
-            ServerInfo.changeServer(ROISE)
-            startMain(ROISE.url)
-        }
+        binding.btnDeetooServer.setOnClickListener { startMain(DEETOO) }
+        binding.btnEmilServer.setOnClickListener { startMain(EMIL) }
+        binding.btnRoiseServer.setOnClickListener { startMain(ROISE) }
     }
 
-    private fun startMain(serverUrl: String) {
-        if (serverUrl == "") {
-            Toast.makeText(this, URL_NOT_EXIST_ERROR, Toast.LENGTH_SHORT).show()
-        } else {
-            startActivity(MainActivity.getIntent(this))
-        }
+    private fun startMain(server: Server) {
+        ServerInfo.changeServer(server)
+        Toast.makeText(this, getString(R.string.enter_server_text), Toast.LENGTH_SHORT).show()
+        startActivity(MainActivity.getIntent(this))
     }
 
     companion object {
-        private const val URL_NOT_EXIST_ERROR = "URL 이 존재하지 않습니다."
         private val DEETOO = Server.Deetoo
         private val EMIL = Server.Emil
         private val ROISE = Server.Roise

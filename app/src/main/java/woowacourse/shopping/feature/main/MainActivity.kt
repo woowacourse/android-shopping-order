@@ -151,7 +151,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.badge)
 
-        // presenter.loadCartCountSize()
         return true
     }
 
@@ -184,9 +183,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context): Intent {
-            return Intent(context, MainActivity::class.java)
-        }
+        fun getIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
 
         private const val TOTAL_SPAN = 2
         private const val HALF_SPAN = TOTAL_SPAN / 2

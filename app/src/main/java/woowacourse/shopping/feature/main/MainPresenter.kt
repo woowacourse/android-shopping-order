@@ -94,8 +94,8 @@ class MainPresenter(
     }
 
     override fun showRecentProductDetail(productId: Long) {
-        val product = _products.value?.find { it.id == productId }
-        if (product != null) {
+        val productUiModel = _products.value?.find { it.id == productId }
+        if (productUiModel != null) {
             showProductDetail(productId)
         } else {
             productRepository.fetchProductById(
@@ -139,8 +139,7 @@ class MainPresenter(
                 cartProducts = newCartProducts
                 _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
             },
-            onFailure = {
-            },
+            onFailure = {},
         )
     }
 

@@ -51,10 +51,6 @@ class CartPresenter(
             },
             onFailure = {},
         )
-        Thread {
-            Thread.sleep(2000)
-            view.hideLoadingView()
-        }.start()
     }
 
     override fun loadPreviousPage() {
