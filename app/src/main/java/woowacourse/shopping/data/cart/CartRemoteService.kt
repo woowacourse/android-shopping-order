@@ -11,6 +11,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.util.BANDAL
 import java.io.IOException
 
 class CartRemoteService {
@@ -182,9 +183,5 @@ class CartRemoteService {
         val price = jsonObject.getInt("price")
 
         return Product(id = id, name = name, imageUrl = imageUrl, price = price)
-    }
-
-    companion object {
-        private const val BANDAL = "bm8xbXNoMTIxN0BnbWFpbC5jb206MTIzNDU="
     }
 }
