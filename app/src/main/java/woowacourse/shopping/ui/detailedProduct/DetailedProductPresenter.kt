@@ -21,7 +21,11 @@ class DetailedProductPresenter(
     override fun setUpLastProduct() {
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }
-            ?.let { runCatching { lastProduct = productRepository.findById(it).toUIModel() } }
+            ?.let {
+                productRepository.findById(it) { product ->
+                    lastProduct = product?.toUIModel()
+                }
+            }
         sharedPreferenceUtils.setLastProductId(product.id)
     }
 

@@ -33,22 +33,17 @@ class ShoppingPresenter(
     }
 
     override fun setUpNextProducts() {
-        Thread {
-            val products = productRepository.getNext(PRODUCT_COUNT).map { it.toUIModel() }
-            handler.post {
-                view.addMoreProducts(products)
+        productRepository.getAll { products ->
+            products?.let {
+                view.addMoreProducts(products.map { it.toUIModel() })
             }
-        }.start()
+        }
     }
 
     override fun setUpRecentProducts() {
-        Thread {
-            val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
-                .map { it.toUIModel() }
-            handler.post {
-                view.setRecentProducts(recentProducts)
-            }
-        }.start()
+        val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
+            .map { it.toUIModel() }
+        view.setRecentProducts(recentProducts)
     }
 
     override fun setUpTotalCount() {
@@ -66,9 +61,11 @@ class ShoppingPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        view.navigateToProductDetail(
-            productRepository.findById(productId).toUIModel()
-        )
+        productRepository.findById(productId) {
+            it?.let {
+                recentRepository.insert(it)
+            }
+        }
     }
 
     companion object {

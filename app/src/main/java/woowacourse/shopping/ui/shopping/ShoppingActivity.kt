@@ -104,9 +104,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun addMoreProducts(products: List<ProductUIModel>) {
-        binding.mainSkeleton.isVisible = false
-        binding.rvProducts.isVisible = true
-        adapter.addList(products)
+        runOnUiThread {
+            binding.mainSkeleton.isVisible = false
+            binding.rvProducts.isVisible = true
+            adapter.addList(products)
+        }
     }
 
     override fun setRecentProducts(recentProductsData: List<RecentProductUIModel>) {

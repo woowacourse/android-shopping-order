@@ -7,37 +7,19 @@ class ProductRepositoryImpl(
     private val localDatabase: ProductRepository,
     private val remoteDatabase: ProductRepository
 ) : ProductRepository {
-    private var isInitialized = false
-
-    override fun getAll(): List<Product> {
-        remoteDatabase.getAll().forEach {
-            localDatabase.insert(it)
-        }
-        return localDatabase.getAll()
+    override fun getAll(callback: (List<Product>?) -> Unit) {
+        remoteDatabase.getAll(callback)
     }
 
-    override fun getNext(count: Int): List<Product> {
-        if (!isInitialized) {
-            getAll()
-            isInitialized = true
-        }
-        return localDatabase.getNext(count)
+    override fun getNext(count: Int, callback: (List<Product>?) -> Unit) {
+        remoteDatabase.getNext(count, callback)
     }
 
-    override fun insert(product: Product): Int {
-        TODO("Not yet implemented")
+    override fun insert(product: Product, callback: (Int) -> Unit) {
+        remoteDatabase.insert(product, callback)
     }
 
-    override fun findById(id: Int): Product {
-        runCatching { localDatabase.findById(id) }
-            .onSuccess { return it }
-
-        runCatching { remoteDatabase.findById(id) }
-            .onSuccess {
-                localDatabase.insert(it)
-                return it
-            }
-
-        throw RuntimeException("Product not found with id: $id")
+    override fun findById(id: Int, callback: (Product?) -> Unit) {
+        remoteDatabase.findById(id, callback)
     }
 }

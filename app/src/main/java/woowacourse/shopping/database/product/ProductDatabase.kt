@@ -10,17 +10,17 @@ class ProductDatabase(context: Context) : ProductRepository {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private var offset = 0
-    override fun getAll(): List<Product> {
+    override fun getAll(callback: (List<Product>?) -> Unit) {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetAllQuery(), null).use {
             while (it.moveToNext()) {
                 products.add(ProductConstant.fromCursor(it))
             }
         }
-        return products
+        callback(products)
     }
 
-    override fun getNext(count: Int): List<Product> {
+    override fun getNext(count: Int, callback: (List<Product>?) -> Unit) {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetNextQuery(count, offset), null).use {
             while (it.moveToNext()) {
@@ -28,18 +28,18 @@ class ProductDatabase(context: Context) : ProductRepository {
                 offset++
             }
         }
-        return products
+        callback(products)
     }
 
-    override fun findById(id: Int): Product {
+    override fun findById(id: Int, callback: (Product?) -> Unit) {
         db.rawQuery(ProductConstant.getGetQuery(id), null).use {
             it.moveToNext()
-            return ProductConstant.fromCursor(it)
+            callback(ProductConstant.fromCursor(it))
         }
     }
 
-    override fun insert(product: Product): Int {
+    override fun insert(product: Product, callback: (Int) -> Unit) {
         db.execSQL(ProductConstant.getInsertQuery(product))
-        return product.id
+        callback(product.id)
     }
 }
