@@ -14,7 +14,6 @@ import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
-import woowacourse.shopping.utils.PRICE_FORMAT
 import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -24,22 +23,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private val cartListAdapter by lazy {
         CartListAdapter(
-            onClickCloseButton = { presenter.onDeleteCartItem(it) },
-            onClickCheckBox = { productId, isSelected ->
-                presenter.onChangeSelectionOfCartItem(productId, isSelected)
-            },
-            onClickPlus = { presenter.onPlusCount(it) },
-            onClickMinus = { presenter.onMinusCount(it) },
-            cartItems = mutableListOf()
+            cartListEvent = makeCartListEvent()
         )
     }
 
-    private val presenter: CartPresenter by lazy {
+    private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
             CartItemRepositoryImpl(
                 CartItemRemoteService(ServerConfiguration.host)
-            )
+            ),
+            PAGE_SIZE
         )
     }
 
@@ -52,78 +46,19 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initOrderUI()
         initCartList()
         loadLastPageIfFromCartItemAdd()
-        restoreStateIfSavedInstanceStateIsNotNull(savedInstanceState)
-    }
-
-    private fun loadLastPageIfFromCartItemAdd() {
-        if (intent.getBooleanExtra(JUST_ADDED_CART_ITEM, false)) {
-            presenter.onLoadCartItemsOfLastPage()
-        }
-    }
-
-    private fun restoreStateIfSavedInstanceStateIsNotNull(savedInstanceState: Bundle?) {
-        fun restoreSelectedCartItems(selectedCartItemIds: String) {
-            presenter.restoreSelectedCartItems(selectedCartItemIds.split(" ").map { it.toLong() })
-        }
-
-        if (savedInstanceState != null) {
-            presenter.restoreCurrentPage(savedInstanceState.getInt(CURRENT_PAGE))
-            val selectedCartItemIds = savedInstanceState.getString(SELECTED_CART_ITEMS)
-            if (!selectedCartItemIds.isNullOrBlank()) restoreSelectedCartItems(selectedCartItemIds)
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            android.R.id.home -> finish()
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 
-    private fun setActionBar() {
-        setSupportActionBar(binding.toolbarCart)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val navigationIcon = binding.toolbarCart.navigationIcon?.mutate()
-        DrawableCompat.setTint(
-            navigationIcon!!,
-            ContextCompat.getColor(this, android.R.color.white),
-        )
-        binding.toolbarCart.navigationIcon = navigationIcon
-    }
-
-    private fun initPageUI() {
-        binding.btnPageDown.setOnClickListener {
-            presenter.onLoadCartItemsOfPreviousPage()
-        }
-        binding.btnPageUp.setOnClickListener {
-            presenter.onLoadCartItemsOfNextPage()
-        }
-    }
-
-    private fun initCartList() {
-        binding.recyclerViewCart.adapter = cartListAdapter
-        presenter.onLoadCartItemsOfNextPage()
-    }
-
-    private fun initOrderUI() {
-        binding.cbPageAllSelect.isChecked = false
-        binding.cbPageAllSelect.setOnCheckedChangeListener { _, isChecked ->
-            presenter.onChangeSelectionOfAllCartItems(isChecked)
-        }
-        binding.tvOrder.text = getString(R.string.order)
-    }
-
-    override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
+    override fun setStateThatCanRequestPreviousPage(canRequest: Boolean) {
         runOnUiThread {
-            binding.layoutSkeletonCartList.isVisible = false
-            binding.layoutCartList.isVisible = true
-            if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
-            cartListAdapter.setCartItems(cartItems)
+            binding.btnPageDown.isEnabled = canRequest
         }
     }
 
@@ -141,22 +76,19 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setStateThatCanRequestPreviousPage(canRequest: Boolean) {
-        runOnUiThread {
-            binding.btnPageDown.isEnabled = canRequest
-        }
-    }
-
     override fun setPage(page: Int) {
         runOnUiThread {
             binding.tvCartPage.text = page.toString()
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURRENT_PAGE, presenter.currentPage)
-        outState.putString(SELECTED_CART_ITEMS, presenter.selectedCartItemIds.joinToString(" "))
-        super.onSaveInstanceState(outState)
+    override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
+        runOnUiThread {
+            binding.layoutSkeletonCartList.isVisible = false
+            binding.layoutCartList.isVisible = true
+            if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
+            cartListAdapter.setCartItems(cartItems)
+        }
     }
 
     override fun setStateOfAllSelection(isAllSelected: Boolean) {
@@ -167,8 +99,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setOrderPrice(price: Int) {
         runOnUiThread {
-            binding.tvOrderPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(price))
+            binding.tvOrderPrice.text = getString(R.string.product_price).format(price)
         }
     }
 
@@ -178,9 +109,66 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    private fun loadLastPageIfFromCartItemAdd() {
+        if (intent.getBooleanExtra(JUST_ADDED_CART_ITEM, false)) {
+            presenter.loadCartItemsOfLastPage()
+        }
+    }
+
+    private fun setActionBar() {
+        setSupportActionBar(binding.toolbarCart)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val navigationIcon = binding.toolbarCart.navigationIcon?.mutate()
+        DrawableCompat.setTint(
+            navigationIcon!!,
+            ContextCompat.getColor(this, android.R.color.white),
+        )
+        binding.toolbarCart.navigationIcon = navigationIcon
+    }
+
+    private fun initPageUI() {
+        binding.btnPageDown.setOnClickListener {
+            presenter.loadCartItemsOfPreviousPage()
+        }
+        binding.btnPageUp.setOnClickListener {
+            presenter.loadCartItemsOfNextPage()
+        }
+    }
+
+    private fun initCartList() {
+        binding.recyclerViewCart.adapter = cartListAdapter
+        presenter.loadCartItemsOfNextPage()
+    }
+
+    private fun initOrderUI() {
+        binding.cbPageAllSelect.isChecked = false
+        binding.cbPageAllSelect.setOnCheckedChangeListener { _, isChecked ->
+            presenter.updateSelectionTotalCartItems(isChecked)
+        }
+        binding.tvOrder.text = getString(R.string.order)
+    }
+
+    private fun makeCartListEvent() = object : CartListEvent {
+        override fun onClickCloseButton(id: Long) {
+            presenter.deleteCartItem(id)
+        }
+
+        override fun onClickCheckBox(id: Long, isChecked: Boolean) {
+            presenter.updateSelectionCartItem(id, isChecked)
+        }
+
+        override fun onClickPlus(id: Long) {
+            presenter.plusCount(id)
+        }
+
+        override fun onClickMinus(id: Long) {
+            presenter.minusCount(id)
+        }
+    }
+
     companion object {
-        private const val CURRENT_PAGE = "CURRENT_PAGE"
-        private const val SELECTED_CART_ITEMS = "SELECTED_CART_ITEMS"
+        private const val PAGE_SIZE = 5
         private const val JUST_ADDED_CART_ITEM = "JUST_ADDED_CART_ITEM"
 
         fun startActivity(context: Context, justAddedCartItem: Boolean = false) {

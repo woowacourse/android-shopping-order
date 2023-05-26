@@ -1,4 +1,4 @@
-package woowacourse.shopping.utils
+package woowacourse.shopping.session
 
 object UserData {
     var credential = ""

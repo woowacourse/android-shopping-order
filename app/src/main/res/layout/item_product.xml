@@ -4,20 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <variable
+            name="productListEvent"
+            type="woowacourse.shopping.ui.productlist.ProductListEvent" />
+
         <variable
             name="product"
-            type="woowacourse.shopping.ui.products.uistate.ProductUIState" />
+            type="woowacourse.shopping.ui.productlist.uistate.ProductUIState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="10dp">
+        android:layout_marginVertical="10dp"
+        android:onClick="@{() -> productListEvent.onClick(product.id)}">
 
         <ImageView
             android:id="@+id/iv_product"
             android:layout_width="155dp"
             android:layout_height="0dp"
+            android:urlSrc="@{product.imageUrl}"
             app:layout_constraintBottom_toTopOf="@id/tv_product_name"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,18 +38,23 @@
             android:layout_height="48dp"
             android:layout_margin="8dp"
             android:background="@drawable/btn_plus"
+            android:onClick="@{() -> productListEvent.onClickAddToCartButton(product.id)}"
+            app:isVisible="@{product.count == 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="@id/iv_product" />
 
-        <woowacourse.shopping.utils.customview.Counter
+        <woowacourse.shopping.ui.customview.Counter
             android:id="@+id/counter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
+            app:count="@{product.count}"
+            app:id="@{product.cartItemId}"
+            app:isVisible="@{product.count != 0}"
+            app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/iv_product" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/tv_product_name"
@@ -64,6 +76,7 @@
             android:id="@+id/tv_product_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:text="@{@string/product_price(product.price)}"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/iv_product"

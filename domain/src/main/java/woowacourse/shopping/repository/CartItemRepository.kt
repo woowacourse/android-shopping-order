@@ -12,7 +12,7 @@ interface CartItemRepository {
 
     fun findAllOrderByAddedTime(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit)
 
-    fun findById(id: Long, onFinish: (CartItem) -> Unit)
+    fun findById(id: Long, onFinish: (CartItem?) -> Unit)
 
     fun findByProductId(productId: Long, onFinish: (CartItem?) -> Unit)
 

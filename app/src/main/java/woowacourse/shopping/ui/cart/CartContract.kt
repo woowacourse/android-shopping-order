@@ -5,29 +5,21 @@ import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 interface CartContract {
 
     interface Presenter {
-        val currentPage: Int
+        fun loadCartItemsOfNextPage()
 
-        val selectedCartItemIds: List<Long>
+        fun loadCartItemsOfPreviousPage()
 
-        fun restoreCurrentPage(currentPage: Int)
+        fun loadCartItemsOfLastPage()
 
-        fun restoreSelectedCartItems(cartItemIds: List<Long>)
+        fun deleteCartItem(cartItemId: Long)
 
-        fun onLoadCartItemsOfNextPage()
+        fun updateSelectionCartItem(cartItemId: Long, isSelected: Boolean)
 
-        fun onLoadCartItemsOfPreviousPage()
+        fun updateSelectionTotalCartItems(isSelected: Boolean)
 
-        fun onLoadCartItemsOfLastPage()
+        fun plusCount(cartItemId: Long)
 
-        fun onDeleteCartItem(cartItemId: Long)
-
-        fun onChangeSelectionOfCartItem(cartItemId: Long, isSelected: Boolean)
-
-        fun onChangeSelectionOfAllCartItems(isSelected: Boolean)
-
-        fun onPlusCount(cartItemId: Long)
-
-        fun onMinusCount(cartItemId: Long)
+        fun minusCount(cartItemId: Long)
     }
 
     interface View {

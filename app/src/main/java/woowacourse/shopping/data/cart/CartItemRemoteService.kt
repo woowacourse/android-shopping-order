@@ -10,8 +10,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.session.UserData
 import woowacourse.shopping.utils.RemoteHost
-import woowacourse.shopping.utils.UserData
 import java.io.IOException
 import java.time.LocalDateTime
 

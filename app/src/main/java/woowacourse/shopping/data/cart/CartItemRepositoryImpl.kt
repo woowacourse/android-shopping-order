@@ -20,13 +20,17 @@ class CartItemRepositoryImpl(
         }
     }
 
-    override fun findAllOrderByAddedTime(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit) {
+    override fun findAllOrderByAddedTime(
+        limit: Int,
+        offset: Int,
+        onFinish: (List<CartItem>) -> Unit
+    ) {
         cartItemDataSource.findAll(limit, offset, onFinish)
     }
 
-    override fun findById(id: Long, onFinish: (CartItem) -> Unit) {
+    override fun findById(id: Long, onFinish: (CartItem?) -> Unit) {
         cartItemDataSource.findAll { cartItems ->
-            onFinish(cartItems.first { it.id == id })
+            onFinish(cartItems.find { it.id == id })
         }
     }
 

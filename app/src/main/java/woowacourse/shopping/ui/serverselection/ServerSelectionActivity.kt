@@ -6,8 +6,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.products.ProductListActivity
-import woowacourse.shopping.utils.UserData
+import woowacourse.shopping.session.UserData
+import woowacourse.shopping.ui.productlist.ProductListActivity
 
 class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.View {
 

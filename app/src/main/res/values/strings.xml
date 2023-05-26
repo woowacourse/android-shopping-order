@@ -2,7 +2,7 @@
     <string name="app_name">Shopping</string>
 
     <!-- 상품 -->
-    <string name="product_price">%s원</string>
+    <string name="product_price">%,d원</string>
     <string name="recently_viewed_products">최근 본 상품</string>
 
     <!-- 상품 상세 -->

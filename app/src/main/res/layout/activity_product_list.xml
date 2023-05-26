@@ -2,7 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.products.ProductListActivity">
+    tools:context=".ui.productlist.ProductListActivity">
+
+    <data>
+
+        <variable
+            name="cartCount"
+            type="Integer" />
+    </data>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,6 +32,40 @@
                 android:textColor="@color/white"
                 android:textSize="22sp" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+                app:isVisible="@{cartCount > 0}">
+
+                <TextView
+                    android:id="@+id/tv_cart_count"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/background_cart_count_badge"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="@{cartCount.toString()}"
+                    android:textColor="@color/white"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageButton
+                android:id="@+id/ib_cart_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="center"
+                android:src="@drawable/icon_cart" />
         </androidx.appcompat.widget.Toolbar>
 
         <GridLayout

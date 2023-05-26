@@ -2,18 +2,17 @@ package woowacourse.shopping.ui.productdetail.uistate
 
 import woowacourse.shopping.domain.RecentlyViewedProduct
 
-class LastViewedProductUIState(
+data class LastViewedProductUIState(
+    val id: Long,
     val name: String,
     val price: Int,
-    val id: Long
 ) {
-
     companion object {
-        fun from(recentlyViewedProduct: RecentlyViewedProduct): LastViewedProductUIState {
+        fun RecentlyViewedProduct.toUIState(): LastViewedProductUIState {
             return LastViewedProductUIState(
-                recentlyViewedProduct.product.name,
-                recentlyViewedProduct.product.price,
-                recentlyViewedProduct.product.id
+                id = product.id,
+                name = product.name,
+                price = product.price,
             )
         }
     }

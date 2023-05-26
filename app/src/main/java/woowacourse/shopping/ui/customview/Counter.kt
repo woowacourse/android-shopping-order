@@ -1,4 +1,4 @@
-package woowacourse.shopping.utils.customview
+package woowacourse.shopping.ui.customview
 
 import android.content.Context
 import android.util.AttributeSet
@@ -12,12 +12,7 @@ class Counter(
 ) : LinearLayout(context, attrs) {
     val binding = LayoutCounterBinding.inflate(LayoutInflater.from(context), this, true)
 
-    var count: Int
-        get() = binding.tvCount.text.toString().toInt()
-        set(value) {
-            binding.tvCount.text = value.toString()
-        }
-
-    val tvPlus = binding.tvPlus
-    val tvMinus = binding.tvMinus
+    init {
+        binding.count = 1
+    }
 }

@@ -63,7 +63,6 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
         val request = Request.Builder().url(host.url + path).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                println(e.message)
             }
 
             override fun onResponse(call: Call, response: Response) {

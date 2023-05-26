@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
@@ -19,17 +19,17 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
-import woowacourse.shopping.utils.PRICE_FORMAT
 import woowacourse.shopping.utils.RemoteHost
-import woowacourse.shopping.utils.customview.AddToCartDialog
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val binding: ActivityProductDetailBinding by lazy {
         ActivityProductDetailBinding.inflate(layoutInflater)
     }
+
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
+            this,
+            ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
             CartItemRepositoryImpl(
                 CartItemRemoteService(RemoteHost.GABI)
             ),
@@ -41,8 +41,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             )
         )
     }
+
     private val lastViewedProductViewHolder: LastViewedProductViewHolder by lazy {
-        LastViewedProductViewHolder(binding) { startActivityFromProductDetailActivity(this, it) }
+        LastViewedProductViewHolder(binding) {
+            startActivityFromProductDetailActivity(this, it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +53,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         setContentView(binding.root)
         setActionBar()
 
-        presenter.onLoadProduct(intent.getLongExtra(PRODUCT_ID, -1))
-        if (intent.getBooleanExtra(FROM_PRODUCT_DETAIL_ACTIVITY, false).not()) {
-            initLastViewedProduct()
-        }
+        initProduct()
+        initLastViewedProduct()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,37 +63,19 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_close -> {
-                finish()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.action_close -> finish()
+            else -> return super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun setActionBar() {
-        setSupportActionBar(binding.toolbarProductDetail)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-    }
-
-    private fun initLastViewedProduct() {
-        presenter.onLoadLastViewedProduct()
+        return true
     }
 
     override fun setProduct(product: ProductDetailUIState) {
         runOnUiThread {
-            Glide.with(this).load(product.imageUrl).into(binding.ivProductDetail)
-
-            binding.tvProductDetailName.text = product.name
-            binding.tvProductDetailPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
-            binding.btnProductDetailAdd.isEnabled = product.isInCart.not()
+            binding.btnProductDetailAdd.isVisible = !product.isInCart
+            binding.product = product
             binding.btnProductDetailAdd.setOnClickListener {
-                AddToCartDialog(product) { productId, count ->
-                    presenter.onAddProductToCart(productId, count)
-                }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+                presenter.showCartCounter(product.id)
             }
         }
     }
@@ -103,9 +86,30 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
+    override fun openCartCounter(product: ProductDetailUIState) {
+        AddToCartDialog(product) { productId, count ->
+            presenter.addProductToCart(productId, count)
+        }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+    }
+
     override fun showCartView() {
         finish()
         CartActivity.startActivity(this, true)
+    }
+
+    private fun setActionBar() {
+        setSupportActionBar(binding.toolbarProductDetail)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+    }
+
+    private fun initProduct() {
+        presenter.loadProduct(intent.getLongExtra(PRODUCT_ID, -1))
+    }
+
+    private fun initLastViewedProduct() {
+        if (!intent.getBooleanExtra(FROM_PRODUCT_DETAIL_ACTIVITY, false)) {
+            presenter.loadLastViewedProduct()
+        }
     }
 
     companion object {

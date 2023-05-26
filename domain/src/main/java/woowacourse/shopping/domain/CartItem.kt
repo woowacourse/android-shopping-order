@@ -1,27 +1,19 @@
 package woowacourse.shopping.domain
 
 import java.time.LocalDateTime
+import kotlin.math.max
 
-class CartItem(
+data class CartItem(
     val id: Long,
     val product: Product,
     val addedTime: LocalDateTime,
-    count: Int
+    val count: Int
 ) {
-    var count: Int = count
-        private set
+    fun calculateOrderPrice(): Int = product.price * count
 
-    fun getOrderPrice(): Int {
-        return product.price * count
-    }
+    fun plusCount(): CartItem = copy(count = count + 1)
 
-    fun plusCount() {
-        count++
-    }
-
-    fun minusCount() {
-        if (count > 1) count--
-    }
+    fun minusCount(): CartItem = copy(count = max(0, count - 1))
 
     override fun equals(other: Any?): Boolean = if (other is CartItem) id == other.id else false
 
