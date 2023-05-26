@@ -13,14 +13,8 @@ class RecentProducts(
         recentProducts.removeIf { it.id == recentProductId }
     }
 
-    fun getRecentProduct(recentProductId: Long): RecentProduct =
-        recentProducts.find { it.id == recentProductId } ?: throw IllegalArgumentException(
-            ERROR_NOT_EXITS_RECENT_ID
-        )
+    fun getRecentProduct(recentProductId: Long): RecentProduct? =
+        recentProducts.find { it.id == recentProductId }
 
     fun getAll(): List<RecentProduct> = recentProducts.toList()
-
-    companion object {
-        private const val ERROR_NOT_EXITS_RECENT_ID = "존재하지 않는 최근 본 상품 ID입니다"
-    }
 }

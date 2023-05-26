@@ -17,19 +17,11 @@ class CartProducts(
         carts.find { it.id == cartId }?.apply {
             carts.remove(this)
             carts.add(updateCartChecked())
-        } ?: throw IllegalArgumentException(
-            ERROR_NOT_EXITS_CART_ID
-        )
+        }
     }
 
-    fun getCart(cartId: Long): CartProduct =
-        carts.find { it.id == cartId } ?: throw IllegalArgumentException(
-            ERROR_NOT_EXITS_CART_ID
-        )
+    fun getCart(cartId: Long): CartProduct? =
+        carts.find { it.id == cartId }
 
     fun getAll(): List<CartProduct> = carts.toList()
-
-    companion object {
-        private const val ERROR_NOT_EXITS_CART_ID = "존재하지 않는 카트 ID입니다"
-    }
 }
