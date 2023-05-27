@@ -6,17 +6,17 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.mockWebServer.MockWeb
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.service.RemoteProductService
+import woowacourse.shopping.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 
-class RemoteProductServiceTest {
+class ProductRemoteDataSourceImplTest {
     private lateinit var mockWebServer: MockWeb
-    private lateinit var remoteProductRepository: RemoteProductService
+    private lateinit var remoteProductRepository: ProductRemoteDataSourceImpl
 
     @Before
     fun setUp() {
         // given
         mockWebServer = MockWeb()
-        remoteProductRepository = RemoteProductService(
+        remoteProductRepository = ProductRemoteDataSourceImpl(
             mockWebServer.url
         )
     }

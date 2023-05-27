@@ -1,10 +1,10 @@
-package woowacourse.shopping.service
+package woowacourse.shopping.remoteDataSourceImpl
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.ProductRepository
+import woowacourse.shopping.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.utils.RetrofitUtil
 
-class RemoteProductService(baseUrl: String) : ProductRepository {
+class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getAll(callback: (List<Product>?) -> Unit) {
         RetrofitUtil.retrofitProductService.getProducts().enqueue(
