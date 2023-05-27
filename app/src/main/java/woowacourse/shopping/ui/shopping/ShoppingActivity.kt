@@ -14,6 +14,7 @@ import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
+import woowacourse.shopping.data.repositoryImpl.RecentRepositoryImpl
 import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
@@ -78,7 +79,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             cartRepository = CartRepositoryImpl(
                 remoteDataSource = CartRemoteDataSourceImpl()
             ),
-            recentRepository = RecentProductDatabase(this)
+            recentRepository = RecentRepositoryImpl(
+                localDataSource = RecentProductDatabase(this)
+            )
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

@@ -13,6 +13,7 @@ import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
+import woowacourse.shopping.data.repositoryImpl.RecentRepositoryImpl
 import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
@@ -55,7 +56,9 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             cartRepository = CartRepositoryImpl(
                 remoteDataSource = CartRemoteDataSourceImpl()
             ),
-            recentRepository = RecentProductDatabase(this)
+            recentRepository = RecentRepositoryImpl(
+                localDataSource = RecentProductDatabase(this)
+            )
         )
         binding.presenter = presenter
         presenter.setUpLastProduct()

@@ -27,7 +27,7 @@ class ShoppingPresenter(
     }
 
     override fun setUpNextProducts() {
-        productRepository.getNext(RECENT_PRODUCT_COUNT) { products ->
+        productRepository.getNext(PRODUCT_PAGE_SIZE) { products ->
             if (products.isNullOrEmpty()) return@getNext
             view.addMoreProducts(products.map { it.toUIModel() })
         }
@@ -61,6 +61,7 @@ class ShoppingPresenter(
     }
 
     companion object {
-        private const val RECENT_PRODUCT_COUNT = 2
+        private const val PRODUCT_PAGE_SIZE = 2
+        private const val RECENT_PRODUCT_COUNT = 10
     }
 }
