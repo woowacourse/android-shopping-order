@@ -37,7 +37,7 @@ class CartRepositoryImpl(
     }
 
     override fun insert(productId: Int) {
-        if (cartItems.findByProductId(productId) != null) {
+        if (cartItems.findById(productId) != null) {
             return
         }
         remoteDataSource.postItem(productId) {
@@ -57,10 +57,11 @@ class CartRepositoryImpl(
                 cartItems.replaceAll(it ?: emptyList())
             }
         }
-        val cartItem = cartItems.findByProductId(id)
-        val updateCallback: (Int?) -> Unit = {
-            getAll { }
-            callback(it)
+        val cartItem = cartItems.findById(id)
+        val updateCallback: (Int?) -> Unit = { int ->
+            getAll {
+                callback(int)
+            }
         }
         when {
             cartItem == null && count == 1 -> remoteDataSource.postItem(id, updateCallback)

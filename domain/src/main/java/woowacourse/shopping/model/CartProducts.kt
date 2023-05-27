@@ -37,8 +37,8 @@ class CartProducts(cartProducts: List<CartProduct>) {
         return checks[id] ?: false
     }
 
-    fun findByProductId(productId: Int): CartProduct? {
-        return cartProducts.firstOrNull { it.product.id == productId }
+    fun findById(Id: Int): CartProduct? {
+        return cartProducts.firstOrNull { it.id == Id }
     }
 
     fun replaceAll(cartProducts: List<CartProduct>) {
