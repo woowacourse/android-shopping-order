@@ -2,10 +2,10 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.utils.NonNullLiveData
 import woowacourse.shopping.utils.NonNullMutableLiveData
 

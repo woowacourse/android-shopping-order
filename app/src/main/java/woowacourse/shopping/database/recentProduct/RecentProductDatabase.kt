@@ -1,10 +1,10 @@
 package woowacourse.shopping.database.recentProduct
 
 import android.content.Context
+import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
-import woowacourse.shopping.repository.RecentRepository
 
 class RecentProductDatabase(context: Context) : RecentRepository {
     private val db = ShoppingDBHelper(context).writableDatabase

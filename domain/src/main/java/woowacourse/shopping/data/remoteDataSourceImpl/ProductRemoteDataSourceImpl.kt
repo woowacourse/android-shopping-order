@@ -1,7 +1,7 @@
-package woowacourse.shopping.remoteDataSourceImpl
+package woowacourse.shopping.data.remoteDataSourceImpl
 
+import woowacourse.shopping.data.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.utils.RetrofitUtil
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {

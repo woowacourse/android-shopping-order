@@ -13,8 +13,8 @@ import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
 
 class CartPresenterTest {
 

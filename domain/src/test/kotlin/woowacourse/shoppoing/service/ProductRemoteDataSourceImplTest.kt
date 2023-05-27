@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.mockWebServer.MockWeb
+import woowacourse.shopping.utils.mockWebServer.MockWeb
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.remoteDataSourceImpl.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 
 class ProductRemoteDataSourceImplTest {
     private lateinit var mockWebServer: MockWeb

@@ -1,9 +1,9 @@
 package woowacourse.shopping.database.product
 
 import android.content.Context
+import woowacourse.shopping.data.localDataSource.ProductLocalDataSource
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.database.cart.ProductConstant
-import woowacourse.shopping.localDataSource.ProductLocalDataSource
 import woowacourse.shopping.model.Product
 
 class ProductDatabase(context: Context) : ProductLocalDataSource {

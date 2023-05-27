@@ -1,9 +1,9 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.data.repositoryImpl
 
+import woowacourse.shopping.data.remoteDataSource.ProductRemoteDataSource
+import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.remoteDataSource.ProductRemoteDataSource
-import woowacourse.shopping.remoteDataSourceImpl.ProductRemoteDataSourceImpl
-import woowacourse.shopping.repository.ProductRepository
 
 class ProductRepositoryImpl : ProductRepository {
     private val remoteDataSource: ProductRemoteDataSource = ProductRemoteDataSourceImpl()

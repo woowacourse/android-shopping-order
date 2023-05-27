@@ -3,8 +3,8 @@ package woowacourse.shoppoing.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.mockWebServer.CartMockWeb
-import woowacourse.shopping.remoteDataSourceImpl.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
+import woowacourse.shopping.utils.mockWebServer.CartMockWeb
 
 class CartRemoteDataSourceImplTest {
     private lateinit var mockWebServer: CartMockWeb

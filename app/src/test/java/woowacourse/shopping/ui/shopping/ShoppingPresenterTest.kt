@@ -6,14 +6,14 @@ import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.RecentRepository
 
 class ShoppingPresenterTest {
 

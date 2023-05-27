@@ -1,9 +1,9 @@
-package woowacourse.shopping.remoteDataSourceImpl
+package woowacourse.shopping.data.remoteDataSourceImpl
 
+import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
-import woowacourse.shopping.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.utils.RetrofitUtil
 
 class CartRemoteDataSourceImpl : CartRemoteDataSource {

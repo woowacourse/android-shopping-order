@@ -1,8 +1,8 @@
-package woowacourse.shopping.repository
+package woowacourse.shopping.data.remoteDataSource
 
 import woowacourse.shopping.model.Product
 
-interface ProductRepository {
+interface ProductRemoteDataSource {
     fun getAll(callback: (List<Product>?) -> Unit)
     fun getNext(count: Int, callback: (List<Product>?) -> Unit)
     fun insert(product: Product, callback: (Int) -> Unit)

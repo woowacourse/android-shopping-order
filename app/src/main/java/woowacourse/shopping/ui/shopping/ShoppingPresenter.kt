@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.shopping
 
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.RecentRepository
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -62,6 +62,5 @@ class ShoppingPresenter(
 
     companion object {
         private const val RECENT_PRODUCT_COUNT = 10
-        private const val PRODUCT_COUNT = 20
     }
 }

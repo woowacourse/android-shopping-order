@@ -1,9 +1,9 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.data.repositoryImpl
 
+import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
+import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.remoteDataSource.CartRemoteDataSource
-import woowacourse.shopping.remoteDataSourceImpl.CartRemoteDataSourceImpl
-import woowacourse.shopping.repository.CartRepository
 
 class CartRepositoryImpl : CartRepository {
     private val remoteDatabase: CartRemoteDataSource = CartRemoteDataSourceImpl()
