@@ -59,7 +59,15 @@ class CartRepositoryImpl(
         }
         val cartItem = cartItems.findByProductId(id)
         when {
+            cartItem == null && count == 1 -> remoteDatabase.postItem(id) {
+                getAll { }
+                callback(it)
+            }
             cartItem == null -> return
+            count == 0 -> remoteDatabase.deleteItem(cartItem.id) {
+                getAll { }
+                callback(it)
+            }
             count < 1 -> return
             else -> remoteDatabase.patchItemQuantity(cartItem.id, count) {
                 getAll { }

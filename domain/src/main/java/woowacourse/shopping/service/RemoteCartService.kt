@@ -37,13 +37,10 @@ class RemoteCartService(baseUrl: String) {
                 ) {
                     if (response.isSuccessful) {
                         callback(response.body())
-                    } else {
-                        println("---" + response.body())
                     }
                 }
 
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
-                    println(t)
                     callback(null)
                 }
             }
@@ -61,12 +58,10 @@ class RemoteCartService(baseUrl: String) {
                     call: retrofit2.Call<Int>,
                     response: retrofit2.Response<Int>
                 ) {
-                    println(response.body())
                     callback(response.body())
                 }
 
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
-                    println(t)
                     callback(null)
                 }
             }

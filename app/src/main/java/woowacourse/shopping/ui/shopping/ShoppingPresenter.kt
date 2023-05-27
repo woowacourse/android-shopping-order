@@ -47,7 +47,6 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.insert(productId)
         cartRepository.updateCount(productId, count) {
             cartRepository.getAll {
                 setUpTotalCount()

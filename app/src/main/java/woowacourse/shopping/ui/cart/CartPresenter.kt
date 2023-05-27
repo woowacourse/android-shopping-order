@@ -121,6 +121,7 @@ class CartPresenter(
 
     override fun removeItem(productId: Int) {
         cartRepository.remove(productId)
+        currentPage.removeIf { it.id == productId }
         if (currentPage.isEmpty() && index > 0) {
             moveToPagePrev()
         } else {
