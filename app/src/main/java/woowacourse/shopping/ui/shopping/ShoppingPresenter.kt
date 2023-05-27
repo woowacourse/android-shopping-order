@@ -27,8 +27,8 @@ class ShoppingPresenter(
     }
 
     override fun setUpNextProducts() {
-        productRepository.getAll { products ->
-            if (products.isNullOrEmpty()) return@getAll
+        productRepository.getNext(RECENT_PRODUCT_COUNT) { products ->
+            if (products.isNullOrEmpty()) return@getNext
             view.addMoreProducts(products.map { it.toUIModel() })
         }
     }
@@ -61,6 +61,6 @@ class ShoppingPresenter(
     }
 
     companion object {
-        private const val RECENT_PRODUCT_COUNT = 10
+        private const val RECENT_PRODUCT_COUNT = 2
     }
 }

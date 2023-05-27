@@ -58,4 +58,8 @@ object ProductConstant : BaseColumns {
         val imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL))
         return Product(id, name, price, imageUrl)
     }
+
+    fun getClearQuery(): String {
+        return "DELETE FROM $TABLE_NAME"
+    }
 }

@@ -38,6 +38,29 @@ class ProductDatabase(context: Context) : ProductLocalDataSource {
         }
     }
 
+    override fun clear() {
+        db.execSQL(ProductConstant.getClearQuery())
+        offset = 0
+    }
+
+    override fun insertAll(it: List<Product>?) {
+        it?.forEach { product ->
+            db.execSQL(ProductConstant.getInsertQuery(product))
+        }
+    }
+
+    override fun isCached(): Boolean {
+        return db.rawQuery(ProductConstant.getGetAllQuery(), null).use {
+            it.count > 0
+        }
+    }
+
+    override fun isEndOfCache(): Boolean {
+        return db.rawQuery(ProductConstant.getGetNextQuery(1, offset), null).use {
+            it.count == 0
+        }
+    }
+
     override fun insert(product: Product, callback: (Int) -> Unit) {
         db.execSQL(ProductConstant.getInsertQuery(product))
         callback(product.id)

@@ -9,8 +9,10 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
+import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
@@ -45,7 +47,10 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             intent.getSerializableExtraCompat(KEY_PRODUCT)
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
-            ProductRepositoryImpl(),
+            ProductRepositoryImpl(
+                localDataSource = ProductDatabase(this),
+                remoteDataSource = ProductRemoteDataSourceImpl()
+            ),
             CartRepositoryImpl(),
             RecentProductDatabase(this)
         )
