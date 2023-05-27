@@ -3,7 +3,7 @@ package woowacourse.shopping.database.recentProduct
 import android.database.Cursor
 import android.provider.BaseColumns
 import woowacourse.shopping.model.RecentProduct
-import woowacourse.shopping.utils.ServerURL
+import woowacourse.shopping.utils.RetrofitUtil
 
 object RecentProductConstant : BaseColumns {
     private const val TABLE_NAME = "recent_product"
@@ -40,7 +40,7 @@ object RecentProductConstant : BaseColumns {
                 $TABLE_COLUMN_PRICE,
                 $TABLE_COLUMN_IMAGE_URL,
                 $TABLE_COLUMN_SAVE_TIME) VALUES (
-                '${ServerURL.url}',
+                '${RetrofitUtil.url}',
                 ${product.id},
                 '${product.name}',
                 ${product.price},
@@ -52,7 +52,7 @@ object RecentProductConstant : BaseColumns {
     fun getGetRecentProductQuery(limit: Int): String {
         return """
             SELECT * FROM $TABLE_NAME
-            WHERE $TABLE_COLUMN_SERVER_ID = '${ServerURL.url}'
+            WHERE $TABLE_COLUMN_SERVER_ID = '${RetrofitUtil.url}'
             ORDER BY $TABLE_COLUMN_SAVE_TIME
             DESC LIMIT $limit
         """.trimIndent()
@@ -62,14 +62,14 @@ object RecentProductConstant : BaseColumns {
         return """
             DELETE FROM $TABLE_NAME
             WHERE $TABLE_COLUMN_ID = $id
-            AND $TABLE_COLUMN_SERVER_ID = '${ServerURL.url}'
+            AND $TABLE_COLUMN_SERVER_ID = '${RetrofitUtil.url}'
         """.trimIndent()
     }
 
     fun getGetQuery(id: Int): String {
         return """
             SELECT * FROM $TABLE_NAME
-            WHERE $TABLE_COLUMN_ID = $id AND $TABLE_COLUMN_SERVER_ID = '${ServerURL.url}'
+            WHERE $TABLE_COLUMN_ID = $id AND $TABLE_COLUMN_SERVER_ID = '${RetrofitUtil.url}'
         """.trimIndent()
     }
 

@@ -8,6 +8,10 @@ import woowacourse.shopping.data.service.RetrofitCartService
 import woowacourse.shopping.data.service.RetrofitProductService
 
 object RetrofitUtil {
+    var url: String = ""
+        set(value) {
+            field = value.removeSuffix("/")
+        }
 
     private var instance: Retrofit? = null
 
@@ -31,15 +35,12 @@ object RetrofitUtil {
 
     private fun getRetrofit(): Retrofit {
         if (instance == null) {
-            instance = Retrofit.Builder() // 객체를 생성해 줍니다.
-                .baseUrl(SERVER_IO) // 통신할 서버 주소를 설정합니다.
+            instance = Retrofit.Builder()
+                .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build()
         }
         return instance!!
     }
-
-    private const val SERVER_IO = "http://43.200.169.154:8080"
-    private const val SERVER_JITO = "http://13.125.207.155:8080"
 }
