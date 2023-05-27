@@ -36,8 +36,8 @@ class CartPresenter(
     private var isChangingItemCheck = false
 
     private fun fetchCartProducts(callback: () -> Unit) {
-        currentPage.clear()
         cartRepository.getPage(index, STEP) {
+            currentPage.clear()
             currentPage.addAll(it.toUIModel())
             callback()
         }
@@ -120,15 +120,16 @@ class CartPresenter(
     }
 
     override fun removeItem(productId: Int) {
-        cartRepository.remove(productId)
-        currentPage.removeIf { it.id == productId }
-        if (currentPage.isEmpty() && index > 0) {
-            moveToPagePrev()
-        } else {
-            fetchCartProducts {
-                setUpCarts()
-                setUpCheckedCount()
-                setUPTotalPrice()
+        cartRepository.remove(productId) {
+            currentPage.removeIf { it.id == productId }
+            if (currentPage.isEmpty() && index > 0) {
+                moveToPagePrev()
+            } else {
+                fetchCartProducts {
+                    setUpCarts()
+                    setUpCheckedCount()
+                    setUPTotalPrice()
+                }
             }
         }
     }

@@ -10,11 +10,9 @@ class CartRepositoryImpl(
     private val cartItems = CartProducts(emptyList())
 
     override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
-        if (cartItems.isEmpty()) {
-            remoteDatabase.getAll {
-                cartItems.replaceAll(it ?: emptyList())
-                callback(cartItems)
-            }
+        remoteDatabase.getAll {
+            cartItems.replaceAll(it ?: emptyList())
+            callback(cartItems)
         }
     }
 
@@ -47,8 +45,10 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun remove(id: Int) {
-        remoteDatabase.deleteItem(id) {}
+    override fun remove(id: Int, callback: () -> Unit) {
+        remoteDatabase.deleteItem(id) {
+            callback()
+        }
     }
 
     override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {

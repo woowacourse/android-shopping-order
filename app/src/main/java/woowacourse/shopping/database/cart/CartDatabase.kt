@@ -89,8 +89,9 @@ class CartDatabase(context: Context) : CartRepository {
         getAll { cartProducts = it }
     }
 
-    override fun remove(id: Int) {
+    override fun remove(id: Int, callback: () -> Unit) {
         db.execSQL(CartConstant.getDeleteQuery(id))
         getAll { cartProducts = it }
+        callback()
     }
 }
