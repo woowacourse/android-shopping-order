@@ -1,6 +1,5 @@
 package woowacourse.shopping.database.cart
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import woowacourse.shopping.data.localDataSource.CartLocalDataSource
@@ -24,7 +23,6 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         }
     }
 
-    @SuppressLint("Range")
     private fun getCartProduct(cursor: Cursor): CartProduct {
         CartConstant.fromCursor(cursor).let {
             return CartProduct(
@@ -60,7 +58,7 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         return cartProducts.size
     }
 
-    override fun getTotalSelectedCount(): Int {
+    override fun getTotalCheckedCount(): Int {
         return cartProducts.totalCheckedQuantity
     }
 
