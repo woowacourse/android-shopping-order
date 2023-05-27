@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
@@ -70,12 +71,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private fun initPresenter() {
         presenter = ShoppingPresenter(
             this,
-            ProductRepositoryImpl(
+            productRepository = ProductRepositoryImpl(
                 localDataSource = ProductDatabase(this),
                 remoteDataSource = ProductRemoteDataSourceImpl()
             ),
-            RecentProductDatabase(this),
-            CartRepositoryImpl()
+            cartRepository = CartRepositoryImpl(
+                remoteDataSource = CartRemoteDataSourceImpl()
+            ),
+            recentRepository = RecentProductDatabase(this)
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

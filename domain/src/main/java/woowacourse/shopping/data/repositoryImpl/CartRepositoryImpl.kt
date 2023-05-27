@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.repositoryImpl
 
 import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
-import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.model.CartProducts
 
-class CartRepositoryImpl : CartRepository {
-    private val remoteDatabase: CartRemoteDataSource = CartRemoteDataSourceImpl()
+class CartRepositoryImpl(
+    private val remoteDataSource: CartRemoteDataSource
+) : CartRepository {
     private val cartItems = CartProducts(emptyList())
 
     override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll {
+        remoteDataSource.getAll {
             cartItems.replaceAll(it ?: emptyList())
             callback(cartItems)
         }
@@ -40,39 +40,34 @@ class CartRepositoryImpl : CartRepository {
         if (cartItems.findByProductId(productId) != null) {
             return
         }
-        remoteDatabase.postItem(productId) {
+        remoteDataSource.postItem(productId) {
             getAll {}
         }
     }
 
     override fun remove(id: Int, callback: () -> Unit) {
-        remoteDatabase.deleteItem(id) {
+        remoteDataSource.deleteItem(id) {
             callback()
         }
     }
 
     override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
         if (cartItems.isEmpty()) {
-            remoteDatabase.getAll {
+            remoteDataSource.getAll {
                 cartItems.replaceAll(it ?: emptyList())
             }
         }
         val cartItem = cartItems.findByProductId(id)
+        val updateCallback: (Int?) -> Unit = {
+            getAll { }
+            callback(it)
+        }
         when {
-            cartItem == null && count == 1 -> remoteDatabase.postItem(id) {
-                getAll { }
-                callback(it)
-            }
+            cartItem == null && count == 1 -> remoteDataSource.postItem(id, updateCallback)
             cartItem == null -> return
-            count == 0 -> remoteDatabase.deleteItem(cartItem.id) {
-                getAll { }
-                callback(it)
-            }
+            count == 0 -> remoteDataSource.deleteItem(cartItem.id, updateCallback)
             count < 1 -> return
-            else -> remoteDatabase.patchItemQuantity(cartItem.id, count) {
-                getAll { }
-                callback(it)
-            }
+            else -> remoteDataSource.patchItemQuantity(cartItem.id, count, updateCallback)
         }
     }
 
@@ -81,7 +76,7 @@ class CartRepositoryImpl : CartRepository {
     }
 
     override fun getAll(callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll {
+        remoteDataSource.getAll {
             cartItems.replaceAll(it ?: emptyList())
             callback(CartProducts(it ?: emptyList()))
         }
