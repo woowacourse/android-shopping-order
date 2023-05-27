@@ -3,32 +3,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.productlist.ProductListActivity">
+        tools:context=".presentation.productlist.ProductListActivity">
 
+        <include
+            android:id="@+id/toolbar_product_list"
+            layout="@layout/toolbar_product_list"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_cart_count_product_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ellipse_green"
+            android:textColor="@color/white"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="10" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/grid_products"
+            android:id="@+id/recycler_product"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:spanCount="2"
-            tools:listitem="@layout/item_product" />
-
-        <include layout="@layout/skeleton_activity_product_list"
-            android:id="@+id/skeleton_products"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar_product_list" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
