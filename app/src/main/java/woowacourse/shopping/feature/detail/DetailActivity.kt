@@ -11,10 +11,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.dataSource.recent.RecentDao
+import woowacourse.shopping.data.dataSource.service.CartProductRemoteService
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
-import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.dialog.CounterDialog
@@ -66,7 +66,6 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             this,
         ) { _, bundle ->
             val changeCount = bundle.getInt(CounterDialog.COUNT_KEY, -1)
-            if (changeCount < 0) return@setFragmentResultListener
             presenter.updateProductCount(changeCount)
         }
     }

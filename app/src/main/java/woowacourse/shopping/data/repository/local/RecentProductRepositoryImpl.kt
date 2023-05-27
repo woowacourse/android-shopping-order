@@ -4,7 +4,7 @@ import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.RecentProductRepository
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.data.dataSource.recent.RecentDao
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

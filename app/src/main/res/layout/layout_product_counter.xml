@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <woowacourse.shopping.common_ui.CounterView
+        <woowacourse.shopping.commonUi.CounterView
             android:id="@+id/counter_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

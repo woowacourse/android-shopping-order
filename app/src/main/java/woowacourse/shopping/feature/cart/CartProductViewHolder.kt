@@ -3,7 +3,7 @@ package woowacourse.shopping.feature.cart
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.common_ui.CounterView
+import woowacourse.shopping.commonUi.CounterView
 import woowacourse.shopping.databinding.ItemCartProductBinding
 import woowacourse.shopping.model.CartProductUiModel
 

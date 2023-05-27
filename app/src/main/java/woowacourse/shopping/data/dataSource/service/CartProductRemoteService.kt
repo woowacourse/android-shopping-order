@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.dataSource.service
 
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Price
@@ -8,6 +8,7 @@ import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
@@ -89,7 +90,7 @@ class CartProductRemoteService {
             "quantity": $count 
             } 
         """.trimIndent()
-        val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+        val body: RequestBody = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
             .url("${baseUrl}cart-items/$cartId")
             .addHeader("Authorization", "Basic $token").patch(body).build()

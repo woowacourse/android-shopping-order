@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.sql.recent
+package woowacourse.shopping.data.dataSource.recent
 
 import android.content.ContentValues
 import android.content.Context

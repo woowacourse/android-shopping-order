@@ -12,13 +12,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.common_ui.CartCounterBadge
+import woowacourse.shopping.commonUi.CartCounterBadge
+import woowacourse.shopping.data.dataSource.recent.RecentDao
+import woowacourse.shopping.data.dataSource.service.CartProductRemoteService
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
-import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
@@ -28,6 +27,7 @@ import woowacourse.shopping.feature.main.product.ProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.module.ApiModule
 
 class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var binding: ActivityMainBinding
@@ -97,10 +97,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val productRemoteService = ProductRemoteService()
+        val productService = ApiModule.createProductService()
         val cartProductRemoteService = CartProductRemoteService()
         presenter = MainPresenter(
-            ProductRepositoryImpl(productRemoteService),
+            ProductRepositoryImpl(productService),
             CartRepositoryImpl(cartProductRemoteService),
             RecentProductRepositoryImpl(RecentDao(this)),
         )

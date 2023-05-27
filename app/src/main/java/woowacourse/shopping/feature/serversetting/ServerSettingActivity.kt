@@ -26,7 +26,8 @@ class ServerSettingActivity : AppCompatActivity() {
 
     private fun startMain(server: Server) {
         ServerInfo.changeServer(server)
-        Toast.makeText(this, getString(R.string.enter_server_text), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.enter_server_text, server.name), Toast.LENGTH_SHORT)
+            .show()
         startActivity(MainActivity.getIntent(this))
     }
 

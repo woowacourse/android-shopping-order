@@ -38,13 +38,15 @@ class DetailPresenter(
     }
 
     override fun updateProductCount(count: Int) {
+        if (count < 0) return
         product.count = count
     }
 
     override fun handleAddCartClick() {
         cartRepository.getAll(
             onSuccess = {
-                val cartProductId = it.find { it.product.id == product.id }?.cartId
+                val cartProductId =
+                    it.find { cartProduct -> cartProduct.product.id == product.id }?.cartId
                 view.showSelectCartProductCountScreen(product, cartProductId)
             },
             onFailure = {},
