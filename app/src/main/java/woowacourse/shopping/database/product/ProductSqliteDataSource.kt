@@ -6,7 +6,7 @@ import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.database.cart.ProductConstant
 import woowacourse.shopping.model.Product
 
-class ProductDatabase(context: Context) : ProductLocalDataSource {
+class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private var offset = 0

@@ -9,7 +9,7 @@ import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.Product
 
-class CartDatabase(context: Context) : CartLocalDataSource {
+class CartSqliteDataSource(context: Context) : CartLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private lateinit var cartProducts: CartProducts

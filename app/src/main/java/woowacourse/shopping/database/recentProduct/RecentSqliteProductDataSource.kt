@@ -6,7 +6,7 @@ import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
 
-class RecentProductDatabase(context: Context) : RecentLocalDataSource {
+class RecentSqliteProductDataSource(context: Context) : RecentLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     override fun insert(product: Product) {

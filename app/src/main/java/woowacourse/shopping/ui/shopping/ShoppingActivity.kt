@@ -15,8 +15,8 @@ import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImp
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
 import woowacourse.shopping.data.repositoryImpl.RecentRepositoryImpl
-import woowacourse.shopping.database.product.ProductDatabase
-import woowacourse.shopping.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.database.product.ProductSqliteDataSource
+import woowacourse.shopping.database.recentProduct.RecentSqliteProductDataSource
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
@@ -73,14 +73,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             productRepository = ProductRepositoryImpl(
-                localDataSource = ProductDatabase(this),
+                localDataSource = ProductSqliteDataSource(this),
                 remoteDataSource = ProductRemoteDataSourceImpl()
             ),
             cartRepository = CartRepositoryImpl(
                 remoteDataSource = CartRemoteDataSourceImpl()
             ),
             recentRepository = RecentRepositoryImpl(
-                localDataSource = RecentProductDatabase(this)
+                localDataSource = RecentSqliteProductDataSource(this)
             )
         )
         presenter.setUpRecentProducts()
