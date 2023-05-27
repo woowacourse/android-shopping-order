@@ -2,21 +2,23 @@ package woowacourse.shopping.model
 
 class CartProducts(cartProducts: List<CartProduct>) {
     private val cartProducts: MutableList<CartProduct>
+    private var checks = mutableMapOf<Int, Boolean>()
+    private val checkedProducts: List<CartProduct>
+        get() = cartProducts.filter { checks.getOrPut(it.id) { true } }
     val size: Int = cartProducts.size
 
     val totalPrice: Int
-        get() = cartProducts.sumOf { it.product.price * it.quantity }
+        get() = checkedProducts.sumOf { it.product.price * it.quantity }
 
     val totalQuantity: Int
         get() = cartProducts.sumOf { it.quantity }
 
     val totalCheckedQuantity: Int
-        get() = cartProducts.filter { it.checked }.sumOf { it.quantity }
+        get() = checkedProducts.sumOf { it.quantity }
 
     init {
-        this.cartProducts = cartProducts.map {
-            it.copy(checked = true)
-        }.toMutableList()
+        checks = cartProducts.associateBy({ it.id }, { true }).toMutableMap()
+        this.cartProducts = cartProducts.toMutableList()
     }
 
     operator fun get(index: Int): CartProduct {
@@ -28,8 +30,11 @@ class CartProducts(cartProducts: List<CartProduct>) {
     }
 
     fun changeChecked(id: Int, checked: Boolean) {
-        val index = cartProducts.indexOfFirst { it.id == id }
-        cartProducts[index] = cartProducts[index].copy(checked = checked)
+        checks[id] = checked
+    }
+
+    fun getCheckedById(id: Int): Boolean {
+        return checks[id] ?: false
     }
 
     fun findByProductId(productId: Int): CartProduct? {
@@ -39,9 +44,7 @@ class CartProducts(cartProducts: List<CartProduct>) {
     fun replaceAll(cartProducts: List<CartProduct>) {
         this.cartProducts.clear()
         this.cartProducts.addAll(cartProducts)
-        this.cartProducts.replaceAll {
-            it.copy(checked = true)
-        }
+        cartProducts.forEach { checks.putIfAbsent(it.id, true) }
     }
 
     fun isEmpty(): Boolean {

@@ -10,7 +10,6 @@ object CartConstant : BaseColumns {
     private const val TABLE_COLUMN_ID = "product_id"
     private const val TABLE_COLUMN_NAME = "product_name"
     private const val TABLE_COLUMN_COUNT = "product_count"
-    private const val TABLE_COLUMN_CHECKED = "product_checked"
     private const val TABLE_COLUMN_PRICE = "product_price"
     private const val TABLE_COLUMN_IMAGE_URL = "product_img_url"
     private const val TABLE_COLUMN_PRODUCT_ID = "product_product_id"
@@ -22,7 +21,6 @@ object CartConstant : BaseColumns {
                 $TABLE_COLUMN_ID INTEGER PRIMARY KEY,
                 $TABLE_COLUMN_NAME TEXT,
                 $TABLE_COLUMN_COUNT INTEGER,
-                $TABLE_COLUMN_CHECKED INTEGER,
                 $TABLE_COLUMN_PRICE INTEGER,
                 $TABLE_COLUMN_IMAGE_URL TEXT,
                 $TABLE_COLUMN_SAVE_TIME INTEGER)
@@ -43,7 +41,6 @@ object CartConstant : BaseColumns {
                 $TABLE_COLUMN_ID,
                 $TABLE_COLUMN_NAME,
                 $TABLE_COLUMN_COUNT,
-                $TABLE_COLUMN_CHECKED,
                 $TABLE_COLUMN_PRICE,
                 $TABLE_COLUMN_IMAGE_URL,
                 $TABLE_COLUMN_PRODUCT_ID,
@@ -51,7 +48,6 @@ object CartConstant : BaseColumns {
                 ${cartProduct.id},
                 '${cartProduct.product.name}',
                 ${cartProduct.quantity},
-                ${cartProduct.checked},
                 ${cartProduct.product.price},
                 '${cartProduct.product.imageUrl}',
                 ${cartProduct.product.id},
@@ -67,14 +63,6 @@ object CartConstant : BaseColumns {
         """.trimIndent()
     }
 
-    fun getUpdateCheckedQuery(id: Int, selected: Boolean): String {
-        return """
-            UPDATE $TABLE_NAME
-            SET $TABLE_COLUMN_CHECKED = ${if (selected) 1 else 0} 
-            WHERE $TABLE_COLUMN_ID = $id
-        """.trimIndent()
-    }
-
     fun getGetAllQuery(): String {
         return "SELECT * FROM $TABLE_NAME ORDER BY $TABLE_COLUMN_SAVE_TIME"
     }
@@ -83,7 +71,6 @@ object CartConstant : BaseColumns {
         return CartProduct(
             id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_ID)),
             quantity = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_COUNT)),
-            checked = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_CHECKED)) == 1,
             product = Product(
                 id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRODUCT_ID)),
                 name = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_NAME)),

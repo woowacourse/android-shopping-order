@@ -30,7 +30,6 @@ class CartDatabase(context: Context) : CartLocalDataSource {
             return CartProduct(
                 id = it.id,
                 quantity = it.quantity,
-                checked = it.checked,
                 product = Product(
                     id = it.product.id,
                     name = it.product.name,
@@ -62,11 +61,11 @@ class CartDatabase(context: Context) : CartLocalDataSource {
     }
 
     override fun getTotalSelectedCount(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.quantity }
+        return cartProducts.totalCheckedQuantity
     }
 
     override fun getTotalPrice(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.product.price * it.quantity }
+        return cartProducts.totalPrice
     }
 
     override fun insert(productId: Int) {
@@ -82,11 +81,6 @@ class CartDatabase(context: Context) : CartLocalDataSource {
             getAll { cartProducts = it }
             callback(count)
         }
-    }
-
-    override fun updateChecked(id: Int, checked: Boolean) {
-        db.execSQL(CartConstant.getUpdateCheckedQuery(id, checked))
-        getAll { cartProducts = it }
     }
 
     override fun remove(id: Int, callback: () -> Unit) {

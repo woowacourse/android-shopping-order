@@ -12,6 +12,5 @@ interface CartLocalDataSource {
     fun insert(productId: Int)
     fun remove(id: Int, callback: () -> Unit)
     fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit)
-    fun updateChecked(id: Int, checked: Boolean)
     fun getAll(callback: (CartProducts) -> Unit)
 }

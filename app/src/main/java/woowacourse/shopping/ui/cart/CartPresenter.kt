@@ -140,7 +140,7 @@ class CartPresenter(
 
     override fun navigateToItemDetail(productId: Int) {
         cartRepository.getAll { cartProducts ->
-            cartProducts.all().first { it.product.id == productId }.toUIModel().toProduct()
+            cartProducts.all().first { it.product.id == productId }.product
                 .let { view.navigateToItemDetail(it.toUIModel()) }
         }
     }
