@@ -28,9 +28,8 @@ class ShoppingPresenter(
 
     override fun setUpNextProducts() {
         productRepository.getAll { products ->
-            products?.let {
-                view.addMoreProducts(products.map { it.toUIModel() })
-            }
+            if (products.isNullOrEmpty()) return@getAll
+            view.addMoreProducts(products.map { it.toUIModel() })
         }
     }
 
@@ -56,9 +55,8 @@ class ShoppingPresenter(
 
     override fun navigateToItemDetail(productId: Int) {
         productRepository.findById(productId) {
-            it?.let {
-                view.navigateToProductDetail(it.toUIModel())
-            }
+            if (it == null) return@findById
+            view.navigateToProductDetail(it.toUIModel())
         }
     }
 
