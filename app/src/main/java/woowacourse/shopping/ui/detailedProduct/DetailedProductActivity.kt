@@ -14,11 +14,9 @@ import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
 import woowacourse.shopping.utils.ActivityUtils
-import woowacourse.shopping.utils.ServerURL
 import woowacourse.shopping.utils.SharedPreferenceUtils
 import woowacourse.shopping.utils.getSerializableExtraCompat
 
@@ -48,7 +46,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
             ProductRepositoryImpl(),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
+            CartRepositoryImpl(),
             RecentProductDatabase(this)
         )
         binding.presenter = presenter

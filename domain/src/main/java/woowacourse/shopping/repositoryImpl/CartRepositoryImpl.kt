@@ -1,12 +1,12 @@
 package woowacourse.shopping.repositoryImpl
 
 import woowacourse.shopping.model.CartProducts
+import woowacourse.shopping.remoteDataSource.CartRemoteDataSource
+import woowacourse.shopping.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.service.RemoteCartService
 
-class CartRepositoryImpl(
-    private val remoteDatabase: RemoteCartService
-) : CartRepository {
+class CartRepositoryImpl : CartRepository {
+    private val remoteDatabase: CartRemoteDataSource = CartRemoteDataSourceImpl()
     private val cartItems = CartProducts(emptyList())
 
     override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {

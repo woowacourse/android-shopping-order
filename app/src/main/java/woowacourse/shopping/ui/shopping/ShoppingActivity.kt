@@ -16,7 +16,6 @@ import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
 import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
@@ -71,7 +70,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             this,
             ProductRepositoryImpl(),
             RecentProductDatabase(this),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url))
+            CartRepositoryImpl()
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

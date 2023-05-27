@@ -1,14 +1,15 @@
-package woowacourse.shopping.service
+package woowacourse.shopping.remoteDataSourceImpl
 
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
+import woowacourse.shopping.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.utils.RetrofitUtil
 
-class RemoteCartService(baseUrl: String) {
+class CartRemoteDataSourceImpl : CartRemoteDataSource {
     private var credentials = "YUBhLmNvbToxMjM0"
 
-    fun getAll(callback: (List<CartProduct>?) -> Unit) {
+    override fun getAll(callback: (List<CartProduct>?) -> Unit) {
         RetrofitUtil.retrofitCartService.getCarts("Basic $credentials").enqueue(
             object : retrofit2.Callback<List<CartProduct>> {
                 override fun onResponse(
@@ -25,7 +26,7 @@ class RemoteCartService(baseUrl: String) {
         )
     }
 
-    fun postItem(itemId: Int, callback: (Int?) -> Unit) {
+    override fun postItem(itemId: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.postCart(
             "Basic $credentials",
             ProductIdBody(itemId)
@@ -47,7 +48,7 @@ class RemoteCartService(baseUrl: String) {
         )
     }
 
-    fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Int?) -> Unit) {
+    override fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.patchCart(
             itemId,
             "Basic $credentials",
@@ -68,7 +69,7 @@ class RemoteCartService(baseUrl: String) {
         )
     }
 
-    fun deleteItem(itemId: Int, callback: (Int?) -> Unit) {
+    override fun deleteItem(itemId: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.deleteCart(itemId, "Basic $credentials").enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
