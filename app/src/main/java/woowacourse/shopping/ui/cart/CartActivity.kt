@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -57,13 +59,19 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val navigationIcon = binding.toolbar.navigationIcon?.mutate()
+        DrawableCompat.setTint(
+            navigationIcon!!,
+            ContextCompat.getColor(this, android.R.color.white),
+        )
+        binding.toolbar.navigationIcon = navigationIcon
     }
 
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
             CartRepositoryImpl(RemoteCartService(ServerURL.url)),
-            savedInstanceState?.getInt(KEY_OFFSET) ?: 0
+            savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
         presenter.setUpView()
 
@@ -98,18 +106,23 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         override fun onPageNext() {
             presenter.moveToPageNext()
         }
+
         override fun onPagePrev() {
             presenter.moveToPagePrev()
         }
+
         override fun onItemRemove(productId: Int) {
             presenter.removeItem(productId)
         }
+
         override fun onItemClick(product: CartProductUIModel) {
             presenter.navigateToItemDetail(product.productId)
         }
+
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
         }
+
         override fun onItemCheckChanged(productId: Int, checked: Boolean) {
             presenter.updateItemCheck(productId, checked)
         }
