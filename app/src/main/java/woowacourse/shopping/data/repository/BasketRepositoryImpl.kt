@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 
 class BasketRepositoryImpl(
-    private val localBasketDataSource: BasketDataSource.Local,
     private val remoteBasketDataSource: BasketDataSource.Remote
 ) :
     BasketRepository {
