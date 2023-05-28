@@ -19,11 +19,15 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        cartRepository.getAll { carts ->
-            val cartProducts = carts.all()
-                .associateBy { it.product.id }
-                .mapValues { it.value.quantity }
-            view.setCartProducts(cartProducts)
+        cartRepository.getAll { result ->
+            result.onSuccess { carts ->
+                val cartProducts = carts.all()
+                    .associateBy { it.product.id }
+                    .mapValues { it.value.quantity }
+                view.setCartProducts(cartProducts)
+            }.onFailure { throwable ->
+                ErrorHandler.printError(throwable)
+            }
         }
     }
 
@@ -53,7 +57,7 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count) {
+        cartRepository.updateCountWithProductId(productId, count) {
             cartRepository.getAll {
                 setUpTotalCount()
             }

@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="product"
+            name="cartProduct"
             type="woowacourse.shopping.model.CartProductUIModel" />
 
         <variable
@@ -21,7 +21,7 @@
         android:layout_height="153dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/layout_border_radius"
-        android:onClick="@{() -> listener.onItemClick(product)}">
+        android:onClick="@{() -> listener.onItemClick(cartProduct)}">
 
         <CheckBox
             android:id="@+id/cb_product_check"
@@ -29,8 +29,8 @@
             android:layout_height="18dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="21dp"
-            android:checked="@{product.checked}"
-            android:onCheckedChanged="@{(_, isChecked) -> listener.onItemCheckChanged(product.id, isChecked)}"
+            android:checked="@{cartProduct.checked}"
+            android:onCheckedChanged="@{(_, isChecked) -> listener.onItemCheckChanged(cartProduct.id, isChecked)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +41,7 @@
             android:layout_marginStart="11dp"
             android:layout_marginTop="10dp"
             android:gravity="center_vertical"
-            android:text="@{product.name}"
+            android:text="@{cartProduct.name}"
             android:textAppearance="@style/cart_item_title"
             app:layout_constraintStart_toEndOf="@id/cb_product_check"
             app:layout_constraintTop_toTopOf="parent"
@@ -54,7 +54,7 @@
             android:layout_marginStart="13dp"
             android:layout_marginTop="13dp"
             android:contentDescription="@string/cart_item_product_image_description"
-            app:imageUrl="@{product.imageUrl}"
+            app:imageUrl="@{cartProduct.imageUrl}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_product_title"
             tools:src="@color/black" />
@@ -66,7 +66,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:contentDescription="@string/cart_item_product_remove_btn_description"
-            android:onClick="@{() -> listener.onItemRemove(product.id)}"
+            android:onClick="@{() -> listener.onItemRemove(cartProduct.id)}"
             android:src="@drawable/ic_cart_close_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="@{@string/product_price(product.price)}"
+            android:text="@{@string/product_price(cartProduct.price)}"
             android:textColor="@color/gray_333333"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/cv_product_counter"
@@ -90,8 +90,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="13dp"
             android:layout_marginBottom="18dp"
-            app:count="@{product.count}"
-            app:productId="@{product.id}"
+            app:count="@{cartProduct.count}"
+            app:productId="@{cartProduct.productId}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:minCount="@{1}" />

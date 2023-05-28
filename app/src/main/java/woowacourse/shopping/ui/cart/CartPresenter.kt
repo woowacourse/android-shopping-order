@@ -6,6 +6,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
+import woowacourse.shopping.utils.ErrorHandler
 import woowacourse.shopping.utils.NonNullLiveData
 import woowacourse.shopping.utils.NonNullMutableLiveData
 
@@ -36,10 +37,14 @@ class CartPresenter(
     private var isChangingItemCheck = false
 
     private fun fetchCartProducts(callback: () -> Unit) {
-        cartRepository.getPage(index, STEP) {
-            currentPage.clear()
-            currentPage.addAll(it.toUIModel())
-            callback()
+        cartRepository.getPage(index, STEP) { result ->
+            result.onSuccess {
+                currentPage.clear()
+                currentPage.addAll(it.toUIModel())
+                callback()
+            }.onFailure { throwable ->
+                ErrorHandler.printError(throwable)
+            }
         }
     }
 
@@ -94,12 +99,16 @@ class CartPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count) {
-            currentPage.indexOfFirst { it.id == productId }
-                .takeIf { it != -1 }
-                ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-            setUpCheckedCount()
-            setUPTotalPrice()
+        cartRepository.updateCountWithProductId(productId, count) { result ->
+            result.onSuccess {
+                currentPage.indexOfFirst { it.productId == productId }
+                    .takeIf { it != -1 }
+                    ?.let { currentPage[it] = currentPage[it].copy(count = count) }
+                setUpCheckedCount()
+                setUPTotalPrice()
+            }.onFailure { throwable ->
+                ErrorHandler.printError(throwable)
+            }
         }
     }
 
@@ -139,9 +148,13 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        cartRepository.getAll { cartProducts ->
-            cartProducts.all().first { it.product.id == productId }.product
-                .let { view.navigateToItemDetail(it.toUIModel()) }
+        cartRepository.getAll { result ->
+            result.onSuccess { cartProducts ->
+                cartProducts.all().first { it.product.id == productId }.product
+                    .let { view.navigateToItemDetail(it.toUIModel()) }
+            }.onFailure { throwable ->
+                ErrorHandler.printError(throwable)
+            }
         }
     }
 

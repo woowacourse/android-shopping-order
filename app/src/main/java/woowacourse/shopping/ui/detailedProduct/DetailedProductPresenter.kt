@@ -41,7 +41,7 @@ class DetailedProductPresenter(
 
     override fun addProductToCart(count: Int) {
         cartRepository.insert(product.id)
-        cartRepository.updateCount(product.id, count) {
+        cartRepository.updateCountWithProductId(product.id, count) {
             view.navigateToCart()
         }
     }

@@ -85,14 +85,14 @@ class DetailedProductPresenterTest {
         // given
         every { cartRepository.insert(any()) } answers { nothing }
         every { productRepository.findById(any()) } answers { fakeProduct }
-        every { cartRepository.updateCount(any(), any()) } returns 0
+        every { cartRepository.updateCountWithProductId(any(), any()) } returns 0
         every { view.navigateToCart() } answers { nothing }
 
         // when
         presenter.addProductToCart(fakeProduct.id)
 
         // then
-        verify(exactly = 1) { cartRepository.updateCount(fakeProduct.id, any()) }
+        verify(exactly = 1) { cartRepository.updateCountWithProductId(fakeProduct.id, any()) }
         verify(exactly = 1) { view.navigateToCart() }
     }
 

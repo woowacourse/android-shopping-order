@@ -161,7 +161,7 @@ class CartPresenterTest {
     @Test
     fun `아이템의 개수를 변경한다`() {
         // given
-        every { cartRepository.updateCount(any(), any()) } returns 10
+        every { cartRepository.updateCountWithProductId(any(), any()) } returns 10
         every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
@@ -174,7 +174,7 @@ class CartPresenterTest {
         presenter.updateItemCount(1, 0)
 
         // then
-        verify(exactly = 1) { cartRepository.updateCount(1, 0) }
+        verify(exactly = 1) { cartRepository.updateCountWithProductId(1, 0) }
         verify(exactly = 1) { view.setPage(any(), any()) }
     }
 

@@ -130,7 +130,7 @@ class ShoppingPresenterTest {
         every { view.setCartProducts(any()) } returns Unit
 
         every { cartRepository.insert(any()) } returns Unit
-        every { cartRepository.updateCount(1, 10) } returns 10
+        every { cartRepository.updateCountWithProductId(1, 10) } returns 10
         every { productRepository.findById(1) } returns fakeProduct
         // when
         presenter.setUpProducts()
