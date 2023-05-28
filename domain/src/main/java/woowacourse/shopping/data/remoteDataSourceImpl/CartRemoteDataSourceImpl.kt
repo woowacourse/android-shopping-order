@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.remoteDataSourceImpl
 
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.ProductIdBody
@@ -11,10 +14,10 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
 
     override fun getAll(callback: (Result<List<CartProduct>>) -> Unit) {
         RetrofitUtil.retrofitCartService.getCarts("Basic $credentials").enqueue(
-            object : retrofit2.Callback<List<CartProduct>> {
+            object : Callback<List<CartProduct>> {
                 override fun onResponse(
-                    call: retrofit2.Call<List<CartProduct>>,
-                    response: retrofit2.Response<List<CartProduct>>
+                    call: Call<List<CartProduct>>,
+                    response: Response<List<CartProduct>>
                 ) {
                     when (response.code()) {
                         200 -> callback(
@@ -24,7 +27,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<List<CartProduct>>, t: Throwable) {
+                override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }
@@ -36,11 +39,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             "Basic $credentials",
             ProductIdBody(itemId)
         ).enqueue(
-            object : retrofit2.Callback<Int> {
-                override fun onResponse(
-                    call: retrofit2.Call<Int>,
-                    response: retrofit2.Response<Int>
-                ) {
+            object : Callback<Int> {
+                override fun onResponse(call: Call<Int>, response: Response<Int>) {
                     when (response.code()) {
                         201 -> callback(
                             Result.success(response.body() ?: throw Throwable("Not Found"))
@@ -50,7 +50,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                override fun onFailure(call: Call<Int>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }
@@ -63,11 +63,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             "Basic $credentials",
             QuantityBody(quantity)
         ).enqueue(
-            object : retrofit2.Callback<Void> {
-                override fun onResponse(
-                    call: retrofit2.Call<Void>,
-                    response: retrofit2.Response<Void>
-                ) {
+            object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     when (response.code()) {
                         200 -> callback(Result.success(quantity))
                         404 -> callback(Result.failure(Throwable("Not Found")))
@@ -75,7 +72,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Void>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }
@@ -84,11 +81,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
 
     override fun deleteItem(itemId: Int, callback: (Result<Int>) -> Unit) {
         RetrofitUtil.retrofitCartService.deleteCart(itemId, "Basic $credentials").enqueue(
-            object : retrofit2.Callback<Int> {
-                override fun onResponse(
-                    call: retrofit2.Call<Int>,
-                    response: retrofit2.Response<Int>
-                ) {
+            object : Callback<Int> {
+                override fun onResponse(call: Call<Int>, response: Response<Int>) {
                     when (response.code()) {
                         200 -> callback(
                             Result.success(response.body() ?: throw Throwable("Not Found"))
@@ -98,7 +92,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                override fun onFailure(call: Call<Int>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }

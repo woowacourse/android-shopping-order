@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.remoteDataSourceImpl
 
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.utils.RetrofitUtil
@@ -8,10 +11,10 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getAll(callback: (Result<List<Product>>) -> Unit) {
         RetrofitUtil.retrofitProductService.getProducts().enqueue(
-            object : retrofit2.Callback<List<Product>> {
+            object : Callback<List<Product>> {
                 override fun onResponse(
-                    call: retrofit2.Call<List<Product>>,
-                    response: retrofit2.Response<List<Product>>
+                    call: Call<List<Product>>,
+                    response: Response<List<Product>>
                 ) {
                     if (response.isSuccessful) {
                         callback(Result.success(response.body() ?: throw Throwable("Not Found")))
@@ -20,7 +23,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<List<Product>>, t: Throwable) {
+                override fun onFailure(call: Call<List<Product>>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }
@@ -37,11 +40,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
         RetrofitUtil.retrofitProductService.getProduct(id).enqueue(
-            object : retrofit2.Callback<Product> {
-                override fun onResponse(
-                    call: retrofit2.Call<Product>,
-                    response: retrofit2.Response<Product>
-                ) {
+            object : Callback<Product> {
+                override fun onResponse(call: Call<Product>, response: Response<Product>) {
                     if (response.isSuccessful) {
                         callback(Result.success(response.body() ?: throw Throwable("Not Found")))
                     } else {
@@ -49,7 +49,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<Product>, t: Throwable) {
+                override fun onFailure(call: Call<Product>, t: Throwable) {
                     callback(Result.failure(t))
                 }
             }
