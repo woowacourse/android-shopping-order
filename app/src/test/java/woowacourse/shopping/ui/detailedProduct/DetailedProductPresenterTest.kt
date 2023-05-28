@@ -27,14 +27,14 @@ class DetailedProductPresenterTest {
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeRecentProduct: RecentProduct = RecentProduct(
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     @Before

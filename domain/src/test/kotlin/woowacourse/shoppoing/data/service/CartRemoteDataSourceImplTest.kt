@@ -31,7 +31,7 @@ class CartRemoteDataSourceImplTest {
             assertThat(cartProducts[i].name).isEqualTo("치킨$i")
             assertThat(cartProducts[i].price).isEqualTo(10000)
             assertThat(cartProducts[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
             )
             assertThat(cartProducts[i].count).isEqualTo(i + 1)
             assertThat(cartProducts[i].checked).isEqualTo(true)

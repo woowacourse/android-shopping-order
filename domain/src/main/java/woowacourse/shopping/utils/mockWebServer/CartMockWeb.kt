@@ -79,7 +79,7 @@ class CartMockWeb {
                     "product": {
                         "name": "치킨$it",
                         "price": 10000,
-                        "imageUrl": "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                        "imageUrl":  "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
                     }
                 }
     """

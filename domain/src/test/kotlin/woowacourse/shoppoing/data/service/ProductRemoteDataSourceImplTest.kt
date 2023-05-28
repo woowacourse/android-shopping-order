@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.utils.mockWebServer.MockWeb
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
+import woowacourse.shopping.model.Product
+import woowacourse.shopping.utils.mockWebServer.MockWeb
 
 class ProductRemoteDataSourceImplTest {
     private lateinit var mockWebServer: MockWeb
@@ -33,7 +33,7 @@ class ProductRemoteDataSourceImplTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
             )
         }
     }
@@ -50,7 +50,7 @@ class ProductRemoteDataSourceImplTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
             )
         }
     }
@@ -69,7 +69,7 @@ class ProductRemoteDataSourceImplTest {
             assertThat(products[i].name).isEqualTo("치킨${i + 10}")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
             )
         }
     }
@@ -87,7 +87,7 @@ class ProductRemoteDataSourceImplTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
             )
         }
     }
@@ -103,7 +103,7 @@ class ProductRemoteDataSourceImplTest {
         assertThat(product.name).isEqualTo("치킨1")
         assertThat(product.price).isEqualTo(10000)
         assertThat(product.imageUrl).isEqualTo(
-            "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+            "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
         )
     }
 
