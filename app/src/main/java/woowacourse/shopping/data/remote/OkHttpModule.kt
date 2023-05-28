@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote
 import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import java.util.*
+import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 object OkHttpModule {
