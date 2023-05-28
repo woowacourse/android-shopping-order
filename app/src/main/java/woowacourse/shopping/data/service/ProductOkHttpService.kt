@@ -10,11 +10,11 @@ import okhttp3.Response
 import org.json.JSONArray
 import java.io.IOException
 
-class ProductRemoteService {
+class ProductOkHttpService : ProductRemoteDataSource {
 
     private val okHttpClient = OkHttpClient()
 
-    fun request(
+    override fun requestProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {

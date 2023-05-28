@@ -16,7 +16,7 @@ import woowacourse.shopping.data.ProductRemoteRepositoryImpl
 import woowacourse.shopping.data.RecentProductRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.CartRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.ProductRetrofitService
 import woowacourse.shopping.data.service.ServerInfo
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
@@ -100,9 +100,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     private fun initPresenter() {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
+
         presenter = MainPresenter(
             this,
-            ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
+            ProductRemoteRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
             CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
         )

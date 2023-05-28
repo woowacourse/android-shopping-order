@@ -3,11 +3,11 @@ package woowacourse.shopping.data
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
-import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.ProductRemoteDataSource
 import java.lang.Thread.sleep
 
 class ProductRemoteRepositoryImpl(
-    private val service: ProductRemoteService,
+    private val service: ProductRemoteDataSource,
     private val productCache: ProductCache
 ) : ProductRepository {
     override fun getProducts(
@@ -16,7 +16,7 @@ class ProductRemoteRepositoryImpl(
         onFailure: () -> Unit
     ) {
         if (productCache.productList.isEmpty()) {
-            service.request(
+            service.requestProducts(
                 onSuccess = {
                     productCache.addProducts(it)
                     sleep(2000)

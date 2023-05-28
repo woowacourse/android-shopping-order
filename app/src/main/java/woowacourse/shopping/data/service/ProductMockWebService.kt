@@ -15,7 +15,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONArray
 import java.io.IOException
 
-class ProductMockWebService {
+class ProductMockWebService : ProductRemoteDataSource{
     private lateinit var mockWebServer: MockWebServer
     private val okHttpClient = OkHttpClient()
 
@@ -34,7 +34,7 @@ class ProductMockWebService {
         }
     }
 
-    fun request(
+    override fun requestProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {

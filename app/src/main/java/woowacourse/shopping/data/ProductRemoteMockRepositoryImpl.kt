@@ -14,7 +14,7 @@ class ProductRemoteMockRepositoryImpl(
     override fun getProducts(page: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
         if (productCache.productList.isEmpty()) {
             Thread {
-                webServer.request(
+                webServer.requestProducts(
                     onSuccess = {
                         productCache.addProducts(it)
                         sleep(2000) // 스켈레톤 확인을 위한 일시 정지
