@@ -1,37 +1,46 @@
 package woowacourse.shopping.data.datasource.product.remote
 
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.OkHttpModule
-import java.io.IOException
 import java.lang.Integer.min
 
-class RemoteProductDataSource() : ProductDataSource.Remote {
+class RemoteProductDataSource : ProductDataSource.Remote {
 
     override fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<DataProduct>) -> Unit
+        onReceived: (products: List<DataProduct>) -> Unit,
     ) {
-        val url = "${OkHttpModule.BASE_URL}/products"
-        val request = Request.Builder()
-            .url(url)
-            .get()
+        // todo: url 관리방법 변경해야함
+        val url = OkHttpModule.BASE_URL
+
+        val retrofitService = Retrofit.Builder()
+            .baseUrl(url)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
+            .create(ProductService::class.java)
 
-        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
+        retrofitService.requestProducts().enqueue(object : retrofit2.Callback<List<DataProduct>> {
 
-            override fun onResponse(call: Call, response: Response) {
-                val productCache = OkHttpModule.gson.fromJson(
-                    response.body?.string(),
-                    Array<DataProduct>::class.java
-                ).toList()
-                onReceived(getDataProductsFromCache(size, lastId, productCache))
+            override fun onResponse(
+                call: retrofit2.Call<List<DataProduct>>,
+                response: retrofit2.Response<List<DataProduct>>,
+            ) {
+                response.body()?.let {
+                    onReceived(
+                        getDataProductsFromCache(
+                            size = size,
+                            lastId = lastId,
+                            allProducts = it
+                        )
+                    )
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<List<DataProduct>>, t: Throwable) {
             }
         })
     }
@@ -39,7 +48,7 @@ class RemoteProductDataSource() : ProductDataSource.Remote {
     private fun getDataProductsFromCache(
         size: Int,
         lastId: Int,
-        allProducts: List<DataProduct>
+        allProducts: List<DataProduct>,
     ): List<DataProduct> {
         if (lastId == -1) return allProducts.subList(0, min(allProducts.size, size))
         val startIndex = allProducts.indexOfFirst { it.id == lastId } + 1
