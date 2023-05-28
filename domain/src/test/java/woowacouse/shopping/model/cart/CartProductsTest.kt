@@ -147,6 +147,6 @@ class CartProductsTest {
 
     companion object {
         fun CartProduct(cartId: Long, productId: Long, productName: String, price: Int, count: Int, checked: Boolean): CartProduct =
-            CartProduct(cartId, Product(productId, productName, price, count), checked)
+            CartProduct(cartId, Product(productId, productName, price, "", count), checked)
     }
 }

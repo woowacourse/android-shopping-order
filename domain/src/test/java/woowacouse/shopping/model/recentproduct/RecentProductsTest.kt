@@ -79,7 +79,13 @@ class RecentProductsTest {
     }
 
     companion object {
-        fun RecentProduct(id: Long, productId: Long, productName: String, price: Int, count: Int): RecentProduct =
-            RecentProduct(id, Product(productId, productName, price, count))
+        fun RecentProduct(
+            id: Long,
+            productId: Long,
+            productName: String,
+            price: Int,
+            count: Int
+        ): RecentProduct =
+            RecentProduct(id, Product(productId, productName, price, "", count))
     }
 }
