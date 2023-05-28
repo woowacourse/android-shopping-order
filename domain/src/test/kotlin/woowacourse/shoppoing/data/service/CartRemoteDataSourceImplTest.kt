@@ -1,4 +1,4 @@
-package woowacourse.shoppoing.service
+package woowacourse.shoppoing.data.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
