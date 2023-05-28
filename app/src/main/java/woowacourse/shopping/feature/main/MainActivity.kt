@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.commonUi.CartCounterBadge
 import woowacourse.shopping.data.dataSource.recent.RecentDao
-import woowacourse.shopping.data.dataSource.service.CartProductRemoteService
+import woowacourse.shopping.data.dataSource.remote.cart.CartProductRemoteService
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl

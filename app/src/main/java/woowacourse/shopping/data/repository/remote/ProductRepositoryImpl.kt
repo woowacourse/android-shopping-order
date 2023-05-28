@@ -8,8 +8,8 @@ import com.example.domain.repository.ProductRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dataSource.service.ProductService
-import woowacourse.shopping.data.model.dto.request.product.ProductDto
+import woowacourse.shopping.data.dataSource.remote.product.ProductService
+import woowacourse.shopping.data.model.dto.response.ProductDto
 
 class ProductRepositoryImpl(
     private val service: ProductService,

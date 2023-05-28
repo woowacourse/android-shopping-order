@@ -34,8 +34,7 @@ class MainPresenter(
     override val badgeCount: LiveData<Int>
         get() = _badgeCount
 
-    private val _mainScreenEvent: MutableLiveData<MainScreenEvent> =
-        MutableLiveData()
+    private val _mainScreenEvent: MutableLiveData<MainScreenEvent> = MutableLiveData()
     override val mainScreenEvent: LiveData<MainScreenEvent>
         get() = _mainScreenEvent
 
@@ -57,7 +56,7 @@ class MainPresenter(
     override fun initLoadProducts() {
         productRepository.fetchFirstProducts(
             onSuccess = {
-                val productUiModels = makeProductUiModels(it)
+                val productUiModels = createProductUiModels(it)
                 _products.postValue(productUiModels)
                 loadRecent()
             },
@@ -184,7 +183,7 @@ class MainPresenter(
         productRepository.fetchNextProducts(
             lastProductId,
             onSuccess = {
-                val nextProductUiModels = makeProductUiModels(it)
+                val nextProductUiModels = createProductUiModels(it)
                 val alreadyProducts = products.value ?: emptyList()
                 _products.postValue(alreadyProducts + nextProductUiModels)
             },
@@ -198,17 +197,15 @@ class MainPresenter(
         productRepository.resetCache()
     }
 
-    private fun makeProductUiModels(products: List<Product>): List<ProductUiModel> {
-        val productUiModels: List<ProductUiModel> = products.map { product ->
-            val findCartProduct = cartProducts.find { it.productUiModel.id == product.id }
-            if (findCartProduct == null) {
-                return@map product.toPresentation()
+    private fun createProductUiModels(products: List<Product>): List<ProductUiModel> {
+        val cartItems = cartProducts.associateBy { it.productUiModel.id }
+        return products.map { product ->
+            val cartItem = cartItems[product.id]
+            if (cartItem != null) {
+                product.toPresentation().apply { count = cartItem.productUiModel.count }
             } else {
-                return@map product.toPresentation()
-                    .apply { count = findCartProduct.productUiModel.count }
+                product.toPresentation().apply { count = 0 }
             }
         }
-
-        return productUiModels
     }
 }

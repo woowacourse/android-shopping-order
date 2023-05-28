@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
-import woowacourse.shopping.data.dataSource.service.CartProductRemoteService
+import woowacourse.shopping.data.dataSource.remote.cart.CartProductRemoteService
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.util.toMoneyFormat
