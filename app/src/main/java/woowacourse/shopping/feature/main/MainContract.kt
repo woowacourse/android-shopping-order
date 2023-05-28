@@ -28,6 +28,7 @@ interface MainContract {
         fun initLoadProducts()
         fun loadMoreProducts()
         fun loadRecentProducts()
+        fun showCartCount()
         fun showProductDetail(productId: Long)
         fun changeProductCartCount(productId: Long, count: Int)
         fun moveToCart()

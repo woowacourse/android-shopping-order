@@ -20,8 +20,8 @@ class ServerSettingActivity : AppCompatActivity() {
 
     private fun setUpView() {
         binding.btnDeetooServer.setOnClickListener { startMain(DEETOO) }
-        binding.btnEmilServer.setOnClickListener { startMain(EMIL) }
         binding.btnRoiseServer.setOnClickListener { startMain(ROISE) }
+        binding.btnEmilServer.setOnClickListener { startMain(EMIL) }
     }
 
     private fun startMain(server: Server) {

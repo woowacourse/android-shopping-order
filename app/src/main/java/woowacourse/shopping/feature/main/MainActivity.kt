@@ -152,6 +152,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.badge)
 
+        presenter.showCartCount()
         return true
     }
 
