@@ -1,13 +1,12 @@
-package woowacourse.shopping.data.datasource.product.remote
+package woowacourse.shopping.data.datasource.product
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.OkHttpModule
 import java.lang.Integer.min
 
-class RemoteProductDataSource : ProductDataSource.Remote {
+class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getPartially(
         size: Int,
@@ -17,13 +16,13 @@ class RemoteProductDataSource : ProductDataSource.Remote {
         // todo: url 관리방법 변경해야함
         val url = OkHttpModule.BASE_URL
 
-        val retrofitService = Retrofit.Builder()
+        val productService = Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ProductService::class.java)
 
-        retrofitService.requestProducts().enqueue(object : retrofit2.Callback<List<DataProduct>> {
+        productService.requestProducts().enqueue(object : retrofit2.Callback<List<DataProduct>> {
 
             override fun onResponse(
                 call: retrofit2.Call<List<DataProduct>>,
