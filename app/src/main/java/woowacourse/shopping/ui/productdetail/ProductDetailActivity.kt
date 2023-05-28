@@ -8,7 +8,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
+import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogProductDetailBinding
@@ -96,7 +96,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private fun initPresenter() {
         presenter = ProductDetailPresenter(
             this,
-            BasketRepositoryImpl(RemoteBasketDataSource()),
+            BasketRepositoryImpl(BasketRemoteDataSourceImpl()),
             currentProduct,
             currentProductBasketId,
             previousProduct,

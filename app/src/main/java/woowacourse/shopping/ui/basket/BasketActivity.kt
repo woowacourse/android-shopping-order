@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
+import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
@@ -51,7 +51,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     private fun initPresenter() {
         presenter = BasketPresenter(
             this,
-            BasketRepositoryImpl(RemoteBasketDataSource())
+            BasketRepositoryImpl(BasketRemoteDataSourceImpl())
         )
     }
 

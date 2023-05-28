@@ -1,16 +1,15 @@
-package woowacourse.shopping.data.datasource.basket.remote
+package woowacourse.shopping.data.datasource.basket
 
 import android.util.Log
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.NullOnEmptyConvertFactory
-import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.OkHttpModule
 
-class RemoteBasketDataSource : BasketDataSource.Remote {
+class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
     private val url = OkHttpModule.BASE_URL
 
