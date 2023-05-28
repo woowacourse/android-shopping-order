@@ -1,16 +1,16 @@
 package woowacouse.shopping.model.recentproduct
 
 class RecentProducts(
-    recentProducts: List<RecentProduct>
+    private val recentProducts: List<RecentProduct>
 ) {
-    private val recentProducts = recentProducts.toMutableList()
-
-    fun addRecentProduct(recentProduct: RecentProduct) {
-        recentProducts.add(recentProduct)
+    fun addRecentProduct(recentProduct: RecentProduct): RecentProducts {
+        val newRecentProducts = recentProducts.toMutableList()
+        newRecentProducts.add(recentProduct)
+        return RecentProducts(newRecentProducts.toList())
     }
 
-    fun deleteRecentProduct(recentProductId: Long) {
-        recentProducts.removeIf { it.id == recentProductId }
+    fun deleteRecentProduct(recentProductId: Long): RecentProducts {
+        return RecentProducts(recentProducts.filterNot { it.id == recentProductId })
     }
 
     fun getRecentProduct(recentProductId: Long): RecentProduct? =

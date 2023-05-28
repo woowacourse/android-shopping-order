@@ -48,11 +48,10 @@ class RecentProductsTest {
         )
 
         // when
-        recentProducts.addRecentProduct(
+        val actual = recentProducts.addRecentProduct(
             RecentProduct(2L, 2L, "치킨", 15_000, 1)
-        )
+        ).getAll()
 
-        val actual = recentProducts.getAll()
         val expected = listOf(
             RecentProduct(1L, 1L, "피자", 12_000, 1),
             RecentProduct(2L, 2L, "치킨", 15_000, 1),
@@ -71,9 +70,8 @@ class RecentProductsTest {
         )
 
         // when
-        recentProducts.deleteRecentProduct(2L)
+        val actual = recentProducts.deleteRecentProduct(2L).getAll()
 
-        val actual = recentProducts.getAll()
         val expected = listOf(
             RecentProduct(1L, 1L, "피자", 12_000, 1),
         )
