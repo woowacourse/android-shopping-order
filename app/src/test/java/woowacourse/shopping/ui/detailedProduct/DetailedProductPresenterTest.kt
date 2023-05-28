@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.detailedProduct
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -84,15 +85,24 @@ class DetailedProductPresenterTest {
     fun `상품을 장바구니에 추가한다`() {
         // given
         every { cartRepository.insert(any()) } answers { nothing }
-        every { productRepository.findById(any()) } answers { fakeProduct }
-        every { cartRepository.updateCountWithProductId(any(), any()) } returns 0
+        every { productRepository.findById(any(), any()) } answers { Unit }
+
+        val successSlot = slot<(Result<Int>) -> Unit>()
+        every {
+            cartRepository.updateCountWithProductId(any(), any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeProduct.id))
+        }
+
         every { view.navigateToCart() } answers { nothing }
 
         // when
         presenter.addProductToCart(fakeProduct.id)
 
         // then
-        verify(exactly = 1) { cartRepository.updateCountWithProductId(fakeProduct.id, any()) }
+        verify(exactly = 1) {
+            cartRepository.updateCountWithProductId(fakeProduct.id, any(), any())
+        }
         verify(exactly = 1) { view.navigateToCart() }
     }
 
@@ -116,8 +126,16 @@ class DetailedProductPresenterTest {
     fun `최근 본 상품으로 이동한다`() {
         // given
         every { view.navigateToDetailedProduct(any()) } answers { nothing }
-        every { sharedPreferenceUtils.getLastProductId() } returns 4
-        every { productRepository.findById(any()) } returns fakeProduct
+        every { sharedPreferenceUtils.getLastProductId() } returns fakeProduct.id + 1
+        every { productRepository.findById(any(), any()) } returns Unit
+
+        val successSlot = slot<(Result<Product>) -> Unit>()
+        every {
+            productRepository.findById(any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeProduct))
+        }
+
         every { sharedPreferenceUtils.setLastProductId(any()) } answers { nothing }
 
         // when
