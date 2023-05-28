@@ -24,8 +24,8 @@ class DetailedProductPresenter(
             .takeIf { it != product.id && it != -1 }
             ?.let {
                 productRepository.findById(it) { result ->
-                    result.onFailure { exception -> ErrorHandler.printError(exception) }
-                        .onSuccess { product -> lastProduct = product.toUIModel() }
+                    result.onSuccess { product -> lastProduct = product.toUIModel() }
+                        .onFailure { exception -> ErrorHandler.printError(exception) }
                 }
             }
         sharedPreferenceUtils.setLastProductId(product.id)

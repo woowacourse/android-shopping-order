@@ -25,22 +25,14 @@ class ShoppingPresenter(
                     .associateBy { it.product.id }
                     .mapValues { it.value.quantity }
                 view.setCartProducts(cartProducts)
-            }.onFailure { throwable ->
-                ErrorHandler.printError(throwable)
-            }
+            }.onFailure { throwable -> ErrorHandler.printError(throwable) }
         }
     }
 
     override fun setUpNextProducts() {
         productRepository.getNext(PRODUCT_PAGE_SIZE) { result ->
-            when (result.isSuccess) {
-                true -> view.addMoreProducts(
-                    result.getOrNull()?.map { it.toUIModel() } ?: return@getNext
-                )
-                false -> ErrorHandler.printError(
-                    result.exceptionOrNull() ?: Exception("알 수 없는 오류가 발생했습니다.")
-                )
-            }
+            result.onSuccess { products -> view.addMoreProducts(products.map { it.toUIModel() }) }
+                .onFailure { throwable -> ErrorHandler.printError(throwable) }
         }
     }
 
@@ -65,15 +57,9 @@ class ShoppingPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        productRepository.findById(productId) {
-            when (it.isSuccess) {
-                true -> view.navigateToProductDetail(
-                    it.getOrNull()?.toUIModel() ?: return@findById
-                )
-                false -> ErrorHandler.printError(
-                    it.exceptionOrNull() ?: Exception("알 수 없는 오류가 발생했습니다.")
-                )
-            }
+        productRepository.findById(productId) { result ->
+            result.onSuccess { view.navigateToProductDetail(it.toUIModel()) }
+                .onFailure { throwable -> ErrorHandler.printError(throwable) }
         }
     }
 

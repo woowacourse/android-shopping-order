@@ -16,18 +16,22 @@ class ProductRepositoryImpl(
     override fun getAll(callback: (Result<List<Product>>) -> Unit) {
         when (localDataSource.isCached()) {
             true -> localDataSource.getAll(callback)
-            false -> remoteDataSource.getAll {
-                localDataSource.insertAll(it.getOrThrow())
-                localDataSource.getAll(callback)
+            false -> remoteDataSource.getAll { result ->
+                result.onSuccess { products ->
+                    localDataSource.insertAll(products)
+                    localDataSource.getAll(callback)
+                }
             }
         }
     }
 
     override fun getNext(count: Int, callback: (Result<List<Product>>) -> Unit) {
         when (localDataSource.isEndOfCache()) {
-            true -> remoteDataSource.getAll { products ->
-                localDataSource.insertAll(products.getOrThrow())
-                localDataSource.getNext(count, callback)
+            true -> remoteDataSource.getAll { result ->
+                result.onSuccess { products ->
+                    localDataSource.insertAll(products)
+                    localDataSource.getNext(count, callback)
+                }
             }
             false -> localDataSource.getNext(count, callback)
         }

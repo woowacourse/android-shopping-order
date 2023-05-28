@@ -14,22 +14,17 @@ class CartRepositoryImpl(
             result.onSuccess { cartProducts ->
                 cartItems.replaceAll(cartProducts)
                 callback(Result.success(CartProducts(cartProducts)))
-            }.onFailure { throwable ->
-                callback(Result.failure(throwable))
-            }
+            }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
 
     override fun getPage(index: Int, size: Int, callback: (Result<CartProducts>) -> Unit) {
         remoteDataSource.getAll { result ->
-            when (result.isFailure) {
-                true -> callback(Result.failure(Exception("")))
-                false -> {
-                    val cartProducts = result.getOrDefault(emptyList())
-                    cartItems.replaceAll(cartProducts)
-                    callback(Result.success(CartProducts(cartProducts)))
-                }
-            }
+            result.onSuccess {
+                val cartProducts = it.subList(index * size, (index + 1) * size)
+                cartItems.replaceAll(cartProducts)
+                callback(Result.success(CartProducts(cartProducts)))
+            }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
 
@@ -57,15 +52,11 @@ class CartRepositoryImpl(
         if (cartItems.findByProductId(productId) != null) {
             return
         }
-        remoteDataSource.postItem(productId) {
-            getAll {}
-        }
+        remoteDataSource.postItem(productId) { getAll {} }
     }
 
     override fun remove(id: Int, callback: () -> Unit) {
-        remoteDataSource.deleteItem(id) {
-            callback()
-        }
+        remoteDataSource.deleteItem(id) { callback() }
     }
 
     override fun updateCountWithProductId(
@@ -75,18 +66,13 @@ class CartRepositoryImpl(
     ) {
         if (cartItems.isEmpty()) {
             remoteDataSource.getAll { result ->
-                result.onSuccess { cartProducts ->
-                    cartItems.replaceAll(cartProducts)
-                }.onFailure { throwable ->
-                    callback(Result.failure(throwable))
-                }
+                result.onSuccess { cartProducts -> cartItems.replaceAll(cartProducts) }
+                    .onFailure { throwable -> callback(Result.failure(throwable)) }
             }
         }
         val cartItem = cartItems.findByProductId(productId)
         val updateCallback: (Result<Int>) -> Unit = { resultUpdate ->
-            getAll {
-                callback(resultUpdate)
-            }
+            getAll { callback(resultUpdate) }
         }
         when {
             cartItem == null && count == 1 -> remoteDataSource.postItem(productId, updateCallback)
