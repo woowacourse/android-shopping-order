@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
@@ -15,8 +13,6 @@ class CartPresenter(
     private val cartRepository: CartRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
-
     private val _totalPrice = NonNullMutableLiveData<Int>(0)
     override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
 
@@ -113,19 +109,15 @@ class CartPresenter(
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
-        Thread {
-            isChangingItemCheck = true
-            cartRepository.updateChecked(productId, checked)
-            handler.post {
-                currentPage.indexOfFirst { it.id == productId }
-                    .takeIf { it != -1 }
-                    ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-                setUpAllButton()
-                isChangingItemCheck = false
-            }
-        }.start()
+        isChangingItemCheck = true
+        cartRepository.updateChecked(productId, checked)
+        currentPage.indexOfFirst { it.id == productId }
+            .takeIf { it != -1 }
+            ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
+        setUpCheckedCount()
+        setUPTotalPrice()
+        setUpAllButton()
+        isChangingItemCheck = false
     }
 
     override fun removeItem(productId: Int) {
