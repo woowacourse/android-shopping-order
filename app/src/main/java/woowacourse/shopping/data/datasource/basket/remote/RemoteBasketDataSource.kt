@@ -1,30 +1,28 @@
 package woowacourse.shopping.data.datasource.basket.remote
 
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
+import android.util.Log
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.NullOnEmptyConvertFactory
 import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.OkHttpModule
-import java.io.IOException
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
+
+    private val url = OkHttpModule.BASE_URL
+
+    private val basketProductService = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(NullOnEmptyConvertFactory)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(BasketProductService::class.java)
+
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {
-        val url = OkHttpModule.BASE_URL
-
-        val cartProductService = Retrofit.Builder()
-            .baseUrl(url)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(BasketProductService::class.java)
-
-        cartProductService.requestBasketProducts(
+        basketProductService.requestBasketProducts(
             // todo: userInfo 어떻게 관리할지도 생각
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<List<DataBasketProduct>> {
@@ -36,62 +34,90 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
                 response.body()?.let {
                     onReceived(it)
                 }
+                Log.d("woogi", "onResponse: 장바구니 상품 조회에 성공했습니다.")
             }
 
             override fun onFailure(call: retrofit2.Call<List<DataBasketProduct>>, t: Throwable) {
+                Log.d("woogi", "onFailure: ${t.message}")
+                Log.d("woogi", "onResponse: 장바구니 상품 조회에 실패했습니다.")
             }
         })
     }
 
-    override fun add(product: DataProduct, onReceived: (Int) -> Unit) {
-        val url = "${OkHttpModule.BASE_URL}/cart-items"
-        val requestBody = "{\"productId\":\"${product.id}\"}"
-            .toRequestBody("application/json".toMediaTypeOrNull())
+    override fun add(
+        product: DataProduct,
+        onReceived: (Int) -> Unit
+    ) {
+        basketProductService.addBasketProduct(
+            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            productId = product.id
+        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
 
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
+            override fun onResponse(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                response: retrofit2.Response<retrofit2.Response<ResponseBody>>
+            ) {
+                response.headers()["Location"]?.let {
+                    val productId = it.split("/").last().toInt()
 
-        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {
-                val productId = response.headers.get("Location")?.split("/")?.last()?.toInt()
-
-                productId?.let {
-                    onReceived(it)
+                    onReceived(productId)
                 }
+                Log.d("woogi", "onResponse: 상품 추가에 성공했습니다.")
+            }
+
+            override fun onFailure(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                t: Throwable
+            ) {
+                Log.d("woogi", "onFailure: ${t.message}")
+                Log.d("woogi", "onResponse: 상품 추가에 실패했습니다.")
             }
         })
     }
 
     override fun update(basketProduct: DataBasketProduct) {
-        val url = "${OkHttpModule.BASE_URL}/cart-items/${basketProduct.id}"
-        val requestBody = "{\"quantity\":\"${basketProduct.count.value}\"}"
-            .toRequestBody("application/json".toMediaTypeOrNull())
+        basketProductService.updateBasketProduct(
+            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            cartItemId = basketProduct.id.toString(),
+            quantity = basketProduct.count.value
+        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
 
-        val request = Request.Builder()
-            .url(url)
-            .patch(requestBody)
-            .build()
+            override fun onResponse(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                response: retrofit2.Response<retrofit2.Response<ResponseBody>>
+            ) {
+                Log.d("woogi", "onResponse: 수량 변경에 성공했습니다.")
+            }
 
-        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {}
+            override fun onFailure(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                t: Throwable
+            ) {
+                Log.d("woogi", "onFailure: ${t.message}")
+                Log.d("woogi", "onResponse: 수량 변경에 실패했습니다.")
+            }
         })
     }
 
     override fun remove(basketProduct: DataBasketProduct) {
-        val url = "${OkHttpModule.BASE_URL}/cart-items/${basketProduct.id}"
-        val request = Request.Builder()
-            .url(url)
-            .delete()
-            .build()
+        basketProductService.removeBasketProduct(
+            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            cartItemId = basketProduct.id.toString(),
+        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
+            override fun onResponse(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                response: retrofit2.Response<retrofit2.Response<ResponseBody>>
+            ) {
+                Log.d("woogi", "onResponse: 상품 삭제에 성공했습니다.")
+            }
 
-        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-
-            override fun onResponse(call: Call, response: Response) {}
+            override fun onFailure(
+                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                t: Throwable
+            ) {
+                Log.d("woogi", "onFailure: ${t.message}")
+                Log.d("woogi", "onResponse: 상품 삭제에 실패했습니다.")
+            }
         })
     }
 }
