@@ -4,7 +4,8 @@ import okhttp3.MediaType.Companion.toMediaType
 
 enum class Header {
     AUTHORIZATION,
-    CONTENT_TYPE;
+    CONTENT_TYPE,
+    ;
 
     companion object {
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
