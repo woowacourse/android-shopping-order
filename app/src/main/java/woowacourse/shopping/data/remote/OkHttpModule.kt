@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit
 
 object OkHttpModule {
     var BASE_URL = ""
-    private const val AUTHORIZATION_FORMAT = "Basic %s"
+    const val AUTHORIZATION_FORMAT = "Basic %s"
 
-    private val encodedUserInfo =
+    val encodedUserInfo =
         Base64.getEncoder().encodeToString("a@a.com:1234".toByteArray(Charsets.UTF_8))
 
     private val authorizationInterceptor: Interceptor =
