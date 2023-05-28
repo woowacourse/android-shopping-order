@@ -15,7 +15,7 @@ import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
+import woowacourse.shopping.data.datasource.remote.cart.CartOkHttpService
 import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
 import woowacourse.shopping.data.datasource.remote.ServerInfo
 import woowacourse.shopping.data.datasource.local.recent.RecentDao
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             this,
             ProductRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
+            CartRemoteRepositoryImpl(CartOkHttpService(token), CartCache)
         )
     }
 

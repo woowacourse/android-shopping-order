@@ -17,14 +17,14 @@ import woowacourse.shopping.data.datasource.remote.ServerInfo
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
-class CartRemoteService(private val credential: String) {
+class CartOkHttpService(private val credential: String): CartRemoteDataSource {
 
     private val okHttpClient = OkHttpClient()
 
     private val baseUrl = ServerInfo.currentBaseUrl
     private val url = "$baseUrl/cart-items"
 
-    fun loadAll(): List<CartProduct> {
+    override fun loadAll(): List<CartProduct> {
         val request = Request.Builder().url(url)
             .header("Authorization", "Basic $credential").build()
 
@@ -78,7 +78,7 @@ class CartRemoteService(private val credential: String) {
         return products
     }
 
-    fun addCartProduct(productId: Int): Int {
+    override fun addCartProduct(productId: Int): Int {
 
         val data = JSONObject().put("productId", "$productId").toString()
         val formBody: RequestBody = data.toRequestBody("application/json".toMediaTypeOrNull())
@@ -109,7 +109,7 @@ class CartRemoteService(private val credential: String) {
         return cartItemId
     }
 
-    fun updateCartProductCount(cartProductId: Int, count: Int) {
+    override fun updateCartProductCount(cartProductId: Int, count: Int) {
 
         val data = JSONObject().put("quantity", count).toString()
         val formBody: RequestBody = data.toRequestBody("application/json".toMediaTypeOrNull())
@@ -135,7 +135,7 @@ class CartRemoteService(private val credential: String) {
         latch.await()
     }
 
-    fun deleteCartProduct(cartProductId: Int) {
+    override fun deleteCartProduct(cartProductId: Int) {
 
         val requestUrl = "$url/$cartProductId"
         val request = Request.Builder().url(requestUrl).delete()

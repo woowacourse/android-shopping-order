@@ -14,7 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.cart.CartCache
 import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
+import woowacourse.shopping.data.datasource.remote.cart.CartOkHttpService
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -35,7 +35,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
         presenter = DetailPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
+            CartRemoteRepositoryImpl(CartOkHttpService(token), CartCache),
             product
         )
         binding.presenter = presenter
