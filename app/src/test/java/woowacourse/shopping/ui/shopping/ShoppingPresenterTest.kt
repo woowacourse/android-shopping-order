@@ -2,8 +2,8 @@ package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.CartRepository
@@ -27,24 +27,20 @@ class ShoppingPresenterTest {
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeRecentProduct: RecentProduct = RecentProduct(
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeCartProduct: CartProduct = CartProduct(
         1,
-        "[사미헌] 갈비탕",
         1,
-        true,
-        12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
-        1
+        fakeProduct
     )
 
     private val fakeProducts = List(10) { fakeProduct }
@@ -67,9 +63,9 @@ class ShoppingPresenterTest {
     @Test
     fun `초기 상품들을 세팅한다`() {
         // given
-        every { productRepository.getNext(any()) } returns fakeProducts
+        mockCartGetAll()
+        mockProductGetNext()
         every { recentRepository.getRecent(10) } returns fakeRecentProducts
-        every { cartRepository.getAll() } returns fakeCartProducts
 
         every { view.setRecentProducts(any()) } returns Unit
         every { view.addMoreProducts(any()) } returns Unit
@@ -93,7 +89,7 @@ class ShoppingPresenterTest {
     @Test
     fun `상품들을 추가로 전달한다`() {
         // given
-        every { productRepository.getNext(any()) } returns fakeProducts
+        mockProductGetNext()
         every { view.addMoreProducts(any()) } returns Unit
 
         // when
@@ -104,9 +100,24 @@ class ShoppingPresenterTest {
     }
 
     @Test
+    fun `최근 본 상품들을 전달한다`() {
+        // given
+        every { recentRepository.getRecent(10) } returns fakeRecentProducts
+        every { view.setRecentProducts(any()) } returns Unit
+
+        // when
+        presenter.setUpRecentProducts()
+
+        // then
+        verify(exactly = 1) {
+            view.setRecentProducts(fakeRecentProducts.map { it.toUIModel() })
+        }
+    }
+
+    @Test
     fun `상품들에 장바구니 숫자를 반영한다`() {
         // given
-        every { cartRepository.getAll() } returns fakeCartProducts
+        mockCartGetAll()
         every { view.setCartProducts(any()) } returns Unit
 
         // when
@@ -121,29 +132,23 @@ class ShoppingPresenterTest {
     @Test
     fun `상품의 개수를 장바구니 저장한다`() {
         // given
-        every { productRepository.getNext(any()) } returns fakeProducts
-        every { recentRepository.getRecent(10) } returns fakeRecentProducts
-        every { cartRepository.getAll() } returns fakeCartProducts
+        mockCartGetAll()
+        mockProductGetNext()
+        mockCartUpdateCountWithProductId()
+        every { cartRepository.getTotalSelectedCount() } returns 10
+        every { view.setToolbar(any()) } returns Unit
 
-        every { view.setRecentProducts(any()) } returns Unit
-        every { view.addMoreProducts(any()) } returns Unit
-        every { view.setCartProducts(any()) } returns Unit
-
-        every { cartRepository.insert(any()) } returns Unit
-        every { cartRepository.updateCountWithProductId(1, 10) } returns 10
-        every { productRepository.findById(1) } returns fakeProduct
         // when
-        presenter.setUpProducts()
-        val count = presenter.updateItemCount(1, 10)
+        presenter.updateItemCount(1, 10)
 
         // then
-        assertEquals(10, count)
+        verify(exactly = 1) { view.setToolbar(10) }
     }
 
     @Test
     fun `총 장바구니 상품 개수를 반영한다`() {
         // given
-        every { cartRepository.getAll() } returns fakeCartProducts
+        mockCartGetAll()
         every { view.setCartProducts(any()) } returns Unit
         every { view.setToolbar(any()) } returns Unit
 
@@ -159,7 +164,7 @@ class ShoppingPresenterTest {
     @Test
     fun `선택한 상품의 상세페이지로 이동한다`() {
         // given
-        every { productRepository.findById(any()) } returns fakeProduct
+        mockProductFindById()
         every { view.navigateToProductDetail(any()) } returns Unit
 
         // when
@@ -167,5 +172,41 @@ class ShoppingPresenterTest {
 
         // then
         verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel()) }
+    }
+
+    private fun mockProductGetNext() {
+        val successSlot = slot<(Result<List<Product>>) -> Unit>()
+        every {
+            productRepository.getNext(any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeProducts))
+        }
+    }
+
+    private fun mockProductFindById() {
+        val successSlot = slot<(Result<Product>) -> Unit>()
+        every {
+            productRepository.findById(any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeProduct))
+        }
+    }
+
+    private fun mockCartGetAll() {
+        val successSlot = slot<(Result<CartProducts>) -> Unit>()
+        every {
+            cartRepository.getAll(capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeCartProducts))
+        }
+    }
+
+    private fun mockCartUpdateCountWithProductId() {
+        val successSlot = slot<(Result<Int>) -> Unit>()
+        every {
+            cartRepository.updateCountWithProductId(1, any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(10))
+        }
     }
 }
