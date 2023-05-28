@@ -109,7 +109,6 @@ class ShoppingActivity :
     override fun setProducts(data: List<ProductsItemType>) {
         binding.productRecyclerview.adapter = ProductsAdapter(
             data,
-            CartDatabase(CartDBHelper(this).writableDatabase),
             this,
             presenter::fetchMoreProducts,
         )
@@ -151,12 +150,12 @@ class ShoppingActivity :
     }
 
     override fun onAddCart(id: Long, count: Int) {
+        presenter.updateItemCount(id, count)
         binding.productRecyclerview.adapter?.let {
             if (it is ProductsAdapter) {
                 it.updateItemCount(id, count)
             }
         }
-        presenter.updateItemCount(id, count)
     }
 
     override fun increaseCount(id: Long) {

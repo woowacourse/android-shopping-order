@@ -11,7 +11,6 @@ import woowacourse.shopping.ui.shopping.viewHolder.RecentProductsViewHolder
 
 class ProductsAdapter(
     productItemTypes: List<ProductsItemType>,
-    private val cartRepository: CartRepository,
     private val onClickListener: ProductsOnClickListener,
     private val onReadMoreClick: () -> Unit,
 ) : RecyclerView.Adapter<ItemViewHolder>() {
@@ -34,7 +33,7 @@ class ProductsAdapter(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         when (holder) {
             is RecentProductsViewHolder -> holder.bind(productItemTypes[position])
-            is ProductsViewHolder -> holder.bind(productItemTypes[position], cartRepository)
+            is ProductsViewHolder -> holder.bind(productItemTypes[position])
             is ReadMoreViewHolder -> return
         }
     }
@@ -56,7 +55,9 @@ class ProductsAdapter(
         val index = productItemTypes.indexOfFirst {
             it is ProductItem && it.product.id == id
         }
-        productItemTypes[index] = (productItemTypes[index] as ProductItem).copy(count = count)
-        notifyDataSetChanged()
+        if (index != -1) {
+            productItemTypes[index] = (productItemTypes[index] as ProductItem).copy(count = count)
+            notifyItemRangeChanged(index, 1)
+        }
     }
 }
