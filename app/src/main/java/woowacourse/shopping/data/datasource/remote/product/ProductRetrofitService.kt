@@ -5,7 +5,7 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.ProductDto
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.datasource.remote.ServerInfo
 
@@ -18,10 +18,10 @@ class ProductRetrofitService : ProductRemoteDataSource {
         .create(ProductApi::class.java)
 
     override fun requestProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
-        productApi.requestProducts().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
+        productApi.requestProducts().enqueue(object : retrofit2.Callback<List<ProductDto>> {
             override fun onResponse(
-                call: Call<List<ProductEntity>>,
-                response: Response<List<ProductEntity>>
+                call: Call<List<ProductDto>>,
+                response: Response<List<ProductDto>>
             ) {
                 response.body()?.let {
                     onSuccess(it.map { productEntity ->
@@ -30,7 +30,7 @@ class ProductRetrofitService : ProductRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<List<ProductEntity>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ProductDto>>, t: Throwable) {
                 onFailure()
             }
         })

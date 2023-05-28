@@ -4,7 +4,7 @@ import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.google.gson.annotations.SerializedName
 
-data class ProductEntity(
+data class ProductDto(
     val id: Int,
     val name: String,
     val price: Int,
@@ -12,4 +12,4 @@ data class ProductEntity(
     val imgUrl: String
 )
 
-fun ProductEntity.toDomain(): Product = Product(id.toLong(), name, imgUrl, Price(price))
+fun ProductDto.toDomain(): Product = Product(id.toLong(), name, imgUrl, Price(price))

@@ -4,10 +4,10 @@ import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.data.datasource.local.cart.CartCache
-import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
+import woowacourse.shopping.data.datasource.remote.cart.CartRemoteDataSource
 
 class CartRemoteRepositoryImpl(
-    private val service: CartRemoteService,
+    private val service: CartRemoteDataSource,
     private val cartCache: CartCache
 ) : CartRepository {
 
