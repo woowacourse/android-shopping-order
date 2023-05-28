@@ -12,7 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.cart.CartCache
 import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
-import woowacourse.shopping.data.repository.product.ProductRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
         presenter = MainPresenter(
             this,
-            ProductRemoteRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
+            ProductRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
             CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
         )

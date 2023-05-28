@@ -6,7 +6,7 @@ import com.example.domain.repository.ProductRepository
 import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSource
 import java.lang.Thread.sleep
 
-class ProductRemoteRepositoryImpl(
+class ProductRepositoryImpl(
     private val service: ProductRemoteDataSource,
     private val productCache: ProductCache
 ) : ProductRepository {
