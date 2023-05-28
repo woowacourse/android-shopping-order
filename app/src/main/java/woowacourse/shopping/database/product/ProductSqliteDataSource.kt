@@ -10,17 +10,17 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private var offset = 0
-    override fun getAll(callback: (List<Product>?) -> Unit) {
+    override fun getAll(callback: (Result<List<Product>>) -> Unit) {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetAllQuery(), null).use {
             while (it.moveToNext()) {
                 products.add(ProductConstant.fromCursor(it))
             }
         }
-        callback(products)
+        callback(Result.success(products))
     }
 
-    override fun getNext(count: Int, callback: (List<Product>?) -> Unit) {
+    override fun getNext(count: Int, callback: (Result<List<Product>>) -> Unit) {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetNextQuery(count, offset), null).use {
             while (it.moveToNext()) {
@@ -28,13 +28,13 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
                 offset++
             }
         }
-        callback(products)
+        callback(Result.success(products))
     }
 
-    override fun findById(id: Int, callback: (Product?) -> Unit) {
+    override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
         db.rawQuery(ProductConstant.getGetQuery(id), null).use {
             it.moveToNext()
-            callback(ProductConstant.fromCursor(it))
+            callback(Result.success(ProductConstant.fromCursor(it)))
         }
     }
 
@@ -43,8 +43,8 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
         offset = 0
     }
 
-    override fun insertAll(it: List<Product>?) {
-        it?.forEach { product ->
+    override fun insertAll(it: List<Product>) {
+        it.forEach { product ->
             db.execSQL(ProductConstant.getInsertQuery(product))
         }
     }

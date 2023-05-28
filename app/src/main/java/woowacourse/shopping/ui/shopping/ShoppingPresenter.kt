@@ -4,6 +4,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
+import woowacourse.shopping.utils.ErrorHandler
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -27,9 +28,15 @@ class ShoppingPresenter(
     }
 
     override fun setUpNextProducts() {
-        productRepository.getNext(PRODUCT_PAGE_SIZE) { products ->
-            if (products.isNullOrEmpty()) return@getNext
-            view.addMoreProducts(products.map { it.toUIModel() })
+        productRepository.getNext(PRODUCT_PAGE_SIZE) { result ->
+            when (result.isSuccess) {
+                true -> view.addMoreProducts(
+                    result.getOrNull()?.map { it.toUIModel() } ?: return@getNext
+                )
+                false -> ErrorHandler.printError(
+                    result.exceptionOrNull() ?: Exception("알 수 없는 오류가 발생했습니다.")
+                )
+            }
         }
     }
 
@@ -55,8 +62,14 @@ class ShoppingPresenter(
 
     override fun navigateToItemDetail(productId: Int) {
         productRepository.findById(productId) {
-            if (it == null) return@findById
-            view.navigateToProductDetail(it.toUIModel())
+            when (it.isSuccess) {
+                true -> view.navigateToProductDetail(
+                    it.getOrNull()?.toUIModel() ?: return@findById
+                )
+                false -> ErrorHandler.printError(
+                    it.exceptionOrNull() ?: Exception("알 수 없는 오류가 발생했습니다.")
+                )
+            }
         }
     }
 

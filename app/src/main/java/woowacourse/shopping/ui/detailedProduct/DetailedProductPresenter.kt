@@ -6,6 +6,7 @@ import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.utils.ErrorHandler
 import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(
@@ -22,8 +23,13 @@ class DetailedProductPresenter(
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }
             ?.let {
-                productRepository.findById(it) { product ->
-                    lastProduct = product?.toUIModel()
+                productRepository.findById(it) { result ->
+                    when (result.isSuccess) {
+                        true -> lastProduct = result.getOrNull()?.toUIModel() ?: return@findById
+                        false -> ErrorHandler.printError(
+                            result.exceptionOrNull() ?: Exception("알 수 없는 오류가 발생했습니다.")
+                        )
+                    }
                 }
             }
         sharedPreferenceUtils.setLastProductId(product.id)
