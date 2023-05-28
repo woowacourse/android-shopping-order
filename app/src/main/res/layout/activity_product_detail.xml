@@ -8,10 +8,6 @@
         <import type="android.view.View" />
 
         <variable
-            name="presenter"
-            type="woowacourse.shopping.ui.productdetail.contract.presenter.ProductDetailPresenter" />
-
-        <variable
             name="product"
             type="woowacourse.shopping.model.ProductUIModel" />
 

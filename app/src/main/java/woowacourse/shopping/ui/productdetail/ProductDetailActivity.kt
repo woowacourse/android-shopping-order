@@ -72,7 +72,7 @@ class ProductDetailActivity :
     }
 
     override fun showProductCountDialog(product: ProductUIModel) {
-        productOrderDialog = ProductOrderDialog(this, this, presenter, this, product)
+        productOrderDialog = ProductOrderDialog(this, this, product)
         productOrderDialog.show()
     }
 
