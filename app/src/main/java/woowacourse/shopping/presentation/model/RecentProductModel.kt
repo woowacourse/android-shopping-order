@@ -7,4 +7,9 @@ import kotlinx.parcelize.Parcelize
 data class RecentProductModel(
     val id: Long,
     val product: ProductModel,
-) : Parcelable
+) : Parcelable {
+    companion object {
+        val errorData: RecentProductModel =
+            RecentProductModel(-1L, ProductModel(-1L, "", 0, "", 0))
+    }
+}

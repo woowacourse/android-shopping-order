@@ -1,13 +1,12 @@
 package woowacourse.shopping.presentation.view.productlist
 
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.recentproduct.RecentProductRepository
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacourse.shopping.presentation.model.RecentProductModel.Companion.errorData
 import woowacouse.shopping.data.repository.product.ProductRepository
+import woowacouse.shopping.data.repository.recentproduct.RecentProductRepository
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,19 +74,11 @@ class ProductListPresenter(
     }
 
     override fun loadRecentProductItems() {
-        recentProducts.clear()
-        recentProducts.addAll(
-            recentProductRepository.getRecentProducts(LOAD_RECENT_PRODUCT_COUNT)
-                .filter { it.id != UNABLE_ID }
-                .map {
-                    RecentProductModel(
-                        it.id,
-                        products.find { product -> product.id == it.productId }
-                            ?: ProductEntity.errorData.toUIModel(),
-                    )
-                },
-        )
-        view.setRecentProductItemsView(recentProducts.toList())
+        recentProductRepository.getRecentProducts(LOAD_RECENT_PRODUCT_COUNT) {
+            recentProducts.clear()
+            recentProducts.addAll(it.toUIModel().recentProducts)
+            view.setRecentProductItemsView(recentProducts.toList())
+        }
     }
 
     override fun saveRecentProduct(productId: Long) {
@@ -99,15 +90,9 @@ class ProductListPresenter(
     }
 
     override fun getLastRecentProductItem(lastRecentIndex: Int): RecentProductModel {
-        val lastRecentProducts = recentProductRepository.getRecentProducts(LAST_RECENT_COUNT).map {
-            RecentProductModel(
-                it.id,
-                products.find { product -> product.id == it.productId }
-                    ?: ProductEntity.errorData.toUIModel(),
-            )
-        }
-
-        return lastRecentProducts[lastRecentIndex]
+        if (recentProducts.isEmpty())
+            return errorData
+        return recentProducts[lastRecentIndex]
     }
 
     override fun getRecentProductsLastScroll(): Int = lastScroll
@@ -167,9 +152,6 @@ class ProductListPresenter(
         private const val LOCAL_DATE_PATTERN = "yyyy-MM-dd"
         private const val LOAD_RECENT_PRODUCT_COUNT = 10
 
-        private const val LAST_RECENT_COUNT = 2
-
         private const val DISPLAY_PRODUCT_COUNT = 20
-        private const val UNABLE_ID = -1L
     }
 }

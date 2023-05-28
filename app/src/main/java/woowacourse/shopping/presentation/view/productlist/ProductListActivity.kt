@@ -185,7 +185,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
-        recentProductListAdapter.setItems(recentProducts)
+        binding.rvProductList.post {
+            recentProductListAdapter.setItems(recentProducts)
+        }
     }
 
     private fun setConcatAdapter() {

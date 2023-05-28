@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.respository.recentproduct.source.local
 
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacouse.shopping.model.recentproduct.RecentProducts
 
 interface RecentProductLocalDataSource {
     fun insertRecentProduct(productId: Long)
     fun deleteNotToday(today: String)
-    fun getAllRecentProducts(limit: Int): List<RecentProductEntity>
+    fun getAllRecentProducts(limit: Int, onSuccess: (RecentProducts) -> Unit)
 }

@@ -9,6 +9,9 @@ import woowacourse.shopping.data.database.RecentProductHelper
 import woowacourse.shopping.data.database.getTableName
 import woowacourse.shopping.data.model.RecentProductEntity
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
+import woowacouse.shopping.model.recentproduct.RecentProduct
+import woowacouse.shopping.model.recentproduct.RecentProducts
 import java.time.LocalDateTime
 
 class RecentProductLocalDataSourceImpl(
@@ -16,6 +19,7 @@ class RecentProductLocalDataSourceImpl(
     server: Server,
 ) : RecentProductLocalDataSource {
     private val db = RecentProductHelper(context).writableDatabase
+    private val productDataSource = ProductRemoteDataSourceImpl(server)
     private val tableName = getTableName(server)
 
     override fun insertRecentProduct(productId: Long) {
@@ -65,7 +69,21 @@ class RecentProductLocalDataSourceImpl(
         db.execSQL(sql)
     }
 
-    override fun getAllRecentProducts(limit: Int): List<RecentProductEntity> {
+    override fun getAllRecentProducts(limit: Int, onSuccess: (RecentProducts) -> Unit) {
+        productDataSource.requestDatas({}) { products ->
+            val recentProductEntities = getAllRecentProductsIds(limit)
+            val recentProducts = (
+                recentProductEntities.mapNotNull { recentProductEntity ->
+                    products.find { it.id == recentProductEntity.productId }?.let { product ->
+                        RecentProduct(recentProductEntity.id, product)
+                    }
+                }
+                ).toList()
+            onSuccess(RecentProducts(recentProducts))
+        }
+    }
+
+    private fun getAllRecentProductsIds(limit: Int): List<RecentProductEntity> {
         val result = mutableListOf<RecentProductEntity>()
         val cursor = getCursor(limit)
         with(cursor) {
