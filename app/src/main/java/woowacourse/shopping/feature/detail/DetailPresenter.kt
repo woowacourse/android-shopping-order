@@ -1,67 +1,98 @@
 package woowacourse.shopping.feature.detail
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
+import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
 class DetailPresenter(
     val view: DetailContract.View,
+    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    product: ProductUiModel,
-    recentProductUiModel: RecentProductUiModel?,
+    private val productId: Long,
+    private val recentProductUiModel: RecentProductUiModel?,
 ) : DetailContract.Presenter {
-    override var product: ProductUiModel = product
-        private set
-    override var recentProduct: RecentProductUiModel? = recentProductUiModel
-        private set
+    private val _product: MutableLiveData<ProductUiModel> =
+        MutableLiveData(ProductUiModel(-1, "", "", 0, 0))
+    override val product: LiveData<ProductUiModel>
+        get() = _product
 
-    override val isRecentProduct: Boolean
+    private val isRecentProduct: Boolean
+        get() {
+            recentProductUiModel?.let {
+                return it.product.id == productId
+            }
+            return false
+        }
 
-    init {
-        isRecentProduct = recentProduct?.let {
-            if (product.id == it.product.id) return@let true
-            return@let false
-        } ?: false
-    }
+    override fun initPresenter() {
+        productRepository.fetchProductById(
+            productId,
+            onSuccess = { product ->
+                cartRepository.getAll(
+                    onSuccess = { cartProducts ->
+                        val productUiModel =
+                            cartProducts.find { it.product.id == productId }
+                                ?.toPresentation()?.productUiModel
 
-    override fun initScreen() {
-        if (isRecentProduct || recentProduct == null) return view.hideRecentScreen()
-        recentProduct?.let {
-            view.setRecentScreen(
-                it.product.name,
-                it.product.toMoneyFormat(),
-            )
+                        productUiModel?.let {
+                            _product.postValue(it)
+                        } ?: _product.postValue(product.toPresentation())
+                    },
+                    onFailure = { }
+                )
+            },
+            onFailure = {
+                failedLoadDetailData()
+            }
+        )
+
+        if (isRecentProduct || recentProductUiModel == null) {
+            view.hideRecentScreen()
+        } else {
+            val recentProduct = recentProductUiModel.product
+            view.setRecentScreen(recentProduct.name, recentProduct.toMoneyFormat())
         }
     }
 
     override fun updateProductCount(count: Int) {
         if (count < 0) return
-        product.count = count
+        _product.value?.count = count
     }
 
     override fun handleAddCartClick() {
-        cartRepository.getAll(
-            onSuccess = {
-                val cartProductId =
-                    it.find { cartProduct -> cartProduct.product.id == product.id }?.cartId
-                view.showSelectCartProductCountScreen(product, cartProductId)
-            },
-            onFailure = {},
-        )
+        _product.value?.let {
+            cartRepository.getAll(
+                onSuccess = { carts ->
+                    val cartProductId =
+                        carts.find { it.product.id == productId }?.cartId
+                    view.showSelectCartProductCountScreen(it, cartProductId)
+                },
+                onFailure = {},
+            )
+        }
     }
 
     override fun navigateRecentProductDetail() {
-        recentProduct?.let {
+        recentProductUiModel?.let {
             recentProductRepository.addRecentProduct(it.product.toDomain())
             view.showRecentProductDetailScreen(it)
         }
     }
 
     override fun setProductCountInfo(count: Int) {
-        product = product.copy(count = count)
+        _product.value?.count = count
+    }
+
+    private fun failedLoadDetailData() {
+        view.failedLoadProductInfo()
+        view.exitDetailScreen()
     }
 
     override fun exit() {

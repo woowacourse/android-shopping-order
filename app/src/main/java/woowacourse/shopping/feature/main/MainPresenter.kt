@@ -37,9 +37,7 @@ class MainPresenter(
     override fun initLoadProducts() {
         _mainScreenEvent.value = MainScreenEvent.ShowLoading
         productRepository.fetchFirstProducts(
-            onSuccess = { products ->
-                loadCartInfo(products)
-            },
+            onSuccess = { products -> loadCartInfo(products) },
             onFailure = {}
         )
     }
@@ -77,12 +75,7 @@ class MainPresenter(
     }
 
     override fun showCartCount() {
-        cartRepository.getAll(
-            onSuccess = { cartProducts ->
-                _badgeCount.postValue(cartProducts.sumOf { it.count })
-            },
-            onFailure = {}
-        )
+        updateCartCountBadge()
     }
 
     override fun showProductDetail(productId: Long) {
@@ -119,7 +112,6 @@ class MainPresenter(
             onSuccess = { cartId ->
                 cartProductUiModel.cartId = cartId
                 cartProductUiModel.productUiModel.count = 1
-                // 다시 보내는 과정이 필요할까?
                 updateCartCountBadge()
             },
             onFailure = {},
@@ -133,7 +125,6 @@ class MainPresenter(
             onSuccess = {
                 cartProductUiModel.cartId = -1
                 cartProductUiModel.productUiModel.count = 0
-
                 updateCartCountBadge()
             },
             onFailure = {},
@@ -147,7 +138,6 @@ class MainPresenter(
             count,
             onSuccess = {
                 cartProductUiModel.productUiModel.count = count
-
                 updateCartCountBadge()
             },
             onFailure = {},
@@ -155,9 +145,10 @@ class MainPresenter(
     }
 
     private fun updateCartCountBadge() {
-        _products.value?.let { cartProducts ->
-            _badgeCount.postValue(cartProducts.sumOf { it.productUiModel.count })
-        }
+        cartRepository.getSize(
+            onSuccess = { size -> _badgeCount.postValue(size) },
+            onFailure = {}
+        )
     }
 
     override fun moveToCart() {

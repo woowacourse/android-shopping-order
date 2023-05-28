@@ -119,14 +119,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 startActivity(CartActivity.getIntent(this))
             }
             is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
-                startActivity(DetailActivity.getIntent(this, event.product, event.recentProduct))
-            }
-            is MainContract.View.MainScreenEvent.HideLoadMore -> {
-                hideLoadMore()
+                startActivity(DetailActivity.getIntent(this, event.product.id, event.recentProduct))
             }
             is MainContract.View.MainScreenEvent.ShowLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.VISIBLE
                 binding.productRecyclerView.visibility = View.GONE
+            }
+            is MainContract.View.MainScreenEvent.HideLoadMore -> {
+                hideLoadMore()
             }
             is MainContract.View.MainScreenEvent.HideLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.GONE

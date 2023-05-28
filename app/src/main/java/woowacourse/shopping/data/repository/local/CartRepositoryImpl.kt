@@ -17,6 +17,15 @@ class CartRepositoryImpl(
         )
     }
 
+    override fun getSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
+        cartProductRemoteService.requestCarts(
+            onSuccess = { cartProducts ->
+                onSuccess(cartProducts.sumOf { it.count })
+            },
+            onFailure = onFailure
+        )
+    }
+
     override fun addCartProduct(
         productId: Long,
         onSuccess: (cartId: Long) -> Unit,

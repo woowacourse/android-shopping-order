@@ -8,6 +8,11 @@ interface CartRepository {
         onFailure: () -> Unit,
     )
 
+    fun getSize(
+        onSuccess: (cartCount: Int) -> Unit,
+        onFailure: () -> Unit
+    )
+
     fun addCartProduct(
         productId: Long,
         onSuccess: (cartId: Long) -> Unit,

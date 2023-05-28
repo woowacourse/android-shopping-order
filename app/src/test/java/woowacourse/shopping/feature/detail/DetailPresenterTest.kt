@@ -38,7 +38,7 @@ internal class DetailPresenterTest {
         )
 
         // when
-        presenter.initScreen()
+        presenter.initPresenter()
 
         verify { view.hideRecentScreen() }
     }
@@ -54,7 +54,7 @@ internal class DetailPresenterTest {
         )
 
         // when
-        presenter.initScreen()
+        presenter.initPresenter()
 
         verify { view.setRecentScreen(any(), any()) }
     }
