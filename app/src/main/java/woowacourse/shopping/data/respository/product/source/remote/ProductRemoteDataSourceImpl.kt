@@ -8,8 +8,8 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
+import woowacouse.shopping.model.product.Product
 import java.io.IOException
 
 class ProductRemoteDataSourceImpl(
@@ -18,7 +18,7 @@ class ProductRemoteDataSourceImpl(
 
     override fun requestDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<ProductEntity>) -> Unit,
+        onSuccess: (products: List<Product>) -> Unit,
     ) {
         val client = OkHttpClient()
         val path = PRODUCT
@@ -42,7 +42,7 @@ class ProductRemoteDataSourceImpl(
     override fun requestData(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (products: ProductEntity) -> Unit,
+        onSuccess: (products: Product) -> Unit,
     ) {
         val client = OkHttpClient()
         val path = "$PRODUCT/$productId"
@@ -63,8 +63,8 @@ class ProductRemoteDataSourceImpl(
         })
     }
 
-    private fun parseProductList(response: String): List<ProductEntity> {
-        val products = mutableListOf<ProductEntity>()
+    private fun parseProductList(response: String): List<Product> {
+        val products = mutableListOf<Product>()
         val jsonArray = JSONArray(response)
 
         for (index in 0 until jsonArray.length()) {
@@ -75,13 +75,13 @@ class ProductRemoteDataSourceImpl(
         return products
     }
 
-    private fun parseProduct(json: JSONObject): ProductEntity {
+    private fun parseProduct(json: JSONObject): Product {
         val id = json.getLong("id")
         val name = json.getString("name")
         val price = json.getInt("price")
         val image = json.getString("imageUrl")
 
-        return ProductEntity(id, name, price, image)
+        return Product(id, name, price, image)
     }
 
     companion object {

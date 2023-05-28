@@ -1,14 +1,13 @@
-package woowacourse.shopping.data.respository.product.source.remote
+package woowacouse.shopping.data.repository.product
 
 import woowacouse.shopping.model.product.Product
 
-interface ProductRemoteDataSource {
-    fun requestDatas(
+interface ProductRepository {
+    fun loadDatas(
         onFailure: () -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     )
-
-    fun requestData(
+    fun loadDataById(
         productId: Long,
         onFailure: () -> Unit,
         onSuccess: (products: Product) -> Unit,

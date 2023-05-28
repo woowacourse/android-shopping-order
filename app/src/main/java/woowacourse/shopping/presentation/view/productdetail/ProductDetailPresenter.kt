@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.view.productdetail
 
-import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.product.ProductRepository
+import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacouse.shopping.data.repository.product.ProductRepository
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
@@ -15,8 +15,8 @@ class ProductDetailPresenter(
     private lateinit var product: ProductModel
 
     init {
-        productRepository.loadDataById(productId, ::onFailure) { productEntity ->
-            product = productEntity.toUIModel()
+        productRepository.loadDataById(productId, ::onFailure) { product ->
+            this.product = product.toUIModel()
             loadProductInfo()
         }
     }

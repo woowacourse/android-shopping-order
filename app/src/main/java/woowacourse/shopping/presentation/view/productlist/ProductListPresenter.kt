@@ -3,10 +3,11 @@ package woowacourse.shopping.presentation.view.productlist
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.product.ProductRepository
 import woowacourse.shopping.data.respository.recentproduct.RecentProductRepository
+import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacouse.shopping.data.repository.product.ProductRepository
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -28,7 +29,7 @@ class ProductListPresenter(
 
     override fun initProductItems() {
         productRepository.loadDatas(::onFailure) {
-            val allProducts = it.map { productEntity -> productEntity.toUIModel() }
+            val allProducts = it.map { product -> product.toUIModel() }
             products.addAll(allProducts)
 
             loadCartItems()
