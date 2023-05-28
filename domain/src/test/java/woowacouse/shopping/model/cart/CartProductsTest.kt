@@ -46,10 +46,9 @@ class CartProductsTest {
         )
 
         // when
-        cartProducts.addCart(CartProduct(2, 2, "치킨", 15_000, 1, false))
+        val actual = cartProducts.addCart(CartProduct(2, 2, "치킨", 15_000, 1, false)).getAll()
 
         // then
-        val actual = cartProducts.getAll()
         val expected = listOf(
             CartProduct(1, 1, "피자", 12_000, 1, false),
             CartProduct(2, 2, "치킨", 15_000, 1, false),
@@ -68,10 +67,9 @@ class CartProductsTest {
         )
 
         // when
-        cartProducts.deleteCart(2L)
+        val actual = cartProducts.deleteCart(2L).getAll()
 
         // then
-        val actual = cartProducts.getAll()
         val expected = listOf(
             CartProduct(1, 1, "피자", 12_000, 1, false),
         )
@@ -88,13 +86,62 @@ class CartProductsTest {
         )
 
         // when
-        cartProducts.updateCartChecked(1L)
+        val actual = cartProducts.updateCartChecked(1L, true).getAll()
 
         // then
-        val actual = cartProducts.getAll()
         val expected = listOf(
             CartProduct(1, 1, "피자", 12_000, 1, true),
         )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `장바구니 아이디들로 아이템들의 체크를 변경할 수 있다`() {
+        // given
+        val cartProducts = CartProducts(
+            listOf(
+                CartProduct(1, 1, "피자", 12_000, 1, false),
+                CartProduct(2, 2, "치킨", 15_000, 1, false),
+            )
+        )
+        val cartsIds = listOf(1L, 2L)
+
+        // when
+        val actual = cartProducts.updateAllCartsChecked(cartsIds, true).getAll()
+
+        // then
+        val expected = listOf(
+            CartProduct(1, 1, "피자", 12_000, 1, true),
+            CartProduct(2, 2, "치킨", 15_000, 1, true),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `장바구니 아이템이 2개고, 모든 아이템이 UnChecked 상태라면 총 가격은 0원이다`() {
+        val cartProducts = CartProducts(
+            listOf(
+                CartProduct(1, 1, "피자", 12_000, 1, false),
+                CartProduct(2, 2, "치킨", 15_000, 1, false),
+            )
+        )
+
+        val actual = cartProducts.totalPrice
+        val expected = 0
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `장바구니에 12_000원, 15_000원 아이템들이 Checked 상태면 총 가격은 27_000원이다`() {
+        val cartProducts = CartProducts(
+            listOf(
+                CartProduct(1, 1, "피자", 12_000, 1, true),
+                CartProduct(2, 2, "치킨", 15_000, 1, true),
+            )
+        )
+
+        val actual = cartProducts.totalPrice
+        val expected = 27_000
         assertEquals(expected, actual)
     }
 

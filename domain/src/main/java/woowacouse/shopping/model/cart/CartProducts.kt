@@ -1,23 +1,42 @@
 package woowacouse.shopping.model.cart
 
 class CartProducts(
-    carts: List<CartProduct>
+    private val carts: List<CartProduct>
 ) {
-    private val carts: MutableList<CartProduct> = carts.toMutableList()
+    val totalPrice: Int
+        get() = carts.sumOf { if (it.checked) it.product.price else 0 }
 
-    fun addCart(cartProduct: CartProduct) {
-        carts.add(cartProduct)
+    fun addCart(cartProduct: CartProduct): CartProducts {
+        val newCarts = carts.toMutableList()
+        newCarts.add(cartProduct)
+        return CartProducts(newCarts.toList())
     }
 
-    fun deleteCart(cartId: Long) {
-        carts.removeIf { it.id == cartId }
+    fun deleteCart(cartId: Long): CartProducts {
+        return CartProducts(carts.filterNot { it.id == cartId })
     }
 
-    fun updateCartChecked(cartId: Long) {
-        carts.find { it.id == cartId }?.apply {
-            carts.remove(this)
-            carts.add(updateCartChecked())
+    fun updateCartChecked(cartId: Long, checked: Boolean): CartProducts {
+        return CartProducts(
+            carts.map {
+                if (it.id == cartId) {
+                    it.copy(checked = checked)
+                } else {
+                    it
+                }
+            }
+        )
+    }
+
+    fun updateAllCartsChecked(cartIds: List<Long>, checked: Boolean): CartProducts {
+        val newCartProducts = carts.map {
+            if (it.id in cartIds) {
+                it.copy(checked = checked)
+            } else {
+                it
+            }
         }
+        return CartProducts(newCartProducts)
     }
 
     fun getCart(cartId: Long): CartProduct? =
