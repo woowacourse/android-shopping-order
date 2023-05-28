@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val recentProductClickListener: RecentProductClickListener =
         object : RecentProductClickListener {
             override fun onClick(productId: Long) {
-                presenter.showRecentProductDetail(productId)
+                presenter.showProductDetail(productId)
             }
         }
 
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         mainProductAdapter = MainProductAdapter(productClickListener)
         recentAdapter = RecentAdapter(recentProductClickListener)
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
-        loadAdapter = LoadAdapter { presenter.loadMoreProduct() }
+        loadAdapter = LoadAdapter { presenter.loadMoreProducts() }
     }
 
     private fun initLayoutManager() {
@@ -142,7 +142,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onStart() {
         super.onStart()
-        presenter.initLoadData()
+        presenter.initLoadProducts()
+        presenter.loadRecentProducts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

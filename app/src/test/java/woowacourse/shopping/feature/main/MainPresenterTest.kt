@@ -91,7 +91,7 @@ internal class MainPresenterTest {
         }
 
         // when
-        presenter.loadMoreProduct()
+        presenter.loadMoreProducts()
 
         // then
         val actual = presenter.products.getOrAwaitValue()
