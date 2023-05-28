@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service.cart
+package woowacourse.shopping.data.service.okhttp.cart
 
 import okhttp3.RequestBody.Companion.toRequestBody
 import woowacourse.shopping.ShoppingApplication.Companion.pref

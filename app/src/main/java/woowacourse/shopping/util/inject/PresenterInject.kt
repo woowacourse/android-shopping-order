@@ -5,8 +5,8 @@ import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.cart.CartServiceImpl
-import woowacourse.shopping.data.service.product.ProductServiceImpl
+import woowacourse.shopping.data.service.okhttp.cart.CartServiceImpl
+import woowacourse.shopping.data.service.okhttp.product.ProductServiceImpl
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
@@ -26,7 +26,7 @@ fun inject(
         view = view,
         productRepository = ProductRepositoryImpl(ProductServiceImpl()),
         recentProductRepository = RecentProductRepositoryImpl(
-            dao = RecentProductDaoImpl(createShoppingDatabase(context))
+            dao = RecentProductDaoImpl(createShoppingDatabase(context)),
         ),
         cartRepository = CartRepositoryImpl(CartServiceImpl()),
     )
@@ -41,7 +41,7 @@ fun inject(
     view = view,
     product = detailProduct,
     recentProductRepository = RecentProductRepositoryImpl(
-        dao = RecentProductDaoImpl(createShoppingDatabase(context))
+        dao = RecentProductDaoImpl(createShoppingDatabase(context)),
     ),
     showLastViewedProduct = showLastViewedProduct,
 )

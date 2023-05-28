@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.service.cart.CartService
+import woowacourse.shopping.data.service.okhttp.cart.CartService
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.repository.CartProductId

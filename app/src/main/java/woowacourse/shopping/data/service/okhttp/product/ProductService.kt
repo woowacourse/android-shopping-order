@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.service.product
+package woowacourse.shopping.data.service.okhttp.product
 
 import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.service.cart.ProductId
+import woowacourse.shopping.data.service.okhttp.cart.ProductId
 
 interface ProductService {
     fun getAllProduct(): List<Product>
