@@ -15,7 +15,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
@@ -72,7 +72,7 @@ internal class MainPresenterTest {
 
     @Test
     fun `최근 본 상품 목록을 가져와서 화면에 띄운다`() {
-        every { recentProductRepository.getAll() } returns mockRecentProducts
+        every { recentProductRepository.getAll() } returns mockRecentProducts.map { it.product.id }
         val slot = slot<List<RecentProductUiModel>>()
         every { view.updateRecent(capture(slot)) } just Runs
 

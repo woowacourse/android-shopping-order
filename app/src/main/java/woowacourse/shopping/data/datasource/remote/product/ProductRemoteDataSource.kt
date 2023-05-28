@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote.product
 
 import com.example.domain.model.Product
 

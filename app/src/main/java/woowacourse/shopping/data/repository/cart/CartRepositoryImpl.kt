@@ -1,9 +1,9 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository.cart
 
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.sql.cart.CartDao
+import woowacourse.shopping.data.datasource.local.cart.CartDao
 
 class CartRepositoryImpl(
     private val cartDao: CartDao

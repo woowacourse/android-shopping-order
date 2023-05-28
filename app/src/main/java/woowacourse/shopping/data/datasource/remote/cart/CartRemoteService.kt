@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote.cart
 
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Price
@@ -13,6 +13,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.data.datasource.remote.ServerInfo
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 

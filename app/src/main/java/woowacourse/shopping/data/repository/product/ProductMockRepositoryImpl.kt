@@ -1,9 +1,10 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository.product
 
 import com.example.domain.ProductCache
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
+import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 
 class ProductMockRepositoryImpl(
     private val productCache: ProductCache = ProductCacheImpl

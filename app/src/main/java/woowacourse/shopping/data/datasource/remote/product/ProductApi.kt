@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote.product
 
 import retrofit2.Call
 import retrofit2.http.GET

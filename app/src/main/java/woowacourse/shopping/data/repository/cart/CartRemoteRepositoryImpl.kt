@@ -1,9 +1,10 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository.cart
 
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.datasource.local.cart.CartCache
+import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
 
 class CartRemoteRepositoryImpl(
     private val service: CartRemoteService,

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.sql.cart
+package woowacourse.shopping.data.datasource.local.cart
 
 import android.content.ContentValues
 import android.content.Context

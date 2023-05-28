@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.cart.CartCache
+import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 
 object ServerInfo {
 

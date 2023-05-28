@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote.product
 
 import com.example.domain.model.Price
 import com.example.domain.model.Product
@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
+import woowacourse.shopping.data.datasource.remote.ServerInfo
 import java.io.IOException
 
 class ProductOkHttpService : ProductRemoteDataSource {

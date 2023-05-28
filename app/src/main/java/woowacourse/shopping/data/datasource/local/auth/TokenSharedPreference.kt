@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.datasource.local.auth
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -8,10 +8,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.datasource.local.cart.CartCache
+import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.cart.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel

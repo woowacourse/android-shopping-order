@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.TokenSharedPreference
+import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.databinding.ActivityLoginBinding
 import woowacourse.shopping.feature.main.MainActivity
 import java.util.Base64

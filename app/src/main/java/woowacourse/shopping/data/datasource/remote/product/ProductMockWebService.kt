@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.datasource.remote.product
 
 import com.example.domain.datasource.firstPageProducts
 import com.example.domain.model.Price
@@ -15,7 +15,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONArray
 import java.io.IOException
 
-class ProductMockWebService : ProductRemoteDataSource{
+class ProductMockWebService : ProductRemoteDataSource {
     private lateinit var mockWebServer: MockWebServer
     private val okHttpClient = OkHttpClient()
 

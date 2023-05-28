@@ -1,8 +1,8 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository.recent
 
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.RecentProductRepository
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.data.datasource.local.recent.RecentDao
 
 class RecentProductRepositoryImpl(
     private val recentDao: RecentDao

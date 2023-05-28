@@ -1,9 +1,9 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository.product
 
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
-import woowacourse.shopping.data.service.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSource
 import java.lang.Thread.sleep
 
 class ProductRemoteRepositoryImpl(
