@@ -1,6 +1,8 @@
 package woowacourse.shopping.view.productlist
 
 // import woowacourse.shopping.view.cart.CartActivity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -55,7 +57,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         setLoadingUi()
         setUpPresenter()
         setUpActionBar()
-        presenter.fetchProducts()
+//        presenter.fetchProducts()
     }
 
     private fun setLoadingUi() {
@@ -193,5 +195,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         const val RESULT_ADDED = 300
         const val RESULT_VISIT_CART = 400
         const val ID = "id"
+
+        fun newIntent(context: Context): Intent {
+            return Intent(context, ProductListActivity::class.java)
+        }
     }
 }
