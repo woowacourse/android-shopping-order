@@ -6,7 +6,7 @@ import woowacourse.shopping.ui.shopping.ProductsItemType
 interface ShoppingContract {
     interface View {
         fun setProducts(data: List<ProductsItemType>)
-        fun navigateToProductDetail(product: ProductUIModel, latestProduct: ProductUIModel?)
+        fun navigateToProductDetail(id: Long, latestProduct: ProductUIModel?)
 
         fun addProducts(data: List<ProductsItemType>)
         fun showCountSize(size: Int)

@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.shopping.contract.presenter
 
-import android.util.Log
-import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentRepository
@@ -17,23 +15,23 @@ class ShoppingPresenter(
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository,
+    offset: Int = 0,
 ) : ShoppingContract.Presenter {
     private var productsData: MutableList<ProductsItemType> = mutableListOf()
     private var productSize: Int = 0
-
+    private var productOffset = ProductsOffset(offset, productRepository)
     override fun initProducts() {
-        productRepository.getAllProducts(
-            onSuccess = { Log.d("123123", "123123") },
-            onFailure = { Log.d("123123", "444444") },
+        productRepository.getMoreProducts(
+            productOffset.getOffset(),
+            PRODUCT_COUNT,
+            onSuccess = { products ->
+                productSize += products.size
+                productsData += products.map {
+                    ProductItem(it.toUIModel(), getCount(it.id))
+                }
+                view.setProducts(productsData.plus(ProductReadMore))
+            },
         )
-        val nextProduct = productRepository.getMoreProducts(PRODUCT_COUNT, productSize)
-        productSize += nextProduct.size
-
-        productsData += nextProduct.map { product ->
-            ProductItem(product.toUIModel(), getCount(product.id))
-        }
-
-        view.setProducts(productsData.plus(ProductReadMore))
     }
 
     override fun updateProducts() {
@@ -61,23 +59,23 @@ class ShoppingPresenter(
     }
 
     override fun fetchMoreProducts() {
-        val nextProduct = productRepository.getMoreProducts(PRODUCT_COUNT, productSize)
-        productSize += nextProduct.size
-
-        productsData += nextProduct.map { product: Product ->
-            ProductItem(product.toUIModel(), getCount(product.id))
-        }
-
-        view.addProducts(productsData.plus(ProductReadMore))
+        productOffset = productOffset.plus(PRODUCT_COUNT)
+        productRepository.getMoreProducts(
+            productOffset.getOffset(),
+            PRODUCT_COUNT,
+            onSuccess = { products ->
+                productSize += products.size
+                productsData += products.map {
+                    ProductItem(it.toUIModel(), getCount(it.id))
+                }
+                view.addProducts(productsData.plus(ProductReadMore))
+            },
+        )
     }
 
     override fun navigateToItemDetail(id: Long) {
-//        val latestProduct = recentRepository.getRecent(1).firstOrNull()?.toUIModel()
-//        productRepository.findById(id, onSuccess = {
-//            view.navigateToProductDetail(it.toUIModel(), latestProduct)
-//        }, onFailure = {
-//            // Handle failure case
-//        })
+        val latestProduct = recentRepository.getRecent(1).firstOrNull()?.toUIModel()
+        view.navigateToProductDetail(id, latestProduct)
     }
 
     override fun updateItemCount(id: Long, count: Int) {

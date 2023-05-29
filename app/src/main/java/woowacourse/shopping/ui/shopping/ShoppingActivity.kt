@@ -28,8 +28,7 @@ import woowacourse.shopping.utils.CustomViewOnClickListener
 class ShoppingActivity :
     AppCompatActivity(),
     ShoppingContract.View,
-    ProductsOnClickListener,
-    CustomViewOnClickListener {
+    ProductsOnClickListener {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var presenter: ShoppingContract.Presenter
 
@@ -117,8 +116,8 @@ class ShoppingActivity :
         binding.includeShoppingSkeleton.root.visibility = View.GONE
     }
 
-    override fun navigateToProductDetail(product: ProductUIModel, latestProduct: ProductUIModel?) {
-        startActivity(ProductDetailActivity.from(this, product, latestProduct))
+    override fun navigateToProductDetail(id: Long, latestProduct: ProductUIModel?) {
+        startActivity(ProductDetailActivity.from(this, id, latestProduct))
     }
 
     override fun addProducts(data: List<ProductsItemType>) {
