@@ -6,7 +6,7 @@ import woowacouse.shopping.model.product.Product
 
 class CartProductsTest {
     @Test
-    fun `장바구니 아이디가 1인 아이템을 조회할 수 있다`() {
+    fun `장바구니 아이디가 2인 아이템을 조회할 수 있다`() {
         val cartProducts = CartProducts(
             listOf(
                 CartProduct(1, 1, "피자", 12_000, 1, false),
@@ -14,8 +14,22 @@ class CartProductsTest {
             )
         )
 
-        val actual = cartProducts.getCart(2L)
+        val actual = cartProducts.getCartByCartId(2L)
         val expected = CartProduct(2, 2, "치킨", 15_000, 1, false)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `장바구니의 상품 아이디가 1인 아이템을 조회할 수 있다`() {
+        val cartProducts = CartProducts(
+            listOf(
+                CartProduct(1, 1, "피자", 12_000, 1, false),
+                CartProduct(2, 2, "치킨", 15_000, 1, false),
+            )
+        )
+
+        val actual = cartProducts.getCartByProductId(1L)
+        val expected = CartProduct(1, 1, "피자", 12_000, 1, false)
         assertEquals(expected, actual)
     }
 
@@ -118,6 +132,27 @@ class CartProductsTest {
     }
 
     @Test
+    fun `장바구니 아이디가 1인 아이템의 개수를 3으로 변경할 수 있다`() {
+        // given
+        val cartProducts = CartProducts(
+            listOf(
+                CartProduct(1, 1, "피자", 12_000, 1, false),
+                CartProduct(2, 2, "치킨", 15_000, 1, false),
+            )
+        )
+
+        // when
+        val actual = cartProducts.updateCartCountByCartId(1L, 3).getAll()
+
+        // then
+        val expected = listOf(
+            CartProduct(1, 1, "피자", 12_000, 3, false),
+            CartProduct(2, 2, "치킨", 15_000, 1, false),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `장바구니 아이템이 2개고, 모든 아이템이 UnChecked 상태라면 총 가격은 0원이다`() {
         val cartProducts = CartProducts(
             listOf(
@@ -146,7 +181,14 @@ class CartProductsTest {
     }
 
     companion object {
-        fun CartProduct(cartId: Long, productId: Long, productName: String, price: Int, count: Int, checked: Boolean): CartProduct =
-            CartProduct(cartId, Product(productId, productName, price, "", count), checked)
+        fun CartProduct(
+            cartId: Long,
+            productId: Long,
+            productName: String,
+            price: Int,
+            count: Int,
+            checked: Boolean
+        ): CartProduct =
+            CartProduct(cartId, Product(productId, productName, price, ""), count, checked)
     }
 }
