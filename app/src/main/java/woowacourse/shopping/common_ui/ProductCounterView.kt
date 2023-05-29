@@ -43,8 +43,6 @@ class ProductCounterView @JvmOverloads constructor(
     init {
         binding.counterStartButton.setOnClickListener {
             binding.counterView.count = START_BUTTON_INIT_VALUE
-            countStateChangeListener.onCountChanged(binding.counterView, START_BUTTON_INIT_VALUE)
-            updateViewState(START_BUTTON_INIT_VALUE)
         }
         binding.counterView.visibility = View.GONE
     }
