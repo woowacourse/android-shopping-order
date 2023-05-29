@@ -40,8 +40,11 @@ class CartPresenter(
     override fun onDeleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId) {
             selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
-            showPageUI(currentPage)
-            updateCartUI()
+            getCartItemsOf(currentPage) { cartItems ->
+                if (cartItems.isEmpty() && currentPage > 1) currentPage--
+                showPageUI(currentPage)
+                updateCartUI()
+            }
         }
     }
 
