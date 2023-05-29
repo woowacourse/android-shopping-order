@@ -1,8 +1,8 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.data.repository.retrofit
 
 import woowacourse.shopping.domain.model.Product
 
-interface ProductRepository {
+interface ProductRepositoryNew {
     fun getAllProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,

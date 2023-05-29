@@ -29,8 +29,11 @@ import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.listener.CartProductClickListener
 import woowacourse.shopping.widget.SkeletonCounterView
 
-class ShoppingActivity : AppCompatActivity(), View,
-    SkeletonCounterView.OnCountChangedListener, CartProductClickListener {
+class ShoppingActivity :
+    AppCompatActivity(),
+    View,
+    SkeletonCounterView.OnCountChangedListener,
+    CartProductClickListener {
     private lateinit var binding: ActivityShoppingBinding
     private val presenter: Presenter by lazy { inject(this, this) }
 

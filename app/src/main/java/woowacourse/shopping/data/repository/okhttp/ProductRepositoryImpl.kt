@@ -10,22 +10,42 @@ class ProductRepositoryImpl(
     private val remoteProductDataSource: ProductService,
 ) : ProductRepository {
 
-    override fun getAllProducts(): List<Product> {
-        return remoteProductDataSource.getAllProduct().map { it.toDomain() }
+    override fun getAllProducts(
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        remoteProductDataSource.getAllProduct().map { it.toDomain() }
     }
 
-    override fun findProductById(id: Int): Product? =
+    override fun findProductById(
+        id: Int,
+        onSuccess: (Product?) -> Unit,
+        onFailure: () -> Unit,
+    ) {
         remoteProductDataSource.findProductById(id)?.toDomain()
-
-    override fun insertProduct(product: Product) {
-        remoteProductDataSource.insertProduct(product.toData())
     }
 
-    override fun updateProduct(product: Product) {
+    override fun insertProduct(
+        product: Product,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        remoteProductDataSource.findProductById(product.id)?.toDomain()
+    }
+
+    override fun updateProduct(
+        product: Product,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         remoteProductDataSource.updateProduct(product.toData())
     }
 
-    override fun deleteProduct(product: Product) {
+    override fun deleteProduct(
+        product: Product,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         remoteProductDataSource.deleteProduct(product.toData())
     }
 }

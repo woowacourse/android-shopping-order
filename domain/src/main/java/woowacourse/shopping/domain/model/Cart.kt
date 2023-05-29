@@ -13,27 +13,35 @@ data class Cart(
     val checkedProductTotalPrice: Int = items.sumOf { it.getTotalPrice(true) }
 
     fun select(product: Product): Cart =
-        copy(items = items.map { item ->
-            if (item.product.id == product.id) item.select() else item
-        })
+        copy(
+            items = items.map { item ->
+                if (item.product.id == product.id) item.select() else item
+            },
+        )
 
     fun unselect(product: Product): Cart =
-        copy(items = items.map { item ->
-            if (item.product.id == product.id) item.unselect() else item
-        })
+        copy(
+            items = items.map { item ->
+                if (item.product.id == product.id) item.unselect() else item
+            },
+        )
 
     fun selectAll(page: Page): Cart {
         val cartProductsOfPage = page.takeItems(this)
-        return copy(items = items.map { item ->
-            cartProductsOfPage.find { it.id == item.id }?.select() ?: item
-        })
+        return copy(
+            items = items.map { item ->
+                cartProductsOfPage.find { it.id == item.id }?.select() ?: item
+            },
+        )
     }
 
     fun unselectAll(page: Page): Cart {
         val cartProductsOfPage = page.takeItems(this)
-        return copy(items = items.map { item ->
-            cartProductsOfPage.find { it.id == item.id }?.unselect() ?: item
-        })
+        return copy(
+            items = items.map { item ->
+                cartProductsOfPage.find { it.id == item.id }?.unselect() ?: item
+            },
+        )
     }
 
     fun update(cart: Cart): Cart =
@@ -49,9 +57,11 @@ data class Cart(
         items.find { it.productId == productId }
 
     fun changeProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
-        return copy(items = items.map { item ->
-            if (item.productId == cartProduct.productId) item.changeCount(count) else item
-        })
+        return copy(
+            items = items.map { item ->
+                if (item.productId == cartProduct.productId) item.changeCount(count) else item
+            },
+        )
     }
 
     operator fun plus(cart: Cart): Cart =

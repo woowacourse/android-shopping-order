@@ -1,12 +1,36 @@
 package woowacourse.shopping.data.datasource.product
 
-import retrofit2.Call
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.domain.model.Product
 
 interface ProductDataSource {
-    fun requestProducts(): Call<List<ProductDto>>
-    fun requestProductById(productId: String): Call<ProductDto?>
-    fun insertProduct(product: ProductDto): Call<ProductDto>
-    fun updateProduct(productId: String, product: ProductDto): Call<ProductDto>
-    fun deleteProduct(productId: String): Call<ProductDto>
+    fun requestProducts(
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun requestProductById(
+        productId: String,
+        onSuccess: (Product?) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun insertProduct(
+        product: ProductDto,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun updateProduct(
+        productId: String,
+        product: ProductDto,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun deleteProduct(
+        productId: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    )
 }

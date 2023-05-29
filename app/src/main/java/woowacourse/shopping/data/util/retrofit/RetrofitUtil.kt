@@ -11,7 +11,7 @@ import woowacourse.shopping.data.service.retrofit.product.RetrofitProductService
 import java.lang.reflect.Type
 
 object RetrofitUtil {
-    val okHttpClient: OkHttpClient by lazy {
+    private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(
                 HttpLoggingInterceptor().apply {

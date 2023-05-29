@@ -2,11 +2,11 @@ package woowacourse.shopping.util.inject
 
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
+import woowacourse.shopping.data.datasource.product.ProductDataSourceImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.okhttp.CartRepositoryImpl
-import woowacourse.shopping.data.repository.okhttp.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.okhttp.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.retrofit.ProductRepositoryImpl
 import woowacourse.shopping.data.service.okhttp.cart.CartServiceImpl
-import woowacourse.shopping.data.service.okhttp.product.ProductServiceImpl
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
@@ -24,7 +24,7 @@ fun inject(
 ): ShoppingContract.Presenter {
     return ShoppingPresenter(
         view = view,
-        productRepository = ProductRepositoryImpl(ProductServiceImpl()),
+        productRepository = ProductRepositoryImpl(ProductDataSourceImpl()),
         recentProductRepository = RecentProductRepositoryImpl(
             dao = RecentProductDaoImpl(createShoppingDatabase(context)),
         ),

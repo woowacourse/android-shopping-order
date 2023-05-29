@@ -2,24 +2,31 @@ package woowacourse.shopping.data.datasource.product
 
 import android.util.Log
 import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
+import woowacourse.shopping.domain.model.Product
 
 class ProductDataSourceImpl : ProductDataSource {
     private val baseUrl: String = ShoppingApplication.pref.getBaseUrl().toString()
     private val retrofitService = getProductByRetrofit(baseUrl)
 
-    override fun requestProducts(): Call<List<ProductDto>> {
+    override fun requestProducts(
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val call = retrofitService.requestProducts()
-
         call.enqueue(object : retrofit2.Callback<List<ProductDto>> {
             override fun onResponse(
                 call: Call<List<ProductDto>>,
-                response: retrofit2.Response<List<ProductDto>>,
+                response: Response<List<ProductDto>>,
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
+                    val products = result?.map { it.toDomain() }
+                    products?.let { onSuccess(it) }
                     Log.d("test", "retrofit result: $result")
                 } else {
                     Log.d("test", "retrofit 실패")
@@ -30,20 +37,25 @@ class ProductDataSourceImpl : ProductDataSource {
                 Log.d("test", "retrofit 실패: ${t.message}")
             }
         })
-        return call
     }
 
-    override fun requestProductById(productId: String): Call<ProductDto?> {
+    override fun requestProductById(
+        productId: String,
+        onSuccess: (Product?) -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val call = retrofitService.requestProductById(productId)
-
         call.enqueue(object : retrofit2.Callback<ProductDto?> {
             override fun onResponse(
                 call: Call<ProductDto?>,
-                response: retrofit2.Response<ProductDto?>,
+                response: Response<ProductDto?>,
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
                     Log.d("test", "retrofit requestProductById result: $result")
+                    if (result != null) {
+                        onSuccess(result.toDomain())
+                    }
                 } else {
                     Log.d("test", "retrofit 실패")
                 }
@@ -51,21 +63,26 @@ class ProductDataSourceImpl : ProductDataSource {
 
             override fun onFailure(call: Call<ProductDto?>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure()
             }
         })
-        return call
     }
 
-    override fun insertProduct(product: ProductDto): Call<ProductDto> {
+    override fun insertProduct(
+        product: ProductDto,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val call = retrofitService.insertProduct(product)
 
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
                 call: Call<ProductDto>,
-                response: retrofit2.Response<ProductDto>,
+                response: Response<ProductDto>,
             ) {
                 if (response.isSuccessful) {
                     Log.d("test", "retrofit requestProductById result: $response")
+                    onSuccess()
                 } else {
                     Log.d("test", "retrofit 실패")
                 }
@@ -73,21 +90,26 @@ class ProductDataSourceImpl : ProductDataSource {
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure()
             }
         })
-        return call
     }
 
-    override fun updateProduct(productId: String, product: ProductDto): Call<ProductDto> {
+    override fun updateProduct(
+        productId: String,
+        product: ProductDto,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val call = retrofitService.updateProduct(productId, product)
-
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
                 call: Call<ProductDto>,
-                response: retrofit2.Response<ProductDto>,
+                response: Response<ProductDto>,
             ) {
                 if (response.isSuccessful) {
                     Log.d("test", "retrofit requestProductById result: $response")
+                    onSuccess()
                 } else {
                     Log.d("test", "retrofit 실패")
                 }
@@ -95,21 +117,25 @@ class ProductDataSourceImpl : ProductDataSource {
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure()
             }
         })
-        return call
     }
 
-    override fun deleteProduct(productId: String): Call<ProductDto> {
+    override fun deleteProduct(
+        productId: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val call = retrofitService.deleteProduct(productId)
-
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
                 call: Call<ProductDto>,
-                response: retrofit2.Response<ProductDto>,
+                response: Response<ProductDto>,
             ) {
                 if (response.isSuccessful) {
                     Log.d("test", "retrofit requestProductById result: $response")
+                    onSuccess()
                 } else {
                     Log.d("test", "retrofit 실패")
                 }
@@ -117,8 +143,8 @@ class ProductDataSourceImpl : ProductDataSource {
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure()
             }
         })
-        return call
     }
 }

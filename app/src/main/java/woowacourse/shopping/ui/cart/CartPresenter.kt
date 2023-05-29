@@ -65,7 +65,7 @@ class CartPresenter(
                 cart.unselectAll(currentPage)
             } else {
                 cart.selectAll(currentPage)
-            }
+            },
         )
     }
 
