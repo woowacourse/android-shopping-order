@@ -6,7 +6,7 @@ import okhttp3.Request
 import okhttp3.Response
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.remote.OkHttpModule
+import woowacourse.shopping.data.remote.RetrofitModule
 import java.io.IOException
 import java.lang.Integer.min
 
@@ -17,17 +17,17 @@ class RemoteProductDataSource() : ProductDataSource.Remote {
         lastId: Int,
         onReceived: (products: List<DataProduct>) -> Unit
     ) {
-        val url = "${OkHttpModule.BASE_URL}/products"
+        val url = "${RetrofitModule.BASE_URL}/products"
         val request = Request.Builder()
             .url(url)
             .get()
             .build()
 
-        OkHttpModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
+        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
 
             override fun onResponse(call: Call, response: Response) {
-                val productCache = OkHttpModule.gson.fromJson(
+                val productCache = RetrofitModule.gson.fromJson(
                     response.body?.string(),
                     Array<DataProduct>::class.java
                 ).toList()

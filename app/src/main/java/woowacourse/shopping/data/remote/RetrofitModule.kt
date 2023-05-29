@@ -3,10 +3,12 @@ package woowacourse.shopping.data.remote
 import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-object OkHttpModule {
+object RetrofitModule {
     var BASE_URL = ""
     private const val AUTHORIZATION_FORMAT = "Basic %s"
 
@@ -32,6 +34,12 @@ object OkHttpModule {
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(authorizationInterceptor)
             .build()
+
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(shoppingOkHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     val gson = Gson()
 }
