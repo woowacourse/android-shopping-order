@@ -1,16 +1,16 @@
 package woowacourse.shopping.ui.productdetail.contract.presenter
 
-import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.ProductDetailRepository
 import com.example.domain.repository.RecentRepository
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.productdetail.contract.ProductDetailContract
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
-    private val product: ProductUIModel,
+    private val id: Long,
+    private val repository: ProductDetailRepository,
     private val cartRepository: CartRepository,
     private val recentRepository: RecentRepository,
 ) : ProductDetailContract.Presenter {
@@ -25,24 +25,41 @@ class ProductDetailPresenter(
     }
 
     override fun setUpProductDetail() {
-        view.setProductDetail(product)
+        repository.getById(
+            id,
+            onSuccess =
+            {
+                view.setProductDetail(it.toUIModel())
+            },
+            onFailure = {},
+        )
     }
 
     override fun addProductToCart() {
-        CartProduct(product.toDomain(), count, true).let {
+        /*CartProduct(product.toDomain(), count, true).let {
             cartRepository.insert(it)
-        }
+        }*/
     }
 
     override fun addProductToRecent() {
-        recentRepository.findById(product.id)?.let {
+        recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)
         }
-        recentRepository.insert(product.toDomain())
+        repository.getById(
+            id,
+            onSuccess =
+            { recentRepository.insert(it) },
+            onFailure = {},
+        )
     }
 
     override fun setProductCountDialog() {
-        view.showProductCountDialog(product)
+        repository.getById(
+            id,
+            onSuccess =
+            { view.showProductCountDialog(it.toUIModel()) },
+            onFailure = {},
+        )
     }
 
     override fun setLatestProduct() {
@@ -53,7 +70,7 @@ class ProductDetailPresenter(
     }
 
     override fun clickLatestProduct() {
-        latestProduct?.let { view.navigateToDetail(it) }
+        latestProduct?.let { view.navigateToDetail(it.id) }
     }
 
     override fun addProductCount(id: Long) {

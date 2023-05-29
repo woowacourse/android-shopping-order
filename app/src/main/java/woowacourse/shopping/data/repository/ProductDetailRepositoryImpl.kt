@@ -1,19 +1,16 @@
 package woowacourse.shopping.data.repository
 
 import android.os.Looper
+import android.util.Log
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductDetailRepository
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
+import retrofit2.Call
+import retrofit2.Callback
 import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailSource
-import java.io.IOException
 
 class ProductDetailRepositoryImpl(
     private val productDetailSource: ProductDetailSource,
-): ProductDetailRepository {
+) : ProductDetailRepository {
     override fun getById(id: Long, onSuccess: (Product) -> Unit, onFailure: (Exception) -> Unit) {
         productDetailSource.getById(id).enqueue(
             createResponseCallback(onSuccess, onFailure),
@@ -23,33 +20,26 @@ class ProductDetailRepositoryImpl(
     private inline fun <reified T> createResponseCallback(
         crossinline onSuccess: (T) -> Unit,
         crossinline onFailure: (Exception) -> Unit,
-    ): Callback {
+    ): Callback<T> {
         val handler = android.os.Handler(Looper.getMainLooper())
-        return object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    Thread {
-                        val result = parseToObject<T>(response.body?.string())
-                        handler.post {
-                            onSuccess.invoke(result)
-                        }
-                    }.start()
-                    return
-                }
-                handler.post {
-                    onFailure.invoke(Exception("Response unsuccessful"))
+        return object : Callback<T> {
+            override fun onResponse(call: Call<T>, response: retrofit2.Response<T>) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    handler.post {
+                        Log.d("ProductRepositoryImpl", "responseBody: $responseBody")
+                        onSuccess(responseBody)
+                    }
+                } else {
+                    handler.post {
+                        onFailure(Exception("Response unsuccessful"))
+                    }
                 }
             }
 
-            override fun onFailure(call: Call, e: IOException) {
-                handler.post {
-                    onFailure.invoke(e)
-                }
+            override fun onFailure(call: Call<T>, t: Throwable) {
+                TODO("Not yet implemented")
             }
         }
-    }
-
-    private inline fun <reified T> parseToObject(responseBody: String?): T {
-        return Gson().fromJson(responseBody, object : TypeToken<T>() {}.type)
     }
 }

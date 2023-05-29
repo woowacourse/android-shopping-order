@@ -1,7 +1,8 @@
 package woowacourse.shopping.data.datasource.remote.producdetail
 
-import okhttp3.Call
+import com.example.domain.model.Product
+import retrofit2.Call
 
 interface ProductDetailSource {
-    fun getById(id: Long): Call
+    fun getById(id: Long): Call<Product>
 }
