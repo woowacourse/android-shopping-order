@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.basket
 
+import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.UserRepository
 import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
@@ -11,9 +13,11 @@ import woowacourse.shopping.ui.model.UiBasketProduct
 
 class BasketPresenter(
     override val view: BasketContract.View,
+    private val userRepository: UserRepository,
     private val basketRepository: BasketRepository,
+    private val orderRepository: OrderRepository,
     private var currentPage: Int = 1,
-    private var startId: Int = 0
+    private var startId: Int = 0,
 ) : BasketContract.Presenter {
     private lateinit var basket: Basket
     private val hasNext: Boolean get() = basket.products.lastIndex >= startId + BASKET_PAGING_SIZE
@@ -105,7 +109,7 @@ class BasketPresenter(
     }
 
     override fun deleteBasketProduct(
-        product: UiBasketProduct
+        product: UiBasketProduct,
     ) {
         basketRepository.remove(product.toDomain())
         basket = basket.remove(product.toDomain())
@@ -126,6 +130,25 @@ class BasketPresenter(
     private fun updateCurrentPage(isIncrease: Boolean) {
         if (isIncrease) currentPage += 1 else currentPage -= 1
         view.updateCurrentPage(currentPage)
+    }
+
+    override fun confirmOrder() {
+        userRepository.getUser {
+            view.showOrderConfirmDialog(it)
+        }
+    }
+
+    override fun addOrder(point: Int) {
+        val baskets = basket.products.filter { it.checked }
+        val basketIds = baskets.map { it.id }
+        val totalPrice = baskets.sumOf { it.product.price.value * it.count.value }
+
+        orderRepository.addOrder(
+            basketIds = basketIds,
+            usingPoint = point,
+            totalPrice = totalPrice,
+            onAdded = view::navigateToOrderDetail
+        )
     }
 
     companion object {

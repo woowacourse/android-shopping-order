@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.User
 
 interface BasketContract {
     interface View {
@@ -20,6 +21,10 @@ interface BasketContract {
         fun updateTotalCheckBox(isChecked: Boolean)
 
         fun updateSkeletonState(isLoaded: Boolean)
+
+        fun showOrderConfirmDialog(user: User)
+
+        fun navigateToOrderDetail(orderId: Int)
     }
 
     interface Presenter {
@@ -40,5 +45,7 @@ interface BasketContract {
         fun updateNextPage()
 
         fun deleteBasketProduct(product: UiBasketProduct)
+        fun addOrder(point: Int)
+        fun confirmOrder()
     }
 }

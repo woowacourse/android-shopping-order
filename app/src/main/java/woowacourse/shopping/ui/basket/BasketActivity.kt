@@ -1,25 +1,34 @@
 package woowacourse.shopping.ui.basket
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
+import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
+import woowacourse.shopping.databinding.DialogConfirmOrderBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
 import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.User
+import woowacourse.shopping.ui.orderfinish.OrderDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
 class BasketActivity : AppCompatActivity(), BasketContract.View {
     private lateinit var presenter: BasketContract.Presenter
-
     private lateinit var binding: ActivityBasketBinding
     private lateinit var basketAdapter: BasketAdapter
+    private lateinit var dialogBinding: DialogConfirmOrderBinding
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +41,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         initToolbarBackButton()
         navigatorClickListener()
         initTotalCheckBoxOnCheckedChangedListener()
+        initOrderButtonListener()
     }
 
     private fun initSkeletonAdapter() {
@@ -51,7 +61,9 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     private fun initPresenter() {
         presenter = BasketPresenter(
             this,
-            BasketRepositoryImpl(BasketRemoteDataSourceImpl())
+            basketRepository = BasketRepositoryImpl(BasketRemoteDataSourceImpl()),
+            userRepository = UserRepositoryImpl(UserRemoteDataSourceImpl()),
+            orderRepository = OrderRepositoryImpl(OrderRemoteDataSourceImpl()),
         )
     }
 
@@ -109,6 +121,43 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     override fun updateSkeletonState(isLoaded: Boolean) {
         binding.isLoaded = isLoaded
+    }
+
+    override fun showOrderConfirmDialog(user: User) {
+        setOrderConfirmDialog(user)
+        dialog.show()
+    }
+
+    override fun navigateToOrderDetail(orderId: Int) {
+        val intent = OrderDetailActivity.getIntent(
+            context = this,
+            orderId = 1
+        )
+
+        startActivity(intent)
+    }
+
+    private fun initOrderButtonListener() {
+        binding.tvOrder.setOnClickListener {
+            presenter.confirmOrder()
+        }
+    }
+
+    private fun setOrderConfirmDialog(user: User) {
+        dialogBinding = DialogConfirmOrderBinding.inflate(layoutInflater).apply {
+            this.user = user
+            btnDialogOrder.setOnClickListener {
+                val usingPoint = tvUsingPoint.text
+                    .toString()
+                    .toInt()
+
+                presenter.addOrder(usingPoint)
+            }
+        }
+
+        dialog = AlertDialog.Builder(this)
+            .setView(dialogBinding.root)
+            .create()
     }
 
     companion object {

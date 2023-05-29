@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="user"
+            type="woowacourse.shopping.ui.model.User" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="12dp"
+            android:includeFontPadding="false"
+            android:text="@{user.email}"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="woogi@wooteco.com" />
+
+        <TextView
+            android:id="@+id/tv_available_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:includeFontPadding="false"
+            android:text="@{String.valueOf(user.point)}"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/tv_user_email"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_email"
+            tools:text="사용가능한 적립금: 5000원" />
+
+        <EditText
+            android:id="@+id/tv_using_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:hint="@string/request_input_using_point"
+            android:includeFontPadding="false"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/tv_available_point"
+            app:layout_constraintTop_toBottomOf="@id/tv_available_point" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_dialog_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/woowa_button"
+            android:includeFontPadding="false"
+            android:text="@string/order"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_using_point" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
