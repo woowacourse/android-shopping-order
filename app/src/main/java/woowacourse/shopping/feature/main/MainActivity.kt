@@ -1,7 +1,9 @@
 package woowacourse.shopping.feature.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +32,7 @@ import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.order.OrderActivity
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
@@ -175,6 +178,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
         presenter.setCartProductCount()
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.user_action -> {
+                startActivity(Intent(this, OrderActivity::class.java))
+                true
+            }
+
+            else -> false
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
