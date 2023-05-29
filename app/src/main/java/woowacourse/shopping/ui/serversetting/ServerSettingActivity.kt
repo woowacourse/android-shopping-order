@@ -34,7 +34,7 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun startMain(baseUrl: String) {
-        RetrofitModule.BASE_URL = baseUrl
+        RetrofitModule.setRetrofit(baseUrl)
         val intent = Intent(this, ShoppingActivity::class.java)
         startActivity(intent)
         finish()
