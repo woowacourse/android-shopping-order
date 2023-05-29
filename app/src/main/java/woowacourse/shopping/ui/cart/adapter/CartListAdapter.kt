@@ -1,8 +1,9 @@
 package woowacourse.shopping.ui.cart.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
@@ -14,9 +15,8 @@ class CartListAdapter(
     private val onClickCloseButton: (Long) -> Unit,
     private val onClickCheckBox: (Long, Boolean) -> Unit,
     private val onClickPlus: (Long) -> Unit,
-    private val onClickMinus: (Long) -> Unit,
-    private val cartItems: MutableList<CartItemUIState> = mutableListOf()
-) : RecyclerView.Adapter<CartListAdapter.CartListViewHolder>() {
+    private val onClickMinus: (Long) -> Unit
+) : ListAdapter<CartItemUIState, CartListAdapter.CartListViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartListViewHolder {
         return CartListViewHolder.create(
@@ -28,17 +28,26 @@ class CartListAdapter(
         )
     }
 
-    override fun getItemCount(): Int = cartItems.size
-
     override fun onBindViewHolder(holder: CartListViewHolder, position: Int) {
-        holder.bind(cartItems[position])
+        holder.bind(getItem(position))
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setCartItems(cartItems: List<CartItemUIState>) {
-        this.cartItems.clear()
-        this.cartItems.addAll(cartItems)
-        notifyDataSetChanged()
+        submitList(cartItems)
+    }
+
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<CartItemUIState>() {
+            override fun areItemsTheSame(
+                oldItem: CartItemUIState,
+                newItem: CartItemUIState
+            ): Boolean = oldItem == newItem
+
+            override fun areContentsTheSame(
+                oldItem: CartItemUIState,
+                newItem: CartItemUIState
+            ): Boolean = oldItem == newItem
+        }
     }
 
     class CartListViewHolder private constructor(

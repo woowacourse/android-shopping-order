@@ -29,8 +29,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 presenter.onChangeSelectionOfCartItem(productId, isSelected)
             },
             onClickPlus = { presenter.onPlusCount(it) },
-            onClickMinus = { presenter.onMinusCount(it) },
-            cartItems = mutableListOf()
+            onClickMinus = { presenter.onMinusCount(it) }
         )
     }
 
