@@ -21,9 +21,7 @@ class ShoppingPresenter(
     override fun setUpCartCounts() {
         cartRepository.getAll { result ->
             result.onSuccess { carts ->
-                val cartProducts = carts.all()
-                    .associateBy { it.product.id }
-                    .mapValues { it.value.quantity }
+                val cartProducts = carts.all().associateBy({ it.product.id }, { it.quantity })
                 view.setCartProducts(cartProducts)
             }.onFailure { throwable -> ErrorHandler.printError(throwable) }
         }
