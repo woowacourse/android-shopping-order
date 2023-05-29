@@ -6,7 +6,7 @@ import woowacourse.shopping.presentation.model.ProductModel
 interface CartContract {
     interface Presenter {
         fun loadCart()
-        fun deleteCartProduct(cartProductModel: CartProductModel)
+        fun deleteCartProductModel(cartProductModel: CartProductModel)
         fun subProductCartCount(cartProductModel: CartProductModel)
         fun addProductCartCount(cartProductModel: CartProductModel)
         fun changeProductSelected(productModel: ProductModel)

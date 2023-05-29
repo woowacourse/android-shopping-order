@@ -6,7 +6,7 @@ import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 
 @BindingAdapter("imageGlide")
-fun setImageResource(view: ImageView, imageUrl: String) {
+fun setImageResource(view: ImageView, imageUrl: String?) {
     Glide.with(view.context)
         .load(imageUrl)
         .error(R.drawable.default_image)

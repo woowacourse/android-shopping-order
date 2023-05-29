@@ -12,17 +12,19 @@ class ProductDetailPresenter(
     private lateinit var currentProduct: Product
 
     override fun loadProductDetail(productId: Long) {
-        val product = cartRepository.findProductById(productId)
-        currentProduct = product
-        view.showProductDetail(currentProduct.toPresentation())
+        cartRepository.findProductById(productId) { product ->
+            currentProduct = product
+            view.showProductDetail(product.toPresentation())
+        }
     }
 
     override fun loadRecentProduct(productId: Long) {
-        val recentProduct = cartRepository.findProductById(productId)
-        view.showRecentProduct(recentProduct.toPresentation())
+        cartRepository.findProductById(productId) { recentProduct ->
+            view.showRecentProduct(recentProduct.toPresentation())
+        }
     }
 
     override fun putProductInCart(count: Int) {
-        cartRepository.insertCartProduct(currentProduct.id, count)
+        cartRepository.insertCartProduct(currentProduct.id, count) {}
     }
 }

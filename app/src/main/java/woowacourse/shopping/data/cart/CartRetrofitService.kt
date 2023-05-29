@@ -8,30 +8,30 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.cart.dto.CartProduct
+import woowacourse.shopping.data.cart.dto.CartProducts
 import woowacourse.shopping.data.cart.dto.Location
 
 interface CartRetrofitService {
 
-    @GET("products/cart-items")
+    @GET("/cart-items")
     fun requestCartProducts(
         @Header("Authorization") authorization: String,
-    ): Call<List<CartProduct>>
+    ): Call<CartProducts>
 
-    @POST("products/cart-items")
+    @POST("/cart-items")
     fun insertCartProduct(
         @Header("Authorization") authorization: String,
         @Body productId: Long,
     ): Call<Location>
 
-    @PATCH("products/cart-items/{cartItemId}")
+    @PATCH("/cart-items/{cartItemId}")
     fun updateCartProduct(
         @Header("Authorization") authorization: String,
         @Path("cartItemId") cartItemId: Long,
         @Body quantity: Int,
     ): Call<Nothing>
 
-    @DELETE("products/cart-items/{cartItemId}")
+    @DELETE("/cart-items/{cartItemId}")
     fun deleteCartProduct(
         @Header("Authorization") authorization: String,
         @Path("cartItemId") cartItemId: Long,

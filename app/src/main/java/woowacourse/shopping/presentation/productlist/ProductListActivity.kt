@@ -91,7 +91,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun setRecentProductModels(productModels: List<ProductModel>) {
-        productListAdapter.setRecentProductsItems(productModels)
+        runOnUiThread {
+            productListAdapter.setRecentProductsItems(productModels)
+        }
     }
 
     override fun setCartCount(count: Int) {

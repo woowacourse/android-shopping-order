@@ -18,13 +18,13 @@ class CartPresenter(
     private lateinit var cartPages: CartPages
     override fun loadCart() {
         initCartPages()
-        updateProductsInCurrentPage()
     }
 
     private fun initCartPages() {
-        val productItems =
-            cartRepository.getCartProducts()
-        cartPages = CartPages(CartProducts(productItems), initialPage)
+        cartRepository.getCartProducts {
+            cartPages = CartPages(CartProducts(it), initialPage)
+            updateProductsInCurrentPage()
+        }
     }
 
     private fun updateProductsInCurrentPage() {
@@ -38,29 +38,32 @@ class CartPresenter(
         checkLeftPageAble()
     }
 
-    override fun deleteCartProduct(cartProductModel: CartProductModel) {
-        cartRepository.deleteCartProduct(cartProductModel.cartId)
-        cartPages.deleteProducts(cartProductModel.productModel.toDomain())
-        val deletedProducts = cartPages.getCurrentProducts()
-        if (deletedProducts.size == 0) {
-            minusPage()
-            return
+    override fun deleteCartProductModel(cartProductModel: CartProductModel) {
+        cartRepository.deleteCartProduct(cartProductModel.cartId) {
+            cartPages.deleteProducts(cartProductModel.productModel.toDomain())
+            val deletedProducts = cartPages.getCurrentProducts()
+            if (deletedProducts.size == 0) {
+                minusPage()
+                return@deleteCartProduct
+            }
+            updateProductsInCurrentPage()
         }
-        updateProductsInCurrentPage()
     }
 
     override fun addProductCartCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count + CART_UNIT
-        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount)
-        cartPages.addCountProducts(cartProductModel.productModel.toDomain())
-        updateProductsInCurrentPage()
+        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount) {
+            cartPages.addCountProducts(cartProductModel.productModel.toDomain())
+            updateProductsInCurrentPage()
+        }
     }
 
     override fun subProductCartCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count - CART_UNIT
-        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount)
-        cartPages.subCountProducts(cartProductModel.productModel.toDomain())
-        updateProductsInCurrentPage()
+        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount) {
+            cartPages.subCountProducts(cartProductModel.productModel.toDomain())
+            updateProductsInCurrentPage()
+        }
     }
 
     override fun changeProductSelected(productModel: ProductModel) {

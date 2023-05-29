@@ -104,15 +104,15 @@ class ProductListAdapter(
     private fun isSameProductModel(targetItem: ProductItem, productItem: ProductItem) =
         targetItem.cartProductModel.productModel == productItem.cartProductModel.productModel
 
-    fun setRecentProductsItems(productModel: List<ProductModel>) {
-        if (productModel.isEmpty()) {
+    fun setRecentProductsItems(productModels: List<ProductModel>) {
+        if (productModels.isEmpty()) {
             return
         }
         if (_productItems[RECENT_PRODUCT_VIEW_POSITION] is RecentProductModels) {
-            _productItems[RECENT_PRODUCT_VIEW_POSITION] = RecentProductModels(productModel)
+            _productItems[RECENT_PRODUCT_VIEW_POSITION] = RecentProductModels(productModels)
             notifyItemChanged(RECENT_PRODUCT_VIEW_POSITION)
         } else {
-            _productItems.add(RECENT_PRODUCT_VIEW_POSITION, RecentProductModels(productModel))
+            _productItems.add(RECENT_PRODUCT_VIEW_POSITION, RecentProductModels(productModels))
             notifyItemInserted(RECENT_PRODUCT_VIEW_POSITION)
         }
     }

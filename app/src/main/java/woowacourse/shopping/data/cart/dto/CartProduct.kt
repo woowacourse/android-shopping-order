@@ -5,8 +5,8 @@ import woowacourse.shopping.model.CartProduct
 
 data class CartProduct(
     val id: Long,
-    val quantity: Int,
     val product: Product,
+    val quantity: Int,
 ) {
     fun toDomainCartProduct(): CartProduct {
         return CartProduct(

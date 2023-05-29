@@ -9,12 +9,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDbDao
-import woowacourse.shopping.data.cart.CartDbHelper
+import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductMockServer
-import woowacourse.shopping.data.product.ProductRepositoryImpl
+import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.productdetail.putincartdialog.PutInCartDialogFragment
@@ -24,9 +22,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var binding: ActivityProductDetailBinding
 
     private val presenter: ProductDetailContract.Presenter by lazy {
-        val productRepository = ProductRepositoryImpl(ProductMockServer().url)
-        val cartRepository: CartRepository =
-            CartRepositoryImpl(CartDbDao(CartDbHelper(this)), productRepository)
+
+        val productDataSource = ProductRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val cartDataSource = CartRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource, productDataSource)
         ProductDetailPresenter(this, cartRepository)
     }
 
@@ -125,6 +124,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         private const val PRODUCT_ID_KEY = "PRODUCT_ID_KEY"
         private const val RECENT_PRODUCT_ID_KEY = "RECENT_PRODUCT_ID_KEY"
         private const val DEFAULT_VALUE = -1L
+        private const val USER_ID = "YmVyQGJlci5jb206MTIzNA=="
 
         fun getIntent(context: Context, productId: Long, recentProductId: Long?): Intent {
             return Intent(context, ProductDetailActivity::class.java).apply {
