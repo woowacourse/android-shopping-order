@@ -35,7 +35,7 @@ interface RetrofitCartService {
         @Path("cartId") cartId: Int,
         @Header("Authorization") token: String,
         @Body quantity: QuantityBody
-    ): Call<Void>
+    ): Call<Int>
 
     @DELETE("cart-items/{cartId}")
     fun deleteCart(
