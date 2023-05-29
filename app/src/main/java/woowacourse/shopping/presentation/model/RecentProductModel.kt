@@ -10,6 +10,6 @@ data class RecentProductModel(
 ) : Parcelable {
     companion object {
         val errorData: RecentProductModel =
-            RecentProductModel(-1L, ProductModel(-1L, "", 0, "", 0))
+            RecentProductModel(-1L, ProductModel(-1L, "", 0, ""))
     }
 }

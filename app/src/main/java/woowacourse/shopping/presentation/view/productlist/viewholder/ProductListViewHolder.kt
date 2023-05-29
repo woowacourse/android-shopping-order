@@ -31,6 +31,6 @@ class ProductListViewHolder(
 
     fun bind(product: ProductModel) {
         binding.product = product
-        binding.productCountView.setCount(product.count)
+        binding.productCountView.setCount(1) // TODO 어댑터는 상품이 아닌 CartModel을 갖도록 함
     }
 }

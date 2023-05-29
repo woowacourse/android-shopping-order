@@ -19,7 +19,7 @@ interface CartContract {
     interface Presenter {
         fun initCartItems()
         fun loadCartItems()
-        fun deleteCartItem(itemId: Long)
+        fun deleteCartItem(cartId: Long)
         fun calculatePreviousPage()
         fun calculateNextPage()
         fun calculateTotalPrice()

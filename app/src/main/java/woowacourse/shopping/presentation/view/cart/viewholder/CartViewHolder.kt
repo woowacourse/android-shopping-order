@@ -32,6 +32,6 @@ class CartViewHolder(
     fun bind(cart: CartModel) {
         binding.cart = cart
         binding.cbCartListItem.isChecked = cart.checked
-        binding.countViewCartListItem.updateCount(cart.product.count)
+        binding.countViewCartListItem.updateCount(cart.count)
     }
 }

@@ -1,7 +1,10 @@
 package woowacourse.shopping.presentation.view.productlist
 
+import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
+import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
+import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel.Companion.errorData
@@ -17,6 +20,7 @@ class ProductListPresenter(
     private val recentProductRepository: RecentProductRepository,
 ) : ProductContract.Presenter {
     private val products = mutableListOf<ProductModel>()
+    private var carts = CartProductsModel(listOf())
     private val recentProducts = mutableListOf<RecentProductModel>()
     private var lastScroll = 0
     private var productsStartIndex = 0
@@ -43,16 +47,9 @@ class ProductListPresenter(
 
     override fun loadCartItems() {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val newProducts = products.map { product ->
-                product.copy(
-                    count = carts.find { cart -> cart.product.id == product.id }?.quantity ?: 0,
-                )
-            }
+            this.carts = CartProductsModel(carts.map { it.toUIModel() })
 
-            products.clear()
-            products.addAll(newProducts)
-
-            val allCount = newProducts.sumOf { it.count }
+            val allCount = this.carts.toModel().totalCount
 
             view.setProductItemsView(products.subList(0, getSubToIndex()).toList())
             view.updateToolbarCartCountView(allCount)
@@ -102,37 +99,40 @@ class ProductListPresenter(
     }
 
     override fun updateCount(productId: Long, count: Int) {
-        val product = products.find { it.id == productId } ?: return
-        if (product.count == 0) {
+        val targetCartProduct = carts.toModel().getCartByProductId(productId) ?: return
+        if (targetCartProduct.count == 0) {
             cartRepository.addCartProduct(productId, ::onFailure) {
-                product.count = count
+                this.carts = this.carts.toModel()
+                    .updateCartCountByCartId(targetCartProduct.id, count)
+                    .toUIModel()
 
                 cartRepository.loadAllCarts(::onFailure) { carts ->
-                    val cartProduct =
-                        carts.find { it.product.id == product.id } ?: return@loadAllCarts
-                    cartRepository.addLocalCart(cartProduct.id)
+                    carts.find { it.id == targetCartProduct.id } ?: return@loadAllCarts
+                    cartRepository.addLocalCart(targetCartProduct.id)
                 }
 
-                val allCount = products.sumOf { it.count }
+                val allCount = this.carts.toModel().totalCount
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)
             }
             return
         }
+
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = (carts.find { it.product.id == productId } ?: return@loadAllCarts)
+            val remoteCartProduct = carts.find { it.product.id == productId } ?: return@loadAllCarts
+            cartRepository.addLocalCart(remoteCartProduct.id)
 
-            cartRepository.addLocalCart(cartProduct.id)
-
-            val newCartProduct = cartProduct.copy(quantity = count)
+            val newCartProduct = remoteCartProduct.copy(quantity = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                 if (count == 0) {
                     cartRepository.deleteLocalCart(newCartProduct.id)
                 }
 
-                product.count = count
-                val allCount = products.sumOf { it.count }
+                this.carts = this.carts.toModel().updateCartCountByCartId(remoteCartProduct.id, count)
+                    .toUIModel()
+
+                val allCount = this.carts.toModel().totalCount
 
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)
