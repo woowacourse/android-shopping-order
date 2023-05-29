@@ -15,17 +15,18 @@ abstract class Page(
 
     abstract fun getStartPage(): Page
 
-    abstract fun hasPrevious(): Boolean
-
-    abstract fun hasNext(cart: Cart): Boolean
-
     abstract fun next(): Page
 
     abstract fun update(value: Int): Page
 
     abstract fun takeItems(cart: Cart): List<CartProduct>
 
-    abstract fun getCheckedProductSize(cart: Cart): Int
+    fun hasPrevious(): Boolean = value > MIN_PAGE
+
+    fun hasNext(cart: Cart): Boolean = cart.items.size > sizePerPage * value
+
+    fun getCheckedProductSize(cart: Cart): Int =
+        takeItems(cart).count { item -> item.isChecked }
 
     companion object {
         private const val DEFAULT_PAGE = 1
