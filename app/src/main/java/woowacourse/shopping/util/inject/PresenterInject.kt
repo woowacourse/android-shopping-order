@@ -2,9 +2,9 @@ package woowacourse.shopping.util.inject
 
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.okhttp.CartRepositoryImpl
+import woowacourse.shopping.data.repository.okhttp.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.okhttp.RecentProductRepositoryImpl
 import woowacourse.shopping.data.service.okhttp.cart.CartServiceImpl
 import woowacourse.shopping.data.service.okhttp.product.ProductServiceImpl
 import woowacourse.shopping.model.UiProduct

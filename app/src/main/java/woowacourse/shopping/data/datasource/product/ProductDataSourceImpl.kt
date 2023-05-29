@@ -1,19 +1,14 @@
-package woowacourse.shopping.data.service.retrofit.product
+package woowacourse.shopping.data.datasource.product
 
 import android.util.Log
-import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.Converter
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.ShoppingApplication.Companion.pref
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.util.RetrofitUtil
-import java.lang.reflect.Type
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
 
-class RetrofitProductServiceImpl : RetrofitProductService {
-    private val baseUrl: String = pref.getBaseUrl().toString()
-    private val retrofitService = getRetrofit()
+class ProductDataSourceImpl : ProductDataSource {
+    private val baseUrl: String = ShoppingApplication.pref.getBaseUrl().toString()
+    private val retrofitService = getProductByRetrofit(baseUrl)
 
     override fun requestProducts(): Call<List<ProductDto>> {
         val call = retrofitService.requestProducts()
@@ -126,30 +121,4 @@ class RetrofitProductServiceImpl : RetrofitProductService {
         })
         return call
     }
-
-    private fun getRetrofit(): RetrofitProductService {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(NullOnEmptyConverterFactory())
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(RetrofitUtil.okHttpClient)
-            .build()
-            .create(RetrofitProductService::class.java)
-    }
-
-    class NullOnEmptyConverterFactory : Converter.Factory() {
-        override fun responseBodyConverter(
-            type: Type,
-            annotations: Array<out Annotation>,
-            retrofit: Retrofit,
-        ): Converter<ResponseBody, *> {
-            val delegate = retrofit.nextResponseBodyConverter<Any>(this, type, annotations)
-            return Converter<ResponseBody, Any> {
-                if (it.contentLength() == 0L) return@Converter EmptyResponse()
-                delegate.convert(it)
-            }
-        }
-    }
-
-    class EmptyResponse()
 }

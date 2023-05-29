@@ -1,17 +1,14 @@
-package woowacourse.shopping.data.service.retrofit.cart
+package woowacourse.shopping.data.datasource.cart
 
 import android.util.Log
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.CartProductDto
-import woowacourse.shopping.data.service.retrofit.product.RetrofitProductServiceImpl.NullOnEmptyConverterFactory
-import woowacourse.shopping.util.RetrofitUtil.okHttpClient
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getCartProductByRetrofit
 
-class RetrofitCartProductServiceImpl : RetrofitCartProductService {
+class CartProductDataSourceImpl : CartProductDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
-    private val retrofitService = getRetrofit()
+    private val retrofitService = getCartProductByRetrofit(baseUrl)
 
     override fun requestCartProducts(token: String): Call<List<CartProductDto>> {
         val call = retrofitService.requestCartProducts(token)
@@ -87,7 +84,7 @@ class RetrofitCartProductServiceImpl : RetrofitCartProductService {
         return call
     }
 
-    override fun deleteCartPRoductById(token: String, cartItemId: String): Call<CartProductDto> {
+    override fun deleteCartProductById(token: String, cartItemId: String): Call<CartProductDto> {
         val call = retrofitService.deleteCartPRoductById(token, cartItemId)
 
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
@@ -108,20 +105,5 @@ class RetrofitCartProductServiceImpl : RetrofitCartProductService {
             }
         })
         return call
-    }
-
-//    override fun requestCartProductById(productId: Int): CartProduct? {
-//        val cartProducts = requestCartProducts()
-//        return cartProducts.find { it.product.id == productId }
-//    }
-
-    private fun getRetrofit(): RetrofitCartProductService {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(NullOnEmptyConverterFactory())
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-            .create(RetrofitCartProductService::class.java)
     }
 }

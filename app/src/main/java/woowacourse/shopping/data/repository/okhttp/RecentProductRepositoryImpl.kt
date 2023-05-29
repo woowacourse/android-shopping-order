@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.okhttp
 
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDao
 import woowacourse.shopping.data.mapper.toData
