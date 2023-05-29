@@ -43,7 +43,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
 
         binding.counterView.countStateChangeListener =
             object : CounterView.OnCountStateChangeListener {
-                override fun onCountChanged(counterNavigationView: CounterView?, count: Int) {
+                override fun onCountChanged(counterView: CounterView?, count: Int) {
                     presenter.changeCount(count)
                 }
             }
