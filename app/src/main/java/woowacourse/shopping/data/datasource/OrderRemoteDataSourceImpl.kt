@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.NullOnEmptyConvertFactory
 import woowacourse.shopping.data.model.DataOrderRecord
+import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
@@ -18,6 +19,32 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(OrderService::class.java)
+
+    override fun addOrder(
+        orderRequest: OrderRequest,
+        onAdded: (orderId: Long) -> Unit,
+    ) {
+        orderService.addOrder(
+            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            orderRequest = orderRequest
+        ).enqueue(object : retrofit2.Callback<DataOrderRecord> {
+
+            override fun onResponse(
+                call: Call<DataOrderRecord>,
+                response: Response<DataOrderRecord>,
+            ) {
+                response.headers()["Location"]?.let {
+                    val orderId = it.split("/").last().toLong()
+
+                    onAdded(orderId)
+                }
+            }
+
+            override fun onFailure(call: Call<DataOrderRecord>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
 
     override fun getOrderRecord(
         orderId: Int,
