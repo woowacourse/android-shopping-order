@@ -5,6 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.service.RetrofitCartService
+import woowacourse.shopping.data.service.RetrofitOrderService
 import woowacourse.shopping.data.service.RetrofitProductService
 
 object RetrofitUtil {
@@ -21,6 +22,10 @@ object RetrofitUtil {
 
     val retrofitCartService: RetrofitCartService by lazy {
         getRetrofit().create(RetrofitCartService::class.java)
+    }
+
+    val retrofitOrderService: RetrofitOrderService by lazy {
+        getRetrofit().create(RetrofitOrderService::class.java)
     }
 
     private val okHttpClient: OkHttpClient by lazy {
@@ -42,5 +47,21 @@ object RetrofitUtil {
                 .build()
         }
         return instance!!
+    }
+
+    fun <T> callback(callback: (Result<T>) -> Unit): retrofit2.Callback<T> {
+        return object : retrofit2.Callback<T> {
+            override fun onResponse(call: retrofit2.Call<T>, response: retrofit2.Response<T>) {
+                if (response.isSuccessful) {
+                    callback(Result.success(response.body()!!))
+                } else {
+                    callback(Result.failure(Throwable(response.message())))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<T>, t: Throwable) {
+                callback(Result.failure(t))
+            }
+        }
     }
 }
