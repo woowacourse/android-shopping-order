@@ -97,9 +97,8 @@ class MainPresenter(
         val cartProductUiModel: CartProductUiModel =
             _products.value?.find { it.productUiModel.id == productId }
                 ?: return
-
         when {
-            cartProductUiModel.cartId < 0 -> addFirstProductToCart(cartProductUiModel)
+            cartProductUiModel.cartId <= 0 -> addFirstProductToCart(cartProductUiModel)
             count == 0 -> deleteCartProduct(cartProductUiModel)
             else -> updateCartProductCount(cartProductUiModel, count)
         }

@@ -9,10 +9,10 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
 import woowacourse.shopping.commonUi.CounterView
-import woowacourse.shopping.data.dataSource.remote.cart.CartProductRemoteService
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
+import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getParcelableCompat
 
 class CounterDialog : DialogFragment(), CounterDialogContract.View {
@@ -52,7 +52,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
     private fun setInitPresenter(product: ProductUiModel, cartId: Long?) {
         presenter = CounterDialogPresenter(
             this,
-            CartRepositoryImpl(CartProductRemoteService()),
+            CartRepositoryImpl(ApiModule.createCartService()),
             product,
             cartId,
         )

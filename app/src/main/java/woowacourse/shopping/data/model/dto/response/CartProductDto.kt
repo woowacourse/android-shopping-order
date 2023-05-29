@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.model.dto.response
 
+import com.example.domain.model.CartProduct
 import com.google.gson.annotations.SerializedName
 
 data class CartProductDto(
@@ -9,4 +10,8 @@ data class CartProductDto(
     val count: Int,
     @SerializedName("product")
     val product: ProductDto
-)
+) {
+    fun toDomain(): CartProduct {
+        return CartProduct(id, product.toDomain(), count, true)
+    }
+}

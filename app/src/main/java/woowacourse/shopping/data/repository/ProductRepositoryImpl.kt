@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.remote
+package woowacourse.shopping.data.repository
 
 import com.example.domain.cache.ProductCache
 import com.example.domain.cache.ProductLocalCache
@@ -31,7 +31,7 @@ class ProductRepositoryImpl(
                     allProducts.addAll(
                         products.map {
                             with(it) {
-                                Product(id.toLong(), name, imageUrl, Price(price))
+                                Product(id, name, imageUrl, Price(price))
                             }
                         }
                     )
@@ -70,7 +70,7 @@ class ProductRepositoryImpl(
                 val product = response.body() ?: return onFailure()
                 onSuccess(
                     with(product) {
-                        Product(id.toLong(), name, imageUrl, Price(price))
+                        Product(id, name, imageUrl, Price(price))
                     }
                 )
             }

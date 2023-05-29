@@ -13,10 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.dataSource.recent.RecentDao
-import woowacourse.shopping.data.dataSource.remote.cart.CartProductRemoteService
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
-import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.dialog.CounterDialog
@@ -56,7 +55,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             this,
             ProductRepositoryImpl(ApiModule.createProductService()),
             RecentProductRepositoryImpl(RecentDao(this)),
-            CartRepositoryImpl(CartProductRemoteService()),
+            CartRepositoryImpl(ApiModule.createCartService()),
             productId,
             recentProductUiModel,
         )

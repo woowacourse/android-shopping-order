@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.local
+package woowacourse.shopping.data.repository
 
 import com.example.domain.model.Price
 import com.example.domain.model.Product
