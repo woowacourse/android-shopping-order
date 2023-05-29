@@ -91,7 +91,7 @@ internal class MainPresenterTest {
         }
 
         // when
-        presenter.loadMoreProduct()
+        presenter.loadMoreProducts()
 
         // then
         val actual = presenter.products.getOrAwaitValue()
@@ -106,7 +106,7 @@ internal class MainPresenterTest {
         every { recentProductRepository.getAll() } returns mockRecentProducts
 
         // when
-        presenter.loadRecent()
+        presenter.loadRecentProducts()
 
         // then
         val actual = presenter.recentProducts.getOrAwaitValue()

@@ -6,19 +6,19 @@ import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.repository.remote.MockRemoteProductRepositoryImpl
-import woowacourse.shopping.data.service.MockProductRemoteService
+import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
+import woowacourse.shopping.data.service.ProductRemoteService
 import java.lang.Thread.sleep
 
 internal class MockRemoteProductRepositoryTest {
     private lateinit var mockRemoteProductRepository: ProductRepository
-    private val mockProductRemoteService: MockProductRemoteService =
-        MockProductRemoteService()
+    private val mockProductRemoteService: ProductRemoteService =
+        ProductRemoteService()
 
     @Before
     fun init() {
         mockRemoteProductRepository =
-            MockRemoteProductRepositoryImpl(mockProductRemoteService, ProductLocalCache)
+            ProductRepositoryImpl(mockProductRemoteService, ProductLocalCache)
         ProductLocalCache.clear()
     }
 

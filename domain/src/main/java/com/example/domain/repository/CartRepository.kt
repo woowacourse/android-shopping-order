@@ -26,4 +26,6 @@ interface CartRepository {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     )
+
+    fun getSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit)
 }

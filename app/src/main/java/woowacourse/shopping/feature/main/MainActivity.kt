@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val recentProductClickListener: RecentProductClickListener =
         object : RecentProductClickListener {
             override fun onClick(productId: Long) {
-                presenter.showRecentProductDetail(productId)
+                presenter.showProductDetail(productId)
             }
         }
 
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         mainProductAdapter = MainProductAdapter(productClickListener)
         recentAdapter = RecentAdapter(recentProductClickListener)
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
-        loadAdapter = LoadAdapter { presenter.loadMoreProduct() }
+        loadAdapter = LoadAdapter { presenter.loadMoreProducts() }
     }
 
     private fun initLayoutManager() {
@@ -97,11 +97,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val productRemoteService = ProductRemoteService()
-        val cartProductRemoteService = CartProductRemoteService()
         presenter = MainPresenter(
-            ProductRepositoryImpl(productRemoteService),
-            CartRepositoryImpl(cartProductRemoteService),
+            ProductRepositoryImpl(ProductRemoteService()),
+            CartRepositoryImpl(CartProductRemoteService()),
             RecentProductRepositoryImpl(RecentDao(this)),
         )
     }
@@ -119,14 +117,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 startActivity(CartActivity.getIntent(this))
             }
             is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
-                startActivity(DetailActivity.getIntent(this, event.product, event.recentProduct))
-            }
-            is MainContract.View.MainScreenEvent.HideLoadMore -> {
-                hideLoadMore()
+                startActivity(DetailActivity.getIntent(this, event.product.id, event.recentProduct))
             }
             is MainContract.View.MainScreenEvent.ShowLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.VISIBLE
                 binding.productRecyclerView.visibility = View.GONE
+            }
+            is MainContract.View.MainScreenEvent.HideLoadMore -> {
+                hideLoadMore()
             }
             is MainContract.View.MainScreenEvent.HideLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.GONE
@@ -142,7 +140,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onStart() {
         super.onStart()
-        presenter.initLoadData()
+        presenter.initLoadProducts()
+        presenter.loadRecentProducts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -151,7 +150,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.badge)
 
-        // presenter.loadCartCountSize()
+        presenter.showCartCount()
         return true
     }
 
@@ -184,9 +183,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context): Intent {
-            return Intent(context, MainActivity::class.java)
-        }
+        fun getIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
 
         private const val TOTAL_SPAN = 2
         private const val HALF_SPAN = TOTAL_SPAN / 2

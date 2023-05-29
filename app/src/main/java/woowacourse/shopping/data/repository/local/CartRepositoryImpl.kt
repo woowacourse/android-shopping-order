@@ -45,4 +45,8 @@ class CartRepositoryImpl(
     ) {
         cartProductRemoteService.requestDeleteCartProduct(cartId, onSuccess, onFailure)
     }
+
+    override fun getSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
+        onSuccess(3)
+    }
 }

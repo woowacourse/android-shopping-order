@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.main
 
 import androidx.lifecycle.LiveData
+import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
@@ -20,18 +21,17 @@ interface MainContract {
     }
 
     interface Presenter {
-        val products: LiveData<List<ProductUiModel>>
+        val products: LiveData<List<CartProductUiModel>>
         val recentProducts: LiveData<List<RecentProductUiModel>>
         val badgeCount: LiveData<Int>
         val mainScreenEvent: LiveData<View.MainScreenEvent>
-        fun initLoadData()
         fun initLoadProducts()
-        fun loadRecent()
-        fun moveToCart()
+        fun loadMoreProducts()
+        fun loadRecentProducts()
+        fun showCartCount()
         fun showProductDetail(productId: Long)
-        fun showRecentProductDetail(productId: Long)
         fun changeProductCartCount(productId: Long, count: Int)
-        fun loadMoreProduct()
+        fun moveToCart()
         fun resetProducts()
     }
 }

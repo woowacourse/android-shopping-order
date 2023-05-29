@@ -121,11 +121,11 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
 
         fun getIntent(
             context: Context,
-            product: ProductUiModel,
+            productId: Long,
             recentProductUiModel: RecentProductUiModel?,
         ): Intent {
             return Intent(context, DetailActivity::class.java).apply {
-                putExtra(PRODUCT_KEY, product)
+                putExtra(PRODUCT_KEY, productId)
                 recentProductUiModel?.let { putExtra(RECENT_PRODUCT_KEY, it) }
             }
         }
