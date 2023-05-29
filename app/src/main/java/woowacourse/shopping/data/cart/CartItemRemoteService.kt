@@ -31,6 +31,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful.not()) return
                 val id =
                     response.header("Location")?.removePrefix("/cart-items/")?.toLong() ?: return
                 val savedCartItem = CartItem(
@@ -51,7 +52,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.code != 200) return
+                if (response.isSuccessful.not()) return
                 val body = response.body?.string()
                 val jsonArray = JSONArray(body)
                 val cartItems = (0 until jsonArray.length()).map {
@@ -73,7 +74,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.code != 200) return
+                if (response.isSuccessful.not()) return
                 val body = response.body?.string()
                 val jsonArray = JSONArray(body)
                 val cartItems = (0 until jsonArray.length()).map {
@@ -99,7 +100,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.code == 200) onFinish()
+                if (response.isSuccessful) onFinish()
             }
         })
     }
@@ -113,7 +114,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.code == 204) onFinish()
+                if (response.isSuccessful) onFinish()
             }
         })
     }

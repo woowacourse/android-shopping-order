@@ -22,6 +22,7 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful.not()) return
                 val body = response.body?.string() ?: return
                 val json = JSONArray(body)
                 val products = (0 until json.length()).map {
@@ -41,6 +42,7 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful.not()) return
                 val body = response.body?.string() ?: return
                 val json = JSONArray(body)
                 val products = (0 until json.length()).map {
@@ -67,6 +69,7 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful.not()) return
                 val body = response.body?.string() ?: return
                 val product = parseToProduct(JSONObject(body))
                 onFinish(product)
