@@ -3,6 +3,7 @@
     <string name="menu_cart_title">cart</string>
     <string name="product_price_prefix">금액</string>
     <string name="product_price">%,d원</string>
+    <string name="product_quantity">%,d개</string>
     <string name="exit">exit</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
@@ -30,5 +31,16 @@
     <string name="cart_dialog_btn">담기</string>
     <string name="server_setting_io_server">이오 서버</string>
     <string name="server_setting_jito_server">지토 서버</string>
+
+    <!-- Strings related to order page -->
+    <string name="order_page_order_list">주문 목록</string>
+    <string name="order_page_discount">할인</string>
+    <string name="order_page_point_use">포인트 사용</string>
+    <string name="order_page_money_suffix">원</string>
+    <string name="order_page_available_points">보유 포인트</string>
+    <string name="order_page_order_price">주문 금액</string>
+    <string name="order_page_discount_price">할인 금액</string>
+    <string name="order_page_total_price">총 결제 금액</string>
+    <string name="order_page_order_btn">주문하기</string>
 
 </resources>
