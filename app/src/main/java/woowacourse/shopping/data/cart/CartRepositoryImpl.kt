@@ -12,58 +12,81 @@ class CartRepositoryImpl(
     private val productDataSource: ProductDataSource,
 ) : CartRepository {
 
-    override fun findProductById(productId: Long): Product {
-        return productDataSource.findProductById(productId) ?: Product.defaultProduct
-    }
-
-    override fun getCartProducts(): List<CartProduct> {
-        val cartItems = cartDataSource.getAllCartItems()
-        return cartItems.map {
-            CartProduct(
-                it.id,
-                productDataSource.findProductById(it.productId)!!,
-                quantity = it.quantity,
-                isChecked = true,
-            )
+    override fun findProductById(productId: Long, callback: (Product) -> Unit) {
+        productDataSource.findProductById(productId) { productDetail ->
+            callback(productDetail.product.toDomainProduct())
         }
     }
 
-    override fun getCartProduct(productId: Long): CartProduct {
-        val cartItem = cartDataSource.getCartItem(productId)
-        return CartProduct(
-            cartItem.id,
-            productDataSource.findProductById(cartItem.productId)!!,
-            cartItem.quantity,
-            true,
-        )
-    }
-
-    override fun deleteCartProduct(productId: Long) {
-        val cartItem = cartDataSource.getCartItem(productId)
-        cartDataSource.deleteCartItem(cartItem.id)
-    }
-
-    override fun insertCartProduct(productId: Long, count: Int) {
-        cartDataSource.insertCartItem(productId)
-        if (count > 1) {
-            val cartItem = cartDataSource.getCartItem(productId)
-            cartDataSource.updateCartItem(cartItem.id, count)
+    override fun getCartProducts(callback: (List<CartProduct>) -> Unit) {
+        cartDataSource.getAllCartProducts { cartProducts ->
+            callback(cartProducts.map { it.toDomainCartProduct() })
         }
     }
 
-    override fun updateCartProductCount(cartId: Long, count: Int) {
+//    override fun getCartProduct(productId: Long): CartProduct {
+//        val cartProduct = cartDataSource.getCartProduct(productId)
+//        return CartProduct(
+//            cartProduct.id,
+//            cartProduct.product.toDomainProduct(),
+//            cartProduct.quantity,
+//            true,
+//        )
+//    }
+
+    override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
+        cartDataSource.deleteCartProduct(cartId, callback)
+    }
+
+    override fun insertCartProduct(productId: Long, count: Int, callback: () -> Unit) {
+        cartDataSource.insertCartProduct(productId) { cartId ->
+            if (count > 1) {
+                cartDataSource.updateCartProduct(cartId, count) {
+                    callback()
+                    return@updateCartProduct
+                }
+            }
+        }
+        callback()
+    }
+
+    override fun updateCartProductCount(cartId: Long, count: Int, callback: () -> Unit) {
         if (count <= 0) {
-            cartDataSource.deleteCartItem(cartId)
-            return
+            cartDataSource.deleteCartProduct(cartId) {
+                callback()
+                return@deleteCartProduct
+            }
         }
-        cartDataSource.updateCartItem(cartId, count)
+        cartDataSource.updateCartProduct(cartId, count) {
+            callback()
+        }
     }
 
-    override fun getProductsByRange(startIndex: Int, size: Int): List<CartProductModel> {
-        val products = productDataSource.getProductsWithRange(startIndex, size)
-        return products.map {
-            val cartItem = cartDataSource.getCartItem(it.id)
-            UnCheckableCartProductModel(cartItem.id, it.toPresentation(), cartItem.quantity)
+    override fun getProductsByRange(
+        lastProductId: Long,
+        pageItemCount: Int,
+        callback: (List<CartProductModel>, Boolean) -> Unit,
+    ) {
+        productDataSource.getProductsWithRange(
+            lastProductId,
+            pageItemCount,
+        ) { productDetails, isLast ->
+            val cartProductModels = productDetails.map {
+                if (it.cartItem == null) {
+                    UnCheckableCartProductModel(
+                        0,
+                        it.product.toDomainProduct().toPresentation(),
+                        0,
+                    )
+                } else {
+                    UnCheckableCartProductModel(
+                        it.cartItem.id,
+                        it.product.toDomainProduct().toPresentation(),
+                        it.cartItem.quantity,
+                    )
+                }
+            }
+            callback(cartProductModels, isLast)
         }
     }
 }

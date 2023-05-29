@@ -1,9 +1,12 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.cart.dto.CartProduct
+
 interface CartDataSource {
-    fun insertCartItem(productId: Long)
-    fun deleteCartItem(cartId: Long)
-    fun updateCartItem(cartId: Long, quantity: Int)
-    fun getCartItem(productId: Long): CartItem
-    fun getAllCartItems(): List<CartItem>
+    fun insertCartProduct(productId: Long, callback: (cartId: Long) -> Unit)
+    fun deleteCartProduct(cartId: Long, callback: () -> Unit)
+    fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit)
+
+    //    fun getCartProduct(productId: Long, callback: (CartProduct) -> Unit)
+    fun getAllCartProducts(callback: (List<CartProduct>) -> Unit)
 }
