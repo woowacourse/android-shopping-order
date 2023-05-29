@@ -6,12 +6,13 @@ import retrofit2.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.util.RetrofitUtil
 import java.lang.reflect.Type
 
 class RetrofitProductServiceImpl : RetrofitProductService {
-    private val baseUrl: String = ShoppingApplication.pref.getBaseUrl().toString()
+    private val baseUrl: String = pref.getBaseUrl().toString()
     private val retrofitService = getRetrofit()
 
     override fun requestProducts(): Call<List<ProductDto>> {
@@ -131,6 +132,7 @@ class RetrofitProductServiceImpl : RetrofitProductService {
             .baseUrl(baseUrl)
             .addConverterFactory(NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
+            .client(RetrofitUtil.okHttpClient)
             .build()
             .create(RetrofitProductService::class.java)
     }
