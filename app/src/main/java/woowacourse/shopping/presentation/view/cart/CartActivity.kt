@@ -60,7 +60,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
-        setAllProduceCheckedClick()
+        setAllProductCheckedClick()
     }
 
     private fun setPresenter() {
@@ -132,8 +132,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    private fun setAllProduceCheckedClick() {
-        binding.cbCartAll.setOnCheckedChangeListener { _, isChecked ->
+    private fun setAllProductCheckedClick() {
+        binding.cbCartAll.setOnCheckedChangeListener { view, isChecked ->
+            if (view.isPressed.not()) return@setOnCheckedChangeListener
             presenter.updateCurrentPageAllProductChecked(isChecked)
             presenter.calculateTotalPrice()
         }
@@ -145,9 +146,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setAllCartChecked(isChecked: Boolean) {
         binding.cbCartAll.post {
-            binding.cbCartAll.setOnCheckedChangeListener { _, _ -> }
             binding.cbCartAll.isChecked = isChecked
-            setAllProduceCheckedClick()
         }
     }
 
