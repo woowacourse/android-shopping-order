@@ -4,7 +4,7 @@ import woowacourse.shopping.model.OrderUiModel
 
 interface OrderContract {
     interface View {
-        fun addOrders(orders: List<OrderUiModel>)
+        fun showOrders(orders: List<OrderUiModel>)
         fun showOrderDetailScreen(orderId: Int)
     }
 
