@@ -40,8 +40,6 @@ class ProductCountView @JvmOverloads constructor(
     init {
         binding.fabProductCount.setOnClickListener {
             binding.countViewProductCount.updateCount(DEFAULT_COUNT)
-            countStateChangeListener.onCountChanged(binding.countViewProductCount, DEFAULT_COUNT)
-            updateCountViewVisibility(DEFAULT_COUNT)
         }
         binding.countViewProductCount.visibility = View.GONE
     }
