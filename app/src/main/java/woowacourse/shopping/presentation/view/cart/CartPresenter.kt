@@ -116,7 +116,7 @@ class CartPresenter(
         for (index in startPosition until getCurrentPageCartLastIndex()) {
             updateProductChecked(carts.carts[index].id, isChecked)
         }
-        view.updateAllChecking(0, DISPLAY_CART_COUNT_CONDITION)
+        view.setChangedCartItemsView(carts.carts.subList(startPosition, getCurrentPageCartLastIndex()))
     }
 
     companion object {

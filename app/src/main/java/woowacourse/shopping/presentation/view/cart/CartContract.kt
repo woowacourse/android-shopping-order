@@ -11,7 +11,6 @@ interface CartContract {
         fun setAllCartChecked(isChecked: Boolean)
         fun setPageCountView(page: Int)
         fun setTotalPriceView(totalPrice: Int)
-        fun updateAllChecking(startPosition: Int, count: Int)
         fun setLayoutVisibility()
         fun handleErrorView()
     }

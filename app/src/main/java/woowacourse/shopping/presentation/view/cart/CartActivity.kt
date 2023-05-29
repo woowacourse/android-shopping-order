@@ -140,10 +140,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun updateAllChecking(startPosition: Int, count: Int) {
-        cartAdapter.updateAllChecking(startPosition, count)
-    }
-
     override fun setAllCartChecked(isChecked: Boolean) {
         binding.cbCartAll.post {
             binding.cbCartAll.isChecked = isChecked
