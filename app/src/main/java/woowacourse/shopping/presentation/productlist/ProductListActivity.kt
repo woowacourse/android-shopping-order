@@ -8,13 +8,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDbDao
-import woowacourse.shopping.data.cart.CartDbHelper
+import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductMockServer
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
-import woowacourse.shopping.data.recentproduct.RecentProductIdDbAdapter
+import woowacourse.shopping.data.product.ProductRemoteDataSource
+import woowacourse.shopping.data.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -30,10 +28,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var productListAdapter: ProductListAdapter
 
     private val presenter: ProductListPresenter by lazy {
-        val productRepository = ProductRepositoryImpl(ProductMockServer().url)
-        val recentProductRepository = RecentProductIdDbAdapter(RecentProductDbHelper(this))
-        val cartProductRepository =
-            CartRepositoryImpl(CartDbDao(CartDbHelper(this)), productRepository)
+        val productDataSource = ProductRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val cartDataSource = CartRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+
+        val recentProductDao =
+            RecentProductDatabase.getInstance(applicationContext).recentProductDao()
+        val recentProductRepository = RecentProductRepositoryImpl(recentProductDao)
+
+        val cartProductRepository = CartRepositoryImpl(cartDataSource, productDataSource)
 
         ProductListPresenter(this, cartProductRepository, recentProductRepository)
     }
@@ -81,9 +83,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         binding.recyclerProduct.adapter = productListAdapter
     }
 
-    override fun setProductModels(cartProductModels: List<CartProductModel>) {
+    override fun setProductModels(cartProductModels: List<CartProductModel>, isLast: Boolean) {
         productListAdapter.setProductItems(
             cartProductModels.map { ProductViewType.ProductItem(it) },
+            isLast,
         )
     }
 
@@ -112,7 +115,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun productClick(productModel: ProductModel) {
-        presenter.saveRecentProductId(productModel.id)
+        presenter.saveRecentProductId(productModel)
         showProductDetail(productModel.id)
     }
 
@@ -136,6 +139,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     companion object {
         private const val SPAN_COUNT = 2
+        private const val USER_ID = "YmVyQGJlci5jb206MTIzNA=="
         fun getIntent(context: Context): Intent {
             return Intent(context, ProductListActivity::class.java)
         }

@@ -67,12 +67,17 @@ class ProductListAdapter(
         }
     }
 
-    fun setProductItems(productItems: List<ProductItem>) {
+    fun setProductItems(productItems: List<ProductItem>, isLast: Boolean) {
         val beforeLastIndex = _productItems.lastIndex
         _productItems.addAll(
             beforeLastIndex,
             productItems,
         )
+        if (isLast) {
+            _productItems.removeLast()
+            notifyItemRangeChanged(beforeLastIndex, productItems.size + 1)
+            return
+        }
         notifyItemRangeInserted(beforeLastIndex, productItems.size)
     }
 
@@ -100,6 +105,9 @@ class ProductListAdapter(
         targetItem.cartProductModel.productModel == productItem.cartProductModel.productModel
 
     fun setRecentProductsItems(productModel: List<ProductModel>) {
+        if (productModel.isEmpty()) {
+            return
+        }
         if (_productItems[RECENT_PRODUCT_VIEW_POSITION] is RecentProductModels) {
             _productItems[RECENT_PRODUCT_VIEW_POSITION] = RecentProductModels(productModel)
             notifyItemChanged(RECENT_PRODUCT_VIEW_POSITION)
