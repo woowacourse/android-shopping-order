@@ -3,21 +3,13 @@ package woowacourse.shopping.data.datasource.user
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.NullOnEmptyConvertFactory
+import woowacourse.shopping.data.NetworkModule
 import woowacourse.shopping.data.model.DataUser
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class UserRemoteDataSourceImpl : UserRemoteDataSource {
 
-    private val url = OkHttpModule.BASE_URL
-    private val userService = Retrofit.Builder()
-        .baseUrl(url)
-        .addConverterFactory(NullOnEmptyConvertFactory)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(UserService::class.java)
+    private val userService = NetworkModule.getService<UserService>()
 
     override fun getUser(onReceived: (user: DataUser) -> Unit) {
         userService.getUser(

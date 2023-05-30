@@ -3,22 +3,14 @@ package woowacourse.shopping.data.datasource.order
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.NullOnEmptyConvertFactory
+import woowacourse.shopping.data.NetworkModule
 import woowacourse.shopping.data.model.DataOrder
 import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
-    private val url = OkHttpModule.BASE_URL
-    private val orderService = Retrofit.Builder()
-        .baseUrl(url)
-        .addConverterFactory(NullOnEmptyConvertFactory)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(OrderService::class.java)
+    private val orderService: OrderService = NetworkModule.getService()
 
     override fun addOrder(
         orderRequest: OrderRequest,
