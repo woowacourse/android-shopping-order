@@ -51,6 +51,6 @@ class OrderListAdapter(
             clear()
             addAll(orders)
         }
-        notifyItemRangeInserted(0, itemCount)
+        notifyDataSetChanged()
     }
 }

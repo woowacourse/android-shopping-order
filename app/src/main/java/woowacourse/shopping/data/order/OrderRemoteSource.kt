@@ -64,7 +64,6 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
                     response: Response<List<OrderEntity>>
                 ) {
                     if (response.code() != 200) return
-                    response.body()?.forEach { println(it.cartItems.size) }
                     onFinish(response.body()?.map { it.toDomain() } ?: return)
                 }
 

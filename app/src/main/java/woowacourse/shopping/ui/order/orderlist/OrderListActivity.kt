@@ -4,10 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
 import woowacourse.shopping.databinding.ActivityOrderListBinding
+import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.order.uistate.OrderUIState
@@ -19,7 +23,9 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private val presenter: OrderListContract.Presenter by lazy {
-        OrderListPresenter(this, DefaultOrderRepository(OrderRemoteSource(ServerConfiguration.host)))
+        OrderListPresenter(
+            this, DefaultOrderRepository(OrderRemoteSource(ServerConfiguration.host))
+        )
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {
@@ -33,6 +39,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         initToolbar()
         initRecycler()
         initOrders()
+        initUsers()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -41,6 +48,25 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    override fun showUserList(users: List<User>) {
+        binding.orderListUserSpinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, users.map { it.name })
+        binding.orderListUserSpinner.setSelection(0, false)
+        binding.orderListUserSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                presenter.loadOrders()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
     }
 
     override fun showOrders(orders: List<OrderUIState>) {
@@ -62,6 +88,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     private fun initOrders() {
         presenter.loadOrders()
+    }
+
+    private fun initUsers() {
+        presenter.loadUsers()
     }
 
     companion object {
