@@ -62,7 +62,7 @@
                         android:textSize="22sp"
                         android:textColor="@color/black"
                         android:layout_marginEnd="12dp"
-                        tools:text="10000"
+                        tools:hint="0"
                         app:layout_constraintTop_toTopOf="@id/text_order_total_point" />
 
 

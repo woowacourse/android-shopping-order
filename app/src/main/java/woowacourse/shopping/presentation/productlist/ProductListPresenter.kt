@@ -79,13 +79,6 @@ class ProductListPresenter(
             }
         }
     }
-
-    override fun showMyCart() {
-        cartRepository.getAllCartItems { cartProducts ->
-            view.navigateToCart(cartProducts.map { it.toPresentation() })
-        }
-    }
-
     companion object {
         private const val PRODUCTS_SIZE = 20
         private const val RECENT_PRODUCTS_SIZE = 10

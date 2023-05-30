@@ -22,7 +22,6 @@ import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.BadgeCartBinding
 import woowacourse.shopping.presentation.cart.CartActivity
-import woowacourse.shopping.presentation.model.CartProductInfoListModel
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
@@ -138,15 +137,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             )
         cartMenuItem.actionView = cartIconBinding?.root
         cartIconBinding?.iconCartMenu?.setOnClickListener {
-            presenter.showMyCart()
+            startActivity(CartActivity.getIntent(this))
         }
         presenter.updateCartCount()
     }
-
-    override fun navigateToCart(cartProductInfoModels: List<CartProductInfoModel>) {
-        startActivity(CartActivity.getIntent(this, CartProductInfoListModel(cartProductInfoModels)))
-    }
-
     override fun setLoadingViewVisible(isVisible: Boolean) {
         if (isVisible) {
             activityBinding.flProductList.visibility = View.VISIBLE

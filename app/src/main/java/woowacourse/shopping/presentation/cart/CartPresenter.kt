@@ -19,14 +19,10 @@ class CartPresenter(
         CartProductInfoList(emptyList())
     private val pageProducts get() = cartProducts.getItemsInRange(offset, paging.limit)
 
-    init {
+    override fun initViewByLoadedItems() {
         cartRepository.getAllCartItems {
             cartProducts = CartProductInfoList(it)
-            refreshCurrentPage()
-            updateOrderCount()
-            updateOrderPrice()
-            view.setPage(paging.currentPage.value.toString())
-            view.setLoadingViewVisible(false)
+            view.showInitView(paging.currentPage.value.toString(), false)
         }
     }
 
@@ -98,14 +94,12 @@ class CartPresenter(
         view.setOrderCount(count)
     }
 
-    override fun deleteProductItem(cartProductModel: CartProductInfoModel) {
+    override fun deleteProductItem(
+        cartProductModel: CartProductInfoModel,
+    ) {
         cartRepository.deleteCartItem(cartProductModel.id) {
             cartProducts = cartProducts.delete(cartProductModel.toDomain())
-            updateOrderCount()
-            updateOrderPrice()
-            refreshCurrentPage()
-            checkCurrentPageProductsOrderState()
-            checkPlusPageAble()
+            view.showDeletedCartView()
         }
     }
 

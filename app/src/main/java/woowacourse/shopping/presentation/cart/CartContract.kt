@@ -19,9 +19,11 @@ interface CartContract {
         fun updateOrderPrice()
         fun updateOrderCount()
         fun updateProductPrice(cartProductModel: CartProductInfoModel)
+        fun initViewByLoadedItems()
     }
 
     interface View {
+        fun showDeletedCartView()
         fun setCartItems(productModels: List<CartProductInfoModel>)
         fun setUpPlusPageState(isEnable: Boolean)
         fun setUpMinusPageState(isEnable: Boolean)
@@ -31,5 +33,6 @@ interface CartContract {
         fun setProductPrice(price: Int)
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
+        fun showInitView(currentPage: String, loadingState: Boolean)
     }
 }

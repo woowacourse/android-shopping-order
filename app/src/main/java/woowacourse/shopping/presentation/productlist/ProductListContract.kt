@@ -10,7 +10,6 @@ interface ProductListContract {
         fun updateCartCount()
         fun loadMoreProductItems()
         fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int)
-        fun showMyCart()
         fun addCartItem(cartProductModel: CartProductInfoModel)
     }
 
@@ -18,7 +17,6 @@ interface ProductListContract {
         fun loadProductItems(cartProductModels: List<CartProductInfoModel>)
         fun loadRecentProductItems(productModels: List<ProductModel>)
         fun showCartCount(count: Int)
-        fun navigateToCart(cartProductInfoModels: List<CartProductInfoModel>)
         fun setLoadingViewVisible(isVisible: Boolean)
     }
 }

@@ -12,7 +12,6 @@ import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.model.CartProductInfoListModel
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -31,7 +30,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
-        managePaging()
     }
 
     override fun onStart() {
@@ -48,8 +46,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initView() {
         initCartAdapter()
         setToolBar()
-        presenter.checkPlusPageAble()
-        presenter.checkMinusPageAble()
+        presenter.initViewByLoadedItems()
+        managePaging()
         allOrderedCheckBoxChange()
     }
 
@@ -68,12 +66,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun updateView() {
-        presenter.refreshCurrentPage()
-        presenter.checkPlusPageAble()
-        presenter.checkMinusPageAble()
-        presenter.checkCurrentPageProductsOrderState()
-        presenter.updateOrderPrice()
-        presenter.updateOrderCount()
+        with(presenter) {
+            refreshCurrentPage()
+            checkPlusPageAble()
+            checkMinusPageAble()
+            checkCurrentPageProductsOrderState()
+            updateOrderPrice()
+            updateOrderCount()
+        }
     }
 
     private fun managePaging() {
@@ -111,6 +111,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.updateOrderPrice()
             presenter.updateOrderCount()
         }
+    }
+
+    override fun showDeletedCartView() {
+        updateView()
     }
 
     override fun setCartItems(productModels: List<CartProductInfoModel>) {
@@ -162,6 +166,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun showInitView(currentPage: String, loadingState: Boolean) {
+        updateView()
+        setPage(currentPage)
+        setLoadingViewVisible(loadingState)
+    }
+
     override fun setOrderPrice(totalPrice: Int) {
         binding.textCartPrice.text = getString(R.string.price_format, totalPrice)
     }
@@ -172,10 +182,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     companion object {
         private const val CART_PRODUCTS_KEY = "CART_PRODUCTS_KEY"
-        fun getIntent(context: Context, cartProducts: CartProductInfoListModel): Intent {
-            val intent = Intent(context, CartActivity::class.java)
-            intent.putExtra(CART_PRODUCTS_KEY, cartProducts)
-            return intent
+        fun getIntent(context: Context): Intent {
+            return Intent(context, CartActivity::class.java)
         }
     }
 }
