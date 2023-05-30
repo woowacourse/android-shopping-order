@@ -9,7 +9,7 @@ object CustomBindingAdapter {
 
     @BindingAdapter("imgResId")
     @JvmStatic
-    fun setImageResource(view: ImageView, url: String) {
+    fun setImageResource(view: ImageView, url: String?) {
         Glide.with(view.context)
             .load(url)
             .error(R.drawable.ic_launcher_foreground)

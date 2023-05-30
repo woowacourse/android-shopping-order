@@ -8,8 +8,8 @@ class AuthInfoDataSourceImpl private constructor(context: Context) : AuthInfoDat
     private val sharedPreference: SharedPreferences =
         context.getSharedPreferences(AUTH_INFO, Context.MODE_PRIVATE)
 
-    override fun getAuthInfo(token: String) {
-        sharedPreference.getString(USER_ACCESS_TOKEN, token)
+    override fun getAuthInfo(): String? {
+        return sharedPreference.getString(USER_ACCESS_TOKEN, null)
     }
 
     override fun setAuthInfo(token: String) {
