@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -13,8 +14,6 @@ import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoListModel
 import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.util.getParcelableExtraCompat
-import woowacourse.shopping.util.noIntentExceptionHandler
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -23,25 +22,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var cartProductsModel: List<CartProductInfoModel>
     private val presenter: CartContract.Presenter by lazy { initPresenter() }
 
-    private fun initProductModel() {
-        intent.getParcelableExtraCompat<CartProductInfoListModel>(CART_PRODUCTS_KEY)
-            ?.let { receivedCartProduct ->
-                cartProductsModel = receivedCartProduct.items
-            } ?: noIntentExceptionHandler(getString(R.string.product_model_null_error_message))
-    }
-
     private fun initPresenter(): CartContract.Presenter {
-        initProductModel()
         return CartPresenter(
             this,
             CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this))),
-            cartProductsModel,
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
+        setLoadingViewVisible(true)
         initView()
         managePaging()
     }
@@ -158,7 +149,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setLoadingViewVisible(isVisible: Boolean) {
-        TODO("Not yet implemented")
+        if (isVisible) {
+            binding.containerCart.visibility = View.GONE
+            binding.flCartList.visibility = View.VISIBLE
+        } else {
+            binding.containerCart.visibility = View.VISIBLE
+            binding.flCartList.visibility = View.GONE
+        }
     }
 
     override fun setOrderPrice(totalPrice: Int) {
