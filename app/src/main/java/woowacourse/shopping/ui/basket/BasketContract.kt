@@ -22,7 +22,7 @@ interface BasketContract {
 
         fun updateSkeletonState(isLoaded: Boolean)
 
-        fun showOrderConfirmDialog(user: User)
+        fun showUsingPointDialog(user: User)
 
         fun navigateToOrderDetail(orderId: Int)
     }
@@ -45,7 +45,9 @@ interface BasketContract {
         fun updateNextPage()
 
         fun deleteBasketProduct(product: UiBasketProduct)
+
         fun addOrder(point: Int)
-        fun confirmOrder()
+
+        fun usePoint()
     }
 }

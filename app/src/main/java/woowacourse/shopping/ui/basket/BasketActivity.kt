@@ -15,7 +15,7 @@ import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
-import woowacourse.shopping.databinding.DialogConfirmOrderBinding
+import woowacourse.shopping.databinding.DialogUsingPointBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.User
@@ -27,7 +27,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     private lateinit var presenter: BasketContract.Presenter
     private lateinit var binding: ActivityBasketBinding
     private lateinit var basketAdapter: BasketAdapter
-    private lateinit var dialogBinding: DialogConfirmOrderBinding
+    private lateinit var dialogBinding: DialogUsingPointBinding
     private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,8 +123,8 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         binding.isLoaded = isLoaded
     }
 
-    override fun showOrderConfirmDialog(user: User) {
-        setOrderConfirmDialog(user)
+    override fun showUsingPointDialog(user: User) {
+        initUsingPointDialog(user)
         dialog.show()
     }
 
@@ -139,12 +139,12 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     private fun initOrderButtonListener() {
         binding.tvOrder.setOnClickListener {
-            presenter.confirmOrder()
+            presenter.usePoint()
         }
     }
 
-    private fun setOrderConfirmDialog(user: User) {
-        dialogBinding = DialogConfirmOrderBinding.inflate(layoutInflater).apply {
+    private fun initUsingPointDialog(user: User) {
+        dialogBinding = DialogUsingPointBinding.inflate(layoutInflater).apply {
             this.user = user
             btnDialogOrder.setOnClickListener {
                 val usingPoint = tvUsingPoint.text

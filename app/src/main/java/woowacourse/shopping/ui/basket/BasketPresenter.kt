@@ -132,9 +132,9 @@ class BasketPresenter(
         view.updateCurrentPage(currentPage)
     }
 
-    override fun confirmOrder() {
+    override fun usePoint() {
         userRepository.getUser {
-            view.showOrderConfirmDialog(it)
+            view.showUsingPointDialog(it)
         }
     }
 
