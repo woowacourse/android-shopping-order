@@ -24,7 +24,7 @@ class MainPresenter(
     private var loadItemFromIndex = 0
 
     override fun loadMoreProducts() {
-        productRepository.getAll(
+        productRepository.requestFetchAllProducts(
             onFailure = {
                 view.showEmptyProducts()
                 view.setProducts(listOf())
@@ -57,7 +57,9 @@ class MainPresenter(
 
     override fun addRecentProduct(product: Product) {
         val nowDateTime: LocalDateTime = LocalDateTime.now()
-        storeRecentProduct(product.id, nowDateTime)
+        recentProductRepository.addRecentProduct(product, nowDateTime)
+
+        storeRecentProduct(product, nowDateTime)
         view.setRecentProducts(recentProductRepository.getAll())
     }
 
@@ -90,7 +92,7 @@ class MainPresenter(
         )
     }
 
-    private fun storeRecentProduct(productId: Int, viewedDateTime: LocalDateTime) {
-        recentProductRepository.addRecentProduct(productId, viewedDateTime)
+    private fun storeRecentProduct(product: Product, viewedDateTime: LocalDateTime) {
+        recentProductRepository.addRecentProduct(product, viewedDateTime)
     }
 }
