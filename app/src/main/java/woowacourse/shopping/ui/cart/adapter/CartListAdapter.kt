@@ -37,7 +37,7 @@ class CartListAdapter(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<CartItemUIState>() {
+        private val diffUtil = object : DiffUtil.ItemCallback<CartItemUIState>() {
             override fun areItemsTheSame(
                 oldItem: CartItemUIState,
                 newItem: CartItemUIState
