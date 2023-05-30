@@ -2,16 +2,16 @@ package woowacourse.shopping.data.repository.local
 
 import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.data.service.CartProductRemoteService
+import woowacourse.shopping.data.service.cart.CartRemoteService
 
 class CartRepositoryImpl(
-    private val cartProductRemoteService: CartProductRemoteService,
+    private val cartRemoteService: CartRemoteService,
 ) : CartRepository {
     override fun getAll(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        cartProductRemoteService.requestCarts(
+        cartRemoteService.requestCarts(
             onSuccess = onSuccess,
             onFailure = onFailure,
         )
@@ -22,7 +22,7 @@ class CartRepositoryImpl(
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        cartProductRemoteService.requestAddCartProduct(
+        cartRemoteService.requestAddCartProduct(
             productId,
             onSuccess,
             onFailure,
@@ -35,7 +35,7 @@ class CartRepositoryImpl(
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        cartProductRemoteService.requestChangeCartProductCount(cartId, count, onSuccess, onFailure)
+        cartRemoteService.requestChangeCartProductCount(cartId, count, onSuccess, onFailure)
     }
 
     override fun deleteCartProduct(
@@ -43,7 +43,7 @@ class CartRepositoryImpl(
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        cartProductRemoteService.requestDeleteCartProduct(cartId, onSuccess, onFailure)
+        cartRemoteService.requestDeleteCartProduct(cartId, onSuccess, onFailure)
     }
 
     override fun getSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {

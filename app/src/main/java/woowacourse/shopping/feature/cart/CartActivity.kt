@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
+import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.util.toMoneyFormat
 
@@ -51,8 +51,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val cartProductRemoteService = CartProductRemoteService()
-        presenter = CartPresenter(this, CartRepositoryImpl(cartProductRemoteService))
+        val cartRemoteService = CartRemoteService()
+        presenter = CartPresenter(this, CartRepositoryImpl(cartRemoteService))
     }
 
     private fun setRecyclerViewAnimator() {

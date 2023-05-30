@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.service.cart
 
 import com.example.domain.model.CartProduct
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -12,12 +12,12 @@ import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.user.ServerInfo
 import java.net.URI
 
-class CartProductRemoteService {
+class CartRemoteService {
 
     private val authorization: String = "Basic ${ServerInfo.token}"
 
     fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
-        CartProductServiceGenerator.service.requestCarts(authorization)
+        CartRetrofitApiGenerator.service.requestCarts(authorization)
             .enqueue(object : Callback<List<CartProductDto>> {
                 override fun onResponse(
                     call: Call<List<CartProductDto>>,
@@ -47,7 +47,7 @@ class CartProductRemoteService {
             } 
         """.trimIndent()
 
-        CartProductServiceGenerator.service
+        CartRetrofitApiGenerator.service
             .requestAddCartProduct(authorization, createRequestBody(bodyString))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -77,7 +77,7 @@ class CartProductRemoteService {
             } 
         """.trimIndent()
 
-        CartProductServiceGenerator.service.requestChangeCartProductCount(
+        CartRetrofitApiGenerator.service.requestChangeCartProductCount(
             authorization,
             cartId,
             createRequestBody(bodyString),
@@ -98,7 +98,7 @@ class CartProductRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        CartProductServiceGenerator.service.requestDeleteCartProduct(authorization, cartId)
+        CartRetrofitApiGenerator.service.requestDeleteCartProduct(authorization, cartId)
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,

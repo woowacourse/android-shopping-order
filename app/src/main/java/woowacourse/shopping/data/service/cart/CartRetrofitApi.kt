@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.service.cart
 
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -11,7 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.dto.CartProductDto
 
-interface CartProductRetrofitApi {
+interface CartRetrofitApi {
     @GET("cart-items")
     fun requestCarts(@Header("Authorization") authorization: String): Call<List<CartProductDto>>
 

@@ -16,8 +16,8 @@ import woowacourse.shopping.common_ui.CartCounterBadge
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
 import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private fun initPresenter() {
         presenter = MainPresenter(
             ProductRepositoryImpl(ProductRemoteService()),
-            CartRepositoryImpl(CartProductRemoteService()),
+            CartRepositoryImpl(CartRemoteService()),
             RecentProductRepositoryImpl(RecentDao(this)),
         )
     }
