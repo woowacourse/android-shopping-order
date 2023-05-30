@@ -6,7 +6,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.utils.ErrorHandler
+import woowacourse.shopping.utils.LogUtil
 
 class CartPresenter(
     private val view: CartContract.View,
@@ -38,7 +38,7 @@ class CartPresenter(
                 currentPage.clear()
                 currentPage.addAll(it.toUIModel())
                 callback()
-            }.onFailure { throwable -> ErrorHandler.printError(throwable) }
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
@@ -100,7 +100,7 @@ class CartPresenter(
                     ?.let { currentPage[it] = currentPage[it].copy(count = count) }
                 setUpCheckedCount()
                 setUPTotalPrice()
-            }.onFailure { throwable -> ErrorHandler.printError(throwable) }
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
@@ -140,7 +140,7 @@ class CartPresenter(
             result.onSuccess { cartProducts ->
                 cartProducts.all().first { it.product.id == productId }.product
                     .let { view.navigateToItemDetail(it.toUIModel()) }
-            }.onFailure { throwable -> ErrorHandler.printError(throwable) }
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 

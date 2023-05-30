@@ -6,7 +6,7 @@ import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.utils.ErrorHandler
+import woowacourse.shopping.utils.LogUtil
 import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(
@@ -25,7 +25,7 @@ class DetailedProductPresenter(
             ?.let {
                 productRepository.findById(it) { result ->
                     result.onSuccess { product -> lastProduct = product.toUIModel() }
-                        .onFailure { exception -> ErrorHandler.printError(exception) }
+                        .onFailure { exception -> LogUtil.logError(exception) }
                 }
             }
         sharedPreferenceUtils.setLastProductId(product.id)

@@ -4,7 +4,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.utils.ErrorHandler
+import woowacourse.shopping.utils.LogUtil
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -23,14 +23,14 @@ class ShoppingPresenter(
             result.onSuccess { carts ->
                 val cartProducts = carts.all().associateBy({ it.product.id }, { it.quantity })
                 view.setCartProducts(cartProducts)
-            }.onFailure { throwable -> ErrorHandler.printError(throwable) }
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
     override fun setUpNextProducts() {
         productRepository.getNext(PRODUCT_PAGE_SIZE) { result ->
             result.onSuccess { products -> view.addMoreProducts(products.map { it.toUIModel() }) }
-                .onFailure { throwable -> ErrorHandler.printError(throwable) }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
@@ -57,7 +57,7 @@ class ShoppingPresenter(
     override fun navigateToItemDetail(productId: Int) {
         productRepository.findById(productId) { result ->
             result.onSuccess { view.navigateToProductDetail(it.toUIModel()) }
-                .onFailure { throwable -> ErrorHandler.printError(throwable) }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
