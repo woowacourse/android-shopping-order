@@ -33,6 +33,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     private val presenter: ProductListContract.Presenter by lazy { createPresenter() }
 
+    private val cartItemRemoteService: CartItemRemoteService =
+        CartItemRemoteService(ServerConfiguration.host)
+
     private fun createPresenter(): ProductListPresenter {
         val productRemoteService = ProductRemoteService(ServerConfiguration.host)
         val dbHelper = DbHelper.getDbInstance(this)
@@ -40,9 +43,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
             recentlyViewedProductMemoryDao, productRemoteService
         )
-        val cartItemRepositoryImpl = CartItemRepositoryImpl(
-            CartItemRemoteService(ServerConfiguration.host)
-        )
+        val cartItemRepositoryImpl = CartItemRepositoryImpl(cartItemRemoteService)
         val productRepositoryImpl = ProductRepositoryImpl(productRemoteService)
         return ProductListPresenter(
             this, recentlyViewedProductRepositoryImpl, productRepositoryImpl, cartItemRepositoryImpl
@@ -72,6 +73,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onStart() {
         super.onStart()
+        cartItemRemoteService.initializeCache()
         presenter.onLoadRecentlyViewedProducts()
         presenter.onRefreshProducts()
         presenter.onLoadCartItemCount()
