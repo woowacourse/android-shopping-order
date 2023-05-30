@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.cart.CartItem
 
 interface CartItemDataSource {
 

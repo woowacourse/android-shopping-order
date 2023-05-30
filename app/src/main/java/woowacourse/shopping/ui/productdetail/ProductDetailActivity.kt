@@ -125,7 +125,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
 
         fun startActivityFromProductDetailActivity(context: Context, productId: Long) {
-            val intent = Intent(context, ProductDetailActivity::class.java).apply {
+            val intent = Intent(context, this::class.java).apply {
                 putExtra(PRODUCT_ID, productId)
                 putExtra(FROM_PRODUCT_DETAIL_ACTIVITY, true)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP

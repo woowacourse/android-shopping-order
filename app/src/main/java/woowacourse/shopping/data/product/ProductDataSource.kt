@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 
 interface ProductDataSource {
 

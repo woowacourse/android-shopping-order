@@ -8,8 +8,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.session.UserData
 import woowacourse.shopping.utils.RemoteHost
 import java.io.IOException
@@ -34,7 +34,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
                 val id =
                     response.header("Location")?.removePrefix("/cart-items/")?.toLong() ?: return
                 val savedCartItem = CartItem(
-                    id, cartItem.product, cartItem.addedTime, cartItem.count
+                    id, cartItem.quantity, cartItem.product, cartItem.addedTime
                 )
                 onFinish(savedCartItem)
             }
@@ -123,7 +123,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val quantity = jsonObject.getInt("quantity")
         val jsonObject1 = jsonObject.getJSONObject("product")
         val product = parseToProduct(jsonObject1)
-        return CartItem(id, product, LocalDateTime.now(), quantity)
+        return CartItem(id, quantity, product, LocalDateTime.now())
     }
 
     private fun parseToProduct(jsonObject: JSONObject): Product {
@@ -131,6 +131,6 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val name = jsonObject.getString("name")
         val price = jsonObject.getInt("price")
         val imageUrl = jsonObject.getString("imageUrl")
-        return Product(id, imageUrl, name, price)
+        return Product(id, name, price, imageUrl)
     }
 }

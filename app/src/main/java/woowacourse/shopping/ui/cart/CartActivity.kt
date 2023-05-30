@@ -40,7 +40,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setActionBar()
+        initToolbar()
 
         initPageUI()
         initOrderUI()
@@ -115,7 +115,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    private fun setActionBar() {
+    private fun initToolbar() {
         setSupportActionBar(binding.toolbarCart)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -172,7 +172,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         private const val JUST_ADDED_CART_ITEM = "JUST_ADDED_CART_ITEM"
 
         fun startActivity(context: Context, justAddedCartItem: Boolean = false) {
-            Intent(context, CartActivity::class.java).apply {
+            Intent(context, this::class.java).apply {
                 putExtra(JUST_ADDED_CART_ITEM, justAddedCartItem)
             }.run {
                 context.startActivity(this)

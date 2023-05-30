@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.productlist
 
-import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
@@ -50,7 +50,7 @@ class ProductListPresenter(
     override fun addProductToCart(productId: Long) {
         productRepository.findById(productId) { product ->
             product ?: return@findById
-            val cartItem = CartItem(-1, product, LocalDateTime.now(), 1)
+            val cartItem = CartItem(-1, 1, product, LocalDateTime.now())
             cartItemRepository.save(cartItem) { savedCartItem ->
                 view.changeProduct(savedCartItem.toUIState())
                 loadCartItemCount()
@@ -61,8 +61,8 @@ class ProductListPresenter(
     override fun plusCount(cartItemId: Long) {
         cartItemRepository.findById(cartItemId) { loadedCartItem ->
             requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
-            val cartItem = loadedCartItem.plusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+            val cartItem = loadedCartItem.plusQuantity()
+            cartItemRepository.updateCountById(cartItemId, cartItem.quantity) {
                 view.changeProduct(cartItem.toUIState())
             }
         }
@@ -72,17 +72,17 @@ class ProductListPresenter(
         cartItemRepository.findById(cartItemId) { loadedCartItem ->
             requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
-            if (loadedCartItem.count == 1) {
+            if (loadedCartItem.quantity == 1) {
                 cartItemRepository.deleteById(cartItemId) {
                     view.changeProduct(
-                        loadedCartItem.copy(id = -1, count = 0).toUIState()
+                        loadedCartItem.copy(id = -1, quantity = 0).toUIState()
                     )
                     loadCartItemCount()
                 }
                 return@findById
             }
-            val cartItem = loadedCartItem.minusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
+            val cartItem = loadedCartItem.minusQuantity()
+            cartItemRepository.updateCountById(cartItemId, cartItem.quantity) {
                 view.changeProduct(cartItem.toUIState())
             }
         }

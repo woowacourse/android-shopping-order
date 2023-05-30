@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
-import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
@@ -31,7 +31,7 @@ class ProductDetailPresenter(
         productRepository.findById(productId) { product ->
             requireNotNull(product) { ERROR_PRODUCT_NULL.format(productId) }
 
-            val cartItem = CartItem(-1, product, LocalDateTime.now(), count)
+            val cartItem = CartItem(-1, count, product, LocalDateTime.now())
             cartItemRepository.save(cartItem) { savedCartItem ->
                 cartItemRepository.updateCountById(savedCartItem.id, count) {
                     view.showCartView()

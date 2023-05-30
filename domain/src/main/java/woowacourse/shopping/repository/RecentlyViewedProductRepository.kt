@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentlyViewedProduct
+import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import java.time.LocalDateTime
 
 interface RecentlyViewedProductRepository {

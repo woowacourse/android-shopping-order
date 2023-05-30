@@ -22,7 +22,7 @@ class CartListViewHolder private constructor(
     }
 
     companion object {
-        fun create(
+        fun from(
             parent: ViewGroup,
             cartListEvent: CartListEvent
         ): CartListViewHolder {

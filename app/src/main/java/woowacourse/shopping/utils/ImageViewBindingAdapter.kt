@@ -5,7 +5,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 
 object ImageViewBindingAdapter {
-    @BindingAdapter("android:urlSrc")
+    @BindingAdapter("app:urlSrc")
     @JvmStatic
     fun src(imageView: ImageView, src: String?) {
         src ?: return

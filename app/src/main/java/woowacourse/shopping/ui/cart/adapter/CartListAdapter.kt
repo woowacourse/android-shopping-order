@@ -11,7 +11,7 @@ class CartListAdapter(
 ) : RecyclerView.Adapter<CartListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartListViewHolder {
-        return CartListViewHolder.create(
+        return CartListViewHolder.from(
             parent, cartListEvent
         )
     }

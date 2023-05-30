@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.productlist.uistate
 
-import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.product.Product
 
 data class ProductUIState(
     val id: Long,
@@ -9,7 +9,7 @@ data class ProductUIState(
     val name: String,
     val price: Int,
     val cartItemId: Long,
-    val count: Int = 0,
+    val quantity: Int = 0,
 ) {
     companion object {
         fun Product.toUIState(): ProductUIState = ProductUIState(
@@ -18,7 +18,7 @@ data class ProductUIState(
             name = name,
             price = price,
             cartItemId = -1,
-            count = 0
+            quantity = 0
         )
 
         fun CartItem.toUIState(): ProductUIState = ProductUIState(
@@ -27,7 +27,7 @@ data class ProductUIState(
             name = product.name,
             price = product.price,
             cartItemId = id,
-            count = count
+            quantity = quantity
         )
     }
 }

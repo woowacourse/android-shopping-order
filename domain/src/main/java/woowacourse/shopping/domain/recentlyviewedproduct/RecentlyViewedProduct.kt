@@ -1,5 +1,6 @@
-package woowacourse.shopping.domain
+package woowacourse.shopping.domain.recentlyviewedproduct
 
+import woowacourse.shopping.domain.product.Product
 import java.time.LocalDateTime
 
 class RecentlyViewedProduct(

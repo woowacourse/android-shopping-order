@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import woowacourse.shopping.data.database.ProductContract
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentlyViewedProduct
+import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import java.time.LocalDateTime
 
 class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase) :

@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.repository.ProductRepository
 
 class ProductRepositoryImpl(private val dataSource: ProductDataSource) : ProductRepository {

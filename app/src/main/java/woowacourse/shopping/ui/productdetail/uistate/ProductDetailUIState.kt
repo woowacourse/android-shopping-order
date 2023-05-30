@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productdetail.uistate
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 
 data class ProductDetailUIState(
     val id: Long,

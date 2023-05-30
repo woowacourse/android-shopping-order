@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.recentlyviewedproduct
 
 import woowacourse.shopping.data.product.ProductDataSource
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentlyViewedProduct
+import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import java.time.LocalDateTime
 

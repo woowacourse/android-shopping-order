@@ -49,11 +49,11 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:scaleType="centerCrop"
-            android:urlSrc="@{cartItem.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1.7"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cb_cart_item_selected"
+            app:urlSrc="@{cartItem.imageUrl}"
             tools:src="@mipmap/ic_launcher_round" />
 
         <ImageButton
@@ -82,7 +82,7 @@
             android:id="@+id/counter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:count="@{cartItem.count}"
+            app:count="@{cartItem.quantity}"
             app:id="@{cartItem.id}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

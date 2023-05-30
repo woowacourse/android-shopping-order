@@ -20,4 +20,8 @@
     <string name="plus_sign">+</string>
     <string name="last_viewed_product">마지막으로 본 상품</string>
     <string name="put">담기</string>
+    <string name="order_list_header_text"><![CDATA[상세보기 >]]></string>
+    <string name="order_list_id">주문번호 : %d</string>
+    <string name="order_list_description">%,d원 / 수량 : %d개</string>
+    <string name="order_detail_info_header">결제금액 정보</string>
 </resources>

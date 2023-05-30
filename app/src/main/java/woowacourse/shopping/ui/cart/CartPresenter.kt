@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState.Companion.toUIState
 
@@ -75,7 +75,7 @@ class CartPresenter(
         cartItemRepository.findById(cartItemId) { loadedCartItem ->
             requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
-            val cartItem = loadedCartItem.plusCount()
+            val cartItem = loadedCartItem.plusQuantity()
             updateCount(cartItem)
         }
     }
@@ -84,7 +84,7 @@ class CartPresenter(
         cartItemRepository.findById(cartItemId) { loadedCartItem ->
             requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
-            val cartItem = loadedCartItem.minusCount()
+            val cartItem = loadedCartItem.minusQuantity()
             updateCount(cartItem)
         }
     }
@@ -139,7 +139,7 @@ class CartPresenter(
     }
 
     private fun updateCount(cartItem: CartItem) {
-        cartItemRepository.updateCountById(cartItem.id, cartItem.count) {
+        cartItemRepository.updateCountById(cartItem.id, cartItem.quantity) {
             if (cartItem in selectedCartItems) {
                 selectedCartItems = selectedCartItems - cartItem + cartItem
                 showAllSelectionUI(currentPage, selectedCartItems)

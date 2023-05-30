@@ -1,10 +1,10 @@
-package woowacourse.shopping.domain
+package woowacourse.shopping.domain.product
 
 class Product(
     val id: Long,
-    val imageUrl: String,
     val name: String,
     val price: Int,
+    val imageUrl: String,
 ) {
     override fun equals(other: Any?): Boolean = if (other is Product) id == other.id else false
 

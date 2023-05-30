@@ -24,12 +24,12 @@
             android:id="@+id/iv_product"
             android:layout_width="155dp"
             android:layout_height="0dp"
-            android:urlSrc="@{product.imageUrl}"
             app:layout_constraintBottom_toTopOf="@id/tv_product_name"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:urlSrc="@{product.imageUrl}"
             tools:src="@mipmap/ic_launcher_round" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -39,7 +39,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/btn_plus"
             android:onClick="@{() -> productListEvent.onClickAddToCartButton(product.id)}"
-            app:isVisible="@{product.count == 0}"
+            app:isVisible="@{product.quantity == 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="@id/iv_product" />
 
@@ -49,9 +49,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
-            app:count="@{product.count}"
+            app:count="@{product.quantity}"
             app:id="@{product.cartItemId}"
-            app:isVisible="@{product.count != 0}"
+            app:isVisible="@{product.quantity != 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

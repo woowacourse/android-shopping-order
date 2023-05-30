@@ -7,7 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.utils.RemoteHost
 import java.io.IOException
 
@@ -78,6 +78,6 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
         val name = jsonObject.getString("name")
         val price = jsonObject.getInt("price")
         val imageUrl = jsonObject.getString("imageUrl")
-        return Product(id, imageUrl, name, price)
+        return Product(id, name, price, imageUrl)
     }
 }

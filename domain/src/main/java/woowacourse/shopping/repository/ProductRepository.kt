@@ -1,6 +1,6 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 
 interface ProductRepository {
     fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit)

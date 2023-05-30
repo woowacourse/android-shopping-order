@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="product"
+            type="woowacourse.shopping.ui.productlist.uistate.ProductUIState" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <ImageView
+            android:id="@+id/order_list_picture"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:urlSrc="@{product.imageUrl}"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/order_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@{product.name}"
+            app:layout_constraintStart_toEndOf="@id/order_list_picture"
+            app:layout_constraintTop_toTopOf="@id/order_list_picture"
+            tools:text="친환경 실링용기-ECO 19153" />
+
+        <TextView
+            android:id="@+id/order_list_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@{@string/order_list_description(product.price, product.quantity)}"
+            app:layout_constraintStart_toEndOf="@id/order_list_picture"
+            app:layout_constraintTop_toBottomOf="@id/order_list_name"
+            tools:text="180,600원 / 수량 : 3개" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

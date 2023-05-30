@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productdetail.uistate
 
-import woowacourse.shopping.domain.RecentlyViewedProduct
+import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 
 data class LastViewedProductUIState(
     val id: Long,
