@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.database
 
-import android.provider.BaseColumns
 import woowacourse.shopping.data.model.Server
 
 object CartContract {
@@ -15,7 +14,7 @@ object CartContract {
         return "DROP TABLE IF EXISTS ${getTableName(server)}"
     }
 
-    object Cart : BaseColumns {
+    object Cart {
         const val ID = "Id"
         const val CHECKED = "Checked"
     }
