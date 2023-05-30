@@ -6,18 +6,18 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.model.DataOrderRecord
+import woowacourse.shopping.data.model.DataOrder
 import woowacourse.shopping.data.model.OrderRequest
 
 interface OrderService {
 
     @GET("orders/{id}")
-    fun getOrderRecord(
+    fun getOrder(
         @Header("Authorization")
         authorization: String,
         @Path("id")
         orderId: Int,
-    ): Call<DataOrderRecord>
+    ): Call<DataOrder>
 
     @POST("orders")
     fun addOrder(
@@ -25,5 +25,11 @@ interface OrderService {
         authorization: String,
         @Body
         orderRequest: OrderRequest,
-    ): Call<DataOrderRecord>
+    ): Call<DataOrder>
+
+    @GET("orders")
+    fun getOrders(
+        @Header("Authorization")
+        authorization: String,
+    ): Call<List<DataOrder>>
 }

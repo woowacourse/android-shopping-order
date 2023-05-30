@@ -6,7 +6,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.NullOnEmptyConvertFactory
-import woowacourse.shopping.data.model.DataOrderRecord
+import woowacourse.shopping.data.model.DataOrder
 import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.remote.OkHttpModule
 
@@ -27,11 +27,11 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         orderService.addOrder(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             orderRequest = orderRequest
-        ).enqueue(object : retrofit2.Callback<DataOrderRecord> {
+        ).enqueue(object : retrofit2.Callback<DataOrder> {
 
             override fun onResponse(
-                call: Call<DataOrderRecord>,
-                response: Response<DataOrderRecord>,
+                call: Call<DataOrder>,
+                response: Response<DataOrder>,
             ) {
                 response.headers()["Location"]?.let {
                     val orderId = it.split("/").last().toLong()
@@ -40,24 +40,24 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<DataOrderRecord>, t: Throwable) {
+            override fun onFailure(call: Call<DataOrder>, t: Throwable) {
                 TODO("Not yet implemented")
             }
         })
     }
 
-    override fun getOrderRecord(
+    override fun getOrder(
         orderId: Int,
-        onReceived: (DataOrderRecord) -> Unit,
+        onReceived: (DataOrder) -> Unit,
     ) {
-        orderService.getOrderRecord(
+        orderService.getOrder(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             orderId = orderId
-        ).enqueue(object : retrofit2.Callback<DataOrderRecord> {
+        ).enqueue(object : retrofit2.Callback<DataOrder> {
 
             override fun onResponse(
-                call: Call<DataOrderRecord>,
-                response: Response<DataOrderRecord>,
+                call: Call<DataOrder>,
+                response: Response<DataOrder>,
             ) {
                 Log.d("woogi", "onResponse: ${response.body()}")
                 response.body()?.let {
@@ -65,7 +65,28 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<DataOrderRecord>, t: Throwable) {
+            override fun onFailure(call: Call<DataOrder>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
+    override fun getOrders(onReceived: (List<DataOrder>) -> Unit) {
+        orderService.getOrders(
+            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
+        ).enqueue(object : retrofit2.Callback<List<DataOrder>> {
+
+            override fun onResponse(
+                call: Call<List<DataOrder>>,
+                response: Response<List<DataOrder>>,
+            ) {
+                Log.d("woogi", "onResponse: ${response.body()}")
+                response.body()?.let {
+                    onReceived(it)
+                }
+            }
+
+            override fun onFailure(call: Call<List<DataOrder>>, t: Throwable) {
                 TODO("Not yet implemented")
             }
         })
