@@ -18,7 +18,6 @@ import woowacourse.shopping.ServerType
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
 import woowacourse.shopping.data.cart.CartRemoteService
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
     private val presenter: MainContract.Presenter by lazy {
         val productRepository: ProductRepository =
-            ProductRepositoryImpl(serverUrl, ProductRemoteService())
+            ProductRepositoryImpl(serverUrl)
         val recentProductRepository: RecentProductRepository =
             RecentProductRepositoryImpl(this, serverUrl)
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)

@@ -2,54 +2,63 @@ package woowacourse.shopping.data.product
 
 import com.example.domain.Product
 import com.example.domain.repository.ProductRepository
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class ProductRepositoryImpl(
-    private val url: String,
-    private val service: ProductRemoteService
+    url: String,
+    port: String = "8080",
 ) : ProductRepository {
 
-    override fun getAll(
+    private val baseUrl = "$url:$port"
+    private val retrofitProductService: RetrofitProductService = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(RetrofitProductService::class.java)
+
+    override fun requestFetchAllProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {
-        Thread {
-            service.requestAllProducts(
-                url = url,
-                onSuccess = onSuccess,
-                onFailure = onFailure
-            )
-        }.start()
+        retrofitProductService.requestFetchAllProducts()
+            .enqueue(object : retrofit2.Callback<List<Product>> {
+                override fun onResponse(
+                    call: Call<List<Product>>,
+                    response: retrofit2.Response<List<Product>>
+                ) {
+                    val result = response.body() ?: emptyList()
+                    if (400 <= response.code()) return onFailure()
+                    onSuccess(result)
+                }
+
+                override fun onFailure(call: Call<List<Product>>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
 
-    override fun getProduct(
-        id: Int,
+    override fun requestFetchProductById(
+        id: Long,
         onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     ) {
-        Thread {
-            service.requestProduct(
-                url = url,
-                id = id,
-                onSuccess = onSuccess,
-                onFailure = onFailure,
-            )
-        }
+        retrofitProductService.requestFetchProductById(id)
+            .enqueue(object : retrofit2.Callback<Product> {
+                override fun onResponse(
+                    call: Call<Product>,
+                    response: retrofit2.Response<Product>
+                ) {
+                    val result: Product? = response.body()
+                    if (response.isSuccessful) onSuccess(result)
+                    if (400 <= response.code()) return onFailure()
+                    onSuccess(result)
+                }
+
+                override fun onFailure(call: Call<Product>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
-
-    override fun addProduct(
-        name: String,
-        price: Int,
-        imageUrl: String,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
-    ) = Unit
-
-    override fun updateProduct(
-        product: Product,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
-    ) = Unit
-
-    override fun deleteProduct(id: Int, onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) =
-        Unit
 }
