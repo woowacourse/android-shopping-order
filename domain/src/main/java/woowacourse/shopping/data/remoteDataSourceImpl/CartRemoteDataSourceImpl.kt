@@ -27,7 +27,12 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             "Basic $credentials",
             QuantityBody(quantity)
         ).enqueue(
-            RetrofitUtil.callback(callback)
+            RetrofitUtil.callbackWithNoBody { result ->
+                when (result) {
+                    null -> callback(Result.success(quantity))
+                    else -> callback(Result.failure(NullPointerException()))
+                }
+            }
         )
     }
 

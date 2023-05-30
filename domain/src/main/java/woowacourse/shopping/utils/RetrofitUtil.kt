@@ -67,4 +67,20 @@ object RetrofitUtil {
             }
         }
     }
+
+    fun <T> callbackWithNoBody(block: (Result<T>?) -> Unit): retrofit2.Callback<T> {
+        return object : retrofit2.Callback<T> {
+            override fun onResponse(call: retrofit2.Call<T>, response: retrofit2.Response<T>) {
+                if (response.isSuccessful) {
+                    block(null)
+                } else {
+                    block(Result.failure(Throwable(response.message())))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<T>, t: Throwable) {
+                block(Result.failure(t))
+            }
+        }
+    }
 }

@@ -18,12 +18,6 @@ interface RetrofitCartService {
         @Header("Authorization") token: String
     ): Call<List<CartProduct>>
 
-    @GET("cart-items/{cartId}")
-    fun getCart(
-        @Header("Authorization") token: String,
-        @Path("cartId") cartId: Int
-    ): Call<CartProduct>
-
     @POST("cart-items")
     fun postCart(
         @Header("Authorization") token: String,
@@ -35,7 +29,7 @@ interface RetrofitCartService {
         @Path("cartId") cartId: Int,
         @Header("Authorization") token: String,
         @Body quantity: QuantityBody
-    ): Call<Int>
+    ): Call<Void>
 
     @DELETE("cart-items/{cartId}")
     fun deleteCart(

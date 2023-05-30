@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repositoryImpl
 
+import java.lang.Integer.min
 import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.model.CartProducts
@@ -21,7 +22,7 @@ class CartRepositoryImpl(
     override fun getPage(index: Int, size: Int, callback: (Result<CartProducts>) -> Unit) {
         remoteDataSource.getAll { result ->
             result.onSuccess {
-                val cartProducts = it.subList(index * size, (index + 1) * size)
+                val cartProducts = it.subList(index * size, min((index + 1) * size, it.size))
                 cartItems.replaceAll(cartProducts)
                 callback(Result.success(CartProducts(cartProducts)))
             }.onFailure { throwable -> callback(Result.failure(throwable)) }
