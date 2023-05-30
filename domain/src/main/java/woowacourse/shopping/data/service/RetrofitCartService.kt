@@ -35,5 +35,5 @@ interface RetrofitCartService {
     fun deleteCart(
         @Path("cartId") cartId: Int,
         @Header("Authorization") token: String
-    ): Call<Int>
+    ): Call<Void>
 }

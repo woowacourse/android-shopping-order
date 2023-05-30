@@ -73,7 +73,12 @@ class CartRepositoryImpl(
         }
         val cartItem = cartItems.findByProductId(productId)
         val updateCallback: (Result<Int>) -> Unit = { resultUpdate ->
-            getAll { callback(resultUpdate) }
+            resultUpdate.onSuccess {
+                getAll { resultGetAll ->
+                    resultGetAll.onSuccess { callback(resultUpdate) }
+                        .onFailure { throwable -> callback(Result.failure(throwable)) }
+                }
+            }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
         when {
             cartItem == null && count == 1 -> remoteDataSource.postItem(productId, updateCallback)

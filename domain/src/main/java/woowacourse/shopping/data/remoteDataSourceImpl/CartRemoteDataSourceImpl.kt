@@ -28,6 +28,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             QuantityBody(quantity)
         ).enqueue(
             RetrofitUtil.callbackWithNoBody { result ->
+                RetrofitUtil.callback(callback)
                 when (result) {
                     null -> callback(Result.success(quantity))
                     else -> callback(Result.failure(NullPointerException()))
@@ -38,6 +39,14 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
 
     override fun deleteItem(itemId: Int, callback: (Result<Int>) -> Unit) {
         RetrofitUtil.retrofitCartService.deleteCart(itemId, "Basic $credentials")
-            .enqueue(RetrofitUtil.callback(callback))
+            .enqueue(
+                RetrofitUtil.callbackWithNoBody { result ->
+                    RetrofitUtil.callback(callback)
+                    when (result) {
+                        null -> callback(Result.success(0))
+                        else -> callback(Result.failure(NullPointerException()))
+                    }
+                }
+            )
     }
 }
