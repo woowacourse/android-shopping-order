@@ -11,6 +11,9 @@ data class PageNation(
     val pageCount: Int
         get() = calculatePageCount(cartProducts.getAll().size)
 
+    val totalPrice: Int
+        get() = cartProducts.totalPrice
+
     val currentStartIndex: Int
         get() = (currentPage - 1) * PAGE_MAX_CART_COUNT
 
@@ -42,9 +45,37 @@ data class PageNation(
         return copy(currentPage = currentPage - PAGE_NATION_COUNT)
     }
 
+    // TODO 테스트 작성
+    fun updateCartCheckedByCartId(cartId: Long, checked: Boolean): PageNation {
+        return PageNation(
+            cartProducts.updateCartChecked(cartId, checked),
+            currentPage
+        )
+    }
+
+    // TODO 테스트 작성
+    fun updateCartCountByCartId(cartId: Long, count: Int): PageNation {
+        return PageNation(
+            cartProducts.updateCartCountByCartId(cartId, count),
+            currentPage
+        )
+    }
+
     fun updateAllCartsChecked(checked: Boolean): PageNation {
         val ids = cartProducts.getAll().map { it.id }
         return copy(cartProducts = cartProducts.updateAllCartsChecked(ids, checked))
+    }
+
+    // TODO 테스트 작성
+    fun deleteCartByCartId(cartId: Long): PageNation {
+        return PageNation(
+            cartProducts.deleteCart(cartId),
+            currentPage
+        )
+    }
+
+    fun getCartByCartId(cartId: Long): CartProduct? {
+        return cartProducts.getCartByCartId(cartId)
     }
 
     private fun calculatePageCount(size: Int): Int {
