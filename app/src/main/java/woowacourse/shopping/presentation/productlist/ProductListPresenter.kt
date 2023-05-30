@@ -18,7 +18,6 @@ class ProductListPresenter(
 
     private var size = PRODUCTS_SIZE
     override fun refreshProductItems() {
-        view.setLoadingViewVisible(true)
         productRepository.getProductsWithRange(0, size) { products ->
             cartRepository.getAllCartItems { allCartItems ->
                 val foundCartItems = products.findCartItem(allCartItems)
@@ -74,10 +73,7 @@ class ProductListPresenter(
                 refreshProductItems()
             }
         } else {
-            cartRepository.updateCartItemQuantity(
-                cartProductModel.id,
-                count,
-            ) {
+            cartRepository.updateCartItemQuantity(cartProductModel.id, count) {
                 updateCartCount()
                 refreshProductItems()
             }

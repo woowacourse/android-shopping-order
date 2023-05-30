@@ -9,20 +9,25 @@ import woowacourse.shopping.repository.CartRepository
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    cartProductModels: List<CartProductInfoModel>,
     initPage: Int = DEFAULT_INIT_PAGE,
 ) : CartContract.Presenter {
 
     private val paging = CartOffsetPaging(cartRepository = cartRepository, startPage = initPage)
     private val offset: Int get() = paging.currentPage.getOffset(paging.limit)
 
-    private var cartProducts = CartProductInfoList(cartProductModels.map { it.toDomain() })
+    private var cartProducts =
+        CartProductInfoList(emptyList())
     private val pageProducts get() = cartProducts.getItemsInRange(offset, paging.limit)
 
     init {
-        updateOrderCount()
-        updateOrderPrice()
-        view.setPage(paging.currentPage.value.toString())
+        cartRepository.getAllCartItems {
+            cartProducts = CartProductInfoList(it)
+            refreshCurrentPage()
+            updateOrderCount()
+            updateOrderPrice()
+            view.setPage(paging.currentPage.value.toString())
+            view.setLoadingViewVisible(false)
+        }
     }
 
     override fun checkPlusPageAble() {

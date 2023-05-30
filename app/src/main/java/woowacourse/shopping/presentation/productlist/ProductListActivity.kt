@@ -59,6 +59,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onStart() {
         super.onStart()
+        setLoadingViewVisible(true)
         updateView()
     }
 
