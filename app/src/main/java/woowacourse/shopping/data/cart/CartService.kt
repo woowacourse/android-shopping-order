@@ -1,76 +1,39 @@
 package woowacourse.shopping.data.cart
 
-import com.google.gson.GsonBuilder
-import woowacourse.shopping.data.ApiClient
-import woowacourse.shopping.data.common.SharedPreferencesDb
-import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Path
 
-class CartService(private val sharedPreferences: SharedPreferencesDb) : CartRemoteDataSource {
-    override fun addProduct(productId: Int) {
-        val requestBody = ApiClient().getRequestBody(
-            name = "productId", value = productId.toString()
-        )
-        val thread = Thread() {
-            ApiClient().postApiService(
-                path = PATH,
-                body = requestBody,
-                header = getAuthToken()
-            )
-        }
-        thread.start()
-        thread.join()
-    }
+interface CartService {
+    @GET("cart-items")
+    fun getAllCartItems(
+        @Header("Authorization") credentials: String,
+    ): Call<List<CartDataModel>>
 
-    override fun deleteCartProduct(cartId: Int) {
-        val thread = Thread {
-            ApiClient().deleteApiService(
-                path = "$PATH/$cartId",
-                header = getAuthToken()
-            )
-        }
-        thread.start()
-        thread.join()
-    }
+    @Headers("Content-Type: application/json")
+    @POST("cart-items")
+    fun addCartItem(
+        @Header("Authorization") credentials: String,
+        @Body addCartRequestBody: AddCartRequestBody,
+    ): Call<Unit>
 
-    override fun updateProductCount(cartId: Int, count: Int) {
-        val requestBody = ApiClient().getRequestBody(
-            name = "quantity", value = count.toString()
-        )
-        val thread = Thread() {
-            ApiClient().patchApiService(
-                path = "$PATH/$cartId",
-                body = requestBody,
-                header = getAuthToken()
-            )
-        }
-        thread.start()
-        thread.join()
-    }
+    @DELETE("cart-items/{cartItemId}")
+    fun deleteCartItem(
+        @Header("Authorization") credentials: String,
+        @Path("cartItemId") cartItemId: Int,
+    ): Call<CartDataModel>
 
-    override fun getAllCartProductsInfo(): List<CartRemoteDataModel> {
-        var cartProducts = emptyList<CartRemoteDataModel>()
-        val thread = Thread {
-            val response = ApiClient().getApiService(
-                path = PATH,
-                header = getAuthToken()
-            )
-            val responseBody = response.body?.string()
-            cartProducts = parseToCartProducts(responseBody)
-        }
-        thread.start()
-        thread.join()
-        return cartProducts
-    }
-
-    private fun parseToCartProducts(responseBody: String?): List<CartRemoteDataModel> {
-        val gson = GsonBuilder().create()
-        return gson.fromJson(responseBody, Array<CartRemoteDataModel>::class.java).toList()
-    }
-
-    private fun getAuthToken() =
-        sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
-
-    companion object {
-        private const val PATH = "cart-items"
-    }
+    @Headers("Content-Type: application/json")
+    @PATCH("cart-items/{cartItemId}")
+    fun updateCartItemCount(
+        @Header("Authorization") credentials: String,
+        @Path("cartItemId") cartItemId: Int,
+        @Body quantityBody: UpdateQuantityRequestBody,
+    ): Call<Unit>
 }

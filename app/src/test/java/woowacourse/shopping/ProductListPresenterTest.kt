@@ -39,7 +39,7 @@ class ProductListPresenterTest {
         // given
         every { productRepository.getProductsWithRange(0, 20) } returns listOf()
         // when
-        presenter.updateProductItems()
+        presenter.refreshProductItems()
         // then
         verify { view.loadProductModels(listOf()) }
     }
@@ -59,7 +59,7 @@ class ProductListPresenterTest {
     @Test
     fun 카트정보를_불러와_카트_갯수를_표시한다() {
         // given
-        every { cartRepository.getAllCartProductsInfo() } returns makeTestCartProductInfoList()
+        every { cartRepository.getAllCartItems() } returns makeTestCartProductInfoList()
         // when
         presenter.updateCartProductInfoList()
         // then
@@ -71,7 +71,7 @@ class ProductListPresenterTest {
         // given
         val productModel = ProductModel(1, "", "", 1000)
         // when
-        presenter.updateCartProductCount(productModel, 0)
+        presenter.updateCartItemQuantity(productModel, 0)
         // then
         verify { cartRepository.deleteCartProductId(1) }
     }
@@ -81,7 +81,7 @@ class ProductListPresenterTest {
         // given
         val productModel = ProductModel(1, "", "", 1000)
         // when
-        presenter.updateCartProductCount(productModel, 1)
+        presenter.updateCartItemQuantity(productModel, 1)
         // then
         verify { cartRepository.updateCartProductCount(1, 1) }
     }

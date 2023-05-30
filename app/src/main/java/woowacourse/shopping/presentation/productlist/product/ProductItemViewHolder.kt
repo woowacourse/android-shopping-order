@@ -1,11 +1,10 @@
 package woowacourse.shopping.presentation.productlist.product
 
-import androidx.core.view.doOnAttach
-import androidx.lifecycle.findViewTreeLifecycleOwner
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.presentation.common.CounterContract
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.common.CounterListener
+import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.ProductListContract
 
@@ -13,71 +12,68 @@ class ProductItemViewHolder(
     private val binding: ItemProductBinding,
     private val presenter: ProductListContract.Presenter,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private lateinit var cartProductModel: CartProductInfoModel
+    private val counterListener = object : CounterListener {
+        override fun onPlus(count: Int) {
+            presenter.updateCartItemQuantity(cartProductModel, count)
+        }
 
-    private val context = binding.root.context
-    private lateinit var productModel: ProductModel
-    private val counterPresenter: CounterContract.Presenter = binding.counterProductList.presenter
+        override fun onMinus(count: Int) {
+            presenter.updateCartItemQuantity(cartProductModel, count)
+        }
+    }
 
     init {
         itemViewClick()
-        setAddButtonClick()
-        setCounterMinusCLick()
-        setCounterPlusCLick()
+    }
+
+    fun bind(item: CartProductInfoModel) {
+        cartProductModel = item
+        binding.cartProductModel = cartProductModel
+        setUpCounterView()
+        setUpAddButtonView()
     }
 
     private fun itemViewClick() {
         itemView.setOnClickListener {
-            showProductDetail(productModel)
+            showProductDetail()
         }
     }
 
-    private fun showProductDetail(productModel: ProductModel) {
-        context.startActivity(
+    private fun showProductDetail() {
+        itemView.context.startActivity(
             ProductDetailActivity.getIntent(
-                context,
-                productModel,
+                itemView.context,
+                cartProductModel.productModel,
             ),
         )
     }
 
-    private fun setAddButtonClick() {
-        binding.buttonProductListAddCart.setOnClickListener {
-            presenter.putProductInCart(productModel)
-            presenter.updateCartProductInfoList()
-        }
-    }
-
-    private fun setCounterMinusCLick() {
-        binding.counterProductList.minusButton.setOnClickListener {
-            counterPresenter.minusCount()
-            presenter.updateCartProductCount(productModel, counterPresenter.counter.value.value)
-            presenter.updateCartProductInfoList()
-        }
-    }
-
-    private fun setCounterPlusCLick() {
-        binding.counterProductList.plusButton.setOnClickListener {
-            counterPresenter.plusCount()
-            presenter.updateCartProductCount(productModel, counterPresenter.counter.value.value)
-            presenter.updateCartProductInfoList()
-        }
-    }
-
-    fun bind(product: ProductModel) {
-        productModel = product
-        setUpBinding(productModel)
-        counterPresenter.updateCount(
-            presenter.cartProductInfoList.value.findCountByProductId(
-                productModel.id,
-            ),
+    private fun setUpCounterView() {
+        binding.counterProductList.setUpView(
+            counterListener = counterListener,
+            initCount = cartProductModel.count,
+            minimumCount = 0,
         )
     }
 
-    private fun setUpBinding(product: ProductModel) {
-        itemView.doOnAttach {
-            binding.productModel = product
-            binding.presenter = presenter
-            binding.lifecycleOwner = itemView.findViewTreeLifecycleOwner()
+    private fun setUpAddButtonView() {
+        with(binding.buttonProductListAddCart) {
+            setOnClickListener { addButtonClick() }
+            visibility = addButtonVisibility()
+        }
+    }
+
+    private fun addButtonClick() {
+        presenter.addCartItem(cartProductModel)
+        presenter.refreshProductItems()
+    }
+
+    private fun addButtonVisibility(): Int {
+        return if (cartProductModel.count == 0) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 }
