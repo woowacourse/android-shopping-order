@@ -10,13 +10,26 @@ class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
 ) : ProductRepository {
 
+    private val products = mutableListOf<Product>()
+    private var isProductDataCached = false
+
     override fun getAllProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
+        if (isProductDataCached) {
+            onSuccess(products)
+            return
+        }
+
         productDataSource.getAllProducts().enqueue(
             createResponseCallback(
-                onSuccess,
+                onSuccess = {
+                    products.clear()
+                    products.addAll(it)
+                    isProductDataCached = true
+                    onSuccess(it)
+                },
                 onFailure,
             ),
         )
@@ -27,18 +40,27 @@ class ProductRepositoryImpl(
         count: Int,
         onSuccess: (List<Product>) -> Unit,
     ) {
-        getAllProducts(
-            onSuccess = { products ->
-                val limitedProducts = products.subList(
-                    offset.coerceAtMost(products.size),
-                    (offset + count).coerceAtMost(products.size),
-                )
-                onSuccess(limitedProducts)
-            },
-            onFailure = {},
-        )
+        if (isProductDataCached) {
+            val limitedProducts = products.subList(
+                offset.coerceAtMost(products.size),
+                (offset + count).coerceAtMost(products.size),
+            )
+            onSuccess(limitedProducts)
+        } else {
+            getAllProducts(
+                onSuccess = { products ->
+                    val limitedProducts = products.subList(
+                        offset.coerceAtMost(products.size),
+                        (offset + count).coerceAtMost(products.size),
+                    )
+                    onSuccess(limitedProducts)
+                },
+                onFailure = { exception ->
+                    Log.e("ProductRepositoryImpl", "getMoreProducts: $exception")
+                },
+            )
+        }
     }
-
 
     private inline fun <reified T> createResponseCallback(
         crossinline onSuccess: (T) -> Unit,
