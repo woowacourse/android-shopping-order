@@ -20,8 +20,16 @@ class CartItemRepositoryImpl(
         }
     }
 
-    override fun findAllOrderByAddedTime(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit) {
-        cartItemDataSource.findAll(limit, offset, onFinish)
+    override fun findAllOrderByAddedTime(
+        limit: Int,
+        offset: Int,
+        onFinish: (List<CartItem>) -> Unit
+    ) {
+        cartItemDataSource.findAll { cartItems ->
+            val slicedCartItems = cartItems.slice(offset until cartItems.size)
+                .take(limit)
+            onFinish(slicedCartItems)
+        }
     }
 
     override fun findById(id: Long, onFinish: (CartItem) -> Unit) {
