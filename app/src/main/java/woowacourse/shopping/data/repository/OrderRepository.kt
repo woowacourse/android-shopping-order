@@ -16,4 +16,6 @@ interface OrderRepository {
         orderId: Int,
         onReceived: (order: Order) -> Unit,
     )
+
+    fun getOrders(onReceived: (orders: List<Order>) -> Unit)
 }
