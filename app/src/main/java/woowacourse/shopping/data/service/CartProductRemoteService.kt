@@ -1,49 +1,39 @@
 package woowacourse.shopping.data.service
 
 import com.example.domain.model.CartProduct
-import com.example.domain.model.Price
-import com.example.domain.model.Product
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import woowacourse.shopping.data.dto.CartProductDto
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.user.ServerInfo
-import java.io.IOException
 import java.net.URI
 
 class CartProductRemoteService {
-    private val baseUrl: String
-        get() = ServerInfo.url
 
-    private val token: String
-        get() = ServerInfo.token
+    private val authorization: String = "Basic ${ServerInfo.token}"
 
     fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
-        val request = Request.Builder().url("${baseUrl}cart-items")
-            .addHeader("Authorization", "Basic $token").build()
+        CartProductServiceGenerator.service.requestCarts(authorization)
+            .enqueue(object : Callback<List<CartProductDto>> {
+                override fun onResponse(
+                    call: Call<List<CartProductDto>>,
+                    response: Response<List<CartProductDto>>,
+                ) {
+                    if (response.isSuccessful) {
+                        val result: List<CartProductDto>? = response.body()
+                        val cartProducts = result?.map { it.toDomain() } ?: listOf()
+                        onSuccess(cartProducts)
+                    }
+                }
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onFailure()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code >= 400) return onFailure()
-                val responseBody = response.body?.string()
-                response.close()
-
-                val result = responseBody?.let {
-                    parseJsonToCartProductList(it)
-                } ?: emptyList()
-
-                onSuccess(result)
-            }
-        })
+                override fun onFailure(call: Call<List<CartProductDto>>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
 
     fun requestAddCartProduct(
@@ -51,31 +41,28 @@ class CartProductRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val bodyString = """ { 
+        val bodyString = """ 
+            { 
                 "productId": $productId 
             } 
         """.trimIndent()
-        val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-        val request = Request.Builder()
-            .url("${baseUrl}cart-items")
-            .addHeader("Authorization", "Basic $token")
-            .post(body).build()
 
-        val thread = Thread {
-            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
-                .onSuccess {
-                    if (it.isSuccessful) {
-                        val responseHeader = it.headers["Location"] ?: return@onSuccess onFailure()
+        CartProductServiceGenerator.service
+            .requestAddCartProduct(authorization, createRequestBody(bodyString))
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful) {
+                        val responseHeader: String =
+                            response.headers()["Location"] ?: return onFailure()
                         val cartId = URI(responseHeader).path.substringAfterLast("/").toLong()
                         onSuccess(cartId)
-                    } else {
-                        onFailure()
                     }
                 }
-                .onFailure { onFailure() }
-        }
-        thread.start()
-        thread.join()
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
 
     fun requestChangeCartProductCount(
@@ -89,21 +76,21 @@ class CartProductRemoteService {
             "quantity": $count 
             } 
         """.trimIndent()
-        val body = bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-        val request = Request.Builder()
-            .url("${baseUrl}cart-items/$cartId")
-            .addHeader("Authorization", "Basic $token").patch(body).build()
 
-        val thread = Thread {
-            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
-                .onSuccess {
-                    if (it.isSuccessful) return@onSuccess onSuccess(cartId)
-                    onFailure()
-                }
-                .onFailure { onFailure() }
-        }
-        thread.start()
-        thread.join()
+        CartProductServiceGenerator.service.requestChangeCartProductCount(
+            authorization,
+            cartId,
+            createRequestBody(bodyString),
+        ).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) return onSuccess(cartId)
+                onFailure()
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 
     fun requestDeleteCartProduct(
@@ -111,44 +98,23 @@ class CartProductRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val request = Request.Builder()
-            .url("${baseUrl}cart-items/$cartId")
-            .addHeader("Authorization", "Basic $token").delete().build()
-
-        val thread = Thread {
-            kotlin.runCatching { OkHttpClient().newCall(request).execute() }
-                .onSuccess {
-                    if (it.isSuccessful) return@onSuccess onSuccess(cartId)
+        CartProductServiceGenerator.service.requestDeleteCartProduct(authorization, cartId)
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) return onSuccess(cartId)
                     onFailure()
                 }
-                .onFailure { onFailure() }
-        }
-        thread.start()
-        thread.join()
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
 
-    private fun parseJsonToCartProductList(responseString: String): List<CartProduct> {
-        val jsonArray = JSONArray(responseString)
-        val cartItems = mutableListOf<CartProduct>()
-        for (i in 0 until jsonArray.length()) {
-            val jsonObject = jsonArray.getJSONObject(i)
-            val id = jsonObject.getInt("id")
-            val quantity = jsonObject.getInt("quantity")
-            val productObject = jsonObject.getJSONObject("product")
-            val product = parseJsonToProduct(productObject)
-
-            val cartItem = CartProduct(id.toLong(), product, quantity, true)
-            cartItems.add(cartItem)
-        }
-        return cartItems
-    }
-
-    private fun parseJsonToProduct(jsonProduct: JSONObject): Product {
-        val id = jsonProduct.getInt("id")
-        val name = jsonProduct.getString("name")
-        val price = jsonProduct.getInt("price")
-        val imageUrl = jsonProduct.getString("imageUrl")
-
-        return Product(id.toLong(), name, imageUrl, Price(price))
+    private fun createRequestBody(bodyString: String): RequestBody {
+        return bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     }
 }
