@@ -4,6 +4,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.remote.service.ProductService
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
@@ -42,4 +43,6 @@ object RetrofitModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
+
+    val productService: ProductService = retrofit.create(ProductService::class.java)
 }

@@ -1,13 +1,11 @@
 package woowacourse.shopping.data.datasource.product.remote
 
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.RetrofitModule
-import java.io.IOException
 import java.lang.Integer.min
 
 class RemoteProductDataSource() : ProductDataSource.Remote {
@@ -17,23 +15,19 @@ class RemoteProductDataSource() : ProductDataSource.Remote {
         lastId: Int,
         onReceived: (products: List<DataProduct>) -> Unit
     ) {
-        val url = "${RetrofitModule.BASE_URL}/products"
-        val request = Request.Builder()
-            .url(url)
-            .get()
-            .build()
+        RetrofitModule.productService.getAllProducts().enqueue(
+            object : Callback<List<DataProduct>> {
+                override fun onResponse(
+                    call: Call<List<DataProduct>>,
+                    response: Response<List<DataProduct>>
+                ) {
+                    val productCache: List<DataProduct> = response.body() ?: listOf()
+                    onReceived(getDataProductsFromCache(size, lastId, productCache))
+                }
 
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-
-            override fun onResponse(call: Call, response: Response) {
-                val productCache = RetrofitModule.gson.fromJson(
-                    response.body?.string(),
-                    Array<DataProduct>::class.java
-                ).toList()
-                onReceived(getDataProductsFromCache(size, lastId, productCache))
+                override fun onFailure(call: Call<List<DataProduct>>, t: Throwable) {}
             }
-        })
+        )
     }
 
     private fun getDataProductsFromCache(
