@@ -46,6 +46,6 @@ object RetrofitModule {
             .build()
     }
 
-    val productService: ProductService = retrofit.create(ProductService::class.java)
-    val basketService: BasketService = retrofit.create(BasketService::class.java)
+    val productService: ProductService by lazy { retrofit.create(ProductService::class.java) }
+    val basketService: BasketService by lazy { retrofit.create(BasketService::class.java) }
 }
