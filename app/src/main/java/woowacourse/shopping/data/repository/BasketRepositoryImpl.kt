@@ -9,8 +9,7 @@ import woowacourse.shopping.domain.repository.BasketRepository
 
 class BasketRepositoryImpl(
     private val remoteBasketRemoteDataSource: BasketRemoteDataSource
-) :
-    BasketRepository {
+) : BasketRepository {
 
     override fun getAll(onReceived: (List<BasketProduct>) -> Unit) {
         remoteBasketRemoteDataSource.getAll { dataBasketProduct ->
