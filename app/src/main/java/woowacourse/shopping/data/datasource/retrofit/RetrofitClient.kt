@@ -5,13 +5,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private val BASE_URL = "http://3.34.134.115:8080"
-    private val retrofit = Retrofit.Builder()
+    private const val BASE_URL = "http://3.34.134.115:8080"
+    val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val _api = retrofit.create(ShoppingCartService::class.java)
-    val api: ShoppingCartService
-        get() = _api
+    inline fun <reified T> create(): T = retrofit.create<T>(T::class.java)
+}
+
+object ServicePool {
+    val productDataService = RetrofitClient.create<ProductDataService>()
+    val productDetailService = RetrofitClient.create<ProductDetailService>()
+    val shoppingCartService = RetrofitClient.create<ShoppingCartService>()
 }
