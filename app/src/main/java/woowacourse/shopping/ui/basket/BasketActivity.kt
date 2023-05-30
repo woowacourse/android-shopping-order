@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.OrderRemoteDataSourceImpl
@@ -152,6 +153,13 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
                     .toInt()
 
                 presenter.addOrder(usingPoint)
+            }
+            tvUsingPoint.addTextChangedListener {
+                if (!it.isNullOrBlank()) {
+                    val usingPoint = it.toString().toInt()
+
+                    btnDialogOrder.isEnabled = user.point >= usingPoint
+                }
             }
         }
 
