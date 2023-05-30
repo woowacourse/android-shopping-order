@@ -16,4 +16,5 @@
     <string name="order_format">주문하기(%d)</string>
     <string name="gray_server">그레이 서버</string>
     <string name="glan_server">글렌 서버</string>
+    <string name="toolbar_order_title">Order</string>
 </resources>
