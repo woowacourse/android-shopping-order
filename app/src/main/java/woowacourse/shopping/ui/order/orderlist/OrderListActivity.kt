@@ -1,12 +1,13 @@
-package woowacourse.shopping.ui.orderlist
+package woowacourse.shopping.ui.order.orderlist
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityOrderListBinding
-import woowacourse.shopping.ui.orderlist.adapter.OrderListAdapter
-import woowacourse.shopping.ui.orderlist.uistate.OrderUIState
+import woowacourse.shopping.ui.order.adapter.OrderListAdapter
+import woowacourse.shopping.ui.order.uistate.OrderUIState
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private val binding: ActivityOrderListBinding by lazy {
@@ -27,7 +28,15 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
         initToolbar()
         initRecycler()
-        initPresenter()
+        initOrders()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
     }
 
     override fun showOrders(orders: List<OrderUIState>) {
@@ -43,7 +52,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         binding.orderListRecycler.adapter = orderListAdapter
     }
 
-    private fun initPresenter() {
+    private fun initOrders() {
         presenter.loadOrders()
     }
 

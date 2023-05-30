@@ -1,9 +1,9 @@
-package woowacourse.shopping.ui.orderlist.adapter
+package woowacourse.shopping.ui.order.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.orderlist.uistate.OrderUIState
+import woowacourse.shopping.ui.order.uistate.OrderUIState
 
 class OrderListAdapter(private val orders: MutableList<OrderUIState>) :
     RecyclerView.Adapter<OrderListViewHolder>() {

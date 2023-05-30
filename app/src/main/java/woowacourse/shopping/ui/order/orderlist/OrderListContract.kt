@@ -1,6 +1,6 @@
-package woowacourse.shopping.ui.orderlist
+package woowacourse.shopping.ui.order.orderlist
 
-import woowacourse.shopping.ui.orderlist.uistate.OrderUIState
+import woowacourse.shopping.ui.order.uistate.OrderUIState
 
 interface OrderListContract {
     interface Presenter {

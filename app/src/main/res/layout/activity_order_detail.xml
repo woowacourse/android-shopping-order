@@ -7,13 +7,13 @@
 
         <variable
             name="order"
-            type="woowacourse.shopping.domain.order.Order" />
+            type="woowacourse.shopping.ui.order.uistate.OrderUIState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.orderdetail.OrderDetailActivity">
+        tools:context=".ui.order.orderdetail.OrderDetailActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/order_detail_toolbar"
@@ -27,6 +27,7 @@
             android:id="@+id/order_detail_recycler"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/order_detail_toolbar" />
@@ -48,60 +49,33 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-
-                android:id="@+id/order_detail_user_discount_header"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/order_detail_discount_layout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="회원 등급 할인"
+                android:orientation="vertical"
+                app:discountPolicies="@{order.discountPolicies}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/order_detail_price_header" />
-
-            <TextView
-                android:id="@+id/order_detail_user_discount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="10,000원"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_price_header" />
-
-            <TextView
-                android:id="@+id/order_detail_price_discount_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="금액 구간 할인"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_user_discount_header" />
-
-            <TextView
-                android:id="@+id/order_detail_price_discount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="10,000원"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_user_discount_header" />
 
             <TextView
                 android:id="@+id/order_detail_total_price_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="총 결제 금액"
+                android:text="@string/order_detail_total_price_header"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_price_discount_header" />
+                app:layout_constraintTop_toBottomOf="@id/order_detail_discount_layout" />
 
             <TextView
                 android:id="@+id/order_detail_total_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="10,000원"
+                android:text="@{@string/product_price(order.totalPrice)}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_price_discount_header" />
+                app:layout_constraintTop_toBottomOf="@id/order_detail_discount_layout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,10 +1,10 @@
-package woowacourse.shopping.ui.orderlist.adapter
+package woowacourse.shopping.ui.order.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderListHeaderBinding
-import woowacourse.shopping.ui.orderlist.uistate.OrderUIState
+import woowacourse.shopping.ui.order.uistate.OrderUIState
 
 class OrderListHeaderViewHolder private constructor(
     private val binding: ItemOrderListHeaderBinding

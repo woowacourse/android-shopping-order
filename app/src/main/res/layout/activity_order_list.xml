@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.orderlist.OrderListActivity">
+        tools:context=".ui.order.orderlist.OrderListActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/order_list_toolbar"

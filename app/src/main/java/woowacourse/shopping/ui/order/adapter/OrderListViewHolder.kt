@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orderlist.adapter
+package woowacourse.shopping.ui.order.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
