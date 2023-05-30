@@ -2,6 +2,7 @@ package woowacourse.shopping.data.remote.service
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -23,5 +24,10 @@ interface BasketService {
     fun update(
         @Path("cartItemId") cartItemId: Int,
         @Body body: BasketUpdateRequest
+    ): Call<Unit>
+
+    @DELETE("/cart-items/{cartItemId}")
+    fun delete(
+        @Path("cartItemId") cartItemId: Int
     ): Call<Unit>
 }

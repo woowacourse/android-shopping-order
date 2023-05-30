@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.basket.remote
 
-import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -10,10 +9,6 @@ import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.request.BasketAddRequest
 import woowacourse.shopping.data.remote.request.BasketUpdateRequest
-import java.io.IOException
-import okhttp3.Call as okhttpCall
-import okhttp3.Callback as okhttpCallback
-import okhttp3.Response as okhttpResponse
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {
@@ -34,10 +29,7 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun add(product: DataProduct, onReceived: (Int) -> Unit) {
         RetrofitModule.basketService.add(BasketAddRequest(product.id)).enqueue(
             object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>
-                ) {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     val basketId = response.headers()["Location"]?.split("/")?.last()?.toInt()
 
                     basketId?.let {
@@ -56,28 +48,19 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
             body = BasketUpdateRequest(basketProduct.count.value)
         ).enqueue(
             object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>
-                ) {
-                }
-
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
                 override fun onFailure(call: Call<Unit>, t: Throwable) {}
             }
         )
     }
 
-    override fun remove(basketProduct: DataBasketProduct) {
-        val url = "${RetrofitModule.BASE_URL}/cart-items/${basketProduct.id}"
-        val request = Request.Builder()
-            .url(url)
-            .delete()
-            .build()
-
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
-            override fun onFailure(call: okhttpCall, e: IOException) {}
-
-            override fun onResponse(call: okhttpCall, response: okhttpResponse) {}
-        })
+    override fun delete(basketProduct: DataBasketProduct) {
+        RetrofitModule.basketService.delete(cartItemId = basketProduct.id)
+            .enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {}
+                }
+            )
     }
 }
