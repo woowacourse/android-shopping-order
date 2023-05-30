@@ -20,7 +20,7 @@ class ProductRepositoryImpl(
                 result.onSuccess { products ->
                     localDataSource.insertAll(products)
                     localDataSource.getAll(callback)
-                }
+                }.onFailure { throwable -> callback(Result.failure(throwable)) }
             }
         }
     }
@@ -31,7 +31,7 @@ class ProductRepositoryImpl(
                 result.onSuccess { products ->
                     localDataSource.insertAll(products)
                     localDataSource.getNext(count, callback)
-                }
+                }.onFailure { throwable -> callback(Result.failure(throwable)) }
             }
             false -> localDataSource.getNext(count, callback)
         }
