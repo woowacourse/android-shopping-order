@@ -46,37 +46,28 @@ class ProductDetailPresenter(
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
             if (cartProduct == null) {
-                cartRepository.addCartProduct(product.id, ::onFailure) {
-                    if (count == UPDATE_COUNT_CONDITION) {
+                cartRepository.addCartProduct(product.id, ::onFailure) { cartId ->
+                    cartRepository.addLocalCart(cartId)
+
+                    view.addCartSuccessView()
+                    view.exitProductDetailView()
+
+                    if (count > UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
-                            val reCartProduct =
-                                reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
-                                    ?: return@loadAllCarts
-
-                            cartRepository.addLocalCart(reCartProduct.id)
-                        }
-
-                        view.addCartSuccessView()
-                        view.exitProductDetailView()
-                        return@addCartProduct
-                    }
-
-                    cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
-                        val reCartProduct =
-                            reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
-                                ?: return@loadAllCarts
-
-                        val newCartProduct = reCartProduct.copy(quantity = count)
-                        cartRepository.updateCartCount(newCartProduct, ::onFailure) {
-                            view.addCartSuccessView()
-                            view.exitProductDetailView()
+                            reLoadCarts.find { cartProduct -> cartProduct.id == cartId }?.let {
+                                val newCartProduct = it.copy(quantity = count)
+                                cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+                                    view.addCartSuccessView()
+                                    view.exitProductDetailView()
+                                }
+                            }
                         }
                     }
                 }
             }
 
             cartProduct?.let { cart ->
-                val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
+                val newCartProduct = cart.copy(quantity = cart.quantity + count)
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()

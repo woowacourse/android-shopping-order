@@ -79,7 +79,7 @@ class CartRemoteDataSourceImpl(
     override fun requestPostCartItem(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (Long) -> Unit,
     ) {
         val client = OkHttpClient()
         val mediaType = "application/json".toMediaType()
@@ -100,7 +100,9 @@ class CartRemoteDataSourceImpl(
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.code == 201) {
-                    onSuccess()
+                    val location = response.headers["Location"] ?: return onFailure()
+                    val cartId = location.substringAfterLast("cart-items/").toLong()
+                    onSuccess(cartId)
                     return
                 }
                 onFailure()

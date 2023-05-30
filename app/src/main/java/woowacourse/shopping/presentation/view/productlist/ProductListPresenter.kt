@@ -121,20 +121,16 @@ class ProductListPresenter(
         this.lastScroll = lastScroll
     }
 
-    // TODO 아이템 1개 초과부터 툴바 반영이 안 됨 (id 갱신을 안 해줌)
     override fun updateCount(productId: Long, count: Int) {
         val targetCartProduct = cartProducts.toModel().getCartByProductId(productId) ?: return
         if (targetCartProduct.count == 0) {
-            cartRepository.addCartProduct(productId, ::onFailure) {
+            cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
                 cartProducts = cartProducts.toModel()
                     .updateCartCountByCartId(targetCartProduct.id, count)
                     .toUIModel()
 
-                cartRepository.loadAllCarts(::onFailure) { carts ->
-                    carts.find { it.product.id == targetCartProduct.product.id } ?: return@loadAllCarts
-
-                    cartRepository.addLocalCart(targetCartProduct.id)
-                }
+                cartRepository.addLocalCart(cartId)
+                cartProducts = cartProducts.toModel().updateCartId(cartId, productId).toUIModel()
 
                 val allCount = cartProducts.toModel().totalCount
                 view.updateToolbarCartCountView(allCount)

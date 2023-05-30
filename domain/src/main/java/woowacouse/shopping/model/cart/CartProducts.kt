@@ -4,7 +4,7 @@ class CartProducts(
     private val carts: List<CartProduct>
 ) {
     val totalPrice: Int
-        get() = carts.sumOf { if (it.checked) it.product.price else 0 }
+        get() = carts.sumOf { if (it.checked) it.product.price * it.count else 0 }
 
     val totalCount: Int
         get() = carts.sumOf { it.count }
@@ -20,6 +20,19 @@ class CartProducts(
 
     fun deleteCart(cartId: Long): CartProducts {
         return CartProducts(carts.filterNot { it.id == cartId })
+    }
+
+    // TODO 테스트 코드 작성
+    fun updateCartId(cartId: Long, productId: Long): CartProducts {
+        return CartProducts(
+            carts.map {
+                if (it.product.id == productId) {
+                    it.copy(id = cartId)
+                } else {
+                    it
+                }
+            }
+        )
     }
 
     fun updateCartChecked(cartId: Long, checked: Boolean): CartProducts {

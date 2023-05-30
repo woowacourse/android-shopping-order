@@ -12,7 +12,7 @@ interface CartRepository {
     fun addCartProduct(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (Long) -> Unit,
     )
     fun loadAllCarts(
         onFailure: () -> Unit,
