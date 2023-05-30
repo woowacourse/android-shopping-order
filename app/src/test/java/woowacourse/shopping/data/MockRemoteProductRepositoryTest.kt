@@ -7,7 +7,7 @@ import com.example.domain.repository.ProductRepository
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.product.ProductRemoteService
 import java.lang.Thread.sleep
 
 internal class MockRemoteProductRepositoryTest {
@@ -32,7 +32,7 @@ internal class MockRemoteProductRepositoryTest {
             onSuccess = {
                 actual = it
             },
-            onFailure = {}
+            onFailure = {},
         )
         sleep(1000)
 
@@ -52,7 +52,7 @@ internal class MockRemoteProductRepositoryTest {
             onSuccess = {
                 actual = it
             },
-            onFailure = {}
+            onFailure = {},
         )
         sleep(1000)
 
@@ -72,7 +72,7 @@ internal class MockRemoteProductRepositoryTest {
             onSuccess = {
                 actual = it
             },
-            onFailure = {}
+            onFailure = {},
         )
         sleep(1000)
 

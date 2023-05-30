@@ -15,8 +15,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.ProductRemoteService
 import woowacourse.shopping.data.service.cart.CartRemoteService
+import woowacourse.shopping.data.service.product.ProductRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.feature.cart.CartActivity

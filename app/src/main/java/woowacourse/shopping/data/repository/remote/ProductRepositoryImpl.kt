@@ -4,7 +4,7 @@ import com.example.domain.cache.ProductCache
 import com.example.domain.cache.ProductLocalCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
-import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.product.ProductRemoteService
 
 class ProductRepositoryImpl(
     private val service: ProductRemoteService,

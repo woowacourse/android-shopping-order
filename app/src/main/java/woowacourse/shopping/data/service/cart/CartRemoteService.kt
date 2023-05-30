@@ -8,6 +8,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.CartProductDto
+import woowacourse.shopping.data.service.RetrofitApiGenerator
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.user.ServerInfo
 import java.net.URI
@@ -17,7 +18,7 @@ class CartRemoteService {
     private val authorization: String = "Basic ${ServerInfo.token}"
 
     fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
-        CartRetrofitApiGenerator.service.requestCarts(authorization)
+        RetrofitApiGenerator.cartService.requestCarts(authorization)
             .enqueue(object : Callback<List<CartProductDto>> {
                 override fun onResponse(
                     call: Call<List<CartProductDto>>,
@@ -47,7 +48,7 @@ class CartRemoteService {
             } 
         """.trimIndent()
 
-        CartRetrofitApiGenerator.service
+        RetrofitApiGenerator.cartService
             .requestAddCartProduct(authorization, createRequestBody(bodyString))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -77,7 +78,7 @@ class CartRemoteService {
             } 
         """.trimIndent()
 
-        CartRetrofitApiGenerator.service.requestChangeCartProductCount(
+        RetrofitApiGenerator.cartService.requestChangeCartProductCount(
             authorization,
             cartId,
             createRequestBody(bodyString),
@@ -98,7 +99,7 @@ class CartRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        CartRetrofitApiGenerator.service.requestDeleteCartProduct(authorization, cartId)
+        RetrofitApiGenerator.cartService.requestDeleteCartProduct(authorization, cartId)
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
