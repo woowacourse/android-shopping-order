@@ -3,7 +3,7 @@ package woowacourse.shopping.data.model
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
-data class DataOrderRecord(
+data class DataOrder(
     val orderId: Long,
     @SerializedName("createdAt")
     val orderedTime: Date?,

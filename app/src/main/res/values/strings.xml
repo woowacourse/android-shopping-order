@@ -32,6 +32,7 @@
     <string name="order">주문하기</string>
     <string name="order_count">수량: %d</string>
     <string name="request_input_using_point">사용할 적립금을 입력하세요.</string>
+    <string name="orderHistory">주문내역</string>
 
 
 </resources>
