@@ -1,44 +1,48 @@
 package woowacourse.shopping.ui.cart
 
+import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.repository.CartItemRepository
+import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState.Companion.toUIState
+import woowacourse.shopping.ui.order.uistate.PaymentUIState.Companion.toUIState
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
+    private val orderRepository: OrderRepository,
     private val pageSize: Int
 ) : CartContract.Presenter {
-    private var selectedCartItems = setOf<CartItem>()
+    private var selectedCart = Cart(emptyList())
     var currentPage = 0
 
     override fun loadCartItemsOfNextPage() {
         currentPage++
-        showOrderUI(selectedCartItems)
-        showCartItems(currentPage, selectedCartItems, true)
+        showOrderUI(selectedCart)
+        showCartItems(currentPage, selectedCart, true)
         showPageUI(currentPage)
-        showAllSelectionUI(currentPage, selectedCartItems)
+        showAllSelectionUI(currentPage, selectedCart)
     }
 
     override fun loadCartItemsOfPreviousPage() {
         currentPage--
-        showCartItems(currentPage, selectedCartItems, true)
+        showCartItems(currentPage, selectedCart, true)
         showPageUI(currentPage)
-        showAllSelectionUI(currentPage, selectedCartItems)
+        showAllSelectionUI(currentPage, selectedCart)
     }
 
     override fun loadCartItemsOfLastPage() {
         cartItemRepository.countAll { count ->
             currentPage = (count - 1) / pageSize + 1
-            showCartItems(currentPage, selectedCartItems, true)
+            showCartItems(currentPage, selectedCart, true)
             showPageUI(currentPage)
-            showAllSelectionUI(currentPage, selectedCartItems)
+            showAllSelectionUI(currentPage, selectedCart)
         }
     }
 
     override fun deleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId) {
-            selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
+            selectedCart = Cart(selectedCart.value.filter { it.id != cartItemId })
             showPageUI(currentPage)
             updateCartUI()
         }
@@ -48,13 +52,13 @@ class CartPresenter(
         cartItemRepository.findById(cartItemId) { loadedCartItem ->
             requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
-            selectedCartItems = if (isSelected) {
-                selectedCartItems + loadedCartItem
+            selectedCart = if (isSelected) {
+                selectedCart.copy(value = selectedCart.value + loadedCartItem)
             } else {
-                selectedCartItems - loadedCartItem
+                selectedCart.copy(value = selectedCart.value - loadedCartItem)
             }
-            showAllSelectionUI(currentPage, selectedCartItems)
-            showOrderUI(selectedCartItems)
+            showAllSelectionUI(currentPage, selectedCart)
+            showOrderUI(selectedCart)
         }
     }
 
@@ -62,10 +66,12 @@ class CartPresenter(
         val offset = (currentPage - 1) * pageSize
         cartItemRepository.findAllOrderByAddedTime(pageSize, offset) { cartItemsOfCurrentPage ->
             if (isSelected) {
-                selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
+                selectedCart =
+                    selectedCart.copy(value = selectedCart.value + cartItemsOfCurrentPage)
                 updateCartUI()
-            } else if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
-                selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
+            } else if (cartItemsOfCurrentPage.all { it in selectedCart.value }) {
+                selectedCart =
+                    selectedCart.copy(value = selectedCart.value - cartItemsOfCurrentPage.toSet())
                 updateCartUI()
             }
         }
@@ -89,23 +95,34 @@ class CartPresenter(
         }
     }
 
-    private fun showCartItems(page: Int, selectedCartItems: Set<CartItem>, initScroll: Boolean) {
+    override fun checkPayment() {
+        orderRepository.findDiscountPolicy(selectedCart) {
+            view.showPaymentWindow(it.toUIState())
+        }
+    }
+
+    override fun placeOrder() {
+        orderRepository.save(selectedCart) {
+            view.showOrderDetail(it)
+        }
+    }
+
+    private fun showCartItems(page: Int, selectedCartItems: Cart, initScroll: Boolean) {
         getCartItemsOf(page) { cartItems ->
-            val cartItemUIStates =
-                cartItems.map { it.toUIState(it in selectedCartItems) }
+            val cartItemUIStates = cartItems.map { it.toUIState(it in selectedCartItems.value) }
             view.setCartItems(cartItemUIStates, initScroll)
         }
     }
 
     private fun updateCartUI() {
-        showAllSelectionUI(currentPage, selectedCartItems)
-        showOrderUI(selectedCartItems)
-        showCartItems(currentPage, selectedCartItems, false)
+        showAllSelectionUI(currentPage, selectedCart)
+        showOrderUI(selectedCart)
+        showCartItems(currentPage, selectedCart, false)
     }
 
-    private fun showAllSelectionUI(currentPage: Int, selectedCartItems: Set<CartItem>) {
+    private fun showAllSelectionUI(currentPage: Int, selectedCartItems: Cart) {
         getCartItemsOf(currentPage) { cartItems ->
-            view.setStateOfAllSelection(cartItems.all { it in selectedCartItems } && cartItems.isNotEmpty())
+            view.setStateOfAllSelection(cartItems.all { it in selectedCartItems.value } && cartItems.isNotEmpty())
         }
     }
 
@@ -114,9 +131,9 @@ class CartPresenter(
         return cartItemRepository.findAllOrderByAddedTime(pageSize, offset, onFinish)
     }
 
-    private fun showOrderUI(selectedCartItems: Set<CartItem>) {
-        view.setOrderPrice(selectedCartItems.sumOf(CartItem::calculateOrderPrice))
-        view.setOrderCount(selectedCartItems.size)
+    private fun showOrderUI(selectedCartItems: Cart) {
+        view.setOrderPrice(selectedCartItems.calculateTotalPrice())
+        view.setOrderCount(selectedCartItems.value.size)
     }
 
     private fun showPageUI(currentPage: Int) {
@@ -140,12 +157,12 @@ class CartPresenter(
 
     private fun updateCount(cartItem: CartItem) {
         cartItemRepository.updateCountById(cartItem.id, cartItem.quantity) {
-            if (cartItem in selectedCartItems) {
-                selectedCartItems = selectedCartItems - cartItem + cartItem
-                showAllSelectionUI(currentPage, selectedCartItems)
-                showOrderUI(selectedCartItems)
+            if (cartItem in selectedCart.value) {
+                selectedCart = selectedCart.updateElement(cartItem, cartItem)
+                showAllSelectionUI(currentPage, selectedCart)
+                showOrderUI(selectedCart)
             }
-            showCartItems(currentPage, selectedCartItems, false)
+            showCartItems(currentPage, selectedCart, false)
         }
     }
 

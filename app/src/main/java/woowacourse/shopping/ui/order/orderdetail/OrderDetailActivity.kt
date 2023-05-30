@@ -8,11 +8,15 @@ import android.view.MenuItem
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
+import woowacourse.shopping.data.order.OrderRemoteSource
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.databinding.ItemOrderDiscountBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.uistate.DiscountPolicyUIState
 import woowacourse.shopping.ui.order.uistate.OrderUIState
+import woowacourse.shopping.utils.ServerConfiguration
+import woowacourse.shopping.utils.getSerializable
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private val binding: ActivityOrderDetailBinding by lazy {
@@ -20,7 +24,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private val presenter: OrderDetailContract.Presenter by lazy {
-        OrderDetailPresenter(this)
+        OrderDetailPresenter(this, OrderRepositoryImpl(OrderRemoteSource(ServerConfiguration.host)))
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {
@@ -31,6 +35,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        validateExtra()
         initToolbar()
         initRecycler()
         initOrder()
@@ -49,6 +54,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         orderListAdapter.setOrders(listOf(order))
     }
 
+    private fun validateExtra() {
+        intent.extras?.containsKey(ORDER_ID) ?: return finish()
+    }
+
     private fun initToolbar() {
         setSupportActionBar(binding.orderDetailToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -59,12 +68,16 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun initOrder() {
-        presenter.loadOrder()
+        val orderId = intent.getSerializable<Long>(ORDER_ID) ?: return finish()
+        presenter.loadOrder(orderId)
     }
 
     companion object {
-        fun startActivity(context: Context) {
-            Intent(context, this::class.java).run {
+        private const val ORDER_ID = "orderId"
+        fun startActivity(context: Context, orderId: Long) {
+            Intent(context, OrderDetailActivity::class.java).run {
+                putExtra(ORDER_ID, orderId)
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
                 context.startActivity(this)
             }
         }
@@ -75,9 +88,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             discountPolicies ?: return
             for (discountPolicy in discountPolicies) {
                 val discountPolicyBinding = ItemOrderDiscountBinding.inflate(
-                    LayoutInflater.from(layout.context),
-                    layout,
-                    true
+                    LayoutInflater.from(layout.context), layout, true
                 )
                 discountPolicyBinding.discountPolicy = discountPolicy
             }

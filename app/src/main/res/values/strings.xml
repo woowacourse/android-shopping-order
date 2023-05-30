@@ -12,6 +12,7 @@
     <!-- App Bar -->
     <string name="app_bar_title_product_list">Shopping</string>
     <string name="app_bar_title_cart">Cart</string>
+
     <string name="button_load_more">더보기</string>
     <string name="order_with_count">주문하기(%d)</string>
     <string name="order">주문하기</string>
@@ -25,4 +26,6 @@
     <string name="order_list_description">%,d원 / 수량 : %d개</string>
     <string name="order_detail_info_header">결제금액 정보</string>
     <string name="order_detail_total_price_header">총 결제 금액</string>
+    <string name="cart_dialog_payment_positive">결제</string>
+    <string name="cart_dialog_payment_negative">취소</string>
 </resources>

@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.order.uistate.PaymentUIState
 
 interface CartContract {
 
@@ -20,6 +21,10 @@ interface CartContract {
         fun plusCount(cartItemId: Long)
 
         fun minusCount(cartItemId: Long)
+
+        fun checkPayment()
+
+        fun placeOrder()
     }
 
     interface View {
@@ -38,5 +43,9 @@ interface CartContract {
         fun setOrderPrice(price: Int)
 
         fun setOrderCount(count: Int)
+
+        fun showPaymentWindow(payment: PaymentUIState)
+
+        fun showOrderDetail(orderId: Long)
     }
 }

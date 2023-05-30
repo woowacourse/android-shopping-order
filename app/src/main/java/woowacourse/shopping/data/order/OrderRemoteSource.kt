@@ -1,3 +1,5 @@
 package woowacourse.shopping.data.order
 
-class OrderRemoteSource : OrderDataSource
+import woowacourse.shopping.utils.RemoteHost
+
+class OrderRemoteSource(private val host: RemoteHost) : OrderDataSource

@@ -58,7 +58,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     companion object {
         fun startActivity(context: Context) {
-            Intent(context, this::class.java).run {
+            Intent(context, OrderListActivity::class.java).run {
                 context.startActivity(this)
             }
         }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -11,9 +12,14 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.order.OrderRemoteSource
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.databinding.CustomOrderBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.order.orderdetail.OrderDetailActivity
+import woowacourse.shopping.ui.order.uistate.PaymentUIState
 import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -32,6 +38,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             this,
             CartItemRepositoryImpl(
                 CartItemRemoteService(ServerConfiguration.host)
+            ),
+            OrderRepositoryImpl(
+                OrderRemoteSource(ServerConfiguration.host)
             ),
             PAGE_SIZE
         )
@@ -105,8 +114,30 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setOrderCount(count: Int) {
         runOnUiThread {
-            binding.tvOrder.text = getString(R.string.order_with_count).format(count)
+            binding.btnOrder.text = getString(R.string.order_with_count).format(count)
         }
+    }
+
+    override fun showPaymentWindow(payment: PaymentUIState) {
+        val orderDialog = CustomOrderBinding.inflate(layoutInflater)
+
+        AlertDialog.Builder(this).apply {
+            setView(orderDialog.root)
+            create()
+            setPositiveButton(getString(R.string.cart_dialog_payment_positive)) { dialog, _ ->
+                presenter.placeOrder()
+                dialog.dismiss()
+            }
+            setNegativeButton(getString(R.string.cart_dialog_payment_negative)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        }.show()
+
+        orderDialog.payment = payment
+    }
+
+    override fun showOrderDetail(orderId: Long) {
+        OrderDetailActivity.startActivity(this, orderId)
     }
 
     private fun loadLastPageIfFromCartItemAdd() {
@@ -134,6 +165,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.btnPageUp.setOnClickListener {
             presenter.loadCartItemsOfNextPage()
         }
+        binding.btnOrder.setOnClickListener {
+            presenter.checkPayment()
+        }
     }
 
     private fun initCartList() {
@@ -146,7 +180,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cbPageAllSelect.setOnCheckedChangeListener { _, isChecked ->
             presenter.updateSelectionTotalCartItems(isChecked)
         }
-        binding.tvOrder.text = getString(R.string.order)
+        binding.btnOrder.text = getString(R.string.order)
     }
 
     private fun makeCartListEvent() = object : CartListEvent {
@@ -172,8 +206,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         private const val JUST_ADDED_CART_ITEM = "JUST_ADDED_CART_ITEM"
 
         fun startActivity(context: Context, justAddedCartItem: Boolean = false) {
-            Intent(context, this::class.java).apply {
+            Intent(context, CartActivity::class.java).apply {
                 putExtra(JUST_ADDED_CART_ITEM, justAddedCartItem)
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
             }.run {
                 context.startActivity(this)
             }

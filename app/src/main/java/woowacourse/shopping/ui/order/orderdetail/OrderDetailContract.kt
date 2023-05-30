@@ -4,7 +4,7 @@ import woowacourse.shopping.ui.order.uistate.OrderUIState
 
 interface OrderDetailContract {
     interface Presenter {
-        fun loadOrder()
+        fun loadOrder(orderId: Long)
     }
 
     interface View {

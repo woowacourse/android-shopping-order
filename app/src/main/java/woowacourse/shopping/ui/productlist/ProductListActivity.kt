@@ -163,7 +163,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     companion object {
         fun startActivity(context: Context) {
-            val intent = Intent(context, this::class.java).apply {}
+            val intent = Intent(context, ProductListActivity::class.java).apply {}
             context.startActivity(intent)
         }
     }

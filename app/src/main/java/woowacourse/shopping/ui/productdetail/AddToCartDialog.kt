@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import woowacourse.shopping.databinding.LayoutAddToCartDialogBinding
+import woowacourse.shopping.databinding.DialogAddToCartBinding
 import woowacourse.shopping.ui.customview.CounterEvent
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 
@@ -13,15 +13,14 @@ class AddToCartDialog(
     private val product: ProductDetailUIState,
     private val onClickButton: (Long, Int) -> Unit
 ) : DialogFragment() {
-    private lateinit var binding: LayoutAddToCartDialogBinding
+    private lateinit var binding: DialogAddToCartBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding =
-            LayoutAddToCartDialogBinding.inflate(LayoutInflater.from(context), container, true)
+        binding = DialogAddToCartBinding.inflate(LayoutInflater.from(context), container, true)
 
         binding.counter.binding.counterEvent = makeCounterEvent()
 

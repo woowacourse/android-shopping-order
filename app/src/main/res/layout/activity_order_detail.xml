@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -32,53 +33,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/order_detail_toolbar" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="200dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/order_detail_recycler">
 
-            <TextView
-                android:id="@+id/order_detail_price_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/order_detail_info_header"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/order_detail_discount_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:discountPolicies="@{order.discountPolicies}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_price_header" />
-
-            <TextView
-                android:id="@+id/order_detail_total_price_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/order_detail_total_price_header"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_discount_layout" />
-
-            <TextView
-                android:id="@+id/order_detail_total_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@{@string/product_price(order.totalPrice)}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/order_detail_discount_layout" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+            <include
+                layout="@layout/custom_order"
+                bind:payment="@{order.payment}" />
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
