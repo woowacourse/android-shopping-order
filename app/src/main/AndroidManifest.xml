@@ -36,7 +36,7 @@
             android:name=".ui.productdetail.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.productlist.ProductListActivity"
+            android:name=".ui.shopping.ShoppingActivity"
             android:exported="false" />
     </application>
 

@@ -7,11 +7,11 @@
 
         <variable
             name="productListEvent"
-            type="woowacourse.shopping.ui.productlist.ProductListEvent" />
+            type="woowacourse.shopping.ui.shopping.ShoppingEvent" />
 
         <variable
             name="product"
-            type="woowacourse.shopping.ui.productlist.uistate.ProductUIState" />
+            type="woowacourse.shopping.ui.shopping.uistate.ProductUIState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

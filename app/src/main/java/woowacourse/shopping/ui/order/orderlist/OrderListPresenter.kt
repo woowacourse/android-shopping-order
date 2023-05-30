@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.order.orderlist
 import woowacourse.shopping.ui.order.uistate.DiscountPolicyUIState
 import woowacourse.shopping.ui.order.uistate.OrderUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 
 class OrderListPresenter(private val view: OrderListContract.View) : OrderListContract.Presenter {
     override fun loadOrders() {

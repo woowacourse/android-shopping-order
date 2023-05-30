@@ -1,24 +1,24 @@
-package woowacourse.shopping.ui.productlist.adapter
+package woowacourse.shopping.ui.shopping.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.ui.productlist.ProductListEvent
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.ShoppingEvent
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 
-class ProductListAdapter(
+class ShoppingAdapter(
     private val products: MutableList<ProductUIState> = mutableListOf(),
-    private val productListEvent: ProductListEvent
-) : RecyclerView.Adapter<ProductListViewHolder>() {
+    private val shoppingEvent: ShoppingEvent
+) : RecyclerView.Adapter<ShoppingViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListViewHolder {
-        return ProductListViewHolder.from(
-            parent, productListEvent
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShoppingViewHolder {
+        return ShoppingViewHolder.from(
+            parent, shoppingEvent
         )
     }
 
     override fun getItemCount(): Int = products.size
 
-    override fun onBindViewHolder(holder: ProductListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ShoppingViewHolder, position: Int) {
         holder.bind(products[position])
     }
 

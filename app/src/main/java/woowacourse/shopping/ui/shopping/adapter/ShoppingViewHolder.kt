@@ -1,21 +1,21 @@
-package woowacourse.shopping.ui.productlist.adapter
+package woowacourse.shopping.ui.shopping.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.ui.productlist.ProductListEvent
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.ShoppingEvent
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 
-class ProductListViewHolder private constructor(
+class ShoppingViewHolder private constructor(
     private val binding: ItemProductBinding,
-    productListEvent: ProductListEvent
+    shoppingEvent: ShoppingEvent
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        binding.productListEvent = productListEvent
-        binding.counter.binding.counterEvent = productListEvent
+        binding.productListEvent = shoppingEvent
+        binding.counter.binding.counterEvent = shoppingEvent
     }
 
     fun bind(product: ProductUIState) {
@@ -25,13 +25,13 @@ class ProductListViewHolder private constructor(
     companion object {
         fun from(
             parent: ViewGroup,
-            productListEvent: ProductListEvent
-        ): ProductListViewHolder {
+            shoppingEvent: ShoppingEvent
+        ): ShoppingViewHolder {
             val view =
                 LayoutInflater.from(parent.context).inflate(R.layout.item_product, parent, false)
             val binding = ItemProductBinding.bind(view)
-            return ProductListViewHolder(
-                binding, productListEvent
+            return ShoppingViewHolder(
+                binding, shoppingEvent
             )
         }
     }

@@ -1,21 +1,21 @@
-package woowacourse.shopping.ui.productlist
+package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState.Companion.toUIState
-import woowacourse.shopping.ui.productlist.uistate.RecentlyViewedProductUIState.Companion.toUIState
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState.Companion.toUIState
+import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState.Companion.toUIState
 import java.time.LocalDateTime
 
-class ProductListPresenter(
-    private val view: ProductListContract.View,
+class ShoppingPresenter(
+    private val view: ShoppingContract.View,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository
-) : ProductListContract.Presenter {
+) : ShoppingContract.Presenter {
 
     private var currentPage = 1
 

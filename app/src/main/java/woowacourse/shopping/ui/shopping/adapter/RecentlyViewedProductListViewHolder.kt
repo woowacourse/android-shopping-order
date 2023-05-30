@@ -1,11 +1,11 @@
-package woowacourse.shopping.ui.productlist.adapter
+package woowacourse.shopping.ui.shopping.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemRecentlyViewedProductBinding
-import woowacourse.shopping.ui.productlist.uistate.RecentlyViewedProductUIState
+import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
 
 class RecentlyViewedProductListViewHolder private constructor(
     private val binding: ItemRecentlyViewedProductBinding,

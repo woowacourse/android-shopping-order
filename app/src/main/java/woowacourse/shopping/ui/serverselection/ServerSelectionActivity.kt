@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import woowacourse.shopping.R
 import woowacourse.shopping.session.UserData
-import woowacourse.shopping.ui.productlist.ProductListActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.View {
 
@@ -23,7 +23,7 @@ class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.Vie
     }
 
     override fun showProductListView() {
-        ProductListActivity.startActivity(this)
+        ShoppingActivity.startActivity(this)
     }
 
     private fun saveUserInfo(credential: String) {

@@ -7,7 +7,7 @@
 
         <variable
             name="recentlyViewedProduct"
-            type="woowacourse.shopping.ui.productlist.uistate.RecentlyViewedProductUIState" />
+            type="woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

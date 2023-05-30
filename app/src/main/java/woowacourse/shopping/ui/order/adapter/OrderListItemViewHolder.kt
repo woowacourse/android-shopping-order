@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderListBinding
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 
 class OrderListItemViewHolder private constructor(
     private val binding: ItemOrderListBinding

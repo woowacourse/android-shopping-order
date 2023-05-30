@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.productlist.uistate
+package woowacourse.shopping.ui.shopping.uistate
 
 import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 

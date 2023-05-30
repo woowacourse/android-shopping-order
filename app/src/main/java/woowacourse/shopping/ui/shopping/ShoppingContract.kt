@@ -1,9 +1,9 @@
-package woowacourse.shopping.ui.productlist
+package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.ui.productlist.uistate.ProductUIState
-import woowacourse.shopping.ui.productlist.uistate.RecentlyViewedProductUIState
+import woowacourse.shopping.ui.shopping.uistate.ProductUIState
+import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
 
-interface ProductListContract {
+interface ShoppingContract {
     interface Presenter {
         fun loadRecentlyViewedProducts()
         fun loadProductsNextPage()
