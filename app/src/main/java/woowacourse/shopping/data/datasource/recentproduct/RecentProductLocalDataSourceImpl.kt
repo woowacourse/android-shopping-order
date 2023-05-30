@@ -1,7 +1,6 @@
-package woowacourse.shopping.data.datasource.recentproduct.local
+package woowacourse.shopping.data.datasource.recentproduct
 
 import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDao
-import woowacourse.shopping.data.datasource.recentproduct.RecentProductLocalDataSource
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.model.DataRecentProduct
 
