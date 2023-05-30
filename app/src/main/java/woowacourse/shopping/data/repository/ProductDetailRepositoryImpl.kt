@@ -7,13 +7,16 @@ import com.example.domain.repository.ProductDetailRepository
 import retrofit2.Call
 import retrofit2.Callback
 import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailSource
+import woowacourse.shopping.mapper.toDomain
 
 class ProductDetailRepositoryImpl(
     private val productDetailSource: ProductDetailSource,
 ) : ProductDetailRepository {
     override fun getById(id: Long, onSuccess: (Product) -> Unit, onFailure: (Exception) -> Unit) {
         productDetailSource.getById(id).enqueue(
-            createResponseCallback(onSuccess, onFailure),
+            createResponseCallback(onSuccess = {
+                it.toDomain()
+            }, onFailure),
         )
     }
 

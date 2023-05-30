@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 import woowacourse.shopping.data.datasource.remote.product.ProductDataSource
+import woowacourse.shopping.mapper.toDomain
 
 class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
@@ -25,10 +26,11 @@ class ProductRepositoryImpl(
         productDataSource.getAllProducts().enqueue(
             createResponseCallback(
                 onSuccess = {
+                    val productsDomain = it.map { productDto -> productDto.toDomain() }
                     products.clear()
-                    products.addAll(it)
+                    products.addAll(productsDomain)
                     isProductDataCached = true
-                    onSuccess(it)
+                    onSuccess(productsDomain)
                 },
                 onFailure,
             ),
