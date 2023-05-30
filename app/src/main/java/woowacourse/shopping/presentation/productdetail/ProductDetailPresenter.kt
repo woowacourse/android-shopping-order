@@ -1,52 +1,58 @@
 package woowacourse.shopping.presentation.productdetail
 
 import woowacourse.shopping.CartProductInfo
-import woowacourse.shopping.Product
 import woowacourse.shopping.presentation.mapper.toDomain
+import woowacourse.shopping.presentation.mapper.toPresentation
+import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import woowacourse.shopping.util.SafeLiveData
-import woowacourse.shopping.util.SafeMutableLiveData
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    productModel: ProductModel,
+    private val productModel: ProductModel,
 ) : ProductDetailContract.Presenter {
-
-    private val _productInfo =
-        SafeMutableLiveData(CartProductInfo(1, productModel.toDomain(), 0))
-    override val productInfo: SafeLiveData<CartProductInfo> get() = _productInfo
-
-    private val _mostRecentProduct: SafeMutableLiveData<Product> =
-        SafeMutableLiveData(Product.defaultProduct)
-    override val mostRecentProduct: SafeLiveData<Product> get() = _mostRecentProduct
+    private lateinit var mostRecentProductModel: ProductModel
     override fun checkCurrentProductIsMostRecent() {
-        _mostRecentProduct.value = recentProductRepository.getMostRecentProduct()
-        if (mostRecentProduct.value == productInfo.value.product || mostRecentProduct.value.id
-            == -1
-        ) view.hideMostRecentProduct()
+        recentProductRepository.getMostRecentProduct {
+            mostRecentProductModel = it?.toPresentation() ?: productModel
+            if (productModel == mostRecentProductModel) {
+                view.setMostRecentProductVisible(
+                    false,
+                    mostRecentProductModel,
+                )
+            } else {
+                view.setMostRecentProductVisible(true, mostRecentProductModel)
+            }
+        }
+    }
+
+    override fun showMostRecentProductDetail() {
+        view.navigateToMostRecent(mostRecentProductModel)
+    }
+
+    override fun showProductCart() {
+        val cartProduct = CartProductInfoModel(0, productModel, 1)
+        view.showProductCart(cartProduct)
+    }
+
+    override fun updateTotalPrice(count: Int) {
+        val price = CartProductInfo(0, productModel.toDomain(), count).totalPrice
+        view.setTotalPrice(price)
     }
 
     override fun saveRecentProduct() {
-        recentProductRepository.deleteRecentProductId(productInfo.value.product.id)
-        recentProductRepository.addRecentProductId(productInfo.value.product.id)
+        recentProductRepository.deleteRecentProductId(productModel.id)
+        recentProductRepository.addRecentProductId(productModel.id)
     }
 
     override fun saveProductInRepository(count: Int) {
-        if (count == 0) return
-        if (cartRepository.getCartIdByProductId(productInfo.value.product.id) == -1)
-            cartRepository.putProductInCart(
-                productInfo.value.product.id
-            )
-        val cartId = cartRepository.getCartIdByProductId(productInfo.value.product.id)
-        cartRepository.updateCartProductCount(cartId, count)
-        view.showCompleteMessage(productInfo.value.product.name)
-    }
-
-    override fun updateProductCount(count: Int) {
-        _productInfo.value = _productInfo.value.setCount(count)
+        cartRepository.addCartItem(productModel.id) {
+            cartRepository.updateCartItemQuantity(productModel.id, count) {
+                view.showCompleteMessage(productModel.name)
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ interface ProductService {
     @GET("products")
     fun getAllProducts(): Call<List<ProductDataModel>>
 
-    @GET("product/{id}")
+    @GET("products/{id}")
     fun getProductById(
         @Path("id") id: Int,
     ): Call<ProductDataModel>

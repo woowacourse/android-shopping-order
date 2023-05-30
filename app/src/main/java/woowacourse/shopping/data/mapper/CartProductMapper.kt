@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.CartProductInfo
-import woowacourse.shopping.data.cart.CartRemoteDataModel
+import woowacourse.shopping.data.cart.CartDataModel
 
-fun CartRemoteDataModel.toDomain(): CartProductInfo {
+fun CartDataModel.toDomain(): CartProductInfo {
     return CartProductInfo(
         id = id,
         product = product.toDomain(),
@@ -11,8 +11,8 @@ fun CartRemoteDataModel.toDomain(): CartProductInfo {
     )
 }
 
-fun CartProductInfo.toDataModel(): CartRemoteDataModel {
-    return CartRemoteDataModel(
+fun CartProductInfo.toDataModel(): CartDataModel {
+    return CartDataModel(
         id = id,
         product = product.toDataModel(),
         count = count,

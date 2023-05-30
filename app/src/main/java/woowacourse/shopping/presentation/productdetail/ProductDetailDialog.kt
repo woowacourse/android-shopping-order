@@ -5,17 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.DialogProductDetailBinding
-import woowacourse.shopping.presentation.common.CounterContract
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.common.CounterListener
+import woowacourse.shopping.presentation.model.CartProductInfoModel
 
 class ProductDetailDialog(
-    private val productModel: ProductModel,
+    private val cartProductModel: CartProductInfoModel,
     private val presenter: ProductDetailContract.Presenter,
 ) : DialogFragment() {
 
-    private lateinit var counter: CounterContract.Presenter
-    private lateinit var binding: DialogProductDetailBinding
+    lateinit var binding: DialogProductDetailBinding
+
+    private val counterListener = object : CounterListener {
+        override fun onPlus(count: Int) {
+            presenter.updateTotalPrice(count)
+        }
+
+        override fun onMinus(count: Int) {
+            presenter.updateTotalPrice(count)
+        }
+    }
+
+    fun setTotalPrice(totalPrice: Int) {
+        binding.textDialogCartProductPrice.text = getString(R.string.price_format, totalPrice)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,40 +43,18 @@ class ProductDetailDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpBinding()
-        initView()
+        addCartButtonClick()
     }
 
     private fun setUpBinding() {
         binding.lifecycleOwner = this
-        binding.productModel = productModel
-        binding.presenter = presenter
-        counter = binding.counterDialogCartProduct.presenter
-    }
-
-    private fun initView() {
-        counter.updateCount(presenter.productInfo.value.count)
-        minusClick()
-        plusCLick()
-        addCartButtonClick()
-    }
-
-    private fun minusClick() {
-        binding.counterDialogCartProduct.minusButton.setOnClickListener {
-            counter.minusCount()
-            presenter.updateProductCount(counter.counter.value.value)
-        }
-    }
-
-    private fun plusCLick() {
-        binding.counterDialogCartProduct.plusButton.setOnClickListener {
-            counter.plusCount()
-            presenter.updateProductCount(counter.counter.value.value)
-        }
+        binding.cartProduct = cartProductModel
+        binding.counterDialogCartProduct.setUpView(counterListener = counterListener, 1, 1)
     }
 
     private fun addCartButtonClick() {
         binding.buttonDialogPutCart.setOnClickListener {
-            presenter.saveProductInRepository(counter.counter.value.value)
+            presenter.saveProductInRepository(binding.counterDialogCartProduct.count)
             dismiss()
         }
     }

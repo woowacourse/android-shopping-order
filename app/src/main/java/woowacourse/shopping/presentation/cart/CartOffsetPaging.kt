@@ -1,39 +1,48 @@
 package woowacourse.shopping.presentation.cart
 
+import android.util.Log
 import woowacourse.shopping.CartProductInfo
+import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.Page
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.util.OffsetPaging
 
 class CartOffsetPaging(
     override val limit: Int = LIMIT,
-    private val startPage: Int = START_PAGE,
+    startPage: Int = START_PAGE,
     private val cartRepository: CartRepository,
 ) : OffsetPaging<CartProductInfo>(startPage) {
     fun plusPage() {
-        setPage(currentPage.value.plus(PAGE_STEP))
+        setPage(currentPage.plus(PAGE_STEP))
     }
 
     fun minusPage() {
-        setPage(currentPage.value.minus(PAGE_STEP))
+        setPage(currentPage.minus(PAGE_STEP))
     }
 
-    override fun loadPageItems(page: Page): List<CartProductInfo> {
-        val cartProductList = cartRepository.getAllCartProductsInfo()
-        return cartProductList.getItemsInRange(page.getOffset(limit), limit).items
+    private fun loadPageItems(page: Page, onSuccess: (List<CartProductInfo>) -> Unit) {
+        cartRepository.getAllCartItems {
+            var cartItems = CartProductInfoList(it)
+            cartItems = cartItems.getItemsInRange(page.getOffset(limit), limit)
+            Log.d("wooseok", "${page.value}  " + cartItems.items.toString())
+            onSuccess(cartItems.items)
+        }
     }
 
-    override fun isPlusPageAble(): Boolean {
-        val page = currentPage.value.plus(PAGE_STEP)
-        return loadPageItems(page).isNotEmpty()
+    fun isPlusPageAble(onSuccess: (Boolean) -> Unit) {
+        val page = currentPage.plus(PAGE_STEP)
+        loadPageItems(page) {
+            onSuccess(it.isNotEmpty())
+        }
     }
 
-    override fun isMinusPageAble(): Boolean {
+    fun isMinusPageAble(): Boolean {
         val page = currentPage.value
-        return page.value != startPage
+        return page != MINIMUM_PAGE
     }
 
     companion object {
+        private const val MINIMUM_PAGE = 1
         private const val START_PAGE = 1
         private const val PAGE_STEP = 1
         private const val LIMIT = 5
