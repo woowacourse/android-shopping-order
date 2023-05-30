@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.mapper.toOrderRecord
 import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.ui.model.OrderRecord

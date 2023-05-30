@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.user
 
 import android.util.Log
 import retrofit2.Call

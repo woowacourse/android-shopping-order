@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.order
 
 import woowacourse.shopping.data.model.DataOrderRecord
 import woowacourse.shopping.data.model.OrderRequest

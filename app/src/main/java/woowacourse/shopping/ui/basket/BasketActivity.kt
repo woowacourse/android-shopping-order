@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.user.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.UserRepositoryImpl
