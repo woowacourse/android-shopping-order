@@ -1,8 +1,6 @@
 package woowacourse.shopping.data.datasource.basket.remote
 
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,6 +9,7 @@ import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.request.BasketAddRequest
+import woowacourse.shopping.data.remote.request.BasketUpdateRequest
 import java.io.IOException
 import okhttp3.Call as okhttpCall
 import okhttp3.Callback as okhttpCallback
@@ -45,25 +44,27 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
                         onReceived(it)
                     }
                 }
+
                 override fun onFailure(call: Call<Unit>, t: Throwable) {}
             }
         )
     }
 
     override fun update(basketProduct: DataBasketProduct) {
-        val url = "${RetrofitModule.BASE_URL}/cart-items/${basketProduct.id}"
-        val requestBody = "{\"quantity\":\"${basketProduct.count.value}\"}"
-            .toRequestBody("application/json".toMediaTypeOrNull())
+        RetrofitModule.basketService.update(
+            cartItemId = basketProduct.id,
+            body = BasketUpdateRequest(basketProduct.count.value)
+        ).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>
+                ) {
+                }
 
-        val request = Request.Builder()
-            .url(url)
-            .patch(requestBody)
-            .build()
-
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
-            override fun onFailure(call: okhttpCall, e: IOException) {}
-            override fun onResponse(call: okhttpCall, response: okhttpResponse) {}
-        })
+                override fun onFailure(call: Call<Unit>, t: Throwable) {}
+            }
+        )
     }
 
     override fun remove(basketProduct: DataBasketProduct) {
