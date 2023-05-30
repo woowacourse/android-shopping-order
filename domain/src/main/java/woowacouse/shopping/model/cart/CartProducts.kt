@@ -46,6 +46,16 @@ class CartProducts(
         )
     }
 
+    // TODO 테스트 코드 작성
+    fun updateCartCountByCartIds(cartIds: Map<Long, Int>): CartProducts {
+        return CartProducts(
+            carts.map { cart ->
+                val count = cartIds[cart.id] ?: 0
+                cart.updateCount(count)
+            }
+        )
+    }
+
     fun updateAllCartsChecked(cartIds: List<Long>, checked: Boolean): CartProducts {
         val newCartProducts = carts.map {
             if (it.id in cartIds) {

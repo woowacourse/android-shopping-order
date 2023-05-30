@@ -4,6 +4,7 @@ import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
@@ -19,8 +20,8 @@ class ProductListPresenter(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ProductContract.Presenter {
-    private val products = mutableListOf<ProductModel>()
-    private var carts = CartProductsModel(listOf())
+    private var cartProducts = CartProductsModel(listOf())
+
     private val recentProducts = mutableListOf<RecentProductModel>()
     private var lastScroll = 0
     private var productsStartIndex = 0
@@ -31,13 +32,30 @@ class ProductListPresenter(
     }
 
     override fun initProductItems() {
-        productRepository.loadDatas(::onFailure) {
-            val allProducts = it.map { product -> product.toUIModel() }
-            products.addAll(allProducts)
+        productRepository.loadDatas(::onFailure) { remoteProducts ->
+            cartRepository.loadAllCarts(::onFailure) { remoteCarts ->
+                val remoteCartProducts = remoteCarts.map { it.toUIModel() }
+                cartProducts = CartProductsModel(
+                    remoteProducts.map { it.toUIModel() }
+                        .updateCartProductsInfo(remoteCartProducts)
+                )
 
-            loadCartItems()
-            loadRecentProductItems()
-            view.setLayoutVisibility()
+                val allCount = cartProducts.toModel().totalCount
+
+                view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
+                loadRecentProductItems()
+                view.setLayoutVisibility()
+                updateCartCount(allCount)
+            }
+        }
+    }
+
+    private fun List<ProductModel>.updateCartProductsInfo(
+        cartProducts: List<CartModel>
+    ): List<CartModel> {
+        return map { product ->
+            cartProducts.find { it.product.id == product.id }
+                ?: CartModel.getNoHasCountCartProduct(product)
         }
     }
 
@@ -47,26 +65,31 @@ class ProductListPresenter(
 
     override fun loadCartItems() {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            this.carts = CartProductsModel(carts.map { it.toUIModel() })
+            val cartIdsCount = carts.associate { it.id to it.quantity }
+            cartProducts =
+                cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel()
 
-            val allCount = this.carts.toModel().totalCount
-
-            view.setProductItemsView(products.subList(0, getSubToIndex()).toList())
-            view.updateToolbarCartCountView(allCount)
-            updateVisibilityCartCount(allCount)
+            val allCount = cartProducts.toModel().totalCount
+            view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
+            updateCartCount(allCount)
         }
+    }
+
+    private fun updateCartCount(allCount: Int) {
+        view.updateToolbarCartCountView(allCount)
+        updateVisibilityCartCount(allCount)
     }
 
     override fun updateProductItems(startIndex: Int) {
         productsStartIndex = startIndex
-        view.setProductItemsView(products.subList(0, getSubToIndex()).toList())
+        view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
     }
 
     private fun getSubToIndex(): Int {
-        return if (products.size > productsStartIndex + DISPLAY_PRODUCT_COUNT) {
+        return if (cartProducts.carts.size > productsStartIndex + DISPLAY_PRODUCT_COUNT) {
             productsStartIndex + DISPLAY_PRODUCT_COUNT
         } else {
-            products.size
+            cartProducts.carts.size
         }
     }
 
@@ -98,20 +121,22 @@ class ProductListPresenter(
         this.lastScroll = lastScroll
     }
 
+    // TODO 아이템 1개 초과부터 툴바 반영이 안 됨 (id 갱신을 안 해줌)
     override fun updateCount(productId: Long, count: Int) {
-        val targetCartProduct = carts.toModel().getCartByProductId(productId) ?: return
+        val targetCartProduct = cartProducts.toModel().getCartByProductId(productId) ?: return
         if (targetCartProduct.count == 0) {
             cartRepository.addCartProduct(productId, ::onFailure) {
-                this.carts = this.carts.toModel()
+                cartProducts = cartProducts.toModel()
                     .updateCartCountByCartId(targetCartProduct.id, count)
                     .toUIModel()
 
                 cartRepository.loadAllCarts(::onFailure) { carts ->
-                    carts.find { it.id == targetCartProduct.id } ?: return@loadAllCarts
+                    carts.find { it.product.id == targetCartProduct.product.id } ?: return@loadAllCarts
+
                     cartRepository.addLocalCart(targetCartProduct.id)
                 }
 
-                val allCount = this.carts.toModel().totalCount
+                val allCount = cartProducts.toModel().totalCount
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)
             }
@@ -129,10 +154,11 @@ class ProductListPresenter(
                     cartRepository.deleteLocalCart(newCartProduct.id)
                 }
 
-                this.carts = this.carts.toModel().updateCartCountByCartId(remoteCartProduct.id, count)
-                    .toUIModel()
+                cartProducts =
+                    cartProducts.toModel().updateCartCountByCartId(remoteCartProduct.id, count)
+                        .toUIModel()
 
-                val allCount = this.carts.toModel().totalCount
+                val allCount = cartProducts.toModel().totalCount
 
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)

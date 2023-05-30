@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductListBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.productlist.ProductListener
 
 class ProductListViewHolder(
@@ -25,8 +25,11 @@ class ProductListViewHolder(
         }
     }
 
-    fun bind(product: ProductModel) {
-        binding.product = product
-        binding.productCountView.setCount(1) // TODO 어댑터는 상품이 아닌 CartModel을 갖도록 함
+    fun bind(cartProduct: CartModel) {
+        binding.product = cartProduct.product
+        binding.productCountView.setCount(cartProduct.count)
+
+        // binding.product = product
+        // binding.productCountView.setCount(1) // TODO 어댑터는 상품이 아닌 CartModel을 갖도록 함
     }
 }
