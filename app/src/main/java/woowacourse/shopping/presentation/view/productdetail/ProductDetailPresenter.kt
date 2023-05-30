@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.view.productdetail
 
-import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.data.repository.product.ProductRepository
 
 class ProductDetailPresenter(
@@ -55,7 +55,7 @@ class ProductDetailPresenter(
                     if (count > UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                             reLoadCarts.find { cartProduct -> cartProduct.id == cartId }?.let {
-                                val newCartProduct = it.copy(quantity = count)
+                                val newCartProduct = it.copy(count = count)
                                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                                     view.addCartSuccessView()
                                     view.exitProductDetailView()
@@ -67,7 +67,7 @@ class ProductDetailPresenter(
             }
 
             cartProduct?.let { cart ->
-                val newCartProduct = cart.copy(quantity = cart.quantity + count)
+                val newCartProduct = cart.copy(count = cart.count + count)
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()

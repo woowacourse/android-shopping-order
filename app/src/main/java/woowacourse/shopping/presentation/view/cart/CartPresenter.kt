@@ -1,12 +1,10 @@
 package woowacourse.shopping.presentation.view.cart
 
-import woowacourse.shopping.data.mapper.toEntity
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.CartProductsModel
+import woowacouse.shopping.data.repository.cart.CartRepository
 
 class CartPresenter(
     private val view: CartContract.View,
@@ -43,7 +41,7 @@ class CartPresenter(
 
     private fun loadLocalCartItemChecked() {
         cartRepository.getAllLocalCart().forEach { cart ->
-            carts = carts.toModel().updateCartChecked(cart.id, cart.checked == 1).toUIModel()
+            carts = carts.toModel().updateCartChecked(cart.id, cart.checked).toUIModel()
         }
     }
 
@@ -93,8 +91,7 @@ class CartPresenter(
         carts = carts.toModel().updateCartCountByCartId(cartId, count).toUIModel()
 
         carts.toModel().getCartByCartId(cartId)?.let { cartProduct ->
-            val cartEntity = cartProduct.toEntity()
-            cartRepository.updateCartCount(cartEntity, ::onFailure) {
+            cartRepository.updateCartCount(cartProduct, ::onFailure) {
                 if (count == 0) {
                     deleteCartItem(cartId)
                 }

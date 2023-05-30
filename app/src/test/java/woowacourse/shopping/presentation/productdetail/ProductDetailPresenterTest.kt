@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.productdetail
 
-import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
@@ -8,14 +7,13 @@ import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.product.ProductRepository
 import woowacourse.shopping.presentation.ProductFixture
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailContract
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailPresenter
+import woowacouse.shopping.data.repository.cart.CartRepository
+import woowacouse.shopping.data.repository.product.ProductRepository
 
 class ProductDetailPresenterTest {
     private lateinit var presenter: ProductDetailContract.Presenter
@@ -27,9 +25,9 @@ class ProductDetailPresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
 
-        cartRepository = mockk()
-        productRepository = mockk()
-        every { productRepository.loadDataById(0L) } returns ProductFixture.getData()
+        cartRepository = mockk(relaxed = true)
+        productRepository = mockk(relaxed = true)
+        justRun { productRepository.loadDataById(0L, onFailure = {}, onSuccess = {}) }
 
         presenter = ProductDetailPresenter(view, 0L, productRepository, cartRepository)
     }
@@ -45,17 +43,17 @@ class ProductDetailPresenterTest {
 
         // then
         val actual = slot.captured
-        val expected = ProductFixture.getData().toUIModel()
+        val expected = ProductFixture.getData()
 
         assertEquals(expected, actual)
-        verify { productRepository.loadDataById(actual.id) }
+        verify { productRepository.loadDataById(actual.id, onFailure = {}, onSuccess = {}) }
         verify { view.setProductInfoView(actual) }
     }
 
     @Test
     fun `장바구니 담기를 누르면 상품의 개수를 정하는 다이얼로그가 보여진다`() {
         // given
-        val product = ProductFixture.getData().toUIModel()
+        val product = ProductFixture.getData()
         justRun { view.showCountView(product) }
 
         // when
@@ -68,7 +66,7 @@ class ProductDetailPresenterTest {
     @Test
     fun `마지막으로 본 상품을 보여준다`() {
         // given
-        val product = ProductFixture.getData().toUIModel()
+        val product = ProductFixture.getData()
         val lastRecentProduct = RecentProductModel(1L, product)
         val slot = slot<RecentProductModel>()
         justRun { view.setVisibleOfLastRecentProductInfoView(capture(slot)) }
@@ -101,7 +99,8 @@ class ProductDetailPresenterTest {
         // given
         val slotId = slot<Long>()
         val slotCount = slot<Int>()
-        justRun { cartRepository.addCart(capture(slotId), capture(slotCount)) }
+        justRun { cartRepository.loadAllCarts(onFailure = {}, onSuccess = {}) }
+        justRun { cartRepository.addCartProduct(capture(slotId), onFailure = {}, onSuccess = {}) }
         justRun { view.addCartSuccessView() }
         justRun { view.exitProductDetailView() }
 
@@ -115,7 +114,8 @@ class ProductDetailPresenterTest {
         val expectedCount = 1
         assertEquals(expectedId, actualId)
         assertEquals(expectedCount, actualCount)
-        verify { cartRepository.addCart(actualId, actualCount) }
+        justRun { cartRepository.loadAllCarts(onFailure = {}, onSuccess = {}) }
+        justRun { cartRepository.addCartProduct(actualId, onFailure = {}, onSuccess = {}) }
         verify { view.addCartSuccessView() }
         verify { view.exitProductDetailView() }
     }

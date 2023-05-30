@@ -10,9 +10,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
-import woowacourse.shopping.data.model.CartRemoteEntity
-import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
+import woowacouse.shopping.model.cart.CartProduct
+import woowacouse.shopping.model.product.Product
 import java.io.IOException
 
 class CartRemoteDataSourceImpl(
@@ -20,7 +20,7 @@ class CartRemoteDataSourceImpl(
 ) : CartRemoteDataSource {
     override fun requestDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onSuccess: (products: List<CartProduct>) -> Unit,
     ) {
         val client = OkHttpClient()
         val request =
@@ -45,14 +45,14 @@ class CartRemoteDataSourceImpl(
     }
 
     override fun requestPatchCartItem(
-        cartEntity: CartRemoteEntity,
+        cartProduct: CartProduct,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
         val client = OkHttpClient()
-        val path = PATH_CART_PATCH + cartEntity.id
+        val path = PATH_CART_PATCH + cartProduct.id
         val mediaType = "application/json".toMediaType()
-        val json = JSONObject().put("quantity", cartEntity.quantity)
+        val json = JSONObject().put("quantity", cartProduct.count)
         val body = json.toString().toRequestBody(mediaType)
 
         val request =
@@ -128,8 +128,8 @@ class CartRemoteDataSourceImpl(
         thread.join()
     }
 
-    private fun parseCartProductList(response: String): List<CartRemoteEntity> {
-        val cartProducts = mutableListOf<CartRemoteEntity>()
+    private fun parseCartProductList(response: String): List<CartProduct> {
+        val cartProducts = mutableListOf<CartProduct>()
         val jsonArray = JSONArray(response)
 
         for (index in 0 until jsonArray.length()) {
@@ -140,22 +140,21 @@ class CartRemoteDataSourceImpl(
         return cartProducts
     }
 
-    private fun parseCartProduct(json: JSONObject): CartRemoteEntity {
+    private fun parseCartProduct(json: JSONObject): CartProduct {
         val cartId = json.getLong("id")
-        val quantity = json.getInt("quantity")
-        val product = json.getJSONObject("product")
-        val productEntity = parseProduct(product)
+        val count = json.getInt("quantity")
+        val product = parseProduct(json.getJSONObject("product"))
 
-        return CartRemoteEntity(cartId, quantity, productEntity)
+        return CartProduct(cartId, product, count, true)
     }
 
-    private fun parseProduct(json: JSONObject): ProductEntity {
+    private fun parseProduct(json: JSONObject): Product {
         val id = json.getLong("id")
         val name = json.getString("name")
         val price = json.getInt("price")
         val image = json.getString("imageUrl")
 
-        return ProductEntity(id, name, price, image)
+        return Product(id, name, price, image)
     }
 
     companion object {

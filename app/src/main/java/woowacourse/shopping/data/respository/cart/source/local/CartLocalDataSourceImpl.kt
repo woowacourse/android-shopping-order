@@ -6,8 +6,10 @@ import android.database.Cursor
 import woowacourse.shopping.data.database.CartContract
 import woowacourse.shopping.data.database.CartHelper
 import woowacourse.shopping.data.database.getTableName
+import woowacourse.shopping.data.mapper.toModel
 import woowacourse.shopping.data.model.CartLocalEntity
 import woowacourse.shopping.data.model.Server
+import woowacouse.shopping.model.cart.CartProduct
 
 class CartLocalDataSourceImpl(
     context: Context,
@@ -47,8 +49,8 @@ class CartLocalDataSourceImpl(
         )
     }
 
-    override fun selectAllCarts(): List<CartLocalEntity> {
-        return getItems(getCursorAll())
+    override fun selectAllCarts(): List<CartProduct> {
+        return getItems(getCursorAll()).map { it.toModel() }
     }
 
     private fun getItems(cursor: Cursor): List<CartLocalEntity> {

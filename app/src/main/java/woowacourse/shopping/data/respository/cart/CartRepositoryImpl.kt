@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.respository.cart
 
-import woowacourse.shopping.data.model.CartLocalEntity
-import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSource
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSource
+import woowacouse.shopping.data.repository.cart.CartRepository
+import woowacouse.shopping.model.cart.CartProduct
 
 class CartRepositoryImpl(
     private val cartLocalDataSource: CartLocalDataSource,
@@ -20,17 +20,17 @@ class CartRepositoryImpl(
 
     override fun loadAllCarts(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onSuccess: (products: List<CartProduct>) -> Unit
     ) {
         cartRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
     override fun updateCartCount(
-        cartEntity: CartRemoteEntity,
+        cartProduct: CartProduct,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: () -> Unit
     ) {
-        cartRemoteDataSource.requestPatchCartItem(cartEntity, onFailure, onSuccess)
+        cartRemoteDataSource.requestPatchCartItem(cartProduct, onFailure, onSuccess)
     }
 
     override fun addLocalCart(cartId: Long) {
@@ -45,7 +45,7 @@ class CartRepositoryImpl(
         cartLocalDataSource.updateCartChecked(cartId, isChecked)
     }
 
-    override fun getAllLocalCart(): List<CartLocalEntity> {
+    override fun getAllLocalCart(): List<CartProduct> {
         return cartLocalDataSource.selectAllCarts()
     }
 

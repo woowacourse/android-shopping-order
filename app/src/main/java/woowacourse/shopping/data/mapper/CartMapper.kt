@@ -1,18 +1,9 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.CartRemoteEntity
-import woowacourse.shopping.presentation.mapper.toUIModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.data.model.CartLocalEntity
 import woowacouse.shopping.model.cart.CartProduct
+import woowacouse.shopping.model.product.Product
 
-fun CartRemoteEntity.toUIModel(): CartModel =
-    CartModel(
-        id,
-        product.toUIModel(),
-        quantity,
-        checked = true,
-    )
+private val EMPTY_PRODUCT = Product(-1, "", 0, "")
 
-fun CartProduct.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toUIModel().toEntity())
-
-fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toEntity())
+fun CartLocalEntity.toModel(): CartProduct = CartProduct(id, EMPTY_PRODUCT, 0, checked == 1)

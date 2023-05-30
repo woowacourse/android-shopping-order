@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.view.productlist
 
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.CartModel
@@ -9,6 +7,7 @@ import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel.Companion.errorData
+import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.data.repository.product.ProductRepository
 import woowacouse.shopping.data.repository.recentproduct.RecentProductRepository
 import java.time.LocalDateTime
@@ -65,7 +64,7 @@ class ProductListPresenter(
 
     override fun loadCartItems() {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartIdsCount = carts.associate { it.id to it.quantity }
+            val cartIdsCount = carts.associate { it.id to it.count }
             cartProducts =
                 cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel()
 
@@ -143,7 +142,7 @@ class ProductListPresenter(
             val remoteCartProduct = carts.find { it.product.id == productId } ?: return@loadAllCarts
             cartRepository.addLocalCart(remoteCartProduct.id)
 
-            val newCartProduct = remoteCartProduct.copy(quantity = count)
+            val newCartProduct = remoteCartProduct.copy(count = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                 if (count == 0) {
