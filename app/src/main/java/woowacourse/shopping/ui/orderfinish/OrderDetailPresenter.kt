@@ -9,7 +9,7 @@ class OrderDetailPresenter(
 ) : OrderDetailContract.Presenter {
 
     override fun getOrderRecord() {
-        orderRepository.getOrderRecord(orderId) {
+        orderRepository.getOrder(orderId) {
             view.setUpView(it)
         }
     }

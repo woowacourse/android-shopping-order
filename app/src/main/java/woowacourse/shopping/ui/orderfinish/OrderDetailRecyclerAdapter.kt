@@ -2,10 +2,10 @@ package woowacourse.shopping.ui.orderfinish
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.ui.model.OrderRecord
+import woowacourse.shopping.ui.model.Order
 
 class OrderDetailRecyclerAdapter(
-    private val orderRecord: OrderRecord,
+    private val order: Order,
 ) : RecyclerView.Adapter<OrderDetailViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderDetailViewHolder {
@@ -13,9 +13,9 @@ class OrderDetailRecyclerAdapter(
         return OrderDetailViewHolder.from(parent)
     }
 
-    override fun getItemCount(): Int = orderRecord.orderProducts.size
+    override fun getItemCount(): Int = order.orderProducts.size
 
     override fun onBindViewHolder(holder: OrderDetailViewHolder, position: Int) {
-        holder.bind(orderRecord.orderProducts[position])
+        holder.bind(order.orderProducts[position])
     }
 }

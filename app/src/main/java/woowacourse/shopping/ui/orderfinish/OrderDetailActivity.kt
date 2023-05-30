@@ -9,7 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.ui.model.OrderRecord
+import woowacourse.shopping.ui.model.Order
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
@@ -33,8 +33,8 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         presenter.getOrderRecord()
     }
 
-    override fun setUpView(orderRecord: OrderRecord) {
-        binding.rvOrderProducts.adapter = OrderDetailRecyclerAdapter(orderRecord)
+    override fun setUpView(order: Order) {
+        binding.rvOrderProducts.adapter = OrderDetailRecyclerAdapter(order)
     }
 
     companion object {
@@ -44,15 +44,15 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         fun getIntent(
             context: Context,
             orderId: Int? = 1,
-            orderRecord: OrderRecord? = null,
+            order: Order? = null,
         ): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
                 .apply {
                     orderId?.let {
                         putExtra(ORDER_ID, it)
                     }
-                    orderRecord?.let {
-                        putExtra(ORDER_RECORD, orderRecord)
+                    order?.let {
+                        putExtra(ORDER_RECORD, order)
                     }
                 }
 
