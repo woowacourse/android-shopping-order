@@ -6,14 +6,20 @@ import woowacourse.shopping.repository.ProductRepository
 class ProductRepositoryImpl(private val dataSource: ProductDataSource) : ProductRepository {
 
     override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
-        return dataSource.findAll(limit, offset, onFinish)
+        dataSource.findAll { products ->
+            val slicedProducts = products.slice(offset until products.size)
+                .take(limit)
+            onFinish(slicedProducts)
+        }
     }
 
     override fun countAll(onFinish: (Int) -> Unit) {
-        return dataSource.countAll(onFinish)
+        dataSource.findAll { products ->
+            onFinish(products.size)
+        }
     }
 
     override fun findById(id: Long, onFinish: (Product?) -> Unit) {
-        return dataSource.findById(id, onFinish)
+        dataSource.findById(id, onFinish)
     }
 }

@@ -34,32 +34,6 @@ class ProductRemoteService(private val host: RemoteHost) : ProductDataSource {
         })
     }
 
-    override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
-        val path = "/products?limit=$limit&offset=$offset"
-        val request = Request.Builder().url(host.url + path).build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful.not()) return
-                val body = response.body?.string() ?: return
-                val json = JSONArray(body)
-                val products = (0 until json.length()).map {
-                    val jsonObject = json.getJSONObject(it)
-                    parseToProduct(jsonObject)
-                }
-                onFinish(products.slice(offset until products.size).take(limit))
-            }
-        })
-    }
-
-    override fun countAll(onFinish: (Int) -> Unit) {
-        findAll {
-            onFinish(it.size)
-        }
-    }
-
     override fun findById(id: Long, onFinish: (Product?) -> Unit) {
         val path = "/products/$id"
         val request = Request.Builder().url(host.url + path).build()
