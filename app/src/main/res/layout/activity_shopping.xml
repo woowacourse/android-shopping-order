@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <variable
             name="isLoaded"
@@ -57,6 +57,16 @@
                 app:layout_constraintTop_toTopOf="@+id/tb_shopping"
                 app:srcCompat="@drawable/ic_cart" />
 
+            <ImageView
+                android:id="@+id/iv_order_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tb_shopping"
+                app:layout_constraintEnd_toStartOf="@id/iv_basket"
+                app:layout_constraintTop_toTopOf="@id/tb_shopping"
+                app:srcCompat="@drawable/ic_order_history" />
 
         </androidx.appcompat.widget.Toolbar>
 
