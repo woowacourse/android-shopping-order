@@ -10,6 +10,7 @@ import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.RetrofitModule
+import woowacourse.shopping.data.remote.request.BasketAddRequest
 import java.io.IOException
 import okhttp3.Call as okhttpCall
 import okhttp3.Callback as okhttpCallback
@@ -17,7 +18,7 @@ import okhttp3.Response as okhttpResponse
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {
-        RetrofitModule.basketService.getAllBasketProducts().enqueue(
+        RetrofitModule.basketService.getAll().enqueue(
             object : Callback<List<DataBasketProduct>> {
                 override fun onResponse(
                     call: Call<List<DataBasketProduct>>,
@@ -32,25 +33,21 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
     }
 
     override fun add(product: DataProduct, onReceived: (Int) -> Unit) {
-        val url = "${RetrofitModule.BASE_URL}/cart-items"
-        val requestBody = "{\"productId\":\"${product.id}\"}"
-            .toRequestBody("application/json".toMediaTypeOrNull())
+        RetrofitModule.basketService.add(BasketAddRequest(product.id)).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>
+                ) {
+                    val basketId = response.headers()["Location"]?.split("/")?.last()?.toInt()
 
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
-
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
-            override fun onFailure(call: okhttpCall, e: IOException) {}
-            override fun onResponse(call: okhttpCall, response: okhttpResponse) {
-                val productId = response.headers.get("Location")?.split("/")?.last()?.toInt()
-
-                productId?.let {
-                    onReceived(it)
+                    basketId?.let {
+                        onReceived(it)
+                    }
                 }
+                override fun onFailure(call: Call<Unit>, t: Throwable) {}
             }
-        })
+        )
     }
 
     override fun update(basketProduct: DataBasketProduct) {
