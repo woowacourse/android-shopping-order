@@ -1,10 +1,6 @@
 package woowacourse.shopping.domain.pagination
 
 interface PrevPagination<T> {
-    val isPrevEnabled: Boolean
-        get() = prevItemExist()
+    fun prevItems(callback: (List<T>) -> Unit): List<T>
 
-    fun prevItems(): List<T>
-
-    fun prevItemExist(): Boolean
 }

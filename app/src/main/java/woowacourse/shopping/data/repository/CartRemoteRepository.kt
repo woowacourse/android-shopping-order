@@ -7,7 +7,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -21,7 +20,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
     override fun findAll(callback: (List<CartProduct>) -> Unit) {
         val request = Request.Builder()
             .url("$baseUrl/cart-items")
-            .addHeader("Authorization", USER_EMAIL_INFO)
+            .addHeader("Authorization", "Basic ZG9vbHlAZG9vbHkuY29tOjEyMzQ=")
             .build()
 
         executeGetRequest(request, callback)
@@ -101,7 +100,7 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
 
                 override fun onResponse(call: Call, response: Response) {
                     responseBody = response.body?.string()
-                    callBack(parseResponse(responseBody))
+//                    callBack(parseResponse(responseBody))
                     response.close()
                 }
             },
@@ -142,19 +141,6 @@ class CartRemoteRepository(private val baseUrl: String) : CartRepository {
                 }
             },
         )
-    }
-
-    private fun parseResponse(responseBody: String?): List<CartProduct> {
-        return responseBody?.let {
-            val cartProductsJSONArray = JSONArray(it)
-            val cartProducts = mutableListOf<CartProduct>()
-            for (index in 0 until cartProductsJSONArray.length()) {
-                val productJSON = cartProductsJSONArray.getJSONObject(index)
-                val cartProduct = CartProduct.fromJson(productJSON)
-                cartProducts.add(cartProduct)
-            }
-            cartProducts
-        } ?: emptyList()
     }
 
     companion object {

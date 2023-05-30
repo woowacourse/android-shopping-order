@@ -2,6 +2,7 @@ package woowacourse.shopping.view.productlist
 
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.pagination.ProductListPagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentViewedRepository
@@ -14,32 +15,26 @@ class ProductListPresenter(
     private val recentViewedRepository: RecentViewedRepository,
     private val cartRepository: CartRepository,
 ) : ProductListContract.Presenter {
-    private var mark: Int = 0
 
     private val productsListItems = mutableListOf<ProductListViewItem>()
+    private val pagination = ProductListPagination(PAGINATION_SIZE, productRepository)
 
     override fun fetchProducts() {
-        // 최근 본 항목
+        // 최근 본 상품
         recentViewedRepository.findAll { viewedProducts ->
             if (viewedProducts.isNotEmpty()) addViewedProductsItem(viewedProducts)
             // 상품 리스트
-            productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
-                cartRepository.findAll {
-                    addProductsItem(products.toUiModels(it))
-                    mark += products.size
-                    // 더보기
-                    addShowMoreItem()
-                }
+            pagination.fetchNextItems { productsWithCartInfo ->
+                addProductsItem(productsWithCartInfo.map { it.toUiModel() })
+                addShowMoreItem()
+                view.showProducts(productsListItems)
+                view.stopLoading()
             }
         }
     }
 
     private fun addShowMoreItem() {
-        productRepository.isExistByMark(mark) { isNextExist ->
-            if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
-            view.showProducts(productsListItems)
-            view.stopLoading()
-        }
+        if (pagination.isNextEnabled) productsListItems.add(ProductListViewItem.ShowMoreItem())
     }
 
     private fun addViewedProductsItem(products: List<Product>) {
@@ -68,17 +63,12 @@ class ProductListPresenter(
             productsListItems.filterIsInstance<ProductListViewItem.ProductItem>().size
 
         val position = productsItemSize + recentViewedItemSize
-        productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
-            cartRepository.findAll { cartProducts ->
-                val nextProducts = products.toUiModels(cartProducts)
-                productsListItems.removeLast()
-                addProductsItem(nextProducts)
-                mark += nextProducts.size
-                productRepository.isExistByMark(mark) { isNextExist ->
-                    if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
-                    view.notifyAddProducts(position, nextProducts.size)
-                }
-            }
+        pagination.fetchNextItems { productsWithCartInfo ->
+            if (productsWithCartInfo.isEmpty()) return@fetchNextItems
+            productsListItems.removeLast()
+            addProductsItem(productsWithCartInfo.map { it.toUiModel() })
+            addShowMoreItem()
+            view.notifyAddProducts(position, productsWithCartInfo.size)
         }
     }
 
@@ -110,7 +100,7 @@ class ProductListPresenter(
             val itemsHaveCount = productsListItems
                 .asSequence()
                 .filterIsInstance<ProductListViewItem.ProductItem>()
-                .filter { it.product.count > 0 }
+                .filter { it.product.quantity > 0 }
                 .toList()
 
             itemsHaveCount.forEach { item ->
@@ -119,7 +109,7 @@ class ProductListPresenter(
                 productsListItems[position] = ProductListViewItem.ProductItem(
                     (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
                         cartId = cartProduct?.cartId ?: 0,
-                        count = cartProduct?.count ?: 0,
+                        quantity = cartProduct?.count ?: 0,
                     ),
                 )
                 view.notifyDataChanged(position)
@@ -136,7 +126,7 @@ class ProductListPresenter(
             productsListItems[position] = ProductListViewItem.ProductItem(
                 (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
                     cartId = cartProduct?.cartId ?: 0,
-                    count = cartProduct?.count ?: 0,
+                    quantity = cartProduct?.count ?: 0,
                 ),
             )
             view.notifyDataChanged(position)
@@ -153,8 +143,8 @@ class ProductListPresenter(
                     0,
                     ProductListViewItem.RecentViewedItem(products.toUiModels(cartProducts)),
                 )
+                view.notifyRecentViewedChanged()
             }
-            view.notifyRecentViewedChanged()
         }
     }
 

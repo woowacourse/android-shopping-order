@@ -40,22 +40,26 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
                 binding.layoutAddBtns.visibility = View.VISIBLE
             }
             binding.btnPlus.setOnClickListener {
-                onItemClick.onProductUpdateCount(
-                    item.product.cartId,
-                    item.product.id,
-                    Integer.parseInt(binding.textCount.text.toString()) + 1,
-                )
-                binding.textCount.text =
-                    (Integer.parseInt(binding.textCount.text.toString()) + 1).toString()
+                item.product.cartId?.let {
+                    onItemClick.onProductUpdateCount(
+                        item.product.cartId,
+                        item.product.id,
+                        Integer.parseInt(binding.textCount.text.toString()) + 1,
+                    )
+                    binding.textCount.text =
+                        (Integer.parseInt(binding.textCount.text.toString()) + 1).toString()
+                }
             }
             binding.btnMinus.setOnClickListener {
-                onItemClick.onProductUpdateCount(
-                    item.product.cartId,
-                    item.product.id,
-                    Integer.parseInt(binding.textCount.text.toString()) - 1,
-                )
-                binding.textCount.text =
-                    (Integer.parseInt(binding.textCount.text.toString()) - 1).toString()
+                item.product.cartId?.let {
+                    onItemClick.onProductUpdateCount(
+                        item.product.cartId,
+                        item.product.id,
+                        Integer.parseInt(binding.textCount.text.toString()) - 1,
+                    )
+                    binding.textCount.text =
+                        (Integer.parseInt(binding.textCount.text.toString()) - 1).toString()
+                }
             }
         }
     }

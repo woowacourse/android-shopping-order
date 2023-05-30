@@ -12,7 +12,7 @@ class ServerPreferencesRepository(context: Context) : ServerStoreRespository {
         editor.putString(SERVER, url).apply()
     }
 
-    override fun getServerUrl(url: String): String = sharedPreferences.getString(SERVER, "") ?: ""
+    override fun getServerUrl(): String = sharedPreferences.getString(SERVER, "") ?: ""
 
     companion object {
         const val SERVER = "SERVER"
