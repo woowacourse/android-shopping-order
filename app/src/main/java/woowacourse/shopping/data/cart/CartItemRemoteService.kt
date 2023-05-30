@@ -13,7 +13,6 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.session.UserData
 import woowacourse.shopping.utils.RemoteHost
 import java.io.IOException
-import java.time.LocalDateTime
 
 class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
     private val client = OkHttpClient()
@@ -34,7 +33,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
                 val id =
                     response.header("Location")?.removePrefix("/cart-items/")?.toLong() ?: return
                 val savedCartItem = CartItem(
-                    id, cartItem.quantity, cartItem.product, cartItem.addedTime
+                    id, cartItem.quantity, cartItem.product
                 )
                 onFinish(savedCartItem)
             }
@@ -123,7 +122,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val quantity = jsonObject.getInt("quantity")
         val jsonObject1 = jsonObject.getJSONObject("product")
         val product = parseToProduct(jsonObject1)
-        return CartItem(id, quantity, product, LocalDateTime.now())
+        return CartItem(id, quantity, product)
     }
 
     private fun parseToProduct(jsonObject: JSONObject): Product {

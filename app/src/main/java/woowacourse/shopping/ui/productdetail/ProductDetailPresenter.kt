@@ -31,7 +31,7 @@ class ProductDetailPresenter(
         productRepository.findById(productId) { product ->
             requireNotNull(product) { ERROR_PRODUCT_NULL.format(productId) }
 
-            val cartItem = CartItem(-1, count, product, LocalDateTime.now())
+            val cartItem = CartItem(-1, count, product)
             cartItemRepository.save(cartItem) { savedCartItem ->
                 cartItemRepository.updateCountById(savedCartItem.id, count) {
                     view.showCartView()

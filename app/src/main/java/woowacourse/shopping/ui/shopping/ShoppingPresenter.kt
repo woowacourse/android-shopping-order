@@ -8,7 +8,6 @@ import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState.Companion.toUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState.Companion.toUIState
-import java.time.LocalDateTime
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -50,7 +49,7 @@ class ShoppingPresenter(
     override fun addProductToCart(productId: Long) {
         productRepository.findById(productId) { product ->
             product ?: return@findById
-            val cartItem = CartItem(-1, 1, product, LocalDateTime.now())
+            val cartItem = CartItem(-1, 1, product)
             cartItemRepository.save(cartItem) { savedCartItem ->
                 view.changeProduct(savedCartItem.toUIState())
                 loadCartItemCount()

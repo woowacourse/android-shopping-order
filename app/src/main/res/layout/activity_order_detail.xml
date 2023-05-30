@@ -9,6 +9,10 @@
         <variable
             name="order"
             type="woowacourse.shopping.ui.order.uistate.OrderUIState" />
+
+        <variable
+            name="payment"
+            type="woowacourse.shopping.ui.order.uistate.PaymentUIState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,7 +47,8 @@
 
             <include
                 layout="@layout/custom_order"
-                bind:payment="@{order.payment}" />
+                bind:totalPrice="@{order.price}"
+                bind:payment="@{payment}" />
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

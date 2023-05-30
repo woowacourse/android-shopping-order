@@ -44,7 +44,7 @@ interface CartContract {
 
         fun setOrderCount(count: Int)
 
-        fun showPaymentWindow(payment: PaymentUIState)
+        fun showPaymentWindow(payment: PaymentUIState, totalPrice: Int)
 
         fun showOrderDetail(orderId: Long)
     }

@@ -12,8 +12,8 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
-import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.databinding.CustomOrderBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
@@ -39,7 +39,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             CartItemRepositoryImpl(
                 CartItemRemoteService(ServerConfiguration.host)
             ),
-            OrderRepositoryImpl(
+            DefaultOrderRepository(
                 OrderRemoteSource(ServerConfiguration.host)
             ),
             PAGE_SIZE
@@ -118,7 +118,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun showPaymentWindow(payment: PaymentUIState) {
+    override fun showPaymentWindow(payment: PaymentUIState, totalPrice: Int) {
         val orderDialog = CustomOrderBinding.inflate(layoutInflater)
 
         AlertDialog.Builder(this).apply {
@@ -133,6 +133,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             }
         }.show()
 
+        orderDialog.totalPrice = totalPrice
         orderDialog.payment = payment
     }
 

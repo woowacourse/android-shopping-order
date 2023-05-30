@@ -8,13 +8,14 @@ import android.view.MenuItem
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
+import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
-import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.databinding.ItemOrderDiscountBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.uistate.DiscountPolicyUIState
 import woowacourse.shopping.ui.order.uistate.OrderUIState
+import woowacourse.shopping.ui.order.uistate.PaymentUIState
 import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.getSerializable
 
@@ -24,7 +25,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private val presenter: OrderDetailContract.Presenter by lazy {
-        OrderDetailPresenter(this, OrderRepositoryImpl(OrderRemoteSource(ServerConfiguration.host)))
+        OrderDetailPresenter(this, DefaultOrderRepository(OrderRemoteSource(ServerConfiguration.host)))
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {
@@ -49,8 +50,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         return true
     }
 
-    override fun showOrder(order: OrderUIState) {
+    override fun showOrder(order: OrderUIState, payment: PaymentUIState) {
         binding.order = order
+        binding.payment = payment
         orderListAdapter.setOrders(listOf(order))
     }
 

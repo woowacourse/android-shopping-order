@@ -13,7 +13,7 @@ class CartPresenter(
     private val orderRepository: OrderRepository,
     private val pageSize: Int
 ) : CartContract.Presenter {
-    private var selectedCart = Cart(emptyList())
+    private var selectedCart = Cart(emptySet())
     var currentPage = 0
 
     override fun loadCartItemsOfNextPage() {
@@ -42,7 +42,7 @@ class CartPresenter(
 
     override fun deleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId) {
-            selectedCart = Cart(selectedCart.value.filter { it.id != cartItemId })
+            selectedCart = Cart(selectedCart.value.filter { it.id != cartItemId }.toSet())
             showPageUI(currentPage)
             updateCartUI()
         }
@@ -96,13 +96,14 @@ class CartPresenter(
     }
 
     override fun checkPayment() {
-        orderRepository.findDiscountPolicy(selectedCart) {
-            view.showPaymentWindow(it.toUIState())
+        val totalPrice = selectedCart.calculateTotalPrice()
+        orderRepository.findDiscountPolicy(totalPrice, "gold") {
+            view.showPaymentWindow(it.toUIState(), totalPrice)
         }
     }
 
     override fun placeOrder() {
-        orderRepository.save(selectedCart) {
+        orderRepository.save(selectedCart.value.map { it.id }) {
             view.showOrderDetail(it)
         }
     }

@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.order.DiscountPolicy
 
 data class DiscountPolicyUIState(
     val name: String,
-    val discountRate: Int,
+    val discountRate: Double,
     val discountPrice: Int
 ) {
 
