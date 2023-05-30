@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
@@ -12,10 +10,8 @@ import woowacourse.shopping.utils.NonNullMutableLiveData
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private var index: Int = 0
+    private var index: Int = 0,
 ) : CartContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
-
     private val _totalPrice = NonNullMutableLiveData<Int>(0)
     override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
 
@@ -27,11 +23,12 @@ class CartPresenter(
 
     private val currentPage = mutableListOf<CartProductUIModel>()
 
-    private val pageUIModel get() = PageUIModel(
-        cartRepository.hasNextPage(index, STEP),
-        cartRepository.hasPrevPage(index, STEP),
-        index + 1
-    )
+    private val pageUIModel
+        get() = PageUIModel(
+            cartRepository.hasNextPage(index, STEP),
+            cartRepository.hasPrevPage(index, STEP),
+            index + 1,
+        )
 
     private var isChangingItemCheck = false
 
@@ -69,7 +66,10 @@ class CartPresenter(
     }
 
     override fun setUpProductsCheck(checked: Boolean) {
-        if (isChangingItemCheck) { return }
+        if (isChangingItemCheck) {
+            return
+        }
+
         currentPage.replaceAll {
             cartRepository.updateChecked(it.id, checked)
             it.copy(checked = checked)
@@ -98,25 +98,24 @@ class CartPresenter(
             currentPage.indexOfFirst { it.id == productId }
                 .takeIf { it != -1 }
                 ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-            setUpCheckedCount()
-            setUPTotalPrice()
+
+            fetchCartProducts {
+                setUpCheckedCount()
+                setUPTotalPrice()
+            }
         }
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
-        Thread {
-            isChangingItemCheck = true
-            cartRepository.updateChecked(productId, checked)
-            handler.post {
-                currentPage.indexOfFirst { it.id == productId }
-                    .takeIf { it != -1 }
-                    ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-                setUpAllButton()
-                isChangingItemCheck = false
-            }
-        }.start()
+        isChangingItemCheck = true
+        cartRepository.updateChecked(productId, checked)
+        currentPage.indexOfFirst { it.id == productId }
+            .takeIf { it != -1 }
+            ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
+        setUpCheckedCount()
+        setUPTotalPrice()
+        setUpAllButton()
+        isChangingItemCheck = false
     }
 
     override fun removeItem(productId: Int) {

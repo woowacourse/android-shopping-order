@@ -2,7 +2,7 @@ package woowacourse.shopping.model
 
 class CartProducts(cartProducts: List<CartProduct>) {
     private val cartProducts: MutableList<CartProduct>
-    val size: Int = cartProducts.size
+    val size: Int get() = cartProducts.size
 
     val totalPrice: Int
         get() = cartProducts.sumOf { it.product.price * it.quantity }

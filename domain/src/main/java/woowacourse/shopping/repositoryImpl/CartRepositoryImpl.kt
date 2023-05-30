@@ -5,7 +5,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.service.RemoteCartService
 
 class CartRepositoryImpl(
-    private val remoteDatabase: RemoteCartService
+    private val remoteDatabase: RemoteCartService,
 ) : CartRepository {
     private val cartItems = CartProducts(emptyList())
 
@@ -57,13 +57,16 @@ class CartRepositoryImpl(
                 cartItems.replaceAll(it ?: emptyList())
             }
         }
+
         val cartItem = cartItems.findByProductId(id)
         when {
             cartItem == null && count == 1 -> remoteDatabase.postItem(id) {
                 getAll { }
                 callback(it)
             }
-            cartItem == null -> return
+            cartItem == null -> {
+                return
+            }
             count == 0 -> remoteDatabase.deleteItem(cartItem.id) {
                 getAll { }
                 callback(it)

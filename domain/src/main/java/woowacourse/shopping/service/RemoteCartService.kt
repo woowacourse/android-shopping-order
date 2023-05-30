@@ -13,7 +13,7 @@ class RemoteCartService(baseUrl: String) {
             object : retrofit2.Callback<List<CartProduct>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<CartProduct>>,
-                    response: retrofit2.Response<List<CartProduct>>
+                    response: retrofit2.Response<List<CartProduct>>,
                 ) {
                     callback(response.body())
                 }
@@ -21,19 +21,19 @@ class RemoteCartService(baseUrl: String) {
                 override fun onFailure(call: retrofit2.Call<List<CartProduct>>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 
     fun postItem(itemId: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.postCart(
             "Basic $credentials",
-            ProductIdBody(itemId)
+            ProductIdBody(itemId),
         ).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
-                    response: retrofit2.Response<Int>
+                    response: retrofit2.Response<Int>,
                 ) {
                     if (response.isSuccessful) {
                         callback(response.body())
@@ -43,7 +43,7 @@ class RemoteCartService(baseUrl: String) {
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 
@@ -51,12 +51,12 @@ class RemoteCartService(baseUrl: String) {
         RetrofitUtil.retrofitCartService.patchCart(
             itemId,
             "Basic $credentials",
-            QuantityBody(quantity)
+            QuantityBody(quantity),
         ).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
-                    response: retrofit2.Response<Int>
+                    response: retrofit2.Response<Int>,
                 ) {
                     callback(response.body())
                 }
@@ -64,7 +64,7 @@ class RemoteCartService(baseUrl: String) {
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 
@@ -73,7 +73,7 @@ class RemoteCartService(baseUrl: String) {
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
-                    response: retrofit2.Response<Int>
+                    response: retrofit2.Response<Int>,
                 ) {
                     callback(response.body())
                 }
@@ -81,7 +81,7 @@ class RemoteCartService(baseUrl: String) {
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 }
