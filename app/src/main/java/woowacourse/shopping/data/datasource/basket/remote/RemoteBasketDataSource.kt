@@ -1,37 +1,34 @@
 package woowacourse.shopping.data.datasource.basket.remote
 
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
 import woowacourse.shopping.data.remote.RetrofitModule
 import java.io.IOException
+import okhttp3.Call as okhttpCall
+import okhttp3.Callback as okhttpCallback
+import okhttp3.Response as okhttpResponse
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {
-        val url = "${RetrofitModule.BASE_URL}/cart-items"
-        val request = Request.Builder()
-            .url(url)
-            .get()
-            .build()
+        RetrofitModule.basketService.getAllBasketProducts().enqueue(
+            object : Callback<List<DataBasketProduct>> {
+                override fun onResponse(
+                    call: Call<List<DataBasketProduct>>,
+                    response: Response<List<DataBasketProduct>>
+                ) {
+                    onReceived(response.body() ?: emptyList())
+                }
 
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-
-            override fun onResponse(call: Call, response: Response) {
-                onReceived(
-                    RetrofitModule.gson.fromJson(
-                        response.body?.string(),
-                        Array<DataBasketProduct>::class.java
-                    ).toList()
-                )
+                override fun onFailure(call: Call<List<DataBasketProduct>>, t: Throwable) {}
             }
-        })
+        )
     }
 
     override fun add(product: DataProduct, onReceived: (Int) -> Unit) {
@@ -44,9 +41,9 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
             .post(requestBody)
             .build()
 
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {
+        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
+            override fun onFailure(call: okhttpCall, e: IOException) {}
+            override fun onResponse(call: okhttpCall, response: okhttpResponse) {
                 val productId = response.headers.get("Location")?.split("/")?.last()?.toInt()
 
                 productId?.let {
@@ -66,9 +63,9 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
             .patch(requestBody)
             .build()
 
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {}
+        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
+            override fun onFailure(call: okhttpCall, e: IOException) {}
+            override fun onResponse(call: okhttpCall, response: okhttpResponse) {}
         })
     }
 
@@ -79,10 +76,10 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
             .delete()
             .build()
 
-        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
+        RetrofitModule.shoppingOkHttpClient.newCall(request).enqueue(object : okhttpCallback {
+            override fun onFailure(call: okhttpCall, e: IOException) {}
 
-            override fun onResponse(call: Call, response: Response) {}
+            override fun onResponse(call: okhttpCall, response: okhttpResponse) {}
         })
     }
 }

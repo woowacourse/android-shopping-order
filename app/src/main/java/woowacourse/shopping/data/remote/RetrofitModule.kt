@@ -4,6 +4,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
+import woowacourse.shopping.data.remote.service.BasketService
 import woowacourse.shopping.data.remote.service.ProductService
 import java.util.Base64
 import java.util.concurrent.TimeUnit
@@ -45,4 +47,5 @@ object RetrofitModule {
     }
 
     val productService: ProductService = retrofit.create(ProductService::class.java)
+    val basketService: BasketService = retrofit.create(BasketService::class.java)
 }
