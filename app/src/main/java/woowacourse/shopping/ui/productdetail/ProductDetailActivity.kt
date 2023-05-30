@@ -20,7 +20,7 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
-import woowacourse.shopping.utils.RemoteHost
+import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.customview.AddToCartDialog
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -29,15 +29,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
+            this, ProductRepositoryImpl(ProductRemoteService(ServerConfiguration.host)),
             CartItemRepositoryImpl(
-                CartItemRemoteService(RemoteHost.GABI)
+                CartItemRemoteService(ServerConfiguration.host)
             ),
             RecentlyViewedProductRepositoryImpl(
                 RecentlyViewedProductMemoryDao(
                     DbHelper.getDbInstance(this)
                 ),
-                ProductRemoteService(RemoteHost.GABI)
+                ProductRemoteService(ServerConfiguration.host)
             )
         )
     }
