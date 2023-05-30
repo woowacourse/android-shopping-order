@@ -13,6 +13,7 @@ interface ShoppingContract {
         fun minusCount(cartItemId: Long)
         fun loadCartItemCount()
         fun openCart()
+        fun openOrderList()
     }
 
     interface View {
@@ -23,5 +24,6 @@ interface ShoppingContract {
         fun setCanLoadMore(canLoadMore: Boolean)
         fun setCartItemCount(count: Int)
         fun showCart()
+        fun showOrderList()
     }
 }

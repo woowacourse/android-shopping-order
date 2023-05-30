@@ -5,11 +5,15 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.order.uistate.OrderUIState
 
-class OrderListAdapter(private val orders: MutableList<OrderUIState>) :
-    RecyclerView.Adapter<OrderListViewHolder>() {
+class OrderListAdapter(
+    private val orders: MutableList<OrderUIState>,
+    private val onClickOrderHeader: (Long) -> Unit
+) : RecyclerView.Adapter<OrderListViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderListViewHolder {
         return when (viewType) {
-            R.layout.item_order_list_header -> OrderListHeaderViewHolder.from(parent)
+            R.layout.item_order_list_header -> OrderListHeaderViewHolder.from(
+                parent, onClickOrderHeader
+            )
             else -> OrderListItemViewHolder.from(parent)
         }
     }

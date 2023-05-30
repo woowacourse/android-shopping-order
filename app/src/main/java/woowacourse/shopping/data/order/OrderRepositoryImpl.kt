@@ -21,7 +21,14 @@ class OrderRepositoryImpl(private val orderDataSource: OrderDataSource) : OrderR
                 Cart(
                     listOf(
                         CartItem(
-                            0, 0, Product(0, "asdf", 0, "https://i.namu.wiki/i/3SNrFXL0Nqv2oS7urTbIaBEVtyIrHHFbxCjKNdLzSnT2gFsMoTKIV9d7VtmA9rpBKCeeVpor7BYzp9Ui9BtirqU8RsZKM1UmrAJ9sGfnSvZGnwHUbbakXgbW8MmXEdQrNQ6nsI6FJ6LC4U9GL7bcOg.webp"), LocalDateTime.now()
+                            0, 0,
+                            Product(
+                                0,
+                                "asdf",
+                                0,
+                                "https://i.namu.wiki/i/3SNrFXL0Nqv2oS7urTbIaBEVtyIrHHFbxCjKNdLzSnT2gFsMoTKIV9d7VtmA9rpBKCeeVpor7BYzp9Ui9BtirqU8RsZKM1UmrAJ9sGfnSvZGnwHUbbakXgbW8MmXEdQrNQ6nsI6FJ6LC4U9GL7bcOg.webp"
+                            ),
+                            LocalDateTime.now()
                         )
                     )
                 ),
@@ -38,7 +45,34 @@ class OrderRepositoryImpl(private val orderDataSource: OrderDataSource) : OrderR
     }
 
     override fun findAll(onFinish: (List<Order>) -> Unit) {
-        TODO("Not yet implemented")
+        val orders = listOf(
+            Order(
+                0,
+                Cart(
+                    listOf(
+                        CartItem(
+                            0, 0,
+                            Product(
+                                0,
+                                "asdf",
+                                0,
+                                "https://i.namu.wiki/i/3SNrFXL0Nqv2oS7urTbIaBEVtyIrHHFbxCjKNdLzSnT2gFsMoTKIV9d7VtmA9rpBKCeeVpor7BYzp9Ui9BtirqU8RsZKM1UmrAJ9sGfnSvZGnwHUbbakXgbW8MmXEdQrNQ6nsI6FJ6LC4U9GL7bcOg.webp"
+                            ),
+                            LocalDateTime.now()
+                        )
+                    )
+                ),
+                Payment(
+                    listOf(
+                        DiscountPolicy(
+                            "", 0, 0
+                        )
+                    ),
+                    0
+                )
+            )
+        )
+        onFinish(orders)
     }
 
     override fun findDiscountPolicy(cart: Cart, onFinish: (Payment) -> Unit) {

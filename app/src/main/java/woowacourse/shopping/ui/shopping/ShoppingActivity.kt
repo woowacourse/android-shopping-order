@@ -14,6 +14,7 @@ import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemo
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.order.orderlist.OrderListActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.adapter.RecentlyViewedProductListAdapter
 import woowacourse.shopping.ui.shopping.adapter.ShoppingAdapter
@@ -102,11 +103,18 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         CartActivity.startActivity(this)
     }
 
+    override fun showOrderList() {
+        OrderListActivity.startActivity(this)
+    }
+
     private fun initToolBar() {
         setSupportActionBar(binding.toolbarProductList)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        binding.ibCartButton.setOnClickListener {
+        binding.ibCart.setOnClickListener {
             presenter.openCart()
+        }
+        binding.ibOrders.setOnClickListener {
+            presenter.openOrderList()
         }
         binding.cartCount = 0
     }

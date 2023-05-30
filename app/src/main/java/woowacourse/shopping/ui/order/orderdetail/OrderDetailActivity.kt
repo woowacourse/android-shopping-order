@@ -28,7 +28,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {
-        OrderListAdapter(mutableListOf())
+        OrderListAdapter(mutableListOf()) { }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

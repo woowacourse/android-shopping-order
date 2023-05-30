@@ -5,9 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.order.OrderRemoteSource
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
+import woowacourse.shopping.ui.order.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.order.uistate.OrderUIState
+import woowacourse.shopping.utils.ServerConfiguration
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private val binding: ActivityOrderListBinding by lazy {
@@ -15,11 +19,11 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private val presenter: OrderListContract.Presenter by lazy {
-        OrderListPresenter(this)
+        OrderListPresenter(this, OrderRepositoryImpl(OrderRemoteSource(ServerConfiguration.host)))
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {
-        OrderListAdapter(mutableListOf())
+        OrderListAdapter(mutableListOf(), presenter::openOrderDetail)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +45,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     override fun showOrders(orders: List<OrderUIState>) {
         orderListAdapter.setOrders(orders)
+    }
+
+    override fun showOrderDetail(orderId: Long) {
+        OrderDetailActivity.startActivity(this, orderId)
     }
 
     private fun initToolbar() {
