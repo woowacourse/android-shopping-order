@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.shopping
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.DomainCartProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
@@ -35,7 +36,7 @@ class ShoppingPresenter(
         get() = UiProductCount(cart.productCountInCart)
 
     override fun fetchAll() {
-        updateCart(newCartProducts = loadAllCartProducts())
+        fetchAllCartProducts()
         fetchRecentProducts()
     }
 
@@ -64,29 +65,42 @@ class ShoppingPresenter(
 
     override fun addCartProduct(product: UiProduct, addCount: Int) {
         cartRepository.addCartProductByProductId(product.toDomain().id)
-        updateCart(newCartProducts = loadAllCartProducts())
+        fetchAllCartProducts()
     }
 
     override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
         cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+        fetchAllCartProducts()
     }
 
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
         cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+        fetchAllCartProducts()
     }
 
-    private fun loadAllCartProducts(): List<CartProduct> {
-        val products = productRepository.getAllProducts()
-        val cartProducts = cartRepository.getAllCartProducts()
+    private fun fetchAllCartProducts() {
+        productRepository.getAllProducts(
+            onSuccess = { products -> transformCountedCartProduct(products, ::updateCart) },
+            onFailed = { view.showErrorMessage(it.message ?: "") }
+        )
+    }
 
-        return products.map { product ->
-            cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
-                product = product,
-                selectedCount = ProductCount(0)
-            )
-        }
+    private fun transformCountedCartProduct(
+        products: List<Product>,
+        onSuccess: (List<CartProduct>) -> Unit,
+    ) {
+        cartRepository.getAllCartProducts(
+            onSuccess = { fetchedCartProducts ->
+                val countedCartProduct = products.map { product ->
+                    fetchedCartProducts.find { it.productId == product.id } ?: DomainCartProduct(
+                        product = product,
+                        selectedCount = ProductCount(0)
+                    )
+                }
+                onSuccess(countedCartProduct)
+            },
+            onFailed = { view.showErrorMessage(it.message ?: "") },
+        )
     }
 
     private fun updateCart(newCartProducts: List<CartProduct>) {

@@ -71,6 +71,10 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         finish()
     }
 
+    override fun showErrorMessage(message: String) {
+        showToast(message)
+    }
+
     companion object {
         private const val START_PAGE = 1
 

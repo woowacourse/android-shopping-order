@@ -5,8 +5,8 @@ import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.cart.CartServiceImpl
-import woowacourse.shopping.data.service.product.ProductServiceImpl
+import woowacourse.shopping.data.util.cartService
+import woowacourse.shopping.data.util.productService
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
@@ -24,11 +24,11 @@ fun inject(
 ): ShoppingContract.Presenter {
     return ShoppingPresenter(
         view = view,
-        productRepository = ProductRepositoryImpl(ProductServiceImpl()),
+        productRepository = ProductRepositoryImpl(productService),
         recentProductRepository = RecentProductRepositoryImpl(
             dao = RecentProductDaoImpl(createShoppingDatabase(context))
         ),
-        cartRepository = CartRepositoryImpl(CartServiceImpl()),
+        cartRepository = CartRepositoryImpl(cartService),
     )
 }
 
@@ -51,7 +51,7 @@ fun injectCartPresenter(
 ): CartPresenter {
     return CartPresenter(
         view = view,
-        cartRepository = CartRepositoryImpl(CartServiceImpl()),
+        cartRepository = CartRepositoryImpl(cartService),
     )
 }
 

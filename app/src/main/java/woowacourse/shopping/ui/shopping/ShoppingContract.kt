@@ -15,6 +15,7 @@ interface ShoppingContract {
         fun showLoadMoreButton()
         fun hideLoadMoreButton()
         fun updateCartBadge(count: ProductCount)
+        fun showErrorMessage(message: String)
     }
 
     abstract class Presenter(protected val view: View) {

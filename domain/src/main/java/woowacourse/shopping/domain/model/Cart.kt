@@ -45,7 +45,7 @@ data class Cart(
     fun delete(cartProduct: CartProduct): Cart =
         copy(items = items.filter { it.productId != cartProduct.productId })
 
-    fun findCartProductById(productId: Int): CartProduct? =
+    fun findCartProductByProductId(productId: Int): CartProduct? =
         items.find { it.productId == productId }
 
     fun changeProductCount(cartProduct: DomainCartProduct, count: Int): Cart {

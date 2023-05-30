@@ -25,6 +25,7 @@ import woowacourse.shopping.util.extension.findItemActionView
 import woowacourse.shopping.util.extension.findTextView
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
+import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.listener.CartProductClickListener
 import woowacourse.shopping.widget.SkeletonCounterView
@@ -90,6 +91,10 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     override fun hideLoadMoreButton() {
         loadMoreAdapter.hideButton()
+    }
+
+    override fun showErrorMessage(message: String) {
+        showToast(message)
     }
 
     override fun updateCartBadge(count: ProductCount) {

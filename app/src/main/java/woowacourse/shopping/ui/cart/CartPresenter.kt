@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
@@ -23,7 +22,7 @@ class CartPresenter(
     private var cart: Cart = Cart(minProductSize = 1)
     private var currentPage: Page = Pagination(sizePerPage = cartSize)
 
-    private val _totalCheckSize = MutableLiveData(cartRepository.getAllCartProducts().size)
+    private val _totalCheckSize = MutableLiveData(0)
     val totalCheckSize: LiveData<Int> get() = _totalCheckSize
 
     private val _pageCheckSize = MutableLiveData(currentPage.getCheckedProductSize(cart))
@@ -32,7 +31,7 @@ class CartPresenter(
     }
 
     init {
-        updateCart(cart.update(loadCartProducts()))
+        fetchCartProducts()
     }
 
     override fun fetchCart(page: Int) {
@@ -46,7 +45,8 @@ class CartPresenter(
     override fun changeProductCount(cartProduct: UiCartProduct, count: Int) {
         val domainCartProduct = cartProduct.toDomain()
         val newCart = cart.changeProductCount(domainCartProduct, count)
-        newCart.findCartProductById(domainCartProduct.productId)?.let { _cartProduct ->
+
+        newCart.findCartProductByProductId(domainCartProduct.productId)?.let { _cartProduct ->
             cartRepository.updateProductCountById(_cartProduct.id, _cartProduct.selectedCount)
         }
         updateCart(newCart)
@@ -86,8 +86,17 @@ class CartPresenter(
         view.navigateToHome()
     }
 
-    private fun loadCartProducts(): List<CartProduct> {
-        return cartRepository.getAllCartProducts()
+    private fun fetchCartProducts() {
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts ->
+                updateCart(cart.update(cartProducts))
+                _totalCheckSize.postValue(cartProducts.size)
+            },
+            onFailed = {
+                view.showErrorMessage(it.message ?: "")
+                _totalCheckSize.postValue(DEFAULT_TOTAL_CHECK_COUNT)
+            },
+        )
     }
 
     private fun updateCart(newCart: Cart) {
@@ -101,5 +110,9 @@ class CartPresenter(
         view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
         view.updateTotalPrice(cart.checkedProductTotalPrice)
         view.updateCart(currentPage.takeItems(cart).toUi())
+    }
+
+    companion object {
+        private const val DEFAULT_TOTAL_CHECK_COUNT = 0
     }
 }

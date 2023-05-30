@@ -12,6 +12,7 @@ interface CartContract {
         fun showOrderComplete(productCount: Int)
         fun showOrderFailed()
         fun navigateToHome()
+        fun showErrorMessage(message: String)
     }
 
     abstract class Presenter(protected val view: View) {
