@@ -98,8 +98,10 @@ class CartPresenter(
                 currentPage.indexOfFirst { it.productId == productId }
                     .takeIf { it != -1 }
                     ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-                setUpCheckedCount()
-                setUPTotalPrice()
+                fetchCartProducts {
+                    setUpCheckedCount()
+                    setUPTotalPrice()
+                }
             }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }

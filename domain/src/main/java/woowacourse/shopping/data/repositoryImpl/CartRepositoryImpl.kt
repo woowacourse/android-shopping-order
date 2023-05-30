@@ -72,20 +72,12 @@ class CartRepositoryImpl(
             }
         }
         val cartItem = cartItems.findByProductId(productId)
-        val updateCallback: (Result<Int>) -> Unit = { resultUpdate ->
-            resultUpdate.onSuccess {
-                getAll { resultGetAll ->
-                    resultGetAll.onSuccess { callback(resultUpdate) }
-                        .onFailure { throwable -> callback(Result.failure(throwable)) }
-                }
-            }.onFailure { throwable -> callback(Result.failure(throwable)) }
-        }
         when {
-            cartItem == null && count == 1 -> remoteDataSource.postItem(productId, updateCallback)
+            cartItem == null && count == 1 -> remoteDataSource.postItem(productId, callback)
             cartItem == null -> return
-            count == 0 -> remoteDataSource.deleteItem(cartItem.id, updateCallback)
+            count == 0 -> remoteDataSource.deleteItem(cartItem.id, callback)
             count < 1 -> return
-            else -> remoteDataSource.patchItemQuantity(cartItem.id, count, updateCallback)
+            else -> remoteDataSource.patchItemQuantity(cartItem.id, count, callback)
         }
     }
 
