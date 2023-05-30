@@ -1,26 +1,26 @@
 package woowacourse.shopping.ui.cart
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.utils.ErrorHandler
-import woowacourse.shopping.utils.NonNullLiveData
-import woowacourse.shopping.utils.NonNullMutableLiveData
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
-    private val _totalPrice = NonNullMutableLiveData<Int>(0)
-    override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
+    private val _totalPrice = MutableLiveData<Int>(0)
+    override val totalPrice: LiveData<Int> get() = _totalPrice
 
-    private val _checkedCount = NonNullMutableLiveData<Int>(0)
-    override val checkedCount: NonNullLiveData<Int> get() = _checkedCount
+    private val _checkedCount = MutableLiveData<Int>(0)
+    override val checkedCount: LiveData<Int> get() = _checkedCount
 
-    private val _allCheck = NonNullMutableLiveData<Boolean>(false)
-    override val allCheck: NonNullLiveData<Boolean> get() = _allCheck
+    private val _allCheck = MutableLiveData<Boolean>(false)
+    override val allCheck: LiveData<Boolean> get() = _allCheck
 
     private val currentPage = mutableListOf<CartProductUIModel>()
 
