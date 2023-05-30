@@ -24,15 +24,6 @@ class ProductListPresenter(
         return currentPage
     }
 
-    override fun restoreCurrentPage(currentPage: Int) {
-        this.currentPage = currentPage
-        productRepository.findAll(offset, PAGE_SIZE) { products ->
-            val productUIStates = products.map(ProductUIState::from)
-            view.addProducts(productUIStates)
-            refreshCanLoadMore()
-        }
-    }
-
     override fun onLoadRecentlyViewedProducts() {
         recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc { recentlyViewedProducts ->
             val recentlyViewedProductUIStates =

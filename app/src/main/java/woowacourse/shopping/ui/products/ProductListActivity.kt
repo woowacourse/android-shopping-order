@@ -68,9 +68,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
         initProductList()
         initLoadingButton()
-        if (savedInstanceState != null) {
-            presenter.restoreCurrentPage(savedInstanceState.getInt(CURRENT_PAGE))
-        }
     }
 
     override fun onStart() {
@@ -179,14 +176,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURRENT_PAGE, presenter.getCurrentPage())
-        super.onSaveInstanceState(outState)
-    }
-
     companion object {
-        private const val CURRENT_PAGE = "CURRENT_PAGE"
-
         fun startActivity(context: Context) {
             val intent = Intent(context, ProductListActivity::class.java).apply {}
             context.startActivity(intent)
