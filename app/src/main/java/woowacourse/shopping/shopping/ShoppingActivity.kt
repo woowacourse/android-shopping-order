@@ -23,7 +23,6 @@ import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
-import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.data.database.dao.RecentProductDao
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -100,7 +99,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            presenter.updateCartChange()
+            beforeLoad()
+            presenter.loadProducts()
+            presenter.setCartAmount()
         }
     }
 
@@ -113,6 +114,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
         binding.shoppingProductList.itemAnimator = null
 
+        beforeLoad()
         initProductList()
 
         initPresenter()
@@ -131,7 +133,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
 
         shoppingCartAmount = shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
-        presenter.setUpCartAmount()
+        presenter.setCartAmount()
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -145,11 +147,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun updateProducts(productModels: List<ShoppingProductModel>) {
         productAdapter.updateProducts(productModels)
+        afterLoad()
     }
 
     override fun addProducts(productModels: List<ShoppingProductModel>) {
-        binding.shoppingProductList.visibility = View.VISIBLE
-        binding.skeletonShoppingProductList.visibility = View.GONE
         productAdapter.addProducts(productModels)
     }
 
@@ -170,8 +171,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         shoppingCartAmount?.text = amount.toString()
     }
 
-    override fun updateShoppingProduct(prev: ShoppingProductModel, new: ShoppingProductModel) {
-        productAdapter.updateProduct(prev, new)
+    override fun updateShoppingProduct(shoppingProductModel: ShoppingProductModel) {
+        productAdapter.updateProduct(shoppingProductModel)
     }
 
     override fun notifyLoadFailed() {
@@ -192,13 +193,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private fun initPresenter() {
         val db = ShoppingDBOpenHelper(this).writableDatabase
         val productRepository = ProductRepositoryImpl(
-            productRemoteDataSource = ProductRemoteDataSource()
+            productRemoteDataSource = ProductRemoteDataSource(),
+            cartRemoteDataSource = CartRemoteDataSource()
         )
         presenter = ShoppingPresenter(
             this,
             productRepository = productRepository,
             recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(db), ProductRemoteDataSource()),
-            cartRepository = CartRepositoryImpl(CartRemoteDataSource(), CartDao(db)),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSource()),
             recentProductSize = 10,
             productLoadSize = 20
         )
@@ -221,6 +223,24 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private fun startProductDetailActivity(productModel: ProductModel, recentProductModel: ProductModel?) {
         val intent = ProductDetailActivity.createIntent(this, productModel, recentProductModel)
         activityResultLauncher.launch(intent)
+    }
+
+    private fun beforeLoad() {
+        showSkeleton()
+    }
+
+    private fun showSkeleton() {
+        binding.shoppingProductList.visibility = View.GONE
+        binding.skeletonShoppingProductList.visibility = View.VISIBLE
+    }
+
+    private fun afterLoad() {
+        showProducts()
+    }
+
+    private fun showProducts() {
+        binding.skeletonShoppingProductList.visibility = View.GONE
+        binding.shoppingProductList.visibility = View.VISIBLE
     }
 
     companion object {

@@ -46,8 +46,8 @@ class CartPresenter(
 
     override fun changeCartProductChecked(cartProductModel: CartProductModel) {
         val isChecked = !cartProductModel.isChecked
-        val newCartProduct = cartProductModel.toDomain().changeChecked(isChecked)
-        applyCartProductCheckedChange(cartProductModel.toDomain(), newCartProduct)
+        val cartProduct = cartProductModel.toDomain().changeChecked(isChecked)
+        applyCartProductCheckedChange(cartProduct)
     }
 
     override fun updateAllChecked() {
@@ -57,9 +57,8 @@ class CartPresenter(
 
     override fun decreaseCartProductAmount(cartProductModel: CartProductModel) {
         if (cartProductModel.quantity > 1) {
-            val prevCartProduct = cartProductModel.toDomain()
-            val newCartProduct = prevCartProduct.decreaseAmount()
-            updateCartProduct(prevCartProduct, newCartProduct)
+            val cartProduct = cartProductModel.toDomain().decreaseAmount()
+            updateCartProduct(cartProduct)
 
             updateTotalPrice()
             updateTotalQuantity()
@@ -67,9 +66,8 @@ class CartPresenter(
     }
 
     override fun increaseCartProductAmount(cartProductModel: CartProductModel) {
-        val prevCartProduct = cartProductModel.toDomain()
-        val newCartProduct = prevCartProduct.increaseAmount()
-        updateCartProduct(prevCartProduct, newCartProduct)
+        val cartProduct = cartProductModel.toDomain().increaseAmount()
+        updateCartProduct(cartProduct)
 
         updateTotalPrice()
         updateTotalQuantity()
@@ -92,7 +90,7 @@ class CartPresenter(
             val cartProduct = cart.findCartProduct(it)!!
             cart = if (cartProduct.isChecked != isChecked) {
                 val newCartProduct = cartProduct.changeChecked(isChecked)
-                applyCartProductCheckedChange(cartProduct, newCartProduct)
+                applyCartProductCheckedChange(newCartProduct)
                 cart.replaceCartProduct(newCartProduct)
             } else {
                 cart.replaceCartProduct(cartProduct)
@@ -145,16 +143,22 @@ class CartPresenter(
         )
     }
 
-    private fun applyCartProductCheckedChange(prev: CartProduct, new: CartProduct) {
-        view.updateCartProduct(prev.toView(), new.toView())
+    private fun applyCartProductCheckedChange(cartProduct: CartProduct) {
+        view.updateCartProduct(cartProduct.toView())
 
         updateTotalPrice()
         updateTotalQuantity()
     }
 
-    private fun updateCartProduct(prev: CartProduct, new: CartProduct) {
-        cartRepository.modifyCartProduct(new)
-        cartRepository.replaceCartProduct(prev, new)
-        view.updateCartProduct(prev.toView(), new.toView())
+    private fun updateCartProduct(cartProduct: CartProduct) {
+        cartRepository.updateCartProductQuantity(
+            cartProduct = cartProduct,
+            onSuccess = {
+                cart = cart.replaceCartProduct(cartProduct)
+                view.updateCartProduct(cartProduct.toView())
+                view.setResultForChange()
+            },
+            onFailure = {}
+        )
     }
 }

@@ -1,7 +1,9 @@
 package woowacourse.shopping.productdetail.dialog
 
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -94,14 +96,14 @@ class CartProductDialogPresenterTest {
             cartRepository,
             cartProductAmount = 1
         )
-        every { cartRepository.getCartProductByProduct(any()) } returns null
+        every { cartRepository.findByProductId(any(), any(), any()) } just runs
 
         // when
         presenter.addToCart()
 
         // then
         verify {
-            cartRepository.addCartProduct(any())
+            cartRepository.addCartProduct(any(), any(), any())
             view.notifyAddToCartCompleted()
         }
     }
@@ -115,14 +117,14 @@ class CartProductDialogPresenterTest {
             cartRepository,
             cartProductAmount = 1
         )
-        every { cartRepository.getCartProductByProduct(any()) } returns mockk(relaxed = true)
+        every { cartRepository.findByProductId(any(), any(), any()) } just runs
 
         // when
         presenter.addToCart()
 
         // then
         verify {
-            cartRepository.modifyCartProduct(any())
+            cartRepository.updateCartProductQuantity(any(), any(), any())
             view.notifyAddToCartCompleted()
         }
     }

@@ -10,7 +10,6 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.common.model.mapper.ProductMapper.toView
-import woowacourse.shopping.createCartProduct
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.createRecentProduct
 import woowacourse.shopping.createShoppingProductModel
@@ -52,11 +51,10 @@ class ShoppingPresenterTest {
     @Test
     fun 카트_상품_개수를_세팅한다() {
         // given
-        every { cartRepository.getTotalAmount() } returns 0
         every { view.updateCartAmount(any()) } just runs
 
         // when
-        presenter.setUpCartAmount()
+        presenter.setCartAmount()
 
         // then
         verify {
@@ -161,10 +159,9 @@ class ShoppingPresenterTest {
     @Test
     fun 카트에_담긴_상품_개수를_증가시키면_카트에_상품이_추가되고_상품과_카트의_총_상품_개수가_업데이트된다() {
         // given
-        every { cartRepository.getCartProductByProduct(any()) } returns createCartProduct()
-        every { cartRepository.addCartProduct(any()) } just runs
-        every { cartRepository.getTotalAmount() } returns 0
-        every { view.updateShoppingProduct(any(), any()) } just runs
+        every { cartRepository.findByProductId(any(), any(), any()) } just runs
+        every { cartRepository.addCartProduct(any(), any(), any()) } just runs
+        every { view.updateShoppingProduct(any()) } just runs
         every { view.updateCartAmount(any()) } just runs
 
         // when
@@ -173,8 +170,8 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            cartRepository.addCartProduct(any())
-            view.updateShoppingProduct(any(), any())
+            cartRepository.addCartProduct(any(), any(), any())
+            view.updateShoppingProduct(any())
             view.updateCartAmount(any())
         }
     }
@@ -182,10 +179,9 @@ class ShoppingPresenterTest {
     @Test
     fun 카트에_담긴_상품_개수를_감소시키면_카트에서_상품이_삭제되고_상품과_카트의_총_상품_개수가_업데이트된다() {
         // given
-        every { cartRepository.getCartProductByProduct(any()) } returns createCartProduct()
+        every { cartRepository.findByProductId(any(), any(), any()) } just runs
         every { cartRepository.deleteCartProduct(any()) } just runs
-        every { cartRepository.getTotalAmount() } returns 0
-        every { view.updateShoppingProduct(any(), any()) } just runs
+        every { view.updateShoppingProduct(any()) } just runs
         every { view.updateCartAmount(any()) } just runs
 
         // when
@@ -195,7 +191,7 @@ class ShoppingPresenterTest {
         // then
         verify {
             cartRepository.deleteCartProduct(any())
-            view.updateShoppingProduct(any(), any())
+            view.updateShoppingProduct(any())
             view.updateCartAmount(any())
         }
     }
@@ -203,12 +199,11 @@ class ShoppingPresenterTest {
     @Test
     fun 카트_변경_업데이트를_하면_상품_정보가_업데이트_되고_총_카트_상품_개수가_업데이트_된다() {
         // given
-        every { cartRepository.getTotalAmount() } returns 0
         every { view.updateProducts(any()) } just runs
         every { view.updateCartAmount(any()) } just runs
 
         // when
-        presenter.updateCartChange()
+        presenter.loadProducts()
 
         // then
         verify {

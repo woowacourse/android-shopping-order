@@ -71,9 +71,9 @@ class CartAdapter(
         this.isNavigationVisible = isNavigationVisible
     }
 
-    fun updateCartProduct(prev: CartProductModel, new: CartProductModel) {
-        val index = cartProducts.indexOf(prev)
-        cartProducts[index] = new
+    fun updateCartProduct(cartProduct: CartProductModel) {
+        val index = cartProducts.indexOfFirst { it.id == cartProduct.id }
+        cartProducts[index] = cartProduct
         notifyItemChanged(index)
     }
 }

@@ -41,9 +41,9 @@ class ProductAdapter(
         notifyItemRangeInserted(lastPosition, products.size)
     }
 
-    fun updateProduct(prev: ShoppingProductModel, new: ShoppingProductModel) {
-        val index = products.indexOf(prev)
-        products[index] = new
+    fun updateProduct(shoppingProductModel: ShoppingProductModel) {
+        val index = products.indexOfFirst { it.product.id == shoppingProductModel.product.id }
+        products[index] = shoppingProductModel
         notifyItemChanged(index)
     }
 

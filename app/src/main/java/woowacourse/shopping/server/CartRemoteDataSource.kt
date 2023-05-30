@@ -97,6 +97,33 @@ class CartRemoteDataSource {
         )
     }
 
+    fun updateCartProductQuantity(id: Int, quantity: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val baseUrl = Server.getUrl(Storage.server)
+        val url = "$baseUrl/$PATH/$id"
+        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val json = JSONObject().put("quantity", quantity)
+        val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val request = Request.Builder()
+            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .patch(body)
+            .url(url)
+            .build()
+        val handler = Handler(Looper.myLooper()!!)
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onFailure()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                handler.post {
+                    onSuccess()
+                }
+            }
+        })
+    }
+
     companion object {
         private const val PATH = "cart-items"
         private const val HEADER_AUTHORIZATION = "Authorization"

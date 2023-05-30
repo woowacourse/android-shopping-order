@@ -32,7 +32,7 @@ interface CartContract {
 
         fun setResultForChange()
 
-        fun updateCartProduct(prev: CartProductModel, new: CartProductModel)
+        fun updateCartProduct(cartProduct: CartProductModel)
 
         fun updateAllChecked(isAllChecked: Boolean)
 

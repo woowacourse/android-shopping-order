@@ -11,8 +11,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.common.model.CartProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.database.ShoppingDBOpenHelper
-import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.server.CartRemoteDataSource
 
@@ -31,6 +29,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         binding.cartProductList.itemAnimator = null
 
+        beforeLoad()
         initCartAdapter()
 
         setupCartProductAllCheckbox()
@@ -51,7 +50,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         isLastPage: Boolean
     ) {
         cartAdapter.updateCartProducts(cartProducts, currentPage, isLastPage)
-        showCart()
+        afterLoad()
     }
 
     override fun updateNavigationVisibility(visibility: Boolean) {
@@ -70,8 +69,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         setResult(Activity.RESULT_OK)
     }
 
-    override fun updateCartProduct(prev: CartProductModel, new: CartProductModel) {
-        cartAdapter.updateCartProduct(prev, new)
+    override fun updateCartProduct(cartProduct: CartProductModel) {
+        cartAdapter.updateCartProduct(cartProduct)
     }
 
     override fun updateAllChecked(isAllChecked: Boolean) {
@@ -86,11 +85,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         cartAdapter = CartAdapter(
             onCartItemRemoveButtonClick = { presenter.removeCartProduct(it) },
             onPreviousButtonClick = {
-                showSkeleton()
+                beforeLoad()
                 presenter.goToPreviousPage()
             },
             onNextButtonClick = {
-                showSkeleton()
+                beforeLoad()
                 presenter.goToNextPage()
             },
             onCheckBoxClick = { cartProductModel ->
@@ -98,11 +97,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 presenter.updateAllChecked()
             },
             onMinusAmountButtonClick = {
-                setResult(RESULT_OK)
                 presenter.decreaseCartProductAmount(it)
             },
             onPlusAmountButtonClick = {
-                setResult(RESULT_OK)
                 presenter.increaseCartProductAmount(it)
             }
         )
@@ -116,17 +113,24 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val db = ShoppingDBOpenHelper(this).writableDatabase
         presenter = CartPresenter(
             this,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSource(), CartDao(db)),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSource()),
             sizePerPage = SIZE_PER_PAGE
         )
+    }
+
+    private fun beforeLoad() {
+        showSkeleton()
     }
 
     private fun showSkeleton() {
         binding.cartProductList.visibility = View.GONE
         binding.skeletonCartProductList.visibility = View.VISIBLE
+    }
+
+    private fun afterLoad() {
+        showCart()
     }
 
     private fun showCart() {

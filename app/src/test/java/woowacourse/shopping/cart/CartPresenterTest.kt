@@ -23,15 +23,13 @@ class CartPresenterTest {
     @Before
     fun setUP() {
         every { cartRepository.getAll(any(), any()) } just runs
-        every { cartRepository.getAllCount() } returns 0
-        every { cartRepository.getTotalPrice() } returns 0
-        every { cartRepository.getTotalAmount() } returns 0
         every { view.updateNavigationVisibility(any()) } just runs
         every { view.updateCart(any(), any(), any()) } just runs
         every { view.updateCartTotalPrice(any()) } just runs
         every { view.updateCartTotalAmount(any()) } just runs
         every { cartRepository.isAllCheckedInPage(any(), any()) } returns true
         every { view.updateAllChecked(any()) } just runs
+        every { cartRepository.getAllCount(any(), any()) } just runs
 
         presenter = CartPresenter(
             view, cartRepository, 0, 0
@@ -106,7 +104,7 @@ class CartPresenterTest {
         // given
         val cartRemoteDataSource: CartRemoteDataSource = mockk()
         val cartDao: CartDao = mockk()
-        val cartRepository = CartRepositoryImpl(cartRemoteDataSource, cartDao)
+        val cartRepository = CartRepositoryImpl(cartRemoteDataSource)
         every { cartDao.selectAllCount() } returns 0
         every { cartDao.getTotalPrice() } returns 0
         every { cartDao.getTotalAmount() } returns 0
@@ -122,24 +120,21 @@ class CartPresenterTest {
     @Test
     fun 카트_상품의_체크_상태를_업데이트_하면_카트_상품이_교체되고_뷰에_업데이트_된다() {
         // given
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         presenter.changeCartProductChecked(createCartProductModel())
 
         // then
         verify {
-            cartRepository.replaceCartProduct(any(), any())
-            view.updateCartProduct(any(), any())
+            view.updateCartProduct(any())
         }
     }
 
     @Test
     fun 카트_상품의_체크_상태를_업데이트_하면_총_가격이_업데이트_된다() {
         // given
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
         every { view.updateCartTotalPrice(any()) } just runs
 
         // when
@@ -152,8 +147,7 @@ class CartPresenterTest {
     @Test
     fun 카트_상품의_체크_상태를_업데이트_하면_총_수량이_업데이트_된다() {
         // given
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
         every { view.updateCartTotalAmount(any()) } just runs
 
         // when
@@ -180,9 +174,8 @@ class CartPresenterTest {
     @Test
     fun 카트_상품_수량을_증가시키면_레포지토리의_카트_상품을_수정_및_교체하고_뷰의_카트_상품을_업데이트_한다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 0, false, createProductModel())
@@ -190,18 +183,16 @@ class CartPresenterTest {
 
         // then
         verify {
-            cartRepository.modifyCartProduct(any())
-            cartRepository.replaceCartProduct(any(), any())
-            view.updateCartProduct(any(), any())
+            cartRepository.updateCartProductQuantity(any(), any(), any())
+            view.updateCartProduct(any())
         }
     }
 
     @Test
     fun 카트_상품이_체크_상태가_아닐_때_카트_상품_수량을_증가시키면_총_가격과_수량이_업데이트_되지_않아_총_한_번_업데이트_한다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 0, false, createProductModel())
@@ -217,9 +208,8 @@ class CartPresenterTest {
     @Test
     fun 카트_상품이_체크_상태일_때_카트_상품_수량을_증가시키면_총_가격과_수량이_업데이트_되어_총_두_번_업데이트_된다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 0, true, createProductModel())
@@ -242,18 +232,16 @@ class CartPresenterTest {
 
         // then
         verify(exactly = 0) {
-            cartRepository.modifyCartProduct(any())
-            cartRepository.replaceCartProduct(any(), any())
-            view.updateCartProduct(any(), any())
+            cartRepository.updateCartProductQuantity(any(), any(), any())
+            view.updateCartProduct(any())
         }
     }
 
     @Test
     fun 카트_상품_수량을_감소시키면_레포지토리의_카트_상품을_수정_및_교체하고_뷰의_카트_상품을_업데이트_한다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 2, false, createProductModel())
@@ -261,18 +249,16 @@ class CartPresenterTest {
 
         // then
         verify {
-            cartRepository.modifyCartProduct(any())
-            cartRepository.replaceCartProduct(any(), any())
-            view.updateCartProduct(any(), any())
+            cartRepository.updateCartProductQuantity(any(), any(), any())
+            view.updateCartProduct(any())
         }
     }
 
     @Test
     fun 카트_상품이_체크_상태가_아닐_때_카트_상품_수량을_감소시키면_총_가격과_수량이_업데이트_되지_않아_총_한_번_업데이트_한다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 2, false, createProductModel())
@@ -288,9 +274,8 @@ class CartPresenterTest {
     @Test
     fun 카트_상품이_체크_상태일_때_카트_상품_수량을_감소시키면_총_가격과_수량이_업데이트_되어_총_두_번_업데이트_된다() {
         // given
-        every { cartRepository.modifyCartProduct(any()) } just runs
-        every { cartRepository.replaceCartProduct(any(), any()) } just runs
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { cartRepository.updateCartProductQuantity(any(), any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         val cartProductModel = CartProductModel(0, 2, true, createProductModel())
@@ -306,17 +291,17 @@ class CartPresenterTest {
     @Test
     fun 체크된_상품_2개와_체크되지_않은_상품_3개가_있을_때_전체_체크를_하면_체크되지_않은_3개의_상품만큼만_업데이트_된다() {
         // given
-        val cartRepository = CartRepositoryImpl(mockk(relaxed = true), mockk(relaxed = true))
+        val cartRepository = CartRepositoryImpl(mockk(relaxed = true))
         presenter = CartPresenter(
             view, cartRepository, 0, 5
         )
-        every { view.updateCartProduct(any(), any()) } just runs
+        every { view.updateCartProduct(any()) } just runs
 
         // when
         presenter.updateCartProductCheckedInPage(true)
 
         // then
         val expected = 3
-        verify(exactly = expected) { view.updateCartProduct(any(), any()) }
+        verify(exactly = expected) { view.updateCartProduct(any()) }
     }
 }

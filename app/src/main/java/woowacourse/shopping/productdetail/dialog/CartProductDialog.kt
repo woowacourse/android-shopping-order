@@ -10,8 +10,6 @@ import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.getSerializableByKey
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.database.ShoppingDBOpenHelper
-import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
 import woowacourse.shopping.server.CartRemoteDataSource
 
@@ -59,11 +57,10 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     }
 
     private fun initPresenter() {
-        val db = ShoppingDBOpenHelper(requireContext()).writableDatabase
         presenter = CartProductDialogPresenter(
             this,
             product,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSource(), CartDao(db)),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSource()),
             cartProductAmount = 1
         )
     }

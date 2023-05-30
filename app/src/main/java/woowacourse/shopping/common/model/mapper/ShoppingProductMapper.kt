@@ -9,7 +9,7 @@ object ShoppingProductMapper : Mapper<ShoppingProduct, ShoppingProductModel> {
     override fun ShoppingProduct.toView(): ShoppingProductModel {
         return ShoppingProductModel(
             product.toView(),
-            amount
+            quantity
         )
     }
 

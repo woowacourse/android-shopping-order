@@ -35,15 +35,14 @@ class CartProductDialogPresenter(
     }
 
     override fun addToCart() {
-        cartRepository.findId(
+        cartRepository.findByProductId(
             productId = cartProduct.product.id,
             onSuccess = {
                 if (it == null) {
                     addCartProduct()
                 } else {
-                    val cartProduct = cartProduct.copy(id = it)
+                    val cartProduct = cartProduct.copy(id = it.id, quantity = cartProduct.quantity + it.quantity)
                     updateCartProduct(cartProduct)
-                    view.notifyAddToCartCompleted()
                 }
             },
             onFailure = {}
@@ -60,9 +59,12 @@ class CartProductDialogPresenter(
         )
     }
 
-    private fun updateCartProduct(prevCartProduct: CartProduct) {
-        cartProduct = prevCartProduct.copy(quantity = prevCartProduct.quantity + cartProduct.quantity)
-        cartRepository.modifyCartProduct(cartProduct)
+    private fun updateCartProduct(cartProduct: CartProduct) {
+        cartRepository.updateCartProductQuantity(
+            cartProduct,
+            onSuccess = { view.notifyAddToCartCompleted() },
+            onFailure = { }
+        )
     }
 
     companion object {

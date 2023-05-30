@@ -6,11 +6,11 @@ import woowacourse.shopping.common.model.ShoppingProductModel
 
 interface ShoppingContract {
     interface Presenter {
-        fun updateCartChange()
+        fun loadProducts()
 
         fun updateRecentProducts()
 
-        fun setUpCartAmount()
+        fun setCartAmount()
 
         fun openProduct(productModel: ProductModel)
 
@@ -36,7 +36,7 @@ interface ShoppingContract {
 
         fun updateCartAmount(amount: Int)
 
-        fun updateShoppingProduct(prev: ShoppingProductModel, new: ShoppingProductModel)
+        fun updateShoppingProduct(shoppingProductModel: ShoppingProductModel)
 
         fun notifyLoadFailed()
     }
