@@ -53,7 +53,10 @@ object RetrofitUtil {
         return object : retrofit2.Callback<T> {
             override fun onResponse(call: retrofit2.Call<T>, response: retrofit2.Response<T>) {
                 if (response.isSuccessful) {
-                    callback(Result.success(response.body()!!))
+                    when (response.body()) {
+                        null -> callback(Result.failure(Throwable("response body is null")))
+                        else -> callback(Result.success(response.body()!!))
+                    }
                 } else {
                     callback(Result.failure(Throwable(response.message())))
                 }
