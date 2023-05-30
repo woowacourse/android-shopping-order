@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.database.cart.CartDBHelper
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
@@ -23,7 +23,6 @@ import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.contract.ShoppingContract
 import woowacourse.shopping.ui.shopping.contract.presenter.ShoppingPresenter
 import woowacourse.shopping.ui.shopping.viewHolder.ProductsOnClickListener
-import woowacourse.shopping.utils.CustomViewOnClickListener
 
 class ShoppingActivity :
     AppCompatActivity(),
@@ -45,8 +44,8 @@ class ShoppingActivity :
                 ProductDataSourceImpl(),
             ),
             RecentProductDatabase(this),
-            CartDatabase(
-                CartDBHelper(this).writableDatabase,
+            CartRepositoryImpl(
+                ShoppingCartDataSourceImpl("c2FuZ3VuQDEyMzQ="),
             ),
         )
 
@@ -71,7 +70,6 @@ class ShoppingActivity :
 
     private fun initLayoutManager() {
         val layoutManager = GridLayoutManager(this@ShoppingActivity, 2)
-        val spacing = resources.getDimensionPixelSize(R.dimen.item_spacing)
         val spanCount = 2
 
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -91,15 +89,21 @@ class ShoppingActivity :
                 parent: RecyclerView,
                 state: RecyclerView.State,
             ) { // 1부터 시작
+                /*val spacingOuter =
+                    resources.getDimensionPixelSize(R.dimen.spacing_outer)
+                val spacingInner =
+                    resources.getDimensionPixelSize(R.dimen.spacing_inner)
+                val includeEdge = true
                 val position = parent.getChildAdapterPosition(view)
-                val spanSize = layoutManager.spanSizeLookup.getSpanSize(position)
+                val column = position % spanCount
 
-                if (spanSize != spanCount) {
-                    outRect.left = spacing
-                    outRect.right = spacing
-                }
-
-                outRect.top = spacing
+                if (includeEdge) {
+                    outRect.left = spacingOuter - column * spacingInner / spanCount
+                    outRect.right = (column + 1) * spacingInner / spanCount
+                } else {
+                    outRect.left = column * spacingInner / spanCount
+                    outRect.right = spacingInner - (column + 1) * spacingInner / spanCount
+                }*/
             }
         })
         binding.productRecyclerview.layoutManager = layoutManager
@@ -149,12 +153,7 @@ class ShoppingActivity :
     }
 
     override fun onAddCart(id: Long, count: Int) {
-        presenter.updateItemCount(id, count)
-        binding.productRecyclerview.adapter?.let {
-            if (it is ProductsAdapter) {
-                it.updateItemCount(id, count)
-            }
-        }
+        presenter.insertItem(id, count)
     }
 
     override fun increaseCount(id: Long) {
