@@ -9,8 +9,10 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     override fun getUser(onReceived: (user: User) -> Unit) {
-        userRemoteDateSource.getUser { dataUser ->
-            onReceived(dataUser.toUser())
+        userRemoteDateSource.getUser {
+            val user = it.toUser()
+
+            onReceived(user)
         }
     }
 }

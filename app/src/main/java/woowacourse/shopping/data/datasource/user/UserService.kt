@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.user
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
-import woowacourse.shopping.data.model.DataUser
+import woowacourse.shopping.data.model.UserRequest
 
 interface UserService {
 
@@ -11,5 +11,5 @@ interface UserService {
     fun getUser(
         @Header("Authorization")
         authorization: String,
-    ): Call<DataUser>
+    ): Call<UserRequest>
 }
