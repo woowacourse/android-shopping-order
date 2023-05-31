@@ -38,7 +38,7 @@ class CartPresenter(
 
         val newCarts = pageNation.currentItems.map { it.toUIModel() }
         view.setCartItemsView(newCarts)
-        view.setAllCartChecked(isAllChecked())
+        view.setAllCartChecked(pageNation.isAllChecked)
     }
 
     private fun loadLocalCartItemChecked() {
@@ -60,12 +60,12 @@ class CartPresenter(
     }
 
     override fun calculatePreviousPage() {
-        pageNation = pageNation.copy(currentPage = pageNation.currentPage.dec())
+        pageNation = pageNation.previousPage()
         view.setPageCountView(pageNation.currentPage)
     }
 
     override fun calculateNextPage() {
-        pageNation = pageNation.copy(currentPage = pageNation.currentPage.inc())
+        pageNation = pageNation.nextPage()
         view.setPageCountView(pageNation.currentPage)
     }
 
@@ -89,11 +89,7 @@ class CartPresenter(
         pageNation = pageNation.updateCartCheckedByCartId(cartId, isChecked)
 
         cartRepository.updateLocalCartChecked(cartId, isChecked)
-        view.setAllCartChecked(isAllChecked())
-    }
-
-    private fun isAllChecked(): Boolean {
-        return pageNation.currentItems.all { it.checked }
+        view.setAllCartChecked(pageNation.isAllChecked)
     }
 
     override fun updateCurrentPageAllProductChecked(isChecked: Boolean) {

@@ -27,6 +27,9 @@ data class PageNation(
     val currentItems: List<CartProduct>
         get() = cartProducts.getAll().subList(currentStartIndex, currentLastIndex)
 
+    val isAllChecked: Boolean
+        get() = currentItems.all { it.checked }
+
     fun hasNextPage(): Boolean = currentPage < pageCount
 
     fun nextPage(): PageNation {
