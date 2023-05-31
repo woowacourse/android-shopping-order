@@ -21,7 +21,7 @@
             android:id="@+id/detail_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/add_cart_btn"
+            app:layout_constraintBottom_toTopOf="@id/order_btn"
             app:layout_constraintTop_toTopOf="parent"
             android:paddingBottom="32dp">
 
@@ -155,7 +155,7 @@
         </ScrollView>
 
         <TextView
-            android:id="@+id/add_cart_btn"
+            android:id="@+id/order_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/mint"

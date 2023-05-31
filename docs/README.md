@@ -61,3 +61,7 @@
 - 전체 상품 목록을 가져온다
 - Product를 받아서 RecentProduct DB에 저장한다
 
+### OrderResult
+
+- 주문 목록 내용을 보여준다.
+- 주문 상세 내역을 볼 수 있다.

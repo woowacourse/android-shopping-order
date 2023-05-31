@@ -18,4 +18,10 @@
     <string name="cart_count_badge">장바구니 갯수</string>
     <string name="cart_order">주문하기</string>
     <string name="failed_load_product_detail_info">상품 정보를 불러오는데 실패했습니다</string>
+    <string name="cart_order_product">주문 상품</string>
+    <string name="sale">할인</string>
+    <string name="pay_amount">결제 금액</string>
+    <string name="order_pay_amount">주문 금액</string>
+    <string name="sale_amount">할인 금액</string>
+    <string name="final_pay_amount">최종 결제 금액</string>
 </resources>
