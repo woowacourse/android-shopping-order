@@ -3,9 +3,9 @@ package woowacourse.shopping.ui.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-typealias UiCount = Count
+typealias UiEarnRate = EarnRate
 
 @Parcelize
-data class Count(
+data class EarnRate(
     val value: Int
 ) : Parcelable

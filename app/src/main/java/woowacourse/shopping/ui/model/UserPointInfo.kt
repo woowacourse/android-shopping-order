@@ -3,9 +3,10 @@ package woowacourse.shopping.ui.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-typealias UiCount = Count
+typealias UiUserPointInfo = UserPointInfo
 
 @Parcelize
-data class Count(
-    val value: Int
+class UserPointInfo(
+    val point: Point,
+    val earnRate: EarnRate
 ) : Parcelable

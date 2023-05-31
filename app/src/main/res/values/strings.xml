@@ -39,6 +39,7 @@
     <string name="tv_payment_actual_amount_title">실 결제액</string>
     <string name="tv_payment_total_price_title">구매 총액</string>
     <string name="tv_payment_using_point_title">사용 포인트</string>
+    <string name="tv_payment_earning_rate">고객님의 적립율은 %d% 입니다</string>
 
 
 </resources>
