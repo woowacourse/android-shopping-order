@@ -3,7 +3,7 @@ package woowacourse.shopping.data.product
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.repository.ProductRepository
 
-class ProductRepositoryImpl(private val dataSource: ProductDataSource) : ProductRepository {
+class DefaultProductRepository(private val dataSource: ProductDataSource) : ProductRepository {
 
     override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
         return dataSource.findAll(limit, offset, onFinish)

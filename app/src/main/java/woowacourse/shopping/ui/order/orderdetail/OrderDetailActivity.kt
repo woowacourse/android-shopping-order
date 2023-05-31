@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
+import woowacourse.shopping.data.ShoppingRetrofit
 import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
 import woowacourse.shopping.data.user.DefaultUserRepository
@@ -19,7 +20,6 @@ import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.uistate.DiscountPolicyUIState
 import woowacourse.shopping.ui.order.uistate.OrderUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState
-import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.getSerializable
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
@@ -30,7 +30,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private val presenter: OrderDetailContract.Presenter by lazy {
         OrderDetailPresenter(
             this,
-            DefaultOrderRepository(OrderRemoteSource(ServerConfiguration.host)),
+            DefaultOrderRepository(OrderRemoteSource(ShoppingRetrofit.retrofit)),
             DefaultUserRepository(UserMemorySource(), UserRemoteSource())
         )
     }

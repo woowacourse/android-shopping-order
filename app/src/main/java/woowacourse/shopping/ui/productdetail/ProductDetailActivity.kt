@@ -8,13 +8,14 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
+import woowacourse.shopping.data.ShoppingRetrofit
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
+import woowacourse.shopping.data.recentlyviewedproduct.DefaultRecentlyViewedProductRepository
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.user.DefaultUserRepository
 import woowacourse.shopping.data.user.UserMemorySource
 import woowacourse.shopping.data.user.UserRemoteSource
@@ -32,12 +33,12 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
             this,
-            ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
+            DefaultProductRepository(ProductRemoteService(RemoteHost.GABI)),
             DefaultCartItemRepository(
-                CartItemRemoteService(RemoteHost.GABI)
+                CartItemRemoteService(ShoppingRetrofit.retrofit)
             ),
             DefaultUserRepository(UserMemorySource(), UserRemoteSource()),
-            RecentlyViewedProductRepositoryImpl(
+            DefaultRecentlyViewedProductRepository(
                 RecentlyViewedProductMemoryDao(
                     DbHelper.getDbInstance(this)
                 ),

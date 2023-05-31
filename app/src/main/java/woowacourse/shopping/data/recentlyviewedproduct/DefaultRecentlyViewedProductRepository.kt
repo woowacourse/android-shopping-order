@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import java.time.LocalDateTime
 
-class RecentlyViewedProductRepositoryImpl(
+class DefaultRecentlyViewedProductRepository(
     private val recentlyViewedProductDataSource: RecentlyViewedProductDataSource,
     private val productDataSource: ProductDataSource
 ) : RecentlyViewedProductRepository {

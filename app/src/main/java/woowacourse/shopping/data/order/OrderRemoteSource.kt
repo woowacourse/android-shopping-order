@@ -1,12 +1,9 @@
 package woowacourse.shopping.data.order
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import woowacourse.shopping.data.entity.CartItemIdsEntity
 import woowacourse.shopping.data.entity.DiscountEntity.Companion.toDomain
 import woowacourse.shopping.data.entity.DiscountsEntity
@@ -15,17 +12,12 @@ import woowacourse.shopping.data.entity.OrderEntity.Companion.toDomain
 import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.order.Payment
 import woowacourse.shopping.domain.user.User
-import woowacourse.shopping.utils.RemoteHost
 
-class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
-    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-
-    private val retrofitService = Retrofit.Builder().baseUrl(host.url)
-        .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
-        .create(OrderRetrofitService::class.java)
+class OrderRemoteSource(retrofit: Retrofit) : OrderDataSource {
+    private val orderService = retrofit.create(OrderRetrofitService::class.java)
 
     override fun save(cartItemIds: List<Long>, user: User, onFinish: (Long) -> Unit) {
-        retrofitService.postOrder("Basic " + user.token, CartItemIdsEntity(cartItemIds))
+        orderService.postOrder("Basic " + user.token, CartItemIdsEntity(cartItemIds))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.code() != 201) return
@@ -42,7 +34,7 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
     }
 
     override fun findById(id: Long, user: User, onFinish: (Order) -> Unit) {
-        retrofitService.selectOrderById("Basic " + user.token, id)
+        orderService.selectOrderById("Basic " + user.token, id)
             .enqueue(object : Callback<OrderEntity> {
                 override fun onResponse(call: Call<OrderEntity>, response: Response<OrderEntity>) {
                     if (response.code() != 200) return
@@ -57,7 +49,7 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
     }
 
     override fun findAll(user: User, onFinish: (List<Order>) -> Unit) {
-        retrofitService.selectOrders("Basic " + user.token)
+        orderService.selectOrders("Basic " + user.token)
             .enqueue(object : Callback<List<OrderEntity>> {
                 override fun onResponse(
                     call: Call<List<OrderEntity>>,
@@ -75,7 +67,7 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
     }
 
     override fun findDiscountPolicy(price: Int, memberGrade: String, onFinish: (Payment) -> Unit) {
-        retrofitService.selectDiscountPolicy(price, memberGrade)
+        orderService.selectDiscountPolicy(price, memberGrade)
             .enqueue(object : Callback<DiscountsEntity> {
                 override fun onResponse(
                     call: Call<DiscountsEntity>,

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.ShoppingRetrofit
 import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
 import woowacourse.shopping.data.user.DefaultUserRepository
@@ -14,7 +15,6 @@ import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.order.uistate.OrderUIState
-import woowacourse.shopping.utils.ServerConfiguration
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private val binding: ActivityOrderListBinding by lazy {
@@ -24,7 +24,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private val presenter: OrderListContract.Presenter by lazy {
         OrderListPresenter(
             this,
-            DefaultOrderRepository(OrderRemoteSource(ServerConfiguration.host)),
+            DefaultOrderRepository(OrderRemoteSource(ShoppingRetrofit.retrofit)),
             DefaultUserRepository(UserMemorySource(), UserRemoteSource())
         )
     }
