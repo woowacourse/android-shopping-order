@@ -9,9 +9,6 @@ class CartProducts(
     val totalCount: Int
         get() = carts.sumOf { it.count }
 
-    val size: Int
-        get() = carts.size
-
     fun addCart(cartProduct: CartProduct): CartProducts {
         val newCarts = carts.toMutableList()
         newCarts.add(cartProduct)
@@ -87,4 +84,14 @@ class CartProducts(
         carts.find { it.product.id == productId }
 
     fun getAll(): List<CartProduct> = carts.toList()
+
+    // TODO 테스트 코드 작성
+    fun getDisplayList(lastDisplayedIndex: Int, displayCountCondition: Int): List<CartProduct> {
+        val subToIndex = if (carts.size > lastDisplayedIndex + displayCountCondition) {
+            lastDisplayedIndex + displayCountCondition
+        } else {
+            carts.size
+        }
+        return carts.subList(0, subToIndex)
+    }
 }

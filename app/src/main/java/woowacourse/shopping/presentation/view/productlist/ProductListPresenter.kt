@@ -41,7 +41,11 @@ class ProductListPresenter(
 
                 val allCount = cartProducts.toModel().totalCount
 
-                view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
+                val displayProducts =
+                    cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
+                        .map { it.toUIModel() }
+
+                view.setProductItemsView(displayProducts)
                 loadRecentProductItems()
                 view.setLayoutVisibility()
                 updateCartCount(allCount)
@@ -69,7 +73,12 @@ class ProductListPresenter(
                 cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel()
 
             val allCount = cartProducts.toModel().totalCount
-            view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
+
+            val displayProducts =
+                cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
+                    .map { it.toUIModel() }
+
+            view.setProductItemsView(displayProducts)
             updateCartCount(allCount)
         }
     }
@@ -81,15 +90,10 @@ class ProductListPresenter(
 
     override fun updateProductItems(startIndex: Int) {
         productsStartIndex = startIndex
-        view.setProductItemsView(cartProducts.carts.subList(0, getSubToIndex()))
-    }
-
-    private fun getSubToIndex(): Int {
-        return if (cartProducts.carts.size > productsStartIndex + DISPLAY_PRODUCT_COUNT) {
-            productsStartIndex + DISPLAY_PRODUCT_COUNT
-        } else {
-            cartProducts.carts.size
-        }
+        val displayProducts =
+            cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
+                .map { it.toUIModel() }
+        view.setProductItemsView(displayProducts)
     }
 
     override fun loadRecentProductItems() {
