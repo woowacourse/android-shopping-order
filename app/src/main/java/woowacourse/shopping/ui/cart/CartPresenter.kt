@@ -93,7 +93,6 @@ class CartPresenter(
 
     override fun plusCount(cartItemId: Long) {
         userRepository.findCurrent { currentUser ->
-
             cartItemRepository.findById(cartItemId, currentUser) { loadedCartItem ->
                 requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
@@ -105,7 +104,6 @@ class CartPresenter(
 
     override fun minusCount(cartItemId: Long) {
         userRepository.findCurrent { currentUser ->
-
             cartItemRepository.findById(cartItemId, currentUser) { loadedCartItem ->
                 requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
 
@@ -117,8 +115,10 @@ class CartPresenter(
 
     override fun checkPayment() {
         val totalPrice = selectedCart.calculateTotalPrice()
-        orderRepository.findDiscountPolicy(totalPrice, "gold") {
-            view.showPaymentWindow(it.toUIState(), totalPrice)
+        userRepository.findCurrent { currentUser ->
+            orderRepository.findDiscountPolicy(totalPrice, currentUser.rank.toString()) {
+                view.showPayment(it.toUIState(), totalPrice - it.calculateDiscountPrice())
+            }
         }
     }
 
@@ -153,10 +153,7 @@ class CartPresenter(
         userRepository.findCurrent { currentUser ->
             val offset = (page - 1) * pageSize
             cartItemRepository.findAllOrderByAddedTime(
-                pageSize,
-                offset,
-                currentUser,
-                onFinish
+                pageSize, offset, currentUser, onFinish
             )
         }
     }

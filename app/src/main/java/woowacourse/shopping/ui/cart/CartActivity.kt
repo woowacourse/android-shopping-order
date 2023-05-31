@@ -104,7 +104,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun showPaymentWindow(payment: PaymentUIState, totalPrice: Int) {
+    override fun showPayment(payment: PaymentUIState, totalPrice: Int) {
         val orderDialog = CustomOrderBinding.inflate(layoutInflater)
 
         AlertDialog.Builder(this).apply {
