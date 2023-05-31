@@ -12,6 +12,8 @@ class PointEditText : AppCompatEditText {
             field = value
             initMaxPointHint()
         }
+    val point: Int
+        get() = text.toString().toIntOrNull() ?: DEFAULT_USE_POINT
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(
@@ -54,5 +56,6 @@ class PointEditText : AppCompatEditText {
 
     companion object {
         private const val DEFAULT_MAX_POINT = 0
+        private const val DEFAULT_USE_POINT = 0
     }
 }

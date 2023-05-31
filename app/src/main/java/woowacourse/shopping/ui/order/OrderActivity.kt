@@ -29,7 +29,7 @@ class OrderActivity : AppCompatActivity(), View {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderBinding.inflate(layoutInflater).setContentView(this)
         binding.presenter = presenter
-        binding.adapter = OrderRecyclerViewAdapter()
+        binding.adapter = OrderRecyclerViewAdapter(onApplyPoint = presenter::applyPoint)
         presenter.fetchAll()
     }
 
@@ -51,7 +51,6 @@ class OrderActivity : AppCompatActivity(), View {
 
     override fun showTotalPayment(totalPayment: UiPrice) {
         binding.totalPayment = totalPayment
-        binding.invalidateAll()
     }
 
     override fun navigateToHome() {

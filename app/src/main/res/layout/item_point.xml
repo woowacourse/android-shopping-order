@@ -6,13 +6,14 @@
     <data>
 
         <variable
-            name="availablePoint"
+            name="maxAvailablePoint"
             type="woowacourse.shopping.model.Point" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:padding="12dp">
 
         <ImageView
@@ -48,7 +49,7 @@
             app:layout_constraintEnd_toStartOf="@+id/point_apply_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/use_point_icon_image_view"
-            app:maxPoint="@{availablePoint.value}"
+            app:maxPoint="@{maxAvailablePoint.value}"
             tools:hint="2,153원" />
 
         <com.google.android.material.button.MaterialButton

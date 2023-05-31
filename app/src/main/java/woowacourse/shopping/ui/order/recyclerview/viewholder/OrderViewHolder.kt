@@ -14,7 +14,7 @@ class OrderViewHolder(
 ) {
     private val binding: ItemOrderBinding = ItemOrderBinding.bind(itemView)
 
-    override fun bind(item: ListItem) {
-        binding.orderProduct = item as? OrderProduct
+    override fun bind(orderProduct: ListItem) {
+        binding.orderProduct = orderProduct as? OrderProduct
     }
 }
