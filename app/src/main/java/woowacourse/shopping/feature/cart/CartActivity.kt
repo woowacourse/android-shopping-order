@@ -12,6 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.order.OrderActivity
 import woowacourse.shopping.util.toMoneyFormat
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -100,6 +101,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showLoadingView() {
         binding.cartLayout.visibility = View.GONE
         binding.skeletonCartLoadingLayout.visibility = View.VISIBLE
+    }
+
+    override fun navigateToOrder(cartIds: List<Long>) {
+        startActivity(OrderActivity.getIntent(this, cartIds))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

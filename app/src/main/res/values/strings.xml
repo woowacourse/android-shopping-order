@@ -17,4 +17,13 @@
     <string name="cart_count_badge">장바구니 갯수</string>
     <string name="cart_order">주문하기</string>
     <string name="failed_load_product_detail_info">상품 정보를 불러오는데 실패했습니다</string>
+    <string name="ordered_products">주문 상품</string>
+    <string name="order">Order</string>
+    <string name="discount">할인</string>
+    <string name="order_price">주문 금액</string>
+    <string name="discount_price">할인 금액</string>
+    <string name="final_price">최종 결제 금액</string>
+    <string name="discount_condition">%s 이상 구매 시</string>
+    <string name="discount_amount">%s 할인</string>
+    <string name="discount_price_format">-%s 원</string>
 </resources>

@@ -10,6 +10,7 @@ interface CartContract {
         fun exitCartScreen()
         fun hideLoadingView()
         fun showLoadingView()
+        fun navigateToOrder(cartId: List<Long>)
     }
 
     interface Presenter {
