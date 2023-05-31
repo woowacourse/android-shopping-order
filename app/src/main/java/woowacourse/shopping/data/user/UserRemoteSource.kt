@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.UserEntity
 import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
 import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.network.retrofit.UserRetrofitService
 
 class UserRemoteSource(retrofit: Retrofit) : UserDataSource {
     private val userService = retrofit.create(UserRetrofitService::class.java)

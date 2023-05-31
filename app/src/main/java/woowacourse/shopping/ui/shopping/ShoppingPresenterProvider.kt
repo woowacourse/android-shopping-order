@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import android.content.Context
-import woowacourse.shopping.data.ShoppingRetrofit
+import woowacourse.shopping.network.ShoppingRetrofit
 import woowacourse.shopping.data.cart.CartItemRemoteSource
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
@@ -25,7 +25,8 @@ object ShoppingPresenterProvider {
             CartItemRemoteSource(ShoppingRetrofit.retrofit)
         )
         val defaultProductRepository = DefaultProductRepository(productRemoteSource)
-        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit))
+        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource(
+            ShoppingRetrofit.retrofit))
         return ShoppingPresenter(
             view,
             defaultRecentlyViewedProductRepository,

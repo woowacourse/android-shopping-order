@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.order.orderlist
 
-import woowacourse.shopping.data.ShoppingRetrofit
+import woowacourse.shopping.network.ShoppingRetrofit
 import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
 import woowacourse.shopping.data.user.DefaultUserRepository

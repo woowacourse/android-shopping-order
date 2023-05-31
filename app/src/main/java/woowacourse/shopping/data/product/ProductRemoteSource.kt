@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.ProductEntity
 import woowacourse.shopping.data.entity.ProductEntity.Companion.toDomain
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.network.retrofit.ProductRetrofitService
 
 class ProductRemoteSource(retrofit: Retrofit) : ProductDataSource {
     private val productService = retrofit.create(ProductRetrofitService::class.java)

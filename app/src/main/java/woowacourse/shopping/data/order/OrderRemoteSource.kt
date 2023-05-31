@@ -12,6 +12,7 @@ import woowacourse.shopping.data.entity.OrderEntity.Companion.toDomain
 import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.order.Payment
 import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.network.retrofit.OrderRetrofitService
 
 class OrderRemoteSource(retrofit: Retrofit) : OrderDataSource {
     private val orderService = retrofit.create(OrderRetrofitService::class.java)

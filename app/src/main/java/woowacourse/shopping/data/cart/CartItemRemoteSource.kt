@@ -10,6 +10,7 @@ import woowacourse.shopping.data.entity.ProductIdEntity
 import woowacourse.shopping.data.entity.QuantityEntity
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.network.retrofit.CartItemRetrofitService
 
 class CartItemRemoteSource(retrofit: Retrofit) : CartItemDataSource {
     private val cartItemService = retrofit.create(CartItemRetrofitService::class.java)

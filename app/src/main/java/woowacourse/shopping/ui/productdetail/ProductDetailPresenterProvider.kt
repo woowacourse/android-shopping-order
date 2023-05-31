@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.productdetail
 
 import android.content.Context
-import woowacourse.shopping.data.ShoppingRetrofit
+import woowacourse.shopping.network.ShoppingRetrofit
 import woowacourse.shopping.data.cart.CartItemRemoteSource
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
