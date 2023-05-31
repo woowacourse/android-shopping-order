@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderProductsModel
 
 interface CartContract {
     interface Presenter {
@@ -20,6 +21,7 @@ interface CartContract {
         fun updateOrderCount()
         fun updateProductPrice(cartProductModel: CartProductInfoModel)
         fun initViewByLoadedItems()
+        fun orderItems()
     }
 
     interface View {
@@ -34,5 +36,6 @@ interface CartContract {
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
         fun showInitView(currentPage: String, loadingState: Boolean)
+        fun showOrderView(orderProductsModel: OrderProductsModel)
     }
 }

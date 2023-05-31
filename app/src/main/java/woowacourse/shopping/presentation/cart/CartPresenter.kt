@@ -4,6 +4,8 @@ import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.mapper.toPresentation
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderProductModel
+import woowacourse.shopping.presentation.model.OrderProductsModel
 import woowacourse.shopping.repository.CartRepository
 
 class CartPresenter(
@@ -117,6 +119,16 @@ class CartPresenter(
 
     override fun refreshCurrentPage() {
         view.setCartItems(pageProducts.toPresentationList())
+    }
+
+    override fun orderItems() {
+        val orderProductModel = OrderProductsModel(
+            cartProducts
+                .orders
+                .items
+                .map { OrderProductModel(it.product.toPresentation(), it.count) }
+        )
+        view.showOrderView(orderProductModel)
     }
 
     companion object {

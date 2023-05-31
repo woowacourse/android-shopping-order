@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
@@ -13,6 +14,8 @@ import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderProductsModel
+import woowacourse.shopping.presentation.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -49,6 +52,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.initViewByLoadedItems()
         managePaging()
         allOrderedCheckBoxChange()
+        orderButtonClick()
     }
 
     private fun initCartAdapter() {
@@ -110,6 +114,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.changeCurrentPageProductsOrder(isChecked)
             presenter.updateOrderPrice()
             presenter.updateOrderCount()
+        }
+    }
+
+    private fun orderButtonClick() {
+        binding.buttonCartOrder.setOnClickListener {
+            presenter.orderItems()
         }
     }
 
@@ -180,8 +190,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.buttonCartOrder.text = getString(R.string.order_format, count)
     }
 
+    override fun showOrderView(orderProductsModel: OrderProductsModel) {
+        if (orderProductsModel.list.isEmpty()) Toast.makeText(
+            this,
+            getString(R.string.no_order_in_cart_message),
+            Toast.LENGTH_SHORT
+        ).show()
+        else startActivity(OrderActivity.getIntent(this, orderProductsModel))
+    }
+
     companion object {
-        private const val CART_PRODUCTS_KEY = "CART_PRODUCTS_KEY"
         fun getIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

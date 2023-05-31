@@ -17,4 +17,5 @@
     <string name="gray_server">그레이 서버</string>
     <string name="glan_server">글렌 서버</string>
     <string name="toolbar_order_title">Order</string>
+    <string name="no_order_in_cart_message">상품을 체크해주세요!</string>
 </resources>
