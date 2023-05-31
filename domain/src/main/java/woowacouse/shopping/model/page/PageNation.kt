@@ -62,7 +62,7 @@ data class PageNation(
     }
 
     fun updateAllCartsChecked(checked: Boolean): PageNation {
-        val ids = cartProducts.getAll().map { it.id }
+        val ids = currentItems.map { it.id }
         return copy(cartProducts = cartProducts.updateAllCartsChecked(ids, checked))
     }
 
