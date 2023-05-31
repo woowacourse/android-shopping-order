@@ -19,14 +19,22 @@ class OrderServiceHelper(
         sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
 
     override fun getAllOrders(): Call<BaseResponse<List<OrderDataModel>>> {
-        return orderService.getOrders()
+        return orderService.getOrders(
+            credentials = getAuthToken()
+        )
     }
 
     override fun getOrderDetail(orderId: Int): Call<BaseResponse<OrderDetailDataModel>> {
-        return orderService.getOrderDetail(orderId)
+        return orderService.getOrderDetail(
+            credentials = getAuthToken(),
+            orderId = orderId
+        )
     }
 
-    override fun addOrder(orderItemBodyList: List<OrderItemBody>): Call<BaseResponse<Unit>> {
-        return orderService.addOrder(orderItemBodyList)
+    override fun addOrder(orderItemBodies: List<OrderItemBody>): Call<BaseResponse<Unit>> {
+        return orderService.addOrder(
+            credentials = getAuthToken(),
+            orderItemBodies = orderItemBodies
+        )
     }
 }
