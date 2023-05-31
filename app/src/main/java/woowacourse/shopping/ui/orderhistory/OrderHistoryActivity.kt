@@ -28,7 +28,14 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_history)
 
+        initToolbar()
         presenter.getOrders()
+    }
+
+    private fun initToolbar() {
+        binding.tbOrders.setNavigationOnClickListener {
+            finish()
+        }
     }
 
     override fun setUpView(orders: List<Order>) {

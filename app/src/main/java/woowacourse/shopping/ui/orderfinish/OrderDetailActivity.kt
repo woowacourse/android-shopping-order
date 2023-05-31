@@ -30,7 +30,14 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_detail)
 
+        initToolbar()
         presenter.getOrderRecord()
+    }
+
+    private fun initToolbar() {
+        binding.tbOrder.setNavigationOnClickListener {
+            finish()
+        }
     }
 
     override fun setUpView(order: Order) {
