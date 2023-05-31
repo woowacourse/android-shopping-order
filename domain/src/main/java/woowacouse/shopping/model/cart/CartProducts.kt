@@ -19,7 +19,6 @@ class CartProducts(
         return CartProducts(carts.filterNot { it.id == cartId })
     }
 
-    // TODO 테스트 코드 작성
     fun updateCartId(cartId: Long, productId: Long): CartProducts {
         return CartProducts(
             carts.map {
@@ -56,7 +55,6 @@ class CartProducts(
         )
     }
 
-    // TODO 테스트 코드 작성
     fun updateCartCountByCartIds(cartIds: Map<Long, Int>): CartProducts {
         return CartProducts(
             carts.map { cart ->
@@ -94,7 +92,6 @@ class CartProducts(
 
     fun getAll(): List<CartProduct> = carts.toList()
 
-    // TODO 테스트 코드 작성
     fun getDisplayList(lastDisplayedIndex: Int, displayCountCondition: Int): List<CartProduct> {
         val subToIndex = if (carts.size > lastDisplayedIndex + displayCountCondition) {
             lastDisplayedIndex + displayCountCondition
