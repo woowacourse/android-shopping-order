@@ -19,19 +19,27 @@ class ProductsViewHolder private constructor(
         val productItem = productItemType as? ProductsItemType.Product ?: return
 
         binding.item = productItem
+        binding.btnProductCount.count = productItem.count
+        setVisibility(binding.btnProductCount.count)
 
         binding.btnProductCount.setOnCountChangeListener { _, count ->
             listener.onAddCartOrUpdateCount(productItem.product.id, count)
-            if (count == 0) {
-                binding.btnAddToCart.visibility = View.VISIBLE
-                binding.btnProductCount.visibility = View.GONE
-            } else {
-                binding.btnAddToCart.visibility = View.GONE
-                binding.btnProductCount.visibility = View.VISIBLE
-            }
+            setVisibility(count)
         }
         binding.btnAddToCart.setOnClickListener {
             binding.btnProductCount.count = 1
+            listener.onAddCartOrUpdateCount(productItem.product.id, binding.btnProductCount.count)
+            setVisibility(binding.btnProductCount.count)
+        }
+    }
+
+    private fun setVisibility(count: Int) {
+        if (count == 0) {
+            binding.btnAddToCart.visibility = View.VISIBLE
+            binding.btnProductCount.visibility = View.GONE
+        } else {
+            binding.btnAddToCart.visibility = View.GONE
+            binding.btnProductCount.visibility = View.VISIBLE
         }
     }
 

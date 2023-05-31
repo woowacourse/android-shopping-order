@@ -24,10 +24,7 @@ class ProductCounter @JvmOverloads constructor(
             binding.tvCount.text = when {
                 value < minCount -> minCount.toString()
                 value > maxCount -> maxCount.toString()
-                else -> {
-                    onCountChangeListener(productId, value)
-                    value.toString()
-                }
+                else -> value.toString()
             }
         }
 
@@ -41,7 +38,13 @@ class ProductCounter @JvmOverloads constructor(
 
     private fun initView() {
         binding.tvCount.text = "0"
-        binding.tvPlus.setOnClickListener { count += 1 }
-        binding.tvMinus.setOnClickListener { count -= 1 }
+        binding.tvPlus.setOnClickListener {
+            count += 1
+            onCountChangeListener(productId, count)
+        }
+        binding.tvMinus.setOnClickListener {
+            count -= 1
+            onCountChangeListener(productId, count)
+        }
     }
 }

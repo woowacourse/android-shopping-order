@@ -23,6 +23,7 @@ class ShoppingPresenter(
             result.onSuccess { carts ->
                 val cartProducts = carts.all().associateBy({ it.product.id }, { it.quantity })
                 view.setCartProducts(cartProducts)
+                setUpTotalCount()
             }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
