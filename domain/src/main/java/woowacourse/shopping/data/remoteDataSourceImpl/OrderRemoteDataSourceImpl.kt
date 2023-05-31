@@ -5,7 +5,7 @@ import woowacourse.shopping.model.OrderList
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-    private var credentials = "YUBhLmNvbToxMjM0"
+    private var credentials = "Basic YUBhLmNvbToxMjM0"
 
     override fun getOrder(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))

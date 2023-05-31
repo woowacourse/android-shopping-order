@@ -8,7 +8,6 @@ class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource
 ) : OrderRepository {
     override fun getOrderList(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
-        println("$cartIds------------------------------")
         orderRemoteDataSource.getOrder(cartIds, callback)
     }
 }
