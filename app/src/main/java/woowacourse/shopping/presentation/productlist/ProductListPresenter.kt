@@ -43,6 +43,7 @@ class ProductListPresenter(
                 lastProductId = cartProductModels.last().productModel.id
             }
             callback(cartProductModels, isLast)
+            view.stopLoading()
         }
     }
 

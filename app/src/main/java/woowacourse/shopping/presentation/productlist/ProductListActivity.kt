@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
@@ -146,6 +147,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun replaceProductModel(cartProductModel: CartProductModel) {
         productListAdapter.replaceProductItem(ProductViewType.ProductItem(cartProductModel))
+    }
+
+    override fun stopLoading() {
+        binding.skeletonProducts.isVisible = false
+        binding.recyclerProduct.isVisible = true
     }
 
     companion object {

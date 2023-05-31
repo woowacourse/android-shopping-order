@@ -17,5 +17,6 @@ interface ProductListContract {
         fun setProductModels(cartProductModels: List<CartProductModel>, isLast: Boolean)
         fun replaceProductModel(cartProductModel: CartProductModel)
         fun setRecentProductModels(productModels: List<ProductModel>)
+        fun stopLoading()
     }
 }
