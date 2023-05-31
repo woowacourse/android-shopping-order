@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.data.repository.order.OrderMockRepository
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.feature.main.load.LoadAdapter
+import woowacourse.shopping.feature.common.load.LoadAdapter
 import woowacourse.shopping.model.OrderUiModel
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {

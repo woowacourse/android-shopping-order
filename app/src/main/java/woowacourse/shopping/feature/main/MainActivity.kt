@@ -27,7 +27,7 @@ import woowacourse.shopping.data.datasource.remote.product.ProductApi
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
-import woowacourse.shopping.feature.main.load.LoadAdapter
+import woowacourse.shopping.feature.common.load.LoadAdapter
 import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter

@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.main.load
+package woowacourse.shopping.feature.common.load
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemLoadMoreProductBinding
