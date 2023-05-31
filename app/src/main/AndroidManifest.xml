@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".feature.order.result.OrderResultActivity"
+            android:name=".feature.order.confirm.OrderConfirmActivity"
             android:exported="false" />
         <activity
             android:name=".feature.serversetting.ServerSettingActivity"

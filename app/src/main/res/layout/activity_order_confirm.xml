@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".feature.order.result.OrderResultActivity">
+        tools:context=".feature.order.confirm.OrderConfirmActivity">
 
         <ScrollView
             android:layout_width="match_parent"
