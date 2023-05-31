@@ -1,4 +1,4 @@
-package woowacourse.shopping.utils
+package woowacourse.shopping.ui.databinding
 
 import android.view.View
 import androidx.core.view.isVisible

@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
 import android.content.Context
-import woowacourse.shopping.network.ShoppingRetrofit
 import woowacourse.shopping.data.cart.CartItemRemoteSource
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
@@ -12,6 +11,7 @@ import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemo
 import woowacourse.shopping.data.user.DefaultUserRepository
 import woowacourse.shopping.data.user.UserMemorySource
 import woowacourse.shopping.data.user.UserRemoteSource
+import woowacourse.shopping.network.ShoppingRetrofit
 
 object ProductDetailPresenterProvider {
     fun create(

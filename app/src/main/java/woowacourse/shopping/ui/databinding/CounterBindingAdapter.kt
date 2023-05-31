@@ -1,4 +1,4 @@
-package woowacourse.shopping.utils
+package woowacourse.shopping.ui.databinding
 
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.ui.customview.Counter

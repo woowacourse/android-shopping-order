@@ -3,15 +3,10 @@ package woowacourse.shopping.ui.order.orderdetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.BindingAdapter
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.databinding.ItemOrderDiscountBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
-import woowacourse.shopping.ui.order.uistate.DiscountPolicyUIState
 import woowacourse.shopping.ui.order.uistate.OrderUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState
 import woowacourse.shopping.utils.getSerializable
@@ -78,18 +73,6 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
                 putExtra(ORDER_ID, orderId)
                 flags = Intent.FLAG_ACTIVITY_NO_HISTORY
                 context.startActivity(this)
-            }
-        }
-
-        @BindingAdapter("app:discountPolicies")
-        @JvmStatic
-        fun discountPolicies(layout: LinearLayout, discountPolicies: List<DiscountPolicyUIState>?) {
-            discountPolicies ?: return
-            for (discountPolicy in discountPolicies) {
-                val discountPolicyBinding = ItemOrderDiscountBinding.inflate(
-                    LayoutInflater.from(layout.context), layout, true
-                )
-                discountPolicyBinding.discountPolicy = discountPolicy
             }
         }
     }
