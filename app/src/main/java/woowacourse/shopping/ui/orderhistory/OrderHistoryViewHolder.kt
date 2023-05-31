@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.orderhistory
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderHistoryBinding
 import woowacourse.shopping.ui.model.Order
 
@@ -13,7 +14,19 @@ class OrderHistoryViewHolder(
 
     fun bind(order: Order) {
         with(binding) {
-            this.order = order
+            tvOrderCount.text = root.context.getString(
+                R.string.tv_order_count,
+                order.orderProducts.size
+            )
+            tvOrderDate.text = root.context.getString(
+                R.string.tv_order_date,
+                order.orderDate
+            )
+            tvOrderProducts.text = root.context.getString(
+                R.string.tv_order_products,
+                order.orderProducts.first().productName,
+                order.orderProducts.size - COUNT_DIFF
+            )
             root.setOnClickListener {
                 onClicked(order)
             }
@@ -21,6 +34,8 @@ class OrderHistoryViewHolder(
     }
 
     companion object {
+        private const val COUNT_DIFF = 1
+
         fun from(
             parent: ViewGroup,
             onClicked: (order: Order) -> Unit,

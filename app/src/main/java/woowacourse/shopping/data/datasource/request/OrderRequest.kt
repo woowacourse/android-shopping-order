@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.datasource.request
 
 data class OrderRequest(
     val basketIds: List<Long>,

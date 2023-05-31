@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.orderhistory
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -33,7 +32,6 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setUpView(orders: List<Order>) {
-        Log.d("woogi", "setUpView: $orders")
         binding.rvOrders.adapter = OrderHistoryAdapter(
             orders = orders,
             onClicked = ::showOrderDetail

@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.datasource.response
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
+import woowacourse.shopping.data.model.DataOrderProduct
 
-data class DataOrder(
+data class OrderResponse(
     val orderId: Long,
-    @SerializedName("createdAt")
-    val orderedTime: Date?,
+    @SerializedName("createAt")
+    val orderedTime: String?,
     @SerializedName("orderItems")
     val orderDetails: List<DataOrderProduct>,
     val totalPrice: Long,
