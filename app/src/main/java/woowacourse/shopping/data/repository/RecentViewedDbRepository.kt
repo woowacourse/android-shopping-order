@@ -8,23 +8,21 @@ import woowacourse.shopping.domain.repository.RecentViewedRepository
 
 class RecentViewedDbRepository(
     context: Context,
-    private val productRepository: ProductRepository,
 ) : RecentViewedRepository {
     private val dbHelper = RecentViewedDBHelper(context)
 
-    override fun findAll(callBack: (List<Product>) -> Unit) {
-        val productIds: List<Int> = dbHelper.selectAll()
-        productRepository.getProductsById(productIds, callBack)
+    override fun findAll(callback: (List<Product>) -> Unit) {
+        callback(dbHelper.selectAll())
     }
 
-    override fun add(id: Int) {
-        if (find(id) != null) {
-            dbHelper.remove(id)
+    override fun add(product: Product) {
+        if (find(product.id) != null) {
+            dbHelper.remove(product.id)
         }
-        dbHelper.insert(id)
+        dbHelper.insert(product)
     }
 
-    private fun find(id: Int): Int? {
+    private fun find(id: Int): Product? {
         return dbHelper.selectWhereId(id)
     }
 

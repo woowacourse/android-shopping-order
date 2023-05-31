@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 
-interface RetrofitService {
+interface ProductApi {
     @Headers("Authorization: Basic ZG9vbHlAZG9vbHkuY29tOjEyMzQ=")
     @GET("products")
     fun requestProducts(): Call<List<Product>>

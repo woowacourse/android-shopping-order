@@ -4,8 +4,9 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.retrofit.RetrofitService
+import woowacourse.shopping.data.retrofit.ProductApi
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -14,7 +15,7 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(RetrofitService::class.java)
+        .create(ProductApi::class.java)
     // "Authorization", "Basic ZG9vbHlAZG9vbHkuY29tOjEyMzQ="
 //    override fun getAll(callBack: (List<Product>) -> Unit) {
 //        executeRequest(request, callBack)
@@ -27,12 +28,12 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
 //        executeRequest(request, ::callBackWrapper)
 //    }
 
-    override fun getProductsByRange(lastId: Int, pageItemCount: Int, callBack: (ProductsWithCartItemDTO) -> Unit) {
+    override fun getProductsByRange(lastId: Int, pageItemCount: Int, callback: (ProductsWithCartItemDTO) -> Unit) {
         retrofitService.requestProductsByRange(lastId, pageItemCount)
             .enqueue(object : retrofit2.Callback<ProductsWithCartItemDTO> {
                 override fun onResponse(call: Call<ProductsWithCartItemDTO>, response: Response<ProductsWithCartItemDTO>) {
                     response.body()?.let {
-                        callBack(it)
+                        callback(it)
                     }
                 }
 
@@ -51,6 +52,23 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
             }
 
             override fun onFailure(call: Call<List<Product>>, t: Throwable) {
+                throw t
+            }
+        })
+    }
+
+    override fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit) {
+        retrofitService.requestProductById(id).enqueue(object : retrofit2.Callback<ProductWithCartInfo> {
+            override fun onResponse(
+                call: Call<ProductWithCartInfo>,
+                response: Response<ProductWithCartInfo>
+            ) {
+                response.body()?.let { productWithCartInfo ->
+                    callback(productWithCartInfo)
+                }
+            }
+
+            override fun onFailure(call: Call<ProductWithCartInfo>, t: Throwable) {
                 throw t
             }
         })

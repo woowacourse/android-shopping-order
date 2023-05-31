@@ -1,5 +1,5 @@
 package woowacourse.shopping.domain.model
 
-data class Product(val id: Int, val name: String, val imageUrl: String, val price: Int) {
+data class Product(val id: Int, val name: String, val price: Int, val imageUrl: String) {
     companion object
 }
