@@ -16,7 +16,8 @@ import woowacouse.shopping.model.product.Product
 import java.io.IOException
 
 class CartRemoteDataSourceImpl(
-    private val server: Server,
+    private val url: Server.Url,
+    private val token: Server.Token,
 ) : CartRemoteDataSource {
     override fun requestDatas(
         onFailure: () -> Unit,
@@ -25,8 +26,8 @@ class CartRemoteDataSourceImpl(
         val client = OkHttpClient()
         val request =
             Request.Builder()
-                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
-                .url(server.url + PATH_CART)
+                .addHeader("Authorization", "Basic ${token.value}")
+                .url(url.value + PATH_CART)
                 .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -57,9 +58,9 @@ class CartRemoteDataSourceImpl(
 
         val request =
             Request.Builder()
-                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                .addHeader("Authorization", "Basic ${token.value}")
                 .patch(body)
-                .url(server.url + path)
+                .url(url.value + path)
                 .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -88,9 +89,9 @@ class CartRemoteDataSourceImpl(
 
         val request =
             Request.Builder()
-                .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                .addHeader("Authorization", "Basic ${token.value}")
                 .post(body)
-                .url(server.url + PATH_CART)
+                .url(url.value + PATH_CART)
                 .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -117,9 +118,9 @@ class CartRemoteDataSourceImpl(
 
             val request =
                 Request.Builder()
-                    .addHeader("Authorization", "Basic ${Server.TOKEN_KRRONG}")
+                    .addHeader("Authorization", "Basic ${token.value}")
                     .delete()
-                    .url(server.url + path)
+                    .url(url.value + path)
                     .build()
 
             client.newCall(request).execute()

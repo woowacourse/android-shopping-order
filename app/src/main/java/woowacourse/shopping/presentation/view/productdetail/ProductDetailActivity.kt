@@ -19,6 +19,7 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -34,7 +35,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         intent.getParcelableCompat(KEY_RECENT_PRODUCT)
     }
 
-    private lateinit var server: Server
+    private lateinit var url: Server.Url
+    private lateinit var token: Server.Token
 
     private lateinit var presenter: ProductDetailContract.Presenter
 
@@ -45,7 +47,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
         supportActionBar?.title = ACTION_BAR_TITLE
 
-        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
 
         setPresenter()
 
@@ -69,9 +72,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(url)
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
         presenter = ProductDetailPresenter(
             this,
             productId = productId,
@@ -96,7 +99,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setLastRecentProduct() {
         binding.clLastProductInfo.setOnClickListener {
-            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, server)
+            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, url, token)
             startActivity(intent)
             finish()
         }
@@ -139,11 +142,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             context: Context,
             id: Long,
             recentProduct: RecentProductModel?,
-            server: Server,
+            url: Server.Url,
+            token: Server.Token,
         ): Intent {
             val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra(KEY_PRODUCT_ID, id)
-            intent.putExtra(KEY_SERVER_SERVER, server)
+            intent.putExtra(KEY_SERVER_SERVER, url)
+            intent.putExtra(KEY_SERVER_TOKEN, token)
 
             recentProduct?.let { intent.putExtra(KEY_RECENT_PRODUCT, it) }
 

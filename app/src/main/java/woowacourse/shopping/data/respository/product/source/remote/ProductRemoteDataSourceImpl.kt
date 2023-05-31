@@ -13,7 +13,7 @@ import woowacouse.shopping.model.product.Product
 import java.io.IOException
 
 class ProductRemoteDataSourceImpl(
-    private val server: Server,
+    private val url: Server.Url,
 ) : ProductRemoteDataSource {
 
     override fun requestDatas(
@@ -22,7 +22,7 @@ class ProductRemoteDataSourceImpl(
     ) {
         val client = OkHttpClient()
         val path = PRODUCT
-        val request = Request.Builder().url(server.url + path).build()
+        val request = Request.Builder().url(url.value + path).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("Request Failed", e.toString())
@@ -46,7 +46,7 @@ class ProductRemoteDataSourceImpl(
     ) {
         val client = OkHttpClient()
         val path = "$PRODUCT/$productId"
-        val request = Request.Builder().url(server.url + path).build()
+        val request = Request.Builder().url(url.value + path).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("Request Failed", e.toString())

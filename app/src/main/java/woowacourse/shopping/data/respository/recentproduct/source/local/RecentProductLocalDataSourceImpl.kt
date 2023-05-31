@@ -13,10 +13,10 @@ import java.time.LocalDateTime
 
 class RecentProductLocalDataSourceImpl(
     context: Context,
-    server: Server,
+    url: Server.Url,
 ) : RecentProductLocalDataSource {
     private val db = RecentProductHelper(context).writableDatabase
-    private val tableName = getTableName(server)
+    private val tableName = getTableName(url)
 
     override fun insertRecentProduct(productId: Long) {
         val value = ContentValues().apply {

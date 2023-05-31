@@ -1,27 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
+        <RadioGroup
+            android:id="@+id/rdog_main_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@id/bt_main_tori"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <RadioButton
+                android:id="@+id/rdobt_main_krrong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/main_color"
+                android:text="@string/main_radio_button_text_krrong" />
+
+            <RadioButton
+                android:id="@+id/rdobt_main_sunny"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/main_color"
+                android:text="@string/main_radio_button_text_sunny" />
+
+        </RadioGroup>
 
         <Button
             android:id="@+id/bt_main_tori"
             android:text="@string/main_button_text_tori"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/main_color"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bt_main_jenna"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/bt_main_jenna"
             android:text="@string/main_button_text_jenna"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/main_color"
+            app:layout_constraintBottom_toTopOf="@id/bt_main_poi"
+            app:layout_constraintTop_toBottomOf="@id/bt_main_tori"
+            app:layout_constraintStart_toStartOf="@id/bt_main_tori"
+            app:layout_constraintEnd_toEndOf="@+id/bt_main_tori" />
 
         <Button
             android:id="@+id/bt_main_poi"
             android:text="@string/main_button_text_poi"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/main_color"
+            app:layout_constraintTop_toBottomOf="@id/bt_main_jenna"
+            app:layout_constraintStart_toStartOf="@id/bt_main_jenna"
+            app:layout_constraintEnd_toEndOf="@+id/bt_main_jenna"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

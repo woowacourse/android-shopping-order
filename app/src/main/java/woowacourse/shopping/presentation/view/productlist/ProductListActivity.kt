@@ -37,7 +37,8 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private lateinit var binding: ActivityProductListBinding
     private lateinit var toolbarCartBinding: LayoutToolbarCartBinding
 
-    private lateinit var server: Server
+    private lateinit var url: Server.Url
+    private lateinit var token: Server.Token
 
     private lateinit var presenter: ProductContract.Presenter
 
@@ -100,7 +101,8 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product_list)
         toolbarCartBinding = LayoutToolbarCartBinding.inflate(layoutInflater)
 
-        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
 
         setPresenter()
         initLayoutManager()
@@ -120,10 +122,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
-        val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, server)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(url)
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
+        val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, url)
         presenter = ProductListPresenter(
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
@@ -201,12 +203,13 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         val recentProduct = presenter.getLastRecentProductItem(0)
         presenter.saveRecentProduct(productId)
 
-        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct, server)
+        val intent =
+            ProductDetailActivity.createIntent(this, productId, recentProduct, url, token)
         recentProductResultLauncher.launch(intent)
     }
 
     override fun moveToCartView() {
-        cartResultLauncher.launch(CartActivity.createIntent(this, server))
+        cartResultLauncher.launch(CartActivity.createIntent(this, url, token))
     }
 
     override fun handleErrorView() {
@@ -232,10 +235,12 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
         internal const val KEY_SERVER_SERVER = "KEY_SERVER_SERVER"
+        internal const val KEY_SERVER_TOKEN = "KEY_SERVER_TOKEN"
 
-        fun createIntent(context: Context, server: Server): Intent {
+        fun createIntent(context: Context, server: Server.Url, token: Server.Token): Intent {
             val intent = Intent(context, ProductListActivity::class.java)
             intent.putExtra(KEY_SERVER_SERVER, server)
+            intent.putExtra(KEY_SERVER_TOKEN, token)
             return intent
         }
     }

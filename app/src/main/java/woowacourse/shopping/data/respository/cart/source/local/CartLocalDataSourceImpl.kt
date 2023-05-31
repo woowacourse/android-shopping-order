@@ -13,10 +13,10 @@ import woowacouse.shopping.model.cart.CartProduct
 
 class CartLocalDataSourceImpl(
     context: Context,
-    server: Server,
+    url: Server.Url,
 ) : CartLocalDataSource {
     private val db = CartHelper(context).writableDatabase
-    private val tableName = getTableName(server)
+    private val tableName = getTableName(url)
 
     override fun insertCart(cartId: Long) {
         val value = ContentValues().apply {

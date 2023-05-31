@@ -4,16 +4,16 @@ import android.provider.BaseColumns
 import woowacourse.shopping.data.model.Server
 
 object RecentProductContract {
-    fun getCreateSQL(server: Server): String {
-        val tableName = getTableName(server)
+    fun getCreateSQL(url: Server.Url): String {
+        val tableName = getTableName(url)
         return "CREATE TABLE IF NOT EXISTS $tableName (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${RecentProduct.PRODUCT_ID} INTEGER UNIQUE," +
             "${RecentProduct.CREATE_DATE} TEXT)"
     }
 
-    fun getDropSQL(server: Server): String {
-        return "DROP TABLE IF EXISTS ${getTableName(server)}"
+    fun getDropSQL(url: Server.Url): String {
+        return "DROP TABLE IF EXISTS ${getTableName(url)}"
     }
 
     object RecentProduct : BaseColumns {
