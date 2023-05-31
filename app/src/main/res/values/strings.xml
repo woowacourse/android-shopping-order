@@ -18,4 +18,10 @@
     <string name="glan_server">글렌 서버</string>
     <string name="toolbar_order_title">Order</string>
     <string name="no_order_in_cart_message">상품을 체크해주세요!</string>
+    <string name="not_load_error_message">불러올수없음</string>
+    <string name="order_original_price_description">주문 금액</string>
+    <string name="order_final_price_description">총 결제금액</string>
+    <string name="order_button_description">결제하기</string>
+    <string name="order_total_point_format">사용 가능한 포인트: %d</string>
+    <string name="order_product_count_format">%d개</string>
 </resources>

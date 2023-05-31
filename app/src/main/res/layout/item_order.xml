@@ -4,10 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
-            name="cartProduct"
-            type="woowacourse.shopping.presentation.model.CartProductInfoModel" />
+            name="orderProduct"
+            type="woowacourse.shopping.presentation.model.OrderProductModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,7 +36,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="10dp"
-                    android:text="@{cartProduct.productModel.name}"
+                    android:text="@{orderProduct.product.name}"
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="18sp"
@@ -45,7 +44,7 @@
 
 
                 <ImageView
-                    app:imageUrl="@{cartProduct.productModel.imageUrl}"
+                    app:imageUrl="@{orderProduct.product.imageUrl}"
                     app:error="@{@drawable/default_image}"
                     android:id="@+id/image_order_product_poster"
                     android:layout_width="136dp"
@@ -59,6 +58,7 @@
                     tools:src="@drawable/default_image" />
 
                 <TextView
+                    android:text="@{@string/order_product_count_format(orderProduct.count)}"
                     android:textSize="20sp"
                     android:id="@+id/text_order_product_count"
                     android:layout_width="wrap_content"
