@@ -6,6 +6,17 @@
 
     <data>
 
+        <variable
+            name="presenter"
+            type="woowacourse.shopping.ui.order.OrderContract.Presenter" />
+
+        <variable
+            name="adapter"
+            type="woowacourse.shopping.ui.order.recyclerview.adapter.OrderRecyclerViewAdapter" />
+
+        <variable
+            name="totalPayment"
+            type="woowacourse.shopping.model.Price" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,9 +39,12 @@
             android:id="@+id/order_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/order_bottom_layout"
             app:layout_constraintTop_toBottomOf="@+id/order_tool_bar"
-            bind:fixedSize="@{true}" />
+            bind:adapter="@{adapter}"
+            bind:fixedSize="@{true}"
+            tools:listitem="@layout/item_order" />
 
         <LinearLayout
             android:id="@+id/order_bottom_layout"
@@ -43,13 +57,14 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <TextView
-                android:id="@+id/total_price_text_view"
+                android:id="@+id/total_payment_text_view"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/white"
                 android:gravity="center"
                 android:paddingVertical="18dp"
+                bind:price="@{totalPayment}"
                 android:textColor="@color/woowa_text_black"
                 android:textSize="17sp"
                 tools:text="합계: 0원" />
@@ -60,7 +75,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/woowa_emerald"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
+                android:onClick="@{() -> presenter.order()}"
                 android:paddingVertical="18dp"
                 android:text="@string/purchase"
                 android:textColor="@color/white"

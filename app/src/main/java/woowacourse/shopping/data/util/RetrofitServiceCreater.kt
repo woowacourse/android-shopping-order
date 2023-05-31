@@ -7,6 +7,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.service.cart.CartService
+import woowacourse.shopping.data.service.order.OrderService
+import woowacourse.shopping.data.service.point.PointService
 import woowacourse.shopping.data.service.product.ProductService
 import woowacourse.shopping.data.util.okhttp.Header
 import woowacourse.shopping.data.util.okhttp.Header.AUTHORIZATION
@@ -34,3 +36,5 @@ private val retrofit = Retrofit.Builder()
 
 val productService = retrofit.create(ProductService::class.java)
 val cartService = retrofit.create(CartService::class.java)
+val orderService = retrofit.create(OrderService::class.java)
+val pointService = retrofit.create(PointService::class.java)

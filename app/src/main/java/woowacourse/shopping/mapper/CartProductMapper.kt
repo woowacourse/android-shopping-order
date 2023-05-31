@@ -19,3 +19,6 @@ fun DomainCartProduct.toUi(): UiCartProduct = UiCartProduct(
 
 fun List<DomainCartProduct>.toUi(): List<UiCartProduct> =
     map { cartProduct -> cartProduct.toUi() }
+
+fun List<UiCartProduct>.toDomain(): List<DomainCartProduct> =
+    map { cartProduct -> cartProduct.toDomain() }

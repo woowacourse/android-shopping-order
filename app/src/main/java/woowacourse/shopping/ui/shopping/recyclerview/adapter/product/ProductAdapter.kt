@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.shopping.recyclerview.adapter.product
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 import woowacourse.shopping.util.diffutil.ProductDiffUtil
 import woowacourse.shopping.util.listener.CartProductClickListener
 import woowacourse.shopping.widget.SkeletonCounterView

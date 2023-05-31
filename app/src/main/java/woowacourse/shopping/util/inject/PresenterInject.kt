@@ -3,15 +3,22 @@ package woowacourse.shopping.util.inject
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
+import woowacourse.shopping.data.repository.PointRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.util.cartService
+import woowacourse.shopping.data.util.orderService
+import woowacourse.shopping.data.util.pointService
 import woowacourse.shopping.data.util.productService
+import woowacourse.shopping.model.UiOrder
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
 import woowacourse.shopping.ui.detail.ProductDetailContract
 import woowacourse.shopping.ui.detail.ProductDetailPresenter
+import woowacourse.shopping.ui.order.OrderContract
+import woowacourse.shopping.ui.order.OrderPresenter
 import woowacourse.shopping.ui.serversetting.ServerSettingContract
 import woowacourse.shopping.ui.serversetting.ServerSettingPresenter
 import woowacourse.shopping.ui.shopping.ShoppingContract
@@ -61,4 +68,14 @@ fun inject(
 ): ServerSettingContract.Presenter = ServerSettingPresenter(
     view,
     shoppingPreference,
+)
+
+fun injectOrderPresenter(
+    view: OrderContract.View,
+    order: UiOrder,
+): OrderContract.Presenter = OrderPresenter(
+    view = view,
+    order = order,
+    orderRepository = OrderRepositoryImpl(orderService),
+    pointRepository = PointRepositoryImpl(pointService),
 )

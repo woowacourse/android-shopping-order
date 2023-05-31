@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.UiRecentProduct
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 
 class RecentProductWrapperAdapter(
     private val recentProductAdapter: RecentProductAdapter,

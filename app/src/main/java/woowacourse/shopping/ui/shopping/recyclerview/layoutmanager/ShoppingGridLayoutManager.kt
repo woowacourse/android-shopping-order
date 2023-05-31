@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 
 class ShoppingGridLayoutManager(
     context: Context,

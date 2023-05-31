@@ -54,6 +54,9 @@ data class Cart(
         })
     }
 
+    fun getCheckedCartItems(): List<CartProduct> =
+        items.filter { it.isChecked }
+
     operator fun plus(cart: Cart): Cart =
         copy(items = (this.items + cart.items).distinctBy { it.product.id })
 

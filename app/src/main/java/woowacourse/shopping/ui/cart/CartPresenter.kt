@@ -4,11 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.OrderProduct
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUi
+import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract.Presenter
@@ -75,11 +78,11 @@ class CartPresenter(
     }
 
     override fun order() {
-        if (_totalCheckSize.value == 0) {
-            view.showOrderFailed(); return
-        }
-        cart.items.forEach { cartRepository.deleteCartProductById(it.id) }
-        view.showOrderComplete(_totalCheckSize.value ?: 0)
+        val order = Order(
+            orderProducts = cart.getCheckedCartItems().map(OrderProduct::of).toUi(),
+            totalPayment = Price(cart.checkedProductTotalPrice),
+        )
+        view.navigateToOrder(order)
     }
 
     override fun navigateToHome() {

@@ -6,11 +6,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiPage
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener
 import woowacourse.shopping.ui.cart.recyclerview.adapter.CartAdapter
+import woowacourse.shopping.ui.order.OrderActivity
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectCartPresenter
@@ -57,13 +59,9 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         presenter.removeProduct(cartProduct)
     }
 
-    override fun showOrderComplete(productCount: Int) {
-        showToast(getString(R.string.order_success_message, productCount))
-        navigateToHome()
-    }
-
-    override fun showOrderFailed() {
-        showToast(getString(R.string.order_failed_message))
+    override fun navigateToOrder(order: Order) {
+        startActivity(OrderActivity.getIntent(this, order))
+        finish()
     }
 
     override fun navigateToHome() {
