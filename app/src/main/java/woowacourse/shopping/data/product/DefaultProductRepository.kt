@@ -6,7 +6,7 @@ import woowacourse.shopping.repository.ProductRepository
 class DefaultProductRepository(private val dataSource: ProductDataSource) : ProductRepository {
 
     override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
-        return dataSource.findAll(limit, offset, onFinish)
+        return dataSource.findRanged(limit, offset, onFinish)
     }
 
     override fun countAll(onFinish: (Int) -> Unit) {

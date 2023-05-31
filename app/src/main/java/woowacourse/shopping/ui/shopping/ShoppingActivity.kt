@@ -28,7 +28,6 @@ import woowacourse.shopping.ui.shopping.adapter.RecentlyViewedProductListAdapter
 import woowacourse.shopping.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
-import woowacourse.shopping.utils.ServerConfiguration
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private val binding: ActivityShoppingBinding by lazy {
@@ -163,7 +162,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun createPresenter(): ShoppingPresenter {
-        val productRemoteService = ProductRemoteService(ServerConfiguration.host)
+        val productRemoteService = ProductRemoteService(ShoppingRetrofit.retrofit)
         val dbHelper = DbHelper.getDbInstance(this)
         val recentlyViewedProductMemoryDao = RecentlyViewedProductMemoryDao(dbHelper)
         val defaultRecentlyViewedProductRepository = DefaultRecentlyViewedProductRepository(

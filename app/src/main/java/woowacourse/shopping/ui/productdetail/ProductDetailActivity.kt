@@ -23,7 +23,6 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
-import woowacourse.shopping.utils.RemoteHost
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val binding: ActivityProductDetailBinding by lazy {
@@ -33,7 +32,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
             this,
-            DefaultProductRepository(ProductRemoteService(RemoteHost.GABI)),
+            DefaultProductRepository(ProductRemoteService(ShoppingRetrofit.retrofit)),
             DefaultCartItemRepository(
                 CartItemRemoteService(ShoppingRetrofit.retrofit)
             ),
@@ -42,7 +41,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 RecentlyViewedProductMemoryDao(
                     DbHelper.getDbInstance(this)
                 ),
-                ProductRemoteService(RemoteHost.GABI)
+                ProductRemoteService(ShoppingRetrofit.retrofit)
             ),
         )
     }

@@ -6,7 +6,7 @@ interface ProductDataSource {
 
     fun findAll(onFinish: (List<Product>) -> Unit)
 
-    fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit)
+    fun findRanged(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit)
 
     fun countAll(onFinish: (Int) -> Unit)
 
