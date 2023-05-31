@@ -14,7 +14,7 @@ import woowacourse.shopping.data.entity.OrderEntity
 import woowacourse.shopping.data.entity.OrderEntity.Companion.toDomain
 import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.order.Payment
-import woowacourse.shopping.session.UserData
+import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.utils.RemoteHost
 
 class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
@@ -24,8 +24,8 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
         .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
         .create(OrderRetrofitService::class.java)
 
-    override fun save(cartItemIds: List<Long>, onFinish: (Long) -> Unit) {
-        retrofitService.postOrder("Basic " + UserData.credential, CartItemIdsEntity(cartItemIds))
+    override fun save(cartItemIds: List<Long>, user: User, onFinish: (Long) -> Unit) {
+        retrofitService.postOrder("Basic " + user.token, CartItemIdsEntity(cartItemIds))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.code() != 201) return
@@ -41,8 +41,8 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
             })
     }
 
-    override fun findById(id: Long, onFinish: (Order) -> Unit) {
-        retrofitService.selectOrderById("Basic " + UserData.credential, id)
+    override fun findById(id: Long, user: User, onFinish: (Order) -> Unit) {
+        retrofitService.selectOrderById("Basic " + user.token, id)
             .enqueue(object : Callback<OrderEntity> {
                 override fun onResponse(call: Call<OrderEntity>, response: Response<OrderEntity>) {
                     if (response.code() != 200) return
@@ -56,8 +56,8 @@ class OrderRemoteSource(host: RemoteHost) : OrderDataSource {
             })
     }
 
-    override fun findAll(onFinish: (List<Order>) -> Unit) {
-        retrofitService.selectOrders("Basic " + UserData.credential)
+    override fun findAll(user: User, onFinish: (List<Order>) -> Unit) {
+        retrofitService.selectOrders("Basic " + user.token)
             .enqueue(object : Callback<List<OrderEntity>> {
                 override fun onResponse(
                     call: Call<List<OrderEntity>>,

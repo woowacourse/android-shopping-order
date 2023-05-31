@@ -6,7 +6,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import woowacourse.shopping.R
-import woowacourse.shopping.session.UserData
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.View {
@@ -17,20 +16,12 @@ class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.Vie
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_selection)
 
-        saveUserInfo("YUBhLmNvbToxMjM0")
         initServerButton()
         initPresenter()
     }
 
     override fun showProductListView() {
         ShoppingActivity.startActivity(this)
-    }
-
-    private fun saveUserInfo(credential: String) {
-        UserData.credential = credential
-        val preferences = getSharedPreferences("shopping", MODE_PRIVATE)
-        preferences.edit().putString("user", credential)
-            .apply()
     }
 
     private fun initServerButton() {

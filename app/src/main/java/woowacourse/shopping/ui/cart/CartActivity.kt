@@ -11,9 +11,12 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteSource
+import woowacourse.shopping.data.user.DefaultUserRepository
+import woowacourse.shopping.data.user.UserMemorySource
+import woowacourse.shopping.data.user.UserRemoteSource
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.databinding.CustomOrderBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
@@ -36,11 +39,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
-            CartItemRepositoryImpl(
+            DefaultCartItemRepository(
                 CartItemRemoteService(ServerConfiguration.host)
             ),
             DefaultOrderRepository(
                 OrderRemoteSource(ServerConfiguration.host)
+            ),
+            DefaultUserRepository(
+                UserMemorySource(),
+                UserRemoteSource()
             ),
             PAGE_SIZE
         )

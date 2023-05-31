@@ -9,12 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.user.DefaultUserRepository
+import woowacourse.shopping.data.user.UserMemorySource
+import woowacourse.shopping.data.user.UserRemoteSource
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
@@ -30,15 +33,16 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         ProductDetailPresenter(
             this,
             ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
-            CartItemRepositoryImpl(
+            DefaultCartItemRepository(
                 CartItemRemoteService(RemoteHost.GABI)
             ),
+            DefaultUserRepository(UserMemorySource(), UserRemoteSource()),
             RecentlyViewedProductRepositoryImpl(
                 RecentlyViewedProductMemoryDao(
                     DbHelper.getDbInstance(this)
                 ),
                 ProductRemoteService(RemoteHost.GABI)
-            )
+            ),
         )
     }
 

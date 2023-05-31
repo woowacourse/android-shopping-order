@@ -3,16 +3,23 @@ package woowacourse.shopping.ui.shopping
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.user.DefaultUserRepository
+import woowacourse.shopping.data.user.UserMemorySource
+import woowacourse.shopping.data.user.UserRemoteSource
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.order.orderlist.OrderListActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
@@ -42,13 +49,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initToolBar()
         initProductList()
         initLoadingButton()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.loadRecentlyViewedProducts()
-        presenter.refreshProducts()
-        presenter.loadCartItemCount()
+        initUsers()
+        initRecentlyViewedProducts()
     }
 
     override fun setRecentlyViewedProducts(recentlyViewedProducts: List<RecentlyViewedProductUIState>) {
@@ -107,6 +109,25 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         OrderListActivity.startActivity(this)
     }
 
+    override fun showUserList(users: List<User>) {
+        binding.shoppingUserSpinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, users.map { it.email })
+        binding.shoppingUserSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    presenter.selectUser(users[position])
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+    }
+
     private fun initToolBar() {
         setSupportActionBar(binding.toolbarProductList)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -129,6 +150,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
     }
 
+    private fun initUsers() {
+        presenter.loadUsers()
+    }
+
+    private fun initRecentlyViewedProducts() {
+        presenter.loadRecentlyViewedProducts()
+    }
+
     private fun createPresenter(): ShoppingPresenter {
         val productRemoteService = ProductRemoteService(ServerConfiguration.host)
         val dbHelper = DbHelper.getDbInstance(this)
@@ -136,12 +165,17 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
             recentlyViewedProductMemoryDao, productRemoteService
         )
-        val cartItemRepositoryImpl = CartItemRepositoryImpl(
+        val defaultCartItemRepository = DefaultCartItemRepository(
             CartItemRemoteService(ServerConfiguration.host)
         )
         val productRepositoryImpl = ProductRepositoryImpl(productRemoteService)
+        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource())
         return ShoppingPresenter(
-            this, recentlyViewedProductRepositoryImpl, productRepositoryImpl, cartItemRepositoryImpl
+            this,
+            recentlyViewedProductRepositoryImpl,
+            productRepositoryImpl,
+            defaultCartItemRepository,
+            userRepository
         )
     }
 

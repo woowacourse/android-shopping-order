@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
 
@@ -14,6 +15,8 @@ interface ShoppingContract {
         fun loadCartItemCount()
         fun openCart()
         fun openOrderList()
+        fun loadUsers()
+        fun selectUser(user: User)
     }
 
     interface View {
@@ -25,5 +28,6 @@ interface ShoppingContract {
         fun setCartItemCount(count: Int)
         fun showCart()
         fun showOrderList()
+        fun showUserList(users: List<User>)
     }
 }

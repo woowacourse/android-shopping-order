@@ -10,13 +10,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.session.UserData
+import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.utils.RemoteHost
 import java.io.IOException
 
 class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
     private val client = OkHttpClient()
-    override fun save(cartItem: CartItem, onFinish: (CartItem) -> Unit) {
+    override fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit) {
         val path = "/cart-items"
         val jsonObject = JSONObject().apply {
             put("productId", cartItem.product.id)
@@ -24,7 +24,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val body = jsonObject.toString().toRequestBody()
         val request = Request.Builder().url(host.url + path).post(body)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
+            .addHeader("Authorization", "Basic ${user.token}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
@@ -40,10 +40,10 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
-    override fun findAll(onFinish: (List<CartItem>) -> Unit) {
+    override fun findAll(user: User, onFinish: (List<CartItem>) -> Unit) {
         val path = "/cart-items"
         val request =
-            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
+            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${user.token}")
                 .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -62,10 +62,10 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
-    override fun findAll(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit) {
+    override fun findAll(limit: Int, offset: Int, user: User, onFinish: (List<CartItem>) -> Unit) {
         val path = "/cart-items"
         val request =
-            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
+            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${user.token}")
                 .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -84,7 +84,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
-    override fun updateCountById(id: Long, count: Int, onFinish: () -> Unit) {
+    override fun updateCountById(id: Long, count: Int, user: User, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val jsonObject = JSONObject().apply {
             put("quantity", count)
@@ -92,7 +92,7 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         val body = jsonObject.toString().toRequestBody()
         val request = Request.Builder().url(host.url + path).patch(body)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
+            .addHeader("Authorization", "Basic ${user.token}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
@@ -103,10 +103,10 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
         })
     }
 
-    override fun deleteById(id: Long, onFinish: () -> Unit) {
+    override fun deleteById(id: Long, user: User, onFinish: () -> Unit) {
         val path = "/cart-items/$id"
         val request = Request.Builder().url(host.url + path).delete()
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
+            .addHeader("Authorization", "Basic ${user.token}").build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
