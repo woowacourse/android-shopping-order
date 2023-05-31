@@ -94,6 +94,16 @@
             app:layout_constraintTop_toBottomOf="@id/order_title_tv"
             tools:text="30,000원" />
 
+        <TextView
+            android:id="@+id/order_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:text="@{order.orderStatus}"
+            app:layout_constraintStart_toEndOf="@id/center_guideline"
+            app:layout_constraintTop_toBottomOf="@id/order_payment_tv"
+            tools:text="배송중" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
