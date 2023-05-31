@@ -10,20 +10,20 @@ interface CartRepository {
     )
 
     fun addCartProduct(
-        productId: Int,
-        onSuccess: (cartId: Int) -> Unit,
+        productId: Long,
+        onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit
     )
 
     fun updateCartProductQuantity(
-        id: Int,
+        id: Long,
         quantity: Int,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     )
 
     fun deleteCartProduct(
-        id: Int,
+        id: Long,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     )

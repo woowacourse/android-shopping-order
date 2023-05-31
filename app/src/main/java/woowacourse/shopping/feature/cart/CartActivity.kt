@@ -10,8 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
-import woowacourse.shopping.data.cart.CartRemoteService
-import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.CartRemoteRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.util.extension.formatPriceWon
@@ -23,7 +22,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: CartContract.Presenter by lazy {
-        val cartRepo: CartRepository = CartRepositoryImpl(url, CartRemoteService())
+        val cartRepo: CartRepository = CartRemoteRepository(url = url)
         CartPresenter(this, cartRepo)
     }
     private val adapter: CartProductListAdapter by lazy {
@@ -31,7 +30,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             onCartProductDeleteClick = presenter::deleteCartProduct,
             plusQuantity = { state -> presenter.plusQuantity(state) },
             minusQuantity = { state -> presenter.minusQuantity(state) },
-            updateChecked = { productId: Int, checked: Boolean ->
+            updateChecked = { productId: Long, checked: Boolean ->
                 presenter.updateChecked(productId, checked)
                 presenter.loadCheckedCartProductCount()
             }

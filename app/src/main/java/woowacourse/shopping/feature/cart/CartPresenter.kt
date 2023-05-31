@@ -92,7 +92,7 @@ class CartPresenter(
         )
     }
 
-    override fun updateChecked(productId: Int, checked: Boolean) {
+    override fun updateChecked(productId: Long, checked: Boolean) {
 //        cartRepository.updateCartProductChecked(productId, checked)
 //        view.setTotalCost(PaymentCalculator.totalPaymentAmount(cartRepository.getAll()).toInt())
     }

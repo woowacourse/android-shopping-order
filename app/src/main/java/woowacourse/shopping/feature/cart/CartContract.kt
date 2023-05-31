@@ -24,7 +24,7 @@ interface CartContract {
         fun minusPageNumber()
         fun plusQuantity(cartProductState: CartProductState)
         fun minusQuantity(cartProductState: CartProductState)
-        fun updateChecked(productId: Int, checked: Boolean)
+        fun updateChecked(productId: Long, checked: Boolean)
         fun deleteCartProduct(cartProductState: CartProductState)
         fun checkAll()
     }

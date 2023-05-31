@@ -71,7 +71,7 @@ class MainPresenter(
     }
 
     override fun storeCartProduct(productState: ProductState) {
-        cartRepository.addCartProduct(productState.id, { }, { })
+        cartRepository.addCartProduct(productState.id.toLong(), { }, { })
         loadCartProductCounts()
         loadCartProductCountBadge()
     }
