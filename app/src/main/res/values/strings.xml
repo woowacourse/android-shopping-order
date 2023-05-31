@@ -38,4 +38,5 @@
     <string name="apply_point">적용하기</string>
     <string name="use_point_icon_desc">use point icon</string>
     <string name="order_load_failed_message">주문 정보 로딩에 실패하였습니다!</string>
+    <string name="order_list">주문 목록</string>
 </resources>

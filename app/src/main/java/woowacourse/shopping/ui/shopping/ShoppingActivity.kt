@@ -13,6 +13,7 @@ import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
+import woowacourse.shopping.ui.orderlist.OrderListActivity
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore.LoadMoreAdapter
@@ -47,18 +48,23 @@ class ShoppingActivity : AppCompatActivity(), View,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShoppingBinding.inflate(layoutInflater).setContentView(this)
+        initShoppingToolbar()
         initView()
+    }
+
+    private fun initShoppingToolbar() {
+        val cart = binding.shoppingToolBar.findItemActionView(R.id.cart)
+        cart?.setOnClickListener { presenter.navigateToCart() }
+
+        binding.shoppingToolBar.setOnMenuItemClickListener { item ->
+            if (item?.itemId == R.id.order_list) presenter.inquiryOrders()
+            true
+        }
     }
 
     private fun initView() {
         binding.presenter = presenter
-        initMenuClickListener()
         initRecyclerView()
-    }
-
-    private fun initMenuClickListener() {
-        val cartItemView = binding.shoppingToolBar.findItemActionView(R.id.cart)
-        cartItemView?.setOnClickListener { presenter.navigateToCart() }
     }
 
     private fun initRecyclerView() {
@@ -95,6 +101,10 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     override fun showErrorMessage(message: String) {
         showToast(message)
+    }
+
+    override fun navigateToOrderList() {
+        startActivity(OrderListActivity.getIntent(this))
     }
 
     override fun updateCartBadge(count: ProductCount) {

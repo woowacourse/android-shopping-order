@@ -78,6 +78,10 @@ class ShoppingPresenter(
         fetchAllCartProducts()
     }
 
+    override fun inquiryOrders() {
+        view.navigateToOrderList()
+    }
+
     private fun fetchAllCartProducts() {
         productRepository.getAllProducts(
             onSuccess = { products -> transformCountedCartProduct(products, ::updateCart) },
