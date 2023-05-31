@@ -115,6 +115,27 @@ class CartRemoteService {
             })
     }
 
+    fun requestSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
+        RetrofitApiGenerator.cartService.requestCarts(authorization)
+            .enqueue(object : Callback<List<CartProductDto>> {
+                override fun onResponse(
+                    call: Call<List<CartProductDto>>,
+                    response: Response<List<CartProductDto>>,
+                ) {
+                    if (response.isSuccessful) {
+                        val result: List<CartProductDto>? = response.body()
+                        val cartProducts = result?.map { it.toDomain() } ?: listOf()
+                        val count = cartProducts.sumOf { it.count }
+                        onSuccess(count)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<CartProductDto>>, t: Throwable) {
+                    onFailure()
+                }
+            })
+    }
+
     private fun createRequestBody(bodyString: String): RequestBody {
         return bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     }
