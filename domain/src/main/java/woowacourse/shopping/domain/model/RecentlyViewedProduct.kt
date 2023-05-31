@@ -8,6 +8,6 @@ data class RecentlyViewedProduct(
 ) {
     val id: Long get() = product.id
     val name: String get() = product.name
-    val itemImage: String get() = product.itemImage
+    val itemImage: String get() = product.imageUrl
     val price: Int get() = product.price
 }

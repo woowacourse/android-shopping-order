@@ -2,9 +2,9 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.PageNumber
 
-class CartPagination(productInCarts: List<ProductInCart>) {
-    private val _shoppingCart = mutableListOf<ProductInCart>()
-    val shoppingCart: List<ProductInCart> get() = _shoppingCart.toList()
+class CartPagination(productInCarts: List<CartProduct>) {
+    private val _shoppingCart = mutableListOf<CartProduct>()
+    val shoppingCart: List<CartProduct> get() = _shoppingCart.toList()
     var currentPage = PageNumber()
         private set
     private val pageStartIdx: Int get() = (currentPage.value - 1) * PAGE_UNIT
@@ -22,7 +22,7 @@ class CartPagination(productInCarts: List<ProductInCart>) {
         return (currentPage.value - 1) * PAGE_UNIT + index
     }
 
-    fun getCurrentPage(): List<ProductInCart> {
+    fun getCurrentPage(): List<CartProduct> {
         return if (shoppingCart.isEmpty()) {
             emptyList()
         } else {
@@ -41,7 +41,7 @@ class CartPagination(productInCarts: List<ProductInCart>) {
     fun isNextPageEnable(): Boolean = shoppingCart.size > currentPage.value * PAGE_UNIT
     fun isPreviousPageEnable(): Boolean = currentPage.value > 1
 
-    operator fun get(index: Int): ProductInCart = shoppingCart[getAbsolutePosition(index)]
+    operator fun get(index: Int): CartProduct = shoppingCart[getAbsolutePosition(index)]
 
     fun removeFromCurrentPage(index: Int) {
         _shoppingCart.removeAt(getAbsolutePosition(index))
@@ -76,13 +76,13 @@ class CartPagination(productInCarts: List<ProductInCart>) {
     fun getPayment(): Int {
         return shoppingCart.asSequence()
             .filter { it.isChecked }
-            .sumOf { it.quantity * it.product.price }
+            .sumOf { it.cartItem.quantity * it.product.price }
     }
 
     fun getOrderCount(): Int {
         return shoppingCart.asSequence()
             .filter { it.isChecked }
-            .sumOf { it.quantity }
+            .sumOf { it.cartItem.quantity }
     }
 
     fun updateProductQuantity(index: Int, operator: Operator) {

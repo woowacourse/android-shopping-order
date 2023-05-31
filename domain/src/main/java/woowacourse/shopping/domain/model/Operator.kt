@@ -2,15 +2,15 @@ package woowacourse.shopping.domain.model
 
 enum class Operator {
     INCREASE {
-        override fun operate(productInCart: ProductInCart): ProductInCart {
-            return productInCart.increase()
+        override fun operate(cartProduct: CartProduct): CartProduct {
+            return cartProduct.increase()
         }
     },
     DECREASE {
-        override fun operate(productInCart: ProductInCart): ProductInCart {
-            return productInCart.decrease()
+        override fun operate(cartProduct: CartProduct): CartProduct {
+            return cartProduct.decrease()
         }
     }, ;
 
-    abstract fun operate(productInCart: ProductInCart): ProductInCart
+    abstract fun operate(cartProduct: CartProduct): CartProduct
 }
