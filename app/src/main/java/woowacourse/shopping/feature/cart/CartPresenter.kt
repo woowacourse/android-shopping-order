@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import com.example.domain.Cart
 import com.example.domain.CartProduct
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductState
@@ -9,7 +10,8 @@ import woowacourse.shopping.model.mapper.toUi
 
 class CartPresenter(
     private val view: CartContract.View,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val cart: Cart = Cart()
 ) : CartContract.Presenter {
 
     private val maxProductsPerPage: Int = 5
@@ -26,28 +28,25 @@ class CartPresenter(
 
         cartRepository.getAll(onFailure = {}, onSuccess = {
             val items: List<CartProductState> = it.map(CartProduct::toUi)
+            cart.addAll(it)
+            updatePaymentAmount()
+            updatePickedCartProductCount()
             view.setCartPageNumber(pageNumber)
             view.setCartProducts(items)
             view.showCartProducts()
         })
 
-//        val cartProducts: List<CartProductState> = cartRepository.getAll().map(CartProduct::toUi)
 //        val items: List<CartProductState> =
 //            cartProducts.filterIndexed { index, _ -> index in startIndex..endIndex }
 //
 //        view.setCartPageNumber(pageNumber)
-//        view.setCartProducts(items)
         view.hidePageSelectorView()
 //        if (minPageNumber < maxPageNumber) view.showPageSelectorView()
     }
 
-    override fun loadCheckedCartProductCount() {
-        cartRepository.getAll(onFailure = {}, onSuccess = { cartProducts ->
-            val cartProductCount = cartProducts.filter { it.isPicked }.size
-            view.setCartProductCount(cartProductCount)
-        })
-//        val cartProductCount = cartRepository.getAll().filter { it.checked }.size
-//        view.setCartProductCount(cartProductCount)
+    override fun updatePickedCartProductCount() {
+        val count = cart.getPickedCount()
+        view.setCartProductCount(count)
     }
 
     override fun plusPageNumber() {
@@ -75,8 +74,9 @@ class CartPresenter(
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
             onFailure = {}, onSuccess = {
+            cart.updateProductQuantityByIndex(cartProductState.id, cartProductState.quantity)
             view.updateItem(cartProductState)
-            // todo 계산 로직 필요
+            updatePaymentAmount()
         }
         )
     }
@@ -86,15 +86,21 @@ class CartPresenter(
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
             onFailure = {}, onSuccess = {
+            cart.updateProductQuantityByIndex(cartProductState.id, cartProductState.quantity)
             view.updateItem(cartProductState)
-            // todo 계산 로직 필요
+            updatePaymentAmount()
         }
         )
     }
 
-    override fun updateChecked(productId: Long, checked: Boolean) {
-//        cartRepository.updateCartProductChecked(productId, checked)
-//        view.setTotalCost(PaymentCalculator.totalPaymentAmount(cartRepository.getAll()).toInt())
+    override fun updatePickedByCartId(cartId: Long, checked: Boolean) {
+        cart.updatePickedByIndex(cartId, checked)
+        updatePaymentAmount()
+    }
+
+    override fun updatePaymentAmount() {
+        val sum = cart.getPickedProductsTotalPrice()
+        view.setTotalCost(sum)
     }
 
     override fun deleteCartProduct(cartProductState: CartProductState) {
@@ -106,14 +112,12 @@ class CartPresenter(
         loadCart()
     }
 
-    override fun checkAll() {
-//        val cartProducts: List<CartProduct> = cartRepository.getAll()
-//        val checked: Boolean = cartProducts.find { !it.checked } != null
-//
-//        cartProducts.forEach {
-//            cartRepository.updateCartProductChecked(it.productId, checked)
-//        }
-//        view.setTotalCost(PaymentCalculator.totalPaymentAmount(cartRepository.getAll()).toInt())
+    override fun changeAllPicked() {
+        if (cart.isAllPicked()) {
+            cart.setAllPicked(false)
+            return
+        }
+        cart.setAllPicked(true)
     }
 
     private fun getMaxPageNumber(cartsSize: Int): Int {
