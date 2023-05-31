@@ -55,8 +55,8 @@ class MainPresenter(
     }
 
     override fun setCartProductCount() {
-        val count = cartRepository.getAll().size
-        view.updateCartProductCount(count)
+        totalCount = cartRepository.getAll().size
+        view.updateCartProductCount(totalCount)
     }
 
     override fun moveToCart() {
@@ -85,15 +85,17 @@ class MainPresenter(
 
     override fun increaseCartProduct(product: ProductUiModel, previousCount: Int) {
         cartRepository.addProduct(product.toDomain(), previousCount + 1)
-        totalCount = cartRepository.getAll().size
-        view.updateCartProductCount(totalCount)
+        if (previousCount == 0) {
+            ++totalCount
+            view.updateCartProductCount(totalCount)
+        }
         view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun decreaseCartProduct(product: ProductUiModel, previousCount: Int) {
         if (previousCount == 1) {
             cartRepository.deleteProduct(product.toDomain())
-            totalCount = cartRepository.getAll().size
+            --totalCount
             view.updateCartProductCount(totalCount)
         } else {
             cartRepository.addProduct(product.toDomain(), previousCount - 1)
@@ -105,6 +107,7 @@ class MainPresenter(
         val products = cartRepository.getAll().map {
             it.product.toPresentation(count = it.count)
         }
+        totalCount = products.size
         view.updateProductsCount(products)
         view.updateCartProductCount(products.size)
     }

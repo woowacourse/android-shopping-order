@@ -13,7 +13,9 @@ class CartRemoteRepositoryImpl(
 
     override fun getAll(): List<CartProduct> {
         if (cartCache.cartProducts.isEmpty()) {
-            cartCache.addCartProducts(service.loadAll())
+            val thread = Thread { cartCache.addCartProducts(service.loadAll()) }
+            thread.start()
+            thread.join()
         }
         return cartCache.cartProducts
     }
@@ -21,11 +23,19 @@ class CartRemoteRepositoryImpl(
     override fun addProduct(product: Product, count: Int) {
         val findProduct = cartCache.cartProducts.find { it.product.id == product.id }
         if (findProduct != null) {
-            service.updateCartProductCount(findProduct.cartProductId.toInt(), count)
+            val thread =
+                Thread { service.updateCartProductCount(findProduct.cartProductId.toInt(), count) }
+            thread.start()
+            thread.join()
         } else {
-            val cartItemId = service.addCartProduct(product.id.toInt())
+            var cartItemId = -1
+            val addThread = Thread { cartItemId = service.addCartProduct(product.id.toInt()) }
+            addThread.start()
+            addThread.join()
             if (cartItemId != -1) {
-                service.updateCartProductCount(cartItemId, count)
+                val updateThread = Thread { service.updateCartProductCount(cartItemId, count) }
+                updateThread.start()
+                updateThread.join()
             }
         }
         refreshCache()
@@ -36,7 +46,9 @@ class CartRemoteRepositoryImpl(
             cartCache.cartProducts.find { it.product.id == product.id }?.cartProductId ?: -1
 
         if (cartId != -1L) {
-            service.deleteCartProduct(cartId.toInt())
+            val thread = Thread { service.deleteCartProduct(cartId.toInt()) }
+            thread.start()
+            thread.join()
             refreshCache()
         }
     }
@@ -51,6 +63,8 @@ class CartRemoteRepositoryImpl(
 
     private fun refreshCache() {
         cartCache.clear()
-        cartCache.addCartProducts(service.loadAll())
+        val thread = Thread { cartCache.addCartProducts(service.loadAll()) }
+        thread.start()
+        thread.join()
     }
 }

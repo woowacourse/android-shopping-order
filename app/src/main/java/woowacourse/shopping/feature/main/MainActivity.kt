@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.cart.CartCache
 import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
@@ -22,7 +20,9 @@ import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
 import woowacourse.shopping.data.datasource.remote.ServerInfo
 import woowacourse.shopping.data.datasource.local.recent.RecentDao
-import woowacourse.shopping.data.datasource.remote.cart.CartOkHttpService
+import woowacourse.shopping.data.datasource.remote.RetrofitClient
+import woowacourse.shopping.data.datasource.remote.cart.CartApi
+import woowacourse.shopping.data.datasource.remote.cart.CartRetrofitService
 import woowacourse.shopping.data.datasource.remote.product.ProductApi
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -107,17 +107,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private fun initPresenter() {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
 
-        val productApi = Retrofit.Builder()
-            .baseUrl(ServerInfo.currentBaseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val productApi = RetrofitClient.retrofit
             .create(ProductApi::class.java)
+
+        val cartApi = RetrofitClient.getInstanceWithToken(token)
+            .create(CartApi::class.java)
 
         presenter = MainPresenter(
             this,
             ProductRepositoryImpl(ProductRetrofitService(productApi), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartOkHttpService(token), CartCache)
+            CartRemoteRepositoryImpl(CartRetrofitService(cartApi), CartCache)
         )
     }
 
