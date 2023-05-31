@@ -92,6 +92,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initCartList() {
         binding.recyclerViewCart.adapter = cartListAdapter
+        binding.recyclerViewCart.itemAnimator = null
         presenter.onLoadCartItemsOfNextPage()
     }
 

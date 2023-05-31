@@ -101,6 +101,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     private fun initProductList() {
         binding.recyclerViewMainProduct.adapter = productListAdapter
+        binding.recyclerViewMainProduct.itemAnimator = null
     }
 
     private fun initLoadingButton() {
