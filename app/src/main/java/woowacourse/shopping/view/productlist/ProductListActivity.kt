@@ -129,7 +129,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun notifyRecentViewedChanged() {
-        binding.gridProducts.adapter?.notifyItemChanged(0)
+        binding.gridProducts.adapter?.notifyDataSetChanged()
     }
 
     override fun notifyDataChanged(position: Int) {
@@ -138,7 +138,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onClickProductDetail(product: ProductModel, lastViewedProduct: ProductModel?) {
         val intent =
-            ProductDetailActivity.newIntent(binding.root.context, product, lastViewedProduct)
+            ProductDetailActivity.newIntent(binding.root.context, product)
         resultLauncher.launch(intent)
     }
 

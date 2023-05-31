@@ -13,6 +13,14 @@
             name="onItemClick"
             type="woowacourse.shopping.view.productlist.ProductListAdapter.OnItemClick" />
 
+        <variable
+            name="onPlusClick"
+            type="kotlin.jvm.functions.Function2" />
+
+        <variable
+            name="onMinusClick"
+            type="kotlin.jvm.functions.Function2" />
+
         <import type="woowacourse.shopping.util.PriceFormatter" />
 
         <import type="android.view.View" />
@@ -48,19 +56,21 @@
             app:layout_constraintStart_toStartOf="@id/img_product"
             app:layout_constraintTop_toTopOf="@id/btn_add">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/btn_minus"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_left_rounded"
+                android:onClick="@{() -> onMinusClick.invoke(product.cartId, product.id)}"
                 android:text="@string/minus"
                 android:textColor="@color/gray_700"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toStartOf="@id/text_count"
+                android:textSize="17sp"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toStartOf="@id/text_quantity"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/text_count"
+                android:id="@+id/text_quantity"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@color/white"
@@ -73,27 +83,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/btn_plus"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_right_rounded"
+                android:onClick="@{() -> onPlusClick.invoke(product.cartId, product.id)}"
                 android:text="@string/plus"
                 android:textColor="@color/gray_700"
-                android:textSize="22sp"
-                app:layout_constraintStart_toEndOf="@id/text_count"
+                android:textSize="17sp"
+                app:backgroundTint="@null"
+                app:layout_constraintStart_toEndOf="@id/text_quantity"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:id="@+id/btn_add"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/ic_add_circle"
+            android:onClick="@{() -> onItemClick.onProductClickAddFirst(product.id)}"
             android:visibility="@{product.quantity == 0 ? View.VISIBLE : View.INVISIBLE}"
+            app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="@id/img_product"
             app:layout_constraintCircleRadius="@dimen/cardview_compat_inset_shadow"
             app:layout_constraintEnd_toEndOf="@id/img_product" />

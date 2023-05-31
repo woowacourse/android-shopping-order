@@ -53,16 +53,16 @@
             android:text="@string/minus"
             android:textColor="@color/gray_700"
             android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="@id/text_count"
-            app:layout_constraintEnd_toStartOf="@id/text_count"
-            app:layout_constraintTop_toTopOf="@id/text_count" />
+            app:layout_constraintBottom_toBottomOf="@id/text_quantity"
+            app:layout_constraintEnd_toStartOf="@id/text_quantity"
+            app:layout_constraintTop_toTopOf="@id/text_quantity" />
 
         <TextView
-            android:id="@+id/text_count"
+            android:id="@+id/text_quantity"
             android:layout_width="42dp"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="@{presenter.count.toString()}"
+            android:text="@{presenter.quantity.toString()}"
             android:textColor="@color/gray_700"
             android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="@id/btn_plus"

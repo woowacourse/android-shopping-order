@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.productlist
 
-import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.pagination.ProductListPagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -76,6 +74,7 @@ class ProductListPresenter(
     override fun insertCartProduct(productId: Int) {
         cartRepository.insert(productId, 1) {
             fetchProductCount(productId)
+            fetchCartCount()
         }
     }
 
@@ -137,29 +136,14 @@ class ProductListPresenter(
 
     override fun updateRecentViewed(id: Int) {
         if (id == -1) return
-        if (isExistRecentViewed()) productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
+        productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
 
         recentViewedRepository.findAll { products ->
-            cartRepository.getAll { cartProducts ->
-                productsListItems.add(
-                    0,
-                    ProductListViewItem.RecentViewedItem(products.toUiModels(cartProducts)),
-                )
-                view.notifyRecentViewedChanged()
-            }
-        }
-    }
-
-    private fun isExistRecentViewed(): Boolean =
-        productsListItems[0] is ProductListViewItem.RecentViewedItem
-
-    private fun List<Product>.toUiModels(cartProducts: List<CartProduct>): List<ProductModel> {
-        return this.map { product ->
-            val cartProduct = cartProducts.find { it.product.id == product.id }
-            product.toUiModel(
-                cartProduct?.id,
-                cartProduct?.quantity ?: 0,
+            productsListItems.add(
+                0,
+                ProductListViewItem.RecentViewedItem(products.map { it.toUiModel(null) }),
             )
+            view.notifyRecentViewedChanged()
         }
     }
 

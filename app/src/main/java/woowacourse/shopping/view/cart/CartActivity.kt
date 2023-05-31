@@ -66,15 +66,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showChangedItems() {
-        runOnUiThread {
-            binding.recyclerCart.adapter?.notifyDataSetChanged()
-        }
+        binding.recyclerCart.adapter?.notifyDataSetChanged()
     }
 
     override fun showChangedItem(position: Int) {
-        runOnUiThread {
-            binding.recyclerCart.adapter?.notifyItemChanged(position)
-        }
+        binding.recyclerCart.adapter?.notifyItemChanged(position)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

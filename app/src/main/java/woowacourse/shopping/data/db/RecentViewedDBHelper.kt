@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 
 class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
@@ -28,6 +29,7 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
         values.put(RecentViewedContract.TABLE_COLUMN_ID, product.id)
         values.put(RecentViewedContract.TABLE_COLUMN_NAME, product.name)
         values.put(RecentViewedContract.TABLE_COLUMN_IMAGE, product.imageUrl)
+        values.put(RecentViewedContract.TABLE_COLUMN_PRICE, product.price.price)
         writableDatabase.insert(RecentViewedContract.TABLE_NAME, null, values)
     }
 
@@ -37,7 +39,7 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
 
     fun selectWhereId(id: Int): Product? {
         val sql =
-            "select * from ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id"
+            "SELECT * FROM ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id"
         val cursor = readableDatabase.rawQuery(sql, null)
         while (cursor.moveToNext()) {
             val id =
@@ -47,9 +49,9 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
             val imageUrl =
                 cursor.getString(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_IMAGE))
             val price =
-                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_IMAGE))
+                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_PRICE))
             cursor.close()
-            return Product(id, name, price, imageUrl)
+            return Product(id, name, Price(price), imageUrl)
         }
         return null
     }
@@ -66,8 +68,8 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
             val imageUrl =
                 cursor.getString(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_IMAGE))
             val price =
-                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_IMAGE))
-            viewedProducts.add(Product(id, name, price, imageUrl))
+                cursor.getInt(cursor.getColumnIndexOrThrow(RecentViewedContract.TABLE_COLUMN_PRICE))
+            viewedProducts.add(Product(id, name, Price(price), imageUrl))
         }
         cursor.close()
         return viewedProducts
