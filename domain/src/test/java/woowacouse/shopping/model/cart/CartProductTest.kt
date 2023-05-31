@@ -60,4 +60,46 @@ class CartProductTest {
         val expected = 0
         assertEquals(expected, actual.count)
     }
+
+    @Test
+    fun `장바구니 상품의 개수를 5개로 설정할 수 있다`() {
+        // given
+        val product = Product(1L, "피자", 12_000, "")
+        val cartProduct = CartProduct(1L, product, 0, false)
+
+        // when
+        val actual = cartProduct.updateCount(5)
+
+        // then
+        val expected = 5
+        assertEquals(expected, actual.count)
+    }
+
+    @Test
+    fun `장바구니 상품의 개수를 음수로 설정하면 기존의 상품 개수를 갖는다`() {
+        // given
+        val product = Product(1L, "피자", 12_000, "")
+        val cartProduct = CartProduct(1L, product, 3, false)
+
+        // when
+        val actual = cartProduct.updateCount(-1)
+
+        // then
+        val expected = 3
+        assertEquals(expected, actual.count)
+    }
+
+    @Test
+    fun `장바구니 상품의 아이디를 통해 장바구니 아이디를 변경할 수 있다`() {
+        // given
+        val product = Product(1L, "피자", 12_000, "")
+        val cartProduct = CartProduct(99999L, product, 1, false)
+
+        // when
+        val actual = cartProduct.updateCartIdByProductId(1L, 1L)
+
+        // then
+        val expected = 1L
+        assertEquals(expected, actual.id)
+    }
 }
