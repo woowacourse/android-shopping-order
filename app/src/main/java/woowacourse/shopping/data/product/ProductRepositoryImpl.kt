@@ -12,17 +12,13 @@ class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource
 ) : ProductRepository {
-    override fun getProductsInSize(
-        startIndex: Int,
-        size: Int,
+    override fun getProducts(
         onSuccess: (ShoppingProducts) -> Unit,
         onFailure: () -> Unit
     ) {
         productRemoteDataSource.getProducts(
-            onSuccess = {products ->
-                val endIndex = minOf(startIndex + size, products.size)
-                val productsInSize = products.subList(startIndex, endIndex)
-                joinProductAmount(productsInSize, onSuccess, onFailure)
+            onSuccess = {
+                joinProductAmount(it, onSuccess, onFailure)
             },
             onFailure = { onFailure() }
         )

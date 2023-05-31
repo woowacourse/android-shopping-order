@@ -11,10 +11,12 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.ShoppingProduct
+import woowacourse.shopping.domain.ShoppingProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
+import kotlin.math.min
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -25,20 +27,20 @@ class ShoppingPresenter(
     private val productLoadSize: Int,
 ) : ShoppingContract.Presenter {
     private var productSize: Int = 0
+    private lateinit var shoppingProducts: ShoppingProducts
 
     init {
+        productSize += productLoadSize
         loadProducts()
     }
 
     override fun loadProducts() {
-        if (productSize == 0) productSize += productLoadSize
-
-        productRepository.getProductsInSize(
-            0,
-            productSize,
+        productRepository.getProducts(
             onSuccess = { products ->
-                productSize = products.value.size
-                view.updateProducts(products.value.map { it.toView() })
+                productSize = minOf(productSize, products.value.size)
+                shoppingProducts = products
+                view.updateProducts(shoppingProducts.value.map { it.toView() })
+                setCartQuantity()
             },
             onFailure = { view.notifyLoadFailed() }
         )
@@ -54,8 +56,8 @@ class ShoppingPresenter(
         )
     }
 
-    override fun setCartAmount() {
-        updateCartAmount()
+    override fun setCartQuantity() {
+        updateCartQuantity()
     }
 
     override fun openProduct(productModel: ProductModel) {
@@ -99,25 +101,15 @@ class ShoppingPresenter(
         view.showCart()
     }
 
-    override fun loadMoreProduct() {
-        productRepository.getProductsInSize(
-            productSize,
-            productLoadSize,
-            onSuccess = { loadedProducts ->
-                productSize += loadedProducts.value.size
-                view.addProducts(loadedProducts.value.map { it.toView() })
-            },
-            onFailure = { view.notifyLoadFailed() }
-        )
+    override fun loadMoreProducts() {
+        val toIndex = min(productSize + productLoadSize, shoppingProducts.value.size)
+        val products = shoppingProducts.value.subList(productSize, toIndex)
+        productSize += products.size
+        view.addProducts(products.map { it.toView() })
     }
 
-    private fun updateCartAmount() {
-        cartRepository.getAllCount(
-            onSuccess = {
-                view.updateCartAmount(it)
-            },
-            onFailure = { }
-        )
+    private fun updateCartQuantity() {
+        view.updateCartQuantity(shoppingProducts.totalQuantity)
     }
 
     override fun decreaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {
@@ -177,8 +169,9 @@ class ShoppingPresenter(
                 cartProduct = cartProduct,
                 onSuccess = {
                     val shoppingProduct = ShoppingProduct(cartProduct.product, cartProduct.quantity)
+                    shoppingProducts = shoppingProducts.replaceShoppingProduct(shoppingProduct)
                     view.updateShoppingProduct(shoppingProduct.toView())
-                    updateCartAmount()
+                    updateCartQuantity()
                 },
                 onFailure = {}
             )
@@ -192,8 +185,9 @@ class ShoppingPresenter(
             shoppingProductModel.toDomain().product,
             onSuccess = {
                 val shoppingProduct = ShoppingProduct(shoppingProductModel.product.toDomain(), 1)
+                shoppingProducts = shoppingProducts.replaceShoppingProduct(shoppingProduct)
                 view.updateShoppingProduct(shoppingProduct.toView())
-                updateCartAmount()
+                updateCartQuantity()
             },
             onFailure = {}
         )

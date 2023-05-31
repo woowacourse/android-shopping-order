@@ -58,7 +58,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private val loadMoreAdapter: LoadMoreAdapter by lazy {
         LoadMoreAdapter {
-            presenter.loadMoreProduct()
+            presenter.loadMoreProducts()
         }
     }
 
@@ -101,7 +101,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         if (result.resultCode == Activity.RESULT_OK) {
             beforeLoad()
             presenter.loadProducts()
-            presenter.setCartAmount()
+            presenter.setCartQuantity()
         }
     }
 
@@ -133,7 +133,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
 
         shoppingCartAmount = shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
-        presenter.setCartAmount()
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -167,7 +166,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         startCartActivity()
     }
 
-    override fun updateCartAmount(amount: Int) {
+    override fun updateCartQuantity(amount: Int) {
         shoppingCartAmount?.text = amount.toString()
     }
 
@@ -176,7 +175,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun notifyLoadFailed() {
-        Toaster.showToast(this, "상품을 불러오는데 실패했습니다!")
+        runOnUiThread {
+            Toaster.showToast(this, "상품을 불러오는데 실패했습니다!")
+        }
     }
 
     private fun startCartActivity() {

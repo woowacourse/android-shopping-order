@@ -14,9 +14,9 @@ interface CartContract {
 
         fun updateAllChecked()
 
-        fun decreaseCartProductAmount(cartProductModel: CartProductModel)
+        fun decreaseCartProductQuantity(cartProductModel: CartProductModel)
 
-        fun increaseCartProductAmount(cartProductModel: CartProductModel)
+        fun increaseCartProductQuantity(cartProductModel: CartProductModel)
 
         fun changeAllChecked(isChecked: Boolean)
     }

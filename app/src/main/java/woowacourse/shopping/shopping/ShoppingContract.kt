@@ -10,13 +10,13 @@ interface ShoppingContract {
 
         fun updateRecentProducts()
 
-        fun setCartAmount()
+        fun setCartQuantity()
 
         fun openProduct(productModel: ProductModel)
 
         fun openCart()
 
-        fun loadMoreProduct()
+        fun loadMoreProducts()
 
         fun decreaseCartProductAmount(shoppingProductModel: ShoppingProductModel)
 
@@ -34,7 +34,7 @@ interface ShoppingContract {
 
         fun showCart()
 
-        fun updateCartAmount(amount: Int)
+        fun updateCartQuantity(amount: Int)
 
         fun updateShoppingProduct(shoppingProductModel: ShoppingProductModel)
 

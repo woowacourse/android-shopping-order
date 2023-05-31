@@ -106,14 +106,14 @@ class CartPresenter(
         view.updateAllChecked(isAllChecked)
     }
 
-    override fun decreaseCartProductAmount(cartProductModel: CartProductModel) {
+    override fun decreaseCartProductQuantity(cartProductModel: CartProductModel) {
         if (cartProductModel.quantity > 1) {
             val cartProduct = cartProductModel.toDomain().decreaseAmount()
             updateCartProductQuantity(cartProduct)
         }
     }
 
-    override fun increaseCartProductAmount(cartProductModel: CartProductModel) {
+    override fun increaseCartProductQuantity(cartProductModel: CartProductModel) {
         val cartProduct = cartProductModel.toDomain().increaseAmount()
         updateCartProductQuantity(cartProduct)
     }

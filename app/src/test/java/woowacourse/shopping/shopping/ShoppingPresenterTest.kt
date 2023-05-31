@@ -26,7 +26,7 @@ class ShoppingPresenterTest {
 
     @Before
     fun setUp() {
-        every { productRepository.getProductsInSize(any(), any(), any(), any()) } just runs
+        every { productRepository.getProducts(any(), any()) } just runs
         every { view.addProducts(any()) } just Runs
 
         presenter = ShoppingPresenter(
@@ -43,7 +43,7 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            productRepository.getProductsInSize(any(), any(), any(), any())
+            productRepository.getProducts(any(), any())
             view.addProducts(any())
         }
     }
@@ -51,14 +51,14 @@ class ShoppingPresenterTest {
     @Test
     fun 카트_상품_개수를_세팅한다() {
         // given
-        every { view.updateCartAmount(any()) } just runs
+        every { view.updateCartQuantity(any()) } just runs
 
         // when
-        presenter.setCartAmount()
+        presenter.setCartQuantity()
 
         // then
         verify {
-            view.updateCartAmount(any())
+            view.updateCartQuantity(any())
         }
     }
 
@@ -147,11 +147,11 @@ class ShoppingPresenterTest {
         }
 
         // when
-        presenter.loadMoreProduct()
+        presenter.loadMoreProducts()
 
         // then
         verify {
-            productRepository.getProductsInSize(any(), any(), any(), any())
+            productRepository.getProducts(any(), any())
             view.addProducts(any())
         }
     }
@@ -162,7 +162,7 @@ class ShoppingPresenterTest {
         every { cartRepository.findByProductId(any(), any(), any()) } just runs
         every { cartRepository.addCartProduct(any(), any(), any()) } just runs
         every { view.updateShoppingProduct(any()) } just runs
-        every { view.updateCartAmount(any()) } just runs
+        every { view.updateCartQuantity(any()) } just runs
 
         // when
         val shoppingProductModel = createShoppingProductModel()
@@ -172,7 +172,7 @@ class ShoppingPresenterTest {
         verify {
             cartRepository.addCartProduct(any(), any(), any())
             view.updateShoppingProduct(any())
-            view.updateCartAmount(any())
+            view.updateCartQuantity(any())
         }
     }
 
@@ -182,7 +182,7 @@ class ShoppingPresenterTest {
         every { cartRepository.findByProductId(any(), any(), any()) } just runs
         every { cartRepository.deleteCartProduct(any()) } just runs
         every { view.updateShoppingProduct(any()) } just runs
-        every { view.updateCartAmount(any()) } just runs
+        every { view.updateCartQuantity(any()) } just runs
 
         // when
         val shoppingProductModel = createShoppingProductModel()
@@ -192,7 +192,7 @@ class ShoppingPresenterTest {
         verify {
             cartRepository.deleteCartProduct(any())
             view.updateShoppingProduct(any())
-            view.updateCartAmount(any())
+            view.updateCartQuantity(any())
         }
     }
 
@@ -200,7 +200,7 @@ class ShoppingPresenterTest {
     fun 카트_변경_업데이트를_하면_상품_정보가_업데이트_되고_총_카트_상품_개수가_업데이트_된다() {
         // given
         every { view.updateProducts(any()) } just runs
-        every { view.updateCartAmount(any()) } just runs
+        every { view.updateCartQuantity(any()) } just runs
 
         // when
         presenter.loadProducts()
@@ -208,7 +208,7 @@ class ShoppingPresenterTest {
         // then
         verify {
             view.updateProducts(any())
-            view.updateCartAmount(any())
+            view.updateCartQuantity(any())
         }
     }
 }

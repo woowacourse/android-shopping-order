@@ -78,7 +78,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun notifyLoadFailed() {
-        Toaster.showToast(this, "장바구니 상품을 불러오는데 실패했습니다!")
+        runOnUiThread {
+            Toaster.showToast(this, "장바구니 상품을 불러오는데 실패했습니다!")
+        }
     }
 
     private fun initCartAdapter() {
@@ -97,10 +99,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 presenter.updateAllChecked()
             },
             onMinusAmountButtonClick = {
-                presenter.decreaseCartProductAmount(it)
+                presenter.decreaseCartProductQuantity(it)
             },
             onPlusAmountButtonClick = {
-                presenter.increaseCartProductAmount(it)
+                presenter.increaseCartProductQuantity(it)
             }
         )
         binding.cartProductList.adapter = cartAdapter

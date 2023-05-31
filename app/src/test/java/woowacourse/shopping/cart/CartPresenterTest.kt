@@ -177,7 +177,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 0, false, createProductModel())
-        presenter.increaseCartProductAmount(cartProductModel)
+        presenter.increaseCartProductQuantity(cartProductModel)
 
         // then
         verify {
@@ -194,7 +194,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 0, false, createProductModel())
-        presenter.increaseCartProductAmount(cartProductModel)
+        presenter.increaseCartProductQuantity(cartProductModel)
 
         // then
         verify(exactly = 1) {
@@ -211,7 +211,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 0, true, createProductModel())
-        presenter.increaseCartProductAmount(cartProductModel)
+        presenter.increaseCartProductQuantity(cartProductModel)
 
         // then
         verify(exactly = 2) {
@@ -226,7 +226,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 1, false, createProductModel())
-        presenter.decreaseCartProductAmount(cartProductModel)
+        presenter.decreaseCartProductQuantity(cartProductModel)
 
         // then
         verify(exactly = 0) {
@@ -243,7 +243,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 2, false, createProductModel())
-        presenter.decreaseCartProductAmount(cartProductModel)
+        presenter.decreaseCartProductQuantity(cartProductModel)
 
         // then
         verify {
@@ -260,7 +260,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 2, false, createProductModel())
-        presenter.decreaseCartProductAmount(cartProductModel)
+        presenter.decreaseCartProductQuantity(cartProductModel)
 
         // then
         verify(exactly = 1) {
@@ -277,7 +277,7 @@ class CartPresenterTest {
 
         // when
         val cartProductModel = CartProductModel(0, 2, true, createProductModel())
-        presenter.decreaseCartProductAmount(cartProductModel)
+        presenter.decreaseCartProductQuantity(cartProductModel)
 
         // then
         verify(exactly = 2) {

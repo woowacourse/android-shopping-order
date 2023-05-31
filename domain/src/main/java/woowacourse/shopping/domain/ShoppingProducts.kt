@@ -1,7 +1,14 @@
 package woowacourse.shopping.domain
 
-class ShoppingProducts(val value: List<ShoppingProduct>) {
-    operator fun plus(products: ShoppingProducts): ShoppingProducts {
-        return ShoppingProducts(value + products.value)
+data class ShoppingProducts(val value: List<ShoppingProduct>) {
+    val totalQuantity: Int = value.sumOf { it.quantity }
+
+    fun replaceShoppingProduct(shoppingProduct: ShoppingProduct): ShoppingProducts {
+        return ShoppingProducts(
+            value.map {
+                if (it.product.id == shoppingProduct.product.id) shoppingProduct
+                else it
+            }
+        )
     }
 }
