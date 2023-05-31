@@ -8,17 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import woowacourse.shopping.data.ShoppingRetrofit
-import woowacourse.shopping.data.cart.CartItemRemoteSource
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductRemoteSource
-import woowacourse.shopping.data.recentlyviewedproduct.DefaultRecentlyViewedProductRepository
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemorySource
-import woowacourse.shopping.data.user.DefaultUserRepository
-import woowacourse.shopping.data.user.UserMemorySource
-import woowacourse.shopping.data.user.UserRemoteSource
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.ui.cart.CartActivity
@@ -34,7 +23,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         ActivityShoppingBinding.inflate(layoutInflater)
     }
 
-    private val presenter: ShoppingContract.Presenter by lazy { createPresenter() }
+    private val presenter: ShoppingContract.Presenter by lazy {
+        ShoppingPresenterProvider.create(this, applicationContext)
+    }
 
     private val shoppingAdapter: ShoppingAdapter by lazy {
         ShoppingAdapter(
@@ -159,27 +150,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun initRecentlyViewedProducts() {
         presenter.loadRecentlyViewedProducts()
-    }
-
-    private fun createPresenter(): ShoppingPresenter {
-        val productRemoteSource = ProductRemoteSource(ShoppingRetrofit.retrofit)
-        val dbHelper = DbHelper.getDbInstance(this)
-        val recentlyViewedProductMemorySource = RecentlyViewedProductMemorySource(dbHelper)
-        val defaultRecentlyViewedProductRepository = DefaultRecentlyViewedProductRepository(
-            recentlyViewedProductMemorySource, productRemoteSource
-        )
-        val defaultCartItemRepository = DefaultCartItemRepository(
-            CartItemRemoteSource(ShoppingRetrofit.retrofit)
-        )
-        val defaultProductRepository = DefaultProductRepository(productRemoteSource)
-        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource())
-        return ShoppingPresenter(
-            this,
-            defaultRecentlyViewedProductRepository,
-            defaultProductRepository,
-            defaultCartItemRepository,
-            userRepository
-        )
     }
 
     private fun setUIAboutRecentlyViewedProductIsVisible(isVisible: Boolean) {

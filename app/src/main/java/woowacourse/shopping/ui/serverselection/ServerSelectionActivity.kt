@@ -10,14 +10,15 @@ import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.View {
 
-    private lateinit var presenter: ServerSelectionPresenter
+    private val presenter: ServerSelectionContract.Presenter by lazy {
+        ServerSelectionPresenterProvider.create(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_selection)
 
         initServerButton()
-        initPresenter()
     }
 
     override fun showProductListView() {
@@ -31,9 +32,5 @@ class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.Vie
                     presenter.selectServer(index)
                 }
             }
-    }
-
-    private fun initPresenter() {
-        presenter = ServerSelectionPresenter(this)
     }
 }

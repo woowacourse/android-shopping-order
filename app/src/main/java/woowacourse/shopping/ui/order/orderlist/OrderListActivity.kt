@@ -5,12 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.ShoppingRetrofit
-import woowacourse.shopping.data.order.DefaultOrderRepository
-import woowacourse.shopping.data.order.OrderRemoteSource
-import woowacourse.shopping.data.user.DefaultUserRepository
-import woowacourse.shopping.data.user.UserMemorySource
-import woowacourse.shopping.data.user.UserRemoteSource
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.orderdetail.OrderDetailActivity
@@ -22,11 +16,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private val presenter: OrderListContract.Presenter by lazy {
-        OrderListPresenter(
-            this,
-            DefaultOrderRepository(OrderRemoteSource(ShoppingRetrofit.retrofit)),
-            DefaultUserRepository(UserMemorySource(), UserRemoteSource())
-        )
+        OrderListPresenterProvider.create(this)
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {

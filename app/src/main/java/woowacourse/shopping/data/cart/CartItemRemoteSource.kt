@@ -38,7 +38,8 @@ class CartItemRemoteSource(retrofit: Retrofit) : CartItemDataSource {
                 }
 
                 override fun onResponse(
-                    call: Call<List<CartItemEntity>>, response: Response<List<CartItemEntity>>
+                    call: Call<List<CartItemEntity>>,
+                    response: Response<List<CartItemEntity>>
                 ) {
                     if (response.code() != 200) return
                     onFinish(response.body()?.map { it.toDomain() } ?: return)
@@ -53,7 +54,8 @@ class CartItemRemoteSource(retrofit: Retrofit) : CartItemDataSource {
                 }
 
                 override fun onResponse(
-                    call: Call<List<CartItemEntity>>, response: Response<List<CartItemEntity>>
+                    call: Call<List<CartItemEntity>>,
+                    response: Response<List<CartItemEntity>>
                 ) {
                     if (response.code() != 200) return
                     val cartItems = response.body() ?: return
