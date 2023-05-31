@@ -9,6 +9,6 @@ interface RecentProductDao {
     @Upsert
     fun upsertRecentProduct(recentProduct: RecentProduct)
 
-    @Query("SELECT * FROM recent_product ORDER BY timestamp DESC")
-    fun loadAllRecentProducts(): List<RecentProduct>
+    @Query("SELECT * FROM recent_product WHERE userInfo = :userInfo AND serverUrl = :serverUrl ORDER BY timestamp DESC")
+    fun loadAllRecentProducts(userInfo: String, serverUrl: String): List<RecentProduct>
 }

@@ -5,7 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [RecentProduct::class], version = 1)
+@Database(
+    entities = [RecentProduct::class],
+    version = 2,
+)
 abstract class RecentProductDatabase : RoomDatabase() {
     abstract fun recentProductDao(): RecentProductDao
 
@@ -15,7 +18,8 @@ abstract class RecentProductDatabase : RoomDatabase() {
                 context,
                 RecentProductDatabase::class.java,
                 "recent_product.db",
-            ).build()
+            ).fallbackToDestructiveMigration()
+                .build()
         }
     }
 }

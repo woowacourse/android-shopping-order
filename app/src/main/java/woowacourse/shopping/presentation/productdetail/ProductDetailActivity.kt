@@ -13,6 +13,7 @@ import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteDataSource
+import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.productdetail.putincartdialog.PutInCartDialogFragment
@@ -22,9 +23,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var binding: ActivityProductDetailBinding
 
     private val presenter: ProductDetailContract.Presenter by lazy {
-
-        val productDataSource = ProductRemoteDataSource("http://43.200.181.131:8080", USER_ID)
-        val cartDataSource = CartRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val sharedPref = ShoppingOrderSharedPreference(applicationContext)
+        val productDataSource = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
+        val cartDataSource = CartRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
         val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource, productDataSource)
         ProductDetailPresenter(this, cartRepository)
     }
@@ -124,7 +125,6 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         private const val PRODUCT_ID_KEY = "PRODUCT_ID_KEY"
         private const val RECENT_PRODUCT_ID_KEY = "RECENT_PRODUCT_ID_KEY"
         private const val DEFAULT_VALUE = -1L
-        private const val USER_ID = "YmVyQGJlci5jb206MTIzNA=="
 
         fun getIntent(context: Context, productId: Long, recentProductId: Long?): Intent {
             return Intent(context, ProductDetailActivity::class.java).apply {

@@ -1,11 +1,12 @@
 package woowacourse.shopping.data.recentproduct
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "recent_product")
+@Entity(primaryKeys = ["productId", "userInfo", "serverUrl"], tableName = "recent_product")
 data class RecentProduct(
-    @PrimaryKey val productId: Long,
+    val productId: Long,
+    val userInfo: String,
+    val serverUrl: String,
     val imageUrl: String,
     val name: String,
     val price: Int,

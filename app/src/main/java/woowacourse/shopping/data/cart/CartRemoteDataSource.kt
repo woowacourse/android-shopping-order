@@ -28,7 +28,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
                         call: Call<Unit>,
                         response: Response<Unit>,
                     ) {
-                        val location = response.headers()["Location"]?.split("/")?.last()
+                        val location = response.headers()[LOCATION]?.split("/")?.last()
                         callback(location?.toLong() ?: 0)
                     }
 
@@ -107,4 +107,8 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
 //                },
 //            )
 //    }
+
+    companion object {
+        private const val LOCATION = "Location"
+    }
 }

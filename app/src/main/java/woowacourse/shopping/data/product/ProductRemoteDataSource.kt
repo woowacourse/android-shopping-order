@@ -32,8 +32,7 @@ class ProductRemoteDataSource(
                         }
                     }
 
-                    override fun onFailure(call: Call<ProductDetail>, t: Throwable) {
-                    }
+                    override fun onFailure(call: Call<ProductDetail>, t: Throwable) {}
                 },
             )
     }
@@ -55,8 +54,7 @@ class ProductRemoteDataSource(
                         callback(productDetails, isLast)
                     }
 
-                    override fun onFailure(call: Call<ProductListInfo>, t: Throwable) {
-                    }
+                    override fun onFailure(call: Call<ProductListInfo>, t: Throwable) {}
                 },
             )
     }

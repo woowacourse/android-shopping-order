@@ -10,6 +10,7 @@ import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteDataSource
+import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
@@ -19,10 +20,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
     private val presenter: CartContract.Presenter by lazy {
-        val productRepository = ProductRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val sharedPref = ShoppingOrderSharedPreference(applicationContext)
+        val productRepository = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
         val cartRepository: CartRepository =
             CartRepositoryImpl(
-                CartRemoteDataSource("http://43.200.181.131:8080", USER_ID),
+                CartRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo),
                 productRepository,
             )
         CartPresenter(this, cartRepository)
@@ -147,8 +149,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-
-        private const val USER_ID = "YmVyQGJlci5jb206MTIzNA=="
         fun getIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

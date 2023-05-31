@@ -13,6 +13,7 @@ import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -28,12 +29,21 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var productListAdapter: ProductListAdapter
 
     private val presenter: ProductListPresenter by lazy {
-        val productDataSource = ProductRemoteDataSource("http://43.200.181.131:8080", USER_ID)
-        val cartDataSource = CartRemoteDataSource("http://43.200.181.131:8080", USER_ID)
+        val shoppingOrderPref = ShoppingOrderSharedPreference(applicationContext)
+        val productDataSource = ProductRemoteDataSource(
+            baseUrl = shoppingOrderPref.baseUrl,
+            userId = shoppingOrderPref.userInfo,
+        )
+        val cartDataSource = CartRemoteDataSource(
+            baseUrl = shoppingOrderPref.baseUrl,
+            userId = shoppingOrderPref.userInfo,
+        )
 
+        val shoppingOrderSharedPref = ShoppingOrderSharedPreference(applicationContext)
         val recentProductDao =
             RecentProductDatabase.getInstance(applicationContext).recentProductDao()
-        val recentProductRepository = RecentProductRepositoryImpl(recentProductDao)
+        val recentProductRepository =
+            RecentProductRepositoryImpl(recentProductDao, shoppingOrderSharedPref)
         val cartProductRepository = CartRepositoryImpl(cartDataSource, productDataSource)
 
         ProductListPresenter(this, cartProductRepository, recentProductRepository)
@@ -140,7 +150,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     companion object {
         private const val SPAN_COUNT = 2
-        private const val USER_ID = "YmVyQGJlci5jb206MTIzNA=="
         fun getIntent(context: Context): Intent {
             return Intent(context, ProductListActivity::class.java)
         }
