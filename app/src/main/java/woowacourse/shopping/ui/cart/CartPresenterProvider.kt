@@ -20,7 +20,7 @@ object CartPresenterProvider {
                 OrderRemoteSource(ShoppingRetrofit.retrofit)
             ),
             DefaultUserRepository(
-                UserMemorySource(), UserRemoteSource()
+                UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit)
             ),
             pageSize
         )

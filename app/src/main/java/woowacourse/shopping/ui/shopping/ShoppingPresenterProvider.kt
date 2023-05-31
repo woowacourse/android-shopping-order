@@ -25,7 +25,7 @@ object ShoppingPresenterProvider {
             CartItemRemoteSource(ShoppingRetrofit.retrofit)
         )
         val defaultProductRepository = DefaultProductRepository(productRemoteSource)
-        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource())
+        val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit))
         return ShoppingPresenter(
             view,
             defaultRecentlyViewedProductRepository,

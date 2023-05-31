@@ -24,7 +24,7 @@ object ProductDetailPresenterProvider {
             DefaultCartItemRepository(
                 CartItemRemoteSource(ShoppingRetrofit.retrofit)
             ),
-            DefaultUserRepository(UserMemorySource(), UserRemoteSource()),
+            DefaultUserRepository(UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit)),
             DefaultRecentlyViewedProductRepository(
                 RecentlyViewedProductMemorySource(
                     DbHelper.getDbInstance(context)

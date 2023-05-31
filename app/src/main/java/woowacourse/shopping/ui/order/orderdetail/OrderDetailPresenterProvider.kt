@@ -12,7 +12,7 @@ object OrderDetailPresenterProvider {
         return OrderDetailPresenter(
             view,
             DefaultOrderRepository(OrderRemoteSource(ShoppingRetrofit.retrofit)),
-            DefaultUserRepository(UserMemorySource(), UserRemoteSource())
+            DefaultUserRepository(UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit))
         )
     }
 }
