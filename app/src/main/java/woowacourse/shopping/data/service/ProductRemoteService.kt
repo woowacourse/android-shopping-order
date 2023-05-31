@@ -1,64 +1,35 @@
 package woowacourse.shopping.data.service
 
-import com.example.domain.model.Price
-import com.example.domain.model.Product
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import java.io.IOException
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.model.ProductDto
 
 class ProductRemoteService {
 
-    private val okHttpClient = OkHttpClient()
+    private val retrofitService = Retrofit.Builder()
+        .baseUrl(ServerInfo.currentBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(RetrofitService::class.java)
 
     fun request(
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (List<ProductDto>) -> Unit,
         onFailure: () -> Unit
     ) {
-        val baseUrl = ServerInfo.currentBaseUrl
-        val url = "$baseUrl/products"
-        val request = Request.Builder().url(url).build()
+        retrofitService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductDto>> {
+            override fun onResponse(
+                call: retrofit2.Call<List<ProductDto>>,
+                response: retrofit2.Response<List<ProductDto>>
+            ) {
+                if (response.code() >= 400) return onFailure()
+                val value = response.body() ?: emptyList()
 
-        okHttpClient.newCall(request).enqueue(
-            object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    onFailure()
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.code >= 400) return onFailure()
-                    val responseBody = response.body?.string()
-                    response.close()
-
-                    val result = responseBody?.let {
-                        parseJsonToProducts(responseBody)
-                    } ?: emptyList()
-
-                    onSuccess(result)
-                }
+                onSuccess(value)
             }
-        )
-    }
 
-    private fun parseJsonToProducts(json: String): List<Product> {
-        val products = mutableListOf<Product>()
-        val jsonProducts = JSONArray(json)
-
-        for (i in 0 until jsonProducts.length()) {
-            val jsonProduct = jsonProducts.getJSONObject(i)
-
-            val id = jsonProduct.getInt("id")
-            val name = jsonProduct.getString("name")
-            val imageUrl = jsonProduct.getString("imageUrl")
-            val price = Price(jsonProduct.getInt("price"))
-
-            val product = Product(id.toLong(), name, imageUrl, price)
-            products.add(product)
-        }
-
-        return products
+            override fun onFailure(call: retrofit2.Call<List<ProductDto>>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 }

@@ -3,8 +3,8 @@ package woowacourse.shopping.data
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
+import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.service.ProductRemoteService
-import java.lang.Thread.sleep
 
 class ProductRemoteRepositoryImpl(
     private val service: ProductRemoteService,
@@ -17,9 +17,8 @@ class ProductRemoteRepositoryImpl(
     ) {
         if (productCache.productList.isEmpty()) {
             service.request(
-                onSuccess = {
-                    productCache.addProducts(it)
-                    sleep(2000)
+                onSuccess = { ProductDtos ->
+                    productCache.addProducts(ProductDtos.map { it.toDomain() })
                     onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
                 },
                 onFailure = {}
