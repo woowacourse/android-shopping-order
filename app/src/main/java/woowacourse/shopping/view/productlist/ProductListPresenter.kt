@@ -21,15 +21,13 @@ class ProductListPresenter(
 
     override fun fetchProducts() {
         // 최근 본 상품
-        recentViewedRepository.findAll { viewedProducts ->
-            if (viewedProducts.isNotEmpty()) addViewedProductsItem(viewedProducts)
-            // 상품 리스트
-            pagination.fetchNextItems { productsWithCartInfo ->
-                addProductsItem(productsWithCartInfo.map { it.toUiModel() })
-                addShowMoreItem()
-                view.showProducts(productsListItems)
-                view.stopLoading()
-            }
+        addViewedProductsItem()
+        // 상품 리스트
+        pagination.fetchNextItems { productsWithCartInfo ->
+            addProductsItem(productsWithCartInfo.map { it.toUiModel() })
+            addShowMoreItem()
+            view.showProducts(productsListItems)
+            view.stopLoading()
         }
     }
 
@@ -37,9 +35,12 @@ class ProductListPresenter(
         if (pagination.isNextEnabled) productsListItems.add(ProductListViewItem.ShowMoreItem())
     }
 
-    private fun addViewedProductsItem(products: List<Product>) {
-        val viewedProductsModel = products.map { it.toUiModel() }
-        productsListItems.add(ProductListViewItem.RecentViewedItem(viewedProductsModel))
+    private fun addViewedProductsItem() {
+        recentViewedRepository.findAll { products ->
+            if (products.isEmpty()) return@findAll
+            val viewedProductsModel = products.map { it.toUiModel(null) }
+            productsListItems.add(ProductListViewItem.RecentViewedItem(viewedProductsModel))
+        }
     }
 
     private fun addProductsItem(products: List<ProductModel>) {
@@ -73,7 +74,7 @@ class ProductListPresenter(
     }
 
     override fun insertCartProduct(productId: Int) {
-        cartRepository.insert(productId) {
+        cartRepository.insert(productId, 1) {
             fetchProductCount(productId)
         }
     }
@@ -92,11 +93,13 @@ class ProductListPresenter(
     }
 
     override fun fetchCartCount() {
-        cartRepository.findAll { view.showCartCount(it.size) }
+        cartRepository.getAll {
+            view.showCartCount(it.size)
+        }
     }
 
     override fun fetchProductsCounts() {
-        cartRepository.findAll { cartProducts ->
+        cartRepository.getAll { cartProducts ->
             val itemsHaveCount = productsListItems
                 .asSequence()
                 .filterIsInstance<ProductListViewItem.ProductItem>()
@@ -104,12 +107,12 @@ class ProductListPresenter(
                 .toList()
 
             itemsHaveCount.forEach { item ->
-                val cartProduct = cartProducts.find { it.cartId == item.product.id }
+                val cartProduct = cartProducts.find { it.product.id == item.product.id }
                 val position = productsListItems.indexOf(item)
                 productsListItems[position] = ProductListViewItem.ProductItem(
                     (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                        cartId = cartProduct?.cartId ?: 0,
-                        quantity = cartProduct?.count ?: 0,
+                        cartId = cartProduct?.id,
+                        quantity = cartProduct?.quantity ?: 0,
                     ),
                 )
                 view.notifyDataChanged(position)
@@ -119,14 +122,13 @@ class ProductListPresenter(
 
     override fun fetchProductCount(id: Int) {
         if (id == -1) return
-        cartRepository.findAll { cartProducts ->
-            val cartProduct = cartProducts.find { it.product.id == id }
+        productRepository.getProductById(id) { productWithCartInfo ->
             val position =
                 productsListItems.indexOfFirst { it is ProductListViewItem.ProductItem && it.product.id == id }
             productsListItems[position] = ProductListViewItem.ProductItem(
                 (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                    cartId = cartProduct?.cartId ?: 0,
-                    quantity = cartProduct?.count ?: 0,
+                    cartId = productWithCartInfo.cartItem?.id,
+                    quantity = productWithCartInfo.cartItem?.quantity ?: 0,
                 ),
             )
             view.notifyDataChanged(position)
@@ -138,7 +140,7 @@ class ProductListPresenter(
         if (isExistRecentViewed()) productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
 
         recentViewedRepository.findAll { products ->
-            cartRepository.findAll { cartProducts ->
+            cartRepository.getAll { cartProducts ->
                 productsListItems.add(
                     0,
                     ProductListViewItem.RecentViewedItem(products.toUiModels(cartProducts)),
@@ -155,8 +157,8 @@ class ProductListPresenter(
         return this.map { product ->
             val cartProduct = cartProducts.find { it.product.id == product.id }
             product.toUiModel(
-                cartProduct?.cartId ?: 0,
-                cartProduct?.count ?: 0,
+                cartProduct?.id,
+                cartProduct?.quantity ?: 0,
             )
         }
     }

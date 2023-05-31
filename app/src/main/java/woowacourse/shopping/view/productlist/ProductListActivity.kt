@@ -86,7 +86,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             ProductListPresenter(
                 this,
                 productRemoteRepository,
-                RecentViewedDbRepository(this, productRemoteRepository),
+                RecentViewedDbRepository(this),
                 CartRemoteRepository(url),
             )
     }

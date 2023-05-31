@@ -11,7 +11,7 @@ interface ProductDetailContract {
     interface Presenter {
         val count: LiveData<Int>
         fun putInCart(product: ProductModel)
-        fun updateRecentViewedProducts(id: Int)
+        fun updateRecentViewedProducts(product: ProductModel)
         fun plusCount()
         fun minusCount()
     }
