@@ -24,4 +24,8 @@
     <string name="order_button_description">결제하기</string>
     <string name="order_total_point_format">사용 가능한 포인트: %d</string>
     <string name="order_product_count_format">%d개</string>
+    <string name="my_order_payment_price_format">결제금액: %d원</string>
+    <string name="my_order_order_date">주문일자: </string>
+    <string name="toolbar_my_order_title">MyOrder</string>
+    <string name="toolbar_my_order_icon_title">toolbar_my_order_icon_title</string>
 </resources>

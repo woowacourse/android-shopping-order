@@ -1,14 +1,17 @@
 package woowacourse.shopping.presentation.mapper
 
 import woowacourse.shopping.CartProductInfo
+import woowacourse.shopping.Order
 import woowacourse.shopping.OrderProduct
 import woowacourse.shopping.OrderProducts
 import woowacourse.shopping.Price
 import woowacourse.shopping.Product
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderModel
 import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.presentation.model.OrderProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.util.LocalDateTimeHelper
 
 fun Product.toPresentation(): ProductModel {
     return ProductModel(
@@ -56,5 +59,14 @@ fun OrderProductModel.toDomain(): OrderProduct {
 fun OrderProductsModel.toDomain(): OrderProducts {
     return OrderProducts(
         list.map { it.toDomain() }
+    )
+}
+
+fun Order.toPresentation(): OrderModel {
+    return OrderModel(
+        orderId = orderId,
+        imageUrl = imageUrl,
+        orderDate = LocalDateTimeHelper.convertLocalDateTimeToDateString(orderDate),
+        sendPrice = sendPrice.value
     )
 }

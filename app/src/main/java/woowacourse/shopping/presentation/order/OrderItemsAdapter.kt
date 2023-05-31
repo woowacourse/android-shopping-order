@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemOrderBinding
 import woowacourse.shopping.presentation.model.OrderProductModel
 
-class OrderListAdapter() : ListAdapter<OrderProductModel, OrderItemViewHolder>(diffCallBack()) {
+class OrderItemsAdapter() : ListAdapter<OrderProductModel, OrderItemViewHolder>(diffCallBack()) {
 
     private lateinit var itemOrderBinding: ItemOrderBinding
     private lateinit var inflater: LayoutInflater

@@ -23,7 +23,7 @@ import woowacourse.shopping.util.noIntentExceptionHandler
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
     private lateinit var presenter: OrderContract.Presenter
-    private lateinit var orderAdapter: OrderListAdapter
+    private lateinit var orderAdapter: OrderItemsAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
@@ -54,7 +54,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initOrderProductsView() {
-        orderAdapter = OrderListAdapter()
+        orderAdapter = OrderItemsAdapter()
         binding.recyclerOrder.adapter = orderAdapter
         presenter.loadOrderItems()
     }

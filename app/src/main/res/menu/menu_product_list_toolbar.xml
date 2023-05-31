@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/icon_my_order"
+        android:title="@string/toolbar_my_order_icon_title"
+        android:enabled="true"
+        android:icon="@drawable/baseline_assignment_24"
+        app:showAsAction="always">
+    </item>
+
+    <item
         android:id="@+id/icon_cart"
         android:title="@string/toolbar_cart_title"
         android:enabled="true"

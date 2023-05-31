@@ -24,6 +24,7 @@ import woowacourse.shopping.databinding.BadgeCartBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.myorder.MyOrderActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.product.ProductListAdapter
 import woowacourse.shopping.presentation.productlist.recentproduct.RecentProductAdapter
@@ -125,6 +126,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private fun initCartIcon(menu: Menu) {
         menuInflater.inflate(R.menu.menu_product_list_toolbar, menu)
         cartMenuItem = menu.findItem(R.id.icon_cart)
+        val myOrderItem = menu.findItem(R.id.icon_my_order)
+        myOrderItem.setOnMenuItemClickListener {
+            startActivity(MyOrderActivity.getIntent(this))
+            true
+        }
         setUpCartIconBinding()
     }
 
