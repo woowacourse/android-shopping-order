@@ -14,10 +14,10 @@ data class PageNation(
     val totalPrice: Int
         get() = cartProducts.totalPrice
 
-    val currentStartIndex: Int
+    private val currentStartIndex: Int
         get() = (currentPage - 1) * PAGE_MAX_CART_COUNT
 
-    val currentLastIndex: Int
+    private val currentLastIndex: Int
         get() = if (cartProducts.getAll().size > currentStartIndex + PAGE_MAX_CART_COUNT) {
             currentStartIndex + PAGE_MAX_CART_COUNT
         } else {
@@ -48,7 +48,6 @@ data class PageNation(
         return copy(currentPage = currentPage - PAGE_NATION_COUNT)
     }
 
-    // TODO 테스트 작성
     fun updateCartCheckedByCartId(cartId: Long, checked: Boolean): PageNation {
         return PageNation(
             cartProducts.updateCartChecked(cartId, checked),
@@ -56,7 +55,6 @@ data class PageNation(
         )
     }
 
-    // TODO 테스트 작성
     fun updateCartCountByCartId(cartId: Long, count: Int): PageNation {
         return PageNation(
             cartProducts.updateCartCountByCartId(cartId, count),
@@ -69,7 +67,6 @@ data class PageNation(
         return copy(cartProducts = cartProducts.updateAllCartsChecked(ids, checked))
     }
 
-    // TODO 테스트 작성
     fun deleteCartByCartId(cartId: Long): PageNation {
         return PageNation(
             cartProducts.deleteCart(cartId),
