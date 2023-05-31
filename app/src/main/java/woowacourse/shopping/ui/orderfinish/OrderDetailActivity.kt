@@ -52,16 +52,26 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         fun getIntent(
             context: Context,
-            orderId: Int? = 1,
             order: Order? = null,
+        ): Intent {
+            val intent = Intent(context, OrderDetailActivity::class.java)
+                .apply {
+                    order?.let {
+                        putExtra(ORDER_RECORD, order)
+                    }
+                }
+
+            return intent
+        }
+
+        fun getIntent(
+            context: Context,
+            orderId: Int? = 1,
         ): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
                 .apply {
                     orderId?.let {
                         putExtra(ORDER_ID, it)
-                    }
-                    order?.let {
-                        putExtra(ORDER_RECORD, order)
                     }
                 }
 
