@@ -5,7 +5,6 @@ import woowacourse.shopping.presentation.model.RecentProductModel
 
 interface ProductContract {
     interface View {
-        // fun setProductItemsView(products: List<ProductModel>)
         fun setProductItemsView(cartProducts: List<CartModel>)
         fun setRecentProductItemsView(recentProducts: List<RecentProductModel>)
         fun setVisibleToolbarCartCountView()
