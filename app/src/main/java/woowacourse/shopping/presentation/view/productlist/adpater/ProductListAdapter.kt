@@ -11,6 +11,10 @@ class ProductListAdapter(
     private val productListener: ProductListener,
 ) : ListAdapter<CartModel, ProductListViewHolder>(productDiffUtil) {
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListViewHolder {
         return ProductListViewHolder(parent, productListener)
     }

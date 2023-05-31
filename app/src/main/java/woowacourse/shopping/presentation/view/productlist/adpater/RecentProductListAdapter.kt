@@ -10,6 +10,10 @@ class RecentProductListAdapter(
     private val onProductClick: (Long) -> Unit,
 ) : ListAdapter<RecentProductModel, RecentProductListViewHolder>(diffUtil) {
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentProductListViewHolder {
         return RecentProductListViewHolder(parent) {
             onProductClick(getItem(it).product.id)

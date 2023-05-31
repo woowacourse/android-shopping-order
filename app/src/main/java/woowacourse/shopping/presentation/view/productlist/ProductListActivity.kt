@@ -104,6 +104,8 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
 
+        binding.rvProductList.itemAnimator = null
+
         setPresenter()
         initLayoutManager()
         presenter.initRecentProductItems()
