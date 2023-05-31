@@ -15,12 +15,17 @@ inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(key: String)
 }
 
 @Suppress("DEPRECATION")
-inline fun <reified T : Parcelable> Intent.getParcelableArrayListExtraCompat(key: String): ArrayList<T>? {
+inline fun <reified T : Parcelable> Intent.getParcelableListExtraCompat(key: String): List<T>? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getParcelableArrayListExtra(key, T::class.java)
+        getParcelableArrayListExtra<T>(key)
     } else {
-        getParcelableArrayListExtra(key)
+        val array = getParcelableArrayExtra(key)?.filterIsInstance<T>()
+        array?.toList()
     }
+}
+@Suppress("DEPRECATION")
+inline fun <reified T : Parcelable> Intent.getParcelableArrayExtraCompat(key: String): Array<T>? {
+    return getParcelableArrayExtra(key)?.filterIsInstance<T>()?.toTypedArray()
 }
 
 @Suppress("DEPRECATION")
