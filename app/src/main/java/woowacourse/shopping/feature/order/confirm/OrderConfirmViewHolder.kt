@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemOrderConfirmItemBinding
-import woowacourse.shopping.model.OrderProductUiModel
+import woowacourse.shopping.model.CartProductUiModel
 
 class OrderConfirmViewHolder(
     private val binding: ItemOrderConfirmItemBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(orderProductUiModel: OrderProductUiModel) {
-        binding.orderProduct = orderProductUiModel
+    fun bind(cartProductUiModel: CartProductUiModel) {
+        binding.cartProduct = cartProductUiModel
     }
 
     companion object {

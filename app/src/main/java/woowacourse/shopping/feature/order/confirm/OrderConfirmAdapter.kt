@@ -3,10 +3,10 @@ package woowacourse.shopping.feature.order.confirm
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.model.OrderProductUiModel
+import woowacourse.shopping.model.CartProductUiModel
 
 class OrderConfirmAdapter :
-    ListAdapter<OrderProductUiModel, OrderConfirmViewHolder>(OrderConfirmDiffUtil) {
+    ListAdapter<CartProductUiModel, OrderConfirmViewHolder>(OrderConfirmDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderConfirmViewHolder {
         return OrderConfirmViewHolder.create(parent)
@@ -16,22 +16,22 @@ class OrderConfirmAdapter :
         holder.bind(currentList[position])
     }
 
-    fun setOrderProducts(list: List<OrderProductUiModel>) {
+    fun setOrderProducts(list: List<CartProductUiModel>) {
         submitList(list)
     }
 
     companion object {
-        private val OrderConfirmDiffUtil = object : DiffUtil.ItemCallback<OrderProductUiModel>() {
+        private val OrderConfirmDiffUtil = object : DiffUtil.ItemCallback<CartProductUiModel>() {
             override fun areItemsTheSame(
-                oldItem: OrderProductUiModel,
-                newItem: OrderProductUiModel
+                oldItem: CartProductUiModel,
+                newItem: CartProductUiModel
             ): Boolean {
-                return oldItem.productUiModel.id == newItem.productUiModel.id
+                return oldItem.cartId == newItem.cartId
             }
 
             override fun areContentsTheSame(
-                oldItem: OrderProductUiModel,
-                newItem: OrderProductUiModel
+                oldItem: CartProductUiModel,
+                newItem: CartProductUiModel
             ): Boolean {
                 return oldItem == newItem
             }
