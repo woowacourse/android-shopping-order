@@ -14,7 +14,7 @@ object CartFixture {
                     price = 24_900,
                     imageUrl = "https://product-image.kurly.com/product/image/2c392328-104a-4fef-8222-c11be9c5c35f.jpg",
                 ),
-                0,
+                1,
                 true
             ),
             CartModel(
@@ -23,6 +23,17 @@ object CartFixture {
                     id = 2L,
                     title = "치킨치킨",
                     price = 15_000,
+                    imageUrl = "https://product-image.kurly.com/product/image/2c392328-104a-4fef-8222-c11be9c5c35f.jpg",
+                ),
+                1,
+                true
+            ),
+            CartModel(
+                3L,
+                ProductModel(
+                    id = 3L,
+                    title = "피자피자",
+                    price = 10_000,
                     imageUrl = "https://product-image.kurly.com/product/image/2c392328-104a-4fef-8222-c11be9c5c35f.jpg",
                 ),
                 0,

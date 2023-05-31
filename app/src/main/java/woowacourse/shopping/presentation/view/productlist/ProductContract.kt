@@ -18,6 +18,7 @@ interface ProductContract {
     interface Presenter {
         fun initRecentProductItems()
         fun initProductItems()
+        fun setCartProductItems(products: List<CartModel>)
         fun loadRecentProductItems()
         fun loadCartItems()
         fun updateProductItems(startIndex: Int)

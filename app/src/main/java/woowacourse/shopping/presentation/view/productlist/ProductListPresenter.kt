@@ -34,7 +34,8 @@ class ProductListPresenter(
         productRepository.loadDatas(::onFailure) { remoteProducts ->
             cartRepository.loadAllCarts(::onFailure) { remoteCarts ->
                 val remoteCartProducts = remoteCarts.map { it.toUIModel() }
-                cartProducts = CartProductsModel(
+
+                setCartProductItems(
                     remoteProducts.map { it.toUIModel() }
                         .updateCartProductsInfo(remoteCartProducts)
                 )
@@ -66,15 +67,22 @@ class ProductListPresenter(
         view.handleErrorView()
     }
 
+    override fun setCartProductItems(products: List<CartModel>) {
+        cartProducts = CartProductsModel(products)
+    }
+
     override fun loadCartItems() {
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val productIdToCartId = carts.associate { it.product.id to it.id }
-            cartProducts =
-                cartProducts.toModel().updateCartIdsByProductIds(productIdToCartId).toUIModel()
+            setCartProductItems(
+                cartProducts.toModel().updateCartIdsByProductIds(productIdToCartId)
+                    .toUIModel().carts
+            )
 
             val cartIdsCount = carts.associate { it.id to it.count }
-            cartProducts =
-                cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel()
+            setCartProductItems(
+                cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel().carts
+            )
 
             val allCount = cartProducts.toModel().totalCount
 
@@ -132,12 +140,21 @@ class ProductListPresenter(
         val targetCartProduct = cartProducts.toModel().getCartByProductId(productId) ?: return
         if (targetCartProduct.count == 0) {
             cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
-                cartProducts = cartProducts.toModel()
-                    .updateCartCountByCartId(targetCartProduct.id, count)
-                    .toUIModel()
+                setCartProductItems(
+                    cartProducts.toModel()
+                        .updateCartCountByCartId(targetCartProduct.id, count)
+                        .toUIModel()
+                        .carts
+                )
 
                 cartRepository.addLocalCart(cartId)
-                cartProducts = cartProducts.toModel().updateCartId(cartId, productId).toUIModel()
+
+                setCartProductItems(
+                    cartProducts.toModel()
+                        .updateCartId(cartId, productId)
+                        .toUIModel()
+                        .carts
+                )
 
                 val allCount = cartProducts.toModel().totalCount
                 view.updateToolbarCartCountView(allCount)
@@ -157,9 +174,12 @@ class ProductListPresenter(
                     cartRepository.deleteLocalCart(newCartProduct.id)
                 }
 
-                cartProducts =
-                    cartProducts.toModel().updateCartCountByCartId(remoteCartProduct.id, count)
+                setCartProductItems(
+                    cartProducts.toModel()
+                        .updateCartCountByCartId(remoteCartProduct.id, count)
                         .toUIModel()
+                        .carts
+                )
 
                 val allCount = cartProducts.toModel().totalCount
 
