@@ -14,9 +14,9 @@ interface ProductDetailContract {
         fun exitProductDetailView()
     }
     interface Presenter {
+        fun setProduct(productId: Long)
         fun loadLastRecentProductInfo(recentProduct: RecentProductModel?)
-        fun loadProductInfo()
-        fun addCart(count: Int)
+        fun addCart(productId: Long, count: Int)
         fun showCount()
     }
 }

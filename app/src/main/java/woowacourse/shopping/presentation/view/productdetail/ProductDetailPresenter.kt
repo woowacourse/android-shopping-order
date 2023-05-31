@@ -8,13 +8,12 @@ import woowacouse.shopping.data.repository.product.ProductRepository
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
-    productId: Long,
-    productRepository: ProductRepository,
+    private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
     private lateinit var product: ProductModel
 
-    init {
+    override fun setProduct(productId: Long) {
         productRepository.loadDataById(productId, ::onFailure) { product ->
             this.product = product.toUIModel()
             loadProductInfo()
@@ -25,15 +24,7 @@ class ProductDetailPresenter(
         view.handleErrorView()
     }
 
-    override fun loadLastRecentProductInfo(recentProduct: RecentProductModel?) {
-        if (recentProduct == null || recentProduct.id == UNABLE_ID) {
-            view.setGoneOfLastRecentProductInfoView()
-            return
-        }
-        view.setVisibleOfLastRecentProductInfoView(recentProduct)
-    }
-
-    override fun loadProductInfo() {
+    private fun loadProductInfo() {
         if (product.id == UNABLE_ID) {
             view.handleErrorView()
             view.exitProductDetailView()
@@ -42,11 +33,19 @@ class ProductDetailPresenter(
         view.setProductInfoView(product)
     }
 
-    override fun addCart(count: Int) {
+    override fun loadLastRecentProductInfo(recentProduct: RecentProductModel?) {
+        if (recentProduct == null || recentProduct.id == UNABLE_ID) {
+            view.setGoneOfLastRecentProductInfoView()
+            return
+        }
+        view.setVisibleOfLastRecentProductInfoView(recentProduct)
+    }
+
+    override fun addCart(productId: Long, count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
+            val cartProduct = carts.find { cartProduct -> cartProduct.product.id == productId }
             if (cartProduct == null) {
-                cartRepository.addCartProduct(product.id, ::onFailure) { cartId ->
+                cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
                     cartRepository.addLocalCart(cartId)
 
                     view.addCartSuccessView()

@@ -51,7 +51,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
 
         setPresenter()
-
+        presenter.setProduct(productId)
         presenter.loadLastRecentProductInfo(recentProduct)
         setAddCart()
         setLastRecentProduct()
@@ -77,7 +77,6 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
         presenter = ProductDetailPresenter(
             this,
-            productId = productId,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
         )
@@ -113,7 +112,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     override fun showCountView(productModel: ProductModel) {
         CartInsertionDialog(this, productModel) { count ->
-            presenter.addCart(count)
+            presenter.addCart(productModel.id, count)
         }
     }
 
