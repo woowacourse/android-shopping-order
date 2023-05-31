@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
+import woowacourse.shopping.data.cart.CartItemLocalCache
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -68,6 +69,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPause() {
+        CartItemLocalCache.clear()
+        super.onPause()
     }
 
     private fun setActionBar() {

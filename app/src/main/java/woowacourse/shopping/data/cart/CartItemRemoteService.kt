@@ -17,13 +17,7 @@ import java.time.LocalDateTime
 
 class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
 
-    private val cache: CartItemCache = CartItemCache()
-
     private val client = OkHttpClient()
-
-    fun initializeCache() {
-        cache.clear()
-    }
 
     override fun save(cartItem: CartItem, onFinish: (CartItem) -> Unit) {
         val path = "/cart-items"
@@ -45,19 +39,12 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
                 val savedCartItem = CartItem(
                     id, cartItem.product, cartItem.addedTime, cartItem.count
                 )
-                cache.save(savedCartItem)
                 onFinish(savedCartItem)
             }
         })
     }
 
     override fun findAll(onFinish: (List<CartItem>) -> Unit) {
-        if (cache.isActivated) {
-            val cartItems = cache.findAll()
-            onFinish(cartItems)
-            return
-        }
-
         val path = "/cart-items"
         val request =
             Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
@@ -74,7 +61,6 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
                     val jsonObject = jsonArray.getJSONObject(it)
                     parseToCartItem(jsonObject)
                 }
-                if (cache.isActivated.not()) cache.activate(cartItems)
                 onFinish(cartItems)
             }
         })
@@ -95,7 +81,6 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    cache.updateCountById(id, count)
                     onFinish()
                 }
             }
@@ -112,7 +97,6 @@ class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    cache.deleteById(id)
                     onFinish()
                 }
             }

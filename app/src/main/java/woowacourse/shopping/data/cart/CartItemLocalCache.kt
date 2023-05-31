@@ -2,7 +2,7 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.CartItem
 
-class CartItemCache {
+object CartItemLocalCache {
 
     private val cartItems: MutableMap<Long, CartItem> = mutableMapOf()
 
@@ -10,9 +10,9 @@ class CartItemCache {
         private set
 
     @Synchronized
-    fun activate(cartItems: List<CartItem>) {
+    fun activate(allCartItems: List<CartItem>) {
         isActivated = true
-        cartItems.forEach {
+        allCartItems.forEach {
             this.cartItems[it.id] = it
         }
     }

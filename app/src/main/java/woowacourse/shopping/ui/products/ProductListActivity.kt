@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
+import woowacourse.shopping.data.cart.CartItemLocalCache
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
@@ -73,7 +74,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onStart() {
         super.onStart()
-        cartItemRemoteService.initializeCache()
         presenter.onLoadRecentlyViewedProducts()
         presenter.onRefreshProducts()
         presenter.onLoadCartItemCount()
@@ -101,6 +101,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPause() {
+        CartItemLocalCache.clear()
+        super.onPause()
     }
 
     private fun setActionBar() {
