@@ -40,6 +40,8 @@ class ProductRemoteDataSource {
                 handler.post {
                     onSuccess(products)
                 }
+
+                response.close()
             }
         })
     }
@@ -63,6 +65,8 @@ class ProductRemoteDataSource {
                 handler.post {
                     onSuccess(product)
                 }
+
+                response.close()
             }
         })
     }

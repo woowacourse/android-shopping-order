@@ -45,6 +45,8 @@ class CartRemoteDataSource {
                     val id = location.substringAfterLast("/").toInt()
                     onSuccess(id)
                 }
+
+                response.close()
             }
         })
     }
@@ -76,6 +78,8 @@ class CartRemoteDataSource {
                 handler.post {
                     onSuccess(products)
                 }
+
+                response.close()
             }
         })
     }
@@ -120,6 +124,33 @@ class CartRemoteDataSource {
                 handler.post {
                     onSuccess()
                 }
+
+                response.close()
+            }
+        })
+    }
+
+    fun deleteCartProduct(cartProductId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val baseUrl = Server.getUrl(Storage.server)
+        val url = "$baseUrl/$PATH/$cartProductId"
+        val credentials = Storage.credential
+
+        val request = Request.Builder()
+            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .delete()
+            .url(url)
+            .build()
+        val handler = Handler(Looper.myLooper()!!)
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onFailure()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                handler.post { onSuccess() }
+
+                response.close()
             }
         })
     }

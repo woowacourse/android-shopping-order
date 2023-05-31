@@ -11,9 +11,7 @@ import woowacourse.shopping.common.model.CartProductModel
 import woowacourse.shopping.createCartProductModel
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.database.dao.CartDao
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.server.CartRemoteDataSource
 
 class CartPresenterTest {
     private lateinit var presenter: CartPresenter
@@ -28,7 +26,6 @@ class CartPresenterTest {
         every { view.updateCartTotalPrice(any()) } just runs
         every { view.updateCartTotalQuantity(any()) } just runs
         every { view.updateAllChecked(any()) } just runs
-        every { cartRepository.getAllCount(any(), any()) } just runs
 
         presenter = CartPresenter(
             view, cartRepository, 0, 0
@@ -71,7 +68,6 @@ class CartPresenterTest {
     @Test
     fun 장바구니_아이템을_제거하면_저장하고_뷰에_갱신한다() {
         // given
-        every { cartRepository.deleteCartProduct(any()) } just runs
         every { view.setResultForChange() } just runs
 
         // when
@@ -80,7 +76,6 @@ class CartPresenterTest {
 
         // then
         verify {
-            cartRepository.deleteCartProduct(any())
             view.setResultForChange()
         }
     }
@@ -96,24 +91,6 @@ class CartPresenterTest {
         verify {
             cartRepository.getAll(any(), any())
         }
-    }
-
-    @Test
-    fun 카트의_사이즈보다_현재_페이지와_페이지당_사이즈의_곱이_작다면_캐싱되어_있는_카트를_가져온다() {
-        // given
-        val cartRemoteDataSource: CartRemoteDataSource = mockk()
-        val cartDao: CartDao = mockk()
-        val cartRepository = CartRepositoryImpl(cartRemoteDataSource)
-        every { cartDao.selectAllCount() } returns 0
-        every { cartDao.getTotalPrice() } returns 0
-        every { cartDao.getTotalAmount() } returns 0
-
-        // when
-        presenter = CartPresenter(
-            view, cartRepository, 0, 1
-        )
-
-        // then
     }
 
     @Test

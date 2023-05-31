@@ -2,6 +2,7 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.server.CartRemoteDataSource
 
@@ -17,15 +18,6 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun getAllCount(onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
-        cartRemoteDataSource.getCartProducts(
-            onSuccess = {
-                onSuccess(it.size)
-            },
-            onFailure = { onFailure() }
-        )
-    }
-
     override fun getAll(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit
@@ -36,9 +28,35 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun deleteCartProduct(cartProduct: CartProduct) {
-        // cartDao.deleteCartProduct(cartProduct)
-        // cart = cart.removeCartProduct(cartProduct)
+    override fun deleteCartProduct(
+        cartProduct: CartProduct,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        cartRemoteDataSource.deleteCartProduct(
+            cartProductId = cartProduct.id,
+            onSuccess = onSuccess,
+            onFailure = onFailure
+        )
+    }
+
+    override fun deleteCartProduct(
+        shoppingProduct: ShoppingProduct,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        findByProductId(
+            productId = shoppingProduct.product.id,
+            onSuccess = {
+                if(it != null) {
+                    deleteCartProduct(it, onSuccess, onFailure)
+                }
+                else {
+                    onFailure()
+                }
+            },
+            onFailure = onFailure
+        )
     }
 
     override fun updateCartProductQuantity(cartProduct: CartProduct, onSuccess: () -> Unit, onFailure: () -> Unit) {
@@ -49,10 +67,6 @@ class CartRepositoryImpl(
             onFailure = { onFailure() }
         )
     }
-
-    // override fun getTotalPrice(): Int {
-    //     return cartDao.getTotalPrice()
-    // }
 
     override fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: () -> Unit) {
         getAll(

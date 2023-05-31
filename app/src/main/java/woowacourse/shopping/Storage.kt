@@ -21,11 +21,12 @@ object Storage {
         set(value) {
             sharedPreferences
                 .edit()
-                .putString(KEY_CREDENTIAL, "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
+                .putString(KEY_CREDENTIAL, value)
                 .apply()
         }
 
     fun init(context: Context) {
         sharedPreferences = context.getSharedPreferences("shopping", Application.MODE_PRIVATE)
+        credential = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
     }
 }

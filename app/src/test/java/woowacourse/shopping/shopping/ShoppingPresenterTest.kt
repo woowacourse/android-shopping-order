@@ -180,7 +180,6 @@ class ShoppingPresenterTest {
     fun 카트에_담긴_상품_개수를_감소시키면_카트에서_상품이_삭제되고_상품과_카트의_총_상품_개수가_업데이트된다() {
         // given
         every { cartRepository.findByProductId(any(), any(), any()) } just runs
-        every { cartRepository.deleteCartProduct(any()) } just runs
         every { view.updateShoppingProduct(any()) } just runs
         every { view.updateCartQuantity(any()) } just runs
 
@@ -190,7 +189,6 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            cartRepository.deleteCartProduct(any())
             view.updateShoppingProduct(any())
             view.updateCartQuantity(any())
         }

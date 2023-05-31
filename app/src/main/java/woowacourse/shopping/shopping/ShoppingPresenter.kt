@@ -139,10 +139,6 @@ class ShoppingPresenter(
         // updateCartAmount()
     }
 
-    private fun removeFromCart(cartProduct: CartProduct) {
-        cartRepository.deleteCartProduct(cartProduct)
-    }
-
     override fun increaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {
         cartRepository.findByProductId(
             productId = shoppingProductModel.product.id,
@@ -169,15 +165,30 @@ class ShoppingPresenter(
                 cartProduct = cartProduct,
                 onSuccess = {
                     val shoppingProduct = ShoppingProduct(cartProduct.product, cartProduct.quantity)
-                    shoppingProducts = shoppingProducts.replaceShoppingProduct(shoppingProduct)
-                    view.updateShoppingProduct(shoppingProduct.toView())
-                    updateCartQuantity()
+                    updateShoppingProductQuantity(shoppingProduct)
                 },
                 onFailure = {}
             )
         } else {
             removeFromCart(cartProduct)
         }
+    }
+
+    private fun removeFromCart(cartProduct: CartProduct) {
+        cartRepository.deleteCartProduct(
+            cartProduct = cartProduct,
+            onSuccess = {
+                val shoppingProduct = ShoppingProduct(cartProduct.product, cartProduct.quantity)
+                updateShoppingProductQuantity(shoppingProduct)
+            },
+            onFailure = {}
+        )
+    }
+
+    private fun updateShoppingProductQuantity(shoppingProduct: ShoppingProduct) {
+        shoppingProducts = shoppingProducts.replaceShoppingProduct(shoppingProduct)
+        view.updateShoppingProduct(shoppingProduct.toView())
+        updateCartQuantity()
     }
 
     private fun addToCart(shoppingProductModel: ShoppingProductModel) {

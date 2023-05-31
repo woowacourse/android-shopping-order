@@ -68,10 +68,17 @@ class CartPresenter(
     }
 
     override fun removeCartProduct(cartProductModel: CartProductModel) {
-//        cartRepository.deleteCartProduct(cartProductModel.toDomain())
-//        updateNavigationVisibility()
-//        getCartProducts(onSuccess = { updateCartPage() })
-//        view.setResultForChange()
+        val cartProduct = cartProductModel.toDomain()
+        cartRepository.deleteCartProduct(
+            cartProduct = cartProduct,
+            onSuccess = {
+                cart = cart.removeCartProduct(cartProduct)
+                updateCartPage()
+                updateNavigationVisibility()
+                view.setResultForChange()
+            },
+            onFailure = {}
+        )
     }
 
     override fun goToPreviousPage() {
