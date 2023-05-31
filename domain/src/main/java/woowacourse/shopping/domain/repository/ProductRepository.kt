@@ -1,11 +1,12 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductInCart
+import woowacourse.shopping.domain.util.WoowaResult
 
 interface ProductRepository {
-    fun getAll(callBack: (List<Product>) -> Unit)
-    fun getProduct(id: Int, callBack: (Product?) -> Unit)
-    fun getProductsByRange(mark: Int, rangeSize: Int, callBack: (List<Product>) -> Unit)
-    fun getProductsById(ids: List<Int>, callBack: (List<Product>) -> Unit)
-    fun isExistByMark(mark: Int, callBack: (Boolean) -> Unit)
+
+    fun getProduct(id: Long): WoowaResult<Product>
+    fun getProducts(unit: Int, lastId: Long): List<ProductInCart>
+    fun isLastProduct(id: Long): Boolean
 }

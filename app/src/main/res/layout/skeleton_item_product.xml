@@ -1,56 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="25dp">
+    android:paddingHorizontal="8dp"
+    android:paddingTop="20dp">
 
     <ImageView
-        android:id="@+id/img_product"
+        android:id="@+id/imageItemProductProduct"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/gray_500"
+        android:background="@color/woowa_dealer_gray_500"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_add"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <ImageButton
+        android:id="@+id/buttonItemProductInsertProduct"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/oval"
-        android:backgroundTint="@color/gray_200"
-        app:layout_constraintBottom_toBottomOf="@id/img_product"
-        app:layout_constraintCircleRadius="@dimen/cardview_compat_inset_shadow"
-        app:layout_constraintEnd_toEndOf="@id/img_product" />
+        android:backgroundTint="@color/woowa_dealer_gray_200"
+        app:layout_constraintBottom_toBottomOf="@id/imageItemProductProduct"
+        app:layout_constraintEnd_toEndOf="@id/imageItemProductProduct" />
 
-    <TextView
-        android:id="@+id/text_name"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/gray_200"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@id/img_product"
-        app:layout_constraintTop_toBottomOf="@id/img_product"
+        android:layout_height="40dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/woowa_dealer_gray_200"
+        app:layout_constraintBottom_toBottomOf="@id/imageItemProductProduct"
+        app:layout_constraintEnd_toEndOf="@id/imageItemProductProduct"
+        app:layout_constraintStart_toStartOf="@id/imageItemProductProduct"
         app:layout_constraintWidth_percent="0.5" />
 
     <TextView
-        android:id="@+id/text_price"
-        android:layout_width="0dp"
+        android:id="@+id/textItemProductName"
+        style="@style/woowaPro16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/woowa_dealer_gray_200"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minWidth="130dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageItemProductProduct" />
+
+    <TextView
+        android:id="@+id/textItemProductPrice"
+        style="@style/woowaAir16"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:background="@color/gray_200"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@id/text_name"
-        app:layout_constraintTop_toBottomOf="@id/text_name"
-        app:layout_constraintWidth_percent="0.5" />
+        android:background="@color/woowa_dealer_gray_200"
+        android:gravity="center"
+        android:minWidth="130dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textItemProductName" />
 
-
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/woowa_dealer_gray_200"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textItemProductPrice" />
 </androidx.constraintlayout.widget.ConstraintLayout>

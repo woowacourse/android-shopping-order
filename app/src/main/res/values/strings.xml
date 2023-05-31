@@ -1,20 +1,18 @@
 <resources>
     <string name="app_name">Shopping</string>
-    <string name="korean_won">%s원</string>
-    <string name="korean_won2">%,d원</string>
-    <string name="shoppingcart">장바구니</string>
-    <string name="price">금액</string>
-    <string name="put_in_cart">장바구니 담기</string>
-    <string name="recent_viewed_product">최근 본 상품</string>
-    <string name="show_more">더보기</string>
-    <string name="basic_page">1</string>
-    <string name="label_cart">Cart</string>
-    <string name="minus">-</string>
-    <string name="plus">+</string>
-    <string name="product_viewed_last">마지막으로 본 상품</string>
-    <string name="add_to_cart">담기</string>
+    <string name="wrapper_recently_viewed">최근 본 상품</string>
+
+    <string name="detailPriceFormat">%,d만원</string>
+
+    <string name="shoppingCart_title">Cart</string>
+    <string name="itemMore">더보기</string>
+    <string name="putInShoppingCart">장바구니 담기</string>
+    <string name="price">가격</string>
+    <string name="shopping">매물</string>
+    <string name="unexpected_error">예상치 못한 요류가 발생했습니다. 지속될 경우 앱을 재실행해주세요</string>
     <string name="all">전체</string>
-    <string name="order_count">주문하기(%d)</string>
-    <string name="logan_server">로건 서버</string>
-    <string name="sungha_server">성하 서버</string>
+    <string name="orderCount">주문하기(%d)</string>
+    <string name="lastViewedProduct">마지막으로 본 상품</string>
+    <string name="put">담기</string>
+
 </resources>
