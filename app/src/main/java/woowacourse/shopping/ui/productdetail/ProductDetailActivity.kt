@@ -8,8 +8,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.product.ProductRemoteService
@@ -30,7 +30,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
             this, ProductRemoteRepository(),
-            CartItemRepositoryImpl(
+            CartItemRemoteRepository(
                 CartItemRemoteService(ServerConfiguration.host)
             ),
             RecentlyViewedProductRepositoryImpl(

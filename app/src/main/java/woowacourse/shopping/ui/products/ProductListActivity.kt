@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemLocalCache
+import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.product.ProductRemoteService
@@ -44,10 +44,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
             recentlyViewedProductMemoryDao, productRemoteService
         )
-        val cartItemRepositoryImpl = CartItemRepositoryImpl(cartItemRemoteService)
+        val cartItemRemoteRepository = CartItemRemoteRepository(cartItemRemoteService)
         val productRemoteRepository = ProductRemoteRepository()
         return ProductListPresenter(
-            this, recentlyViewedProductRepositoryImpl, productRemoteRepository, cartItemRepositoryImpl
+            this, recentlyViewedProductRepositoryImpl, productRemoteRepository, cartItemRemoteRepository
         )
     }
 

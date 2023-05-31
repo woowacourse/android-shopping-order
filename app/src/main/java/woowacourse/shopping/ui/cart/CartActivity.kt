@@ -10,8 +10,8 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemLocalCache
+import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
@@ -37,7 +37,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartPresenter by lazy {
         CartPresenter(
             this,
-            CartItemRepositoryImpl(
+            CartItemRemoteRepository(
                 CartItemRemoteService(ServerConfiguration.host)
             )
         )
