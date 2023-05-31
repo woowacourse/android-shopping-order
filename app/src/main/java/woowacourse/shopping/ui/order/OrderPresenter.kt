@@ -27,7 +27,7 @@ class OrderPresenter(
                 view.showTotalPayment(order.totalPayment.toUi())
             },
             onFailed = {
-                availablePoint = Point(0)
+                availablePoint = Point(2000)
                 updateOrder(order.orderProducts.toUi() + availablePoint.toUi())
                 view.showTotalPayment(order.totalPayment.toUi())
                 view.showOrderLoadFailed()

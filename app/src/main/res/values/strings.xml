@@ -4,7 +4,7 @@
     <!-- 공통 -->
     <string name="price_format">%,d원</string>
     <string name="quantity_format">%,d개</string>
-    <string name="point_format">%,d원</string>
+    <string name="point_format">%,dP</string>
     <string name="tb_shopping">Shopping</string>
 
     <!-- ShoppingActivity -->

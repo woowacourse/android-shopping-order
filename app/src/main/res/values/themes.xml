@@ -12,5 +12,18 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="PointEditTextStyle">@style/PointEditTextStyle</item>
+    </style>
+
+    <style name="PointEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/shape_woowa_point_edit_text</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">10</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:textColor">@color/woowa_text_black</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:hint">0원</item>
     </style>
 </resources>
