@@ -25,6 +25,9 @@
             android:name=".ui.shopping.ShoppingActivity"
             android:exported="false"/>
         <activity
+            android:name=".ui.order.OrderActivity"
+            android:exported="false"/>
+        <activity
             android:name=".ui.serverSetting.ServerSettingActivity"
             android:exported="true">
             <intent-filter>

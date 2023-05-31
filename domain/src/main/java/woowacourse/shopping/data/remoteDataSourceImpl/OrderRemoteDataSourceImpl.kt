@@ -5,7 +5,10 @@ import woowacourse.shopping.model.OrderList
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-    override fun getAll(callback: (Result<OrderList>) -> Unit) {
-        RetrofitUtil.retrofitOrderService.getOrderList().enqueue(RetrofitUtil.callback(callback))
+    private var credentials = "YUBhLmNvbToxMjM0"
+
+    override fun getOrder(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
+        RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))
+            .enqueue(RetrofitUtil.callback(callback))
     }
 }

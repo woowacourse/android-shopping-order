@@ -5,9 +5,10 @@ import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.model.OrderList
 
 class OrderRepositoryImpl(
-    private val orderApi: OrderRemoteDataSource
+    private val orderRemoteDataSource: OrderRemoteDataSource
 ) : OrderRepository {
-    override fun getOrderList(callback: (Result<OrderList>) -> Unit) {
-        orderApi.getAll(callback)
+    override fun getOrderList(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
+        println("$cartIds------------------------------")
+        orderRemoteDataSource.getOrder(cartIds, callback)
     }
 }

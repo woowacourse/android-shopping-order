@@ -16,12 +16,12 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
-        val buttonJames = findViewById<Button>(R.id.btn_james_server)
-        val buttonLeah = findViewById<Button>(R.id.btn_leah_server)
-        buttonJames.setOnClickListener {
+        val buttonIo = findViewById<Button>(R.id.btn_io_server)
+        val buttonJito = findViewById<Button>(R.id.btn_jito_server)
+        buttonIo.setOnClickListener {
             startMain(SERVER_IO)
         }
-        buttonLeah.setOnClickListener {
+        buttonJito.setOnClickListener {
             startMain(SERVER_JITO)
         }
     }

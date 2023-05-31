@@ -8,13 +8,13 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/btn_james_server"
+            android:id="@+id/btn_io_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/server_setting_io_server" />
 
         <Button
-            android:id="@+id/btn_leah_server"
+            android:id="@+id/btn_jito_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/server_setting_jito_server" />

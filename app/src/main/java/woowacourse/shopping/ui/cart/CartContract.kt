@@ -10,6 +10,7 @@ interface CartContract {
     interface View {
         fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel)
         fun navigateToItemDetail(product: ProductUIModel)
+        fun navigateToOrder(cartIds: List<Int>)
     }
 
     interface Presenter {
@@ -25,5 +26,6 @@ interface CartContract {
         fun removeItem(productId: Int)
         fun getPageIndex(): Int
         fun navigateToItemDetail(productId: Int)
+        fun navigateToOrder()
     }
 }

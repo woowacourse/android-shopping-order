@@ -146,6 +146,14 @@ class CartPresenter(
         }
     }
 
+    override fun navigateToOrder() {
+        cartRepository.getAll { result ->
+            result.onSuccess { cartProducts ->
+                view.navigateToOrder(cartProducts.all().map { it.id })
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
+        }
+    }
+
     companion object {
         private const val STEP = 5
     }

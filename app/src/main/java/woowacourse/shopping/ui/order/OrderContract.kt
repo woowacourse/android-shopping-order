@@ -1,7 +1,11 @@
 package woowacourse.shopping.ui.order
 
 interface OrderContract {
-    interface View
+    interface View {
+        fun showOrderList()
+    }
 
-    interface Presenter
+    interface Presenter {
+        fun getOrderList()
+    }
 }

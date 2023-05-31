@@ -15,9 +15,11 @@
     <string name="cart_select_all_of_page">전체</string>
     <string name="cart_item_product_remove_btn_description">지우기 버튼</string>
     <string name="cart_item_product_image_description">장바구니 상품</string>
+    <string name="cart_dialog_btn">담기</string>
 
     <!-- Strings related to product detail -->
     <string name="product_detail_add_to_cart_btn">장바구니 담기</string>
+    <string name="detailed_product_last_item">마지막으로 본 상품</string>
 
     <!-- Strings related to shopping page -->
     <string name="shopping_toolbar_title">Shopping</string>
@@ -27,8 +29,8 @@
     <!-- Strings related to recent recent product -->
     <string name="recent_product_text">최근 본 상품</string>
     <string name="recent_product_item_product_image_description">최근 본 상품</string>
-    <string name="detailed_product_last_item">마지막으로 본 상품</string>
-    <string name="cart_dialog_btn">담기</string>
+
+    <!-- Strings related to server setting -->
     <string name="server_setting_io_server">이오 서버</string>
     <string name="server_setting_jito_server">지토 서버</string>
 

@@ -17,6 +17,7 @@ import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
+import woowacourse.shopping.ui.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -69,6 +70,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.setUpView()
 
         binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
+        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.navigateToOrder() }
     }
 
     private fun initObserve() {
@@ -124,6 +126,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun navigateToItemDetail(product: ProductUIModel) {
         startActivity(DetailedProductActivity.getIntent(this, product))
+    }
+
+    override fun navigateToOrder(cartIds: List<Int>) {
+        startActivity(OrderActivity.getIntent(this, cartIds))
     }
 
     companion object {
