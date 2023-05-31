@@ -1,20 +1,16 @@
-package woowacourse.shopping.model
+package com.example.domain.model
 
-class CartItemsUIModel(
-    cartProducts: List<CartProductUIModel> = mutableListOf(),
+class CartItems(
+    cartProducts: List<CartProduct> = mutableListOf(),
 ) {
     private val _cartProducts = cartProducts.toMutableList()
 
-    override fun toString(): String {
-        return _cartProducts.toString()
-    }
-
-    fun updateItems(data: List<CartProductUIModel>) {
+    fun updateItem(data: List<CartProduct>) {
         _cartProducts.clear()
         _cartProducts.addAll(data)
     }
 
-    fun insert(cartProduct: CartProductUIModel) {
+    fun insert(cartProduct: CartProduct) {
         if (!_cartProducts.contains(cartProduct)) {
             _cartProducts.add(cartProduct)
         }
@@ -25,7 +21,7 @@ class CartItemsUIModel(
     }
 
     fun getPrice(): Int {
-        return _cartProducts.sumOf { it.product.price * it.count }
+        return _cartProducts.sumOf { it.product.price * it.quantity }
     }
 
     fun isContain(id: Long): Boolean {

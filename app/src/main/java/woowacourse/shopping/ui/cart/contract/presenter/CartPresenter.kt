@@ -13,7 +13,7 @@ class CartPresenter(
     val view: CartContract.View,
     offset: Int = 0,
 ) : CartContract.Presenter {
-    private val cartItems = CartItemsUIModel()
+    private val cartItems = CartItems()
     private var cartOffset = CartOffset(offset, repository)
 
     override fun setUpCarts() {
