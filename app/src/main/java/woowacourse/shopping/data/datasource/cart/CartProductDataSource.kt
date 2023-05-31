@@ -1,16 +1,35 @@
 package woowacourse.shopping.data.datasource.cart
 
-import retrofit2.Call
-import woowacourse.shopping.data.dto.CartProductDto
+import woowacourse.shopping.domain.model.CartProduct
 
 interface CartProductDataSource {
-    fun requestCartProducts(token: String): Call<List<CartProductDto>>
+    fun requestCartProducts(
+        token: String,
+        onSuccess: (List<CartProduct>) -> Unit,
+        onFailure: () -> Unit,
+    ) // List<CartProductDto>
 
-    fun addCartProductByProductId(token: String, productId: String): Call<Int>
+    fun addCartProductByProductId(
+        token: String,
+        productId: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) // : Call<Int>
 
-    fun updateCartProductCountById(token: String, cartItemId: String, quantity: Int): Call<Void>
+    fun updateCartProductCountById(
+        token: String,
+        cartItemId: String,
+        quantity: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) // : Call<Void>
 
-    fun deleteCartProductById(token: String, cartItemId: String): Call<CartProductDto>
+    fun deleteCartProductById(
+        token: String,
+        cartItemId: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) // : Call<CartProductDto>
 
     // fun requestCartProductById(productId: Int): CartProduct?
 }

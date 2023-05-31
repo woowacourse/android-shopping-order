@@ -64,13 +64,22 @@ class ShoppingPresenter(
     }
 
     override fun addCartProduct(product: UiProduct, addCount: Int) {
-        cartRepository.addCartProductByProductId(product.toDomain().id)
-        loadAllProducts()
+        cartRepository.addCartProductByProductId(
+            product.toDomain().id,
+            onSuccess = {
+                loadAllProducts()
+            },
+            onFailure = {},
+        )
     }
 
     override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
-        cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
-        loadAllProducts()
+        cartRepository.updateProductCountById(
+            cartProduct.toDomain().id,
+            ProductCount(changedCount),
+            onSuccess = { loadAllProducts() },
+            onFailure = { },
+        )
     }
 
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
@@ -91,15 +100,18 @@ class ShoppingPresenter(
     }
 
     private fun loadCartProducts(products: List<Product>) {
-        val cartProducts = cartRepository.getAllCartProducts()
-        val allCartProducts = products.map { product ->
-            cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
-                product = product,
-                selectedCount = ProductCount(0),
-            )
-        }
-
-        updateCart(allCartProducts)
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts ->
+                val allCartProducts = products.map { product ->
+                    cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
+                        product = product,
+                        selectedCount = ProductCount(0),
+                    )
+                }
+                updateCart(allCartProducts)
+            },
+            onFailure = {},
+        )
     }
 
     private fun updateCart(newCartProducts: List<CartProduct>) {

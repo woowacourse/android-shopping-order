@@ -26,7 +26,6 @@ class Pagination(
     override fun getCheckedProductSize(cart: Cart): Int =
         takeItems(cart).count { item -> item.isChecked }
 
-
     companion object {
         private const val FIRST_PAGE = 1
     }
