@@ -29,7 +29,8 @@ class DetailPresenter(
     }
 
     override fun addCart() {
-        cartRepository.addProduct(_product.toDomain(), product.count + _count)
+        val product = cartRepository.getAll().find { it.product.id == product.id }
+        cartRepository.addProduct(_product.toDomain(), (product?.count ?: 0) + _count)
         view.showCartScreen()
     }
 }
