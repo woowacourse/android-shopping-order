@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.basket
 
+import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.ui.model.UiBasketProduct
@@ -29,6 +30,7 @@ interface BasketContract {
 
     interface Presenter {
         val view: View
+        var basket: Basket
 
         fun fetchTotalCheckToCurrentPage(totalIsChecked: Boolean)
 

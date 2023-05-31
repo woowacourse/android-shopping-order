@@ -19,7 +19,7 @@ class BasketPresenter(
     private var currentPage: Int = 1,
     private var startId: Int = 0,
 ) : BasketContract.Presenter {
-    private lateinit var basket: Basket
+    override lateinit var basket: Basket
     private val hasNext: Boolean get() = basket.products.lastIndex >= startId + BASKET_PAGING_SIZE
     private var isLoaded: Boolean = false
 
