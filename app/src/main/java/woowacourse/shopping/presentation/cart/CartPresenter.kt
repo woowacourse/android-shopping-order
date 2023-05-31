@@ -24,6 +24,7 @@ class CartPresenter(
         cartRepository.getCartProducts {
             cartPages = CartPages(CartProducts(it), initialPage)
             updateProductsInCurrentPage()
+            view.stopLoading()
         }
     }
 

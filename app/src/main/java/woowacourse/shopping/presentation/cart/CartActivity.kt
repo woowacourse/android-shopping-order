@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepository
@@ -146,6 +147,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun showAllCheckBoxIsChecked(isChecked: Boolean) {
         binding.checkBoxSelectAll.isChecked = isChecked
+    }
+
+    override fun stopLoading() {
+        binding.skeletonCarts.isVisible = false
+        binding.containerCart.isVisible = true
     }
 
     companion object {

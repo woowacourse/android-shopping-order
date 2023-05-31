@@ -24,5 +24,6 @@ interface CartContract {
         fun showTotalPrice(price: Int)
         fun showTotalCount(count: Int)
         fun showAllCheckBoxIsChecked(isChecked: Boolean)
+        fun stopLoading()
     }
 }
