@@ -1,16 +1,20 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.ProductInCart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.util.WoowaResult
 
 interface ShoppingCartRepository {
+    fun fetchAll(callback: (WoowaResult<List<CartProduct>>) -> Unit)
+    fun delete(callback: (WoowaResult<Boolean>) -> Unit, id: Int)
+    fun insert(
+        callback: (WoowaResult<Long>) -> Unit,
+        productId: Int,
+        quantity: Int = 1,
+    )
 
-    fun getAll(): List<ProductInCart>
-    fun getShoppingCart(unit: Int, pageNumber: Int): List<ProductInCart>
-    fun insertProductInCart(productInCart: ProductInCart): Long
-    fun deleteProductInCart(id: Long): Boolean
-    fun getShoppingCartSize(): Int
-    fun getTotalQuantity(): Int
-    fun updateProductQuantity(productId: Long, count: Int): WoowaResult<Int>
-    fun increaseProductQuantity(productId: Long, plusCount: Int)
+    fun update(
+        callback: (WoowaResult<Boolean>) -> Unit,
+        productId: Int,
+        updatedQuantity: Int,
+    )
 }

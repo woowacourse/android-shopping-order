@@ -1,12 +1,14 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ProductInCart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.util.WoowaResult
 
 interface ProductRepository {
 
-    fun getProduct(id: Long): WoowaResult<Product>
-    fun getProducts(unit: Int, lastId: Long): List<ProductInCart>
-    fun isLastProduct(id: Long): Boolean
+    fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Int)
+    fun fetchPagedProducts(
+        callback: (products: WoowaResult<List<CartProduct>>, isLast: Boolean) -> Unit,
+        pageItemCount: Int,
+        lastId: Int,
+    )
 }
