@@ -10,11 +10,11 @@ import woowacourse.shopping.utils.ServerConfiguration
 
 class ProductRemoteRepository : ProductRepository {
 
-    private val productRemoteService: ProductRemoteService1 = Retrofit.Builder()
+    private val productRemoteService: ProductRemoteService = Retrofit.Builder()
         .baseUrl(ServerConfiguration.host.url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(ProductRemoteService1::class.java)
+        .create(ProductRemoteService::class.java)
 
     override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
         productRemoteService.requestProducts()
@@ -63,9 +63,5 @@ class ProductRemoteRepository : ProductRepository {
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
             }
         })
-    }
-
-    private fun ProductDto.toDomain(): Product {
-        return Product(this.id, this.imageUrl, this.name, this.price)
     }
 }

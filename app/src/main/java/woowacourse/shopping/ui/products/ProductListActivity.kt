@@ -10,12 +10,9 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemLocalCache
 import woowacourse.shopping.data.cart.CartItemRemoteRepository
-import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.ProductRemoteRepository
-import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRemoteRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
@@ -23,7 +20,6 @@ import woowacourse.shopping.ui.products.adapter.ProductListAdapter
 import woowacourse.shopping.ui.products.adapter.RecentlyViewedProductListAdapter
 import woowacourse.shopping.ui.products.uistate.ProductUIState
 import woowacourse.shopping.ui.products.uistate.RecentlyViewedProductUIState
-import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.customview.CountBadge
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
@@ -32,22 +28,12 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         ActivityProductListBinding.inflate(layoutInflater)
     }
 
-    private val presenter: ProductListContract.Presenter by lazy { createPresenter() }
-
-    private val cartItemRemoteService: CartItemRemoteService =
-        CartItemRemoteService(ServerConfiguration.host)
-
-    private fun createPresenter(): ProductListPresenter {
-        val productRemoteService = ProductRemoteService(ServerConfiguration.host)
-        val dbHelper = DbHelper.getDbInstance(this)
-        val recentlyViewedProductMemoryDao = RecentlyViewedProductMemoryDao(dbHelper)
-        val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
-            recentlyViewedProductMemoryDao, productRemoteService
-        )
-        val cartItemRemoteRepository = CartItemRemoteRepository(cartItemRemoteService)
-        val productRemoteRepository = ProductRemoteRepository()
-        return ProductListPresenter(
-            this, recentlyViewedProductRepositoryImpl, productRemoteRepository, cartItemRemoteRepository
+    private val presenter: ProductListContract.Presenter by lazy {
+        ProductListPresenter(
+            this,
+            RecentlyViewedProductRemoteRepository(DbHelper.getDbInstance(this)),
+            ProductRemoteRepository(),
+            CartItemRemoteRepository()
         )
     }
 

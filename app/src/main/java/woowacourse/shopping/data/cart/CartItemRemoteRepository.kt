@@ -10,15 +10,14 @@ import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.UserData
 
 class CartItemRemoteRepository(
-    private val cartItemDataSource: CartItemDataSource,
     private val cache: CartItemLocalCache = CartItemLocalCache
 ) : CartItemRepository {
 
-    private val cartItemRemoteService: CartItemRemoteService1 = Retrofit.Builder()
+    private val cartItemRemoteService: CartItemRemoteService = Retrofit.Builder()
         .baseUrl(ServerConfiguration.host.url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(CartItemRemoteService1::class.java)
+        .create(CartItemRemoteService::class.java)
 
     override fun save(cartItem: CartItem, onFinish: (CartItem) -> Unit) {
         cartItemRemoteService.requestToSave(

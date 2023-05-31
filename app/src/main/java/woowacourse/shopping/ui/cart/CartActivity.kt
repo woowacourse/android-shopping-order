@@ -11,12 +11,10 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemLocalCache
 import woowacourse.shopping.data.cart.CartItemRemoteRepository
-import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
-import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding by lazy {
@@ -35,12 +33,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private val presenter: CartPresenter by lazy {
-        CartPresenter(
-            this,
-            CartItemRemoteRepository(
-                CartItemRemoteService(ServerConfiguration.host)
-            )
-        )
+        CartPresenter(this, CartItemRemoteRepository())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
