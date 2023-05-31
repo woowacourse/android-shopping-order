@@ -12,8 +12,8 @@ import woowacourse.shopping.data.cart.CartItemLocalCache
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
@@ -45,9 +45,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             recentlyViewedProductMemoryDao, productRemoteService
         )
         val cartItemRepositoryImpl = CartItemRepositoryImpl(cartItemRemoteService)
-        val productRepositoryImpl = ProductRepositoryImpl(productRemoteService)
+        val productRemoteRepository = ProductRemoteRepository()
         return ProductListPresenter(
-            this, recentlyViewedProductRepositoryImpl, productRepositoryImpl, cartItemRepositoryImpl
+            this, recentlyViewedProductRepositoryImpl, productRemoteRepository, cartItemRepositoryImpl
         )
     }
 

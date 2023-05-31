@@ -11,8 +11,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemRemoteService
 import woowacourse.shopping.data.cart.CartItemRepositoryImpl
 import woowacourse.shopping.data.database.DbHelper
+import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
@@ -29,7 +29,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductRemoteService(ServerConfiguration.host)),
+            this, ProductRemoteRepository(),
             CartItemRepositoryImpl(
                 CartItemRemoteService(ServerConfiguration.host)
             ),
