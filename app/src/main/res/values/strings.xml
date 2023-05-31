@@ -30,5 +30,15 @@
     <string name="tv_total">전체</string>
     <string name="tv_order">주문하기(%d)</string>
 
+    <!-- activity_payment_confirm -->
+    <string name="btn_final_order">주문하기</string>
+    <string name="tb_payment">주문내역</string>
+    <string name="tv_holding_point_title">보유 포인트</string>
+    <string name="btn_use_point">사용</string>
+    <string name="et_using_point_hint">사용하실 포인트를 입력해 주세요</string>
+    <string name="tv_payment_actual_amount_title">실 결제액</string>
+    <string name="tv_payment_total_price_title">구매 총액</string>
+    <string name="tv_payment_using_point_title">사용 포인트</string>
+
 
 </resources>
