@@ -2,19 +2,19 @@ package woowacourse.shopping.feature.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.CartProducts
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
-import woowacourse.shopping.model.ProductUiModel
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
 ) : CartContract.Presenter {
 
-    override var page: PageUiModel = PageUiModel(cartRepository.getAll().size, 1)
+    override lateinit var page: PageUiModel
         private set
 
     private var _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
@@ -26,14 +26,21 @@ class CartPresenter(
     private var _allSelected: MutableLiveData<Boolean> = MutableLiveData(false)
     val allSelected: LiveData<Boolean> get() = _allSelected
 
+    private lateinit var cartProducts: CartProducts
+
     override fun setup() {
+        cartProducts = cartRepository.getAll()
+        page = PageUiModel(cartProducts.size, 1)
         _allSelected.value = isAllSelected()
+
         updateTotalSelectedValues()
         changePageState(getCurrentPageItems())
     }
 
-    override fun deleteCartProduct(product: ProductUiModel) {
-        cartRepository.deleteProduct(product.toDomain())
+    override fun deleteCartProduct(cartProduct: CartProductUiModel) {
+        cartRepository.deleteProduct(cartProduct.cartProductId.toInt())
+        cartProducts.delete(cartProduct.toDomain())
+
         this.page = this.page.copy(allSize = this.page.allSize - 1)
 
         var loadedItems = getCurrentPageItems()
@@ -64,22 +71,29 @@ class CartPresenter(
         changePageState(getCurrentPageItems())
     }
 
-    override fun increaseCartProduct(product: ProductUiModel, previousCount: Int) {
-        cartRepository.addProduct(product.toDomain(), previousCount + 1)
+    override fun increaseCartProduct(cartProduct: CartProductUiModel, previousCount: Int) {
+        if (previousCount == 0) {
+            cartRepository.addProduct(cartProduct.productUiModel.toDomain())
+            cartProducts = cartRepository.getAll()
+        } else {
+            cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount + 1)
+            cartProducts.updateProductCount(cartProduct.toDomain(), previousCount + 1)
+        }
         updateTotalSelectedValues()
     }
 
-    override fun decreaseCartProduct(product: ProductUiModel, previousCount: Int) {
+    override fun decreaseCartProduct(cartProduct: CartProductUiModel, previousCount: Int) {
         if (previousCount == 1) {
-            deleteCartProduct(product)
+            deleteCartProduct(cartProduct)
         } else {
-            cartRepository.addProduct(product.toDomain(), previousCount - 1)
+            cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount - 1)
+            cartProducts.updateProductCount(cartProduct.toDomain(), previousCount - 1)
         }
         updateTotalSelectedValues()
     }
 
     override fun toggleCartProduct(cartProduct: CartProductUiModel, isSelected: Boolean) {
-        cartRepository.updateSelection(cartProduct.productUiModel.toDomain(), isSelected)
+        cartProducts.updateSelection(cartProduct.toDomain(), isSelected)
 
         if (!isSelected) _allSelected.value = false
         else _allSelected.value = isAllSelected()
@@ -99,7 +113,7 @@ class CartPresenter(
 
     private fun selectAll(notSelectedItems: List<CartProductUiModel>) {
         notSelectedItems.forEach { cartProduct ->
-            cartRepository.updateSelection(cartProduct.productUiModel.toDomain(), true)
+            cartProducts.updateSelection(cartProduct.toDomain(), true)
         }
         updateTotalSelectedValues()
         changePageState(getCurrentPageItems())
@@ -107,26 +121,24 @@ class CartPresenter(
 
     private fun deselectAll() {
         getCurrentPageItems().forEach { cartProduct ->
-            cartRepository.updateSelection(cartProduct.productUiModel.toDomain(), false)
+            cartProducts.updateSelection(cartProduct.toDomain(), false)
         }
         updateTotalSelectedValues()
         changePageState(getCurrentPageItems())
     }
 
     private fun updateTotalSelectedValues() {
-        val totalItems = cartRepository.getAll().filter { it.isSelected }
+        val selectedItems = cartProducts.selectedProducts().map { it.toPresentation() }
 
-        _totalPrice.value = totalItems.sumOf { it.toPresentation().totalPrice() }
-        _totalCount.value = totalItems.size
+        _totalPrice.value = selectedItems.sumOf { it.totalPrice() }
+        _totalCount.value = selectedItems.size
     }
 
     private fun isAllSelected(): Boolean = getCurrentPageItems().all { it.isSelected }
 
     private fun getCurrentPageItems(): List<CartProductUiModel> {
-        val cartProducts =
-            cartRepository.getProductsByPage(page.currentPage, PageUiModel.PAGE_LOAD_SIZE)
-
-        return cartProducts.map { it.toPresentation() }
+        return cartProducts.cartProductsByRange(page.currentPageStart, page.currentPageEnd)
+            .map { it.toPresentation() }
     }
 
     private fun changePageState(itemModels: List<CartProductUiModel>) {

@@ -8,8 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.cart.CartCache
-import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.RetrofitClient
 import woowacourse.shopping.data.datasource.remote.cart.CartApi
@@ -44,7 +43,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         val cartPresenter = CartPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRetrofitService(cartApi), CartCache)
+            CartRepositoryImpl(CartRetrofitService(cartApi))
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter
@@ -56,11 +55,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             listOf(),
             object : CartProductClickListener {
                 override fun onPlusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.increaseCartProduct(cartProduct.productUiModel, previousCount)
+                    presenter.increaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onMinusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.decreaseCartProduct(cartProduct.productUiModel, previousCount)
+                    presenter.decreaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onCheckClick(cartProduct: CartProductUiModel, isSelected: Boolean) {
@@ -68,7 +67,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
 
                 override fun onDeleteClick(cartProduct: CartProductUiModel) {
-                    presenter.deleteCartProduct(cartProduct.productUiModel)
+                    presenter.deleteCartProduct(cartProduct)
                 }
             }
         )

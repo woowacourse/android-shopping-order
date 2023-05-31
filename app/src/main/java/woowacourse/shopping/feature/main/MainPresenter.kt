@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.main
 
+import com.example.domain.model.CartProducts
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
@@ -20,6 +21,7 @@ class MainPresenter(
 
     private var totalCount: Int = 0
     private var page = 1
+    private lateinit var cartProducts: CartProducts
 
     override fun loadProducts() {
         productRepository.getProducts(
@@ -34,9 +36,9 @@ class MainPresenter(
     }
 
     private fun matchCartProductCount(products: List<Product>): List<ProductUiModel> {
-        val cartProducts = cartRepository.getAll()
+        cartProducts = cartRepository.getAll()
         return products.map { product ->
-            val count = cartProducts.find { it.product.id == product.id }?.count ?: 0
+            val count = cartProducts.findByProductId(productId = product.id)?.count ?: 0
             product.toPresentation(count)
         }
     }
@@ -55,7 +57,7 @@ class MainPresenter(
     }
 
     override fun setCartProductCount() {
-        totalCount = cartRepository.getAll().size
+        totalCount = cartProducts.size
         view.updateCartProductCount(totalCount)
     }
 
@@ -84,27 +86,39 @@ class MainPresenter(
     }
 
     override fun increaseCartProduct(product: ProductUiModel, previousCount: Int) {
-        cartRepository.addProduct(product.toDomain(), previousCount + 1)
         if (previousCount == 0) {
+            cartRepository.addProduct(product.toDomain())
+            cartProducts = cartRepository.getAll()
             ++totalCount
             view.updateCartProductCount(totalCount)
+        } else {
+            cartProducts.findByProductId(productId = product.toDomain().id)?.let { cartProduct ->
+                cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount + 1)
+                cartProducts.updateProductCount(cartProduct, previousCount + 1)
+            }
         }
         view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun decreaseCartProduct(product: ProductUiModel, previousCount: Int) {
-        if (previousCount == 1) {
-            cartRepository.deleteProduct(product.toDomain())
-            --totalCount
-            view.updateCartProductCount(totalCount)
-        } else {
-            cartRepository.addProduct(product.toDomain(), previousCount - 1)
+        cartProducts.findByProductId(product.toDomain().id)?.let { cartProduct ->
+            if (previousCount == 1) {
+                cartRepository.deleteProduct(cartProduct.cartProductId.toInt())
+                cartProducts.delete(cartProduct)
+                --totalCount
+                view.updateCartProductCount(totalCount)
+            } else {
+                cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount - 1)
+                cartProducts.updateProductCount(cartProduct, previousCount - 1)
+            }
         }
         view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun updateProducts() {
-        val products = cartRepository.getAll().map {
+        cartProducts = cartRepository.getAll()
+
+        val products = cartProducts.data.map {
             it.product.toPresentation(count = it.count)
         }
         totalCount = products.size

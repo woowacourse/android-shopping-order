@@ -9,6 +9,12 @@ data class PageUiModel(
             return kotlin.math.ceil((allSize.toDouble() / PAGE_LOAD_SIZE)).toInt()
         }
 
+    val currentPageStart: Int = (currentPage - 1) * PAGE_LOAD_SIZE
+
+    val currentPageEnd: Int =
+        if (currentPageStart + PAGE_LOAD_SIZE >= allSize) allSize
+        else currentPageStart + PAGE_LOAD_SIZE
+
     fun hasPreviousPage(): Boolean {
         return currentPage > 1
     }

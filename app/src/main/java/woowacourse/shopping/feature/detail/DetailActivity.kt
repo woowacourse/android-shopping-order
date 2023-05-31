@@ -11,8 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.cart.CartCache
-import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.RetrofitClient
 import woowacourse.shopping.data.datasource.remote.cart.CartApi
@@ -41,7 +40,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
 
         presenter = DetailPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRetrofitService(cartApi), CartCache),
+            CartRepositoryImpl(CartRetrofitService(cartApi)),
             product
         )
         binding.presenter = presenter
