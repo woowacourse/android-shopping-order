@@ -6,5 +6,5 @@ data class OrderDetailDataModel(
     val spendPoint: Int,
     val spendPrice: Int,
     val orderDate: String,
-    val orderItems: OrderProductDataModel,
+    val orderItems: List<OrderProductDataModel>,
 )
