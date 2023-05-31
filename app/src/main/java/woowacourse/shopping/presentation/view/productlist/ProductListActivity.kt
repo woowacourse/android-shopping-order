@@ -128,7 +128,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductLocalDataSource),
+            recentProductRepository = RecentProductRepositoryImpl(
+                productRemoteDataSource,
+                recentProductLocalDataSource
+            ),
         )
     }
 
@@ -183,11 +186,6 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
             productListAdapter.setItems(cartProducts)
         }
     }
-    // override fun setProductItemsView(products: List<ProductModel>) {
-    //     binding.rvProductList.post {
-    //         productListAdapter.setItems(products)
-    //     }
-    // }
 
     override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
         binding.rvProductList.post {
