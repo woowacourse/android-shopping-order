@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.UserRequest
+import woowacourse.shopping.data.datasource.request.UserRequest
 import woowacourse.shopping.ui.model.User
 
 fun UserRequest.toUser() = User(

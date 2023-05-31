@@ -4,7 +4,7 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.data.NetworkModule
-import woowacourse.shopping.data.model.UserRequest
+import woowacourse.shopping.data.datasource.request.UserRequest
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class UserRemoteDataSourceImpl : UserRemoteDataSource {

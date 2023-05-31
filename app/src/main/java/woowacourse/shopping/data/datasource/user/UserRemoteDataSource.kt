@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.user
 
-import woowacourse.shopping.data.model.UserRequest
+import woowacourse.shopping.data.datasource.request.UserRequest
 
 interface UserRemoteDataSource {
 
