@@ -26,7 +26,7 @@ interface RetrofitService {
     fun addCartProduct(
         @Header("Authorization") credential: String,
         @Body productId: Int,
-    ): Call<Int>
+    ): Call<Void>
 
     @Headers("Content-Type: application/json")
     @PATCH("/cart-items/{cartItemId}")
@@ -34,11 +34,11 @@ interface RetrofitService {
         @Header("Authorization") credential: String,
         @Path("cartItemId") cartItemId: Int,
         @Body quantity: Int,
-    ): Call<Unit>
+    ): Call<Void>
 
     @DELETE("/cart-items/{cartItemId}")
     fun deleteCartProduct(
         @Header("Authorization") credential: String,
         @Path("cartItemId") cartItemId: Int,
-    ): Call<Unit>
+    ): Call<Void>
 }

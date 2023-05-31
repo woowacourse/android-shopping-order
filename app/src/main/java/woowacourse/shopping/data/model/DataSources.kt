@@ -16,7 +16,7 @@ fun ProductDto.toDomain() = Product(id, name, imageUrl, price)
 data class CartProductDto(
     val id: Long,
     val quantity: Int,
-    val product: Product
+    val product: ProductDto
 )
 
-fun CartProductDto.toDomain() = CartProduct(id, product, quantity, true)
+fun CartProductDto.toDomain() = CartProduct(id, product.toDomain(), quantity, true)
