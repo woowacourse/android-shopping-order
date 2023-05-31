@@ -1,8 +1,10 @@
 package woowacourse.shopping.model
 
 class CartProducts(cartProducts: List<CartProduct>) {
-    private val cartProducts: MutableList<CartProduct>
+    private val cartProducts: MutableList<CartProduct> = cartProducts.toMutableList()
     val size: Int get() = cartProducts.size
+
+    private val checkedProductsIds = mutableSetOf<Int>()
 
     val totalPrice: Int
         get() = cartProducts.sumOf { it.product.price * it.quantity }
@@ -10,13 +12,15 @@ class CartProducts(cartProducts: List<CartProduct>) {
     val totalQuantity: Int
         get() = cartProducts.sumOf { it.quantity }
 
+    val totalCheckedPrice: Int
+        get() = cartProducts.filter { checkedProductsIds.contains(it.id) }
+            .sumOf { it.product.price * it.quantity }
+
     val totalCheckedQuantity: Int
-        get() = cartProducts.filter { it.checked }.sumOf { it.quantity }
+        get() = cartProducts.filter { checkedProductsIds.contains(it.id) }.sumOf { it.quantity }
 
     init {
-        this.cartProducts = cartProducts.map {
-            it.copy(checked = true)
-        }.toMutableList()
+        this.checkedProductsIds.addAll(cartProducts.map { it.id })
     }
 
     operator fun get(index: Int): CartProduct {
@@ -29,7 +33,12 @@ class CartProducts(cartProducts: List<CartProduct>) {
 
     fun changeChecked(id: Int, checked: Boolean) {
         val index = cartProducts.indexOfFirst { it.id == id }
-        cartProducts[index] = cartProducts[index].copy(checked = checked)
+
+        if (checked) {
+            checkedProductsIds.add(cartProducts[index].id)
+        } else {
+            checkedProductsIds.remove(cartProducts[index].id)
+        }
     }
 
     fun findByProductId(productId: Int): CartProduct? {
@@ -39,9 +48,6 @@ class CartProducts(cartProducts: List<CartProduct>) {
     fun replaceAll(cartProducts: List<CartProduct>) {
         this.cartProducts.clear()
         this.cartProducts.addAll(cartProducts)
-        this.cartProducts.replaceAll {
-            it.copy(checked = true)
-        }
     }
 
     fun isEmpty(): Boolean {
@@ -64,5 +70,9 @@ class CartProducts(cartProducts: List<CartProduct>) {
 
     fun hasPrevPage(index: Int, size: Int): Boolean {
         return index * size - size >= 0
+    }
+
+    fun getCheckedState(item: CartProduct): Boolean {
+        return checkedProductsIds.contains(item.id)
     }
 }

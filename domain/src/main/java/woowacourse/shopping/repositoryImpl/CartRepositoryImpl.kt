@@ -33,7 +33,7 @@ class CartRepositoryImpl(
     }
 
     override fun getTotalPrice(): Int {
-        return cartItems.totalPrice
+        return cartItems.totalCheckedPrice
     }
 
     override fun insert(productId: Int) {

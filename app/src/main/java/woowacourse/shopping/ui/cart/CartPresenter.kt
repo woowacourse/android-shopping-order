@@ -71,6 +71,7 @@ class CartPresenter(
         }
 
         currentPage.replaceAll {
+            println("called: set up products check !")
             cartRepository.updateChecked(it.id, checked)
             it.copy(checked = checked)
         }
@@ -139,12 +140,15 @@ class CartPresenter(
 
     override fun navigateToItemDetail(productId: Int) {
         cartRepository.getAll { cartProducts ->
-            cartProducts.all().first { it.product.id == productId }.toUIModel().toProduct()
+            cartProducts.all()
+                .first { it.product.id == productId }
+                .toUIModel(true)
+                .toProduct()
                 .let { view.navigateToItemDetail(it.toUIModel()) }
         }
     }
 
     companion object {
-        private const val STEP = 5
+        private const val STEP: Int = 5
     }
 }

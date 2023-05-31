@@ -51,7 +51,6 @@ object CartConstant : BaseColumns {
                 ${cartProduct.id},
                 '${cartProduct.product.name}',
                 ${cartProduct.quantity},
-                ${cartProduct.checked},
                 ${cartProduct.product.price},
                 '${cartProduct.product.imageUrl}',
                 ${cartProduct.product.id},
@@ -83,13 +82,12 @@ object CartConstant : BaseColumns {
         return CartProduct(
             id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_ID)),
             quantity = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_COUNT)),
-            checked = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_CHECKED)) == 1,
             product = Product(
                 id = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRODUCT_ID)),
                 name = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_NAME)),
                 price = cursor.getInt(cursor.getColumnIndexOrThrow(TABLE_COLUMN_PRICE)),
-                imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL))
-            )
+                imageUrl = cursor.getString(cursor.getColumnIndexOrThrow(TABLE_COLUMN_IMAGE_URL)),
+            ),
         )
     }
 }

@@ -30,13 +30,12 @@ class CartDatabase(context: Context) : CartRepository {
             return CartProduct(
                 id = it.id,
                 quantity = it.quantity,
-                checked = it.checked,
                 product = Product(
                     id = it.product.id,
                     name = it.product.name,
                     price = it.product.price,
-                    imageUrl = it.product.imageUrl
-                )
+                    imageUrl = it.product.imageUrl,
+                ),
             )
         }
     }
@@ -62,11 +61,11 @@ class CartDatabase(context: Context) : CartRepository {
     }
 
     override fun getTotalSelectedCount(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.quantity }
+        return cartProducts.totalCheckedQuantity
     }
 
     override fun getTotalPrice(): Int {
-        return cartProducts.all().filter { it.checked }.sumOf { it.product.price * it.quantity }
+        return cartProducts.totalCheckedPrice
     }
 
     override fun insert(productId: Int) {
