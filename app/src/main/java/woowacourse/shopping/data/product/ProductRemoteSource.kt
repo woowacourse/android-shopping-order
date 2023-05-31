@@ -8,7 +8,7 @@ import woowacourse.shopping.data.entity.ProductEntity
 import woowacourse.shopping.data.entity.ProductEntity.Companion.toDomain
 import woowacourse.shopping.domain.product.Product
 
-class ProductRemoteService(retrofit: Retrofit) : ProductDataSource {
+class ProductRemoteSource(retrofit: Retrofit) : ProductDataSource {
     private val productService = retrofit.create(ProductRetrofitService::class.java)
 
     override fun findAll(onFinish: (List<Product>) -> Unit) {

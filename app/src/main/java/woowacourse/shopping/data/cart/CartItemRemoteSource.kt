@@ -11,7 +11,7 @@ import woowacourse.shopping.data.entity.QuantityEntity
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
 
-class CartItemRemoteService(retrofit: Retrofit) : CartItemDataSource {
+class CartItemRemoteSource(retrofit: Retrofit) : CartItemDataSource {
     private val cartItemService = retrofit.create(CartItemRetrofitService::class.java)
     override fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit) {
         cartItemService.postCartItem("Basic ${user.token}", ProductIdEntity(cartItem.product.id))
@@ -38,8 +38,7 @@ class CartItemRemoteService(retrofit: Retrofit) : CartItemDataSource {
                 }
 
                 override fun onResponse(
-                    call: Call<List<CartItemEntity>>,
-                    response: Response<List<CartItemEntity>>
+                    call: Call<List<CartItemEntity>>, response: Response<List<CartItemEntity>>
                 ) {
                     if (response.code() != 200) return
                     onFinish(response.body()?.map { it.toDomain() } ?: return)
@@ -54,8 +53,7 @@ class CartItemRemoteService(retrofit: Retrofit) : CartItemDataSource {
                 }
 
                 override fun onResponse(
-                    call: Call<List<CartItemEntity>>,
-                    response: Response<List<CartItemEntity>>
+                    call: Call<List<CartItemEntity>>, response: Response<List<CartItemEntity>>
                 ) {
                     if (response.code() != 200) return
                     val cartItems = response.body() ?: return

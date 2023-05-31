@@ -9,13 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingRetrofit
-import woowacourse.shopping.data.cart.CartItemRemoteService
+import woowacourse.shopping.data.cart.CartItemRemoteSource
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductRemoteService
+import woowacourse.shopping.data.product.ProductRemoteSource
 import woowacourse.shopping.data.recentlyviewedproduct.DefaultRecentlyViewedProductRepository
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemorySource
 import woowacourse.shopping.data.user.DefaultUserRepository
 import woowacourse.shopping.data.user.UserMemorySource
 import woowacourse.shopping.data.user.UserRemoteSource
@@ -32,16 +32,16 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
             this,
-            DefaultProductRepository(ProductRemoteService(ShoppingRetrofit.retrofit)),
+            DefaultProductRepository(ProductRemoteSource(ShoppingRetrofit.retrofit)),
             DefaultCartItemRepository(
-                CartItemRemoteService(ShoppingRetrofit.retrofit)
+                CartItemRemoteSource(ShoppingRetrofit.retrofit)
             ),
             DefaultUserRepository(UserMemorySource(), UserRemoteSource()),
             DefaultRecentlyViewedProductRepository(
-                RecentlyViewedProductMemoryDao(
+                RecentlyViewedProductMemorySource(
                     DbHelper.getDbInstance(this)
                 ),
-                ProductRemoteService(ShoppingRetrofit.retrofit)
+                ProductRemoteSource(ShoppingRetrofit.retrofit)
             ),
         )
     }

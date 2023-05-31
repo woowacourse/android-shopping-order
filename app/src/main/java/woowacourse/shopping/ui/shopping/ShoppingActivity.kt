@@ -9,13 +9,13 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.data.ShoppingRetrofit
-import woowacourse.shopping.data.cart.CartItemRemoteService
+import woowacourse.shopping.data.cart.CartItemRemoteSource
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
 import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductRemoteService
+import woowacourse.shopping.data.product.ProductRemoteSource
 import woowacourse.shopping.data.recentlyviewedproduct.DefaultRecentlyViewedProductRepository
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemorySource
 import woowacourse.shopping.data.user.DefaultUserRepository
 import woowacourse.shopping.data.user.UserMemorySource
 import woowacourse.shopping.data.user.UserRemoteSource
@@ -162,16 +162,16 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun createPresenter(): ShoppingPresenter {
-        val productRemoteService = ProductRemoteService(ShoppingRetrofit.retrofit)
+        val productRemoteSource = ProductRemoteSource(ShoppingRetrofit.retrofit)
         val dbHelper = DbHelper.getDbInstance(this)
-        val recentlyViewedProductMemoryDao = RecentlyViewedProductMemoryDao(dbHelper)
+        val recentlyViewedProductMemorySource = RecentlyViewedProductMemorySource(dbHelper)
         val defaultRecentlyViewedProductRepository = DefaultRecentlyViewedProductRepository(
-            recentlyViewedProductMemoryDao, productRemoteService
+            recentlyViewedProductMemorySource, productRemoteSource
         )
         val defaultCartItemRepository = DefaultCartItemRepository(
-            CartItemRemoteService(ShoppingRetrofit.retrofit)
+            CartItemRemoteSource(ShoppingRetrofit.retrofit)
         )
-        val defaultProductRepository = DefaultProductRepository(productRemoteService)
+        val defaultProductRepository = DefaultProductRepository(productRemoteSource)
         val userRepository = DefaultUserRepository(UserMemorySource(), UserRemoteSource())
         return ShoppingPresenter(
             this,

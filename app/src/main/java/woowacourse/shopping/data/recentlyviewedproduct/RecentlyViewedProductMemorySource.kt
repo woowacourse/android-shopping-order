@@ -9,12 +9,10 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import java.time.LocalDateTime
 
-class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase) :
+class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
     RecentlyViewedProductDataSource {
     override fun save(
-        product: Product,
-        viewedTime: LocalDateTime,
-        onFinish: (RecentlyViewedProduct) -> Unit
+        product: Product, viewedTime: LocalDateTime, onFinish: (RecentlyViewedProduct) -> Unit
     ) {
         deleteRecentlyViewedProductIfSameProductExists(product)
 
@@ -45,8 +43,7 @@ class RecentlyViewedProductMemoryDao(private val db: SQLiteDatabase) :
             SELECT * FROM ${ProductContract.RecentlyViewedProductEntry.TABLE_NAME}
             ORDER BY ${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME} DESC
             LIMIT $limit
-            """.trimIndent(),
-            null
+            """.trimIndent(), null
         )
 
         while (cursor.moveToNext()) {
