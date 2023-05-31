@@ -10,16 +10,18 @@ import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.util.getSerializableCompat
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     private val presenter: OrderDetailContract.Presenter by lazy {
         OrderDetailPresenter(
+            view = this,
             orderRepository = OrderRepositoryImpl(
                 orderRemoteDataSource = OrderRemoteDataSourceImpl()
             ),
-            orderId = 1,
-            view = this
+            orderId = intent.getIntExtra(ORDER_ID, -1),
+            order = intent.getSerializableCompat(ORDER_RECORD)
         )
     }
     private val binding: ActivityOrderDetailBinding by lazy {
