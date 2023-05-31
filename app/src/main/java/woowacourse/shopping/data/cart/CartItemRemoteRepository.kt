@@ -10,7 +10,7 @@ import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.UserData
 
 class CartItemRemoteRepository(
-    private val cache: CartItemLocalCache = CartItemLocalCache
+    private val cache: CartItemMemoryCache = CartItemMemoryCache
 ) : CartItemRepository {
 
     private val cartItemRemoteService: CartItemRemoteService = Retrofit.Builder()
@@ -94,10 +94,8 @@ class CartItemRemoteRepository(
         onFinish: (List<CartItem>) -> Unit
     ) {
         if (cache.isActivated) {
-            val cartItems = cache.findAll()
-            val slicedCartItems = cartItems.slice(offset until cartItems.size)
-                .take(limit)
-            onFinish(slicedCartItems)
+            val cartItems = cache.findAll(limit, offset)
+            onFinish(cartItems)
             return
         }
 

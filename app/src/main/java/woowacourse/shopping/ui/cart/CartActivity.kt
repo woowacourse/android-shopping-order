@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartItemLocalCache
+import woowacourse.shopping.data.cart.CartItemMemoryCache
 import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
@@ -65,7 +65,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun onPause() {
-        CartItemLocalCache.clear()
+        CartItemMemoryCache.clear()
         super.onPause()
     }
 

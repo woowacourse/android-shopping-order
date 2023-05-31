@@ -2,7 +2,7 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.CartItem
 
-object CartItemLocalCache {
+object CartItemMemoryCache {
 
     private val cartItems: MutableMap<Long, CartItem> = mutableMapOf()
 
