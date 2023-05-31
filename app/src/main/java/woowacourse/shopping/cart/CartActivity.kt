@@ -61,7 +61,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cartTotalPrice.text = getString(R.string.product_price, price)
     }
 
-    override fun updateCartTotalAmount(amount: Int) {
+    override fun updateCartTotalQuantity(amount: Int) {
         binding.cartOrderButton.text = getString(R.string.order_button, amount)
     }
 
@@ -93,7 +93,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 presenter.goToNextPage()
             },
             onCheckBoxClick = { cartProductModel ->
-                presenter.changeCartProductChecked(cartProductModel)
+                presenter.reverseCartProductChecked(cartProductModel)
                 presenter.updateAllChecked()
             },
             onMinusAmountButtonClick = {
@@ -108,7 +108,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun setupCartProductAllCheckbox() {
         binding.cartProductAllCheckbox.setOnClickListener {
-            presenter.updateCartProductCheckedInPage(binding.cartProductAllCheckbox.isChecked)
+            presenter.changeAllChecked(binding.cartProductAllCheckbox.isChecked)
         }
     }
 

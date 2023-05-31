@@ -54,13 +54,6 @@ class CartRepositoryImpl(
     //     return cartDao.getTotalPrice()
     // }
 
-    override fun isAllCheckedInPage(page: Int, sizePerPage: Int): Boolean {
-        // val startIndex = page * sizePerPage
-        // val cartInPage = cart.getSubCart(startIndex, startIndex + sizePerPage)
-        // return cartInPage.cartProducts.all { it.isChecked }
-        return true
-    }
-
     override fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: () -> Unit) {
         getAll(
             onSuccess = { products ->

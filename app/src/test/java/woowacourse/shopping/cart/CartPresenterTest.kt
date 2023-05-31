@@ -26,8 +26,7 @@ class CartPresenterTest {
         every { view.updateNavigationVisibility(any()) } just runs
         every { view.updateCart(any(), any(), any()) } just runs
         every { view.updateCartTotalPrice(any()) } just runs
-        every { view.updateCartTotalAmount(any()) } just runs
-        every { cartRepository.isAllCheckedInPage(any(), any()) } returns true
+        every { view.updateCartTotalQuantity(any()) } just runs
         every { view.updateAllChecked(any()) } just runs
         every { cartRepository.getAllCount(any(), any()) } just runs
 
@@ -66,7 +65,7 @@ class CartPresenterTest {
         // when
 
         // then
-        verify { view.updateCartTotalAmount(any()) }
+        verify { view.updateCartTotalQuantity(any()) }
     }
 
     @Test
@@ -123,7 +122,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any()) } just runs
 
         // when
-        presenter.changeCartProductChecked(createCartProductModel())
+        presenter.reverseCartProductChecked(createCartProductModel())
 
         // then
         verify {
@@ -138,7 +137,7 @@ class CartPresenterTest {
         every { view.updateCartTotalPrice(any()) } just runs
 
         // when
-        presenter.changeCartProductChecked(createCartProductModel())
+        presenter.reverseCartProductChecked(createCartProductModel())
 
         // then
         verify(exactly = 2) { view.updateCartTotalPrice(any()) }
@@ -148,13 +147,13 @@ class CartPresenterTest {
     fun 카트_상품의_체크_상태를_업데이트_하면_총_수량이_업데이트_된다() {
         // given
         every { view.updateCartProduct(any()) } just runs
-        every { view.updateCartTotalAmount(any()) } just runs
+        every { view.updateCartTotalQuantity(any()) } just runs
 
         // when
-        presenter.changeCartProductChecked(createCartProductModel())
+        presenter.reverseCartProductChecked(createCartProductModel())
 
         // then
-        verify(exactly = 2) { view.updateCartTotalAmount(any()) }
+        verify(exactly = 2) { view.updateCartTotalQuantity(any()) }
     }
 
     @Test
@@ -166,7 +165,6 @@ class CartPresenterTest {
 
         // then
         verify(exactly = 2) {
-            cartRepository.isAllCheckedInPage(any(), any())
             view.updateAllChecked(any())
         }
     }
@@ -201,7 +199,7 @@ class CartPresenterTest {
         // then
         verify(exactly = 1) {
             view.updateCartTotalPrice(any())
-            view.updateCartTotalAmount(any())
+            view.updateCartTotalQuantity(any())
         }
     }
 
@@ -218,7 +216,7 @@ class CartPresenterTest {
         // then
         verify(exactly = 2) {
             view.updateCartTotalPrice(any())
-            view.updateCartTotalAmount(any())
+            view.updateCartTotalQuantity(any())
         }
     }
 
@@ -267,7 +265,7 @@ class CartPresenterTest {
         // then
         verify(exactly = 1) {
             view.updateCartTotalPrice(any())
-            view.updateCartTotalAmount(any())
+            view.updateCartTotalQuantity(any())
         }
     }
 
@@ -284,7 +282,7 @@ class CartPresenterTest {
         // then
         verify(exactly = 2) {
             view.updateCartTotalPrice(any())
-            view.updateCartTotalAmount(any())
+            view.updateCartTotalQuantity(any())
         }
     }
 
@@ -298,7 +296,7 @@ class CartPresenterTest {
         every { view.updateCartProduct(any()) } just runs
 
         // when
-        presenter.updateCartProductCheckedInPage(true)
+        presenter.changeAllChecked(true)
 
         // then
         val expected = 3

@@ -10,7 +10,7 @@ interface CartContract {
 
         fun goToNextPage()
 
-        fun changeCartProductChecked(cartProductModel: CartProductModel)
+        fun reverseCartProductChecked(cartProductModel: CartProductModel)
 
         fun updateAllChecked()
 
@@ -18,7 +18,7 @@ interface CartContract {
 
         fun increaseCartProductAmount(cartProductModel: CartProductModel)
 
-        fun updateCartProductCheckedInPage(isChecked: Boolean)
+        fun changeAllChecked(isChecked: Boolean)
     }
 
     interface View {
@@ -28,7 +28,7 @@ interface CartContract {
 
         fun updateCartTotalPrice(price: Int)
 
-        fun updateCartTotalAmount(amount: Int)
+        fun updateCartTotalQuantity(amount: Int)
 
         fun setResultForChange()
 

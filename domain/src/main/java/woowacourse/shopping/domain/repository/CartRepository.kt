@@ -20,7 +20,5 @@ interface CartRepository {
 
     // fun getTotalPrice(): Int
 
-    fun isAllCheckedInPage(page: Int, sizePerPage: Int): Boolean
-
     fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: () -> Unit)
 }
