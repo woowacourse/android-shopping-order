@@ -68,6 +68,10 @@ class ProductListPresenter(
 
     override fun loadCartItems() {
         cartRepository.loadAllCarts(::onFailure) { carts ->
+            val productIdToCartId = carts.associate { it.product.id to it.id }
+            cartProducts =
+                cartProducts.toModel().updateCartIdsByProductIds(productIdToCartId).toUIModel()
+
             val cartIdsCount = carts.associate { it.id to it.count }
             cartProducts =
                 cartProducts.toModel().updateCartCountByCartIds(cartIdsCount).toUIModel()

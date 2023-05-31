@@ -18,6 +18,12 @@ data class CartProduct(
         return copy(count = count)
     }
 
+    fun updateCartIdByProductId(cartId: Long, productId: Long): CartProduct {
+        if (productId == product.id)
+            return copy(id = cartId)
+        return this
+    }
+
     companion object {
         private const val MIN_COUNT = 0
         private const val MAX_COUNT = 99

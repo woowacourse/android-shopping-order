@@ -66,6 +66,15 @@ class CartProducts(
         )
     }
 
+    fun updateCartIdsByProductIds(productIdToCartId: Map<Long, Long>): CartProducts {
+        return CartProducts(
+            carts.map { cart ->
+                val cartId = productIdToCartId[cart.product.id] ?: cart.id
+                cart.updateCartIdByProductId(cartId, cart.product.id)
+            }
+        )
+    }
+
     fun updateAllCartsChecked(cartIds: List<Long>, checked: Boolean): CartProducts {
         val newCartProducts = carts.map {
             if (it.id in cartIds) {
