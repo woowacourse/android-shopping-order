@@ -9,9 +9,10 @@ import woowacourse.shopping.OrderProducts
 import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.order.model.OrderAddBody
 import woowacourse.shopping.data.order.model.OrderDataModel
 import woowacourse.shopping.data.order.model.OrderDetailDataModel
-import woowacourse.shopping.data.order.model.OrderItemBody
+import woowacourse.shopping.data.order.model.OrderProductBody
 import woowacourse.shopping.repository.OrderRepository
 
 class OrderRepositoryImpl constructor(
@@ -62,11 +63,16 @@ class OrderRepositoryImpl constructor(
             })
     }
 
-    override fun addOrder(orderProducts: OrderProducts, onSuccess: (String?) -> Unit) {
-        val orderItemBody = orderProducts.items.map {
-            OrderItemBody(productId = it.product.id, quantity = it.count)
+    override fun addOrder(
+        sendPoint: Int,
+        orderProducts: OrderProducts,
+        onSuccess: (String?) -> Unit
+    ) {
+        val orderProductBodies = orderProducts.items.map {
+            OrderProductBody(productId = it.product.id, quantity = it.count)
         }
-        orderRemoteDataSource.addOrder(orderItemBody)
+        val orderAddBody = OrderAddBody(sendPoint, orderProductBodies)
+        orderRemoteDataSource.addOrder(orderAddBody)
             .enqueue(object : Callback<BaseResponse<Unit>> {
                 override fun onResponse(
                     call: Call<BaseResponse<Unit>>,

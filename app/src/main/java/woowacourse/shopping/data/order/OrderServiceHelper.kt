@@ -4,9 +4,9 @@ import retrofit2.Call
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.data.common.model.BaseResponse
+import woowacourse.shopping.data.order.model.OrderAddBody
 import woowacourse.shopping.data.order.model.OrderDataModel
 import woowacourse.shopping.data.order.model.OrderDetailDataModel
-import woowacourse.shopping.data.order.model.OrderItemBody
 import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
 class OrderServiceHelper(
@@ -31,10 +31,10 @@ class OrderServiceHelper(
         )
     }
 
-    override fun addOrder(orderItemBodies: List<OrderItemBody>): Call<BaseResponse<Unit>> {
+    override fun addOrder(orderAddBody: OrderAddBody): Call<BaseResponse<Unit>> {
         return orderService.addOrder(
             credentials = getAuthToken(),
-            orderItemBodies = orderItemBodies
+            orderAddBody = orderAddBody
         )
     }
 }

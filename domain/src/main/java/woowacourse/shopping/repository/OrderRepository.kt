@@ -7,5 +7,5 @@ import woowacourse.shopping.OrderProducts
 interface OrderRepository {
     fun getAllOrders(onSuccess: (List<Order>) -> Unit)
     fun getOrderDetail(orderId: Int, onSuccess: (OrderDetail?) -> Unit)
-    fun addOrder(orderProducts: OrderProducts, onSuccess: (String?) -> Unit)
+    fun addOrder(sendPoint: Int, orderProducts: OrderProducts, onSuccess: (String?) -> Unit)
 }
