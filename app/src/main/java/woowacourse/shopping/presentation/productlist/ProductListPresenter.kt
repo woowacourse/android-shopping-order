@@ -60,12 +60,20 @@ class ProductListPresenter(
 
     override fun addCartProductCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count + COUNT_UNIT
-        cartRepository.insertCartProduct(cartProductModel.productModel.id, COUNT_UNIT) {
+        if (cartProductModel.cartId == 0L) {
+            insertCartProduct(cartProductModel)
+            return
+        }
+        updateCartProduct(cartProductModel, nextCount)
+    }
+
+    private fun insertCartProduct(cartProductModel: CartProductModel) {
+        cartRepository.insertCartProduct(cartProductModel.productModel.id, COUNT_UNIT) { cartId ->
             view.replaceProductModel(
                 UnCheckableCartProductModel(
-                    cartProductModel.cartId,
+                    cartId,
                     cartProductModel.productModel,
-                    nextCount,
+                    COUNT_UNIT,
                 ),
             )
             loadCartCount()
@@ -74,7 +82,14 @@ class ProductListPresenter(
 
     override fun subCartProductCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count - COUNT_UNIT
-        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount) {
+        updateCartProduct(cartProductModel, nextCount)
+    }
+
+    private fun updateCartProduct(
+        cartProductModel: CartProductModel,
+        nextCount: Int,
+    ) {
+        cartRepository.updateCartProductCount(cartProductModel.cartId, nextCount) {
             view.replaceProductModel(
                 UnCheckableCartProductModel(
                     cartProductModel.cartId,

@@ -38,28 +38,16 @@ class CartRepositoryImpl(
         cartDataSource.deleteCartProduct(cartId, callback)
     }
 
-    override fun insertCartProduct(productId: Long, count: Int, callback: () -> Unit) {
-        cartDataSource.insertCartProduct(productId) { cartId ->
-            if (count > 1) {
-                cartDataSource.updateCartProduct(cartId, count) {
-                    callback()
-                    return@updateCartProduct
-                }
-            }
-        }
-        callback()
+    override fun insertCartProduct(productId: Long, count: Int, callback: (cartId: Long) -> Unit) {
+        cartDataSource.insertCartProduct(productId, count, callback)
     }
 
     override fun updateCartProductCount(cartId: Long, count: Int, callback: () -> Unit) {
         if (count <= 0) {
-            cartDataSource.deleteCartProduct(cartId) {
-                callback()
-                return@deleteCartProduct
-            }
+            cartDataSource.deleteCartProduct(cartId, callback)
+            return
         }
-        cartDataSource.updateCartProduct(cartId, count) {
-            callback()
-        }
+        cartDataSource.updateCartProduct(cartId, count, callback)
     }
 
     override fun getProductsByRange(

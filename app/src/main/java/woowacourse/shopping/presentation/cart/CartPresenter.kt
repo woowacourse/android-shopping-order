@@ -52,7 +52,7 @@ class CartPresenter(
 
     override fun addProductCartCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count + CART_UNIT
-        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount) {
+        cartRepository.updateCartProductCount(cartProductModel.cartId, nextCount) {
             cartPages.addCountProducts(cartProductModel.productModel.toDomain())
             updateProductsInCurrentPage()
         }
@@ -60,7 +60,8 @@ class CartPresenter(
 
     override fun subProductCartCount(cartProductModel: CartProductModel) {
         val nextCount = cartProductModel.count - CART_UNIT
-        cartRepository.updateCartProductCount(cartProductModel.productModel.id, nextCount) {
+        if (nextCount < 1) return
+        cartRepository.updateCartProductCount(cartProductModel.cartId, nextCount) {
             cartPages.subCountProducts(cartProductModel.productModel.toDomain())
             updateProductsInCurrentPage()
         }

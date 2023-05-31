@@ -9,7 +9,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.cart.dto.CartProducts
-import woowacourse.shopping.data.cart.dto.Location
+import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
 
 interface CartRetrofitService {
 
@@ -21,19 +21,19 @@ interface CartRetrofitService {
     @POST("/cart-items")
     fun insertCartProduct(
         @Header("Authorization") authorization: String,
-        @Body productId: Long,
-    ): Call<Location>
+        @Body productInsertRequest: ProductInsertCartRequest,
+    ): Call<Unit>
 
     @PATCH("/cart-items/{cartItemId}")
     fun updateCartProduct(
         @Header("Authorization") authorization: String,
         @Path("cartItemId") cartItemId: Long,
         @Body quantity: Int,
-    ): Call<Nothing>
+    ): Call<Unit>
 
     @DELETE("/cart-items/{cartItemId}")
     fun deleteCartProduct(
         @Header("Authorization") authorization: String,
         @Path("cartItemId") cartItemId: Long,
-    ): Call<Nothing>
+    ): Call<Unit>
 }

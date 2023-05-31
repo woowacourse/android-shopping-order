@@ -34,7 +34,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         val recentProductDao =
             RecentProductDatabase.getInstance(applicationContext).recentProductDao()
         val recentProductRepository = RecentProductRepositoryImpl(recentProductDao)
-
         val cartProductRepository = CartRepositoryImpl(cartDataSource, productDataSource)
 
         ProductListPresenter(this, cartProductRepository, recentProductRepository)

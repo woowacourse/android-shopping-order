@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.cart.dto.CartProduct
 import woowacourse.shopping.data.cart.dto.CartProducts
-import woowacourse.shopping.data.cart.dto.Location
+import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
 
 class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDataSource {
 
@@ -16,18 +16,23 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
         .build()
         .create(CartRetrofitService::class.java)
 
-    override fun insertCartProduct(productId: Long, callback: (cartId: Long) -> Unit) {
-        retrofitService.insertCartProduct(userId, productId)
+    override fun insertCartProduct(
+        productId: Long,
+        quantity: Int,
+        callback: (cartId: Long) -> Unit,
+    ) {
+        retrofitService.insertCartProduct(userId, ProductInsertCartRequest(productId, quantity))
             .enqueue(
-                object : retrofit2.Callback<Location> {
+                object : retrofit2.Callback<Unit> {
                     override fun onResponse(
-                        call: Call<Location>,
-                        response: Response<Location>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
-                        callback(response.body()?.id ?: 0)
+                        val location = response.headers()["Location"]?.split("/")?.last()
+                        callback(location?.toLong() ?: 0)
                     }
 
-                    override fun onFailure(call: Call<Location>, t: Throwable) {
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
                     }
                 },
             )
@@ -36,15 +41,15 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     override fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit) {
         retrofitService.updateCartProduct(userId, cartId, quantity)
             .enqueue(
-                object : retrofit2.Callback<Nothing> {
+                object : retrofit2.Callback<Unit> {
                     override fun onResponse(
-                        call: Call<Nothing>,
-                        response: Response<Nothing>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
                         callback()
                     }
 
-                    override fun onFailure(call: Call<Nothing>, t: Throwable) {
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
                     }
                 },
             )
@@ -53,15 +58,15 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
         retrofitService.deleteCartProduct(userId, cartId)
             .enqueue(
-                object : retrofit2.Callback<Nothing> {
+                object : retrofit2.Callback<Unit> {
                     override fun onResponse(
-                        call: Call<Nothing>,
-                        response: Response<Nothing>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
                         callback()
                     }
 
-                    override fun onFailure(call: Call<Nothing>, t: Throwable) {
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
                     }
                 },
             )

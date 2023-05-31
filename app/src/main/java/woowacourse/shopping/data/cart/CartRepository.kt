@@ -5,7 +5,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.presentation.model.CartProductModel
 
 interface CartRepository {
-    fun insertCartProduct(productId: Long, count: Int, callback: () -> Unit)
+    fun insertCartProduct(productId: Long, count: Int, callback: (cartId: Long) -> Unit)
     fun updateCartProductCount(cartId: Long, count: Int, callback: () -> Unit)
     fun deleteCartProduct(cartId: Long, callback: () -> Unit)
     fun getCartProducts(callback: (List<CartProduct>) -> Unit)
