@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.common.BaseResponse
+import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.order.model.OrderDataModel
 import woowacourse.shopping.data.order.model.OrderDetailDataModel
 import woowacourse.shopping.data.order.model.OrderItemBody

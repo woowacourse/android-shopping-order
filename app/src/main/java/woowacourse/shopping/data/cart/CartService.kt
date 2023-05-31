@@ -9,6 +9,9 @@ import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import woowacourse.shopping.data.cart.model.AddCartRequestBody
+import woowacourse.shopping.data.cart.model.CartDataModel
+import woowacourse.shopping.data.cart.model.UpdateQuantityRequestBody
 
 interface CartService {
     @GET("cart-items")

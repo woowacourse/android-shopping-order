@@ -1,3 +1,3 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.cart.model
 
 data class UpdateQuantityRequestBody(val quantity: Int)

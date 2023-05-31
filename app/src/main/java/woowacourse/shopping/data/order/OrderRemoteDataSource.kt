@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.order
 
 import retrofit2.Call
-import woowacourse.shopping.data.common.BaseResponse
+import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.order.model.OrderDataModel
 import woowacourse.shopping.data.order.model.OrderDetailDataModel
 import woowacourse.shopping.data.order.model.OrderItemBody

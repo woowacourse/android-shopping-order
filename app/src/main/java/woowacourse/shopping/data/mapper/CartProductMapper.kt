@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.CartProductInfo
-import woowacourse.shopping.data.cart.CartDataModel
+import woowacourse.shopping.data.cart.model.CartDataModel
 
 fun CartDataModel.toDomain(): CartProductInfo {
     return CartProductInfo(

@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.cart
 
 import retrofit2.Call
+import woowacourse.shopping.data.cart.model.CartDataModel
 
 interface CartRemoteDataSource {
     fun addCartItem(productId: Int): Call<Unit>

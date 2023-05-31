@@ -7,7 +7,7 @@ import woowacourse.shopping.Order
 import woowacourse.shopping.OrderDetail
 import woowacourse.shopping.OrderProducts
 import woowacourse.shopping.data.HttpErrorHandler
-import woowacourse.shopping.data.common.BaseResponse
+import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.order.model.OrderDataModel
 import woowacourse.shopping.data.order.model.OrderDetailDataModel

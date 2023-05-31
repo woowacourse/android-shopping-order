@@ -6,6 +6,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
+import woowacourse.shopping.data.cart.model.CartDataModel
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.repository.CartRepository
 

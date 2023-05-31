@@ -2,6 +2,9 @@ package woowacourse.shopping.data.cart
 
 import retrofit2.Call
 import woowacourse.shopping.data.ApiClient
+import woowacourse.shopping.data.cart.model.AddCartRequestBody
+import woowacourse.shopping.data.cart.model.CartDataModel
+import woowacourse.shopping.data.cart.model.UpdateQuantityRequestBody
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
