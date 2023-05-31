@@ -1,26 +1,18 @@
 package woowacourse.shopping.ui.basket
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.user.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
-import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
-import woowacourse.shopping.databinding.DialogUsingPointBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
 import woowacourse.shopping.ui.model.UiBasketProduct
-import woowacourse.shopping.ui.model.User
-import woowacourse.shopping.ui.orderfinish.OrderDetailActivity
+import woowacourse.shopping.ui.payment.PaymentActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
@@ -28,8 +20,6 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     private lateinit var presenter: BasketContract.Presenter
     private lateinit var binding: ActivityBasketBinding
     private lateinit var basketAdapter: BasketAdapter
-    private lateinit var dialogBinding: DialogUsingPointBinding
-    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,10 +51,10 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     private fun initPresenter() {
         presenter = BasketPresenter(
-            this,
-            basketRepository = BasketRepositoryImpl(BasketRemoteDataSourceImpl()),
-            userRepository = UserRepositoryImpl(UserRemoteDataSourceImpl()),
-            orderRepository = OrderRepositoryImpl(OrderRemoteDataSourceImpl()),
+            view = this,
+            basketRepository = BasketRepositoryImpl(
+                basketRemoteDataSource = BasketRemoteDataSourceImpl()
+            ),
         )
     }
 
@@ -124,15 +114,10 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         binding.isLoaded = isLoaded
     }
 
-    override fun showUsingPointDialog(user: User) {
-        initUsingPointDialog(user)
-        dialog.show()
-    }
-
-    override fun navigateToOrderDetail(orderId: Int) {
-        val intent = OrderDetailActivity.getIntent(
+    override fun showPaymentView(basketProducts: List<UiBasketProduct>) {
+        val intent = PaymentActivity.getIntent(
             context = this,
-            orderId = 1
+            basketProducts = basketProducts.toTypedArray()
         )
 
         startActivity(intent)
@@ -140,32 +125,8 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     private fun initOrderButtonListener() {
         binding.tvOrder.setOnClickListener {
-            presenter.usePoint()
+            presenter.startPayment()
         }
-    }
-
-    private fun initUsingPointDialog(user: User) {
-        dialogBinding = DialogUsingPointBinding.inflate(layoutInflater).apply {
-            this.user = user
-            btnDialogOrder.setOnClickListener {
-                val usingPoint = tvUsingPoint.text
-                    .toString()
-                    .toInt()
-
-                presenter.addOrder(usingPoint)
-            }
-            tvUsingPoint.addTextChangedListener {
-                if (!it.isNullOrBlank()) {
-                    val usingPoint = it.toString().toInt()
-
-                    btnDialogOrder.isEnabled = user.point >= usingPoint
-                }
-            }
-        }
-
-        dialog = AlertDialog.Builder(this)
-            .setView(dialogBinding.root)
-            .create()
     }
 
     companion object {
