@@ -2,10 +2,19 @@ package woowacourse.shopping.data.service.order
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
-import woowacourse.shopping.data.dto.OrderRequest
+import retrofit2.http.Query
+import woowacourse.shopping.data.dto.OrderPostRequest
+import woowacourse.shopping.data.dto.OrderResponse
 
 interface OrderService {
     @POST("/orders")
-    fun order(@Body orderRequest: OrderRequest): Call<Unit>
+    fun order(@Body orderPostRequest: OrderPostRequest): Call<Unit>
+
+    @GET("/orders")
+    fun getOrders(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Call<List<OrderResponse>>
 }

@@ -13,7 +13,7 @@ import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
-import woowacourse.shopping.ui.orderlist.OrderListActivity
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore.LoadMoreAdapter
@@ -104,7 +104,7 @@ class ShoppingActivity : AppCompatActivity(), View,
     }
 
     override fun navigateToOrderList() {
-        startActivity(OrderListActivity.getIntent(this))
+        startActivity(OrderHistoryActivity.getIntent(this))
     }
 
     override fun updateCartBadge(count: ProductCount) {

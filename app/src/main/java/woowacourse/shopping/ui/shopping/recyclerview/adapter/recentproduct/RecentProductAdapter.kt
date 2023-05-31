@@ -9,7 +9,7 @@ class RecentProductAdapter(private val onItemClick: (UiRecentProduct) -> Unit) :
     ListAdapter<UiRecentProduct, RecentProductViewHolder>(RecentProductDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentProductViewHolder =
-        RecentProductViewHolder(parent) { pos -> onItemClick(currentList[pos]) }
+        RecentProductViewHolder(parent) { pos -> onItemClick(getItem(pos)) }
 
     override fun onBindViewHolder(holder: RecentProductViewHolder, position: Int) {
         holder.bind(getItem(position))

@@ -15,7 +15,7 @@
         android:layout_height="153dp"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/shape_woowa_light_gray_line_1_rect">
+        android:background="@drawable/shape_order_item">
 
         <woowacourse.shopping.widget.SkeletonTextView
             android:id="@+id/product_name_text_view"

@@ -39,4 +39,9 @@
     <string name="use_point_icon_desc">use point icon</string>
     <string name="order_load_failed_message">주문 정보 로딩에 실패하였습니다!</string>
     <string name="order_list">주문 목록</string>
+    <string name="inquiry_order_detail">상세보기  ></string>
+    <string name="load_order_failed_message">주문 목록을 불러오는데 실패했습니다.</string>
+    <string name="order_number_format">주문번호 : %d</string>
+    <string name="order_product_name_format_with_quantity">%s 외 %,d개</string>
+    <string name="product_total_payment_and_count_format">%,d원 / 수량 : %,d개</string>
 </resources>

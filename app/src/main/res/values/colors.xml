@@ -10,7 +10,9 @@
 
     <color name="woowa_dark_gray">#555555</color>
     <color name="woowa_text_black">#333333</color>
+    <color name="woowa_extra_light_gray">#D8D8D8</color>
     <color name="woowa_light_gray">#AAAAAA</color>
+    <color name="woowa_gray_500">#9A9A9A</color>
     <color name="woowa_emerald">#04C09E</color>
     <color name="woowa_divider">#EBEBEB</color>
     <color name="woowa_previous_disable">#E6E6E6</color>
@@ -19,4 +21,5 @@
 
     <!-- Skeleton custom view -->
     <color name="skeleton_background">#E2E2E2</color>
+    <color name="order_list_background_color">#FAFAFA</color>
 </resources>

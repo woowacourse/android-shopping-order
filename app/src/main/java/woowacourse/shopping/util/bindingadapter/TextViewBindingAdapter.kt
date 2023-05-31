@@ -15,3 +15,23 @@ fun TextView.setPrice(price: UiPrice?) {
 fun TextView.setQuantity(quantity: UiProductCount) {
     text = context.getString(R.string.quantity_format, quantity.value)
 }
+
+@BindingAdapter(
+    "bind:productName",
+    "bind:orderProductSize",
+    requireAll = true
+)
+fun TextView.setOrderProductNameWithSize(
+    productName: String,
+    orderProductSize: Int,
+) {
+    text = if (orderProductSize > 1) {
+        context.getString(
+            R.string.order_product_name_format_with_quantity,
+            productName,
+            orderProductSize - 1
+        )
+    } else {
+        productName
+    }
+}

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="order"
+            type="woowacourse.shopping.model.Order" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardElevation="12dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="12dp">
+
+            <TextView
+                android:id="@+id/order_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/order_number_format(order.id)}"
+                android:textColor="@color/woowa_text_black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="주문번호 : 1" />
+
+            <TextView
+                android:id="@+id/order_detail_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/inquiry_order_detail"
+                android:textColor="@color/woowa_emerald"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_order_item"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/order_detail_button">
+
+                <woowacourse.shopping.widget.SkeletonImageView
+                    android:id="@+id/product_detail_image_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="12dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.3"
+                    bind:imageUrl="@{order.thumbnailUrl}"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <woowacourse.shopping.widget.SkeletonTextView
+                    android:id="@+id/product_name_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="18dp"
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/woowa_text_black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/product_detail_image_view"
+                    app:layout_constraintTop_toTopOf="parent"
+                    bind:orderProductSize="@{order.orderProductSize}"
+                    bind:productName="@{order.firstOrderProductName}"
+                    tools:text="랩디오 맥북 프로 15인치 클리어 투명 하드 케이스 A1707 A1990, 1707/A1990 (공용) 외 3개" />
+
+                <woowacourse.shopping.widget.SkeletonTextView
+                    android:id="@+id/total_payment_and_count_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@{@string/product_total_payment_and_count_format(order.firstProductTotalPayment, order.firstProductQuantity)}"
+                    android:textColor="@color/woowa_gray_500"
+                    app:layout_constraintEnd_toEndOf="@+id/product_name_text_view"
+                    app:layout_constraintStart_toStartOf="@+id/product_name_text_view"
+                    app:layout_constraintTop_toBottomOf="@+id/product_name_text_view"
+                    tools:text="54,700원 / 수량 : 1개" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>
