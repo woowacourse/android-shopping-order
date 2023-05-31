@@ -12,7 +12,7 @@ class CartProductViewHolder(
     private val onCartProductDeleteClick: (CartProductState) -> Unit,
     private val minusQuantity: (cartProductState: CartProductState) -> Unit,
     private val plusQuantity: (cartProductState: CartProductState) -> Unit,
-    private val updateChecked: (productId: Int, checked: Boolean) -> Unit
+    private val updateChecked: (productId: Long, checked: Boolean) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val binding = binding as ItemCartProductBinding
 
@@ -50,7 +50,7 @@ class CartProductViewHolder(
             onCartProductDeleteClick: (CartProductState) -> Unit,
             minusQuantity: (cartProductState: CartProductState) -> Unit,
             plusQuantity: (cartProductState: CartProductState) -> Unit,
-            updateChecked: (productId: Int, checked: Boolean) -> Unit
+            updateChecked: (productId: Long, checked: Boolean) -> Unit
         ): CartProductViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemCartProductBinding.inflate(inflater, parent, false)

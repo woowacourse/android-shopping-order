@@ -149,7 +149,7 @@ class RecentProductDao(
                 getLong(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME))
 
             return RecentProduct(
-                productId = productId,
+                productId = productId.toLong(),
                 productImageUrl = productImageUrl,
                 productName = productName,
                 productPrice = productPrice,

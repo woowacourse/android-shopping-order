@@ -9,7 +9,7 @@ class CartProductListAdapter(
     private val onCartProductDeleteClick: (cartProductState: CartProductState) -> Unit,
     private val minusQuantity: (cartProductState: CartProductState) -> Unit,
     private val plusQuantity: (cartProductState: CartProductState) -> Unit,
-    private val updateChecked: (productId: Int, checked: Boolean) -> Unit
+    private val updateChecked: (productId: Long, checked: Boolean) -> Unit
 ) : RecyclerView.Adapter<CartProductViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartProductViewHolder {

@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class RecentProductState(
-    val productId: Int,
+    val productId: Long,
     val productImageUrl: String,
     val productPrice: Int,
     val productName: String

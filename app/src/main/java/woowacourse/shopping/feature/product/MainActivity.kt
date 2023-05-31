@@ -16,9 +16,8 @@ import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
-import woowacourse.shopping.data.cart.CartRemoteService
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
+import woowacourse.shopping.data.cart.CartRemoteRepository
+import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -39,11 +38,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(serverUrl, CartRemoteService())
+        CartRemoteRepository(url = serverUrl)
     }
     private val presenter: MainContract.Presenter by lazy {
         val productRepository: ProductRepository =
-            ProductRepositoryImpl(serverUrl)
+            ProductRemoteRepository(serverUrl)
         val recentProductRepository: RecentProductRepository =
             RecentProductRepositoryImpl(this, serverUrl)
         MainPresenter(this, productRepository, recentProductRepository, cartRepository)
@@ -102,9 +101,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun addProductItems(products: List<ProductState>) {
-        runOnUiThread {
-            productListAdapter.addItems(products)
-        }
+        runOnUiThread { productListAdapter.addItems(products) }
     }
 
     override fun setProducts(products: List<Product>) {
