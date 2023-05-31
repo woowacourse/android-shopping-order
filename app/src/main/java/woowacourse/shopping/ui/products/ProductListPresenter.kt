@@ -49,8 +49,9 @@ class ProductListPresenter(
     ): List<ProductUIState> {
         val cartItemMap = cartItems.associateBy { it.product.id }
         return products.map { product ->
-            if (cartItemMap[product.id] != null) {
-                ProductUIState.from(cartItemMap[product.id]!!)
+            val cartItem = cartItemMap[product.id]
+            if (cartItem != null) {
+                ProductUIState.from(cartItem)
             } else {
                 ProductUIState.from(product)
             }
