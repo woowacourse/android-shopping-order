@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.model
 
-typealias DataUserPointData = UserPointData
+typealias DataUserPointInfo = UserPointData
 
 data class UserPointData(
     val point: DataPoint,

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.UserPointData
+import woowacourse.shopping.domain.UserPointInfo
 
 interface PointRepository {
-    fun getUserPointData(onReceived: (UserPointData) -> Unit)
+    fun getUserPointInfo(onReceived: (UserPointInfo) -> Unit)
 }

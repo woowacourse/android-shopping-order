@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain
 
-data class UserPointData(
+data class UserPointInfo(
     val point: Point,
     val earnRate: EarnRate
 )
