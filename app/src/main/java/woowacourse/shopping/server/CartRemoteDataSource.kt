@@ -23,7 +23,7 @@ class CartRemoteDataSource {
     fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
-        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val credentials = Storage.credential
         val json = JSONObject().put("productId", id)
         val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
@@ -52,7 +52,7 @@ class CartRemoteDataSource {
     fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
-        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val credentials = Storage.credential
         val request = Request.Builder()
             .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
             .url(url)
@@ -100,7 +100,7 @@ class CartRemoteDataSource {
     fun updateCartProductQuantity(id: Int, quantity: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH/$id"
-        val credentials = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+        val credentials = Storage.credential
         val json = JSONObject().put("quantity", quantity)
         val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
 

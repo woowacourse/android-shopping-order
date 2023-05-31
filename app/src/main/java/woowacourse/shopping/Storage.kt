@@ -7,12 +7,21 @@ import android.content.SharedPreferences
 object Storage {
     private lateinit var sharedPreferences: SharedPreferences
     private val KEY_SERVER = "server"
+    private val KEY_CREDENTIAL = "credential"
     var server: String
         get() = sharedPreferences.getString(KEY_SERVER, "") ?: ""
         set(value) {
             sharedPreferences
                 .edit()
                 .putString(KEY_SERVER, value)
+                .apply()
+        }
+    var credential: String
+        get() = sharedPreferences.getString(KEY_CREDENTIAL, "") ?: ""
+        set(value) {
+            sharedPreferences
+                .edit()
+                .putString(KEY_CREDENTIAL, "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
                 .apply()
         }
 
