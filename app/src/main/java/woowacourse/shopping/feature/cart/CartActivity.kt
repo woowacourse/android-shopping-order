@@ -30,9 +30,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             onCartProductDeleteClick = presenter::deleteCartProduct,
             plusQuantity = { state -> presenter.plusQuantity(state) },
             minusQuantity = { state -> presenter.minusQuantity(state) },
-            updateChecked = { productId: Long, checked: Boolean ->
-                presenter.updateChecked(productId, checked)
-                presenter.loadCheckedCartProductCount()
+            updateChecked = { cartId: Long, checked: Boolean ->
+                presenter.updatePickedByCartId(cartId, checked)
+                presenter.updatePickedCartProductCount()
             }
         )
     }
@@ -47,13 +47,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.pageNumberPlusTv.setOnClickListener { presenter.plusPageNumber() }
         binding.pageNumberMinusTv.setOnClickListener { presenter.minusPageNumber() }
         binding.allCheckBox.setOnCheckedChangeListener { compoundButton, b ->
-            presenter.checkAll()
+            presenter.changeAllPicked()
             presenter.loadCart()
-            presenter.loadCheckedCartProductCount()
+            presenter.updatePickedCartProductCount()
         }
 
         presenter.loadCart()
-        presenter.loadCheckedCartProductCount()
+        presenter.updatePickedCartProductCount()
     }
 
     override fun updateItem(newItem: CartProductState) {

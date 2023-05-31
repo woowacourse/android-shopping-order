@@ -19,13 +19,14 @@ interface CartContract {
 
     interface Presenter {
         fun loadCart()
-        fun loadCheckedCartProductCount()
         fun plusPageNumber()
         fun minusPageNumber()
         fun plusQuantity(cartProductState: CartProductState)
         fun minusQuantity(cartProductState: CartProductState)
-        fun updateChecked(productId: Long, checked: Boolean)
+        fun updatePickedByCartId(cartId: Long, checked: Boolean)
+        fun updatePaymentAmount()
+        fun updatePickedCartProductCount()
         fun deleteCartProduct(cartProductState: CartProductState)
-        fun checkAll()
+        fun changeAllPicked()
     }
 }
