@@ -78,6 +78,13 @@ class MainPresenter(
 
     override fun minusCartProductCount(cartProductState: CartProductState) {
         cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
+        if (cartProductState.quantity - 1 == 0) {
+            cartRepository.deleteCartProduct(
+                id = cartProductState.id,
+                onSuccess = {},
+                onFailure = {}
+            )
+        }
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
             onFailure = {}, onSuccess = { loadCartProductCountBadge() }
