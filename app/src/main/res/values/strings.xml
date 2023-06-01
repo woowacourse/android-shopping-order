@@ -13,12 +13,26 @@
     <string name="cart_default_page_text">1</string>
     <string name="cart_button_order_text">주문하기</string>
 
+    <string name="order_product_title_info_text">상품 목록</string>
+    <string name="order_point_title_info_text">포인트 사용</string>
+    <string name="order_available_point_title_info_text">가용 포인트</string>
+    <string name="order_use_point_title_info_text">사용</string>
+    <string name="order_payment_title_info_text">결제 방법</string>
+    <string name="order_payment_detail_title_info_text">결제 상세</string>
+    <string name="order_payment_detail_order_price_title_info_text">주문 금액</string>
+    <string name="order_payment_detail_use_point_title_info_text">포인트 사용</string>
+    <string name="order_payment_detail_total_price_title_info_text">총 결제 금액</string>
+    <string name="order_point_benefit_title_info_text">포인트 혜택</string>
+    <string name="order_point_save_title_info_text">적립 포인트</string>
+    <string name="order_pay_button_text">결제하기</string>
+
     <string name="layout_count_view_minus_text">－</string>
     <string name="layout_count_view_plus_text">＋</string>
 
     <string name="layout_cart_dialog_button_text">담기</string>
 
     <string name="product_price_format">%,d원</string>
+    <string name="product_count_format">%d개</string>
 
     <string name="toolbar_item_cart">장바구니</string>
     <string name="toolbar_item_close">닫기</string>
