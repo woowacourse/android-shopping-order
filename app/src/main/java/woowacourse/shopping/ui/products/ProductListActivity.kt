@@ -15,6 +15,7 @@ import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRemoteRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.mypage.MyPageActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductListAdapter
 import woowacourse.shopping.ui.products.adapter.RecentlyViewedProductListAdapter
@@ -82,6 +83,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         return when (item.itemId) {
             R.id.action_cart -> {
                 CartActivity.startActivity(this)
+                true
+            }
+            R.id.my_page -> {
+                MyPageActivity.startActivity(this)
                 true
             }
 

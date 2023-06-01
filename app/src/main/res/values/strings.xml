@@ -25,4 +25,7 @@
     <string name="order_result">주문 결과</string>
     <string name="order_price_label">주문 금액:</string>
     <string name="format_quantity">%s개</string>
+    <string name="app_bar_title_my_page">My Page</string>
+    <string name="user_id_label">아이디:</string>
+    <string name="order_list">주문 목록</string>
 </resources>

@@ -14,5 +14,10 @@
         app:actionLayout="@layout/layout_cart_count_badge"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/my_page"
+        android:icon="@drawable/icon_my_page"
+        android:title=""
+        app:showAsAction="ifRoom" />
 
 </menu>
