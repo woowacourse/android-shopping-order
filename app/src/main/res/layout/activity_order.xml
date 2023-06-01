@@ -55,24 +55,11 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_orders"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <include
-                        android:id="@+id/order_item1"
-                        layout="@layout/item_order" />
-
-                    <include
-                        android:id="@+id/order_item2"
-                        layout="@layout/item_order" />
-
-                    <include
-                        android:id="@+id/order_item3"
-                        layout="@layout/item_order" />
-
-                </LinearLayout>
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                 <View
                     android:layout_width="match_parent"

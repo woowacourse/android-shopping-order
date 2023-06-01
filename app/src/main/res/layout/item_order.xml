@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="order"
+            type="woowacourse.shopping.model.CartProductUIModel" />
+    </data>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,15 +22,17 @@
             android:layout_height="40dp"
             android:layout_marginStart="13dp"
             android:gravity="center_vertical"
-            android:text="PET보틀-정사각(370ml)"
+            android:text="@{order.name}"
             android:textAppearance="@style/cart_item_title"
             app:layout_constraintStart_toEndOf="@+id/iv_product_image"
-            app:layout_constraintTop_toTopOf="@+id/iv_product_image" />
+            app:layout_constraintTop_toTopOf="@+id/iv_product_image"
+            tools:text="PET보틀-정사각(370ml)" />
 
         <ImageView
             android:id="@+id/iv_product_image"
             android:layout_width="90dp"
             android:layout_height="90dp"
+            imageUrl="@{order.imageUrl}"
             android:contentDescription="@string/cart_item_product_image_description"
             android:src="@color/black"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,21 +42,23 @@
             android:id="@+id/tv_product_price"
             android:layout_width="wrap_content"
             android:layout_height="27dp"
+            android:text="@{`` + order.price}"
             android:textColor="@color/gray_333333"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/tv_product_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_product_title"
-            android:text="99000원" />
+            tools:text="99000원" />
 
         <TextView
             android:id="@+id/tv_product_count"
             android:layout_width="wrap_content"
             android:layout_height="27dp"
-            android:text="1개"
+            android:text="@{`` + order.count}"
             android:textColor="@color/gray_333333"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/tv_product_price"
-            app:layout_constraintTop_toBottomOf="@+id/tv_product_price" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_product_price"
+            tools:text="1개" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

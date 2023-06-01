@@ -1,7 +1,7 @@
 package woowacourse.shopping.model
 
-data class OrderList(
-    val cartItems: List<CartProduct>,
+data class OrderListUIModel(
+    val cartProducts: List<CartProductUIModel>,
     val totalPrice: Int,
     val currentPoints: Int,
     val earnedPoints: Int,

@@ -10,10 +10,14 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.model.OrderListUIModel
+import woowacourse.shopping.ui.order.orderProductAdapter.OrderProductAdapter
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var presenter: OrderContract.Presenter
     private lateinit var binding: ActivityOrderBinding
+
+    private val adapter = OrderProductAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +25,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         initPresenter()
         initBinding()
+        binding.rvOrders.adapter = adapter
         initToolbar()
         presenter.getOrderList()
     }
@@ -35,6 +40,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initPresenter() {
         presenter = OrderPresenter(
+            view = this,
             intent.getIntegerArrayListExtra(KEY_CART_IDS) ?: listOf(),
             orderRepository = OrderRepositoryImpl(
                 orderRemoteDataSource = OrderRemoteDataSourceImpl()
@@ -61,7 +67,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun showOrderList() {
-        TODO("Not yet implemented")
+    override fun showOrderList(orderListUIModel: OrderListUIModel) {
+        adapter.submitList(orderListUIModel.cartProducts)
     }
 }
