@@ -36,7 +36,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="10dp"
-                    android:text="@{String.valueOf(orderModel.orderId)}"
+                    android:text="@{@string/order_id_format(orderModel.orderId)}"
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="18sp"

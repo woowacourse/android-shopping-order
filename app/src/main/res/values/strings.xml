@@ -28,4 +28,5 @@
     <string name="my_order_order_date">주문일자: </string>
     <string name="toolbar_my_order_title">MyOrder</string>
     <string name="toolbar_my_order_icon_title">toolbar_my_order_icon_title</string>
+    <string name="order_id_format">주문 번호: %d</string>
 </resources>

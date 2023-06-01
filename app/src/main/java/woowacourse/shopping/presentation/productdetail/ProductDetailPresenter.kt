@@ -49,10 +49,20 @@ class ProductDetailPresenter(
     }
 
     override fun saveProductInRepository(count: Int) {
-        cartRepository.addCartItem(productModel.id) {
-            cartRepository.updateCartItemQuantity(productModel.id, count) {
-                view.showCompleteMessage(productModel.name)
+        cartRepository.getAllCartItems { cartList ->
+            val cartId = cartList.find { it.product.id == productModel.id }?.id
+            if (cartId == null) cartRepository.addCartItem(productModel.id) { newCartId ->
+                updateCartItem(newCartId, count)
+            } else {
+                updateCartItem(cartId, count)
             }
+        }
+    }
+
+    private fun updateCartItem(cartId: Int?, count: Int) {
+        if (cartId == null) view.showCompleteMessage("상품 추가를 실패했어요!!")
+        else cartRepository.updateCartItemQuantity(cartId, count) {
+            view.showCompleteMessage(productModel.name)
         }
     }
 }
