@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.product
 
+import woowacourse.shopping.data.server.CartRemoteDataSource
+import woowacourse.shopping.data.server.ProductRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.ShoppingProducts
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.server.ProductRemoteDataSource
 
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
-    private val cartRemoteDataSource: CartRemoteDataSourceImpl
+    private val cartRemoteDataSource: CartRemoteDataSource
 ) : ProductRepository {
     override fun getProducts(
         onSuccess: (ShoppingProducts) -> Unit,

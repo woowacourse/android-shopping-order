@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.server
+package woowacourse.shopping.data.cart
 
 import android.os.Handler
 import android.os.Looper
@@ -12,23 +12,24 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.Storage
+import woowacourse.shopping.data.server.CartRemoteDataSource
+import woowacourse.shopping.data.server.Server
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
 
-class CartRemoteDataSourceImpl {
+class CartRemoteDataSourceOkhttp: CartRemoteDataSource {
     private val okHttpClient: OkHttpClient = OkHttpClient()
 
-    fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
-        val credentials = Storage.credential
         val json = JSONObject().put("productId", id)
         val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
         val request = Request.Builder()
-            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .addHeader(HEADER_AUTHORIZATION, Storage.credential)
             .post(body)
             .url(url)
             .build()
@@ -51,12 +52,11 @@ class CartRemoteDataSourceImpl {
         })
     }
 
-    fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
+    override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
-        val credentials = Storage.credential
         val request = Request.Builder()
-            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .addHeader(HEADER_AUTHORIZATION, Storage.credential)
             .url(url)
             .build()
         val handler = Handler(Looper.myLooper()!!)
@@ -101,15 +101,14 @@ class CartRemoteDataSourceImpl {
         )
     }
 
-    fun updateCartProductQuantity(id: Int, quantity: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun updateCartProductQuantity(id: Int, quantity: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH/$id"
-        val credentials = Storage.credential
         val json = JSONObject().put("quantity", quantity)
         val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
         val request = Request.Builder()
-            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .addHeader(HEADER_AUTHORIZATION, Storage.credential)
             .patch(body)
             .url(url)
             .build()
@@ -130,13 +129,12 @@ class CartRemoteDataSourceImpl {
         })
     }
 
-    fun deleteCartProduct(cartProductId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun deleteCartProduct(cartProductId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH/$cartProductId"
-        val credentials = Storage.credential
 
         val request = Request.Builder()
-            .addHeader(HEADER_AUTHORIZATION, "Basic $credentials")
+            .addHeader(HEADER_AUTHORIZATION, Storage.credential)
             .delete()
             .url(url)
             .build()

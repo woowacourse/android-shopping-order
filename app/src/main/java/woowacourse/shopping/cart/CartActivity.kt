@@ -12,7 +12,7 @@ import woowacourse.shopping.common.model.CartProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.cart.CartRemoteDataSourceOkhttp
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -117,7 +117,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter() {
         presenter = CartPresenter(
             this,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceOkhttp()),
             sizePerPage = SIZE_PER_PAGE
         )
     }

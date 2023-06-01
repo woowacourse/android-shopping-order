@@ -1,28 +1,28 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
 
 class CartRepositoryImpl(
-    private val cartRemoteDataSource: CartRemoteDataSourceImpl
+    private val cartRemoteDataSource: CartRemoteDataSource
 ) : CartRepository {
-
-    override fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
-        cartRemoteDataSource.addCartProduct(
-            product.id,
-            onSuccess = { onSuccess(it) },
-            onFailure = { onFailure() }
-        )
-    }
 
     override fun getAll(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit
     ) {
         cartRemoteDataSource.getCartProducts(
+            onSuccess = { onSuccess(it) },
+            onFailure = { onFailure() }
+        )
+    }
+
+    override fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        cartRemoteDataSource.addCartProduct(
+            product.id,
             onSuccess = { onSuccess(it) },
             onFailure = { onFailure() }
         )

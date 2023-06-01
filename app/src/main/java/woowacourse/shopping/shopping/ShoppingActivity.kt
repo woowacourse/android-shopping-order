@@ -21,15 +21,16 @@ import woowacourse.shopping.common.model.RecentProductModel
 import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
+import woowacourse.shopping.data.cart.CartRemoteDataSourceOkhttp
+import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
 import woowacourse.shopping.data.database.dao.RecentProductDao
+import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.productdetail.ProductDetailActivity
-import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
 import woowacourse.shopping.shopping.recyclerview.LoadMoreAdapter
 import woowacourse.shopping.shopping.recyclerview.ProductAdapter
 import woowacourse.shopping.shopping.recyclerview.RecentProductAdapter
@@ -211,13 +212,18 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         val db = ShoppingDBOpenHelper(this).writableDatabase
         val productRepository = ProductRepositoryImpl(
             productRemoteDataSource = ProductRemoteDataSourceRetrofit(),
-            cartRemoteDataSource = CartRemoteDataSourceImpl()
+            cartRemoteDataSource = CartRemoteDataSourceRetrofit()
         )
+        val recentProductRepository = RecentProductRepositoryImpl(
+            recentProductDao = RecentProductDao(db),
+            productRemoteDataSource = ProductRemoteDataSourceRetrofit()
+        )
+
         presenter = ShoppingPresenter(
             this,
             productRepository = productRepository,
-            recentProductRepository = RecentProductRepositoryImpl(RecentProductDao(db), ProductRemoteDataSourceRetrofit()),
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            recentProductRepository = recentProductRepository,
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceOkhttp()),
             recentProductSize = 10,
             productLoadSize = 20
         )

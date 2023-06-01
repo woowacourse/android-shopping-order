@@ -21,7 +21,7 @@ object Storage {
         set(value) {
             sharedPreferences
                 .edit()
-                .putString(KEY_CREDENTIAL, value)
+                .putString(KEY_CREDENTIAL, "Basic $value")
                 .apply()
         }
 
