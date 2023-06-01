@@ -2,7 +2,7 @@ package com.example.domain.model
 
 import java.time.LocalDateTime
 
-data class Order(
+data class OrderMinInfoItem(
     val id: Long,
     val mainProductName: String,
     val mainProductImage: String,
