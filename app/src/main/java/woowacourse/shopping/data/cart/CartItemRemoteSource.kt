@@ -3,7 +3,6 @@ package woowacourse.shopping.data.cart
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.CartItemEntity
 import woowacourse.shopping.data.entity.CartItemEntity.Companion.toDomain
 import woowacourse.shopping.data.entity.ProductIdEntity
@@ -12,8 +11,8 @@ import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.network.retrofit.CartItemRetrofitService
 
-class CartItemRemoteSource(retrofit: Retrofit) : CartItemDataSource {
-    private val cartItemService = retrofit.create(CartItemRetrofitService::class.java)
+class CartItemRemoteSource(private val cartItemService: CartItemRetrofitService) :
+    CartItemDataSource {
     override fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit) {
         cartItemService.postCartItem("Basic ${user.token}", ProductIdEntity(cartItem.product.id))
             .enqueue(object : Callback<Unit> {

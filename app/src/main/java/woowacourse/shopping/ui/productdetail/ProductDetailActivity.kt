@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
@@ -19,7 +20,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private val presenter: ProductDetailContract.Presenter by lazy {
-        ProductDetailPresenterProvider.create(this, applicationContext)
+        ProductDetailPresenterProvider.create(this, (application as App).repositoryContainer)
     }
 
     private val lastViewedProductViewHolder: LastViewedProductViewHolder by lazy {

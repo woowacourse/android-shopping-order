@@ -3,15 +3,12 @@ package woowacourse.shopping.data.product
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.ProductEntity
 import woowacourse.shopping.data.entity.ProductEntity.Companion.toDomain
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.network.retrofit.ProductRetrofitService
 
-class ProductRemoteSource(retrofit: Retrofit) : ProductDataSource {
-    private val productService = retrofit.create(ProductRetrofitService::class.java)
-
+class ProductRemoteSource(private val productService: ProductRetrofitService) : ProductDataSource {
     override fun findAll(onFinish: (List<Product>) -> Unit) {
         productService.selectProducts().enqueue(object : Callback<List<ProductEntity>> {
             override fun onFailure(call: Call<List<ProductEntity>>, t: Throwable) {

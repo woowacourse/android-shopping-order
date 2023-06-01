@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import woowacourse.shopping.App
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.ui.cart.CartActivity
@@ -24,7 +25,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private val presenter: ShoppingContract.Presenter by lazy {
-        ShoppingPresenterProvider.create(this, applicationContext)
+        ShoppingPresenterProvider.create(this, (application as App).repositoryContainer)
     }
 
     private val shoppingAdapter: ShoppingAdapter by lazy {

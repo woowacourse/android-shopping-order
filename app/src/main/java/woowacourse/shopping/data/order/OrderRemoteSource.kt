@@ -3,7 +3,6 @@ package woowacourse.shopping.data.order
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.CartItemIdsEntity
 import woowacourse.shopping.data.entity.DiscountEntity.Companion.toDomain
 import woowacourse.shopping.data.entity.DiscountsEntity
@@ -14,9 +13,7 @@ import woowacourse.shopping.domain.order.Payment
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.network.retrofit.OrderRetrofitService
 
-class OrderRemoteSource(retrofit: Retrofit) : OrderDataSource {
-    private val orderService = retrofit.create(OrderRetrofitService::class.java)
-
+class OrderRemoteSource(private val orderService: OrderRetrofitService) : OrderDataSource {
     override fun save(cartItemIds: List<Long>, user: User, onFinish: (Long) -> Unit) {
         orderService.postOrder("Basic " + user.token, CartItemIdsEntity(cartItemIds))
             .enqueue(object : Callback<Unit> {

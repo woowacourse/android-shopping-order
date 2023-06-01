@@ -3,14 +3,12 @@ package woowacourse.shopping.data.user
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.UserEntity
 import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.network.retrofit.UserRetrofitService
 
-class UserRemoteSource(retrofit: Retrofit) : UserDataSource {
-    private val userService = retrofit.create(UserRetrofitService::class.java)
+class UserRemoteSource(private val userService: UserRetrofitService) : UserDataSource {
     override fun save(user: User) {
     }
 

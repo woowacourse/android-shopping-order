@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.App
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.ui.order.adapter.OrderListAdapter
 import woowacourse.shopping.ui.order.uistate.OrderUIState
@@ -17,7 +18,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private val presenter: OrderDetailContract.Presenter by lazy {
-        OrderDetailPresenterProvider.create(this)
+        OrderDetailPresenterProvider.create(this, (application as App).repositoryContainer)
     }
 
     private val orderListAdapter: OrderListAdapter by lazy {

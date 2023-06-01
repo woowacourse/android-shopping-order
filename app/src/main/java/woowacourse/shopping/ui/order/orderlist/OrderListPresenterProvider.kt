@@ -1,18 +1,14 @@
 package woowacourse.shopping.ui.order.orderlist
 
-import woowacourse.shopping.data.order.DefaultOrderRepository
-import woowacourse.shopping.data.order.OrderRemoteSource
-import woowacourse.shopping.data.user.DefaultUserRepository
-import woowacourse.shopping.data.user.UserMemorySource
-import woowacourse.shopping.data.user.UserRemoteSource
-import woowacourse.shopping.network.ShoppingRetrofit
+import woowacourse.shopping.RepositoryContainer
 
 object OrderListPresenterProvider {
-    fun create(view: OrderListContract.View): OrderListContract.Presenter {
+    fun create(
+        view: OrderListContract.View,
+        repositoryContainer: RepositoryContainer
+    ): OrderListContract.Presenter {
         return OrderListPresenter(
-            view,
-            DefaultOrderRepository(OrderRemoteSource(ShoppingRetrofit.retrofit)),
-            DefaultUserRepository(UserMemorySource(), UserRemoteSource(ShoppingRetrofit.retrofit))
+            view, repositoryContainer.orderRepository, repositoryContainer.userRepository
         )
     }
 }

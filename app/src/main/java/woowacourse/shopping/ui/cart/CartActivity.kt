@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
+import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.databinding.CustomOrderBinding
@@ -29,7 +30,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private val presenter: CartContract.Presenter by lazy {
-        CartPresenterProvider.create(this, PAGE_SIZE)
+        CartPresenterProvider.create(this, (application as App).repositoryContainer, PAGE_SIZE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
