@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -11,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -45,7 +45,7 @@ class ShoppingActivity :
             ),
             RecentProductDatabase(this),
             CartRepositoryImpl(
-                ShoppingCartDataSourceImpl("c2FuZ3VuQDEyMzQ="),
+                ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this)),
             ),
         )
 
@@ -81,29 +81,25 @@ class ShoppingActivity :
                 }
             }
         }
-
         binding.productRecyclerview.addItemDecoration(object : RecyclerView.ItemDecoration() {
             override fun getItemOffsets(
-                outRect: Rect,
+                outRect: android.graphics.Rect,
                 view: View,
                 parent: RecyclerView,
                 state: RecyclerView.State,
-            ) { // 1부터 시작
-                /*val spacingOuter =
-                    resources.getDimensionPixelSize(R.dimen.spacing_outer)
-                val spacingInner =
-                    resources.getDimensionPixelSize(R.dimen.spacing_inner)
-                val includeEdge = true
+            ) {
                 val position = parent.getChildAdapterPosition(view)
-                val column = position % spanCount
+                val column = position % spanCount + 1
+                val space = 20
 
-                if (includeEdge) {
-                    outRect.left = spacingOuter - column * spacingInner / spanCount
-                    outRect.right = (column + 1) * spacingInner / spanCount
-                } else {
-                    outRect.left = column * spacingInner / spanCount
-                    outRect.right = spacingInner - (column + 1) * spacingInner / spanCount
-                }*/
+                /** 마지막 열(column-N)에 있는 아이템인 경우 우측에 [space] 만큼의 여백을 추가한다 */
+                if (column == spanCount) {
+                    outRect.right = space
+                }
+                /** 모든 아이템의 좌측과 하단에 [space] 만큼의 여백을 추가한다. */
+                outRect.top = space
+                outRect.left = space
+                outRect.bottom = space
             }
         })
         binding.productRecyclerview.layoutManager = layoutManager
