@@ -10,7 +10,7 @@ import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.Order
-import woowacourse.shopping.ui.orderfinish.OrderDetailActivity
+import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 

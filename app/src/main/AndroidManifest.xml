@@ -21,7 +21,7 @@
             android:name=".ui.orderhistory.OrderHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.orderfinish.OrderDetailActivity"
+            android:name=".ui.orderdetail.OrderDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.serversetting.ServerSettingActivity"

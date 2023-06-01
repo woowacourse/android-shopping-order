@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orderfinish
+package woowacourse.shopping.ui.orderdetail
 
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.ui.model.Order

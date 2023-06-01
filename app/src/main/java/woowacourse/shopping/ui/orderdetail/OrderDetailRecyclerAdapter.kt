@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orderfinish
+package woowacourse.shopping.ui.orderdetail
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

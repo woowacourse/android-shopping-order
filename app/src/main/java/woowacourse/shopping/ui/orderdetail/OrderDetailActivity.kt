@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orderfinish
+package woowacourse.shopping.ui.orderdetail
 
 import android.content.Context
 import android.content.Intent

@@ -14,7 +14,7 @@ import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.User
-import woowacourse.shopping.ui.orderfinish.OrderDetailActivity
+import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.util.getParcelableArrayExtraCompat
 import woowacourse.shopping.util.handleMissingData
 import woowacourse.shopping.util.setImage

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.orderhistory
 
 import io.mockk.every
 import io.mockk.mockk
@@ -7,9 +7,8 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.ui.OrderFixture
 import woowacourse.shopping.ui.model.Order
-import woowacourse.shopping.ui.orderhistory.OrderHistoryContract
-import woowacourse.shopping.ui.orderhistory.OrderHistoryPresenter
 
 class OrderHistoryPresenterTest {
 

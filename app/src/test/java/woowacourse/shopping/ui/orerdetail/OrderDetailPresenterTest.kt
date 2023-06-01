@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.orerdetail
 
 import io.mockk.every
 import io.mockk.invoke
@@ -8,9 +8,10 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.ui.OrderFixture
 import woowacourse.shopping.ui.model.Order
-import woowacourse.shopping.ui.orderfinish.OrderDetailContract
-import woowacourse.shopping.ui.orderfinish.OrderDetailPresenter
+import woowacourse.shopping.ui.orderdetail.OrderDetailContract
+import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 
 class OrderDetailPresenterTest {
 
