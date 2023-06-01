@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.ui.model.UserUiModel
+import woowacourse.shopping.domain.User
 
 interface UserRepository {
 
-    fun getUser(onReceived: (user: UserUiModel) -> Unit)
+    fun getUser(onReceived: (user: User) -> Unit)
 }

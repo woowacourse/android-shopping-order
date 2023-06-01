@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.datasource.request.UserRequest
-import woowacourse.shopping.ui.model.UserUiModel
+import woowacourse.shopping.domain.User
 
-// todo data layer에서 왜 ui를?
-fun UserRequest.toUserUiModel() = UserUiModel(
+fun UserRequest.toUserDomainModel() = User(
     email = email,
     point = point,
     accumulationRate = accumulationRate

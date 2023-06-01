@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.payment
 
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.UserRepository
+import woowacourse.shopping.ui.mapper.toUserUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class PaymentPresenter(
@@ -15,7 +16,7 @@ class PaymentPresenter(
     override fun getUser() {
         userRepository.getUser {
             view.initView(
-                user = it,
+                user = it.toUserUiModel(),
                 basketProducts = basketProducts,
                 totalPrice = totalPrice
             )

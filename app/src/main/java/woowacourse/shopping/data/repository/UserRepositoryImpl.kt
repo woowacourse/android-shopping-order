@@ -1,18 +1,16 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.user.UserRemoteDataSource
-import woowacourse.shopping.data.mapper.toUserUiModel
-import woowacourse.shopping.ui.model.UserUiModel
+import woowacourse.shopping.data.mapper.toUserDomainModel
+import woowacourse.shopping.domain.User
 
 class UserRepositoryImpl(
     private val userRemoteDateSource: UserRemoteDataSource,
 ) : UserRepository {
 
-    override fun getUser(onReceived: (user: UserUiModel) -> Unit) {
+    override fun getUser(onReceived: (user: User) -> Unit) {
         userRemoteDateSource.getUser {
-            val user = it.toUserUiModel()
-
-            onReceived(user)
+            onReceived(it.toUserDomainModel())
         }
     }
 }
