@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.order.list
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -31,6 +32,8 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_list)
         initPresenter()
         initAdapter()
+        supportActionBar?.title = getString(R.string.order_list_bar_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initPresenter() {
@@ -39,6 +42,17 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     private fun initAdapter() {
         binding.orderRecyclerView.adapter = orderListAdapter
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun setOrderListItems(orderItems: List<OrderMinInfoItemUiModel>) {
