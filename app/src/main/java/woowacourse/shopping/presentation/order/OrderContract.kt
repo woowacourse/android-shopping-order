@@ -16,6 +16,6 @@ interface OrderContract {
         fun loadPoint()
         fun loadTotalPrice()
         fun checkPointOver(usingPoint: String)
-        fun order()
+        fun order(spendPoint: String)
     }
 }

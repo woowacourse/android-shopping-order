@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.product.ProductServiceHelper
+import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -20,7 +20,7 @@ class ServerSettingActivity : AppCompatActivity() {
             PreferenceUtil(this),
             RecentProductRepositoryImpl(
                 recentProductLocalDataSource = RecentProductDao(RecentProductDbHelper(this)),
-                productRemoteDataSource = ProductServiceHelper,
+                productDataSource = ProductRemoteDataSource,
             ),
         )
     }

@@ -12,7 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.product.ProductServiceHelper
+import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -56,7 +56,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 RecentProductDao(
                     RecentProductDbHelper(this),
                 ),
-                ProductServiceHelper,
+                ProductRemoteDataSource,
             ),
         )
     }

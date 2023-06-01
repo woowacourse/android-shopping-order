@@ -2,10 +2,13 @@ package woowacourse.shopping.data.order
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.order.requestbody.OrderRequestBody
+import woowacourse.shopping.data.order.response.OrderDataModel
 
 interface OrderService {
     @Headers("Content-Type: application/json")
@@ -14,4 +17,9 @@ interface OrderService {
         @Header("Authorization") credentials: String,
         @Body orderRequestBody: OrderRequestBody,
     ): Call<Unit>
+
+    @GET("orders")
+    fun loadOrderList(
+        @Header("Authorization") credentials: String
+    ): Call<BaseResponse<List<OrderDataModel>>>
 }

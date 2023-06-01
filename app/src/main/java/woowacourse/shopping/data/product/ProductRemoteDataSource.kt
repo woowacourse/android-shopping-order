@@ -1,8 +1,18 @@
 package woowacourse.shopping.data.product
 
 import retrofit2.Call
+import woowacourse.shopping.data.ApiClient
+import woowacourse.shopping.data.common.BaseResponse
 
-interface ProductRemoteDataSource {
-    fun getProductById(id: Int): Call<ProductDataModel>
-    fun getAllProducts(): Call<List<ProductDataModel>>
+object ProductRemoteDataSource : ProductDataSource {
+    private val productService = ApiClient.client
+        .create(ProductService::class.java)
+
+    override fun getProductById(id: Int): Call<BaseResponse<ProductDataModel>> {
+        return productService.getProductById(id)
+    }
+
+    override fun getAllProducts(): Call<BaseResponse<List<ProductDataModel>>> {
+        return productService.getAllProducts()
+    }
 }

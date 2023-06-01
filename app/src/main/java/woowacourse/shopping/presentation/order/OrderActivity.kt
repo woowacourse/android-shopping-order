@@ -26,7 +26,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private val presenter: OrderContract.Presenter by lazy {
         OrderPresenter(
             this,
-            UserRepositoryImpl(UserRemoteDataSource()),
+            UserRepositoryImpl(UserRemoteDataSource(PreferenceUtil(this))),
             OrderRepositoryImpl(OrderRemoteDataSource(PreferenceUtil(this)))
         )
     }
@@ -43,12 +43,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         initOrderProduct()
         initPoint()
         presenter.loadTotalPrice()
-        setorderButtonClick()
+        setOrderButtonClick()
     }
 
-    private fun setorderButtonClick() {
+    private fun setOrderButtonClick() {
         binding.buttonOrder.setOnClickListener {
-            presenter.order()
+            presenter.order(binding.etOrderUsingPoint.text.toString())
         }
     }
 

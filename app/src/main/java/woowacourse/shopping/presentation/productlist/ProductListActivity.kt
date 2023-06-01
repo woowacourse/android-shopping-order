@@ -13,9 +13,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
+import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.product.ProductServiceHelper
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -25,6 +25,7 @@ import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductInfoListModel
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.product.ProductListAdapter
 import woowacourse.shopping.presentation.productlist.recentproduct.RecentProductAdapter
@@ -36,15 +37,16 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var productListAdapter: ProductListAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private lateinit var cartMenuItem: MenuItem
+    private lateinit var orderListMenuItem: MenuItem
 
-    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductServiceHelper }
+    private val productDataSource: ProductDataSource by lazy { ProductRemoteDataSource }
     private val presenter: ProductListPresenter by lazy {
         ProductListPresenter(
             this,
-            ProductRepositoryImpl(productRemoteDataSource),
+            ProductRepositoryImpl(productDataSource),
             RecentProductRepositoryImpl(
                 RecentProductDao(RecentProductDbHelper(this)),
-                ProductServiceHelper,
+                ProductRemoteDataSource,
             ),
             CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this))),
         )
@@ -119,14 +121,27 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         cartIconBinding = BadgeCartBinding.inflate(layoutInflater, null, false)
-        initCartIcon(menu)
+        initToolbarIcon(menu)
         return true
     }
 
-    private fun initCartIcon(menu: Menu) {
+    private fun initToolbarIcon(menu: Menu) {
         menuInflater.inflate(R.menu.menu_product_list_toolbar, menu)
         cartMenuItem = menu.findItem(R.id.icon_cart)
+        orderListMenuItem = menu.findItem(R.id.icon_order)
         setUpCartIconBinding()
+        setOnOrderListClickEvent()
+    }
+
+    private fun setOnOrderListClickEvent() {
+        orderListMenuItem.setOnMenuItemClickListener {
+            startActivity(Intent(this, OrderListActivity::class.java))
+            return@setOnMenuItemClickListener true
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setUpCartIconBinding() {

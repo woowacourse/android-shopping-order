@@ -6,6 +6,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
+import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.repository.CartRepository
 
@@ -28,16 +29,20 @@ class CartRepositoryImpl constructor(
     }
 
     override fun deleteCartItem(cartId: Int, onSuccess: () -> Unit) {
-        cartRemoteDataSource.deleteCartItem(cartId).enqueue(object : Callback<CartDataModel> {
-            override fun onResponse(call: Call<CartDataModel>, response: Response<CartDataModel>) {
-                onSuccess()
-            }
+        cartRemoteDataSource.deleteCartItem(cartId)
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>
+                ) {
+                    onSuccess()
+                }
 
-            override fun onFailure(call: Call<CartDataModel>, t: Throwable) {
-                Log.d("HttpError", t.message.toString())
-                throw (t)
-            }
-        })
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Log.d("HttpError", t.message.toString())
+                    throw (t)
+                }
+            })
     }
 
     override fun updateCartItemQuantity(cartId: Int, count: Int, onSuccess: () -> Unit) {
@@ -64,12 +69,12 @@ class CartRepositoryImpl constructor(
 
     override fun getAllCartItems(onSuccess: (List<CartProductInfo>) -> Unit) {
         cartRemoteDataSource.getAllCartProductsInfo()
-            .enqueue(object : Callback<List<CartDataModel>> {
+            .enqueue(object : Callback<BaseResponse<List<CartDataModel>>> {
                 override fun onResponse(
-                    call: Call<List<CartDataModel>>,
-                    response: Response<List<CartDataModel>>,
+                    call: Call<BaseResponse<List<CartDataModel>>>,
+                    response: Response<BaseResponse<List<CartDataModel>>>,
                 ) {
-                    val cartItems = response.body()?.map { it.toDomain() }
+                    val cartItems = response.body()?.result?.map { it.toDomain() }
                     if (cartItems == null) {
                         onSuccess(emptyList())
                     } else {
@@ -77,7 +82,10 @@ class CartRepositoryImpl constructor(
                     }
                 }
 
-                override fun onFailure(call: Call<List<CartDataModel>>, t: Throwable) {
+                override fun onFailure(
+                    call: Call<BaseResponse<List<CartDataModel>>>,
+                    t: Throwable
+                ) {
                     Log.d("HttpError", t.message.toString())
                     throw (t)
                 }

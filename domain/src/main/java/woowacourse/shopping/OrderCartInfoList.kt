@@ -1,7 +1,8 @@
 package woowacourse.shopping
 
-class OrderCartInfoList(private val orderCartInfos: List<OrderCartInfo>) {
+class OrderCartInfoList(orderCartInfos: List<OrderCartInfo>) {
+    val value = orderCartInfos.toList()
     fun getTotalPrice(): Int {
-        return orderCartInfos.sumOf { it.product.price.value * it.count }
+        return value.sumOf { it.product.price.value * it.count }
     }
 }

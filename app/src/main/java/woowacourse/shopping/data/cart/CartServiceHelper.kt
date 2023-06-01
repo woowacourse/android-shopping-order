@@ -2,6 +2,7 @@ package woowacourse.shopping.data.cart
 
 import retrofit2.Call
 import woowacourse.shopping.data.ApiClient
+import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
@@ -19,7 +20,7 @@ class CartServiceHelper(private val sharedPreferences: SharedPreferencesDb) : Ca
         )
     }
 
-    override fun deleteCartItem(cartItemId: Int): Call<CartDataModel> {
+    override fun deleteCartItem(cartItemId: Int): Call<Unit> {
         return retrofitService.deleteCartItem(
             credentials = getAuthToken(),
             cartItemId = cartItemId,
@@ -34,7 +35,7 @@ class CartServiceHelper(private val sharedPreferences: SharedPreferencesDb) : Ca
         )
     }
 
-    override fun getAllCartProductsInfo(): Call<List<CartDataModel>> {
+    override fun getAllCartProductsInfo(): Call<BaseResponse<List<CartDataModel>>> {
         return retrofitService.getAllCartItems(
             credentials = getAuthToken(),
         )

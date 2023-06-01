@@ -1,5 +1,14 @@
 package woowacourse.shopping.data.order
 
+import woowacourse.shopping.data.order.response.OrderDataModel
+import woowacourse.shopping.data.order.response.OrderRequestDataModel
+
 interface OrderRepository {
-    fun order(onSuccess: () -> Unit, onFailure: () -> Unit)
+    fun order(
+        orderRequestDataModel: OrderRequestDataModel,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    )
+
+    fun loadOrderList(onSuccess: (List<OrderDataModel>) -> Unit, onFailure: () -> Unit)
 }

@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.order
+package woowacourse.shopping.data.order.response
 
-data class OrderDataModel(
+data class OrderRequestProductDataModel(
     val productId: Int,
     val name: String,
     val imageUrl: String,

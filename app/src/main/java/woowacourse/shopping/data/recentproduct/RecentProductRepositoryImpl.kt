@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.recentproduct
 
 import woowacourse.shopping.Product
-import woowacourse.shopping.data.product.ProductRemoteDataSource
+import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.repository.RecentProductRepository
 
 class RecentProductRepositoryImpl constructor(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
-    productRemoteDataSource: ProductRemoteDataSource,
+    productDataSource: ProductDataSource,
 ) : RecentProductRepository {
-    private val productRepository = ProductRepositoryImpl(productRemoteDataSource)
+    private val productRepository = ProductRepositoryImpl(productDataSource)
     override fun addRecentProductId(recentProductId: Int) {
         recentProductLocalDataSource.addRecentProduct(recentProductId)
     }
