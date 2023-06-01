@@ -18,4 +18,6 @@
     <string name="sungha_server">성하 서버</string>
     <string name="logan_server">로건 서버</string>
     <string name="mypage">마이페이지</string>
+    <string name="charge">충전</string>
+    <string name="cash_on_hand">보유한 캐시 : %,d캐시</string>
 </resources>

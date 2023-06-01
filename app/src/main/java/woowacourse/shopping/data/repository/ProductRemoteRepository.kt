@@ -16,17 +16,6 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(ProductApi::class.java)
-    // "Authorization", "Basic ZG9vbHlAZG9vbHkuY29tOjEyMzQ="
-//    override fun getAll(callBack: (List<Product>) -> Unit) {
-//        executeRequest(request, callBack)
-//    }
-//
-//    override fun getProduct(id: Int, callBack: (Product?) -> Unit) {
-//        fun callBackWrapper(products: List<Product>) {
-//            callBack(products.find { it.id == id })
-//        }
-//        executeRequest(request, ::callBackWrapper)
-//    }
 
     override fun getProductsByRange(lastId: Int, pageItemCount: Int, callback: (ProductsWithCartItemDTO) -> Unit) {
         retrofitService.requestProductsByRange(lastId, pageItemCount)
@@ -61,7 +50,7 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
         retrofitService.requestProductById(id).enqueue(object : retrofit2.Callback<ProductWithCartInfo> {
             override fun onResponse(
                 call: Call<ProductWithCartInfo>,
-                response: Response<ProductWithCartInfo>
+                response: Response<ProductWithCartInfo>,
             ) {
                 response.body()?.let { productWithCartInfo ->
                     callback(productWithCartInfo)
@@ -73,21 +62,4 @@ class ProductRemoteRepository(baseUrl: String) : ProductRepository {
             }
         })
     }
-
-//    private fun executeRequest(request: Request, callBack: (List<Product>) -> Unit) {
-//        var responseBody: String?
-//        client.newCall(request).enqueue(
-//            object : Callback {
-//                override fun onFailure(call: Call, e: IOException) {
-//                    throw java.lang.RuntimeException("Request Failed", e)
-//                }
-//
-//                override fun onResponse(call: Call, response: Response) {
-//                    responseBody = response.body?.string()
-//                    callBack(parseResponse(responseBody))
-//                    response.close()
-//                }
-//            },
-//        )
-//    }
 }
