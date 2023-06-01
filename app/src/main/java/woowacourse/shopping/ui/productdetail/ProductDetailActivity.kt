@@ -77,7 +77,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
             binding.tvProductDetailName.text = product.name
             binding.tvProductDetailPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
+                getString(R.string.format_price).format(PRICE_FORMAT.format(product.price))
 
             if (product.isInCart) {
                 binding.btnProductDetailAdd.isEnabled = false

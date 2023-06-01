@@ -25,7 +25,7 @@ class AddToCartDialog(
     private var productPrice: Int
         get() = binding.tvProductPrice.toString().toInt()
         set(value) {
-            binding.tvProductPrice.text = binding.root.resources.getString(R.string.product_price)
+            binding.tvProductPrice.text = binding.root.resources.getString(R.string.format_price)
                 .format(PRICE_FORMAT.format(value))
         }
 

@@ -60,7 +60,7 @@ class CartListAdapter(
 
         fun bind(cartItem: CartItemUIState) {
             binding.tvCartName.text = cartItem.name
-            binding.tvCartPrice.text = itemView.context.getString(R.string.product_price).format(
+            binding.tvCartPrice.text = itemView.context.getString(R.string.format_price).format(
                 PRICE_FORMAT.format(cartItem.price),
             )
             Glide.with(itemView)

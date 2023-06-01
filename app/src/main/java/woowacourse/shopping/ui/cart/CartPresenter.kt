@@ -117,7 +117,7 @@ class CartPresenter(
     }
 
     override fun onOrderSelectedCartItems() {
-        orderRemoteService.requestOrder(
+        orderRemoteService.requestToPostOrder(
             "Basic ${UserData.credential}",
             OrderRequestBody(selectedCartItems.map { it.id })
         ).enqueue(object : retrofit2.Callback<Unit> {

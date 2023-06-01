@@ -169,7 +169,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun setOrderPrice(price: Int) {
         runOnUiThread {
             binding.tvOrderPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(price))
+                getString(R.string.format_price).format(PRICE_FORMAT.format(price))
         }
     }
 

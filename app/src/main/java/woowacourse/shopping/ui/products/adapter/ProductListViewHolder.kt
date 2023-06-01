@@ -35,7 +35,7 @@ class ProductListViewHolder private constructor(
 
     fun bind(product: ProductUIState) {
         binding.product = product
-        binding.tvProductPrice.text = itemView.context.getString(R.string.product_price)
+        binding.tvProductPrice.text = itemView.context.getString(R.string.format_price)
             .format(PRICE_FORMAT.format(product.price))
         Glide.with(itemView)
             .load(product.imageUrl)
