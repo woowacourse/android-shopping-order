@@ -9,7 +9,7 @@
         tools:context=".ui.order.OrderResultActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_order"
+            android:id="@+id/toolbar_order_result"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/app_bar"
@@ -30,20 +30,6 @@
         </androidx.appcompat.widget.Toolbar>
 
         <TextView
-            android:id="@+id/tv_order_result_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/order_result"
-            android:textSize="50sp"
-            android:textColor="@color/turquoise"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_order"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="주문 결과"/>
-
-        <TextView
             android:id="@+id/tv_total_price_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,7 +38,7 @@
             android:textSize="25sp"
             android:textStyle="bold"
             android:text="@string/order_price_label"
-            app:layout_constraintTop_toBottomOf="@id/tv_order_result_title"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_order_result"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView

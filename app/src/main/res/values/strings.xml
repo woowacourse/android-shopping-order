@@ -21,7 +21,7 @@
     <string name="plus_sign">+</string>
     <string name="last_viewed_product">마지막으로 본 상품</string>
     <string name="put">담기</string>
-    <string name="app_bar_title_order">Order</string>
+    <string name="app_bar_title_order_result">Order Result</string>
     <string name="order_result">주문 결과</string>
     <string name="order_price_label">주문 금액:</string>
     <string name="format_quantity">%s개</string>

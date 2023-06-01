@@ -19,7 +19,7 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".ui.order.OrderActivity"
+            android:name=".ui.order.OrderResultActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

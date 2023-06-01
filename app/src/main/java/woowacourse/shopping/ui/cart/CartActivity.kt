@@ -17,7 +17,7 @@ import woowacourse.shopping.data.order.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
-import woowacourse.shopping.ui.order.OrderActivity
+import woowacourse.shopping.ui.order.OrderResultActivity
 import woowacourse.shopping.utils.PRICE_FORMAT
 import woowacourse.shopping.utils.ServerConfiguration
 
@@ -187,7 +187,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun showOrderResult(orderId: Long) {
         runOnUiThread {
-            OrderActivity.startActivity(this, orderId)
+            OrderResultActivity.startActivity(this, orderId)
         }
     }
 
