@@ -56,4 +56,7 @@ data class Basket(val products: List<BasketProduct>) {
 
     fun getProductByProductId(productId: Int): BasketProduct? =
         products.find { it.product.id == productId }
+
+    fun getCheckedBasketProducts(): List<BasketProduct> =
+        products.filter { it.checked }
 }

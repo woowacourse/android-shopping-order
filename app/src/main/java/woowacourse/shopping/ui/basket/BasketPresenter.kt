@@ -113,6 +113,10 @@ class BasketPresenter(
         updateBasketProductViewData()
     }
 
+    override fun transportCheckedBasketProducts() {
+        view.showPaymentConfirm(basket.getCheckedBasketProducts().map { it.toUi() })
+    }
+
     private fun amendStartId() {
         if (basket.products.lastIndex < startId) {
             startId -= BASKET_PAGING_SIZE

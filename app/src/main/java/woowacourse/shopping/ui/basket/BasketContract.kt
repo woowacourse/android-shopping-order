@@ -20,6 +20,8 @@ interface BasketContract {
         fun updateTotalCheckBox(isChecked: Boolean)
 
         fun updateSkeletonState(isLoaded: Boolean)
+
+        fun showPaymentConfirm(currentOrder: List<UiBasketProduct>)
     }
 
     interface Presenter {
@@ -40,5 +42,7 @@ interface BasketContract {
         fun updateNextPage()
 
         fun deleteBasketProduct(product: UiBasketProduct)
+
+        fun transportCheckedBasketProducts()
     }
 }
