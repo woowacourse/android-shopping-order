@@ -13,6 +13,7 @@ import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.adapter.OrderRecyclerViewAdapter
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
+import woowacourse.shopping.util.extension.showSnackBar
 import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectOrderPresenter
 
@@ -42,7 +43,7 @@ class OrderActivity : AppCompatActivity(), View {
     }
 
     override fun showOrderCompleted() {
-        showToast(getString(R.string.order_success_message))
+        binding.root.showSnackBar(R.string.order_success_message)
     }
 
     override fun showOrderFailed() {
