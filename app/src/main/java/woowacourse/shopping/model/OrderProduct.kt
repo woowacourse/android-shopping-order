@@ -11,7 +11,7 @@ typealias UiOrderProduct = OrderProduct
 
 @Parcelize
 data class OrderProduct(
-    val productId: Int,
+    val cartProductId: Int,
     val name: String,
     val price: UiPrice,
     val totalPrice: UiPrice,

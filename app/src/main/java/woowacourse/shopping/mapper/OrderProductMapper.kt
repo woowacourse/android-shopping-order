@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.OrderProduct
 import woowacourse.shopping.model.UiOrderProduct
 
 fun UiOrderProduct.toDomain(): OrderProduct = OrderProduct(
-    productId = productId,
+    cartProductId = cartProductId,
     name = name,
     price = price.toDomain(),
     quantity = quantity.toDomain(),
@@ -12,7 +12,7 @@ fun UiOrderProduct.toDomain(): OrderProduct = OrderProduct(
 )
 
 fun OrderProduct.toUi(): UiOrderProduct = UiOrderProduct(
-    productId = productId,
+    cartProductId = cartProductId,
     name = name,
     price = price.toUi(),
     totalPrice = totalPrice.toUi(),

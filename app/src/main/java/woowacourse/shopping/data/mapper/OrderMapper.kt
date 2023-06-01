@@ -3,15 +3,14 @@ package woowacourse.shopping.data.mapper
 import woowacourse.shopping.data.dto.OrderPostRequest
 import woowacourse.shopping.data.dto.OrderProductResponse
 import woowacourse.shopping.data.dto.OrderResponse
-import woowacourse.shopping.data.dto.toOrderProductRequest
+import woowacourse.shopping.data.dto.toOrderPostInfo
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.OrderProduct
-import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.ProductCount
 
 fun Order.toOrderRequest(): OrderPostRequest = OrderPostRequest(
-    orderPostInfos = orderProducts.map { it.toOrderProductRequest() },
+    cartItemIds = orderProducts.map { it.toOrderPostInfo() },
     payment = payment.toPaymentRequest(),
 )
 
