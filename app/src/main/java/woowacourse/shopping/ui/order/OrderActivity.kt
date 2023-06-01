@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.OrderModel
-import woowacourse.shopping.model.UiPrice
+import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.ui.order.OrderContract.View
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.adapter.OrderRecyclerViewAdapter
@@ -50,7 +50,7 @@ class OrderActivity : AppCompatActivity(), View {
         showToast(getString(R.string.order_failed_message))
     }
 
-    override fun showFinalPayment(totalPayment: UiPrice) {
+    override fun showFinalPayment(totalPayment: PriceModel) {
         binding.totalPayment = totalPayment
     }
 

@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.order
 
 import woowacourse.shopping.model.PointModel
-import woowacourse.shopping.model.UiPrice
+import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 
 interface OrderContract {
@@ -10,7 +10,7 @@ interface OrderContract {
         fun showOrderLoadFailed()
         fun showOrderCompleted()
         fun showOrderFailed()
-        fun showFinalPayment(totalPayment: UiPrice)
+        fun showFinalPayment(totalPayment: PriceModel)
         fun navigateToHome()
     }
 

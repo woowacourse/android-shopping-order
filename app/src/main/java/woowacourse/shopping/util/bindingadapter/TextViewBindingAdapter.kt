@@ -4,11 +4,11 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.model.PointModel
-import woowacourse.shopping.model.UiPrice
+import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.model.UiProductCount
 
 @BindingAdapter("bind:price")
-fun TextView.setPrice(price: UiPrice?) {
+fun TextView.setPrice(price: PriceModel?) {
     text = context.getString(R.string.price_format, price?.value ?: 0)
 }
 

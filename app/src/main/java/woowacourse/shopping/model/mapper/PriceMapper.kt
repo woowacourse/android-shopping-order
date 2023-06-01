@@ -1,10 +1,10 @@
 package woowacourse.shopping.model.mapper
 
 import woowacourse.shopping.domain.model.Price
-import woowacourse.shopping.model.UiPrice
+import woowacourse.shopping.model.PriceModel
 
-fun UiPrice.toDomain(): Price =
+fun PriceModel.toDomain(): Price =
     Price(value)
 
-fun Price.toUi(): UiPrice =
-    UiPrice(value)
+fun Price.toUi(): PriceModel =
+    PriceModel(value)

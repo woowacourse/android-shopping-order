@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.OrderModel
-import woowacourse.shopping.model.Price
+import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract.Presenter
@@ -47,7 +47,7 @@ class CartPresenter(
     }
 
     override fun order() {
-        val checkedCartItemsPrice = Price(cart.checkedProductTotalPrice).toDomain()
+        val checkedCartItemsPrice = PriceModel(cart.checkedProductTotalPrice).toDomain()
         val order = OrderModel(
             orderProducts = cart.getCheckedCartItems().map(OrderProduct::of).toUi(),
             payment = Payment.of(checkedCartItemsPrice).toUi()

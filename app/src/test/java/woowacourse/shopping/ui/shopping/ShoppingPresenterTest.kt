@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.UiPrice
+import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 
@@ -127,7 +127,7 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun `제품_개수를_증가시킨다`() {
         // given
-        val product = UiProduct(0, "제품", UiPrice(1000), "")
+        val product = UiProduct(0, "제품", PriceModel(1000), "")
         val count = 3
 
         // when

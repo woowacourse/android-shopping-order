@@ -8,8 +8,8 @@ import woowacourse.shopping.ui.orderdetail.recyclerview.OrderDetailViewType
 
 @Parcelize
 data class PaymentModel(
-    val originalPayment: UiPrice,
-    val finalPayment: UiPrice,
+    val originalPayment: PriceModel,
+    val finalPayment: PriceModel,
     val usedPoint: PointModel,
 ) : Parcelable, ListItem {
     @IgnoredOnParcel

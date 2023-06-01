@@ -10,8 +10,8 @@ import woowacourse.shopping.ui.order.recyclerview.OrderViewType
 data class OrderProductModel(
     val cartProductId: Int,
     val name: String,
-    val price: UiPrice,
-    val totalPrice: UiPrice,
+    val price: PriceModel,
+    val totalPrice: PriceModel,
     val quantity: UiProductCount,
     val imageUrl: String,
 ) : Parcelable, ListItem {

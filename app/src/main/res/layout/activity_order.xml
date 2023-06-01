@@ -16,7 +16,7 @@
 
         <variable
             name="totalPayment"
-            type="woowacourse.shopping.model.Price" />
+            type="woowacourse.shopping.model.PriceModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

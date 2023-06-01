@@ -9,6 +9,6 @@ typealias UiProduct = Product
 data class Product(
     val id: Int,
     val name: String,
-    val price: UiPrice,
+    val price: PriceModel,
     val imageUrl: String,
 ) : Parcelable
