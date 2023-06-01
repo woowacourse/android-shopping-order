@@ -16,10 +16,16 @@ internal object ProductFixture {
                 title = "치킨치킨",
                 price = 15_000,
                 imageUrl = "https://product-image.kurly.com/product/image/2c392328-104a-4fef-8222-c11be9c5c35f.jpg",
-            )
+            ),
+            ProductModel(
+                id = 3L,
+                title = "피자피자",
+                price = 10_000,
+                imageUrl = "https://product-image.kurly.com/product/image/2c392328-104a-4fef-8222-c11be9c5c35f.jpg",
+            ),
         )
     }
-    
+
     fun getData(): ProductModel {
         return ProductModel(
             id = 1L,
