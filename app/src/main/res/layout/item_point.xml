@@ -7,7 +7,7 @@
 
         <variable
             name="maxAvailablePoint"
-            type="woowacourse.shopping.model.Point" />
+            type="woowacourse.shopping.model.PointModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

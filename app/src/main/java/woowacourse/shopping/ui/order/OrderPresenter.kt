@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.PointRepository
 import woowacourse.shopping.model.OrderModel
-import woowacourse.shopping.model.UiPoint
+import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.order.OrderContract.View
@@ -41,7 +41,7 @@ class OrderPresenter(
         view.updateOrder(orderItems)
     }
 
-    override fun applyPoint(point: UiPoint) {
+    override fun applyPoint(point: PointModel) {
         if (point.toDomain() <= maxAvailablePoint && point.value != 0) {
             discountedOrder = originOrder.applyPointDiscount(point.toDomain())
             view.showFinalPayment(discountedOrder.finalPrice.toUi())

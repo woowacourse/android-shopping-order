@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemPointBinding
-import woowacourse.shopping.model.Point
-import woowacourse.shopping.model.UiPoint
+import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.util.extension.setOnSingleClickListener
 
 class PointViewHolder(
     parent: ViewGroup,
-    onApplyPoint: (discountAppliedPoint: UiPoint) -> Unit,
+    onApplyPoint: (discountAppliedPoint: PointModel) -> Unit,
 ) : BaseViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.item_point, parent, false)
 ) {
@@ -19,11 +18,11 @@ class PointViewHolder(
 
     init {
         binding.pointApplyButton.setOnSingleClickListener {
-            onApplyPoint(UiPoint(binding.pointEditText.point))
+            onApplyPoint(PointModel(binding.pointEditText.point))
         }
     }
 
     override fun bind(maxPoint: ListItem) {
-        binding.maxAvailablePoint = maxPoint as? Point
+        binding.maxAvailablePoint = maxPoint as? PointModel
     }
 }

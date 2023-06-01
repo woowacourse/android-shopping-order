@@ -10,7 +10,7 @@ import woowacourse.shopping.ui.orderdetail.recyclerview.OrderDetailViewType
 data class PaymentModel(
     val originalPayment: UiPrice,
     val finalPayment: UiPrice,
-    val usedPoint: UiPoint,
+    val usedPoint: PointModel,
 ) : Parcelable, ListItem {
     @IgnoredOnParcel
     override val viewType: Int = OrderDetailViewType.PAYMENT.value

@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.order.recyclerview.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.model.UiPoint
+import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.OrderViewType
 import woowacourse.shopping.ui.order.recyclerview.viewholder.BaseViewHolder
@@ -11,7 +11,7 @@ import woowacourse.shopping.ui.order.recyclerview.viewholder.PointViewHolder
 
 class OrderRecyclerViewAdapter(
     private val items: MutableList<ListItem> = mutableListOf(),
-    private val onApplyPoint: (discountAppliedPoint: UiPoint) -> Unit,
+    private val onApplyPoint: (discountAppliedPoint: PointModel) -> Unit,
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {

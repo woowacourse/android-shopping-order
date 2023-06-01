@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.order
 
-import woowacourse.shopping.model.UiPoint
+import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.model.UiPrice
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 
@@ -16,7 +16,7 @@ interface OrderContract {
 
     interface Presenter {
         fun fetchAll()
-        fun applyPoint(point: UiPoint)
+        fun applyPoint(point: PointModel)
         fun order()
         fun navigateToHome()
     }

@@ -6,10 +6,8 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.OrderViewType
 
-typealias UiPoint = Point
-
 @Parcelize
-data class Point(
+data class PointModel(
     val value: Int,
 ) : Parcelable, ListItem {
     @IgnoredOnParcel

@@ -1,12 +1,12 @@
 package woowacourse.shopping.model.mapper
 
 import woowacourse.shopping.domain.model.Point
-import woowacourse.shopping.model.UiPoint
+import woowacourse.shopping.model.PointModel
 
-fun UiPoint.toDomain(): Point = Point(
+fun PointModel.toDomain(): Point = Point(
     value = value,
 )
 
-fun Point.toUi(): UiPoint = UiPoint(
+fun Point.toUi(): PointModel = PointModel(
     value = value,
 )
