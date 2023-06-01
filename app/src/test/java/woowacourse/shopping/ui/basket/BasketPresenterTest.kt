@@ -170,7 +170,12 @@ class BasketPresenterTest {
         presenter.startPayment()
 
         // then: repository로부터 user정보를 받아 dialog를 띄운다.
-        verify { view.showPaymentView(checkedProducts) }
+        verify {
+            view.showPaymentView(
+                basketProducts = checkedProducts,
+                totalPrice = presenter.basket.getCheckedProductsTotalPrice()
+            )
+        }
     }
 
     @Test

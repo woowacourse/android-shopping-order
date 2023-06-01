@@ -114,9 +114,13 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         binding.isLoaded = isLoaded
     }
 
-    override fun showPaymentView(basketProducts: List<BasketProductUiModel>) {
+    override fun showPaymentView(
+        basketProducts: List<BasketProductUiModel>,
+        totalPrice: Int,
+    ) {
         val intent = PaymentActivity.getIntent(
             context = this,
+            totalPrice = totalPrice,
             basketProducts = basketProducts.toTypedArray()
         )
 

@@ -42,6 +42,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
                 userRepository = UserRepositoryImpl(
                     userRemoteDateSource = UserRemoteDataSourceImpl()
                 ),
+                totalPrice = intent.getIntExtra(TOTAL_PRICE_KEY, -1),
                 orderRepository = OrderRepositoryImpl(
                     orderRemoteDataSource = OrderRemoteDataSourceImpl()
                 )
@@ -67,7 +68,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
             )
             tvPaymentOnImageCount.text = getString(
                 R.string.iv_product_count,
-                basketProducts.size - 1
+                basketProducts.size
             )
             tvPaymentPointMessage.text = getString(R.string.tv_over_using_point)
             tvPaymentHoldingPoint.text = user.point.toString()
@@ -114,13 +115,16 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
     companion object {
         private const val BASKET_PRODUCTS_KEY = "basket_products"
+        private const val TOTAL_PRICE_KEY = "total_price"
 
         fun getIntent(
             context: Context,
+            totalPrice: Int,
             basketProducts: Array<BasketProductUiModel>,
         ): Intent {
             val intent = Intent(context, PaymentActivity::class.java).apply {
                 putExtra(BASKET_PRODUCTS_KEY, basketProducts)
+                putExtra(TOTAL_PRICE_KEY, totalPrice)
             }
 
             return intent

@@ -133,7 +133,10 @@ class BasketPresenter(
             .filter { it.checked }
             .map { it.toBasketProductUiModel() }
 
-        view.showPaymentView(products)
+        view.showPaymentView(
+            basketProducts = products,
+            totalPrice = basket.getCheckedProductsTotalPrice()
+        )
     }
 
     companion object {

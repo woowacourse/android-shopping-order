@@ -22,7 +22,7 @@ interface BasketContract {
 
         fun updateSkeletonState(isLoaded: Boolean)
 
-        fun showPaymentView(basketProducts: List<BasketProductUiModel>)
+        fun showPaymentView(basketProducts: List<BasketProductUiModel>, totalPrice: Int)
     }
 
     interface Presenter {

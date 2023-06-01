@@ -7,6 +7,7 @@ import woowacourse.shopping.ui.model.BasketProductUiModel
 class PaymentPresenter(
     private val view: PaymentContract.View,
     private val basketProducts: List<BasketProductUiModel>,
+    private val totalPrice: Int,
     private val userRepository: UserRepository,
     private val orderRepository: OrderRepository,
 ) : PaymentContract.Presenter {
@@ -16,11 +17,7 @@ class PaymentPresenter(
             view.initView(
                 user = it,
                 basketProducts = basketProducts,
-                totalPrice = basketProducts.sumOf { basketProduct ->
-                    basketProduct.product
-                        .price
-                        .value
-                }
+                totalPrice = totalPrice
             )
         }
     }
