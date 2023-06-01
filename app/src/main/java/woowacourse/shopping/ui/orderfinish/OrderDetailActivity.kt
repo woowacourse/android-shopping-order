@@ -33,7 +33,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         setContentView(R.layout.activity_order_detail)
 
         initToolbar()
-        presenter.getOrderRecord()
+        presenter.getOrder()
     }
 
     private fun initToolbar() {
@@ -42,7 +42,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         }
     }
 
-    override fun setUpView(order: Order) {
+    override fun initView(order: Order) {
         binding.rvOrderProducts.adapter = OrderDetailRecyclerAdapter(order)
     }
 

@@ -5,10 +5,10 @@ import woowacourse.shopping.ui.model.Order
 interface OrderDetailContract {
 
     interface View {
-        fun setUpView(order: Order)
+        fun initView(order: Order)
     }
 
     interface Presenter {
-        fun getOrderRecord()
+        fun getOrder()
     }
 }

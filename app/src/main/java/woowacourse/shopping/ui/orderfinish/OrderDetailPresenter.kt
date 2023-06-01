@@ -10,14 +10,14 @@ class OrderDetailPresenter(
     private val order: Order?,
 ) : OrderDetailContract.Presenter {
 
-    override fun getOrderRecord() {
+    override fun getOrder() {
         if (orderId != -1) {
             orderRepository.getOrder(orderId) {
-                view.setUpView(it)
+                view.initView(it)
             }
         }
         order?.let {
-            view.setUpView(it)
+            view.initView(it)
         }
     }
 }
