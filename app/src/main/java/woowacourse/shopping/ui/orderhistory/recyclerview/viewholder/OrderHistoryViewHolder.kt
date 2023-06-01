@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderHistoryBinding
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.viewholder.BaseViewHolder
 import woowacourse.shopping.util.extension.setOnSingleClickListener
@@ -24,6 +24,6 @@ class OrderHistoryViewHolder(
     }
 
     override fun bind(order: ListItem) {
-        binding.order = order as? UiOrder
+        binding.order = order as? OrderModel
     }
 }

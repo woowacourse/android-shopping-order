@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.View
@@ -27,7 +27,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
         presenter.loadMoreOrderList()
     }
 
-    override fun showExtraOrderList(orders: List<UiOrder>) {
+    override fun showExtraOrderList(orders: List<OrderModel>) {
         binding.adapter?.submitList(orders)
     }
 
@@ -35,7 +35,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
         showToast(getString(R.string.load_order_failed_message))
     }
 
-    override fun navigateToOrderDetail(order: UiOrder) {
+    override fun navigateToOrderDetail(order: OrderModel) {
         startActivity(OrderDetailActivity.getIntent(this, order))
     }
 

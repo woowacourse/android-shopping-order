@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.UiPrice
 import woowacourse.shopping.ui.order.OrderContract.View
 import woowacourse.shopping.ui.order.recyclerview.ListItem
@@ -62,7 +62,7 @@ class OrderActivity : AppCompatActivity(), View {
     companion object {
         private const val ORDER_KEY = "order_key"
 
-        fun getIntent(context: Context, order: UiOrder): Intent {
+        fun getIntent(context: Context, order: OrderModel): Intent {
             return Intent(context, OrderActivity::class.java)
                 .putExtra(ORDER_KEY, order)
         }

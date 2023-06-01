@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.page.LoadMore
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.View
 
@@ -29,7 +29,7 @@ class OrderHistoryPresenter(
         view.navigateToHome()
     }
 
-    override fun inquiryOrderDetail(order: UiOrder) {
+    override fun inquiryOrderDetail(order: OrderModel) {
         view.navigateToOrderDetail(order)
     }
 

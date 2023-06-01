@@ -6,10 +6,8 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 
-typealias UiOrder = Order
-
 @Parcelize
-data class Order(
+data class OrderModel(
     val id: Int = DEFAULT_ORDER_ID,
     val orderProducts: List<OrderProduct>,
     val payment: Payment,

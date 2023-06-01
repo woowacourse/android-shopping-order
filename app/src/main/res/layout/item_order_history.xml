@@ -8,7 +8,7 @@
 
         <variable
             name="order"
-            type="woowacourse.shopping.model.Order" />
+            type="woowacourse.shopping.model.OrderModel" />
     </data>
 
     <androidx.cardview.widget.CardView

@@ -4,16 +4,16 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.PointRepository
+import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.UiPoint
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.UiOrder
-import woowacourse.shopping.model.UiPoint
 import woowacourse.shopping.ui.order.OrderContract.View
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 
 class OrderPresenter(
     private val view: View,
-    order: UiOrder,
+    order: OrderModel,
     private val orderRepository: OrderRepository,
     private val pointRepository: PointRepository,
 ) : OrderContract.Presenter {

@@ -11,7 +11,7 @@ import woowacourse.shopping.data.util.cartService
 import woowacourse.shopping.data.util.orderService
 import woowacourse.shopping.data.util.pointService
 import woowacourse.shopping.data.util.productService
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
@@ -76,7 +76,7 @@ fun injectServerSettingPresenter(
 
 fun injectOrderPresenter(
     view: OrderContract.View,
-    order: UiOrder,
+    order: OrderModel,
 ): OrderContract.Presenter = OrderPresenter(
     view = view,
     order = order,
@@ -93,7 +93,7 @@ fun injectOrderListPresenter(
 
 fun injectOrderDetailPresenter(
     view: OrderDetailContract.View,
-    order: UiOrder,
+    order: OrderModel,
 ): OrderDetailContract.Presenter = OrderDetailPresenter(
     view = view,
     order = order,

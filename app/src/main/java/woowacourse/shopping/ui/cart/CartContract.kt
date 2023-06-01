@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.Page
 import woowacourse.shopping.model.CartProductModel
 
@@ -10,7 +10,7 @@ interface CartContract {
         fun updateNavigatorEnabled(previousEnabled: Boolean, nextEnabled: Boolean)
         fun updatePageNumber(page: Page)
         fun updateTotalPrice(totalPrice: Int)
-        fun navigateToOrder(order: Order)
+        fun navigateToOrder(order: OrderModel)
         fun navigateToHome()
         fun showErrorMessage(message: String)
     }

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract.Presenter
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract.View
@@ -38,7 +38,7 @@ class OrderDetailActivity : AppCompatActivity(), View {
     companion object {
         private const val ORDER_KEY = "order_key"
 
-        fun getIntent(context: Context, order: UiOrder): Intent =
+        fun getIntent(context: Context, order: OrderModel): Intent =
             Intent(context, OrderDetailActivity::class.java)
                 .putExtra(ORDER_KEY, order)
     }
