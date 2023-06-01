@@ -4,7 +4,6 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
     private val _items = cartProductInfos.toMutableList()
     val items get() = _items.toList()
 
-    val size: Int get() = items.size
     val count: Int get() = items.sumOf { it.count }
     val totalPrice: Int get() = items.sumOf { it.totalPrice }
     val orders: CartProductInfoList
@@ -12,18 +11,6 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
             return CartProductInfoList(items.filter { it.isOrdered })
         }
     val isAllOrdered: Boolean get() = items.all { it.isOrdered }
-
-    fun add(item: CartProductInfo): CartProductInfoList {
-        if (items.none { it.product.id == item.product.id }) {
-            _items.add(item)
-        }
-        return CartProductInfoList(items)
-    }
-
-    fun addAll(newItems: List<CartProductInfo>): CartProductInfoList {
-        newItems.forEach { add(it) }
-        return CartProductInfoList(items)
-    }
 
     fun delete(item: CartProductInfo): CartProductInfoList {
         _items.removeAll { it.id == item.id }
@@ -63,7 +50,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         }
     }
 
-    fun replaceItem(newItem: CartProductInfo): CartProductInfoList {
+    private fun replaceItem(newItem: CartProductInfo): CartProductInfoList {
         _items.forEachIndexed { index, item ->
             if (item.id == newItem.id) _items[index] = newItem
         }
