@@ -9,7 +9,7 @@ class ShoppingPresenter(
     private val view: ShoppingContract.View,
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
 ) : ShoppingContract.Presenter {
     override fun setUpProducts() {
         setUpCartCounts()
@@ -42,7 +42,7 @@ class ShoppingPresenter(
 
     override fun setUpTotalCount() {
         view.setToolbar(
-            cartRepository.getTotalSelectedCount()
+            cartRepository.getTotalSelectedCount(),
         )
     }
 
@@ -64,6 +64,5 @@ class ShoppingPresenter(
 
     companion object {
         private const val RECENT_PRODUCT_COUNT = 10
-        private const val PRODUCT_COUNT = 20
     }
 }
