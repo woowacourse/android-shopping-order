@@ -1,23 +1,38 @@
 package woowacourse.shopping.feature.cart
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.order.confirm.OrderConfirmActivity
 import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.getSerializableExtraCompat
 import woowacourse.shopping.util.toMoneyFormat
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var presenter: CartContract.Presenter
     private lateinit var cartProductAdapter: CartProductAdapter
+
+    private val resultLauncher: ActivityResultLauncher<Intent> by lazy {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val cartIds =
+                    result.data?.getSerializableExtraCompat<ArrayList<Long>>(OrderConfirmActivity.ORDER_CART_ID_KEY)
+                cartIds?.let { presenter.processRemoveOrderCheckedItems() }
+            }
+        }
+    }
 
     private val cartProductClickListener: CartProductClickListener by lazy {
         object : CartProductClickListener {
@@ -100,6 +115,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showLoadingView() {
         binding.cartLayout.visibility = View.GONE
         binding.skeletonCartLoadingLayout.visibility = View.VISIBLE
+    }
+
+    override fun showOrderConfirmScreen(cartIds: List<Long>) {
+        resultLauncher.launch(OrderConfirmActivity.getIntent(this, cartIds))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

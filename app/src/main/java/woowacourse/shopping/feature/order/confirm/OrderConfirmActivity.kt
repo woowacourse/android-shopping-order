@@ -76,7 +76,7 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
 
     companion object {
         private const val CART_ID_KEY = "cart_id_key"
-        private const val ORDER_CART_ID_KEY = "order_cart_id_key"
+        const val ORDER_CART_ID_KEY = "order_cart_id_key"
         fun getIntent(context: Context, cartIds: List<Long>): Intent {
             return Intent(context, OrderConfirmActivity::class.java).apply {
                 putExtra(CART_ID_KEY, cartIds.toTypedArray())

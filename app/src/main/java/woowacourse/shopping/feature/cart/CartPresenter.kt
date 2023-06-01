@@ -92,8 +92,12 @@ class CartPresenter(
         _page = page.toDomain().setCurrentPageAllChecked(checked).toPresentation()
     }
 
-    override fun processOrderClick() {
+    override fun requestOrderConfirmScreen() {
         if (page.cartBottomNavigationUiModel.isAnyChecked.not()) return
+        _page?.checkedCartIds?.let { view.showOrderConfirmScreen(it) }
+    }
+
+    override fun processRemoveOrderCheckedItems() {
         _page = page.toDomain().removeAllChecked().toPresentation()
     }
 
