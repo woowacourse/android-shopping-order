@@ -1,8 +1,9 @@
 package woowacourse.shopping.data.product
 
 import retrofit2.Call
+import woowacourse.shopping.data.common.model.BaseResponse
 
 interface ProductRemoteDataSource {
-    fun getProductById(id: Int): Call<ProductDataModel>
-    fun getAllProducts(): Call<List<ProductDataModel>>
+    fun getProductById(id: Int): Call<BaseResponse<ProductDataModel>>
+    fun getAllProducts(): Call<BaseResponse<List<ProductDataModel>>>
 }

@@ -7,6 +7,7 @@ import retrofit2.Response
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.data.cart.model.CartDataModel
+import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.repository.CartRepository
 
@@ -14,14 +15,14 @@ class CartRepositoryImpl constructor(
     private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
     override fun addCartItem(productId: Int, onSuccess: (Int?) -> Unit) {
-        cartRemoteDataSource.addCartItem(productId).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+        cartRemoteDataSource.addCartItem(productId).enqueue(object : Callback<BaseResponse<Unit>> {
+            override fun onResponse(call: Call<BaseResponse<Unit>>, response: Response<BaseResponse<Unit>>) {
                 val locationHeader = response.headers()["Location"]
                 val cartItemId = extractCartItemIdFromLocation(locationHeader)
                 onSuccess(cartItemId)
             }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
                 Log.d("HttpError", t.message.toString())
                 throw (t)
             }
@@ -29,12 +30,12 @@ class CartRepositoryImpl constructor(
     }
 
     override fun deleteCartItem(cartId: Int, onSuccess: () -> Unit) {
-        cartRemoteDataSource.deleteCartItem(cartId).enqueue(object : Callback<CartDataModel> {
-            override fun onResponse(call: Call<CartDataModel>, response: Response<CartDataModel>) {
+        cartRemoteDataSource.deleteCartItem(cartId).enqueue(object : Callback<BaseResponse<CartDataModel>> {
+            override fun onResponse(call: Call<BaseResponse<CartDataModel>>, response: Response<BaseResponse<CartDataModel>>) {
                 onSuccess()
             }
 
-            override fun onFailure(call: Call<CartDataModel>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<CartDataModel>>, t: Throwable) {
                 Log.d("HttpError", t.message.toString())
                 throw (t)
             }
@@ -45,12 +46,12 @@ class CartRepositoryImpl constructor(
         cartRemoteDataSource.updateCartItemQuantity(
             cartId = cartId,
             count = count,
-        ).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+        ).enqueue(object : Callback<BaseResponse<Unit>> {
+            override fun onResponse(call: Call<BaseResponse<Unit>>, response: Response<BaseResponse<Unit>>) {
                 onSuccess()
             }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
                 Log.d("HttpError", t.message.toString())
                 throw (t)
             }
@@ -65,12 +66,13 @@ class CartRepositoryImpl constructor(
 
     override fun getAllCartItems(onSuccess: (List<CartProductInfo>) -> Unit) {
         cartRemoteDataSource.getAllCartProductsInfo()
-            .enqueue(object : Callback<List<CartDataModel>> {
+            .enqueue(object : Callback<BaseResponse<List<CartDataModel>>> {
                 override fun onResponse(
-                    call: Call<List<CartDataModel>>,
-                    response: Response<List<CartDataModel>>,
+                    call: Call<BaseResponse<List<CartDataModel>>>,
+                    response: Response<BaseResponse<List<CartDataModel>>>,
                 ) {
-                    val cartItems = response.body()?.map { it.toDomain() }
+                    val result = response.body()?.result
+                    val cartItems = result?.map { it.toDomain() }
                     if (cartItems == null) {
                         onSuccess(emptyList())
                     } else {
@@ -78,7 +80,7 @@ class CartRepositoryImpl constructor(
                     }
                 }
 
-                override fun onFailure(call: Call<List<CartDataModel>>, t: Throwable) {
+                override fun onFailure(call: Call<BaseResponse<List<CartDataModel>>>, t: Throwable) {
                     Log.d("HttpError", t.message.toString())
                     throw (t)
                 }

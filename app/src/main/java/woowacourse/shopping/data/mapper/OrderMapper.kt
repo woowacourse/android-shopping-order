@@ -16,8 +16,8 @@ fun OrderDataModel.toDomain(): Order {
     return Order(
         orderId = orderId,
         imageUrl = imageUrl,
-        orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(orderDate),
-        sendPrice = Price(value = 0)
+        orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(createdAt),
+        spendPrice = Price(value = spendPrice)
     )
 }
 
@@ -27,7 +27,7 @@ fun OrderDetailDataModel.toDomain(): OrderDetail {
         totalPrice = Price(totalPrice),
         spendPoint = Point(spendPoint),
         spendPrice = Price(spendPrice),
-        orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(orderDate),
+        orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(createdAt),
         orderItems = OrderProducts(orderItems.map { it.toDomain() })
     )
 }

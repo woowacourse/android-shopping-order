@@ -12,25 +12,26 @@ import retrofit2.http.Path
 import woowacourse.shopping.data.cart.model.AddCartRequestBody
 import woowacourse.shopping.data.cart.model.CartDataModel
 import woowacourse.shopping.data.cart.model.UpdateQuantityRequestBody
+import woowacourse.shopping.data.common.model.BaseResponse
 
 interface CartService {
     @GET("cart-items")
     fun getAllCartItems(
         @Header("Authorization") credentials: String,
-    ): Call<List<CartDataModel>>
+    ): Call<BaseResponse<List<CartDataModel>>>
 
     @Headers("Content-Type: application/json")
     @POST("cart-items")
     fun addCartItem(
         @Header("Authorization") credentials: String,
         @Body addCartRequestBody: AddCartRequestBody,
-    ): Call<Unit>
+    ): Call<BaseResponse<Unit>>
 
     @DELETE("cart-items/{cartItemId}")
     fun deleteCartItem(
         @Header("Authorization") credentials: String,
         @Path("cartItemId") cartItemId: Int,
-    ): Call<CartDataModel>
+    ): Call<BaseResponse<CartDataModel>>
 
     @Headers("Content-Type: application/json")
     @PATCH("cart-items/{cartItemId}")
@@ -38,5 +39,5 @@ interface CartService {
         @Header("Authorization") credentials: String,
         @Path("cartItemId") cartItemId: Int,
         @Body quantityBody: UpdateQuantityRequestBody,
-    ): Call<Unit>
+    ): Call<BaseResponse<Unit>>
 }
