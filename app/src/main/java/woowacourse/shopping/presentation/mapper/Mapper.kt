@@ -82,7 +82,9 @@ fun Order.toPresentation(): OrderModel {
         orderId = orderId,
         imageUrl = imageUrl,
         orderDate = LocalDateTimeHelper.convertLocalDateTimeToDateString(orderDate),
-        sendPrice = spendPrice.value
+        sendPrice = spendPrice.value,
+        firstProductName = firstProductName,
+        totalCount = totalCount
     )
 }
 

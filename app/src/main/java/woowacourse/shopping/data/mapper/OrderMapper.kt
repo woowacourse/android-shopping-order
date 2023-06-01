@@ -14,10 +14,13 @@ import woowacourse.shopping.util.LocalDateTimeHelper
 
 fun OrderDataModel.toDomain(): Order {
     return Order(
+
         orderId = orderId,
         imageUrl = imageUrl,
         orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(createdAt),
-        spendPrice = Price(value = spendPrice)
+        spendPrice = Price(value = spendPrice),
+        firstProductName = firstProductName,
+        totalCount = totalCount
     )
 }
 
