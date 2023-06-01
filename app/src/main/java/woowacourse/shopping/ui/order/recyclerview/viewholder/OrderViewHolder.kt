@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderBinding
-import woowacourse.shopping.model.OrderProduct
+import woowacourse.shopping.model.OrderProductModel
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 
 class OrderViewHolder(
@@ -15,6 +15,6 @@ class OrderViewHolder(
     private val binding: ItemOrderBinding = ItemOrderBinding.bind(itemView)
 
     override fun bind(orderProduct: ListItem) {
-        binding.orderProduct = orderProduct as? OrderProduct
+        binding.orderProduct = orderProduct as? OrderProductModel
     }
 }

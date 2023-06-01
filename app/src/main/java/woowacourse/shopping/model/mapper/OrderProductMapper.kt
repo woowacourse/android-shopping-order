@@ -1,9 +1,9 @@
 package woowacourse.shopping.model.mapper
 
 import woowacourse.shopping.domain.model.OrderProduct
-import woowacourse.shopping.model.UiOrderProduct
+import woowacourse.shopping.model.OrderProductModel
 
-fun UiOrderProduct.toDomain(): OrderProduct = OrderProduct(
+fun OrderProductModel.toDomain(): OrderProduct = OrderProduct(
     cartProductId = cartProductId,
     name = name,
     price = price.toDomain(),
@@ -11,7 +11,7 @@ fun UiOrderProduct.toDomain(): OrderProduct = OrderProduct(
     imageUrl = imageUrl,
 )
 
-fun OrderProduct.toUi(): UiOrderProduct = UiOrderProduct(
+fun OrderProduct.toUi(): OrderProductModel = OrderProductModel(
     cartProductId = cartProductId,
     name = name,
     price = price.toUi(),
@@ -20,5 +20,5 @@ fun OrderProduct.toUi(): UiOrderProduct = UiOrderProduct(
     imageUrl = imageUrl,
 )
 
-fun List<UiOrderProduct>.toDomain(): List<OrderProduct> = map { it.toDomain() }
-fun List<OrderProduct>.toUi(): List<UiOrderProduct> = map { it.toUi() }
+fun List<OrderProductModel>.toDomain(): List<OrderProduct> = map { it.toDomain() }
+fun List<OrderProduct>.toUi(): List<OrderProductModel> = map { it.toUi() }

@@ -9,7 +9,7 @@ import woowacourse.shopping.ui.order.recyclerview.ListItem
 @Parcelize
 data class OrderModel(
     val id: Int = DEFAULT_ORDER_ID,
-    val orderProducts: List<OrderProduct>,
+    val orderProducts: List<OrderProductModel>,
     val payment: Payment,
 ) : Parcelable, ListItem {
 

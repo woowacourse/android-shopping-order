@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.orderdetail.recyclerview
 
 import woowacourse.shopping.R
-import woowacourse.shopping.model.OrderProduct
+import woowacourse.shopping.model.OrderProductModel
 
 enum class OrderDetailViewType(val value: Int) {
-    ORDER_DETAIL(OrderProduct.VIEW_TYPE_VALUE),
+    ORDER_DETAIL(OrderProductModel.VIEW_TYPE_VALUE),
     PAYMENT(R.layout.item_payment);
 
     companion object {
