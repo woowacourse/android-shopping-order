@@ -1,13 +1,16 @@
 package woowacourse.shopping.domain.model
 
+import woowacourse.shopping.domain.model.discount.Discountable
+import woowacourse.shopping.domain.model.discount.Point
+
 data class Payment(
     val originalPrice: Price,
     val finalPrice: Price,
-    val usedPoint: Point = Point(0),
+    val usedPoint: Discountable = Point(0),
 ) {
 
-    fun applyPointDiscount(point: Point): Payment = copy(
-        finalPrice = finalPrice - point.value,
+    fun discount(point: Discountable): Payment = copy(
+        finalPrice = point.discount(originalPrice),
         usedPoint = point
     )
 

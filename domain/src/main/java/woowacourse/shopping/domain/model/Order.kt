@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.model
 
+import woowacourse.shopping.domain.model.discount.Discountable
+
 data class Order(
     val id: Int = NO_ID,
     val orderProducts: List<OrderProduct>,
@@ -7,8 +9,8 @@ data class Order(
 ) {
     val finalPrice: Price = payment.finalPrice
 
-    fun applyPointDiscount(point: Point): Order = copy(
-        payment = payment.applyPointDiscount(point)
+    fun discount(point: Discountable): Order = copy(
+        payment = payment.discount(point)
     )
 
     companion object {

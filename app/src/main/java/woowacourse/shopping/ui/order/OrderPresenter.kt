@@ -1,12 +1,13 @@
 package woowacourse.shopping.ui.order
 
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.model.Point
+import woowacourse.shopping.domain.model.discount.Point
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.PointRepository
 import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toPointModelUi
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.order.OrderContract.View
 import woowacourse.shopping.ui.order.recyclerview.ListItem
@@ -25,12 +26,12 @@ class OrderPresenter(
         pointRepository.getPoint(
             onSuccess = { fetchedPoint ->
                 maxAvailablePoint = fetchedPoint
-                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toUi())
+                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toPointModelUi())
                 view.showFinalPayment(discountedOrder.finalPrice.toUi())
             },
             onFailed = {
                 maxAvailablePoint = DEFAULT_POINT
-                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toUi())
+                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toPointModelUi())
                 view.showFinalPayment(discountedOrder.finalPrice.toUi())
                 view.showOrderLoadFailed()
             }
@@ -42,8 +43,8 @@ class OrderPresenter(
     }
 
     override fun applyPoint(point: PointModel) {
-        if (point.toDomain() <= maxAvailablePoint && point.value != 0) {
-            discountedOrder = originOrder.applyPointDiscount(point.toDomain())
+        if (maxAvailablePoint.discountable(point.toDomain())) {
+            discountedOrder = originOrder.discount(point.toDomain())
             view.showFinalPayment(discountedOrder.finalPrice.toUi())
         }
     }

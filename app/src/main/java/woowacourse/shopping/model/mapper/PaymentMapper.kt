@@ -12,5 +12,5 @@ fun PaymentModel.toDomain(): Payment = Payment(
 fun Payment.toUi(): PaymentModel = PaymentModel(
     originalPayment = originalPrice.toUi(),
     finalPayment = finalPrice.toUi(),
-    usedPoint = usedPoint.toUi(),
+    usedPoint = usedPoint.toPointModelUi(),
 )

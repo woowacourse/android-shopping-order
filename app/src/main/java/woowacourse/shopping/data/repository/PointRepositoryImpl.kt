@@ -5,7 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.PointResponse
 import woowacourse.shopping.data.service.point.PointService
-import woowacourse.shopping.domain.model.Point
+import woowacourse.shopping.domain.model.discount.Point
 import woowacourse.shopping.domain.repository.PointRepository
 
 class PointRepositoryImpl(private val service: PointService) : PointRepository {
