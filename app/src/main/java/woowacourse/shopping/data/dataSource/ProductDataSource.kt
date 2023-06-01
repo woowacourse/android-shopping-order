@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.dataSource
 
-import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.data.dto.ProductListDto
+import woowacourse.shopping.data.remote.dto.ProductDto
+import woowacourse.shopping.data.remote.dto.ProductListDto
 import woowacourse.shopping.domain.util.WoowaResult
 
 interface ProductDataSource {

@@ -5,14 +5,14 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE
 import android.provider.BaseColumns
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_IMAGE_URL
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_NAME
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRICE
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRODUCT_ID
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_VIEWED_DATE_TIME
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.TABLE_NAME
-import woowacourse.shopping.data.WoowaShoppingDbHelper
 import woowacourse.shopping.data.dataSource.RecentlyViewedDataSource
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_IMAGE_URL
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_NAME
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRICE
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRODUCT_ID
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_VIEWED_DATE_TIME
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_NAME
+import woowacourse.shopping.data.local.WoowaShoppingDbHelper
 import woowacourse.shopping.domain.model.Product
 import java.time.LocalDateTime
 

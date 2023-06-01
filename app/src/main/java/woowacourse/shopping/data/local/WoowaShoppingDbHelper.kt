@@ -1,10 +1,10 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.CREATE_RECENTLY_VIEWED_TABLE
-import woowacourse.shopping.data.WoowaShoppingContract.RecentlyViewed.DELETE_RECENTLY_VIEWED_TABLE
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.CREATE_RECENTLY_VIEWED_TABLE
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.DELETE_RECENTLY_VIEWED_TABLE
 
 class WoowaShoppingDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
 
