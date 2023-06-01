@@ -41,6 +41,19 @@ class ProductRemoteDataSourceRetrofit : ProductRemoteDataSource {
     }
 
     override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
-        TODO("Not yet implemented")
+        productService.requestProduct(id).enqueue(object : retrofit2.Callback<ProductEntity> {
+            override fun onResponse(call: Call<ProductEntity>, response: Response<ProductEntity>) {
+                if(response.isSuccessful && response.body() != null) {
+                    onSuccess(response.body()!!.toDomain())
+                }
+                else {
+                    onFailure()
+                }
+            }
+
+            override fun onFailure(call: Call<ProductEntity>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 }

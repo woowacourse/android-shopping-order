@@ -15,7 +15,7 @@ import woowacourse.shopping.data.database.dao.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.productdetail.dialog.CartProductDialog
-import woowacourse.shopping.data.product.ProductRemoteDataSourceOkhttp
+import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
 import woowacourse.shopping.shopping.ShoppingActivity
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -106,7 +106,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             recentProductModel = recentProductModel,
             recentProductRepository = RecentProductRepositoryImpl(
                 RecentProductDao(db),
-                ProductRemoteDataSourceOkhttp()
+                ProductRemoteDataSourceRetrofit()
             )
         )
     }
