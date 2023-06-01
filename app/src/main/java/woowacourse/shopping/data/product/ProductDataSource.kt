@@ -3,12 +3,11 @@ package woowacourse.shopping.data.product
 import woowacourse.shopping.data.entity.ProductEntity
 
 interface ProductDataSource {
+    fun findAll(): Result<List<ProductEntity>>
 
-    fun findAll(onFinish: (Result<List<ProductEntity>>) -> Unit)
+    fun findRanged(limit: Int, offset: Int): Result<List<ProductEntity>>
 
-    fun findRanged(limit: Int, offset: Int, onFinish: (Result<List<ProductEntity>>) -> Unit)
+    fun countAll(): Result<Int>
 
-    fun countAll(onFinish: (Result<Int>) -> Unit)
-
-    fun findById(id: Long, onFinish: (Result<ProductEntity>) -> Unit)
+    fun findById(id: Long): Result<ProductEntity>
 }

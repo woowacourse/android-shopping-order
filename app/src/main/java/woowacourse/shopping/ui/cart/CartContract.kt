@@ -6,24 +6,16 @@ import woowacourse.shopping.ui.order.uistate.PaymentUIState
 interface CartContract {
 
     interface Presenter {
+        fun loadCurrentUser()
         fun loadCartItemsOfNextPage()
-
         fun loadCartItemsOfPreviousPage()
-
         fun loadCartItemsOfLastPage()
-
         fun deleteCartItem(cartItemId: Long)
-
         fun updateSelectionCartItem(cartItemId: Long, isSelected: Boolean)
-
         fun updateSelectionTotalCartItems(isSelected: Boolean)
-
         fun plusCount(cartItemId: Long)
-
         fun minusCount(cartItemId: Long)
-
         fun checkPayment()
-
         fun placeOrder()
     }
 

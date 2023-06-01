@@ -4,15 +4,11 @@ import woowacourse.shopping.data.entity.DiscountsEntity
 import woowacourse.shopping.data.entity.OrderEntity
 
 interface OrderDataSource {
-    fun save(cartItemIds: List<Long>, userToken: String, onFinish: (Result<Long>) -> Unit)
+    fun save(cartItemIds: List<Long>, userToken: String): Result<Long>
 
-    fun findById(id: Long, userToken: String, onFinish: (Result<OrderEntity>) -> Unit)
+    fun findById(id: Long, userToken: String): Result<OrderEntity>
 
-    fun findAll(userToken: String, onFinish: (Result<List<OrderEntity>>) -> Unit)
+    fun findAll(userToken: String): Result<List<OrderEntity>>
 
-    fun findDiscountPolicy(
-        price: Int,
-        memberGrade: String,
-        onFinish: (Result<DiscountsEntity>) -> Unit
-    )
+    fun findDiscountPolicy(price: Int, memberGrade: String): Result<DiscountsEntity>
 }

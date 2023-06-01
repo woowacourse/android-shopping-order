@@ -10,10 +10,13 @@ class OrderListPresenter(
     private val userRepository: UserRepository
 ) : OrderListContract.Presenter {
     override fun loadOrders() {
-        userRepository.findCurrent { user ->
-            orderRepository.findAll(user) { orders ->
-                view.showOrders(orders.map { it.toUIState() })
-            }
+        val currentUser = userRepository.findCurrent().getOrElse {
+            return
+        }
+        orderRepository.findAll(currentUser).onSuccess { orders ->
+            view.showOrders(orders.map { it.toUIState() })
+        }.onFailure {
+            return
         }
     }
 

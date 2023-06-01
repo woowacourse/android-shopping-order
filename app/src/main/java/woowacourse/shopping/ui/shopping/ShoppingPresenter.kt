@@ -19,91 +19,94 @@ class ShoppingPresenter(
     private val userRepository: UserRepository
 ) : ShoppingContract.Presenter {
     private var currentPage = 1
+    private lateinit var currentUser: User
 
     override fun loadRecentlyViewedProducts() {
-        recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc { recentlyViewedProducts ->
-            val recentlyViewedProductUIStates = recentlyViewedProducts.map { it.toUIState() }
-            view.setRecentlyViewedProducts(recentlyViewedProductUIStates)
-        }
+        recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
+            .onSuccess { recentlyViewedProducts ->
+                val recentlyViewedProductUIStates = recentlyViewedProducts.map { it.toUIState() }
+                view.setRecentlyViewedProducts(recentlyViewedProductUIStates)
+            }.onFailure {
+                return
+            }
     }
 
     override fun loadProductsNextPage() {
         currentPage++
-        productRepository.findAll(PAGE_SIZE, calculateOffset()) { products ->
-            userRepository.findCurrent { currentUser ->
-                cartItemRepository.findAll(currentUser) { cartItems ->
-                    val cartUIStates = createProductUIState(cartItems, products)
-                    view.addProducts(cartUIStates)
-                    refreshCanLoadMore()
-                }
-            }
+        val products = productRepository.findAll(PAGE_SIZE, calculateOffset()).getOrElse {
+            return
         }
+        val cartItems = cartItemRepository.findAll(currentUser).getOrElse {
+            return
+        }
+        val cartUIStates = createProductUIState(cartItems, products)
+        view.addProducts(cartUIStates)
+        refreshCanLoadMore()
     }
 
     override fun refreshProducts() {
-        productRepository.findAll(calculateOffset() + PAGE_SIZE, 0) { products ->
-            userRepository.findCurrent { currentUser ->
-                cartItemRepository.findAll(currentUser) { cartItems ->
-                    val productUIStates = createProductUIState(cartItems, products)
-                    view.setProducts(productUIStates)
-                    refreshCanLoadMore()
-                }
-            }
+        val products = productRepository.findAll(calculateOffset() + PAGE_SIZE, 0).getOrElse {
+            return
         }
+        val cartItems = cartItemRepository.findAll(currentUser).getOrElse {
+            return
+        }
+        val productUIStates = createProductUIState(cartItems, products)
+        view.setProducts(productUIStates)
+        refreshCanLoadMore()
     }
 
     override fun addProductToCart(productId: Long) {
-        productRepository.findById(productId) { product ->
-            product ?: return@findById
-            val cartItem = CartItem(-1, 1, product)
-            userRepository.findCurrent { currentUser ->
-                cartItemRepository.save(cartItem, currentUser) { savedCartItem ->
-                    view.changeProduct(savedCartItem.toUIState())
-                    loadCartItemCount()
-                }
-            }
+        val product = productRepository.findById(productId).getOrElse {
+            return
+        }
+        val cartItem = CartItem(-1, 1, product)
+        cartItemRepository.save(cartItem, currentUser).onSuccess { savedCartItem ->
+            view.changeProduct(savedCartItem.toUIState())
+            loadCartItemCount()
+        }.onFailure {
+            return
         }
     }
 
     override fun plusCount(cartItemId: Long) {
-        userRepository.findCurrent { currentUser ->
-            cartItemRepository.findById(cartItemId, currentUser) { loadedCartItem ->
-                requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
-                val cartItem = loadedCartItem.plusQuantity()
-                cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser) {
-                    view.changeProduct(cartItem.toUIState())
-                }
-            }
+        val loadedCartItem = cartItemRepository.findById(cartItemId, currentUser).getOrElse {
+            return
+        }
+
+        val cartItem = loadedCartItem.plusQuantity()
+        cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser).onSuccess {
+            view.changeProduct(cartItem.toUIState())
+        }.onFailure {
+            return
         }
     }
 
     override fun minusCount(cartItemId: Long) {
-        userRepository.findCurrent { currentUser ->
-            cartItemRepository.findById(cartItemId, currentUser) { loadedCartItem ->
-                requireNotNull(loadedCartItem) { ERROR_CART_ITEM_NULL.format(cartItemId) }
+        val loadedCartItem = cartItemRepository.findById(cartItemId, currentUser).getOrElse {
+            return
+        }
 
-                if (loadedCartItem.quantity == 1) {
-                    cartItemRepository.deleteById(cartItemId, currentUser) {
-                        view.changeProduct(
-                            loadedCartItem.copy(id = -1, quantity = 0).toUIState()
-                        )
-                        loadCartItemCount()
-                    }
-                    return@findById
-                }
-                val cartItem = loadedCartItem.minusQuantity()
-                cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser) {
-                    view.changeProduct(cartItem.toUIState())
-                }
+        if (loadedCartItem.quantity == 1) {
+            cartItemRepository.deleteById(cartItemId, currentUser).onSuccess {
+                view.changeProduct(loadedCartItem.copy(id = -1, quantity = 0).toUIState())
+                loadCartItemCount()
             }
+            return
+        }
+        val cartItem = loadedCartItem.minusQuantity()
+        cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser).onSuccess {
+            view.changeProduct(cartItem.toUIState())
+        }.onFailure {
+            return
         }
     }
 
     override fun loadCartItemCount() {
-        userRepository.findCurrent { currentUser ->
-            cartItemRepository.countAll(currentUser) { count ->
-                view.setCartItemCount(count)
-            }
+        cartItemRepository.countAll(currentUser).onSuccess { count ->
+            view.setCartItemCount(count)
+        }.onFailure {
+            return
         }
     }
 
@@ -116,13 +119,16 @@ class ShoppingPresenter(
     }
 
     override fun loadUsers() {
-        userRepository.findAll { users ->
+        userRepository.findAll().onSuccess { users ->
             view.showUserList(users)
+        }.onFailure {
+            return
         }
     }
 
     override fun selectUser(user: User) {
         userRepository.saveCurrent(user)
+        currentUser = user
 
         refreshProducts()
         loadCartItemCount()
@@ -143,9 +149,11 @@ class ShoppingPresenter(
     }
 
     private fun refreshCanLoadMore() {
-        productRepository.countAll { count ->
+        productRepository.countAll().onSuccess { count ->
             val maxPage = (count - 1) / PAGE_SIZE + 1
             if (currentPage >= maxPage) view.setCanLoadMore(false)
+        }.onFailure {
+            return
         }
     }
 
@@ -153,6 +161,5 @@ class ShoppingPresenter(
 
     companion object {
         private const val PAGE_SIZE = 20
-        private const val ERROR_CART_ITEM_NULL = "장바구니 상품을 서버에서 조회하지 못했습니다. 상품 ID : %d"
     }
 }

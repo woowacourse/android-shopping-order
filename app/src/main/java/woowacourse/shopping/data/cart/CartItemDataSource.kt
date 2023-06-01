@@ -5,13 +5,13 @@ import woowacourse.shopping.domain.user.User
 
 interface CartItemDataSource {
 
-    fun save(productId: Long, user: User, onFinish: (Result<Long>) -> Unit)
+    fun save(productId: Long, user: User): Result<Long>
 
-    fun findAll(userToken: String, onFinish: (Result<List<CartItemEntity>>) -> Unit)
+    fun findAll(userToken: String): Result<List<CartItemEntity>>
 
-    fun findAll(limit: Int, offset: Int, userToken: String, onFinish: (Result<List<CartItemEntity>>) -> Unit)
+    fun findAll(limit: Int, offset: Int, userToken: String): Result<List<CartItemEntity>>
 
-    fun updateCountById(id: Long, count: Int, userToken: String, onFinish: (Result<Unit>) -> Unit)
+    fun updateCountById(id: Long, count: Int, userToken: String): Result<Unit>
 
-    fun deleteById(id: Long, userToken: String, onFinish: (Result<Unit>) -> Unit)
+    fun deleteById(id: Long, userToken: String): Result<Unit>
 }

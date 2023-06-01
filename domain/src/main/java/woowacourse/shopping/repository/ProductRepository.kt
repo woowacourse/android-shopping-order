@@ -3,9 +3,9 @@ package woowacourse.shopping.repository
 import woowacourse.shopping.domain.product.Product
 
 interface ProductRepository {
-    fun findAll(limit: Int, offset: Int, onFinish: (Result<List<Product>>) -> Unit)
+    fun findAll(limit: Int, offset: Int): Result<List<Product>>
 
-    fun countAll(onFinish: (Result<Int>) -> Unit)
+    fun countAll(): Result<Int>
 
-    fun findById(id: Long, onFinish: (Result<Product>) -> Unit)
+    fun findById(id: Long): Result<Product>
 }

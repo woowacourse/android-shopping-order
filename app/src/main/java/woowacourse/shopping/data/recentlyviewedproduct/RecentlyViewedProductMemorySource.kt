@@ -11,58 +11,58 @@ import java.time.LocalDateTime
 
 class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
     RecentlyViewedProductDataSource {
-    override fun save(
-        product: Product,
-        viewedTime: LocalDateTime,
-        onFinish: (Result<RecentlyViewedProduct>) -> Unit
-    ) {
-        deleteRecentlyViewedProductIfSameProductExists(product)
+    override fun save(product: Product, viewedTime: LocalDateTime): Result<RecentlyViewedProduct> {
+        return runCatching {
+            val selection =
+                "${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID} = ?"
+            val selectionArgs = arrayOf(product.id.toString())
+            db.delete(
+                ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs
+            )
 
-        val value = ContentValues().apply {
-            put(
-                ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID, product.id
-            )
-            put(
-                ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME,
-                viewedTime.toString()
-            )
+            val value = ContentValues().apply {
+                put(
+                    ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID, product.id
+                )
+                put(
+                    ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME,
+                    viewedTime.toString()
+                )
+            }
+            val id = db.insert(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, null, value)
+            RecentlyViewedProduct(id, product, viewedTime)
         }
-        val id = db.insert(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, null, value)
-        onFinish(Result.success(RecentlyViewedProduct(id, product, viewedTime)))
     }
 
-    override fun findFirst10OrderByViewedTimeDesc(onFinish: (Result<List<RecentlyViewedProductEntity>>) -> Unit) {
+    override fun findFirst10OrderByViewedTimeDesc(): Result<List<RecentlyViewedProductEntity>> {
         val recentlyViewedProducts = mutableListOf<RecentlyViewedProductEntity>()
         val limit = 10
-        val cursor = db.rawQuery(
-            """
+
+        return runCatching {
+            val cursor = db.rawQuery(
+                """
             SELECT * FROM ${ProductContract.RecentlyViewedProductEntry.TABLE_NAME}
             ORDER BY ${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME} DESC
             LIMIT $limit
-            """.trimIndent(),
-            null
-        )
-
-        while (cursor.moveToNext()) {
-            val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-            val productId =
-                cursor.getLong(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID))
-            val viewedTime =
-                cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME))
-            recentlyViewedProducts.add(
-                RecentlyViewedProductEntity(
-                    id, productId, viewedTime
-                )
+                """.trimIndent(),
+                null
             )
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
+                val productId =
+                    cursor.getLong(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID))
+                val viewedTime =
+                    cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_VIEWED_TIME))
+                recentlyViewedProducts.add(
+                    RecentlyViewedProductEntity(
+                        id, productId, viewedTime
+                    )
+                )
+            }
+
+            cursor.close()
+            recentlyViewedProducts
         }
-
-        cursor.close()
-        onFinish(Result.success(recentlyViewedProducts))
-    }
-
-    private fun deleteRecentlyViewedProductIfSameProductExists(product: Product) {
-        val selection = "${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID} = ?"
-        val selectionArgs = arrayOf(product.id.toString())
-        db.delete(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs)
     }
 }

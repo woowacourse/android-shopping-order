@@ -5,28 +5,23 @@ import woowacourse.shopping.domain.user.User
 
 interface CartItemRepository {
 
-    fun save(cartItem: CartItem, user: User, onFinish: (Result<CartItem>) -> Unit)
+    fun save(cartItem: CartItem, user: User): Result<CartItem>
 
-    fun findAll(user: User, onFinish: (Result<List<CartItem>>) -> Unit)
+    fun findAll(user: User): Result<List<CartItem>>
 
-    fun findAllByIds(ids: List<Long>, user: User, onFinish: (Result<List<CartItem>>) -> Unit)
+    fun findAllByIds(ids: List<Long>, user: User): Result<List<CartItem>>
 
-    fun findAllOrderByAddedTime(
-        limit: Int,
-        offset: Int,
-        user: User,
-        onFinish: (Result<List<CartItem>>) -> Unit
-    )
+    fun findAllOrderByAddedTime(limit: Int, offset: Int, user: User): Result<List<CartItem>>
 
-    fun findById(id: Long, user: User, onFinish: (Result<CartItem>) -> Unit)
+    fun findById(id: Long, user: User): Result<CartItem>
 
-    fun findByProductId(productId: Long, user: User, onFinish: (Result<CartItem>) -> Unit)
+    fun findByProductId(productId: Long, user: User): Result<CartItem>
 
-    fun countAll(user: User, onFinish: (Result<Int>) -> Unit)
+    fun countAll(user: User): Result<Int>
 
-    fun existByProductId(productId: Long, user: User, onFinish: (Result<Boolean>) -> Unit)
+    fun existByProductId(productId: Long, user: User): Result<Boolean>
 
-    fun updateCountById(id: Long, count: Int, user: User, onFinish: (Result<Unit>) -> Unit)
+    fun updateCountById(id: Long, count: Int, user: User): Result<Unit>
 
-    fun deleteById(id: Long, user: User, onFinish: (Result<Unit>) -> Unit)
+    fun deleteById(id: Long, user: User): Result<Unit>
 }

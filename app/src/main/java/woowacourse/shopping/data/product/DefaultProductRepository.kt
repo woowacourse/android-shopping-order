@@ -5,20 +5,19 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.repository.ProductRepository
 
 class DefaultProductRepository(private val dataSource: ProductDataSource) : ProductRepository {
-
-    override fun findAll(limit: Int, offset: Int, onFinish: (Result<List<Product>>) -> Unit) {
-        return dataSource.findRanged(limit, offset) { result ->
-            onFinish(result.mapCatching { products -> products.map { it.toDomain() } })
+    override fun findAll(limit: Int, offset: Int): Result<List<Product>> {
+        return dataSource.findRanged(limit, offset).mapCatching { products ->
+            products.map { it.toDomain() }
         }
     }
 
-    override fun countAll(onFinish: (Result<Int>) -> Unit) {
-        return dataSource.countAll(onFinish)
+    override fun countAll(): Result<Int> {
+        return dataSource.countAll()
     }
 
-    override fun findById(id: Long, onFinish: (Result<Product>) -> Unit) {
-        return dataSource.findById(id) { result ->
-            onFinish(result.mapCatching { products -> products.toDomain() })
+    override fun findById(id: Long): Result<Product> {
+        return dataSource.findById(id).mapCatching { products ->
+            products.toDomain()
         }
     }
 }

@@ -13,8 +13,10 @@ class UserMemorySource : UserDataSource {
         users.add(user)
     }
 
-    override fun findAll(onFinish: (Result<List<UserEntity>>) -> Unit) {
-        if (users.isEmpty()) onFinish(Result.failure(IllegalStateException("Empty Cached User")))
-        else onFinish(Result.success(users.toList()))
+    override fun findAll(): Result<List<UserEntity>> {
+        return runCatching {
+            if (users.isEmpty()) throw IllegalStateException("Empty Cached User")
+            users.toList()
+        }
     }
 }

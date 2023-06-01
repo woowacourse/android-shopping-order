@@ -12,35 +12,27 @@ class DefaultUserRepository(
         currentUser = user
     }
 
-    override fun findAll(onFinish: (Result<List<User>>) -> Unit) {
-        cacheDataSource.findAll { cachedResult ->
-            cachedResult.onSuccess { usersEntity ->
-                onFinish(Result.success(usersEntity.map { it.toDomain() }))
-            }.onFailure {
-                findAllRemote(onFinish)
-            }
+    override fun findAll(): Result<List<User>> {
+        return cacheDataSource.findAll().mapCatching { users ->
+            users.map { it.toDomain() }
+        }.recoverCatching {
+            findAllRemote().getOrThrow()
         }
     }
 
-    private fun findAllRemote(onFinish: (Result<List<User>>) -> Unit) {
-        remoteDataSource.findAll { remoteResult ->
-            remoteResult.onSuccess { remoteUsers ->
-                remoteUsers.forEach {
-                    cacheDataSource.save(it)
-                }
-                onFinish(Result.success(remoteUsers.map { it.toDomain() }))
-            }.onFailure {
-                onFinish(Result.failure(it))
-            }
+    override fun findCurrent(): Result<User> {
+        return runCatching {
+            currentUser ?: throw IllegalStateException("User Not Exist!")
         }
     }
 
-    override fun findCurrent(onFinish: (Result<User>) -> Unit) {
-        if (currentUser == null) {
-            onFinish(Result.failure(IllegalStateException("User Not Exist!")))
-            return
+    private fun findAllRemote(): Result<List<User>> {
+        return remoteDataSource.findAll().mapCatching { remoteUsers ->
+            remoteUsers.forEach {
+                cacheDataSource.save(it)
+            }
+            remoteUsers.map { it.toDomain() }
         }
-        onFinish(Result.success(currentUser!!))
     }
 
     companion object {

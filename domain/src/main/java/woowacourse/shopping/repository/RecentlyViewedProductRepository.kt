@@ -8,9 +8,8 @@ interface RecentlyViewedProductRepository {
 
     fun save(
         product: Product,
-        viewedTime: LocalDateTime,
-        onFinish: (Result<RecentlyViewedProduct>) -> Unit
-    )
+        viewedTime: LocalDateTime
+    ): Result<RecentlyViewedProduct>
 
-    fun findFirst10OrderByViewedTimeDesc(onFinish: (Result<List<RecentlyViewedProduct>>) -> Unit)
+    fun findFirst10OrderByViewedTimeDesc(): Result<List<RecentlyViewedProduct>>
 }
