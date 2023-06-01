@@ -9,6 +9,7 @@ import woowacourse.shopping.util.diffutil.CartDiffUtil
 class CartAdapter(
     private val cartClickListener: CartClickListener,
 ) : ListAdapter<UiCartProduct, CartViewHolder>(CartDiffUtil) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder =
         CartViewHolder(parent, cartClickListener)
 

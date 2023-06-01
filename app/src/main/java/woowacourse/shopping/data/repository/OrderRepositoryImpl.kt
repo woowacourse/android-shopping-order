@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
+
     override fun order(
         order: Order,
         onSuccess: () -> Unit,

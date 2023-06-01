@@ -25,26 +25,26 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:background="@color/woowa_dark_gray"
-            bind:onNavigationIconClick="@{() -> presenter.navigateToHome()}"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/ic_left_arrow"
             app:navigationIconTint="@color/white"
             app:title="@string/tv_cart"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white"
+            bind:onNavigationIconClick="@{() -> presenter.navigateToHome()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cart_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="20dp"
-            bind:adapter="@{adapter}"
-            bind:animator="@{null}"
             android:clipToPadding="false"
             app:fixedSize="@{true}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/navigator_layout"
             app:layout_constraintTop_toBottomOf="@+id/cart_tool_bar"
             app:layout_constraintVertical_bias="0"
+            bind:adapter="@{adapter}"
+            bind:animator="@{null}"
             tools:itemCount="5"
             tools:listitem="@layout/item_cart" />
 

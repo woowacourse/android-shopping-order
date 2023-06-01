@@ -13,5 +13,5 @@ data class ProductCount(val value: Int) : Parcelable {
         if (value > 99) "99" else value.toString()
 
     fun getVisibility(): Int =
-        if (value == 0) GONE else VISIBLE
+        if (value > 0) VISIBLE else GONE
 }

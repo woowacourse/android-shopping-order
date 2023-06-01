@@ -6,6 +6,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import woowacourse.shopping.R
 
 class SkeletonImageView : AppCompatImageView {
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         initStyledAttributes(attrs)

@@ -9,6 +9,7 @@ abstract class Page(
     val value: Int = DEFAULT_PAGE,
     val sizePerPage: Int = DEFAULT_SIZE_PER_PAGE,
 ) {
+
     init {
         require(value >= MIN_PAGE) { INVALID_PAGE_NUMBER_ERROR_MESSAGE }
     }

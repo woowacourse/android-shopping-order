@@ -9,6 +9,7 @@ inline fun View.setOnSingleClickListener(
     crossinline block: (View) -> Unit,
 ) {
     var previousClickedTime = 0L
+
     setOnClickListener { view ->
         val clickedTime = System.currentTimeMillis()
         if (clickedTime - previousClickedTime >= delay) {

@@ -25,12 +25,12 @@ class OrderHistoryPresenter(
         )
     }
 
-    override fun inquiryOrderDetail(order: UiOrder) {
-        view.navigateToOrderDetail(order)
-    }
-
     override fun navigateToHome() {
         view.navigateToHome()
+    }
+
+    override fun inquiryOrderDetail(order: UiOrder) {
+        view.navigateToOrderDetail(order)
     }
 
     companion object {

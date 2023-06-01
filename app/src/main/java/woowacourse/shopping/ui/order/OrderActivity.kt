@@ -37,16 +37,16 @@ class OrderActivity : AppCompatActivity(), View {
         binding.adapter?.addAll(orderItems)
     }
 
+    override fun showOrderLoadFailed() {
+        showToast(getString(R.string.order_load_failed_message))
+    }
+
     override fun showOrderCompleted() {
         showToast(getString(R.string.order_success_message))
     }
 
     override fun showOrderFailed() {
         showToast(getString(R.string.order_failed_message))
-    }
-
-    override fun showOrderLoadFailed() {
-        showToast(getString(R.string.order_load_failed_message))
     }
 
     override fun showFinalPayment(totalPayment: UiPrice) {

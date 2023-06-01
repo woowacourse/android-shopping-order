@@ -15,7 +15,8 @@ ProductDetailPresenter(
     showLastViewedProduct: Boolean,
     recentProductRepository: RecentProductRepository,
 ) : Presenter(view) {
-    private val lastViewedProduct = recentProductRepository.getPartially(1).getLatest()
+    private val lastViewedProduct =
+        recentProductRepository.getPartially(LAST_VIEWED_PRODUCT_SIZE).getLatest()
 
     init {
         recentProductRepository.add(RecentProduct(product = product.toDomain()))
@@ -26,6 +27,10 @@ ProductDetailPresenter(
         view.showProductDetail(product)
     }
 
+    override fun navigateToHome(count: Int) {
+        view.navigateToHome(product, count)
+    }
+
     override fun inquiryProductCounter() {
         view.showProductCounter(product)
     }
@@ -34,7 +39,7 @@ ProductDetailPresenter(
         lastViewedProduct?.let { view.navigateToProductDetail(it.toUi()) }
     }
 
-    override fun navigateToHome(count: Int) {
-        view.navigateToHome(product, count)
+    companion object {
+        private const val LAST_VIEWED_PRODUCT_SIZE = 1
     }
 }

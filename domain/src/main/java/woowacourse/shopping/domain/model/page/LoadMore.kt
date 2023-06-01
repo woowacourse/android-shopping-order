@@ -9,6 +9,7 @@ class LoadMore(
     value: Int = 1,
     sizePerPage: Int = 20,
 ) : Page(value, sizePerPage) {
+
     override fun getStartPage(): Page = LoadMore(FIRST_PAGE, sizePerPage)
 
     override fun next(): Page = LoadMore(value + 1, sizePerPage)

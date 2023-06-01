@@ -37,19 +37,15 @@ class OrderPresenter(
         )
     }
 
+    private fun updateOrder(orderItems: List<ListItem>) {
+        view.updateOrder(orderItems)
+    }
+
     override fun applyPoint(point: UiPoint) {
         if (point.toDomain() <= maxAvailablePoint && point.value != 0) {
             discountedOrder = originOrder.applyPointDiscount(point.toDomain())
             view.showFinalPayment(discountedOrder.finalPrice.toUi())
         }
-    }
-
-    override fun navigateToHome() {
-        view.navigateToHome()
-    }
-
-    private fun updateOrder(orderItems: List<ListItem>) {
-        view.updateOrder(orderItems)
     }
 
     override fun order() {
@@ -61,6 +57,10 @@ class OrderPresenter(
             },
             onFailed = { view.showOrderFailed() }
         )
+    }
+
+    override fun navigateToHome() {
+        view.navigateToHome()
     }
 
     companion object {

@@ -10,6 +10,7 @@ class Pagination(
     value: Int = 1,
     sizePerPage: Int = 5,
 ) : Page(value, sizePerPage) {
+
     override fun getStartPage(): Page = Pagination(FIRST_PAGE, sizePerPage)
 
     override fun next(): Page = Pagination(value + 1, sizePerPage)

@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.model
 
 data class Price(val value: Int) {
+
     init {
         validateValue()
     }

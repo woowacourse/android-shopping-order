@@ -5,6 +5,7 @@ data class Payment(
     val finalPayment: Price,
     val usedPoint: Point = Point(0),
 ) {
+
     fun applyPointDiscount(point: Point): Payment = copy(
         finalPayment = finalPayment - point.value,
         usedPoint = point

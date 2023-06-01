@@ -49,20 +49,6 @@ class ShoppingPresenter(
         updateCartView()
     }
 
-    override fun inquiryProductDetail(cartProduct: UiCartProduct) {
-        val recentProduct = RecentProduct(product = cartProduct.product.toDomain())
-        view.navigateToProductDetail(cartProduct.product)
-        updateRecentProducts(recentProducts + recentProduct)
-    }
-
-    override fun inquiryRecentProductDetail(recentProduct: UiRecentProduct) {
-        view.navigateToProductDetail(recentProduct.product)
-    }
-
-    override fun navigateToCart() {
-        view.navigateToCart()
-    }
-
     override fun addCartProduct(product: UiProduct, addCount: Int) {
         cartRepository.addCartProductByProductId(product.toDomain().id)
         fetchAllCartProducts()
@@ -76,6 +62,20 @@ class ShoppingPresenter(
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
         cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
         fetchAllCartProducts()
+    }
+
+    override fun navigateToCart() {
+        view.navigateToCart()
+    }
+
+    override fun inquiryProductDetail(cartProduct: UiCartProduct) {
+        val recentProduct = RecentProduct(product = cartProduct.product.toDomain())
+        view.navigateToProductDetail(cartProduct.product)
+        updateRecentProducts(recentProducts + recentProduct)
+    }
+
+    override fun inquiryRecentProductDetail(recentProduct: UiRecentProduct) {
+        view.navigateToProductDetail(recentProduct.product)
     }
 
     override fun inquiryOrders() {

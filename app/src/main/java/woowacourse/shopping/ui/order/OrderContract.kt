@@ -7,17 +7,17 @@ import woowacourse.shopping.ui.order.recyclerview.ListItem
 interface OrderContract {
     interface View {
         fun updateOrder(orderItems: List<ListItem>)
+        fun showOrderLoadFailed()
         fun showOrderCompleted()
         fun showOrderFailed()
-        fun navigateToHome()
-        fun showOrderLoadFailed()
         fun showFinalPayment(totalPayment: UiPrice)
+        fun navigateToHome()
     }
 
     interface Presenter {
         fun fetchAll()
-        fun order()
         fun applyPoint(point: UiPoint)
+        fun order()
         fun navigateToHome()
     }
 }

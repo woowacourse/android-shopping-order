@@ -34,6 +34,23 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         })
     }
 
+    override fun findCartProductByProductId(
+        productId: Int,
+        onSuccess: (CartProduct) -> Unit,
+        onFailed: (Throwable) -> Unit,
+    ) {
+        getAllCartProducts(
+            onSuccess = { cartProducts ->
+                val cartProduct = cartProducts.find { it.product.id == productId } ?: run {
+                    onFailed(IllegalStateException("해당 상품이 존재하지 않습니다."))
+                    return@getAllCartProducts
+                }
+                onSuccess(cartProduct)
+            },
+            onFailed = { onFailed(it) }
+        )
+    }
+
     override fun addCartProductByProductId(productId: ProductId) {
         service.addCartProduct(requestBody = CartAddRequest(productId))
             .enqueue(object : Callback<Unit> {
@@ -57,23 +74,6 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
             override fun onFailure(call: Call<Unit>, throwable: Throwable) {}
         })
-    }
-
-    override fun findCartProductByProductId(
-        productId: Int,
-        onSuccess: (CartProduct) -> Unit,
-        onFailed: (Throwable) -> Unit,
-    ) {
-        getAllCartProducts(
-            onSuccess = { cartProducts ->
-                val cartProduct = cartProducts.find { it.product.id == productId } ?: run {
-                    onFailed(IllegalStateException("해당 상품이 존재하지 않습니다."))
-                    return@getAllCartProducts
-                }
-                onSuccess(cartProduct)
-            },
-            onFailed = { onFailed(it) }
-        )
     }
 
     override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount) {

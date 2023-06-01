@@ -23,7 +23,6 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/order_list_toolbar"
             android:layout_width="0dp"
-            bind:onNavigationIconClick="@{() -> presenter.navigateToHome()}"
             android:layout_height="?actionBarSize"
             android:background="@color/woowa_dark_gray"
             app:layout_constraintEnd_toEndOf="parent"
@@ -32,7 +31,8 @@
             app:navigationIcon="@drawable/ic_left_arrow"
             app:navigationIconTint="@color/white"
             app:title="@string/order_list"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white"
+            bind:onNavigationIconClick="@{() -> presenter.navigateToHome()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"
