@@ -104,7 +104,7 @@ class ProductListPresenter(
         val lastRecentProducts = recentProductRepository.getRecentProducts(LAST_RECENT_COUNT).map {
             RecentProductModel(
                 it.id,
-                products.find { product -> product.id == it.productId }?.product
+                products.find { product -> product.product.id == it.productId }?.product
                     ?: ProductEntity.errorData.toUIModel(),
             )
         }
