@@ -35,7 +35,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_order_product_title_info"
-                tools:listitem="@layout/item_order_list" />
+                tools:listitem="@layout/item_order_product_list" />
 
             <View
                 android:id="@+id/view_line_order1"

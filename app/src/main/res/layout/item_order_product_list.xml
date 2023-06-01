@@ -9,10 +9,6 @@
             name="cart"
             type="woowacourse.shopping.presentation.model.CartModel" />
 
-        <variable
-            name="cartProductListener"
-            type="woowacourse.shopping.presentation.view.cart.CartProductListener" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
