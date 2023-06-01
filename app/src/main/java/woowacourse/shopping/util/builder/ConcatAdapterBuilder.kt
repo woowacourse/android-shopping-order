@@ -4,14 +4,14 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-fun isolatedViewTypeConcatAdapter(block: ConcatAdapter.() -> Unit): ConcatAdapter =
-    ConcatAdapter(isolatedViewTypeConfig).apply(block)
+fun notIsolatedViewTypeConcatAdapter(block: ConcatAdapter.() -> Unit): ConcatAdapter =
+    ConcatAdapter(notIsolatedViewTypeConfig).apply(block)
 
 fun <T : ViewHolder> ConcatAdapter.add(adapter: Adapter<T>) {
     addAdapter(adapter)
 }
 
-val isolatedViewTypeConfig: ConcatAdapter.Config
+val notIsolatedViewTypeConfig: ConcatAdapter.Config
     get() = ConcatAdapter.Config.Builder()
         .setIsolateViewTypes(false)
         .build()

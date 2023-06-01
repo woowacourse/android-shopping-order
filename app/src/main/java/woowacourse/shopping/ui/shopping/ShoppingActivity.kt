@@ -21,7 +21,7 @@ import woowacourse.shopping.ui.shopping.recyclerview.adapter.product.ProductAdap
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.recentproduct.RecentProductAdapter
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.recentproduct.RecentProductWrapperAdapter
 import woowacourse.shopping.util.builder.add
-import woowacourse.shopping.util.builder.isolatedViewTypeConcatAdapter
+import woowacourse.shopping.util.builder.notIsolatedViewTypeConcatAdapter
 import woowacourse.shopping.util.extension.findItemActionView
 import woowacourse.shopping.util.extension.findTextView
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
@@ -68,7 +68,7 @@ class ShoppingActivity : AppCompatActivity(), View,
     }
 
     private fun initRecyclerView() {
-        binding.adapter = isolatedViewTypeConcatAdapter {
+        binding.adapter = notIsolatedViewTypeConcatAdapter {
             add(recentProductWrapperAdapter)
             add(productAdapter)
             add(loadMoreAdapter)
