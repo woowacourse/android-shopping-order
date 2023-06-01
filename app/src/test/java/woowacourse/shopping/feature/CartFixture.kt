@@ -6,10 +6,10 @@ import com.example.domain.model.CartProduct
 internal object CartFixture {
     fun getMockCarts(): List<CartProduct> {
         return listOf(
-            CartProduct(1L, mockProducts[0], 3, true),
-            CartProduct(2L, mockProducts[1], 2, true),
-            CartProduct(3L, mockProducts[2], 1, true),
-            CartProduct(4L, mockProducts[3], 2, true),
+            CartProduct(1L, mockProducts[0], 3, true), // 2000원
+            CartProduct(2L, mockProducts[1], 2, true), // 13000원
+            CartProduct(3L, mockProducts[2], 1, true), // 9000원
+            CartProduct(4L, mockProducts[3], 2, true), // 4000원
         )
     }
 

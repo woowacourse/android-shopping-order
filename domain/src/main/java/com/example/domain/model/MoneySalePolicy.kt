@@ -1,20 +1,21 @@
 package com.example.domain.model
 
-class MoneySalePolicy : SalePolicy {
-    override fun saleApply(cartProducts: List<CartProduct>): Price {
+class MoneySalePolicy {
+    fun saleApply(cartProducts: List<CartProduct>): Pair<MoneySale, Price> {
         val originPrice =
             cartProducts.filter { it.checked }.sumOf { it.count * it.product.price.value }
 
         MoneySale.values().forEach {
-            if (it.boundary <= originPrice) return Price(originPrice - it.saleAmount)
+            if (it.boundary <= originPrice) return Pair(it, Price(originPrice - it.saleAmount))
         }
-        return Price(originPrice)
+        return Pair(MoneySale.NONE, Price(originPrice))
     }
 
     companion object {
-        private enum class MoneySale(val boundary: Int, val saleAmount: Int) {
+        enum class MoneySale(val boundary: Int, val saleAmount: Int) {
             FIVE(50000, 5000),
-            THREE(30000, 3000)
+            THREE(30000, 3000),
+            NONE(0, 0),
         }
     }
 }

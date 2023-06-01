@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/final_pay_amount_price"
+            app:layout_constraintBottom_toTopOf="@id/final_pay_amount_price_layout"
             android:orientation="vertical"
             android:paddingVertical="20dp">
 
@@ -98,12 +98,14 @@
                     app:layout_constraintTop_toBottomOf="@id/order_sale_middle_divider">
 
                     <TextView
+                        android:id="@+id/sale_category_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         tools:text="50,000 원 이상 구매 시"
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/sale_amount_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         tools:text="5000원 할인"
@@ -153,7 +155,7 @@
                     app:layout_constraintTop_toBottomOf="@id/pay_middle_divider" />
 
                 <TextView
-                    android:id="@+id/order_pay_amount_text_view"
+                    android:id="@+id/pay_origin_price_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -173,7 +175,7 @@
                     app:layout_constraintTop_toBottomOf="@id/order_pay_amount" />
 
                 <TextView
-                    android:id="@+id/sale_amount_text_view"
+                    android:id="@+id/pay_sale_amount_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -188,7 +190,7 @@
         </ScrollView>
 
         <LinearLayout
-            android:id="@+id/final_pay_amount_price"
+            android:id="@+id/final_pay_amount_price_layout"
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:background="@color/gray_light"
@@ -209,6 +211,7 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/final_pay_amount_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="79,400원"

@@ -1,15 +1,20 @@
 package woowacourse.shopping.feature.order.confirm
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.example.domain.model.MoneySalePolicy
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderConfirmBinding
+import woowacourse.shopping.model.MoneySaleUiModel
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.util.toMoneyFormat
 
 class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     private lateinit var binding: ActivityOrderConfirmBinding
@@ -32,12 +37,46 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
 
     private fun initPresenter(cartIds: List<Long>) {
         presenter =
-            OrderConfirmPresenter(this, CartRepositoryImpl(ApiModule.createCartService()), cartIds)
+            OrderConfirmPresenter(
+                this,
+                MoneySalePolicy(),
+                CartRepositoryImpl(ApiModule.createCartService()),
+                OrderRepositoryImpl(ApiModule.createOrderService()),
+                cartIds
+            )
         presenter.loadSelectedCarts()
     }
 
+    override fun setSaleInfo(moneySaleUiModel: MoneySaleUiModel) {
+        binding.saleCategoryTextView.text =
+            getString(R.string.sale_boundary_condition, moneySaleUiModel.saleBoundary)
+        binding.saleAmountTextView.text =
+            getString(R.string.sale_apply_amount, moneySaleUiModel.saleAmount)
+    }
+
+    override fun setPayInfo(originMoney: Int, saleApplyMoney: Int) {
+        binding.payOriginPriceTextView.text =
+            getString(R.string.price_format, originMoney.toMoneyFormat())
+        binding.paySaleAmountTextView.text =
+            getString(R.string.sale_price_format, saleApplyMoney.toMoneyFormat())
+    }
+
+    override fun setFinalPayInfo(saleApplyMoney: Int) {
+        binding.finalPayAmountPrice.text =
+            getString(R.string.price_format, saleApplyMoney.toMoneyFormat())
+    }
+
+    override fun showOrderSuccess(cartIds: List<Long>) {
+        val resultIntent = Intent()
+        resultIntent.putExtra(ORDER_CART_ID_KEY, cartIds.toTypedArray())
+        setResult(Activity.RESULT_OK, resultIntent)
+    }
+
+    override fun exitScreen() = finish()
+
     companion object {
         private const val CART_ID_KEY = "cart_id_key"
+        private const val ORDER_CART_ID_KEY = "order_cart_id_key"
         fun getIntent(context: Context, cartIds: List<Long>): Intent {
             return Intent(context, OrderConfirmActivity::class.java).apply {
                 putExtra(CART_ID_KEY, cartIds.toTypedArray())

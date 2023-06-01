@@ -2,6 +2,7 @@
     <string name="app_name">Shopping</string>
     <string name="enter_server_text">%s 서버에 접속했습니다</string>
     <string name="price_format">%s원</string>
+    <string name="sale_price_format">- %s원</string>
     <string name="count_format">%d개</string>
     <string name="price">금액</string>
     <string name="add_cart">장바구니 담기</string>
@@ -25,4 +26,6 @@
     <string name="order_pay_amount">주문 금액</string>
     <string name="sale_amount">할인 금액</string>
     <string name="final_pay_amount">최종 결제 금액</string>
+    <string name="sale_boundary_condition">%s 원 이상 구매 시</string>
+    <string name="sale_apply_amount">%s원 할인</string>
 </resources>

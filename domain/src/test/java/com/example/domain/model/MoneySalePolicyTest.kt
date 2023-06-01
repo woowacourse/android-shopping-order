@@ -19,7 +19,7 @@ internal class MoneySalePolicyTest {
 
         // then
         val expected = Price(2000 * 1 + 5000 * 2 + 5000 * 3)
-        assertEquals(expected, actual)
+        assertEquals(expected, actual.second)
     }
 
     @Test
@@ -37,7 +37,7 @@ internal class MoneySalePolicyTest {
 
         // then
         val expected = Price((2000 * 1 + 5000 * 2 + 6000 * 3) - 3000)
-        assertEquals(expected, actual)
+        assertEquals(expected, actual.second)
     }
 
     @Test
@@ -55,7 +55,7 @@ internal class MoneySalePolicyTest {
 
         // then
         val expected = Price((20000 * 1 + 5000 * 2 + 6000 * 4) - 5000)
-        assertEquals(expected, actual)
+        assertEquals(expected, actual.second)
     }
 
     private fun product(productId: Long, price: Int): Product {

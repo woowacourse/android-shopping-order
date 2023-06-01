@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.dataSource.remote.cart.CartProductService
+import woowacourse.shopping.data.dataSource.remote.order.OrderService
 import woowacourse.shopping.data.dataSource.remote.product.ProductService
 import woowacourse.shopping.user.ServerInfo
 import java.util.concurrent.TimeUnit
@@ -47,5 +48,9 @@ object ApiModule {
 
     fun createProductService(): ProductService {
         return createRetrofit().create(ProductService::class.java)
+    }
+
+    fun createOrderService(): OrderService {
+        return createRetrofit().create(OrderService::class.java)
     }
 }
