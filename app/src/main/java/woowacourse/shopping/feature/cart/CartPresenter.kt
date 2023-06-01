@@ -22,6 +22,9 @@ class CartPresenter(
 
     private var pageNumber: Int = 1
 
+    override fun initContents() {
+    }
+
     override fun loadCart() {
         val startIndex = pageNumber * maxProductsPerPage - maxProductsPerPage
         val endIndex = pageNumber * maxProductsPerPage - 1
@@ -29,8 +32,7 @@ class CartPresenter(
         cartRepository.getAll(onFailure = {}, onSuccess = {
             val items: List<CartProductState> = it.map(CartProduct::toUi)
             cart.addAll(it)
-            updatePaymentAmount()
-            updatePickedCartProductCount()
+            pickAll()
             view.setCartPageNumber(pageNumber)
             view.setCartProducts(items)
             view.showCartProducts()
@@ -118,6 +120,22 @@ class CartPresenter(
             return
         }
         cart.setAllPicked(true)
+    }
+
+    override fun pickAll() {
+        when (cart.isAllPicked()) {
+            true -> {
+                cart.setAllPicked(false)
+                view.setAllPickChecked(false)
+            }
+            false -> {
+                cart.setAllPicked(true)
+                view.setAllPickChecked(true)
+            }
+        }
+        updatePaymentAmount()
+        updatePickedCartProductCount()
+        view.setCartProducts(cart.products.map(CartProduct::toUi))
     }
 
     private fun getMaxPageNumber(cartsSize: Int): Int {

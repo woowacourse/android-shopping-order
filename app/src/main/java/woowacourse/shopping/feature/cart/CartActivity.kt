@@ -46,11 +46,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cartProductRv.adapter = adapter
         binding.pageNumberPlusTv.setOnClickListener { presenter.plusPageNumber() }
         binding.pageNumberMinusTv.setOnClickListener { presenter.minusPageNumber() }
-        binding.allCheckBox.setOnCheckedChangeListener { compoundButton, b ->
-            presenter.changeAllPicked()
-            presenter.loadCart()
-            presenter.updatePickedCartProductCount()
-        }
+        binding.allCheckBox.setOnCheckedChangeListener { _, _ -> presenter.pickAll() }
 
         presenter.loadCart()
         presenter.updatePickedCartProductCount()
@@ -94,6 +90,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         runOnUiThread { binding.totalCostTv.formatPriceWon(paymentAmount) }
     }
 
+    override fun setAllPickChecked(checked: Boolean) {
+        binding.allCheckBox.isChecked = checked
+    }
+
     override fun showPageSelectorView() {
         binding.pageSelectorView.visibility = VISIBLE
     }
@@ -107,15 +107,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         runOnUiThread { binding.skeletonLl.visibility = GONE }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setToolBarBackButton() {
         setSupportActionBar(binding.cartTb)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.back_24)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) finish()
-        return super.onOptionsItemSelected(item)
     }
 
     companion object {

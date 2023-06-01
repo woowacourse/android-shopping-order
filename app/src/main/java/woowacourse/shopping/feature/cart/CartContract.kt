@@ -11,6 +11,7 @@ interface CartContract {
         fun setCartPageNumberMinusEnable(isEnable: Boolean)
         fun setCartProductCount(count: Int)
         fun setTotalCost(paymentAmount: Int)
+        fun setAllPickChecked(checked: Boolean)
         fun showPageSelectorView()
         fun showCartProducts()
         fun hidePageSelectorView()
@@ -18,6 +19,7 @@ interface CartContract {
     }
 
     interface Presenter {
+        fun initContents()
         fun loadCart()
         fun plusPageNumber()
         fun minusPageNumber()
@@ -28,5 +30,6 @@ interface CartContract {
         fun updatePickedCartProductCount()
         fun deleteCartProduct(cartProductState: CartProductState)
         fun changeAllPicked()
+        fun pickAll()
     }
 }
