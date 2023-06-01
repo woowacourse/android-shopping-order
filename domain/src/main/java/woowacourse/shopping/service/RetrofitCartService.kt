@@ -8,38 +8,46 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
 
 interface RetrofitCartService {
     @GET("cart-items")
     fun getCarts(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
     ): Call<List<CartProduct>>
 
     @GET("cart-items/{cartId}")
     fun getCart(
         @Header("Authorization") token: String,
-        @Path("cartId") cartId: Int
+        @Path("cartId") cartId: Int,
     ): Call<CartProduct>
 
     @POST("cart-items")
     fun postCart(
         @Header("Authorization") token: String,
-        @Body productId: ProductIdBody
+        @Body productId: ProductIdBody,
     ): Call<Int>
 
     @PATCH("cart-items/{cartId}")
     fun patchCart(
         @Path("cartId") cartId: Int,
         @Header("Authorization") token: String,
-        @Body quantity: QuantityBody
+        @Body quantity: QuantityBody,
     ): Call<Int>
 
     @DELETE("cart-items/{cartId}")
     fun deleteCart(
         @Path("cartId") cartId: Int,
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
     ): Call<Int>
+
+    @GET("cart-items/checkout")
+    fun orderCart(
+        @Query("ids") itemIds: List<Int>,
+        @Header("Authorization") token: String,
+    ): Call<OrderInfo>
 }

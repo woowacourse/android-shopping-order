@@ -149,7 +149,12 @@ class CartPresenter(
     }
 
     override fun navigateToOrder() {
-        view.navigateToOrder()
+        val ids = cartRepository.getCheckedIds()
+        if (ids.isEmpty()) {
+            view.showEmptyOrderMessage()
+            return
+        }
+        view.navigateToOrder(ids)
     }
 
     companion object {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -140,8 +141,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         startActivity(DetailedProductActivity.getIntent(this, product))
     }
 
-    override fun navigateToOrder() {
-        startActivity(OrderActivity.getIntent(this))
+    override fun navigateToOrder(checkedIds: List<Int>) {
+        startActivity(OrderActivity.getIntent(this, checkedIds.toMutableList() as ArrayList<Int>))
+    }
+
+    override fun showEmptyOrderMessage() {
+        Toast.makeText(this, R.string.cart_empty_order_message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

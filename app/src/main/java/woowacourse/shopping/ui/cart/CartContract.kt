@@ -10,7 +10,8 @@ interface CartContract {
     interface View {
         fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel)
         fun navigateToItemDetail(product: ProductUIModel)
-        fun navigateToOrder()
+        fun navigateToOrder(checkedIds: List<Int>)
+        fun showEmptyOrderMessage()
     }
 
     interface Presenter {

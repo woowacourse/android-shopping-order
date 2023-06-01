@@ -1,6 +1,7 @@
 package woowacourse.shopping.repositoryImpl
 
 import woowacourse.shopping.model.CartProducts
+import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.service.RemoteCartService
 
@@ -36,6 +37,10 @@ class CartRepositoryImpl(
         return cartItems.totalCheckedPrice
     }
 
+    override fun getCheckedIds(): List<Int> {
+        return cartItems.checkedIds
+    }
+
     override fun insert(productId: Int) {
         if (cartItems.findByProductId(productId) != null) {
             return
@@ -64,13 +69,16 @@ class CartRepositoryImpl(
                 getAll { }
                 callback(it)
             }
+
             cartItem == null -> {
                 return
             }
+
             count == 0 -> remoteDatabase.deleteItem(cartItem.id) {
                 getAll { }
                 callback(it)
             }
+
             count < 1 -> return
             else -> remoteDatabase.patchItemQuantity(cartItem.id, count) {
                 getAll { }
@@ -87,6 +95,12 @@ class CartRepositoryImpl(
         remoteDatabase.getAll {
             cartItems.replaceAll(it ?: emptyList())
             callback(CartProducts(it ?: emptyList()))
+        }
+    }
+
+    override fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
+        remoteDatabase.getOrderItemsInfo(ids) {
+            callback(it)
         }
     }
 }

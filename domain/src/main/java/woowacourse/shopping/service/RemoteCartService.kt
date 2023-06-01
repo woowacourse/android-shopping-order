@@ -1,15 +1,16 @@
 package woowacourse.shopping.service
 
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
 import woowacourse.shopping.utils.RetrofitUtil
 
 class RemoteCartService(baseUrl: String) {
-    private var credentials = "YUBhLmNvbToxMjM0"
+    private var credentials = "BASIC YUBhLmNvbToxMjM0"
 
     fun getAll(callback: (List<CartProduct>?) -> Unit) {
-        RetrofitUtil.retrofitCartService.getCarts("Basic $credentials").enqueue(
+        RetrofitUtil.retrofitCartService.getCarts(credentials).enqueue(
             object : retrofit2.Callback<List<CartProduct>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<CartProduct>>,
@@ -27,7 +28,7 @@ class RemoteCartService(baseUrl: String) {
 
     fun postItem(itemId: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.postCart(
-            "Basic $credentials",
+            credentials,
             ProductIdBody(itemId),
         ).enqueue(
             object : retrofit2.Callback<Int> {
@@ -50,7 +51,7 @@ class RemoteCartService(baseUrl: String) {
     fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Int?) -> Unit) {
         RetrofitUtil.retrofitCartService.patchCart(
             itemId,
-            "Basic $credentials",
+            credentials,
             QuantityBody(quantity),
         ).enqueue(
             object : retrofit2.Callback<Int> {
@@ -69,7 +70,7 @@ class RemoteCartService(baseUrl: String) {
     }
 
     fun deleteItem(itemId: Int, callback: (Int?) -> Unit) {
-        RetrofitUtil.retrofitCartService.deleteCart(itemId, "Basic $credentials").enqueue(
+        RetrofitUtil.retrofitCartService.deleteCart(itemId, credentials).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
@@ -79,6 +80,23 @@ class RemoteCartService(baseUrl: String) {
                 }
 
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
+                    callback(null)
+                }
+            },
+        )
+    }
+
+    fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
+        RetrofitUtil.retrofitCartService.orderCart(ids, credentials).enqueue(
+            object : retrofit2.Callback<OrderInfo> {
+                override fun onResponse(
+                    call: retrofit2.Call<OrderInfo>,
+                    response: retrofit2.Response<OrderInfo>,
+                ) {
+                    callback(response.body())
+                }
+
+                override fun onFailure(call: retrofit2.Call<OrderInfo>, t: Throwable) {
                     callback(null)
                 }
             },

@@ -5,6 +5,8 @@ class CartProducts(cartProducts: List<CartProduct>) {
     val size: Int get() = cartProducts.size
 
     private val checkedProductsIds = mutableSetOf<Int>()
+    val checkedIds: List<Int>
+        get() = checkedProductsIds.toList()
 
     val totalPrice: Int
         get() = cartProducts.sumOf { it.product.price * it.quantity }
