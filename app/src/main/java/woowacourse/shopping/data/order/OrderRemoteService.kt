@@ -22,6 +22,9 @@ interface OrderRemoteService {
         @Header("Authorization") authorization: String,
         @Path("orderId") orderId: Long
     ): Call<OrderDto>
+
+    @GET("orders")
+    fun requestOrders(@Header("Authorization") authorization: String): Call<List<OrderDto>>
 }
 
 data class OrderRequestBody(val cartItemIds: List<Long>)

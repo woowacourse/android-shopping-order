@@ -32,4 +32,21 @@ class OrderRemoteRepository : OrderRepository {
             }
         })
     }
+
+    override fun findAll(onFinish: (List<Order>) -> Unit) {
+        orderRemoteService.requestOrders("Basic ${UserData.credential}")
+            .enqueue(object : retrofit2.Callback<List<OrderDto>> {
+                override fun onResponse(
+                    call: Call<List<OrderDto>>,
+                    response: Response<List<OrderDto>>
+                ) {
+                    if (response.isSuccessful.not()) return
+                    val orders = response.body()?.map { it.toDomain() } ?: return
+                    onFinish(orders)
+                }
+
+                override fun onFailure(call: Call<List<OrderDto>>, t: Throwable) {
+                }
+            })
+    }
 }

@@ -29,4 +29,7 @@
     <string name="user_id_label">아이디:</string>
     <string name="order_list">주문 목록</string>
     <string name="orders">Orders</string>
+    <string name="label_order_number">주문 번호:</string>
+    <string name="label_order_price">주문 금액:</string>
+    <string name="label_order_description">주문 설명:</string>
 </resources>
