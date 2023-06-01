@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.cart
 
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.model.page.PageNation
@@ -18,18 +19,19 @@ class CartPresenter(
 
     override fun initCartItems() {
         cartRepository.loadAllCarts(::onFailure) {
-            pageNation = PageNation(
-                CartProductsModel(
-                    it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() }
-                ).toModel(),
-                1
-            )
-
+            setPageNation(it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() }, 1)
             loadLocalCartItemChecked()
             loadCartItems()
             calculateTotalPrice()
             view.setLayoutVisibility()
         }
+    }
+
+    override fun setPageNation(cartProducts: List<CartModel>, currentPage: Int) {
+        pageNation = PageNation(
+            CartProductsModel(cartProducts).toModel(),
+            currentPage
+        )
     }
 
     override fun loadCartItems() {
@@ -59,12 +61,12 @@ class CartPresenter(
         view.setChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 
-    override fun calculatePreviousPage() {
+    override fun setPreviousPage() {
         pageNation = pageNation.previousPage()
         view.setPageCountView(pageNation.currentPage)
     }
 
-    override fun calculateNextPage() {
+    override fun setNextPage() {
         pageNation = pageNation.nextPage()
         view.setPageCountView(pageNation.currentPage)
     }

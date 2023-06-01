@@ -17,10 +17,11 @@ interface CartContract {
 
     interface Presenter {
         fun initCartItems()
+        fun setPageNation(cartProducts: List<CartModel>, currentPage: Int)
         fun loadCartItems()
         fun deleteCartItem(cartId: Long)
-        fun calculatePreviousPage()
-        fun calculateNextPage()
+        fun setPreviousPage()
+        fun setNextPage()
         fun calculateTotalPrice()
         fun updateProductCount(cartId: Long, count: Int)
         fun updateProductChecked(cartId: Long, isChecked: Boolean)

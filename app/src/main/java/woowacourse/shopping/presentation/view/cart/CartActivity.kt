@@ -123,14 +123,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun setLeftButtonClick() {
         binding.btCartListPageLeft.setOnClickListener {
-            presenter.calculatePreviousPage()
+            presenter.setPreviousPage()
             presenter.loadCartItems()
         }
     }
 
     private fun setRightButtonClick() {
         binding.btCartListPageRight.setOnClickListener {
-            presenter.calculateNextPage()
+            presenter.setNextPage()
             presenter.loadCartItems()
         }
     }
