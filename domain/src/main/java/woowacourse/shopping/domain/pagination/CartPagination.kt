@@ -1,49 +1,51 @@
-/*
 package woowacourse.shopping.domain.pagination
 
-import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.cartsystem.CartPageStatus
+import woowacourse.shopping.domain.model.CartProduct
 
-class CartPagination(private val rangeSize: Int, private val cartRepository: CartRepository) :
+class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
     NextPagination<CartProduct>, PrevPagination<CartProduct> {
-    private var mark = 0
+    private var lastIndex = 0
     private val page: Int
-        get() = mark / rangeSize
+        get() = lastIndex / rangeSize
     val status: CartPageStatus
-        get() = CartPageStatus(isPrevEnabled, isNextEnabled, page)
+        get() = CartPageStatus(lastIndex > rangeSize, lastIndex < allItems.size, page)
+    private val allItems: MutableList<CartProduct> = items.toMutableList()
 
-    override fun nextItems(): List<CartProduct> {
-        if (nextItemExist()) {
-            val items = cartRepository.findRange(mark, rangeSize)
-            mark += rangeSize
-            return items
+    override fun fetchNextItems(callback: (List<CartProduct>) -> Unit) {
+        if (allItems.size <= lastIndex) return
+        val items: List<CartProduct> = if (allItems.size < lastIndex + rangeSize) { // 범위 초과
+            allItems.subList(lastIndex, allItems.size)
+        } else {
+            allItems.subList(lastIndex, lastIndex + rangeSize)
         }
-        return emptyList()
+        lastIndex += items.size
+        callback(items)
     }
 
-    override fun prevItems(): List<CartProduct> {
-        if (prevItemExist()) {
-            mark -= rangeSize
-            return cartRepository.findRange(mark - rangeSize, rangeSize)
+    override fun fetchPrevItems(callback: (List<CartProduct>) -> Unit) {
+        if (lastIndex < rangeSize) return
+        val items: List<CartProduct>
+        if (lastIndex % rangeSize == 0) {
+            lastIndex -= rangeSize
+        } else {
+            lastIndex -= lastIndex % rangeSize
         }
-        return emptyList()
+        items = allItems.subList(lastIndex - rangeSize, lastIndex)
+        callback(items)
     }
 
-    override fun nextItemExist(): Boolean {
-        return cartRepository.isExistByMark(mark)
+    fun removeItem(cartProduct: CartProduct): CartProduct? { // return next Item
+        val nextItem = allItems.getOrNull(lastIndex)
+        if (nextItem == null) lastIndex--
+        allItems.remove(cartProduct)
+        return nextItem
     }
 
-    override fun prevItemExist(): Boolean {
-        return cartRepository.isExistByMark(mark - rangeSize - 1)
-    }
-
-    fun currentLastItem(): CartProduct? {
-        val item = cartRepository.findRange(mark - 1, 1)
-        if (item.isNotEmpty()) {
-            return item[0]
-        }
-        return null
+    fun updateItem(cartId: Int, quantity: Int): Boolean {
+        val index = allItems.indexOfFirst { it.id == cartId }
+        if (index == -1) return false
+        allItems[index] = allItems[index].copy(quantity = quantity)
+        return true
     }
 }
-*/

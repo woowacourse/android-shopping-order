@@ -18,8 +18,8 @@ interface CartContract {
         fun fetchProducts()
         fun fetchNextPage()
         fun fetchPrevPage()
-        fun removeProduct(id: Int)
-        fun updateCartProductCount(id: Int, count: Int)
+        fun removeProduct(cartId: Int)
+        fun updateCartProductCount(cartId: Int, quantity: Int)
         fun checkProduct(product: CartProductModel)
         fun checkProductsAll()
     }

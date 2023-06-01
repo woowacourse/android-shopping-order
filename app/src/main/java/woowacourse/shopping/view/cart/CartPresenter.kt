@@ -6,6 +6,7 @@ import woowacourse.shopping.domain.cartsystem.CartPageStatus
 import woowacourse.shopping.domain.cartsystem.CartSystem
 import woowacourse.shopping.domain.cartsystem.CartSystemResult
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.pagination.CartPagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.toDomain
@@ -15,84 +16,102 @@ class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
 ) : CartContract.Presenter {
-    //    private val cartPagination = CartPagination(PAGINATION_SIZE, cartRepository)
+    private lateinit var cartPagination: CartPagination
     private val cartSystem = CartSystem()
     private val cartItems: MutableList<CartViewItem> = mutableListOf()
 
     private var _cartSystemResult = MutableLiveData(CartSystemResult(0, 0))
-    private var _cartPageStatus =
-        CartPageStatus(
-            isPrevEnabled = false,
-            isNextEnabled = false,
-            1,
-        )
-    private var _isCheckedAll = MutableLiveData(false)
-
     override val cartSystemResult: LiveData<CartSystemResult>
         get() = _cartSystemResult
+    private var _isCheckedAll = MutableLiveData(false)
     override val isCheckedAll: LiveData<Boolean>
         get() = _isCheckedAll
 
-    private var mark = 0
+    private var cartPageStatus =
+        CartPageStatus(isPrevEnabled = false, isNextEnabled = false, 1)
 
     init {
-        cartRepository.findRange(mark, PAGINATION_SIZE) { cartProducts ->
-            checkStatus()
-            cartItems.addAll(cartProducts.map { CartViewItem.CartProductItem(it.toUiModel()) })
-
-            mark += cartProducts.size
-            cartRepository.isExistByMark(mark) {
-                _cartPageStatus = CartPageStatus(false, it, 1)
-                cartItems.add(CartViewItem.PaginationItem(_cartPageStatus))
-            }
-        }
-    }
-
-    private fun checkStatus() {
-        cartRepository.isExistByMark(mark) { nextEnabled ->
-            cartRepository.isExistByMark(mark - PAGINATION_SIZE - 1) { prevEnabled ->
-                _cartPageStatus = CartPageStatus(
-                    nextEnabled,
-                    prevEnabled,
-                    mark / PAGINATION_SIZE,
-                )
-            }
+        cartRepository.getAll {
+            cartPagination = CartPagination(PAGINATION_SIZE, it)
+            fetchProducts()
         }
     }
 
     override fun fetchProducts() {
-        view.showProducts(cartItems)
+        cartPagination.fetchNextItems { cartProducts ->
+            val items = cartProducts.map {
+                CartViewItem.CartProductItem(
+                    it.toUiModel(cartSystem.isSelectedProduct(it)),
+                )
+            }
+            cartItems.addAll(items)
+            _isCheckedAll.value = getIsCheckedAll()
+            addBottomPagination()
+            view.showProducts(cartItems)
+        }
     }
 
-    override fun removeProduct(id: Int) {
-        val nextItemExist = _cartPageStatus.isNextEnabled
-        cartRepository.remove(id) { isSuccess ->
-            if (!isSuccess) return@remove
-            cartItems.removeLast()
-            cartItems.removeIf { it is CartViewItem.CartProductItem && it.product.cartId == id }
-            _cartSystemResult.postValue(cartSystem.removeProduct(id))
-            _isCheckedAll.postValue(getIsCheckedAll())
+    private fun addBottomPagination() {
+        cartPageStatus = cartPagination.status
+        cartItems.add(CartViewItem.PaginationItem(cartPageStatus))
+    }
 
-            // 남은 자리 페이지 뒷 상품으로 다시 채우기
-            if (nextItemExist) {
-                addNextProduct()
-                return@remove
+    override fun fetchNextPage() {
+        cartItems.clear()
+        cartPagination.fetchNextItems { cartProducts ->
+            val items = cartProducts.map {
+                CartViewItem.CartProductItem(
+                    it.toUiModel(
+                        cartSystem.isSelectedProduct(it),
+                    ),
+                )
             }
+            cartItems.addAll(items)
+            addBottomPagination()
+            _isCheckedAll.value = getIsCheckedAll()
             view.showChangedItems()
         }
     }
 
-    private fun addNextProduct() {
-        cartRepository.findRange(mark - 1, 1) { products ->
-            val cartProductModel = products[0].toUiModel(cartSystem.isSelectedProduct(products[0]))
-            cartItems.add(CartViewItem.CartProductItem(cartProductModel))
-            cartRepository.isExistByMark(mark) {
-                _cartPageStatus = _cartPageStatus.copy(isNextEnabled = it)
-                cartItems.add(CartViewItem.PaginationItem(_cartPageStatus))
-                _isCheckedAll.postValue(getIsCheckedAll())
-                view.showChangedItems()
+    override fun fetchPrevPage() {
+        cartItems.clear()
+        cartPagination.fetchPrevItems { cartProducts ->
+            val items = cartProducts.map {
+                CartViewItem.CartProductItem(
+                    it.toUiModel(
+                        cartSystem.isSelectedProduct(it),
+                    ),
+                )
             }
+            cartItems.addAll(items)
+            addBottomPagination()
+            _isCheckedAll.value = getIsCheckedAll()
+            view.showChangedItems()
         }
+    }
+
+    override fun removeProduct(cartId: Int) {
+        cartRepository.remove(cartId) { isSuccess ->
+            if (!isSuccess) return@remove
+            val item =
+                cartItems.first { it is CartViewItem.CartProductItem && it.product.cartId == cartId } as CartViewItem.CartProductItem
+            val nextItem = cartPagination.removeItem(item.product.toDomain())
+            cartItems.remove(item)
+
+            _cartSystemResult.postValue(cartSystem.removeProduct(cartId))
+            _isCheckedAll.postValue(getIsCheckedAll())
+
+            cartItems.removeLast()
+            if (nextItem != null) addNextProduct(nextItem)
+            // 2페이지에서 모든 상품 다 지웠을때 1페이지로 못돌아가는 페이징 버그있음, List로 넘겨서 add할지 고민
+            addBottomPagination()
+            view.showChangedItems()
+        }
+    }
+
+    private fun addNextProduct(nextCartProduct: CartProduct) {
+        val model = nextCartProduct.toUiModel(cartSystem.isSelectedProduct(nextCartProduct))
+        cartItems.add(CartViewItem.CartProductItem(model))
     }
 
     private fun getIsCheckedAll() =
@@ -101,8 +120,9 @@ class CartPresenter(
     override fun checkProductsAll() {
         val isChecked = _isCheckedAll.value?.not() ?: true
 
-        cartItems.filterIsInstance<CartViewItem.CartProductItem>().forEachIndexed { index, it ->
-            it.product.isChecked = isChecked
+        cartItems.filterIsInstance<CartViewItem.CartProductItem>().forEachIndexed { index, item ->
+            val newItem = item.product.copy(isChecked = isChecked)
+            cartItems[index] = CartViewItem.CartProductItem(newItem)
             view.showChangedItem(index)
         }
 
@@ -122,62 +142,30 @@ class CartPresenter(
     override fun checkProduct(product: CartProductModel) {
         _cartSystemResult.value = cartSystem.selectProduct(product.toDomain())
         val item = cartItems.filterIsInstance<CartViewItem.CartProductItem>()
-            .first { it.product.id == product.id }
-        item.product.isChecked = !item.product.isChecked
+            .first { it.product.cartId == product.cartId }
+        val index = cartItems.indexOf(item)
+        val newProduct = item.product.copy(isChecked = !item.product.isChecked)
+        cartItems[index] = CartViewItem.CartProductItem(newProduct)
         _isCheckedAll.value = getIsCheckedAll()
     }
 
-    override fun fetchNextPage() {
-        cartRepository.findRange(mark, PAGINATION_SIZE) { items ->
-            if (items.isNotEmpty()) {
-                mark += items.size
-                cartRepository.isExistByMark(mark) { isExist ->
-                    _cartPageStatus = CartPageStatus(true, isExist, _cartPageStatus.count + 1)
-                    changeListItems(items)
-                    view.showChangedItems()
-                }
-            }
-            _isCheckedAll.postValue(getIsCheckedAll())
-        }
-    }
-
-    override fun fetchPrevPage() {
-        mark -= cartItems.filterIsInstance<CartViewItem.CartProductItem>().size
-        cartRepository.findRange(mark - PAGINATION_SIZE, PAGINATION_SIZE) { items ->
-            val isExist: Boolean = mark - PAGINATION_SIZE - 1 >= 0
-            if (items.isNotEmpty()) {
-                _cartPageStatus = CartPageStatus(isExist, true, _cartPageStatus.count - 1)
-                changeListItems(items)
-                view.showChangedItems()
-            }
-            _isCheckedAll.postValue(getIsCheckedAll())
-        }
-    }
-
-    private fun changeListItems(items: List<CartProduct>) {
-        val models = convertCartProductToModels(items)
-        cartItems.clear()
-        cartItems.addAll(models.map { CartViewItem.CartProductItem(it) })
-        cartItems.add(CartViewItem.PaginationItem(_cartPageStatus))
-    }
-
-    override fun updateCartProductCount(cartId: Int, count: Int) {
-        if (count < COUNT_MIN) return
-        cartRepository.update(cartId, count) { isSuccess ->
+    override fun updateCartProductCount(cartId: Int, quantity: Int) {
+        if (quantity < COUNT_MIN) return
+        cartRepository.update(cartId, quantity) { isSuccess ->
+            if (!isSuccess) return@update
             val cartProducts = convertItemsToCartProducts(cartItems)
-            cartProducts.find { it.cartId == cartId }?.let {
-                val index = cartProducts.indexOf(it)
-                (cartItems[index] as CartViewItem.CartProductItem).product.count = count
-                view.showChangedItem(index)
-                _cartSystemResult.postValue(cartSystem.updateProduct(it.product.id, count))
-            }
+            val index = cartProducts.indexOfFirst { it.id == cartId }
+            val newProduct =
+                (cartItems[index] as CartViewItem.CartProductItem).product.copy(quantity = quantity)
+            cartItems[index] = CartViewItem.CartProductItem(newProduct)
+            cartPagination.updateItem(cartId, quantity)
+            cartSystem.updateProduct(cartId, quantity)
+            view.showChangedItem(index)
+            _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
+            view.showChangedItem(index)
+            // TODO :: 카트 스켈레톤까지 목요일 안에 끝낼 것
         }
     }
-
-    private fun convertCartProductToModels(cartProducts: List<CartProduct>) =
-        cartProducts.map {
-            it.toUiModel(cartSystem.isSelectedProduct(it))
-        }.toMutableList()
 
     private fun convertItemsToCartProducts(items: List<CartViewItem>): List<CartProduct> =
         items.filterIsInstance<CartViewItem.CartProductItem>().map { it.product.toDomain() }

@@ -6,36 +6,34 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.repository.CartRemoteRepository
+import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.view.productlist.ProductListActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
-    private lateinit var binding: ActivityCartBinding
+    private val binding: ActivityCartBinding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private lateinit var presenter: CartContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setUpPresenter()
+
+        presenter = CartPresenter(
+            this,
+            CartRemoteRepository(ServerPreferencesRepository(this).getServerUrl()),
+        )
         setUpBinding()
         setContentView(binding.root)
         setUpActionBar()
-        presenter.fetchProducts()
     }
 
     private fun setUpBinding() {
-        binding = ActivityCartBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
         binding.presenter = presenter
     }
 
     private fun setUpActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun setUpPresenter() {
-        presenter =
-            CartPresenter(this, CartRemoteRepository("http://43.200.181.131:8080"))
     }
 
     override fun showProducts(items: List<CartViewItem>) {

@@ -7,13 +7,13 @@ import woowacourse.shopping.domain.model.Product
 fun CartProduct.toUiModel(isChecked: Boolean = false): CartProductModel =
     CartProductModel(
         isChecked,
-        cartId,
+        id,
         product.id,
         product.name,
         product.imageUrl,
-        count,
+        quantity,
         product.price.price,
     )
 
 fun CartProductModel.toDomain(): CartProduct =
-    CartProduct(cartId, count, Product(id, name, imageUrl, Price(price)))
+    CartProduct(cartId, quantity, Product(id, name, Price(price), imageUrl))
