@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.mypage
+package woowacourse.shopping.ui.orders
 
 import android.content.Context
 import android.content.Intent
@@ -7,22 +7,17 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import woowacourse.shopping.databinding.ActivityMyPageBinding
-import woowacourse.shopping.ui.orders.OrdersActivity
-import woowacourse.shopping.utils.UserData
+import woowacourse.shopping.databinding.ActivityOrdersBinding
 
-class MyPageActivity : AppCompatActivity() {
+class OrdersActivity : AppCompatActivity() {
     private val binding by lazy {
-        ActivityMyPageBinding.inflate(layoutInflater)
+        ActivityOrdersBinding.inflate(layoutInflater)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setActionBar()
-
-        initUserInfo()
-        initMenu()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -37,30 +32,20 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun setActionBar() {
-        setSupportActionBar(binding.toolbarMyPage)
+        setSupportActionBar(binding.toolbarOrders)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val navigationIcon = binding.toolbarMyPage.navigationIcon?.mutate()
+        val navigationIcon = binding.toolbarOrders.navigationIcon?.mutate()
         DrawableCompat.setTint(
             navigationIcon!!,
             ContextCompat.getColor(this, android.R.color.white),
         )
-        binding.toolbarMyPage.navigationIcon = navigationIcon
-    }
-
-    private fun initUserInfo() {
-        binding.tvUserId.text = UserData.id
-    }
-
-    private fun initMenu() {
-        binding.tvOrderList.setOnClickListener {
-            OrdersActivity.startActivity(this)
-        }
+        binding.toolbarOrders.navigationIcon = navigationIcon
     }
 
     companion object {
         fun startActivity(context: Context) {
-            val intent = Intent(context, MyPageActivity::class.java)
+            val intent = Intent(context, OrdersActivity::class.java)
             context.startActivity(intent)
         }
     }

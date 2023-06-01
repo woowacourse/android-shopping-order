@@ -55,6 +55,7 @@
             tools:text="a@a.com" />
 
         <TextView
+            android:id="@+id/tv_order_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/item_card_background"
