@@ -44,4 +44,8 @@
     <string name="order_number_format">주문번호 : %d</string>
     <string name="order_product_name_format_with_quantity">%s 외 %,d개</string>
     <string name="product_total_payment_and_count_format">%,d원 / 수량 : %,d개</string>
+    <string name="total_product_payment_title">총 상품 금액</string>
+    <string name="order_point_usage_title">포인트 사용</string>
+    <string name="final_payment_title">최종 결제 금액</string>
+    <string name="detail_order_product_list_title">상세 주문 내역</string>
 </resources>

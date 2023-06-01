@@ -49,7 +49,7 @@ class OrderActivity : AppCompatActivity(), View {
         showToast(getString(R.string.order_load_failed_message))
     }
 
-    override fun showTotalPayment(totalPayment: UiPrice) {
+    override fun showFinalPayment(totalPayment: UiPrice) {
         binding.totalPayment = totalPayment
     }
 

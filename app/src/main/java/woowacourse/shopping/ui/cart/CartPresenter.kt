@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.OrderProduct
+import woowacourse.shopping.domain.model.Payment
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
@@ -78,9 +79,10 @@ class CartPresenter(
     }
 
     override fun order() {
+        val checkedCartItemsPrice = Price(cart.checkedProductTotalPrice).toDomain()
         val order = Order(
             orderProducts = cart.getCheckedCartItems().map(OrderProduct::of).toUi(),
-            totalPayment = Price(cart.checkedProductTotalPrice),
+            payment = Payment.of(checkedCartItemsPrice).toUi()
         )
         view.navigateToOrder(order)
     }

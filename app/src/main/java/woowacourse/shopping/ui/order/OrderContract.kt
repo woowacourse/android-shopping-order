@@ -11,7 +11,7 @@ interface OrderContract {
         fun showOrderFailed()
         fun navigateToHome()
         fun showOrderLoadFailed()
-        fun showTotalPayment(totalPayment: UiPrice)
+        fun showFinalPayment(totalPayment: UiPrice)
     }
 
     interface Presenter {

@@ -3,6 +3,7 @@ package woowacourse.shopping.util.bindingadapter
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
+import woowacourse.shopping.model.UiPoint
 import woowacourse.shopping.model.UiPrice
 import woowacourse.shopping.model.UiProductCount
 
@@ -14,6 +15,11 @@ fun TextView.setPrice(price: UiPrice?) {
 @BindingAdapter("bind:quantity")
 fun TextView.setQuantity(quantity: UiProductCount) {
     text = context.getString(R.string.quantity_format, quantity.value)
+}
+
+@BindingAdapter("bind:point")
+fun TextView.setPoint(point: UiPoint) {
+    text = context.getString(R.string.point_format, point.value)
 }
 
 @BindingAdapter(

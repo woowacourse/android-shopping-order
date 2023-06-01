@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="presenter"
+            type="woowacourse.shopping.ui.orderdetail.OrderDetailContract.Presenter" />
+
+        <variable
+            name="adapter"
+            type="woowacourse.shopping.ui.orderdetail.recyclerview.adapter.OrderDetailRecyclerViewAdapter" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.orderdetail.OrderDetailActivity">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/order_detail_toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?actionBarSize"
+            android:background="@color/woowa_dark_gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_left_arrow"
+            app:navigationIconTint="@color/white"
+            app:title="@string/detail_order_product_list_title"
+            app:titleTextColor="@color/white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/order_detail_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/order_detail_toolbar"
+            bind:adapter="@{adapter}"
+            bind:fixedSize="@{true}"
+            tools:listitem="@layout/item_order_detail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

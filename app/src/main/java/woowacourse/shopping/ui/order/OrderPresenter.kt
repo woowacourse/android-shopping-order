@@ -26,12 +26,12 @@ class OrderPresenter(
             onSuccess = { fetchedPoint ->
                 maxAvailablePoint = fetchedPoint
                 updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toUi())
-                view.showTotalPayment(discountedOrder.totalPayment.toUi())
+                view.showFinalPayment(discountedOrder.finalPrice.toUi())
             },
             onFailed = {
                 maxAvailablePoint = DEFAULT_POINT
                 updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toUi())
-                view.showTotalPayment(discountedOrder.totalPayment.toUi())
+                view.showFinalPayment(discountedOrder.finalPrice.toUi())
                 view.showOrderLoadFailed()
             }
         )
@@ -40,7 +40,7 @@ class OrderPresenter(
     override fun applyPoint(point: UiPoint) {
         if (point.toDomain() <= maxAvailablePoint && point.value != 0) {
             discountedOrder = originOrder.applyPointDiscount(point.toDomain())
-            view.showTotalPayment(discountedOrder.totalPayment.toUi())
+            view.showFinalPayment(discountedOrder.finalPrice.toUi())
         }
     }
 

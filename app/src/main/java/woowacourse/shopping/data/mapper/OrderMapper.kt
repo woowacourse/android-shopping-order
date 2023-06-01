@@ -12,8 +12,7 @@ import woowacourse.shopping.domain.model.ProductCount
 
 fun Order.toOrderRequest(): OrderPostRequest = OrderPostRequest(
     orderPostInfos = orderProducts.map { it.toOrderProductRequest() },
-    payment = totalPayment.value,
-    point = usePoint.value,
+    payment = payment.toPaymentRequest(),
 )
 
 fun List<OrderResponse>.toOrders(): List<Order> = map { it.toOrder() }
@@ -21,8 +20,7 @@ fun List<OrderResponse>.toOrders(): List<Order> = map { it.toOrder() }
 fun OrderResponse.toOrder(): Order = Order(
     id = orderId,
     orderProducts = orderedProducts.map { it.toOrderProduct() },
-    totalPayment = Price(totalPrice),
-    usePoint = Point(usedPoint),
+    payment = payment.toPayment(),
 )
 
 fun OrderProductResponse.toOrderProduct(): OrderProduct = OrderProduct(

@@ -1,11 +1,8 @@
 package woowacourse.shopping.data.dto
 
-import com.google.gson.annotations.SerializedName
-
 data class OrderPostRequest(
     val orderPostInfos: List<OrderPostInfo>,
-    val payment: Int,
-    val point: Int,
+    val payment: PaymentRequest,
 )
 
 data class OrderPostInfo(
@@ -16,10 +13,7 @@ data class OrderPostInfo(
 data class OrderResponse(
     val orderId: Int,
     val orderedProducts: List<OrderProductResponse>,
-    @SerializedName("payment")
-    val totalPrice: Int,
-    @SerializedName("point")
-    val usedPoint: Int,
+    val payment: PaymentResponse,
 )
 
 data class OrderProductResponse(

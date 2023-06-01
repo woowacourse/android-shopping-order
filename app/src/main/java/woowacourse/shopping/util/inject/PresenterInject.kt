@@ -19,6 +19,8 @@ import woowacourse.shopping.ui.detail.ProductDetailContract
 import woowacourse.shopping.ui.detail.ProductDetailPresenter
 import woowacourse.shopping.ui.order.OrderContract
 import woowacourse.shopping.ui.order.OrderPresenter
+import woowacourse.shopping.ui.orderdetail.OrderDetailContract
+import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract
 import woowacourse.shopping.ui.orderhistory.OrderHistoryPresenter
 import woowacourse.shopping.ui.serversetting.ServerSettingContract
@@ -87,4 +89,12 @@ fun injectOrderListPresenter(
 ): OrderHistoryContract.Presenter = OrderHistoryPresenter(
     view = view,
     orderRepository = OrderRepositoryImpl(orderService),
+)
+
+fun injectOrderDetailPresenter(
+    view: OrderDetailContract.View,
+    order: UiOrder,
+): OrderDetailContract.Presenter = OrderDetailPresenter(
+    view = view,
+    order = order,
 )

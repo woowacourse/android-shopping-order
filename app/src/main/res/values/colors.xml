@@ -22,4 +22,5 @@
     <!-- Skeleton custom view -->
     <color name="skeleton_background">#E2E2E2</color>
     <color name="order_list_background_color">#FAFAFA</color>
+    <color name="order_payment_divider_color">#DCDCDC</color>
 </resources>

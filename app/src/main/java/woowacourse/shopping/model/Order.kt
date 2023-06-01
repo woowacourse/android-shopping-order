@@ -12,8 +12,9 @@ typealias UiOrder = Order
 data class Order(
     val id: Int = DEFAULT_ORDER_ID,
     val orderProducts: List<OrderProduct>,
-    val totalPayment: Price,
+    val payment: Payment,
 ) : Parcelable, ListItem {
+
     @IgnoredOnParcel
     override val viewType: Int = R.layout.item_order_history
 

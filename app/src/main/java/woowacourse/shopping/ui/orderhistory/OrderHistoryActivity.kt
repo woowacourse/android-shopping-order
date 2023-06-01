@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.UiOrder
+import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.View
 import woowacourse.shopping.ui.orderhistory.recyclerview.adapter.OrderHistoryRecyclerViewAdapter
@@ -35,7 +36,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
     }
 
     override fun navigateToOrderDetail(order: UiOrder) {
-        showToast("상품 상세 버튼을 눌렀습니다! ${order.firstOrderProductName}")
+        startActivity(OrderDetailActivity.getIntent(this, order))
     }
 
     companion object {
