@@ -1,17 +1,17 @@
 package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.data.entity.CartItemEntity
 import woowacourse.shopping.domain.user.User
 
 interface CartItemDataSource {
 
-    fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit)
+    fun save(productId: Long, user: User, onFinish: (Result<Long>) -> Unit)
 
-    fun findAll(user: User, onFinish: (List<CartItem>) -> Unit)
+    fun findAll(userToken: String, onFinish: (Result<List<CartItemEntity>>) -> Unit)
 
-    fun findAll(limit: Int, offset: Int, user: User, onFinish: (List<CartItem>) -> Unit)
+    fun findAll(limit: Int, offset: Int, userToken: String, onFinish: (Result<List<CartItemEntity>>) -> Unit)
 
-    fun updateCountById(id: Long, count: Int, user: User, onFinish: () -> Unit)
+    fun updateCountById(id: Long, count: Int, userToken: String, onFinish: (Result<Unit>) -> Unit)
 
-    fun deleteById(id: Long, user: User, onFinish: () -> Unit)
+    fun deleteById(id: Long, userToken: String, onFinish: (Result<Unit>) -> Unit)
 }

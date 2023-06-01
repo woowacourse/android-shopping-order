@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.entity.CartItemEntity.Companion.toDomain
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.CartItemRepository
@@ -7,17 +8,29 @@ import woowacourse.shopping.repository.CartItemRepository
 class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource
 ) : CartItemRepository {
-    override fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit) {
-        cartItemDataSource.save(cartItem, user, onFinish)
+    override fun save(cartItem: CartItem, user: User, onFinish: (Result<CartItem>) -> Unit) {
+        cartItemDataSource.save(cartItem.id, user) { result ->
+            onFinish(result.mapCatching { cartId -> cartItem.copy(id = cartId) })
+        }
     }
 
-    override fun findAll(user: User, onFinish: (List<CartItem>) -> Unit) {
-        cartItemDataSource.findAll(user, onFinish)
+    override fun findAll(user: User, onFinish: (Result<List<CartItem>>) -> Unit) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(result.mapCatching { carts -> carts.map { it.toDomain() } })
+        }
     }
 
-    override fun findAllByIds(ids: List<Long>, user: User, onFinish: (List<CartItem>) -> Unit) {
-        cartItemDataSource.findAll(user) { cartItems ->
-            onFinish(cartItems.filter { it.id in ids })
+    override fun findAllByIds(
+        ids: List<Long>,
+        user: User,
+        onFinish: (Result<List<CartItem>>) -> Unit
+    ) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(
+                result.mapCatching { carts ->
+                    carts.filter { it.id in ids }.map { it.toDomain() }
+                }
+            )
         }
     }
 
@@ -25,40 +38,59 @@ class DefaultCartItemRepository(
         limit: Int,
         offset: Int,
         user: User,
-        onFinish: (List<CartItem>) -> Unit
+        onFinish: (Result<List<CartItem>>) -> Unit
     ) {
-        cartItemDataSource.findAll(limit, offset, user, onFinish)
-    }
-
-    override fun findById(id: Long, user: User, onFinish: (CartItem?) -> Unit) {
-        cartItemDataSource.findAll(user) { cartItems ->
-            onFinish(cartItems.find { it.id == id })
+        cartItemDataSource.findAll(limit, offset, user.token) { result ->
+            onFinish(result.mapCatching { carts -> carts.map { it.toDomain() } })
         }
     }
 
-    override fun findByProductId(productId: Long, user: User, onFinish: (CartItem?) -> Unit) {
-        cartItemDataSource.findAll(user) { cartItems ->
-            onFinish(cartItems.find { it.product.id == productId })
+    override fun findById(id: Long, user: User, onFinish: (Result<CartItem>) -> Unit) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(result.mapCatching { cartItems -> cartItems.first { it.id == id }.toDomain() })
         }
     }
 
-    override fun countAll(user: User, onFinish: (Int) -> Unit) {
-        cartItemDataSource.findAll(user) { cartItems ->
-            onFinish(cartItems.size)
+    override fun findByProductId(
+        productId: Long,
+        user: User,
+        onFinish: (Result<CartItem>) -> Unit
+    ) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(
+                result.mapCatching { cartItems ->
+                    cartItems.first { it.product.id == productId }.toDomain()
+                }
+            )
         }
     }
 
-    override fun existByProductId(productId: Long, user: User, onFinish: (Boolean) -> Unit) {
-        cartItemDataSource.findAll(user) { cartItems ->
-            onFinish(cartItems.any { it.product.id == productId })
+    override fun countAll(user: User, onFinish: (Result<Int>) -> Unit) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(result.mapCatching { it.size })
         }
     }
 
-    override fun updateCountById(id: Long, count: Int, user: User, onFinish: () -> Unit) {
-        cartItemDataSource.updateCountById(id, count, user, onFinish)
+    override fun existByProductId(
+        productId: Long,
+        user: User,
+        onFinish: (Result<Boolean>) -> Unit
+    ) {
+        cartItemDataSource.findAll(user.token) { result ->
+            onFinish(result.mapCatching { cartItem -> cartItem.any { it.product.id == productId } })
+        }
     }
 
-    override fun deleteById(id: Long, user: User, onFinish: () -> Unit) {
-        cartItemDataSource.deleteById(id, user, onFinish)
+    override fun updateCountById(
+        id: Long,
+        count: Int,
+        user: User,
+        onFinish: (Result<Unit>) -> Unit
+    ) {
+        cartItemDataSource.updateCountById(id, count, user.token, onFinish)
+    }
+
+    override fun deleteById(id: Long, user: User, onFinish: (Result<Unit>) -> Unit) {
+        cartItemDataSource.deleteById(id, user.token, onFinish)
     }
 }

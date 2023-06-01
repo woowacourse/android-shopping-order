@@ -1,64 +1,41 @@
 package woowacourse.shopping.data.product
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.entity.ProductEntity
-import woowacourse.shopping.data.entity.ProductEntity.Companion.toDomain
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.network.RetrofitErrorHandlerProvider
 import woowacourse.shopping.network.retrofit.ProductRetrofitService
 
 class ProductRemoteSource(private val productService: ProductRetrofitService) : ProductDataSource {
-    override fun findAll(onFinish: (List<Product>) -> Unit) {
-        productService.selectProducts().enqueue(object : Callback<List<ProductEntity>> {
-            override fun onFailure(call: Call<List<ProductEntity>>, t: Throwable) {
-            }
-
-            override fun onResponse(
-                call: Call<List<ProductEntity>>,
-                response: Response<List<ProductEntity>>
-            ) {
-                if (response.code() != 200) return
-                onFinish(response.body()?.map { it.toDomain() } ?: return)
-            }
-        })
+    override fun findAll(onFinish: (Result<List<ProductEntity>>) -> Unit) {
+        productService.selectProducts()
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithBody(200, onFinish))
     }
 
-    override fun findRanged(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
-        productService.selectProducts().enqueue(object : Callback<List<ProductEntity>> {
-            override fun onFailure(call: Call<List<ProductEntity>>, t: Throwable) {
+    override fun findRanged(
+        limit: Int,
+        offset: Int,
+        onFinish: (Result<List<ProductEntity>>) -> Unit
+    ) {
+        productService.selectProducts().enqueue(
+            RetrofitErrorHandlerProvider.callbackWithCustomBody(
+                200, onFinish
+            ) { products ->
+                products.slice(offset until products.size).take(limit)
             }
-
-            override fun onResponse(
-                call: Call<List<ProductEntity>>,
-                response: Response<List<ProductEntity>>
-            ) {
-                if (response.code() != 200) return
-                val products = response.body() ?: return
-                val rangedProducts = products.slice(offset until products.size).take(limit)
-                onFinish(rangedProducts.map { it.toDomain() })
-            }
-        })
+        )
     }
 
-    override fun countAll(onFinish: (Int) -> Unit) {
-        findAll {
-            onFinish(it.size)
+    override fun countAll(onFinish: (Result<Int>) -> Unit) {
+        findAll { result ->
+            result.onSuccess {
+                onFinish(Result.success(it.size))
+            }.onFailure {
+                onFinish(Result.failure(it))
+            }
         }
     }
 
-    override fun findById(id: Long, onFinish: (Product?) -> Unit) {
-        productService.selectProduct(id).enqueue(object : Callback<ProductEntity> {
-            override fun onFailure(call: Call<ProductEntity>, t: Throwable) {
-            }
-
-            override fun onResponse(
-                call: Call<ProductEntity>,
-                response: Response<ProductEntity>
-            ) {
-                if (response.code() != 200) return
-                onFinish(response.body()?.toDomain())
-            }
-        })
+    override fun findById(id: Long, onFinish: (Result<ProductEntity>) -> Unit) {
+        productService.selectProduct(id)
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithBody(200, onFinish))
     }
 }

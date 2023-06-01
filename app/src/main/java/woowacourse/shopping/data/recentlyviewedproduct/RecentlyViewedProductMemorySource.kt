@@ -14,7 +14,7 @@ class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
     override fun save(
         product: Product,
         viewedTime: LocalDateTime,
-        onFinish: (RecentlyViewedProduct) -> Unit
+        onFinish: (Result<RecentlyViewedProduct>) -> Unit
     ) {
         deleteRecentlyViewedProductIfSameProductExists(product)
 
@@ -28,16 +28,10 @@ class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
             )
         }
         val id = db.insert(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, null, value)
-        onFinish(RecentlyViewedProduct(id, product, viewedTime))
+        onFinish(Result.success(RecentlyViewedProduct(id, product, viewedTime)))
     }
 
-    private fun deleteRecentlyViewedProductIfSameProductExists(product: Product) {
-        val selection = "${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID} = ?"
-        val selectionArgs = arrayOf(product.id.toString())
-        db.delete(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs)
-    }
-
-    override fun findFirst10OrderByViewedTimeDesc(onFinish: (List<RecentlyViewedProductEntity>) -> Unit) {
+    override fun findFirst10OrderByViewedTimeDesc(onFinish: (Result<List<RecentlyViewedProductEntity>>) -> Unit) {
         val recentlyViewedProducts = mutableListOf<RecentlyViewedProductEntity>()
         val limit = 10
         val cursor = db.rawQuery(
@@ -63,6 +57,12 @@ class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
         }
 
         cursor.close()
-        onFinish(recentlyViewedProducts)
+        onFinish(Result.success(recentlyViewedProducts))
+    }
+
+    private fun deleteRecentlyViewedProductIfSameProductExists(product: Product) {
+        val selection = "${ProductContract.RecentlyViewedProductEntry.COLUMN_NAME_PRODUCT_ID} = ?"
+        val selectionArgs = arrayOf(product.id.toString())
+        db.delete(ProductContract.RecentlyViewedProductEntry.TABLE_NAME, selection, selectionArgs)
     }
 }

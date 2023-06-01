@@ -1,29 +1,15 @@
 package woowacourse.shopping.data.user
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.entity.UserEntity
-import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
-import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.network.RetrofitErrorHandlerProvider
 import woowacourse.shopping.network.retrofit.UserRetrofitService
 
 class UserRemoteSource(private val userService: UserRetrofitService) : UserDataSource {
-    override fun save(user: User) {
+    override fun save(user: UserEntity) {
     }
 
-    override fun findAll(onFinish: (List<User>) -> Unit) {
-        userService.selectUsers().enqueue(object : Callback<List<UserEntity>> {
-            override fun onResponse(
-                call: Call<List<UserEntity>>,
-                response: Response<List<UserEntity>>
-            ) {
-                if (response.code() != 200) return
-                onFinish(response.body()?.map { it.toDomain() } ?: return)
-            }
-
-            override fun onFailure(call: Call<List<UserEntity>>, t: Throwable) {
-            }
-        })
+    override fun findAll(onFinish: (Result<List<UserEntity>>) -> Unit) {
+        userService.selectUsers()
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithBody(200, onFinish))
     }
 }

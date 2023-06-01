@@ -4,6 +4,6 @@ import woowacourse.shopping.domain.user.User
 
 interface UserRepository {
     fun saveCurrent(user: User)
-    fun findAll(onFinish: (List<User>) -> Unit)
-    fun findCurrent(onFinish: (User) -> Unit)
+    fun findAll(onFinish: (Result<List<User>>) -> Unit)
+    fun findCurrent(onFinish: (Result<User>) -> Unit)
 }

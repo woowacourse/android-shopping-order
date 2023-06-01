@@ -7,7 +7,11 @@ import java.time.LocalDateTime
 
 interface RecentlyViewedProductDataSource {
 
-    fun save(product: Product, viewedTime: LocalDateTime, onFinish: (RecentlyViewedProduct) -> Unit)
+    fun save(
+        product: Product,
+        viewedTime: LocalDateTime,
+        onFinish: (Result<RecentlyViewedProduct>) -> Unit
+    )
 
-    fun findFirst10OrderByViewedTimeDesc(onFinish: (List<RecentlyViewedProductEntity>) -> Unit)
+    fun findFirst10OrderByViewedTimeDesc(onFinish: (Result<List<RecentlyViewedProductEntity>>) -> Unit)
 }

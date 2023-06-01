@@ -4,87 +4,67 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.entity.CartItemEntity
-import woowacourse.shopping.data.entity.CartItemEntity.Companion.toDomain
 import woowacourse.shopping.data.entity.ProductIdEntity
 import woowacourse.shopping.data.entity.QuantityEntity
-import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.network.RetrofitErrorHandlerProvider
 import woowacourse.shopping.network.retrofit.CartItemRetrofitService
 
 class CartItemRemoteSource(private val cartItemService: CartItemRetrofitService) :
     CartItemDataSource {
-    override fun save(cartItem: CartItem, user: User, onFinish: (CartItem) -> Unit) {
-        cartItemService.postCartItem("Basic ${user.token}", ProductIdEntity(cartItem.product.id))
+    override fun save(productId: Long, user: User, onFinish: (Result<Long>) -> Unit) {
+        cartItemService.postCartItem("Basic ${user.token}", ProductIdEntity(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFinish(Result.failure(t))
                 }
 
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.code() != 201) return
-                    val id =
-                        response.headers()["Location"]?.substringAfterLast("/")?.toLong() ?: return
-                    val savedCartItem = CartItem(
-                        id, cartItem.quantity, cartItem.product
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>
+                ) {
+                    if (response.code() != 201) return onFinish(Result.failure(Throwable(response.message())))
+                    val header = response.headers()["Location"] ?: return onFinish(
+                        Result.failure(
+                            Throwable(response.message())
+                        )
                     )
-                    onFinish(savedCartItem)
+                    onFinish(Result.success(header.toLong()))
                 }
             })
     }
 
-    override fun findAll(user: User, onFinish: (List<CartItem>) -> Unit) {
-        cartItemService.selectCartItems("Basic ${user.token}")
-            .enqueue(object : Callback<List<CartItemEntity>> {
-                override fun onFailure(call: Call<List<CartItemEntity>>, t: Throwable) {
-                }
-
-                override fun onResponse(
-                    call: Call<List<CartItemEntity>>,
-                    response: Response<List<CartItemEntity>>
-                ) {
-                    if (response.code() != 200) return
-                    onFinish(response.body()?.map { it.toDomain() } ?: return)
-                }
-            })
+    override fun findAll(userToken: String, onFinish: (Result<List<CartItemEntity>>) -> Unit) {
+        cartItemService.selectCartItems("Basic $userToken")
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithBody(200, onFinish))
     }
 
-    override fun findAll(limit: Int, offset: Int, user: User, onFinish: (List<CartItem>) -> Unit) {
-        cartItemService.selectCartItems("Basic ${user.token}")
-            .enqueue(object : Callback<List<CartItemEntity>> {
-                override fun onFailure(call: Call<List<CartItemEntity>>, t: Throwable) {
+    override fun findAll(
+        limit: Int,
+        offset: Int,
+        userToken: String,
+        onFinish: (Result<List<CartItemEntity>>) -> Unit
+    ) {
+        cartItemService.selectCartItems("Basic $userToken")
+            .enqueue(
+                RetrofitErrorHandlerProvider.callbackWithCustomBody(200, onFinish) {
+                    it.slice(offset until it.size).take(limit)
                 }
-
-                override fun onResponse(
-                    call: Call<List<CartItemEntity>>,
-                    response: Response<List<CartItemEntity>>
-                ) {
-                    if (response.code() != 200) return
-                    val cartItems = response.body() ?: return
-                    val pagedCartItems = cartItems.slice(offset until cartItems.size).take(limit)
-                    onFinish(pagedCartItems.map { it.toDomain() })
-                }
-            })
+            )
     }
 
-    override fun updateCountById(id: Long, count: Int, user: User, onFinish: () -> Unit) {
-        cartItemService.updateCountCartItem("Basic ${user.token}", id, QuantityEntity(count))
-            .enqueue(object : Callback<Unit> {
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                }
-
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.code() == 200) onFinish()
-                }
-            })
+    override fun updateCountById(
+        id: Long,
+        count: Int,
+        userToken: String,
+        onFinish: (Result<Unit>) -> Unit
+    ) {
+        cartItemService.updateCountCartItem("Basic $userToken", id, QuantityEntity(count))
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithoutBody(200, onFinish))
     }
 
-    override fun deleteById(id: Long, user: User, onFinish: () -> Unit) {
-        cartItemService.deleteCartItem("Basic ${user.token}", id).enqueue(object : Callback<Unit> {
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-            }
-
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.code() == 204) onFinish()
-            }
-        })
+    override fun deleteById(id: Long, userToken: String, onFinish: (Result<Unit>) -> Unit) {
+        cartItemService.deleteCartItem("Basic $userToken", id)
+            .enqueue(RetrofitErrorHandlerProvider.callbackWithoutBody(204, onFinish))
     }
 }

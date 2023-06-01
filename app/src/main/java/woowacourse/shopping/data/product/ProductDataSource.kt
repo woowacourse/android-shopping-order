@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.data.entity.ProductEntity
 
 interface ProductDataSource {
 
-    fun findAll(onFinish: (List<Product>) -> Unit)
+    fun findAll(onFinish: (Result<List<ProductEntity>>) -> Unit)
 
-    fun findRanged(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit)
+    fun findRanged(limit: Int, offset: Int, onFinish: (Result<List<ProductEntity>>) -> Unit)
 
-    fun countAll(onFinish: (Int) -> Unit)
+    fun countAll(onFinish: (Result<Int>) -> Unit)
 
-    fun findById(id: Long, onFinish: (Product?) -> Unit)
+    fun findById(id: Long, onFinish: (Result<ProductEntity>) -> Unit)
 }

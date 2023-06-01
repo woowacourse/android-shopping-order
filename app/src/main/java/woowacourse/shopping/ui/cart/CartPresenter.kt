@@ -34,8 +34,10 @@ class CartPresenter(
     }
 
     override fun loadCartItemsOfLastPage() {
-        userRepository.findCurrent { currentUser ->
-            cartItemRepository.countAll(currentUser) { count ->
+        userRepository.findCurrent { userResult ->
+            val user = userResult.getOrThrow()
+            cartItemRepository.countAll(user) { countResult ->
+                val count = countResult.getOrThrow()
                 currentPage = (count - 1) / pageSize + 1
                 showCartItems(currentPage, selectedCart, true)
                 showPageUI(currentPage)
