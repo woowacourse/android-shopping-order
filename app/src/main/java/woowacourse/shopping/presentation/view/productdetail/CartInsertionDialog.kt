@@ -4,11 +4,11 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import woowacourse.shopping.databinding.LayoutCartDialogViewBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 
 class CartInsertionDialog(
     context: Context,
-    product: ProductModel,
+    product: CartModel,
     private val onAddClick: (Int) -> Unit,
 ) : AlertDialog.Builder(context) {
     private val binding = LayoutCartDialogViewBinding.inflate(LayoutInflater.from(context))
@@ -28,8 +28,8 @@ class CartInsertionDialog(
         binding.countViewCartDialog.updateCount(1)
     }
 
-    private fun setProductItemView(product: ProductModel) {
-        binding.product = product
+    private fun setProductItemView(cartModel: CartModel) {
+        binding.product = cartModel
     }
 
     private fun setAddButtonView() {

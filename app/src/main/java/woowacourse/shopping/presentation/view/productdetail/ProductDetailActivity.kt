@@ -16,6 +16,7 @@ import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSo
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
@@ -90,8 +91,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding.clLastProductInfo.visibility = View.GONE
     }
 
-    override fun setProductInfoView(productModel: ProductModel) {
-        binding.product = productModel
+    override fun setProductInfoView(cartModel: CartModel) {
+        binding.product = cartModel
     }
 
     private fun setLastRecentProduct() {
@@ -108,8 +109,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
-    override fun showCountView(productModel: ProductModel) {
-        CartInsertionDialog(this, productModel) { count ->
+    override fun showCountView(cartModel: CartModel) {
+        CartInsertionDialog(this, cartModel) { count ->
             presenter.addCart(count)
         }
     }

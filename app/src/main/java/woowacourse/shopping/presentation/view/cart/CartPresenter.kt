@@ -22,7 +22,7 @@ class CartPresenter(
 
     override fun initCartItems() {
         cartRepository.loadAllCarts(::onFailure) {
-            carts.addAll(it.map { cartEntity2 -> cartEntity2.toUIModel() })
+            carts.addAll(it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() })
             loadLocalCartItemChecked()
             loadCartItems()
             calculateTotalPrice()

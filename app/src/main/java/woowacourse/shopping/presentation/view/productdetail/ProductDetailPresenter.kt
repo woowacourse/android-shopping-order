@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.view.productdetail
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
 class ProductDetailPresenter(
@@ -12,11 +12,11 @@ class ProductDetailPresenter(
     productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
-    private lateinit var product: ProductModel
+    private lateinit var product: CartModel
 
     init {
         productRepository.loadDataById(productId, ::onFailure) { cartRemoteEntity ->
-            product = cartRemoteEntity.productEntity.toUIModel()
+            product = cartRemoteEntity.toUIModel()
             loadProductInfo()
         }
     }
@@ -44,9 +44,10 @@ class ProductDetailPresenter(
 
     override fun addCart(count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = carts.find { cartProduct -> cartProduct.productEntity.id == product.id }
-            if (cartProduct == null) {
-                cartRepository.addCartProduct(product.id, ::onFailure) {
+            val cartRemoteEntity = carts.find { cartRemoteEntity -> cartRemoteEntity.productEntity.id == product.product.id }
+
+            if (cartRemoteEntity == null) {
+                cartRepository.addCartProduct(product.product.id, ::onFailure) {
                     if (count == UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                             val reCartProduct =
@@ -75,9 +76,9 @@ class ProductDetailPresenter(
                 }
             }
 
-            cartProduct?.let { cart ->
-                val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
-                cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+            cartRemoteEntity?.let { cart ->
+                val newCartRemoteEntity = cartRemoteEntity.copy(quantity = cart.quantity + count)
+                cartRepository.updateCartCount(newCartRemoteEntity, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()
                 }
