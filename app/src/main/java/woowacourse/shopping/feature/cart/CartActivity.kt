@@ -13,6 +13,7 @@ import woowacourse.shopping.data.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.CartRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.order.OrderActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
 
@@ -29,6 +30,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         initAdapter()
         initPresenter()
+
+        binding.orderTv.setOnClickListener {
+            startActivity(Intent(this, OrderActivity::class.java))
+            finish()
+        }
 
         supportActionBar?.title = getString(R.string.cart)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

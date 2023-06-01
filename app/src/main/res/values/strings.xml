@@ -15,9 +15,16 @@
     <string name="all">전체</string>
     <string name="order">주문하기(%d)</string>
     <string name="most_recent_product">마지막으로 본 상품</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-    <string name="sign_in">sign in</string>
+    <string name="order_quantity">%d개</string>
     <string name="user1">핑구</string>
     <string name="user2">해시</string>
+    <string name="holding_point">보유 포인트 : %dP</string>
+    <string name="order_btn">%,d원 결제하기</string>
+    <string name="order_products_description">주문 상품</string>
+    <string name="payment_description">결제 금액</string>
+    <string name="order_price_description">주문 금액</string>
+    <string name="discount_price_description">할인 금액</string>
+    <string name="point_initial_value">0</string>
+    <string name="point_unit">P</string>
+    <string name="use_all">전액사용</string>
 </resources>

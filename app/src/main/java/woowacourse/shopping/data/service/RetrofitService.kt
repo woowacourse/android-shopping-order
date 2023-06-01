@@ -10,6 +10,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.model.CartProductDto
+import woowacourse.shopping.data.model.PointDto
 import woowacourse.shopping.data.model.ProductDto
 
 interface RetrofitService {
@@ -41,4 +42,10 @@ interface RetrofitService {
         @Header("Authorization") credential: String,
         @Path("cartItemId") cartItemId: Int,
     ): Call<Void>
+
+    @Headers("Content-Type: application/json")
+    @GET("/points")
+    fun requestPoints(
+        @Header("Authorization") credential: String
+    ): Call<PointDto>
 }
