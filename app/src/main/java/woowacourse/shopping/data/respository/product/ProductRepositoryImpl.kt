@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.respository.product
 
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSource
 
 class ProductRepositoryImpl(
@@ -8,7 +8,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override fun loadDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<ProductEntity>) -> Unit,
+        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
         productRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
@@ -16,7 +16,7 @@ class ProductRepositoryImpl(
     override fun loadDataById(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (products: ProductEntity) -> Unit,
+        onSuccess: (products: CartRemoteEntity) -> Unit,
     ) {
         productRemoteDataSource.requestData(productId, onFailure, onSuccess)
     }

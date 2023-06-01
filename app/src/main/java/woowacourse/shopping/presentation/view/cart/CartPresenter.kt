@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.cart
 
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.cart.CartRepository
@@ -78,7 +79,7 @@ class CartPresenter(
     override fun calculateTotalPrice() {
         val totalPrice = carts.sumOf {
             if (it.checked) {
-                (it.product.price * it.product.count)
+                (it.product.price * it.count)
             } else {
                 0
             }
@@ -88,9 +89,9 @@ class CartPresenter(
 
     override fun updateProductCount(cartId: Long, count: Int) {
         val cartModel = carts.find { it.id == cartId } ?: return
-        carts.find { it.id == cartId }?.apply { product.count = count }
-        val cartEntity = cartModel.toEntity()
+        carts.find { it.id == cartId }?.apply { this.toDomain().updateCount(count) }
 
+        val cartEntity = cartModel.toEntity()
         cartRepository.updateCartCount(cartEntity, ::onFailure) {
             if (count == 0) {
                 deleteCartItem(cartId)

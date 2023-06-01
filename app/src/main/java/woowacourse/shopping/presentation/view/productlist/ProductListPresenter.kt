@@ -1,11 +1,13 @@
 package woowacourse.shopping.presentation.view.productlist
 
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toUIModel
+import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
 import woowacourse.shopping.data.respository.recentproduct.RecentProductRepository
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -16,7 +18,7 @@ class ProductListPresenter(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ProductContract.Presenter {
-    private val products = mutableListOf<ProductModel>()
+    private val products = mutableListOf<CartModel>()
     private val recentProducts = mutableListOf<RecentProductModel>()
     private var lastScroll = 0
     private var productsStartIndex = 0
@@ -27,8 +29,8 @@ class ProductListPresenter(
     }
 
     override fun initProductItems() {
-        productRepository.loadDatas(::onFailure) {
-            val allProducts = it.map { productEntity -> productEntity.toUIModel() }
+        productRepository.loadDatas(::onFailure) { remoteEntities ->
+            val allProducts = remoteEntities.map { productEntity -> productEntity.toUIModel() }
             products.addAll(allProducts)
 
             loadCartItems()
@@ -45,7 +47,8 @@ class ProductListPresenter(
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val newProducts = products.map { product ->
                 product.copy(
-                    count = carts.find { cart -> cart.product.id == product.id }?.quantity ?: 0,
+                    count = carts.find { cart -> cart.productEntity.id == product.product.id }?.quantity
+                        ?: 0,
                 )
             }
 
@@ -81,7 +84,7 @@ class ProductListPresenter(
                 .map {
                     RecentProductModel(
                         it.id,
-                        products.find { product -> product.id == it.productId }
+                        products.find { product -> product.id == it.productId }?.product
                             ?: ProductEntity.errorData.toUIModel(),
                     )
                 },
@@ -101,7 +104,7 @@ class ProductListPresenter(
         val lastRecentProducts = recentProductRepository.getRecentProducts(LAST_RECENT_COUNT).map {
             RecentProductModel(
                 it.id,
-                products.find { product -> product.id == it.productId }
+                products.find { product -> product.id == it.productId }?.product
                     ?: ProductEntity.errorData.toUIModel(),
             )
         }
@@ -116,16 +119,17 @@ class ProductListPresenter(
     }
 
     override fun updateCount(productId: Long, count: Int) {
-        val product = products.find { it.id == productId } ?: return
-        if (product.count == 0) {
-            cartRepository.addCartProduct(productId, ::onFailure) {
-                product.count = count
+        val product = products.find { it.product.id == productId } ?: return
 
-                cartRepository.loadAllCarts(::onFailure) { carts ->
-                    val cartProduct =
-                        carts.find { it.product.id == product.id } ?: return@loadAllCarts
-                    cartRepository.addLocalCart(cartProduct.id)
-                }
+        if (product.count == 0) {
+            cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
+                val newProduct = product.toDomain().updateCount(count).toUiModel()
+                val cartProduct = newProduct.updateId(cartId)
+                cartRepository.addLocalCart(cartProduct.id)
+
+                val index = products.indexOf(product)
+                products.removeAt(index)
+                products.add(index, cartProduct)
 
                 val allCount = products.sumOf { it.count }
                 view.updateToolbarCartCountView(allCount)
@@ -133,11 +137,10 @@ class ProductListPresenter(
             }
             return
         }
+
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = (carts.find { it.product.id == productId } ?: return@loadAllCarts)
-
+            val cartProduct = carts.find { it.productEntity.id == productId } ?: return@loadAllCarts
             cartRepository.addLocalCart(cartProduct.id)
-
             val newCartProduct = cartProduct.copy(quantity = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
@@ -145,9 +148,12 @@ class ProductListPresenter(
                     cartRepository.deleteLocalCart(newCartProduct.id)
                 }
 
-                product.count = count
-                val allCount = products.sumOf { it.count }
+                val newProduct = product.toDomain().updateCount(count).toUiModel()
+                val index = products.indexOf(product)
+                products.removeAt(index)
+                products.add(index, newProduct)
 
+                val allCount = products.sumOf { it.count }
                 view.updateToolbarCartCountView(allCount)
                 updateVisibilityCartCount(allCount)
             }

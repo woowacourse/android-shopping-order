@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductListBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.custom.CountView
 import woowacourse.shopping.presentation.view.productlist.ProductListener
 
@@ -24,13 +24,13 @@ class ProductListViewHolder(
         binding.productCountView.countStateChangeListener =
             object : CountView.OnCountStateChangeListener {
                 override fun onCountChanged(countView: CountView?, count: Int) {
-                    binding.product?.let { productListener.onCountClick(it.id, count) }
+                    binding.cartModel?.let { productListener.onCountClick(it.product.id, count) }
                 }
             }
     }
 
-    fun bind(product: ProductModel) {
-        binding.product = product
+    fun bind(product: CartModel) {
+        binding.cartModel = product
         binding.productCountView.setCount(product.count)
     }
 }

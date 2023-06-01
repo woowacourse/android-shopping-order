@@ -1,13 +1,21 @@
 package woowacourse.shopping.data.mapper
 
+import com.example.domain.cart.CartProduct
 import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.presentation.model.CartModel
 
 fun CartRemoteEntity.toUIModel(): CartModel =
     CartModel(
-        id,
-        product.toUIModel().apply { count = quantity },
+        id = id,
+        product = productEntity.toUIModel(),
+        count = quantity,
         checked = true,
     )
 
-fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, product.count, product.toEntity())
+fun CartRemoteEntity.toDomain(): CartProduct = CartProduct(id, productEntity.toDomain(), checked = false)
+
+fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toEntity())
+
+fun CartModel.toDomain(): CartProduct = CartProduct(id, product.toDomain(), count, checked)
+
+fun CartProduct.toUiModel(): CartModel = CartModel(id, product.toUiModel(), count, checked)

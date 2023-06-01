@@ -3,13 +3,13 @@ package woowacourse.shopping.presentation.view.productlist.adpater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.productlist.ProductListener
 import woowacourse.shopping.presentation.view.productlist.viewholder.ProductListViewHolder
 
 class ProductListAdapter(
     private val productListener: ProductListener,
-) : ListAdapter<ProductModel, ProductListViewHolder>(productDiffUtil) {
+) : ListAdapter<CartModel, ProductListViewHolder>(productDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListViewHolder {
         return ProductListViewHolder(parent, productListener)
@@ -23,17 +23,17 @@ class ProductListAdapter(
 
     override fun getItemViewType(position: Int): Int = ViewType.PRODUCT_LIST.ordinal
 
-    fun setItems(newItems: List<ProductModel>) {
+    fun setItems(newItems: List<CartModel>) {
         submitList(newItems)
     }
 
     companion object {
-        private val productDiffUtil = object : DiffUtil.ItemCallback<ProductModel>() {
-            override fun areItemsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean {
-                return oldItem.id == newItem.id
+        private val productDiffUtil = object : DiffUtil.ItemCallback<CartModel>() {
+            override fun areItemsTheSame(oldItem: CartModel, newItem: CartModel): Boolean {
+                return oldItem.product.id == newItem.product.id
             }
 
-            override fun areContentsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean {
+            override fun areContentsTheSame(oldItem: CartModel, newItem: CartModel): Boolean {
                 return oldItem == newItem
             }
         }

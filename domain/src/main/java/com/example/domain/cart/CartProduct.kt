@@ -5,7 +5,7 @@ import com.example.domain.Product
 data class CartProduct(
     val id: Long,
     val product: Product,
-    val count: Int,
+    val count: Int = 0,
     val checked: Boolean,
 ) {
     fun updateChecked(isChecked: Boolean): CartProduct {

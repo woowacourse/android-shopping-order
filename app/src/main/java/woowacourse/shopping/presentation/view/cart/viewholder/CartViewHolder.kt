@@ -29,9 +29,9 @@ class CartViewHolder(
         }
     }
 
-    fun bind(cart: CartModel) {
-        binding.cart = cart
-        binding.cbCartListItem.isChecked = cart.checked
-        binding.countViewCartListItem.updateCount(cart.product.count)
+    fun bind(cartModel: CartModel) {
+        binding.cart = cartModel
+        binding.cbCartListItem.isChecked = cartModel.checked
+        binding.countViewCartListItem.updateCount(cartModel.count)
     }
 }

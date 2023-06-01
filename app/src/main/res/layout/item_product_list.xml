@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="product"
-            type="woowacourse.shopping.presentation.model.ProductModel" />
+            name="cartModel"
+            type="woowacourse.shopping.presentation.model.CartModel" />
 
         <variable
             name="productListener"
@@ -19,11 +19,11 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="6dp"
         android:layout_marginVertical="10dp"
-        android:onClick="@{() -> productListener.onItemClick(product.id)}">
+        android:onClick="@{() -> productListener.onItemClick(cartModel.id)}">
 
         <ImageView
             android:id="@+id/iv_product_thumbnail"
-            setImageUrl="@{product.imageUrl}"
+            setImageUrl="@{cartModel.product.imageUrl}"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="fitXY"
@@ -42,7 +42,7 @@
             android:textColor="@color/product_info_text_color"
             android:textSize="16sp"
             android:textStyle="bold"
-            setText="@{product.title}"
+            setText="@{cartModel.product.title}"
             app:layout_constraintEnd_toEndOf="@id/iv_product_thumbnail"
             app:layout_constraintStart_toStartOf="@id/iv_product_thumbnail"
             app:layout_constraintTop_toBottomOf="@id/iv_product_thumbnail"
@@ -57,7 +57,7 @@
             android:maxLines="1"
             android:textColor="@color/product_info_text_color"
             android:textSize="16sp"
-            setPrice="@{product.price}"
+            setPrice="@{cartModel.product.price}"
             app:layout_constraintEnd_toEndOf="@id/iv_product_thumbnail"
             app:layout_constraintStart_toStartOf="@id/iv_product_thumbnail"
             app:layout_constraintTop_toBottomOf="@id/tv_product_title"

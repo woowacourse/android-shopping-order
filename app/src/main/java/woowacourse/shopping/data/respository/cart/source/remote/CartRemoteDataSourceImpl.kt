@@ -81,7 +81,7 @@ class CartRemoteDataSourceImpl(
     override fun requestPostCartItem(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (Long) -> Unit,
     ) {
         Thread {
             val client = OkHttpClient()
@@ -100,9 +100,15 @@ class CartRemoteDataSourceImpl(
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())
                 }
+
                 override fun onResponse(call: Call, response: Response) {
+                    val location = response.header("Location")
+                        .toString()
+                        .substringAfterLast("/")
+                        .toLong()
+
                     if (response.code == 201) {
-                        onSuccess()
+                        onSuccess(location)
                         return
                     }
                     onFailure()

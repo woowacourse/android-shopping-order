@@ -24,7 +24,7 @@ internal class PageNationTest {
     @Test
     fun `아이템이 5개 이하면 다음 페이지를 반환하지 않는다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct = CartProduct(1L, product, 3, false)
         val cartProducts = CartProducts(mutableListOf(cartProduct))
         val pageNation = PageNation(cartProducts, 1)
@@ -85,7 +85,7 @@ internal class PageNationTest {
         fun getCartProducts(): CartProducts {
             return CartProducts(
                 List(6) {
-                    Product(1L, "치킨", 13000)
+                    Product(1L, "치킨", 13000, "")
                 }.mapIndexed { index, product ->
                     CartProduct(index.toLong(), product, index + 1, false)
                 }.toMutableList(),

@@ -21,7 +21,7 @@ import woowacourse.shopping.data.respository.recentproduct.RecentProductReposito
 import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.cart.CartActivity
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailActivity
@@ -178,7 +178,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding.rvProductList.layoutManager = layoutManager
     }
 
-    override fun setProductItemsView(products: List<ProductModel>) {
+    override fun setProductItemsView(products: List<CartModel>) {
         binding.rvProductList.post {
             productListAdapter.setItems(products)
         }

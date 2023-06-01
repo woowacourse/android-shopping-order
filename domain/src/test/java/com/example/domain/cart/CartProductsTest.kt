@@ -8,9 +8,8 @@ internal class CartProductsTest {
     @Test
     fun `장바구니 아이템 하나의 checked를 true로 변경한다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct1 = CartProduct(1L, product, 3, false)
-        val cartProduct2 = CartProduct(1L, product, 3, true)
 
         val cartProductList = mutableListOf(cartProduct1)
         val cartProducts = CartProducts(cartProductList)
@@ -18,9 +17,9 @@ internal class CartProductsTest {
         val actual = true
 
         // when
-        cartProducts.updateCheckedBy(cartProduct1.id, true)
+        val newCartProducts = cartProducts.updateCheckedBy(cartProduct1.id, true)
 
-        val expected = cartProducts.getOrNull(cartProduct2.id)?.checked
+        val expected = newCartProducts.getOrNull(cartProduct1.id)?.checked
 
         // then
         assertThat(actual).isEqualTo(expected)
@@ -29,15 +28,15 @@ internal class CartProductsTest {
     @Test
     fun `장바구니 아이템을 삭제한다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct = CartProduct(1L, product, 3, false)
 
         val cartProductList = mutableListOf(cartProduct)
         val cartProducts = CartProducts(cartProductList)
 
         // when
-        cartProducts.remove(cartProduct.id)
-        val actual = cartProducts.getOrNull(cartProduct.id)
+        val newCartProducts = cartProducts.remove(cartProduct.id)
+        val actual = newCartProducts.getOrNull(cartProduct.id)
 
         // then
         assertThat(actual).isNull()
@@ -86,7 +85,7 @@ internal class CartProductsTest {
         fun getCartProducts(): CartProducts {
             return CartProducts(
                 List(6) {
-                    Product(1L, "치킨", 13000)
+                    Product(1L, "치킨", 13000, "")
                 }.mapIndexed { index, product ->
                     CartProduct(index.toLong(), product, index + 1, false)
                 }.toMutableList(),

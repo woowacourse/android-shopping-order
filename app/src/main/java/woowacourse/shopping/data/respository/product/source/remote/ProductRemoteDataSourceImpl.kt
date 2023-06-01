@@ -8,6 +8,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
 import java.io.IOException
@@ -18,7 +19,7 @@ class ProductRemoteDataSourceImpl(
 
     override fun requestDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<ProductEntity>) -> Unit,
+        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
         Thread {
             val client = OkHttpClient()
@@ -28,10 +29,11 @@ class ProductRemoteDataSourceImpl(
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d("krrong", e.toString())
                 }
+
                 override fun onResponse(call: Call, response: Response) {
                     if (response.isSuccessful) {
                         val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseProductList(body))
+                        onSuccess(parseCartEntities(body))
                         return
                     }
                     onFailure()
@@ -43,7 +45,7 @@ class ProductRemoteDataSourceImpl(
     override fun requestData(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (products: ProductEntity) -> Unit,
+        onSuccess: (products: CartRemoteEntity) -> Unit,
     ) {
         Thread {
             val client = OkHttpClient()
@@ -57,7 +59,7 @@ class ProductRemoteDataSourceImpl(
                 override fun onResponse(call: Call, response: Response) {
                     if (response.isSuccessful) {
                         val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseProduct(JSONObject(body)))
+                        onSuccess(parseCartEntity(JSONObject(body)))
                         return
                     }
                     onFailure()
@@ -66,28 +68,32 @@ class ProductRemoteDataSourceImpl(
         }.start()
     }
 
-    private fun parseProductList(response: String): List<ProductEntity> {
-        val products = mutableListOf<ProductEntity>()
+    private fun parseCartEntities(response: String): List<CartRemoteEntity> {
+        val products = mutableListOf<CartRemoteEntity>()
         val jsonArray = JSONArray(response)
 
         for (index in 0 until jsonArray.length()) {
             val json = jsonArray.getJSONObject(index) ?: continue
-            products.add(parseProduct(json))
+            products.add(parseCartEntity(json))
         }
 
         return products
     }
 
-    private fun parseProduct(json: JSONObject): ProductEntity {
+    private fun parseCartEntity(json: JSONObject): CartRemoteEntity {
         val id = json.getLong("id")
         val name = json.getString("name")
         val price = json.getInt("price")
         val image = json.getString("imageUrl")
 
-        return ProductEntity(id, name, price, image)
+        val productEntity = ProductEntity(id, name, price, image)
+
+        return CartRemoteEntity(DUMMY_CART_ID, DEFAULT_QUANTITY, productEntity)
     }
 
     companion object {
         private const val PRODUCT = "/products"
+        private const val DUMMY_CART_ID = 99999L
+        private const val DEFAULT_QUANTITY = 1
     }
 }

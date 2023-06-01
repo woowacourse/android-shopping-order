@@ -24,9 +24,12 @@ class CartProducts(private val cartProducts: List<CartProduct>) {
     }
 
     fun updateCheckedBy(cartId: Long, isChecked: Boolean): CartProducts {
-        val newAll = all
+        val newAll = all.toMutableList()
         val cartProduct = newAll.find { it.id == cartId } ?: return this
-        cartProduct.updateChecked(isChecked)
+        val index = newAll.indexOf(cartProduct)
+        val newProduct = cartProduct.updateChecked(isChecked)
+        newAll.remove(cartProduct)
+        newAll.add(index, newProduct)
         return CartProducts(newAll)
     }
 
@@ -43,7 +46,6 @@ class CartProducts(private val cartProducts: List<CartProduct>) {
 
     fun updateCheckedAll(isChecked: Boolean): CartProducts {
         val newAll = all.map { it.updateChecked(isChecked) }
-        println(newAll)
         return CartProducts(newAll)
     }
 

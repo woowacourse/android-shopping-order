@@ -8,7 +8,7 @@ internal class CartProductTest {
     @Test
     fun `체크를 true로 변경한다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct = CartProduct(1L, product, 3, false)
         val expected = true
 
@@ -22,7 +22,7 @@ internal class CartProductTest {
     @Test
     fun `개수를 1 증가시킨다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct = CartProduct(1L, product, 3, false)
         val expected = 4
 
@@ -36,7 +36,7 @@ internal class CartProductTest {
     @Test
     fun `개수를 1 감소시킨다`() {
         // given
-        val product = Product(1L, "치킨", 13000)
+        val product = Product(1L, "치킨", 13000, "")
         val cartProduct = CartProduct(1L, product, 3, false)
         val expected = 2
 
