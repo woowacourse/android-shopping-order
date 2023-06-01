@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.basket
+package woowacourse.shopping.ui
 
 import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
@@ -12,7 +12,7 @@ object BasketFixture {
         products = listOf(
             BasketProduct(
                 id = 0,
-                count = Count(0),
+                count = Count(10),
                 product = Product(
                     id = 0,
                     name = "",
@@ -23,9 +23,9 @@ object BasketFixture {
             ),
             BasketProduct(
                 id = 1,
-                count = Count(0),
+                count = Count(10),
                 product = Product(
-                    id = 0,
+                    id = 1,
                     name = "",
                     price = Price(0),
                     imageUrl = ""
@@ -33,9 +33,9 @@ object BasketFixture {
             ),
             BasketProduct(
                 id = 2,
-                count = Count(0),
+                count = Count(10),
                 product = Product(
-                    id = 0,
+                    id = 2,
                     name = "",
                     price = Price(0),
                     imageUrl = ""

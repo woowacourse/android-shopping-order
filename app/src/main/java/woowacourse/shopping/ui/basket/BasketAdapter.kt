@@ -27,7 +27,7 @@ class BasketAdapter(
             { minusClickListener(it.toDomain()) },
             { plusClickListener(it.toDomain()) },
             { basketProduct, isChecked ->
-                var processedBasketProduct = BasketProduct(
+                val processedBasketProduct = BasketProduct(
                     id = basketProduct.id,
                     count = basketProduct.count.toDomain(),
                     product = basketProduct.product.toDomain(),
