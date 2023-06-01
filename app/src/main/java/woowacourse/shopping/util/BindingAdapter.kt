@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.model.PreOrderInfo
+import woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo
 
 @BindingAdapter("app:image")
 fun ImageView.setImage(imgUrl: String) {

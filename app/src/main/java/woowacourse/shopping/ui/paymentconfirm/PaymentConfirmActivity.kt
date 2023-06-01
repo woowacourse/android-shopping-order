@@ -12,6 +12,7 @@ import woowacourse.shopping.databinding.ActivityPaymentConfirmBinding
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.UiUserPointInfo
+import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
 
@@ -45,6 +46,10 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
 
     override fun updateUserPointInfo(userPointInfo: UiUserPointInfo) {
         binding.userPointInfo = userPointInfo
+    }
+
+    override fun updatePreOrderInfo(preOrderInfo: UiPreOrderInfo) {
+        binding.preOrderInfo = preOrderInfo
     }
 
     companion object {

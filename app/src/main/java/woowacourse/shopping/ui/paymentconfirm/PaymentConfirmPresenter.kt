@@ -5,6 +5,7 @@ import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.UserPointInfo
 import woowacourse.shopping.domain.repository.PointRepository
 import woowacourse.shopping.ui.mapper.toUi
+import woowacourse.shopping.ui.model.preorderinfo.PreOrderInfoFactory
 
 class PaymentConfirmPresenter(
     override val view: PaymentConfirmContract.View,
@@ -16,6 +17,7 @@ class PaymentConfirmPresenter(
 
     init {
         fetchUserPointInfo()
+        fetchPreOrderInfo()
     }
 
     override fun fetchUserPointInfo() {
@@ -23,5 +25,9 @@ class PaymentConfirmPresenter(
             userPointInfo = it
             view.updateUserPointInfo(userPointInfo.toUi())
         }
+    }
+
+    override fun fetchPreOrderInfo() {
+        view.updatePreOrderInfo(PreOrderInfoFactory(currentOrderBasket).getPreOrderInfo())
     }
 }
