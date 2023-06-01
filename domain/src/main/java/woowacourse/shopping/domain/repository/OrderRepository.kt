@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.page.Page
 
 interface OrderRepository {
-    fun order(
+    fun saveOrder(
         order: Order,
         onSuccess: () -> Unit,
         onFailed: (Throwable) -> Unit,

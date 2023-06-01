@@ -6,7 +6,7 @@ import woowacourse.shopping.ui.order.recyclerview.ListItem
 
 interface OrderContract {
     interface View {
-        fun updateOrder(orderItems: List<ListItem>)
+        fun showMoreOrders(orderItems: List<ListItem>)
         fun showOrderLoadFailed()
         fun showOrderCompleted()
         fun showOrderFailed()

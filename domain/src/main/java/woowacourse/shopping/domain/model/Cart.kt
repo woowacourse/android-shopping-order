@@ -48,7 +48,7 @@ data class Cart(
     fun findCartProductByProductId(productId: Int): CartProduct? =
         items.find { it.productId == productId }
 
-    fun changeProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
+    fun updateProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
         return copy(items = items.map { item ->
             if (item.productId == cartProduct.productId) item.changeCount(count) else item
         })

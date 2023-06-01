@@ -31,7 +31,7 @@ class OrderRecyclerViewAdapter(
 
     fun addAll(newItems: List<ListItem>) {
         items.addAll(newItems)
-        notifyItemRangeRemoved(
+        notifyItemRangeInserted(
             (items.size - newItems.size - 1).coerceAtLeast(0),
             newItems.size,
         )

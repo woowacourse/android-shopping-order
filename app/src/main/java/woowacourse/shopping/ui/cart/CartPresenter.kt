@@ -55,14 +55,14 @@ class CartPresenter(
         view.navigateToOrder(order)
     }
 
-    override fun removeProduct(cartProduct: CartProductModel) {
+    override fun deleteProduct(cartProduct: CartProductModel) {
         cartRepository.deleteCartProductById(cartProduct.id)
         updateCart(cart.delete(cartProduct.toDomain()))
     }
 
-    override fun changeProductCount(cartProduct: CartProductModel, count: Int) {
+    override fun updateProductCount(cartProduct: CartProductModel, count: Int) {
         val domainCartProduct = cartProduct.toDomain()
-        val newCart = cart.changeProductCount(domainCartProduct, count)
+        val newCart = cart.updateProductCount(domainCartProduct, count)
 
         newCart.findCartProductByProductId(domainCartProduct.productId)?.let { _cartProduct ->
             cartRepository.updateProductCountById(_cartProduct.id, _cartProduct.selectedCount)
@@ -80,7 +80,7 @@ class CartPresenter(
         )
     }
 
-    override fun changeProductSelectState(cartProduct: CartProductModel, isSelect: Boolean) {
+    override fun updateProductSelectState(cartProduct: CartProductModel, isSelect: Boolean) {
         updateCart(changeSelectState(cartProduct.product, isSelect))
     }
 

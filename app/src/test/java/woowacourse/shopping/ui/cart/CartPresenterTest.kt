@@ -91,7 +91,7 @@ internal class CartPresenterTest {
         }
 
         // when
-        presenter.removeProduct(product)
+        presenter.deleteProduct(product)
 
         // then
         verify(exactly = 1) { cartRepository.decreaseCartCount(product.toDomain(), 1) }

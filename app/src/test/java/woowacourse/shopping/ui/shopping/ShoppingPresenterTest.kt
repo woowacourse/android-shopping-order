@@ -38,7 +38,7 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun fetchAll_메서드를_호출하면_제품과_최근_본_목록을_갱신한다() {
         // given
-        every { recentProductRepository.getPartially(any()) } returns RecentProducts(
+        every { recentProductRepository.getRecentProducts(any()) } returns RecentProducts(
             items = listOf(
                 RecentProduct(1, Product(1, "상품", Price(1000), "상품 이미지"))
             )
@@ -63,7 +63,7 @@ internal class ShoppingPresenterTest {
         // then
         verify(exactly = 1) { view.updateRecentProducts(any()) }
         verify(exactly = 1) { view.navigateToProductDetail(product, any()) }
-        verify(exactly = 1) { recentProductRepository.add(any()) }
+        verify(exactly = 1) { recentProductRepository.saveRecentProduct(any()) }
     }
 
     @Test
@@ -97,7 +97,7 @@ internal class ShoppingPresenterTest {
 
         // then
         verify(exactly = 1) { view.navigateToProductDetail(any(), any()) }
-        verify(exactly = 1) { recentProductRepository.add(any()) }
+        verify(exactly = 1) { recentProductRepository.saveRecentProduct(any()) }
     }
 
     @Test

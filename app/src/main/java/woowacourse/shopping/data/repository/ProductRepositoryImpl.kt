@@ -54,8 +54,8 @@ class ProductRepositoryImpl(
         })
     }
 
-    override fun insertProduct(product: Product) {
-        productService.insertProduct(product.toProductPostRequest())
+    override fun saveProduct(product: Product) {
+        productService.saveProduct(product.toProductPostRequest())
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
                 override fun onFailure(call: Call<Unit>, throwable: Throwable) {}

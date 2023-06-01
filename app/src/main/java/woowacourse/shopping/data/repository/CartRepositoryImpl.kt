@@ -51,8 +51,8 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         )
     }
 
-    override fun addCartProductByProductId(productId: ProductId) {
-        service.addCartProduct(requestBody = CartAddRequest(productId))
+    override fun saveCartProductByProductId(productId: ProductId) {
+        service.saveCartProduct(requestBody = CartAddRequest(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
                 override fun onFailure(call: Call<Unit>, throwable: Throwable) {}
@@ -84,7 +84,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
                 updateProductCountById(cartProduct.id, updatedCount)
             },
             onFailed = {
-                addCartProductByProductId(productId)
+                saveCartProductByProductId(productId)
                 findCartProductByProductId(
                     productId = productId,
                     onSuccess = { newCartProduct ->

@@ -4,7 +4,7 @@ import woowacourse.shopping.data.entity.RecentProductEntity
 
 interface RecentProductDao {
     fun getSize(): Int
-    fun getRecentProductsPartially(size: Int): List<RecentProductEntity>
-    fun addRecentProduct(item: RecentProductEntity)
-    fun removeLast()
+    fun getRecentProducts(size: Int): List<RecentProductEntity>
+    fun saveRecentProduct(item: RecentProductEntity)
+    fun deleteLast()
 }

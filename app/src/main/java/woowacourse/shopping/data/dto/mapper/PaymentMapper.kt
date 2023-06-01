@@ -7,13 +7,13 @@ import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.model.Price
 
 fun PaymentResponse.toPayment(): Payment = Payment(
-    originalPayment = Price(originalPayment),
-    finalPayment = Price(finalPayment),
+    originalPrice = Price(originalPayment),
+    finalPrice = Price(finalPayment),
     usedPoint = Point(usedPoint),
 )
 
 fun Payment.toPaymentRequest(): PaymentRequest = PaymentRequest(
-    originalPayment = originalPayment.value,
-    finalPayment = finalPayment.value,
+    originalPayment = originalPrice.value,
+    finalPayment = finalPrice.value,
     usedPoint = usedPoint.value,
 )

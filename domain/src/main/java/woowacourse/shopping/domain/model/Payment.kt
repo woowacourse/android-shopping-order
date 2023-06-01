@@ -1,20 +1,20 @@
 package woowacourse.shopping.domain.model
 
 data class Payment(
-    val originalPayment: Price,
-    val finalPayment: Price,
+    val originalPrice: Price,
+    val finalPrice: Price,
     val usedPoint: Point = Point(0),
 ) {
 
     fun applyPointDiscount(point: Point): Payment = copy(
-        finalPayment = finalPayment - point.value,
+        finalPrice = finalPrice - point.value,
         usedPoint = point
     )
 
     companion object {
-        fun of(originalPayment: Price): Payment = Payment(
-            originalPayment = originalPayment,
-            finalPayment = originalPayment,
+        fun of(originalPrice: Price): Payment = Payment(
+            originalPrice = originalPrice,
+            finalPrice = originalPrice,
         )
     }
 }

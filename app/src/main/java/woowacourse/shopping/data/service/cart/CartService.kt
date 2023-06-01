@@ -19,7 +19,7 @@ interface CartService {
     fun getAllCartProduct(): Call<List<CartGetResponse>>
 
     @POST("/cart-items")
-    fun addCartProduct(@Body requestBody: CartAddRequest): Call<Unit>
+    fun saveCartProduct(@Body requestBody: CartAddRequest): Call<Unit>
 
     @PATCH("/cart-items/{cartItemId}")
     fun updateProductCountById(

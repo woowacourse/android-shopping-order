@@ -5,7 +5,7 @@ data class Order(
     val orderProducts: List<OrderProduct>,
     val payment: Payment,
 ) {
-    val finalPrice: Price = payment.finalPayment
+    val finalPrice: Price = payment.finalPrice
 
     fun applyPointDiscount(point: Point): Order = copy(
         payment = payment.applyPointDiscount(point)

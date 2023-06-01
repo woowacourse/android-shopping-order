@@ -13,12 +13,12 @@ import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
 
-    override fun order(
+    override fun saveOrder(
         order: Order,
         onSuccess: () -> Unit,
         onFailed: (Throwable) -> Unit,
     ) {
-        service.order(order.toOrderRequest()).enqueue(object : Callback<Unit> {
+        service.saveOrder(order.toOrderRequest()).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) {
                     onSuccess()

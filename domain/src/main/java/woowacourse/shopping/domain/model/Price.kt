@@ -3,10 +3,6 @@ package woowacourse.shopping.domain.model
 data class Price(val value: Int) {
 
     init {
-        validateValue()
-    }
-
-    private fun validateValue() {
         require(value >= 0) { PRICE_NEGATIVE_ERROR }
     }
 

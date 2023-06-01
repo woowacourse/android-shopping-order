@@ -14,11 +14,11 @@ class OrderHistoryPresenter(
     private var page: Page = LoadMore(INITIAL_PAGE, SIZE_PER_PAGE),
 ) : Presenter(view) {
 
-    override fun loadMoreOrderList() {
+    override fun loadMoreOrders() {
         orderRepository.getOrders(
             page = page,
             onSuccess = { orders ->
-                view.showExtraOrderList(orders.toUi())
+                view.showMoreOrders(orders.toUi())
                 page = page.next()
             },
             onFailed = { view.showLoadOrderFailed() }

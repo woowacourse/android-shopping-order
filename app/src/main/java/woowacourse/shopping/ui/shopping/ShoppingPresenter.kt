@@ -41,7 +41,7 @@ class ShoppingPresenter(
     }
 
     override fun fetchRecentProducts() {
-        updateRecentProducts(recentProductRepository.getPartially(recentProductSize))
+        updateRecentProducts(recentProductRepository.getRecentProducts(recentProductSize))
     }
 
     override fun loadMoreProducts() {
@@ -50,7 +50,7 @@ class ShoppingPresenter(
     }
 
     override fun addCartProduct(product: ProductModel, addCount: Int) {
-        cartRepository.addCartProductByProductId(product.toDomain().id)
+        cartRepository.saveCartProductByProductId(product.toDomain().id)
         fetchAllCartProducts()
     }
 

@@ -21,7 +21,7 @@ interface ProductService {
     fun findProductById(@Path("productId") id: ProductId): Call<ProductGetResponse?>
 
     @POST("/products")
-    fun insertProduct(@Body product: ProductPostRequest): Call<Unit>
+    fun saveProduct(@Body product: ProductPostRequest): Call<Unit>
 
     @PUT("/products/{productId}")
     fun updateProduct(

@@ -38,7 +38,7 @@ class OrderPresenter(
     }
 
     private fun updateOrder(orderItems: List<ListItem>) {
-        view.updateOrder(orderItems)
+        view.showMoreOrders(orderItems)
     }
 
     override fun applyPoint(point: PointModel) {
@@ -49,7 +49,7 @@ class OrderPresenter(
     }
 
     override fun order() {
-        orderRepository.order(
+        orderRepository.saveOrder(
             order = discountedOrder,
             onSuccess = {
                 view.showOrderCompleted()

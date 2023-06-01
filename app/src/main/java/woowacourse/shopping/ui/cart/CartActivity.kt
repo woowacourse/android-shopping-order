@@ -48,15 +48,15 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
     }
 
     override fun onCountChanged(cartProduct: CartProductModel, changedCount: Int) {
-        presenter.changeProductCount(cartProduct, changedCount)
+        presenter.updateProductCount(cartProduct, changedCount)
     }
 
     override fun onCheckStateChanged(cartProduct: CartProductModel, isChecked: Boolean) {
-        presenter.changeProductSelectState(cartProduct, isChecked)
+        presenter.updateProductSelectState(cartProduct, isChecked)
     }
 
     override fun onDeleteClick(cartProduct: CartProductModel) {
-        presenter.removeProduct(cartProduct)
+        presenter.deleteProduct(cartProduct)
     }
 
     override fun navigateToOrder(order: OrderModel) {

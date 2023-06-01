@@ -24,10 +24,10 @@ class OrderHistoryActivity : AppCompatActivity(), View {
         binding = ActivityOrderHistoryBinding.inflate(layoutInflater).setContentView(this)
         binding.presenter = presenter
         binding.adapter = OrderHistoryRecyclerViewAdapter(presenter::inquiryOrderDetail)
-        presenter.loadMoreOrderList()
+        presenter.loadMoreOrders()
     }
 
-    override fun showExtraOrderList(orders: List<OrderModel>) {
+    override fun showMoreOrders(orders: List<OrderModel>) {
         binding.adapter?.submitList(orders)
     }
 

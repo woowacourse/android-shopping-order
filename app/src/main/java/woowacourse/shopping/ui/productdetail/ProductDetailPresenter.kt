@@ -16,10 +16,10 @@ ProductDetailPresenter(
     recentProductRepository: RecentProductRepository,
 ) : Presenter(view) {
     private val lastViewedProduct =
-        recentProductRepository.getPartially(LAST_VIEWED_PRODUCT_SIZE).getLatest()
+        recentProductRepository.getRecentProducts(LAST_VIEWED_PRODUCT_SIZE).getLatest()
 
     init {
-        recentProductRepository.add(RecentProduct(product = product.toDomain()))
+        recentProductRepository.saveRecentProduct(RecentProduct(product = product.toDomain()))
 
         if (showLastViewedProduct) {
             view.showLastViewedProductDetail(lastViewedProduct?.product?.toUi())

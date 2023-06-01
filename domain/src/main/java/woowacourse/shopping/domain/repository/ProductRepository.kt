@@ -14,7 +14,7 @@ interface ProductRepository {
         onFailed: (Throwable) -> Unit,
     )
 
-    fun insertProduct(product: Product)
+    fun saveProduct(product: Product)
     fun updateProduct(product: Product)
     fun deleteProduct(product: Product)
 }

@@ -10,7 +10,7 @@ import woowacourse.shopping.data.dto.OrderResponse
 
 interface OrderService {
     @POST("/orders")
-    fun order(@Body orderPostRequest: OrderPostRequest): Call<Unit>
+    fun saveOrder(@Body orderPostRequest: OrderPostRequest): Call<Unit>
 
     @GET("/orders")
     fun getOrders(

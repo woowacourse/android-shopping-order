@@ -9,15 +9,15 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentProductRepository {
 
-    override fun add(recentProduct: RecentProduct) {
-        while (dao.getSize() >= STORED_DATA_SIZE) {
-            dao.removeLast()
-        }
-        dao.addRecentProduct(recentProduct.toEntity())
-    }
+    override fun getRecentProducts(size: Int): RecentProducts =
+        RecentProducts(items = dao.getRecentProducts(size).toDomain())
 
-    override fun getPartially(size: Int): RecentProducts =
-        RecentProducts(items = dao.getRecentProductsPartially(size).toDomain())
+    override fun saveRecentProduct(recentProduct: RecentProduct) {
+        while (dao.getSize() >= STORED_DATA_SIZE) {
+            dao.deleteLast()
+        }
+        dao.saveRecentProduct(recentProduct.toEntity())
+    }
 
     companion object {
         private const val STORED_DATA_SIZE = 50

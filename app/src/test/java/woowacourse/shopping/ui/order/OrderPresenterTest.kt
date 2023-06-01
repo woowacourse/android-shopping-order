@@ -24,14 +24,14 @@ internal class OrderPresenterTest {
         // Given: 장바구니에서 주문할 상품을 선택한다.
         val order: Order = mockk(relaxed = true)
         justRun { view.showOrderCompleted() }
-        justRun { orderRepository.order(order, {}, {}) }
+        justRun { orderRepository.saveOrder(order, {}, {}) }
         presenter = OrderPresenter(view, order, orderRepository)
 
         // When: 상품을 주문한다.
         presenter.order()
 
         // Then: 주문이 완료되면 성공 메시지를 보여준다.
-        verify { orderRepository.order(order, {}, {}) }
+        verify { orderRepository.saveOrder(order, {}, {}) }
         verify { view.showOrderCompleted() }
     }
 
