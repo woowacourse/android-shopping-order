@@ -6,10 +6,8 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.orderdetail.recyclerview.OrderDetailViewType
 
-typealias UiPayment = Payment
-
 @Parcelize
-data class Payment(
+data class PaymentModel(
     val originalPayment: UiPrice,
     val finalPayment: UiPrice,
     val usedPoint: UiPoint,

@@ -8,7 +8,7 @@
 
         <variable
             name="payment"
-            type="woowacourse.shopping.model.Payment" />
+            type="woowacourse.shopping.model.PaymentModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

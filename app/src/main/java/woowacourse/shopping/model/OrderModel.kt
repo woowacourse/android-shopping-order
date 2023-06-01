@@ -10,7 +10,7 @@ import woowacourse.shopping.ui.order.recyclerview.ListItem
 data class OrderModel(
     val id: Int = DEFAULT_ORDER_ID,
     val orderProducts: List<OrderProductModel>,
-    val payment: Payment,
+    val payment: PaymentModel,
 ) : Parcelable, ListItem {
 
     @IgnoredOnParcel
