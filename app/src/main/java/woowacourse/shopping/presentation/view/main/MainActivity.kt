@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        setEnableButton(false)
         setRadioClick()
         setButtonClick()
     }
@@ -25,9 +26,14 @@ class MainActivity : AppCompatActivity() {
             when (checkedId) {
                 binding.rdobtMainKrrong.id -> {
                     token = Server.Token.KRRONG
+                    setEnableButton(true)
                 }
                 binding.rdobtMainSunny.id -> {
                     token = Server.Token.SUNNY
+                    setEnableButton(true)
+                }
+                else -> {
+                    setEnableButton(false)
                 }
             }
         }
@@ -45,6 +51,12 @@ class MainActivity : AppCompatActivity() {
         binding.btMainPoi.setOnClickListener {
             moveToProductListView(Server.Url.BASE_URL_POI)
         }
+    }
+
+    private fun setEnableButton(isEnabled: Boolean) {
+        binding.btMainTori.isEnabled = isEnabled
+        binding.btMainJenna.isEnabled = isEnabled
+        binding.btMainPoi.isEnabled = isEnabled
     }
 
     private fun moveToProductListView(url: Server.Url) {
