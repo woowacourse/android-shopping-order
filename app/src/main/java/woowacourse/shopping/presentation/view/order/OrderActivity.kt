@@ -5,21 +5,33 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.card.CardRepositoryImpl
+import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
+import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.presentation.model.CardModel
+import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.view.order.adapter.CardListAdapter
+import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
+import woowacourse.shopping.presentation.view.util.showToast
 
-class OrderActivity : AppCompatActivity() {
+class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
 
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
+
+    private lateinit var presenter: OrderContract.Presenter
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +43,8 @@ class OrderActivity : AppCompatActivity() {
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
 
         setToolbar()
+        setPresenter()
+        presenter.loadOrderProducts(cartIds)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -46,6 +60,46 @@ class OrderActivity : AppCompatActivity() {
     private fun setToolbar() {
         supportActionBar?.title = getString(R.string.toolbar_title_order)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun setPresenter() {
+        val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
+
+        presenter = OrderPresenter(
+            this,
+            cardRepository = CardRepositoryImpl(),
+            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource)
+        )
+    }
+
+    override fun setLayoutVisibility() {
+        binding.layoutSkeletonOrder.post {
+            binding.layoutSkeletonOrder.visibility = View.GONE
+        }
+
+        binding.layoutOrder.post {
+            binding.layoutOrder.visibility = View.VISIBLE
+        }
+    }
+
+    override fun setProductItemsView(products: List<CartModel>) {
+        binding.rvOrderProductList.post {
+            binding.rvOrderProductList.adapter = OrderProductListAdapter(products)
+        }
+    }
+
+    override fun setCardItemsView(cards: List<CardModel>) {
+        binding.rvOrderCardList.post {
+            binding.rvOrderCardList.adapter = CardListAdapter(cards)
+        }
+    }
+
+    override fun handleErrorView() {
+        binding.root.post {
+            showToast(getString(R.string.toast_message_system_error))
+            finish()
+        }
     }
 
     companion object {

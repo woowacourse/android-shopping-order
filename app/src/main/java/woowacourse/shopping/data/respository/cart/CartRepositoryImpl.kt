@@ -25,6 +25,16 @@ class CartRepositoryImpl(
         cartRemoteDataSource.requestDatas(onFailure, onSuccess)
     }
 
+    override fun loadCartsByCartIds(
+        cartIds: ArrayList<Long>,
+        onFailure: () -> Unit,
+        onSuccess: (products: List<CartProduct>) -> Unit
+    ) {
+        cartRemoteDataSource.requestDatas(onFailure) { allCarts ->
+            onSuccess(allCarts.filter { it.id in cartIds })
+        }
+    }
+
     override fun updateCartCount(
         cartProduct: CartProduct,
         onFailure: () -> Unit,

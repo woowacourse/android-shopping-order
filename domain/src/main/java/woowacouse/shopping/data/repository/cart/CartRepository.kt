@@ -17,6 +17,11 @@ interface CartRepository {
         onFailure: () -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     )
+    fun loadCartsByCartIds(
+        cartIds: ArrayList<Long>,
+        onFailure: () -> Unit,
+        onSuccess: (products: List<CartProduct>) -> Unit,
+    )
     fun updateCartCount(
         cartProduct: CartProduct,
         onFailure: () -> Unit,

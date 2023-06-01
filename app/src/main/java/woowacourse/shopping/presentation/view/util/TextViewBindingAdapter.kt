@@ -18,3 +18,8 @@ fun setPriceView(textView: TextView, price: Int?) {
 fun setCountView(textView: TextView, count: Int?) {
     textView.text = textView.context.getString(R.string.product_count_format, count ?: 0)
 }
+
+@BindingAdapter("setCardNumber")
+fun setCardView(textView: TextView, number: String) {
+    textView.text = number.substringBefore("-")
+}
