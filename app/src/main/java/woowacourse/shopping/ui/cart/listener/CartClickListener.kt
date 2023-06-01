@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.cart.listener
 
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 
 interface CartClickListener {
-    fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int)
-    fun onCheckStateChanged(cartProduct: UiCartProduct, isChecked: Boolean)
-    fun onDeleteClick(cartProduct: UiCartProduct)
+    fun onCountChanged(cartProduct: CartProductModel, changedCount: Int)
+    fun onCheckStateChanged(cartProduct: CartProductModel, isChecked: Boolean)
+    fun onDeleteClick(cartProduct: CartProductModel)
 }

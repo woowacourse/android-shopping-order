@@ -12,7 +12,7 @@
 
         <variable
             name="cartProduct"
-            type="woowacourse.shopping.model.CartProduct" />
+            type="woowacourse.shopping.model.CartProductModel" />
 
         <variable
             name="cartClickListener"

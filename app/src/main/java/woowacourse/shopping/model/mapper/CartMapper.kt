@@ -1,12 +1,12 @@
 package woowacourse.shopping.model.mapper
 
 import woowacourse.shopping.domain.model.DomainCart
-import woowacourse.shopping.model.UiCart
+import woowacourse.shopping.model.CartModel
 
-fun UiCart.toDomain(): DomainCart = DomainCart(
+fun CartModel.toDomain(): DomainCart = DomainCart(
     items = cartProducts.map { it.toDomain() },
 )
 
-fun DomainCart.toUi(): UiCart = UiCart(
+fun DomainCart.toUi(): CartModel = CartModel(
     cartProducts = items.map { it.toUi() },
 )

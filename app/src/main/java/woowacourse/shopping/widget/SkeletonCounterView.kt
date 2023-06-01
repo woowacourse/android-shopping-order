@@ -7,7 +7,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ViewCounterBinding
-import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.CartProductModel
 import kotlin.properties.Delegates
 
 class SkeletonCounterView : ConstraintLayout {
@@ -79,6 +79,6 @@ class SkeletonCounterView : ConstraintLayout {
     }
 
     interface OnCountChangedListener {
-        fun onCountChanged(cartProduct: CartProduct, changedCount: Int)
+        fun onCountChanged(cartProduct: CartProductModel, changedCount: Int)
     }
 }

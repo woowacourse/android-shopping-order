@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.Order
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.UiPage
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener
@@ -30,7 +30,7 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         presenter.fetchCart(START_PAGE)
     }
 
-    override fun updateCart(cartProducts: List<UiCartProduct>) {
+    override fun updateCart(cartProducts: List<CartProductModel>) {
         binding.adapter?.submitList(cartProducts)
     }
 
@@ -47,15 +47,15 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.totalPriceTextView.text = getString(R.string.price_format, totalPrice)
     }
 
-    override fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int) {
+    override fun onCountChanged(cartProduct: CartProductModel, changedCount: Int) {
         presenter.changeProductCount(cartProduct, changedCount)
     }
 
-    override fun onCheckStateChanged(cartProduct: UiCartProduct, isChecked: Boolean) {
+    override fun onCheckStateChanged(cartProduct: CartProductModel, isChecked: Boolean) {
         presenter.changeProductSelectState(cartProduct, isChecked)
     }
 
-    override fun onDeleteClick(cartProduct: UiCartProduct) {
+    override fun onDeleteClick(cartProduct: CartProductModel) {
         presenter.removeProduct(cartProduct)
     }
 

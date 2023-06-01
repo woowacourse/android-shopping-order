@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiProductCount
 import woowacourse.shopping.model.UiRecentProduct
@@ -54,7 +54,7 @@ class ShoppingPresenter(
         fetchAllCartProducts()
     }
 
-    override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
+    override fun updateCartCount(cartProduct: CartProductModel, changedCount: Int) {
         cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
         fetchAllCartProducts()
     }
@@ -68,7 +68,7 @@ class ShoppingPresenter(
         view.navigateToCart()
     }
 
-    override fun inquiryProductDetail(cartProduct: UiCartProduct) {
+    override fun inquiryProductDetail(cartProduct: CartProductModel) {
         val recentProduct = RecentProduct(product = cartProduct.product.toDomain())
         view.navigateToProductDetail(cartProduct.product)
         updateRecentProducts(recentProducts + recentProduct)

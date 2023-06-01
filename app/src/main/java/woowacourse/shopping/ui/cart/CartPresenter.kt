@@ -13,7 +13,7 @@ import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.Price
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract.Presenter
 import woowacourse.shopping.ui.cart.CartContract.View
@@ -55,12 +55,12 @@ class CartPresenter(
         view.navigateToOrder(order)
     }
 
-    override fun removeProduct(cartProduct: UiCartProduct) {
+    override fun removeProduct(cartProduct: CartProductModel) {
         cartRepository.deleteCartProductById(cartProduct.id)
         updateCart(cart.delete(cartProduct.toDomain()))
     }
 
-    override fun changeProductCount(cartProduct: UiCartProduct, count: Int) {
+    override fun changeProductCount(cartProduct: CartProductModel, count: Int) {
         val domainCartProduct = cartProduct.toDomain()
         val newCart = cart.changeProductCount(domainCartProduct, count)
 
@@ -80,7 +80,7 @@ class CartPresenter(
         )
     }
 
-    override fun changeProductSelectState(cartProduct: UiCartProduct, isSelect: Boolean) {
+    override fun changeProductSelectState(cartProduct: CartProductModel, isSelect: Boolean) {
         updateCart(changeSelectState(cartProduct.product, isSelect))
     }
 

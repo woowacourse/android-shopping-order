@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductCount
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
@@ -77,7 +77,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         }
     }
 
-    override fun updateProducts(products: List<UiCartProduct>) {
+    override fun updateProducts(products: List<CartProductModel>) {
         productAdapter.submitList(products)
     }
 
@@ -117,15 +117,15 @@ class ShoppingActivity : AppCompatActivity(), View,
         productCountTextView.text = count.toText()
     }
 
-    override fun onClickCartProduct(cartProduct: UiCartProduct) {
+    override fun onClickCartProduct(cartProduct: CartProductModel) {
         presenter.inquiryProductDetail(cartProduct)
     }
 
-    override fun onAddCartProduct(cartProduct: UiCartProduct) {
+    override fun onAddCartProduct(cartProduct: CartProductModel) {
         presenter.addCartProduct(cartProduct.product)
     }
 
-    override fun onCountChanged(cartProduct: UiCartProduct, changedCount: Int) {
+    override fun onCountChanged(cartProduct: CartProductModel, changedCount: Int) {
         presenter.updateCartCount(cartProduct, changedCount)
     }
 

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.ui.cart.listener.CartClickListener
 
 class CartViewHolder(
@@ -20,7 +20,7 @@ class CartViewHolder(
         binding.cartClickListener = cartClickListener
     }
 
-    fun bind(item: UiCartProduct) {
+    fun bind(item: CartProductModel) {
         binding.cartProduct = item
     }
 }
