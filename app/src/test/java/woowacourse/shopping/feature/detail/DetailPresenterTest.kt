@@ -3,9 +3,7 @@ package woowacourse.shopping.feature.detail
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -22,14 +20,15 @@ internal class DetailPresenterTest {
     @Before
     fun init() {
         view = mockk(relaxed = true)
-        cartRepository = mockk()
+        cartRepository = mockk(relaxed = true)
         presenter = DetailPresenter(view, cartRepository, mockProduct)
     }
 
     @Test
     fun `장바구니에 상품을 추가한다`() {
         val slot = slot<Product>()
-        every { cartRepository.addProduct(capture(slot), 1) } just Runs
+        every { cartRepository.addProduct(capture(slot)) } returns 1
+        every { cartRepository.getCartProductByProduct(any()) } returns null
 
         presenter.addCart()
 

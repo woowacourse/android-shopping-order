@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.main
 
 import com.example.domain.ProductCache
 import com.example.domain.datasource.productsDatasource
+import com.example.domain.model.CartProducts
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
@@ -51,7 +52,7 @@ internal class MainPresenterTest {
 
         val slot = slot<List<ProductUiModel>>()
         every { view.addProducts(capture(slot)) } just Runs
-        every { cartRepository.getAll() } returns emptyList()
+        every { cartRepository.getAll() } returns CartProducts(emptyList())
 
         presenter.loadProducts()
 
