@@ -1,9 +1,10 @@
 package woowacourse.shopping.ui.order.recyclerview
 
 import woowacourse.shopping.R
+import woowacourse.shopping.model.OrderProduct
 
 enum class OrderViewType(val value: Int) {
-    ORDER(R.layout.item_order),
+    ORDER(OrderProduct.VIEW_TYPE_VALUE),
     POINT(R.layout.item_point);
 
     companion object {

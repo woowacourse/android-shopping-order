@@ -14,12 +14,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/shape_order_item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/order_detail_button">
+        app:layout_constraintStart_toStartOf="parent">
 
         <woowacourse.shopping.widget.SkeletonImageView
             android:id="@+id/product_detail_image_view"

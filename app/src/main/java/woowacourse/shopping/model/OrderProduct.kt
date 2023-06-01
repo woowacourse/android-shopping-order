@@ -5,7 +5,6 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.ui.order.recyclerview.ListItem
 import woowacourse.shopping.ui.order.recyclerview.OrderViewType
-import woowacourse.shopping.ui.orderdetail.recyclerview.OrderDetailViewType
 
 typealias UiOrderProduct = OrderProduct
 
@@ -19,5 +18,9 @@ data class OrderProduct(
     val imageUrl: String,
 ) : Parcelable, ListItem {
     @IgnoredOnParcel
-    override val viewType: Int = OrderViewType.ORDER.value or OrderDetailViewType.ORDER_DETAIL.value
+    override val viewType: Int = OrderViewType.ORDER.value
+
+    companion object {
+        const val VIEW_TYPE_VALUE = 1
+    }
 }
