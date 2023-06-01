@@ -9,6 +9,7 @@ interface MainContract {
     interface View {
         sealed class MainScreenEvent {
             object ShowCartScreen : MainScreenEvent()
+            object ShowOrderListScreen : MainScreenEvent()
             class ShowProductDetailScreen(
                 val product: ProductUiModel,
                 val recentProduct: RecentProductUiModel?,
@@ -32,6 +33,7 @@ interface MainContract {
         fun showProductDetail(productId: Long)
         fun changeProductCartCount(productId: Long, count: Int)
         fun moveToCart()
+        fun moveToOrderList()
         fun resetProducts()
     }
 }

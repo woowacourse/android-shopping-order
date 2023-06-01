@@ -15,6 +15,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".feature.order.list.OrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".feature.order.detail.OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".feature.order.confirm.OrderConfirmActivity"
             android:exported="false" />
         <activity
@@ -42,7 +48,7 @@
             android:name=".feature.main.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"></activity>
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>

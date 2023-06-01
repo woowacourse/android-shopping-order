@@ -154,6 +154,10 @@ class MainPresenter(
         _mainScreenEvent.value = MainScreenEvent.ShowCartScreen
     }
 
+    override fun moveToOrderList() {
+        _mainScreenEvent.value = MainScreenEvent.ShowOrderListScreen
+    }
+
     override fun resetProducts() {
         productRepository.resetCache()
     }

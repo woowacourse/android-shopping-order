@@ -26,6 +26,7 @@ import woowacourse.shopping.feature.main.product.ProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.order.list.OrderListActivity
 import woowacourse.shopping.module.ApiModule
 
 class MainActivity : AppCompatActivity(), MainContract.View {
@@ -117,6 +118,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             is MainContract.View.MainScreenEvent.ShowCartScreen -> {
                 startActivity(CartActivity.getIntent(this))
             }
+            is MainContract.View.MainScreenEvent.ShowOrderListScreen -> {
+                startActivity(OrderListActivity.getIntent(this))
+            }
             is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
                 startActivity(DetailActivity.getIntent(this, event.product.id, event.recentProduct))
             }
@@ -161,7 +165,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 presenter.moveToCart()
                 true
             }
-
+            R.id.order_list -> {
+                presenter.moveToOrderList()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
