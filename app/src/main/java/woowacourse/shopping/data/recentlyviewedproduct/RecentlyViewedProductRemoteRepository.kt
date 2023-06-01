@@ -3,7 +3,6 @@ package woowacourse.shopping.data.recentlyviewedproduct
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -91,7 +90,6 @@ class RecentlyViewedProductRemoteRepository(private val db: SQLiteDatabase) :
                     call: Call<List<ProductDto>>,
                     response: Response<List<ProductDto>>
                 ) {
-                    Log.d("THOMAS", "응답 코드: ${response.code()}")
                     if (response.isSuccessful.not()) return
                     val products = response.body()!!
                         .map { it.toDomain() }
