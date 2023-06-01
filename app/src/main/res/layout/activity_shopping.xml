@@ -44,7 +44,7 @@
             bind:animator="@{null}"
             bind:fixedSize="@{true}"
             bind:layoutManager="@{ShoppingGridLayoutManager.create(context, adapter)}"
-            bind:onAdapted="@{() -> presenter.fetchAll()}"
+            bind:onAdapted="@{presenter::fetchAll}"
             tools:itemCount="10"
             tools:listitem="@layout/item_product" />
 
