@@ -18,7 +18,8 @@ object BasketFixture {
                     name = "",
                     price = Price(0),
                     imageUrl = ""
-                )
+                ),
+                checked = true
             ),
             BasketProduct(
                 id = 1,
@@ -38,7 +39,8 @@ object BasketFixture {
                     name = "",
                     price = Price(0),
                     imageUrl = ""
-                )
+                ),
+                checked = true
             )
         )
     )

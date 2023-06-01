@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.basket
+package woowacourse.shopping.ui
 
 import woowacourse.shopping.ui.model.User
 
