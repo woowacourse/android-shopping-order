@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.domain.model.MoneySalePolicy
@@ -27,12 +28,9 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
         val cartIds =
             intent.getSerializableExtraCompat<ArrayList<Long>>(CART_ID_KEY) ?: return finish()
         binding.orderProductRecyclerView.adapter = orderConfirmAdapter
-        initObserve()
         initPresenter(cartIds)
-    }
-
-    private fun initObserve() {
-        presenter.cartProducts.observe(this) { orderConfirmAdapter.setOrderProducts(it) }
+        initObserve()
+        presenter.loadSelectedCarts()
     }
 
     private fun initPresenter(cartIds: List<Long>) {
@@ -44,7 +42,11 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
                 OrderRepositoryImpl(ApiModule.createOrderService()),
                 cartIds
             )
-        presenter.loadSelectedCarts()
+        binding.presenter = presenter
+    }
+
+    private fun initObserve() {
+        presenter.cartProducts.observe(this) { orderConfirmAdapter.setOrderProducts(it) }
     }
 
     override fun setSaleInfo(moneySaleUiModel: MoneySaleUiModel) {
@@ -68,8 +70,12 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
 
     override fun showOrderSuccess(cartIds: List<Long>) {
         val resultIntent = Intent()
-        resultIntent.putExtra(ORDER_CART_ID_KEY, cartIds.toTypedArray())
+        resultIntent.putExtra(ORDER_CART_ID_KEY, ArrayList(cartIds))
         setResult(Activity.RESULT_OK, resultIntent)
+    }
+
+    override fun showOrderFailed() {
+        Toast.makeText(this, getString(R.string.order_failed_message), Toast.LENGTH_SHORT).show()
     }
 
     override fun exitScreen() = finish()
@@ -79,7 +85,7 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
         const val ORDER_CART_ID_KEY = "order_cart_id_key"
         fun getIntent(context: Context, cartIds: List<Long>): Intent {
             return Intent(context, OrderConfirmActivity::class.java).apply {
-                putExtra(CART_ID_KEY, cartIds.toTypedArray())
+                putExtra(CART_ID_KEY, ArrayList(cartIds))
             }
         }
     }

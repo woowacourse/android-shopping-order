@@ -41,7 +41,7 @@ class OrderConfirmPresenter(
                 view.showOrderSuccess(cartIds)
                 view.exitScreen()
             },
-            onFailure = {}
+            onFailure = { view.showOrderFailed() }
         )
     }
 

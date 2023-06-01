@@ -28,4 +28,5 @@
     <string name="final_pay_amount">최종 결제 금액</string>
     <string name="sale_boundary_condition">%s 원 이상 구매 시</string>
     <string name="sale_apply_amount">%s원 할인</string>
+    <string name="order_failed_message">주문에 실패했습니다\n 잠시 후에 다시 시도해주세요</string>
 </resources>

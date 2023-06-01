@@ -10,6 +10,7 @@ interface OrderConfirmContract {
         fun setPayInfo(originMoney: Int, saleApplyMoney: Int)
         fun setFinalPayInfo(saleApplyMoney: Int)
         fun showOrderSuccess(cartIds: List<Long>)
+        fun showOrderFailed()
         fun exitScreen()
     }
 

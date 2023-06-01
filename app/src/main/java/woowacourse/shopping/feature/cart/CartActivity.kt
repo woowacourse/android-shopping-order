@@ -24,15 +24,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var presenter: CartContract.Presenter
     private lateinit var cartProductAdapter: CartProductAdapter
 
-    private val resultLauncher: ActivityResultLauncher<Intent> by lazy {
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val cartIds =
-                    result.data?.getSerializableExtraCompat<ArrayList<Long>>(OrderConfirmActivity.ORDER_CART_ID_KEY)
-                cartIds?.let { presenter.processRemoveOrderCheckedItems() }
-            }
-        }
-    }
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     private val cartProductClickListener: CartProductClickListener by lazy {
         object : CartProductClickListener {
@@ -63,6 +55,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         setRecyclerViewAnimator()
         observePresenter()
+
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val cartIds =
+                        result.data?.getSerializableExtraCompat<ArrayList<Long>>(
+                            OrderConfirmActivity.ORDER_CART_ID_KEY
+                        )
+                    cartIds?.let { presenter.processRemoveOrderCheckedItems() }
+                }
+            }
     }
 
     private fun initPresenter() {
