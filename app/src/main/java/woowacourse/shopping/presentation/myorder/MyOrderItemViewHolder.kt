@@ -5,9 +5,17 @@ import woowacourse.shopping.databinding.ItemMyOrderBinding
 import woowacourse.shopping.presentation.model.OrderModel
 
 class MyOrderItemViewHolder(
-    private val binding: ItemMyOrderBinding
+    private val binding: ItemMyOrderBinding,
+    showOrderDetail: (OrderModel) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(orderModel: OrderModel) {
+    private lateinit var orderModel: OrderModel
+
+    init {
+        itemView.setOnClickListener { showOrderDetail(orderModel) }
+    }
+
+    fun bind(item: OrderModel) {
+        orderModel = item
         binding.orderModel = orderModel
     }
 }

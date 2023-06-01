@@ -69,6 +69,7 @@
                     app:layout_constraintBottom_toTopOf="@+id/text_order_product_price" />
 
                 <TextView
+                    android:text="@{@string/price_format(orderProduct.product.price)}"
                     android:textSize="25sp"
                     android:textColor="@color/black"
                     android:id="@+id/text_order_product_price"
