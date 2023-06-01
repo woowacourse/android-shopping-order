@@ -104,7 +104,7 @@ class CartProductDataSourceImpl : CartProductDataSource {
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.deleteCartPRoductById(token, cartItemId)
+        val call = retrofitService.deleteCartProductById(token, cartItemId)
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
             override fun onResponse(
                 call: Call<CartProductDto>,

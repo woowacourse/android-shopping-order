@@ -30,7 +30,7 @@ interface RetrofitCartProductService {
     ): Call<Void>
 
     @DELETE("/cart-items/{cartItemId}")
-    fun deleteCartPRoductById(
+    fun deleteCartProductById(
         @Header("Authorization") token: String,
         @Path("cartItemId") cartItemId: String,
     ): Call<CartProductDto>
