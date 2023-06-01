@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="6dp"
         android:layout_marginVertical="10dp"
-        android:onClick="@{() -> productListener.onItemClick(cartModel.id)}">
+        android:onClick="@{() -> productListener.onItemClick(cartModel.product.id)}">
 
         <ImageView
             android:id="@+id/iv_product_thumbnail"
