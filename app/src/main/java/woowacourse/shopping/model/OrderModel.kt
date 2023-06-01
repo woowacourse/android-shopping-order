@@ -20,8 +20,8 @@ data class OrderModel(
     val firstOrderProductName: String? = orderProducts.firstOrNull()?.name
 
     @IgnoredOnParcel
-    val firstProductQuantity: UiProductCount =
-        orderProducts.firstOrNull()?.quantity ?: UiProductCount(0)
+    val firstProductQuantity: ProductCountModel =
+        orderProducts.firstOrNull()?.quantity ?: ProductCountModel(0)
 
     @IgnoredOnParcel
     val firstProductTotalPayment: PriceModel =

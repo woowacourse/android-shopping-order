@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class CartProductModel(
     val id: Int,
     val product: ProductModel,
-    val selectedCount: UiProductCount = UiProductCount(0),
+    val selectedCount: ProductCountModel = ProductCountModel(0),
     val isChecked: Boolean,
 ) : Parcelable {
     val shouldShowCounter: Boolean

@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.ProductCount
+import woowacourse.shopping.model.ProductCountModel
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiRecentProduct
 
@@ -13,7 +13,7 @@ interface ShoppingContract {
         fun navigateToCart()
         fun showLoadMoreButton()
         fun hideLoadMoreButton()
-        fun updateCartBadge(count: ProductCount)
+        fun updateCartBadge(count: ProductCountModel)
         fun showErrorMessage(message: String)
         fun navigateToOrderList()
     }

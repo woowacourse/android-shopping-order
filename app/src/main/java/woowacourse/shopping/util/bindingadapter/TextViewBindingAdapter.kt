@@ -5,7 +5,7 @@ import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.model.PointModel
 import woowacourse.shopping.model.PriceModel
-import woowacourse.shopping.model.UiProductCount
+import woowacourse.shopping.model.ProductCountModel
 
 @BindingAdapter("bind:price")
 fun TextView.setPrice(price: PriceModel?) {
@@ -13,7 +13,7 @@ fun TextView.setPrice(price: PriceModel?) {
 }
 
 @BindingAdapter("bind:quantity")
-fun TextView.setQuantity(quantity: UiProductCount) {
+fun TextView.setQuantity(quantity: ProductCountModel) {
     text = context.getString(R.string.quantity_format, quantity.value)
 }
 

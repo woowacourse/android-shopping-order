@@ -12,7 +12,7 @@ data class OrderProductModel(
     val name: String,
     val price: PriceModel,
     val totalPrice: PriceModel,
-    val quantity: UiProductCount,
+    val quantity: ProductCountModel,
     val imageUrl: String,
 ) : Parcelable, ListItem {
     @IgnoredOnParcel

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.ProductCount
+import woowacourse.shopping.model.ProductCountModel
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
@@ -109,7 +109,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         startActivity(OrderHistoryActivity.getIntent(this))
     }
 
-    override fun updateCartBadge(count: ProductCount) {
+    override fun updateCartBadge(count: ProductCountModel) {
         val cartBadgeView = binding.shoppingToolBar.findItemActionView(R.id.cart) ?: return
         val productCountTextView = cartBadgeView.findTextView(R.id.cart_count_badge) ?: return
 

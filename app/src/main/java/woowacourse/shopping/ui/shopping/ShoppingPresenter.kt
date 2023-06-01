@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.ProductModel
-import woowacourse.shopping.model.UiProductCount
+import woowacourse.shopping.model.ProductCountModel
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
@@ -32,8 +32,8 @@ class ShoppingPresenter(
 ) : Presenter(view) {
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
-    private val cartProductCount: UiProductCount
-        get() = UiProductCount(cart.productCountInCart)
+    private val cartProductCount: ProductCountModel
+        get() = ProductCountModel(cart.productCountInCart)
 
     override fun fetchAll() {
         fetchAllCartProducts()
