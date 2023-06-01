@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.util.WoowaResult
 
 interface ShoppingCartDataSource {
     fun fetchAll(callback: (WoowaResult<List<ShoppingCartDto>>) -> Unit)
-    fun delete(callback: (WoowaResult<Boolean>) -> Unit, id: Int)
+    fun delete(callback: (WoowaResult<Boolean>) -> Unit, id: Long)
     fun insert(
         callback: (WoowaResult<Long>) -> Unit,
         productId: Long,

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.model
 
 data class CartItem(
-    val id: Int,
+    val id: Long,
     val quantity: Int,
 ) {
     companion object {
