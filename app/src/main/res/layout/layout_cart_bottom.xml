@@ -15,6 +15,10 @@
         <variable
             name="onAllCheckClick"
             type="kotlin.jvm.functions.Function1" />
+
+        <variable
+            name="onOrderClick"
+            type="kotlin.jvm.functions.Function0" />
     </data>
 
     <LinearLayout
@@ -64,6 +68,7 @@
             android:layout_height="match_parent"
             android:background="@color/blue_green_04c09e"
             android:gravity="center"
+            android:onClick="@{() -> onOrderClick.invoke()}"
             android:text="@{@string/cart_order_btn(totalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"

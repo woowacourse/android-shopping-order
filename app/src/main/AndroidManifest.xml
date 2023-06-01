@@ -14,7 +14,9 @@
         android:theme="@style/Theme.Shopping"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.order.OrderActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.cart.CartActivity"
             android:exported="false" />
@@ -23,7 +25,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.shopping.ShoppingActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ui.serverSetting.ServerSettingActivity"
             android:exported="true">

@@ -148,6 +148,10 @@ class CartPresenter(
         }
     }
 
+    override fun navigateToOrder() {
+        view.navigateToOrder()
+    }
+
     companion object {
         private const val STEP: Int = 5
     }

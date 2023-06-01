@@ -19,6 +19,7 @@ import woowacourse.shopping.service.RemoteCartService
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
+import woowacourse.shopping.ui.order.OrderActivity
 import woowacourse.shopping.utils.ServerURL
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -76,6 +77,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.setUpView()
 
         binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
+        binding.cartBottom.onOrderClick = presenter::navigateToOrder
     }
 
     private fun initObserve() {
@@ -136,6 +138,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun navigateToItemDetail(product: ProductUIModel) {
         startActivity(DetailedProductActivity.getIntent(this, product))
+    }
+
+    override fun navigateToOrder() {
+        startActivity(OrderActivity.getIntent(this))
     }
 
     companion object {
