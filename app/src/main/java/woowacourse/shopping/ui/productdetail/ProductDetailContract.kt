@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.detail
+package woowacourse.shopping.ui.productdetail
 
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct

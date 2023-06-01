@@ -1,12 +1,12 @@
-package woowacourse.shopping.ui.detail
+package woowacourse.shopping.ui.productdetail
 
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.UiProduct
-import woowacourse.shopping.ui.detail.ProductDetailContract.Presenter
-import woowacourse.shopping.ui.detail.ProductDetailContract.View
+import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
+import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
 
 class
 ProductDetailPresenter(

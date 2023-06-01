@@ -15,21 +15,21 @@ import woowacourse.shopping.model.UiOrder
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
-import woowacourse.shopping.ui.detail.ProductDetailContract
-import woowacourse.shopping.ui.detail.ProductDetailPresenter
 import woowacourse.shopping.ui.order.OrderContract
 import woowacourse.shopping.ui.order.OrderPresenter
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract
 import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract
 import woowacourse.shopping.ui.orderhistory.OrderHistoryPresenter
+import woowacourse.shopping.ui.productdetail.ProductDetailContract
+import woowacourse.shopping.ui.productdetail.ProductDetailPresenter
 import woowacourse.shopping.ui.serversetting.ServerSettingContract
 import woowacourse.shopping.ui.serversetting.ServerSettingPresenter
 import woowacourse.shopping.ui.shopping.ShoppingContract
 import woowacourse.shopping.ui.shopping.ShoppingPresenter
 import woowacourse.shopping.util.preference.BasePreference
 
-fun inject(
+fun injectShoppingPresenter(
     view: ShoppingContract.View,
     context: Context,
 ): ShoppingContract.Presenter {
@@ -37,13 +37,13 @@ fun inject(
         view = view,
         productRepository = ProductRepositoryImpl(productService),
         recentProductRepository = RecentProductRepositoryImpl(
-            dao = RecentProductDaoImpl(createShoppingDatabase(context))
+            dao = RecentProductDaoImpl(injectShoppingDatabase(context))
         ),
         cartRepository = CartRepositoryImpl(cartService),
     )
 }
 
-fun inject(
+fun injectProductDetailPresenter(
     context: Context,
     view: ProductDetailContract.View,
     detailProduct: UiProduct,
@@ -52,7 +52,7 @@ fun inject(
     view = view,
     product = detailProduct,
     recentProductRepository = RecentProductRepositoryImpl(
-        dao = RecentProductDaoImpl(createShoppingDatabase(context))
+        dao = RecentProductDaoImpl(injectShoppingDatabase(context))
     ),
     showLastViewedProduct = showLastViewedProduct,
 )
@@ -66,7 +66,7 @@ fun injectCartPresenter(
     )
 }
 
-fun inject(
+fun injectServerSettingPresenter(
     view: ServerSettingContract.View,
     shoppingPreference: BasePreference,
 ): ServerSettingContract.Presenter = ServerSettingPresenter(

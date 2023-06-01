@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.detail
+package woowacourse.shopping.ui.productdetail
 
 import android.content.Context
 import android.content.Intent
@@ -10,18 +10,18 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
-import woowacourse.shopping.ui.detail.ProductDetailContract.Presenter
-import woowacourse.shopping.ui.detail.ProductDetailContract.View
-import woowacourse.shopping.ui.detail.dialog.ProductCounterDialog
+import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
+import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
+import woowacourse.shopping.ui.productdetail.dialog.ProductCounterDialog
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
-import woowacourse.shopping.util.inject.inject
+import woowacourse.shopping.util.inject.injectProductDetailPresenter
 
 class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener {
     private lateinit var binding: ActivityProductDetailBinding
     private val presenter: Presenter by lazy {
-        inject(
+        injectProductDetailPresenter(
             context = this,
             view = this,
             detailProduct = intent.getParcelableExtraCompat(DETAIL_PRODUCT_KEY)!!,

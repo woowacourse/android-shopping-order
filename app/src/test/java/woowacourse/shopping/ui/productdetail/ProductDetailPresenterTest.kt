@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.detail
+package woowacourse.shopping.ui.productdetail
 
 import io.mockk.mockk
 import io.mockk.verify

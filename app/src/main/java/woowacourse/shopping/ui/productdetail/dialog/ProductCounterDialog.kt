@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.detail.dialog
+package woowacourse.shopping.ui.productdetail.dialog
 
 import android.app.Dialog
 import android.content.Context

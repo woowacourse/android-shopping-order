@@ -10,7 +10,7 @@
 
         <variable
             name="presenter"
-            type="woowacourse.shopping.ui.detail.ProductDetailContract.Presenter" />
+            type="woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter" />
 
         <variable
             name="detailProduct"
@@ -29,7 +29,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".ui.detail.ProductDetailActivity">
+            tools:context=".ui.productdetail.ProductDetailActivity">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/product_detail_tool_bar"

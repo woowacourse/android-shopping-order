@@ -12,8 +12,8 @@ import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
+import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore.LoadMoreAdapter
@@ -27,14 +27,16 @@ import woowacourse.shopping.util.extension.findTextView
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.extension.showToast
-import woowacourse.shopping.util.inject.inject
+import woowacourse.shopping.util.inject.injectShoppingPresenter
 import woowacourse.shopping.util.listener.CartProductClickListener
 import woowacourse.shopping.widget.SkeletonCounterView
 
 class ShoppingActivity : AppCompatActivity(), View,
     SkeletonCounterView.OnCountChangedListener, CartProductClickListener {
     private lateinit var binding: ActivityShoppingBinding
-    private val presenter: Presenter by lazy { inject(this, this) }
+    private val presenter: Presenter by lazy {
+        injectShoppingPresenter(view = this, context = this)
+    }
 
     private val recentProductAdapter = RecentProductAdapter(presenter::inquiryRecentProductDetail)
     private val recentProductWrapperAdapter = RecentProductWrapperAdapter(recentProductAdapter)
