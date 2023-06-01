@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.dto
 
 data class OrderPostRequest(
-    val cartItemIds: List<OrderPostInfo>,
+    val orderItems: List<OrderItem>,
     val payment: PaymentRequest,
 )
 
-data class OrderPostInfo(
+data class OrderItem(
     val cartItemId: Int,
 )
 

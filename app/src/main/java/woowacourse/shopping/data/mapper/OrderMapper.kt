@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.ProductCount
 
 fun Order.toOrderRequest(): OrderPostRequest = OrderPostRequest(
-    cartItemIds = orderProducts.map { it.toOrderPostInfo() },
+    orderItems = orderProducts.map { it.toOrderPostInfo() },
     payment = payment.toPaymentRequest(),
 )
 
