@@ -47,4 +47,20 @@ internal class OrderListPresenterTest {
         assert(actual == expected)
         verify { view.setOrderListItems(any()) }
     }
+
+    @Test
+    fun `주문 목록 중 하나를 선택하면 상세 내역을 볼 수 있다`() {
+        // given
+        val orderId = 3L
+        val orderIdSlot = slot<Long>()
+        every { view.showOrderDetail(capture(orderIdSlot)) } just Runs
+
+        // when
+        presenter.requestOrderDetail(orderId)
+
+        // then
+        val actual = orderIdSlot.captured
+        val expected = 3L
+        assert(actual == expected)
+    }
 }
