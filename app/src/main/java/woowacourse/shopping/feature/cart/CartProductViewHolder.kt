@@ -22,7 +22,7 @@ class CartProductViewHolder(
 
         binding.cartProductCheckBox.isChecked = cartProductState.isPicked
         binding.cartClearImageView.setOnClickListener {
-            updateChecked(cartProductState.productId, false)
+            updateChecked(cartProductState.id, false)
             onCartProductDeleteClick(cartProductState)
         }
         binding.counterView.plusClickListener = {

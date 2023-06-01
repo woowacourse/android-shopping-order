@@ -31,18 +31,18 @@ class CartPresenter(
 
         cartRepository.getAll(onFailure = {}, onSuccess = {
             val items: List<CartProductState> = it.map(CartProduct::toUi)
-            cart.addAll(it)
+            cart.updateAll(it)
             pickAll()
             view.setCartPageNumber(pageNumber)
             view.setCartProducts(items)
             view.showCartProducts()
         })
+        view.hidePageSelectorView()
 
 //        val items: List<CartProductState> =
 //            cartProducts.filterIndexed { index, _ -> index in startIndex..endIndex }
 //
 //        view.setCartPageNumber(pageNumber)
-        view.hidePageSelectorView()
 //        if (minPageNumber < maxPageNumber) view.showPageSelectorView()
     }
 
@@ -107,11 +107,10 @@ class CartPresenter(
 
     override fun deleteCartProduct(cartProductState: CartProductState) {
         cartRepository.deleteCartProduct(
-            id = cartProductState.id,
-            onFailure = {},
-            onSuccess = {},
+            id = cartProductState.id, onFailure = {}, onSuccess = {
+            loadCart()
+        },
         )
-        loadCart()
     }
 
     override fun changeAllPicked() {
