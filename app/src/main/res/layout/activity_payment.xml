@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingBottom="32dp"
+            app:layout_constraintBottom_toTopOf="@id/pay_button_tv"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".feature.payment.PaymentActivity">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/payment_divider"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_payment" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/payment_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    app:layout_constraintTop_toBottomOf="@id/recyclerview" />
+
+                <TextView
+                    android:id="@+id/payment_title_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="@string/pay_amount"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/payment_divider" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/sub_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/payment_title_tv" />
+
+                <TextView
+                    android:id="@+id/order_price_title_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="@string/order_price"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sub_divider" />
+
+                <TextView
+                    android:id="@+id/order_price_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sub_divider"
+                    tools:text="10,000원" />
+
+                <TextView
+                    android:id="@+id/point_title_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="@string/point_to_use"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/order_price_title_tv" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/all_point_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/use_all"
+                    app:layout_constraintBottom_toBottomOf="@id/point_title_tv"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/point_title_tv" />
+
+                <EditText
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_round_border"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
+                    app:layout_constraintBottom_toBottomOf="@id/point_title_tv"
+                    app:layout_constraintEnd_toStartOf="@id/all_point_btn"
+                    app:layout_constraintTop_toTopOf="@id/point_title_tv" />
+
+                <TextView
+                    android:id="@+id/current_point_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/all_point_btn"
+                    tools:text="보유 포인트: 2,000원" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <TextView
+            android:id="@+id/pay_button_tv"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@color/mint"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="17,000원 결제하기" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

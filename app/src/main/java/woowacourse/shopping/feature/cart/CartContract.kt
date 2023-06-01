@@ -7,6 +7,7 @@ interface CartContract {
     interface View {
         fun changeCartProducts(newItems: List<CartProductUiModel>)
         fun setPageState(hasPrevious: Boolean, hasNext: Boolean, pageNumber: Int)
+        fun showPaymentScreen(cartProducts: List<CartProductUiModel>, totalPrice: Int)
     }
 
     interface Presenter {
@@ -20,5 +21,6 @@ interface CartContract {
         fun decreaseCartProduct(cartProduct: CartProductUiModel, previousCount: Int)
         fun toggleCartProduct(cartProduct: CartProductUiModel, isSelected: Boolean)
         fun toggleAllProductOnPage(isSelected: Boolean)
+        fun moveToPayment()
     }
 }

@@ -111,6 +111,13 @@ class CartPresenter(
         }
     }
 
+    override fun moveToPayment() {
+        view.showPaymentScreen(
+            cartProducts.selectedProducts().map { it.toPresentation() },
+            totalPrice.value ?: 0
+        )
+    }
+
     private fun selectAll(notSelectedItems: List<CartProductUiModel>) {
         notSelectedItems.forEach { cartProduct ->
             cartProducts.updateSelection(cartProduct.toDomain(), true)

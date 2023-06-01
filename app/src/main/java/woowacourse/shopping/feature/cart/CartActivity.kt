@@ -14,6 +14,7 @@ import woowacourse.shopping.data.datasource.remote.RetrofitClient
 import woowacourse.shopping.data.datasource.remote.cart.CartApi
 import woowacourse.shopping.data.datasource.remote.cart.CartRetrofitService
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.payment.PaymentActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
 
@@ -86,6 +87,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             nextPageBtn.isEnabled = hasNext
             pageCountTextView.text = pageNumber.toString()
         }
+    }
+
+    override fun showPaymentScreen(cartProducts: List<CartProductUiModel>, totalPrice: Int) {
+        val intent = PaymentActivity.getIntent(
+            this,
+            ArrayList(cartProducts.map { it.cartProductId.toInt() }),
+            totalPrice
+        )
+        startActivity(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

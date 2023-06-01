@@ -30,6 +30,10 @@ class CartProducts(
         return _data.filter { it.isSelected }
     }
 
+    fun findById(cartProductId: Int): CartProduct? {
+        return _data.find { it.cartProductId == cartProductId.toLong() }
+    }
+
     fun findByProductId(productId: Long): CartProduct? {
         return _data.find { it.product.id == productId }
     }

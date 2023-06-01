@@ -135,6 +135,7 @@
                 android:layout_gravity="end"
                 android:background="@color/mint"
                 android:gravity="center"
+                android:onClick="@{()->presenter.moveToPayment()}"
                 android:padding="24dp"
                 android:text="@{@string/order(presenter.totalCount)}"
                 android:textColor="@color/white"

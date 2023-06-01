@@ -18,6 +18,9 @@
             android:name=".feature.order.OrderActivity"
             android:exported="false" />
         <activity
+            android:name=".feature.payment.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".feature.login.LoginActivity"
             android:exported="false" />
         <activity

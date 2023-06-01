@@ -22,4 +22,9 @@
     <string name="order_title">%s 외 %s건</string>
     <string name="product_name">상품명</string>
     <string name="payment">결제 금액</string>
+    <string name="count_format">%s개</string>
+    <string name="pay_amount">결제 금액</string>
+    <string name="order_price">주문 금액</string>
+    <string name="point_to_use">사용 할 포인트</string>
+    <string name="use_all">전액 사용</string>
 </resources>
