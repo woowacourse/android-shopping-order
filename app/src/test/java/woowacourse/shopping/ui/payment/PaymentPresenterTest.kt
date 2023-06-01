@@ -10,7 +10,7 @@ import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.UserFixture
-import woowacourse.shopping.ui.mapper.toUi
+import woowacourse.shopping.ui.mapper.toBasketProductUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 import woowacourse.shopping.ui.model.UserUiModel
 
@@ -28,7 +28,7 @@ class PaymentPresenterTest {
         basketProducts = BasketFixture.createBasket()
             .products
             .filter { it.checked }
-            .map { it.toUi() }
+            .map { it.toBasketProductUiModel() }
 
         userRepository = mockk(relaxed = true)
         orderRepository = mockk(relaxed = true)

@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.productdetail
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
-import woowacourse.shopping.ui.mapper.toDomain
+import woowacourse.shopping.ui.mapper.toProductDomainModel
 import woowacourse.shopping.ui.model.ProductUiModel
 
 class ProductDetailPresenter(
@@ -58,7 +58,7 @@ class ProductDetailPresenter(
             updateCurrentProduct()
             view.showBasket()
         } else {
-            basketRepository.add(currentProduct.toDomain()) {
+            basketRepository.add(currentProduct.toProductDomainModel()) {
                 currentProductBasketId = it
                 if (currentProduct.basketCount > 1) {
                     updateCurrentProduct()
@@ -77,7 +77,7 @@ class ProductDetailPresenter(
     private fun getAddableCurrentProduct() = BasketProduct(
         id = requireNotNull(currentProductBasketId),
         count = Count(currentProduct.basketCount),
-        product = currentProduct.toDomain()
+        product = currentProduct.toProductDomainModel()
     )
 
     override fun selectPreviousProduct() {

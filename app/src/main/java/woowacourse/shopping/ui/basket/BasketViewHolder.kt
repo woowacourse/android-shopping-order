@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.basket
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemBasketBinding
-import woowacourse.shopping.ui.mapper.toDomain
+import woowacourse.shopping.ui.mapper.toBasketProductDomainModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
 
@@ -26,6 +26,6 @@ class BasketViewHolder(
         binding.basketProduct = item
         binding.counterBasket.product = item.product
         binding.counterBasket.count = item.count.value
-        binding.basketProductTotalPrice = item.toDomain().getTotalPrice().value
+        binding.basketProductTotalPrice = item.toBasketProductDomainModel().getTotalPrice().value
     }
 }
