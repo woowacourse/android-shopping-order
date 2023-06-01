@@ -142,6 +142,16 @@ class PageNationTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun `Checked 상태인 장바구니 아이디들을 반환한다`() {
+        val pageNation = PageNation(dummyCartProductsFour, 1)
+
+        val actual = pageNation.getAllCheckedCartIds()
+        val expected = arrayListOf(4L)
+
+        assertEquals(expected, actual)
+    }
+
     companion object {
         private val dummyCartProductsThree = CartProducts(
             listOf(
@@ -156,7 +166,7 @@ class PageNationTest {
                 CartProduct(1L, Product(1L, "피자", 12_000, ""), 1, false),
                 CartProduct(2L, Product(2L, "치킨", 15_000, ""), 1, false),
                 CartProduct(3L, Product(3L, "족발", 28_000, ""), 1, false),
-                CartProduct(4L, Product(4L, "짜장면", 9_000, ""), 1, false),
+                CartProduct(4L, Product(4L, "짜장면", 9_000, ""), 1, true),
             )
         )
     }

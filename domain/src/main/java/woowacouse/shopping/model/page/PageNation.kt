@@ -78,6 +78,10 @@ data class PageNation(
         return cartProducts.getCartByCartId(cartId)
     }
 
+    fun getAllCheckedCartIds(): ArrayList<Long> {
+        return ArrayList(cartProducts.getAll().filter { it.checked }.map { it.id })
+    }
+
     private fun calculatePageCount(size: Int): Int {
         if (size == 0) return 1
         return ceil((size.toDouble() / PAGE_MAX_CART_COUNT)).toInt()
