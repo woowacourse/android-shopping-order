@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.Storage
 import woowacourse.shopping.databinding.ActivitySeverSelectBinding
-import woowacourse.shopping.server.Server
+import woowacourse.shopping.data.server.Server
 import woowacourse.shopping.shopping.ShoppingActivity
 
 class SeverSelectActivity : AppCompatActivity() {

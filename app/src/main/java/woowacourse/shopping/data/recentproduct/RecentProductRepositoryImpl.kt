@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.recentproduct
 
 import woowacourse.shopping.data.database.dao.RecentProductDao
-import woowacourse.shopping.data.database.entity.RecentProductEntity
+import woowacourse.shopping.data.entity.RecentProductEntity
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.server.ProductRemoteDataSource
+import woowacourse.shopping.data.product.ProductRemoteDataSourceOkhttp
 
 class RecentProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,
-    private val productRemoteDataSource: ProductRemoteDataSource
+    private val productRemoteDataSource: ProductRemoteDataSourceOkhttp
 ) : RecentProductRepository {
     override fun getAll(onSuccess: (RecentProducts) -> Unit, onFailure: () -> Unit) {
         val recentProducts = mutableListOf<RecentProduct>()

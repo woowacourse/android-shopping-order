@@ -1,4 +1,4 @@
-package woowacourse.shopping.server
+package woowacourse.shopping.data.product
 
 import android.os.Handler
 import android.os.Looper
@@ -10,14 +10,16 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import woowacourse.shopping.Storage
+import woowacourse.shopping.data.server.ProductRemoteDataSource
+import woowacourse.shopping.data.server.Server
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
 
-class ProductRemoteDataSource {
+class ProductRemoteDataSourceOkhttp : ProductRemoteDataSource {
     private val okHttpClient: OkHttpClient = OkHttpClient()
 
-    fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH"
         val request = Request.Builder().url(url).build()
@@ -46,7 +48,7 @@ class ProductRemoteDataSource {
         })
     }
 
-    fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
+    override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
         val baseUrl = Server.getUrl(Storage.server)
         val url = "$baseUrl/$PATH/$id"
         val request = Request.Builder().url(url).build()

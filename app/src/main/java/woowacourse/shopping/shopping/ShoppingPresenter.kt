@@ -30,20 +30,44 @@ class ShoppingPresenter(
     private lateinit var shoppingProducts: ShoppingProducts
 
     init {
-        productSize += productLoadSize
         loadProducts()
     }
 
-    override fun loadProducts() {
+    private fun loadProducts() {
         productRepository.getProducts(
             onSuccess = { products ->
-                productSize = minOf(productSize, products.value.size)
                 shoppingProducts = products
-                view.updateProducts(shoppingProducts.value.map { it.toView() })
+                loadProductsInSize()
                 setCartQuantity()
+                view.afterLoad()
             },
             onFailure = { view.notifyLoadFailed() }
         )
+    }
+
+    override fun loadProductsInSize() {
+        val toIndex = min(productSize + productLoadSize, shoppingProducts.value.size)
+        val products = shoppingProducts.value.subList(productSize, toIndex)
+        productSize += products.size
+        view.addProducts(products.map { it.toView() })
+    }
+
+    override fun reloadProducts() {
+        productRepository.getProducts(
+            onSuccess = { products ->
+                shoppingProducts = products
+                reloadProductsInSize()
+                setCartQuantity()
+                view.afterLoad()
+            },
+            onFailure = { view.notifyLoadFailed() }
+        )
+    }
+
+    private fun reloadProductsInSize() {
+        productSize = min(productSize, shoppingProducts.value.size)
+        val products = shoppingProducts.value.subList(0, productSize)
+        view.updateProducts(products.map { it.toView() })
     }
 
     override fun updateRecentProducts() {
@@ -101,13 +125,6 @@ class ShoppingPresenter(
         view.showCart()
     }
 
-    override fun loadMoreProducts() {
-        val toIndex = min(productSize + productLoadSize, shoppingProducts.value.size)
-        val products = shoppingProducts.value.subList(productSize, toIndex)
-        productSize += products.size
-        view.addProducts(products.map { it.toView() })
-    }
-
     private fun updateCartQuantity() {
         view.updateCartQuantity(shoppingProducts.totalQuantity)
     }
@@ -128,15 +145,6 @@ class ShoppingPresenter(
             },
             onFailure = {}
         )
-        // var cartProduct = getCartProduct(shoppingProductModel.product)
-        // cartProduct = cartProduct.decreaseAmount()
-        // if (cartProduct.quantity > 0) {
-        //     updateCartProductQuantity(cartProduct)
-        // } else {
-        //     removeFromCart(cartProduct)
-        // }
-        // updateShoppingProduct(shoppingProductModel, cartProduct.quantity)
-        // updateCartAmount()
     }
 
     override fun increaseCartProductAmount(shoppingProductModel: ShoppingProductModel) {

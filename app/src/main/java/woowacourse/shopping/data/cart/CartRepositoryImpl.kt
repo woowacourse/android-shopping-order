@@ -4,10 +4,10 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.server.CartRemoteDataSource
+import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
 
 class CartRepositoryImpl(
-    private val cartRemoteDataSource: CartRemoteDataSource
+    private val cartRemoteDataSource: CartRemoteDataSourceImpl
 ) : CartRepository {
 
     override fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {

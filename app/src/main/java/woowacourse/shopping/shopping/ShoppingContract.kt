@@ -6,7 +6,7 @@ import woowacourse.shopping.common.model.ShoppingProductModel
 
 interface ShoppingContract {
     interface Presenter {
-        fun loadProducts()
+        fun reloadProducts()
 
         fun updateRecentProducts()
 
@@ -16,7 +16,7 @@ interface ShoppingContract {
 
         fun openCart()
 
-        fun loadMoreProducts()
+        fun loadProductsInSize()
 
         fun decreaseCartProductAmount(shoppingProductModel: ShoppingProductModel)
 
@@ -24,6 +24,8 @@ interface ShoppingContract {
     }
 
     interface View {
+        fun afterLoad()
+
         fun updateProducts(productModels: List<ShoppingProductModel>)
 
         fun addProducts(productModels: List<ShoppingProductModel>)

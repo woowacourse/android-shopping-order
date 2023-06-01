@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.database.entity
+package woowacourse.shopping.data.entity
 
 import java.time.LocalDateTime
 

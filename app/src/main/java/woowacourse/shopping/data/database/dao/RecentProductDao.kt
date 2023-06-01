@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import woowacourse.shopping.Storage
-import woowacourse.shopping.data.database.entity.RecentProductEntity
+import woowacourse.shopping.data.entity.RecentProductEntity
 import woowacourse.shopping.data.database.table.SqlRecentProduct
 import java.time.LocalDateTime
 

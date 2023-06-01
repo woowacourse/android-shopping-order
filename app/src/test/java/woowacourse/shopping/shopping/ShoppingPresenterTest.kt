@@ -147,7 +147,7 @@ class ShoppingPresenterTest {
         }
 
         // when
-        presenter.loadMoreProducts()
+        presenter.loadProductsInSize()
 
         // then
         verify {
@@ -201,7 +201,7 @@ class ShoppingPresenterTest {
         every { view.updateCartQuantity(any()) } just runs
 
         // when
-        presenter.loadProducts()
+        presenter.reloadProducts()
 
         // then
         verify {

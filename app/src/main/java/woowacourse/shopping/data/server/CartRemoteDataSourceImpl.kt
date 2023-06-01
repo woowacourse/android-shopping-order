@@ -1,4 +1,4 @@
-package woowacourse.shopping.server
+package woowacourse.shopping.data.server
 
 import android.os.Handler
 import android.os.Looper
@@ -17,7 +17,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 import java.io.IOException
 
-class CartRemoteDataSource {
+class CartRemoteDataSourceImpl {
     private val okHttpClient: OkHttpClient = OkHttpClient()
 
     fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {

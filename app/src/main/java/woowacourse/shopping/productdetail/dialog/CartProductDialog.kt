@@ -11,7 +11,7 @@ import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.getSerializableByKey
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
-import woowacourse.shopping.server.CartRemoteDataSource
+import woowacourse.shopping.data.server.CartRemoteDataSourceImpl
 
 class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     private lateinit var binding: DialogAddCartProductBinding
@@ -60,7 +60,7 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
         presenter = CartProductDialogPresenter(
             this,
             product,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSource()),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceImpl()),
             cartProductAmount = 1
         )
     }

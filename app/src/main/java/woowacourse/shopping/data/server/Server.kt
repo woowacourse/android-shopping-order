@@ -1,4 +1,4 @@
-package woowacourse.shopping.server
+package woowacourse.shopping.data.server
 
 enum class Server(private val url: String) {
     JERRY("https://woowa.store"),
