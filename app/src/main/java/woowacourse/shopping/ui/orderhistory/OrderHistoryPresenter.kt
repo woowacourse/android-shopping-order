@@ -3,8 +3,8 @@ package woowacourse.shopping.ui.orderhistory
 import woowacourse.shopping.domain.model.page.LoadMore
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.View
 

@@ -7,9 +7,9 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
-import woowacourse.shopping.model.ProductCount
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductCount
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
@@ -85,7 +85,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         recentProductWrapperAdapter.submitList(recentProducts)
     }
 
-    override fun navigateToProductDetail(product: UiProduct) {
+    override fun navigateToProductDetail(product: ProductModel) {
         startActivity(ProductDetailActivity.getIntent(this, product, true))
     }
 
@@ -131,7 +131,7 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val product = intent?.getParcelableExtraCompat<UiProduct>(CART_PRODUCT_KEY) ?: return
+        val product = intent?.getParcelableExtraCompat<ProductModel>(CART_PRODUCT_KEY) ?: return
         val count = intent.getIntExtra(COUNT_KEY, 0)
         presenter.increaseCartCount(product, count)
     }
@@ -141,7 +141,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         private const val COUNT_KEY = "count_key"
         private const val SERVER_URL_KEY = "server_url_key"
 
-        fun getIntent(context: Context, product: UiProduct, count: Int): Intent =
+        fun getIntent(context: Context, product: ProductModel, count: Int): Intent =
             Intent(context, ShoppingActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 .putExtra(CART_PRODUCT_KEY, product)

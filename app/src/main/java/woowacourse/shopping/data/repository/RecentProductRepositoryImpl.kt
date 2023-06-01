@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDao
-import woowacourse.shopping.data.entity.mapper.toEntity
 import woowacourse.shopping.data.entity.mapper.toDomain
+import woowacourse.shopping.data.entity.mapper.toEntity
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository

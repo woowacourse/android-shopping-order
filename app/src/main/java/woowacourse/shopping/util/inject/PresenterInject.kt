@@ -12,7 +12,7 @@ import woowacourse.shopping.data.util.orderService
 import woowacourse.shopping.data.util.pointService
 import woowacourse.shopping.data.util.productService
 import woowacourse.shopping.model.OrderModel
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
 import woowacourse.shopping.ui.order.OrderContract
@@ -46,7 +46,7 @@ fun injectShoppingPresenter(
 fun injectProductDetailPresenter(
     context: Context,
     view: ProductDetailContract.View,
-    detailProduct: UiProduct,
+    detailProduct: ProductModel,
     showLastViewedProduct: Boolean,
 ): ProductDetailContract.Presenter = ProductDetailPresenter(
     view = view,

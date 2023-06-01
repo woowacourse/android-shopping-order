@@ -14,11 +14,11 @@
 
         <variable
             name="detailProduct"
-            type="woowacourse.shopping.model.Product" />
+            type="woowacourse.shopping.model.ProductModel" />
 
         <variable
             name="lastViewedProduct"
-            type="woowacourse.shopping.model.Product" />
+            type="woowacourse.shopping.model.ProductModel" />
     </data>
 
     <ScrollView

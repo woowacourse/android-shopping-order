@@ -1,9 +1,9 @@
 package woowacourse.shopping.model.mapper
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 
-fun UiProduct.toDomain(): Product =
+fun ProductModel.toDomain(): Product =
     Product(
         id = id,
         name = name,
@@ -11,8 +11,8 @@ fun UiProduct.toDomain(): Product =
         imageUrl = imageUrl,
     )
 
-fun Product.toUi(): UiProduct =
-    UiProduct(
+fun Product.toUi(): ProductModel =
+    ProductModel(
         id = id,
         name = name,
         price = price.toUi(),

@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.PageModel
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener

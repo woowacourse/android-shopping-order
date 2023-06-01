@@ -4,13 +4,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiRecentProduct
 
 internal class ProductDetailPresenterTest {
     private lateinit var presenter: ProductDetailContract.Presenter
     private lateinit var view: ProductDetailContract.View
-    private lateinit var detailProduct: UiProduct
+    private lateinit var detailProduct: ProductModel
     private lateinit var recentProduct: UiRecentProduct
 
     @Before

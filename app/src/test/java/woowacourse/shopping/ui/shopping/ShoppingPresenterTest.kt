@@ -12,11 +12,11 @@ import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.model.PriceModel
+import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.PriceModel
-import woowacourse.shopping.model.UiProduct
-import woowacourse.shopping.model.UiRecentProduct
 
 internal class ShoppingPresenterTest {
     private lateinit var presenter: ShoppingContract.Presenter
@@ -55,7 +55,7 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun 제품_상세_내용을_조회한다() {
         // given
-        val product = mockk<UiProduct>(relaxed = true)
+        val product = mockk<woowacourse.shopping.model.Product>(relaxed = true)
 
         // when
         presenter.inquiryProductDetail(product)
@@ -127,7 +127,7 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun `제품_개수를_증가시킨다`() {
         // given
-        val product = UiProduct(0, "제품", PriceModel(1000), "")
+        val product = ProductModel(0, "제품", PriceModel(1000), "")
         val count = 3
 
         // when

@@ -4,11 +4,11 @@ import android.app.Dialog
 import android.content.Context
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.CounterBinding
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 
 class ProductCounterDialog(
     context: Context,
-    product: UiProduct,
+    product: ProductModel,
     putInCart: (count: Int) -> Unit,
 ) : Dialog(context) {
 

@@ -2,16 +2,16 @@ package woowacourse.shopping.ui.productdetail
 
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
-import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
 
 class
 ProductDetailPresenter(
     view: View,
-    private val product: UiProduct,
+    private val product: ProductModel,
     showLastViewedProduct: Boolean,
     recentProductRepository: RecentProductRepository,
 ) : Presenter(view) {

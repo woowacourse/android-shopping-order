@@ -12,12 +12,12 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.model.mapper.toDomain
-import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiProductCount
 import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 
@@ -49,7 +49,7 @@ class ShoppingPresenter(
         updateCartView()
     }
 
-    override fun addCartProduct(product: UiProduct, addCount: Int) {
+    override fun addCartProduct(product: ProductModel, addCount: Int) {
         cartRepository.addCartProductByProductId(product.toDomain().id)
         fetchAllCartProducts()
     }
@@ -59,7 +59,7 @@ class ShoppingPresenter(
         fetchAllCartProducts()
     }
 
-    override fun increaseCartCount(product: UiProduct, addCount: Int) {
+    override fun increaseCartCount(product: ProductModel, addCount: Int) {
         cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
         fetchAllCartProducts()
     }

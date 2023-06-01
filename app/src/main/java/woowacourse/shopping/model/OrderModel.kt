@@ -24,7 +24,8 @@ data class OrderModel(
         orderProducts.firstOrNull()?.quantity ?: UiProductCount(0)
 
     @IgnoredOnParcel
-    val firstProductTotalPayment: PriceModel = orderProducts.firstOrNull()?.totalPrice ?: PriceModel(0)
+    val firstProductTotalPayment: PriceModel =
+        orderProducts.firstOrNull()?.totalPrice ?: PriceModel(0)
 
     @IgnoredOnParcel
     val thumbnailUrl: String? = orderProducts.firstOrNull()?.imageUrl

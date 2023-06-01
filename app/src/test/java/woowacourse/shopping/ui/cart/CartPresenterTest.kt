@@ -11,9 +11,9 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.model.mapper.toDomain
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.PriceModel
+import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.mapper.toDomain
 
 internal class CartPresenterTest {
     private lateinit var presenter: CartContract.Presenter
@@ -83,9 +83,9 @@ internal class CartPresenterTest {
     internal fun 장바구니_목록에_있는_제품을_제거하면_뷰를_갱신한다() {
         // given
         val products = MutableList(8) { id ->
-            Product(id, "상품 $id", PriceModel(1000), "")
+            ProductModel(id, "상품 $id", PriceModel(1000), "")
         }
-        val product = Product(0, "상품 0", PriceModel(1000), "")
+        val product = ProductModel(0, "상품 0", PriceModel(1000), "")
         every { cartRepository.decreaseCartCount(product.toDomain(), 1) } answers {
             products.remove(product)
         }

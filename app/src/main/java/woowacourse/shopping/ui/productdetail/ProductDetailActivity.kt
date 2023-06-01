@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
@@ -40,19 +40,19 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
         binding.productDetailToolBar.setOnMenuItemClickListener(this)
     }
 
-    override fun showProductDetail(product: UiProduct) {
+    override fun showProductDetail(product: ProductModel) {
         binding.detailProduct = product
     }
 
-    override fun showLastViewedProductDetail(lastViewedProduct: UiProduct?) {
+    override fun showLastViewedProductDetail(lastViewedProduct: ProductModel?) {
         binding.lastViewedProduct = lastViewedProduct
     }
 
-    override fun showProductCounter(product: UiProduct) {
+    override fun showProductCounter(product: ProductModel) {
         ProductCounterDialog(this, product, presenter::navigateToHome).show()
     }
 
-    override fun navigateToHome(product: UiProduct, count: Int) {
+    override fun navigateToHome(product: ProductModel, count: Int) {
         startActivity(ShoppingActivity.getIntent(this, product, count))
     }
 
@@ -72,7 +72,11 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
         private const val DETAIL_PRODUCT_KEY = "detail_product_key"
         private const val SHOW_LAST_VIEWED_PRODUCT_KEY = "show_last_viewed_product_key"
 
-        fun getIntent(context: Context, detail: UiProduct, showLastViewedProduct: Boolean): Intent =
+        fun getIntent(
+            context: Context,
+            detail: ProductModel,
+            showLastViewedProduct: Boolean,
+        ): Intent =
             Intent(context, ProductDetailActivity::class.java)
                 .putExtra(DETAIL_PRODUCT_KEY, detail)
                 .putExtra(SHOW_LAST_VIEWED_PRODUCT_KEY, showLastViewedProduct)

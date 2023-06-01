@@ -9,12 +9,12 @@ import woowacourse.shopping.domain.model.Payment
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.model.mapper.toDomain
-import woowacourse.shopping.model.mapper.toUi
+import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.PriceModel
-import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.cart.CartContract.Presenter
 import woowacourse.shopping.ui.cart.CartContract.View
 
@@ -84,7 +84,7 @@ class CartPresenter(
         updateCart(changeSelectState(cartProduct.product, isSelect))
     }
 
-    private fun changeSelectState(product: UiProduct, isSelect: Boolean): Cart =
+    private fun changeSelectState(product: ProductModel, isSelect: Boolean): Cart =
         if (isSelect) cart.select(product.toDomain()) else cart.unselect(product.toDomain())
 
     override fun navigateToHome() {
