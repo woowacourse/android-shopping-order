@@ -6,14 +6,18 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="14dp"
+        android:paddingHorizontal="20dp"
         tools:context=".feature.order.list.OrderListActivity">
 
-<!--        <androidx.recyclerview.widget.RecyclerView-->
-<!--            android:id="@+id/order_recycler_view"-->
-<!--            android:layout_width="match_parent"-->
-<!--            -->
-<!--            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
-<!--            android:orientation="vertical"-->
-<!--            android:layout_height="wrap_content" />-->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/order_recycler_view"
+            android:layout_width="match_parent"
+            tools:listitem="@layout/item_order_min_info"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

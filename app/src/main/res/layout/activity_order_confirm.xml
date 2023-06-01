@@ -59,6 +59,7 @@
                     android:layout_height="wrap_content"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="vertical"
+                    tools:listitem="@layout/item_order_confirm_item"
                     app:layout_constraintTop_toBottomOf="@id/order_product_text_view"
                     app:layout_constraintStart_toStartOf="@id/start_guideline"
                     app:layout_constraintEnd_toEndOf="@id/end_guideline"

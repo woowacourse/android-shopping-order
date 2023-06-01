@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -14,8 +16,100 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:background="@drawable/sale_info_box"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="10dp"
+        android:layout_marginBottom="14dp"
+        android:onClick="@{()->listener.onClick(orderItem.id)}">
 
+        <TextView
+            android:id="@+id/order_date_text_view"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="2023.5.30"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="7dp" />
+
+        <TextView
+            android:id="@+id/order_detail_move_view"
+            app:layout_constraintTop_toTopOf="@id/order_date_text_view"
+            app:layout_constraintBottom_toBottomOf="@id/order_date_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="주문 상세보기 >"
+            android:textColor="@color/mint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/order_item_info_layout"
+            app:layout_constraintTop_toBottomOf="@id/order_date_text_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/sale_info_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="15dp"
+            android:paddingHorizontal="7dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/center_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.35" />
+
+            <ImageView
+                android:id="@+id/order_item_main_image_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                imgUrl="@{orderItem.mainProductImage}"
+                android:contentDescription="@string/order_item_main_image_view_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/center_guideline"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="2:1"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                tools:src="@mipmap/ic_launcher_round" />
+
+            <TextView
+                android:id="@+id/order_items_info_text_view"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/center_guideline"
+                app:layout_constraintTop_toTopOf="@id/order_item_main_image_view"
+                tools:text="바나나 1kg 외 2종"
+                android:text="@{@string/order_items_info(orderItem.mainProductName,orderItem.extraProductCount)}"
+                android:layout_marginStart="20dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/order_number_text_view"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/order_items_info_text_view"
+                app:layout_constraintTop_toBottomOf="@id/order_items_info_text_view"
+                app:layout_constraintBottom_toTopOf="@id/order_item_payment_price"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                tools:text="주문번호 1"
+                android:text="@{@string/order_number(orderItem.id)}" />
+
+            <TextView
+                android:id="@+id/order_item_payment_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@id/order_number_text_view"
+                app:layout_constraintBottom_toBottomOf="@id/order_item_main_image_view"
+                tools:text="4,5000원" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

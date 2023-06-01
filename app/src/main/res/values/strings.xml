@@ -31,4 +31,7 @@
     <string name="order_failed_message">주문에 실패했습니다\n 잠시 후에 다시 시도해주세요</string>
     <string name="order_confirm_bar_title">Order</string>
     <string name="order_list">주문 목록</string>
+    <string name="order_item_main_image_view_description">주문 목록 내역의 메인 상품의 이미지입니다</string>
+    <string name="order_items_info">%s 외 %d종</string>
+    <string name="order_number">주문번호 %d</string>
 </resources>

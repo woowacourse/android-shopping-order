@@ -16,7 +16,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private lateinit var binding: ActivityOrderListBinding
     private lateinit var presenter: OrderListContract.Presenter
 
-    private val adapter: OrderListAdapter by lazy {
+    private val orderListAdapter: OrderListAdapter by lazy {
         OrderListAdapter(
             object : OrderItemClickListener {
                 override fun onClick(orderId: Long) {
@@ -38,11 +38,11 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private fun initAdapter() {
-        binding
+        binding.orderRecyclerView.adapter = orderListAdapter
     }
 
     override fun setOrderListItems(orderItems: List<OrderMinInfoItemUiModel>) {
-        adapter.setOrderItems(orderItems)
+        orderListAdapter.setOrderItems(orderItems)
     }
 
     override fun showOrderDetail(orderId: Long) {
