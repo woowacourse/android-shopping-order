@@ -52,6 +52,18 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         binding.preOrderInfo = preOrderInfo
     }
 
+    override fun updatePointMessageCode(pointMessageCode: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateUsingPoint(usingPoint: Int) {
+        binding.usingPoint = usingPoint
+    }
+
+    override fun updateActualPayment(actualPayment: Int) {
+        binding.actualPayment = actualPayment
+    }
+
     companion object {
         private const val CURRENT_ORDER_BASKET_PRODUCTS = "currentOrderBasketProducts"
 

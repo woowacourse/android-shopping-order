@@ -14,10 +14,20 @@ class PaymentConfirmPresenter(
 ) : PaymentConfirmContract.Presenter {
     private lateinit var userPointInfo: UserPointInfo
     private val currentOrderBasket = Basket(currentOrderBasketProducts)
+    private var usingPoint = 0
+    private var totalPrice = currentOrderBasket.getTotalPrice()
+    private val actualPayment: Int
+        get() = totalPrice - usingPoint
 
     init {
         fetchUserPointInfo()
         fetchPreOrderInfo()
+        initPointData()
+    }
+
+    private fun initPointData() {
+        view.updateUsingPoint(usingPoint)
+        view.updateActualPayment(actualPayment)
     }
 
     override fun fetchUserPointInfo() {
@@ -29,5 +39,9 @@ class PaymentConfirmPresenter(
 
     override fun fetchPreOrderInfo() {
         view.updatePreOrderInfo(PreOrderInfoFactory(currentOrderBasket).getPreOrderInfo())
+    }
+
+    override fun applyPoint() {
+        TODO("Not yet implemented")
     }
 }

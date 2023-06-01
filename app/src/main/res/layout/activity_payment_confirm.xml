@@ -14,6 +14,22 @@
         <variable
             name="preOrderInfo"
             type="woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo" />
+
+        <variable
+            name="usingPoint"
+            type="Integer" />
+
+        <variable
+            name="actualPayment"
+            type="Integer" />
+
+        <variable
+            name="applyPointMessageCode"
+            type="Integer" />
+
+        <variable
+            name="pointApplyClickListener"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -137,7 +153,7 @@
             android:layout_marginTop="20dp"
             android:ems="10"
             android:hint="@string/et_using_point_hint"
-            android:inputType="textPersonName"
+            android:inputType="number"
             app:layout_constraintEnd_toStartOf="@id/btn_payment_use_point"
             app:layout_constraintStart_toStartOf="@+id/tv_payment_holding_point_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_payment_holding_point_title"
@@ -192,6 +208,7 @@
             android:layout_marginEnd="20dp"
             android:textColor="@color/black"
             android:textSize="18sp"
+            android:text="@{@string/price_format(usingPoint)}"
             app:layout_constraintBottom_toBottomOf="@+id/tv_payment_using_point_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_payment_using_point_title"
@@ -263,6 +280,7 @@
             android:layout_marginEnd="20dp"
             android:textColor="@color/black"
             android:textSize="18sp"
+            android:text="@{@string/price_format(actualPayment)}"
             app:layout_constraintBottom_toBottomOf="@+id/tv_payment_actual_amount_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_payment_actual_amount_title"
