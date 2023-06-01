@@ -9,7 +9,7 @@ import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.model.ProductModel
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.RecentProductModel
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
 import woowacourse.shopping.ui.productdetail.dialog.ProductCounterDialog
@@ -56,7 +56,7 @@ class ProductDetailActivity : AppCompatActivity(), View, OnMenuItemClickListener
         startActivity(ShoppingActivity.getIntent(this, product, count))
     }
 
-    override fun navigateToProductDetail(recentProduct: UiRecentProduct) {
+    override fun navigateToProductDetail(recentProduct: RecentProductModel) {
         startActivity(getIntent(this, recentProduct.product, false))
         finish()
     }

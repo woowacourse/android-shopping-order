@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.ProductCountModel
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.RecentProductModel
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
@@ -74,7 +74,7 @@ class ShoppingPresenter(
         updateRecentProducts(recentProducts + recentProduct)
     }
 
-    override fun inquiryRecentProductDetail(recentProduct: UiRecentProduct) {
+    override fun inquiryRecentProductDetail(recentProduct: RecentProductModel) {
         view.navigateToProductDetail(recentProduct.product)
     }
 

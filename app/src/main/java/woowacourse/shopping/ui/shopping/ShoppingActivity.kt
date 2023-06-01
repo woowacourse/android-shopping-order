@@ -10,7 +10,7 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.ProductCountModel
 import woowacourse.shopping.model.ProductModel
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.RecentProductModel
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
@@ -81,7 +81,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         productAdapter.submitList(products)
     }
 
-    override fun updateRecentProducts(recentProducts: List<UiRecentProduct>) {
+    override fun updateRecentProducts(recentProducts: List<RecentProductModel>) {
         recentProductWrapperAdapter.submitList(recentProducts)
     }
 

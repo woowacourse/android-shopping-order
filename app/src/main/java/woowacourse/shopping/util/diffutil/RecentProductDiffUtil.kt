@@ -1,16 +1,16 @@
 package woowacourse.shopping.util.diffutil
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.RecentProductModel
 
-object RecentProductDiffUtil : DiffUtil.ItemCallback<UiRecentProduct>() {
+object RecentProductDiffUtil : DiffUtil.ItemCallback<RecentProductModel>() {
     override fun areItemsTheSame(
-        oldItem: UiRecentProduct,
-        newItem: UiRecentProduct,
+        oldItem: RecentProductModel,
+        newItem: RecentProductModel,
     ): Boolean = oldItem.id == newItem.id
 
     override fun areContentsTheSame(
-        oldItem: UiRecentProduct,
-        newItem: UiRecentProduct,
+        oldItem: RecentProductModel,
+        newItem: RecentProductModel,
     ): Boolean = oldItem == newItem
 }

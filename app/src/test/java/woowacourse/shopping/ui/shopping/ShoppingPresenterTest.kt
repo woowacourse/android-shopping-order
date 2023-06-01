@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.model.ProductModel
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.RecentProductModel
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 
@@ -90,7 +90,7 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun 최근_상품_상세_내용을_조회한다() {
         // given
-        val recentProduct = mockk<UiRecentProduct>(relaxed = true)
+        val recentProduct = mockk<RecentProductModel>(relaxed = true)
 
         // when
         presenter.inquiryRecentProductDetail(recentProduct)
