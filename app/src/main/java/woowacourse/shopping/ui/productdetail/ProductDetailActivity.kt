@@ -13,7 +13,7 @@ import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogProductDetailBinding
 import woowacourse.shopping.ui.basket.BasketActivity
-import woowacourse.shopping.ui.model.UiProduct
+import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.getParcelableExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
@@ -24,9 +24,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var binding: ActivityProductDetailBinding
     private lateinit var dialogViewBinding: DialogProductDetailBinding
     private lateinit var alertDialog: AlertDialog
-    private lateinit var currentProduct: UiProduct
+    private lateinit var currentProduct: ProductUiModel
     private var currentProductBasketId: Int? = null
-    private var previousProduct: UiProduct? = null
+    private var previousProduct: ProductUiModel? = null
     private var previousProductBasketId: Int? = null
     private lateinit var presenter: ProductDetailContract.Presenter
 
@@ -51,7 +51,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun showBasketDialog(
-        currentProduct: UiProduct,
+        currentProduct: ProductUiModel,
         minusClickListener: () -> Unit,
         plusClickListener: () -> Unit,
         updateBasketProduct: () -> Unit
@@ -88,7 +88,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         return true
     }
 
-    override fun updateBindingData(product: UiProduct, previousProduct: UiProduct?) {
+    override fun updateBindingData(product: ProductUiModel, previousProduct: ProductUiModel?) {
         binding.product = product
         binding.previousProduct = previousProduct
     }
@@ -123,9 +123,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         private const val PREVIOUS_PRODUCT_BASKET_ID = "previousProductBasketId"
         fun getIntent(
             context: Context,
-            currentProduct: UiProduct,
+            currentProduct: ProductUiModel,
             currentProductBasketId: Int? = null,
-            previousProduct: UiProduct?,
+            previousProduct: ProductUiModel?,
             previousProductBasketId: Int? = null
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {

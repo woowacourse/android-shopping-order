@@ -2,11 +2,11 @@ package woowacourse.shopping.ui.payment
 
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.UserRepository
-import woowacourse.shopping.ui.model.BasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class PaymentPresenter(
     private val view: PaymentContract.View,
-    private val basketProducts: List<BasketProduct>,
+    private val basketProducts: List<BasketProductUiModel>,
     private val userRepository: UserRepository,
     private val orderRepository: OrderRepository,
 ) : PaymentContract.Presenter {

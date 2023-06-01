@@ -9,7 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
@@ -38,14 +38,14 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         }
     }
 
-    override fun initView(orders: List<Order>) {
+    override fun initView(orders: List<OrderUiModel>) {
         binding.rvOrders.adapter = OrderHistoryAdapter(
             orders = orders,
             onClicked = ::showOrderDetail
         )
     }
 
-    private fun showOrderDetail(order: Order) {
+    private fun showOrderDetail(order: OrderUiModel) {
         val intent: Intent = OrderDetailActivity.getIntent(
             context = this,
             order = order

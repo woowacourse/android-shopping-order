@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderHistoryPresenterTest {
 
@@ -30,7 +30,7 @@ class OrderHistoryPresenterTest {
     fun `주문 목록들을 받아온 후 뷰를 초기화한다`() {
         // given
         val orders = OrderFixture.createOrders()
-        val slotInitView = slot<(orders: List<Order>) -> Unit>()
+        val slotInitView = slot<(orders: List<OrderUiModel>) -> Unit>()
         every {
             repository.getOrders(onReceived = capture(slotInitView))
         } answers {

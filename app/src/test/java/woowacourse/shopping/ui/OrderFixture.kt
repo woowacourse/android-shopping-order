@@ -1,32 +1,32 @@
 package woowacourse.shopping.ui
 
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 object OrderFixture {
 
     fun createOrders() = listOf(
-        Order(
+        OrderUiModel(
             orderId = 1,
             orderDate = "",
-            orderProducts = listOf(),
+            uiOrderProducts = listOf(),
             totalPrice = 0,
             usedPoint = 0,
             earnedPoint = 0
         ),
-        Order(
+        OrderUiModel(
             orderId = 2,
             orderDate = "",
-            orderProducts = listOf(),
+            uiOrderProducts = listOf(),
             totalPrice = 0,
             usedPoint = 0,
             earnedPoint = 0
         )
     )
 
-    fun createOrder() = Order(
+    fun createOrder() = OrderUiModel(
         orderId = 1,
         orderDate = "",
-        orderProducts = listOf(),
+        uiOrderProducts = listOf(),
         totalPrice = 0,
         usedPoint = 0,
         earnedPoint = 0

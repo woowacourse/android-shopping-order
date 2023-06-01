@@ -4,14 +4,14 @@ import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.ui.mapper.toDomain
-import woowacourse.shopping.ui.model.UiProduct
+import woowacourse.shopping.ui.model.ProductUiModel
 
 class ProductDetailPresenter(
     override val view: ProductDetailContract.View,
     private val basketRepository: BasketRepository,
-    private var currentProduct: UiProduct,
+    private var currentProduct: ProductUiModel,
     private var currentProductBasketId: Int?,
-    private var previousProduct: UiProduct?,
+    private var previousProduct: ProductUiModel?,
     private var previousProductBasketId: Int?
 ) : ProductDetailContract.Presenter {
 

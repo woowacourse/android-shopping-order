@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.mapper
 
 import woowacourse.shopping.domain.BasketProduct
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
-fun UiBasketProduct.toDomain(): BasketProduct =
+fun BasketProductUiModel.toDomain(): BasketProduct =
     BasketProduct(
         id = id,
         count = count.toDomain(),
@@ -11,5 +11,5 @@ fun UiBasketProduct.toDomain(): BasketProduct =
         checked = checked
     )
 
-fun BasketProduct.toUi(): UiBasketProduct =
-    UiBasketProduct(id = id, count = count.toUi(), product = product.toUi(), checked = checked)
+fun BasketProduct.toUi(): BasketProductUiModel =
+    BasketProductUiModel(id = id, count = count.toUi(), product = product.toUi(), checked = checked)

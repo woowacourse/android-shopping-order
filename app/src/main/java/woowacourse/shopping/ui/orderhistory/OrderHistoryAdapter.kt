@@ -2,11 +2,11 @@ package woowacourse.shopping.ui.orderhistory
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderHistoryAdapter(
-    private val orders: List<Order>,
-    private val onClicked: (order: Order) -> Unit,
+    private val orders: List<OrderUiModel>,
+    private val onClicked: (order: OrderUiModel) -> Unit,
 ) : RecyclerView.Adapter<OrderHistoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderHistoryViewHolder {

@@ -9,7 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 import woowacourse.shopping.util.getSerializableCompat
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
@@ -42,7 +42,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         }
     }
 
-    override fun initView(order: Order) {
+    override fun initView(order: OrderUiModel) {
         binding.rvOrderProducts.adapter = OrderDetailRecyclerAdapter(order)
     }
 
@@ -52,7 +52,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         fun getIntent(
             context: Context,
-            order: Order? = null,
+            order: OrderUiModel? = null,
         ): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
                 .apply {

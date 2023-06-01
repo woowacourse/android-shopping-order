@@ -1,15 +1,15 @@
 package woowacourse.shopping.ui.payment
 
-import woowacourse.shopping.ui.model.BasketProduct
-import woowacourse.shopping.ui.model.User
+import woowacourse.shopping.ui.model.BasketProductUiModel
+import woowacourse.shopping.ui.model.UserUiModel
 
 interface PaymentContract {
 
     interface View {
 
         fun initView(
-            user: User,
-            basketProducts: List<BasketProduct>,
+            user: UserUiModel,
+            basketProducts: List<BasketProductUiModel>,
             totalPrice: Int,
         )
 

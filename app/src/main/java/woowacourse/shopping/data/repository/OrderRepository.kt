@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 // todo: 위치가 어디에?
 interface OrderRepository {
@@ -14,8 +14,8 @@ interface OrderRepository {
 
     fun getOrder(
         orderId: Int,
-        onReceived: (order: Order) -> Unit,
+        onReceived: (order: OrderUiModel) -> Unit,
     )
 
-    fun getOrders(onReceived: (orders: List<Order>) -> Unit)
+    fun getOrders(onReceived: (orders: List<OrderUiModel>) -> Unit)
 }

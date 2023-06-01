@@ -12,8 +12,8 @@ import woowacourse.shopping.data.datasource.user.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.ui.model.UiBasketProduct
-import woowacourse.shopping.ui.model.User
+import woowacourse.shopping.ui.model.BasketProductUiModel
+import woowacourse.shopping.ui.model.UserUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.util.getParcelableArrayExtraCompat
 import woowacourse.shopping.util.handleMissingData
@@ -35,7 +35,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     private fun initPresenter() {
-        intent.getParcelableArrayExtraCompat<UiBasketProduct>(BASKET_PRODUCTS_KEY)?.let {
+        intent.getParcelableArrayExtraCompat<BasketProductUiModel>(BASKET_PRODUCTS_KEY)?.let {
             presenter = PaymentPresenter(
                 view = this,
                 basketProducts = it.toList(),
@@ -50,8 +50,8 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun initView(
-        user: User,
-        basketProducts: List<UiBasketProduct>,
+        user: UserUiModel,
+        basketProducts: List<BasketProductUiModel>,
         totalPrice: Int,
     ) {
         with(binding) {
@@ -117,7 +117,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
         fun getIntent(
             context: Context,
-            basketProducts: Array<UiBasketProduct>,
+            basketProducts: Array<BasketProductUiModel>,
         ): Intent {
             val intent = Intent(context, PaymentActivity::class.java).apply {
                 putExtra(BASKET_PRODUCTS_KEY, basketProducts)

@@ -2,10 +2,10 @@ package woowacourse.shopping.ui.model
 
 import java.io.Serializable
 
-data class Order(
+data class OrderUiModel(
     val orderId: Long,
     val orderDate: String?,
-    val orderProducts: List<OrderProduct>,
+    val uiOrderProducts: List<OrderProductUiModel>,
     val totalPrice: Long,
     val usedPoint: Long,
     val earnedPoint: Long,

@@ -9,11 +9,11 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.ui.model.Product" />
+            type="woowacourse.shopping.ui.model.ProductUiModel" />
 
         <variable
             name="previousProduct"
-            type="woowacourse.shopping.ui.model.Product" />
+            type="woowacourse.shopping.ui.model.ProductUiModel" />
 
         <variable
             name="addMarketClickListener"

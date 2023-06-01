@@ -11,7 +11,7 @@ import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 import woowacourse.shopping.ui.payment.PaymentActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
@@ -83,7 +83,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         }
     }
 
-    override fun updateBasketProducts(basketProducts: List<UiBasketProduct>) {
+    override fun updateBasketProducts(basketProducts: List<BasketProductUiModel>) {
         runOnUiThread {
             basketAdapter.submitList(basketProducts)
         }
@@ -114,7 +114,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         binding.isLoaded = isLoaded
     }
 
-    override fun showPaymentView(basketProducts: List<UiBasketProduct>) {
+    override fun showPaymentView(basketProducts: List<BasketProductUiModel>) {
         val intent = PaymentActivity.getIntent(
             context = this,
             basketProducts = basketProducts.toTypedArray()

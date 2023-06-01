@@ -9,8 +9,8 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.mapper.toUi
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentProductUiModel
 import woowacourse.shopping.util.secondOrNull
 import kotlin.concurrent.thread
 
@@ -21,8 +21,8 @@ class ShoppingPresenter(
     private val basketRepository: BasketRepository,
     private var hasNext: Boolean = false,
     private var lastId: Int = -1,
-    private var totalProducts: List<UiProduct> = listOf(),
-    private var recentProducts: List<UiRecentProduct> = listOf()
+    private var totalProducts: List<ProductUiModel> = listOf(),
+    private var recentProducts: List<RecentProductUiModel> = listOf()
 ) : ShoppingContract.Presenter {
     private lateinit var basket: Basket
     private var isLoaded: Boolean = false
@@ -34,7 +34,7 @@ class ShoppingPresenter(
 
     private fun fetchBasketCount() {
         totalProducts = totalProducts.map {
-            UiProduct(
+            ProductUiModel(
                 it.id,
                 it.name,
                 it.price,
@@ -114,7 +114,7 @@ class ShoppingPresenter(
             }
     }
 
-    private fun checkHasNext(products: List<UiProduct>): Boolean =
+    private fun checkHasNext(products: List<ProductUiModel>): Boolean =
         products.size == TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE
 
     override fun fetchRecentProducts() {
@@ -123,7 +123,7 @@ class ShoppingPresenter(
         view.updateRecentProducts(recentProducts)
     }
 
-    override fun inquiryProductDetail(product: UiProduct) {
+    override fun inquiryProductDetail(product: ProductUiModel) {
         val previousProduct =
             if (recentProducts.firstOrNull()?.product == product) recentProducts.secondOrNull()?.product else recentProducts.firstOrNull()?.product
         view.showProductDetail(

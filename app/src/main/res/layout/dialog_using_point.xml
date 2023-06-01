@@ -7,7 +7,7 @@
 
         <variable
             name="user"
-            type="woowacourse.shopping.ui.model.User" />
+            type="woowacourse.shopping.ui.model.UserUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

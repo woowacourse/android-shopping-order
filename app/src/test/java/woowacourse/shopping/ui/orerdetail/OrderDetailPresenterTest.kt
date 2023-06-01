@@ -9,7 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract
 import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 
@@ -35,7 +35,7 @@ class OrderDetailPresenterTest {
     fun `저장소로부터 주문 식별번호에 해당하는 주문 정보를 얻어온 후 뷰를 초기화한다`() {
         // given
         val order = OrderFixture.createOrder()
-        val slotInitView = slot<(order: Order) -> Unit>()
+        val slotInitView = slot<(order: OrderUiModel) -> Unit>()
         every {
             repository.getOrder(
                 orderId = 10,

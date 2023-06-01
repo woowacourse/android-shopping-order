@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemRecentProductBinding
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.RecentProductUiModel
 import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class RecentProductViewHolder(parent: ViewGroup, onItemClick: (Int) -> Unit) :
@@ -18,7 +18,7 @@ class RecentProductViewHolder(parent: ViewGroup, onItemClick: (Int) -> Unit) :
         binding.root.setThrottleFirstOnClickListener { onItemClick(bindingAdapterPosition) }
     }
 
-    fun bind(recentProduct: UiRecentProduct) {
+    fun bind(recentProduct: RecentProductUiModel) {
         binding.recentProduct = recentProduct
     }
 }

@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.mapper.toUi
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class BasketPresenter(
     override val view: BasketContract.View,
@@ -105,7 +105,7 @@ class BasketPresenter(
     }
 
     override fun deleteBasketProduct(
-        product: UiBasketProduct,
+        product: BasketProductUiModel,
     ) {
         basketRepository.remove(product.toDomain())
         basket = basket.remove(product.toDomain())

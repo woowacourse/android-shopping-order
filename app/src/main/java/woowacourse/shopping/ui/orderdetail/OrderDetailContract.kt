@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.orderdetail
 
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 interface OrderDetailContract {
 
     interface View {
-        fun initView(order: Order)
+        fun initView(order: OrderUiModel)
     }
 
     interface Presenter {

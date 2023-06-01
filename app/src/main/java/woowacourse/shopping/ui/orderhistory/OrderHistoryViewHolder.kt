@@ -5,18 +5,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderHistoryBinding
-import woowacourse.shopping.ui.model.Order
+import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderHistoryViewHolder(
     private val binding: ItemOrderHistoryBinding,
-    private val onClicked: (order: Order) -> Unit,
+    private val onClicked: (order: OrderUiModel) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(order: Order) {
+    fun bind(order: OrderUiModel) {
         with(binding) {
             tvOrderCount.text = root.context.getString(
                 R.string.tv_order_count,
-                order.orderProducts.size
+                order.uiOrderProducts.size
             )
             tvOrderDate.text = root.context.getString(
                 R.string.tv_order_date,
@@ -24,8 +24,8 @@ class OrderHistoryViewHolder(
             )
             tvOrderProducts.text = root.context.getString(
                 R.string.tv_order_products,
-                order.orderProducts.first().productName,
-                order.orderProducts.size - COUNT_DIFF
+                order.uiOrderProducts.first().productName,
+                order.uiOrderProducts.size - COUNT_DIFF
             )
             root.setOnClickListener {
                 onClicked(order)
@@ -38,7 +38,7 @@ class OrderHistoryViewHolder(
 
         fun from(
             parent: ViewGroup,
-            onClicked: (order: Order) -> Unit,
+            onClicked: (order: OrderUiModel) -> Unit,
         ): OrderHistoryViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemOrderHistoryBinding.inflate(layoutInflater, parent, false)

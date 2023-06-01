@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.payment
 
 import io.mockk.every
 import io.mockk.mockk
@@ -8,17 +8,16 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.UserRepository
-import woowacourse.shopping.ui.basket.BasketFixture
+import woowacourse.shopping.ui.BasketFixture
+import woowacourse.shopping.ui.UserFixture
 import woowacourse.shopping.ui.mapper.toUi
-import woowacourse.shopping.ui.model.BasketProduct
-import woowacourse.shopping.ui.model.User
-import woowacourse.shopping.ui.payment.PaymentContract
-import woowacourse.shopping.ui.payment.PaymentPresenter
+import woowacourse.shopping.ui.model.BasketProductUiModel
+import woowacourse.shopping.ui.model.UserUiModel
 
 class PaymentPresenterTest {
 
     private lateinit var view: PaymentContract.View
-    private lateinit var basketProducts: List<BasketProduct>
+    private lateinit var basketProducts: List<BasketProductUiModel>
     private lateinit var userRepository: UserRepository
     private lateinit var orderRepository: OrderRepository
     private lateinit var presenter: PaymentContract.Presenter
@@ -30,6 +29,7 @@ class PaymentPresenterTest {
             .products
             .filter { it.checked }
             .map { it.toUi() }
+
         userRepository = mockk(relaxed = true)
         orderRepository = mockk(relaxed = true)
         presenter = PaymentPresenter(
@@ -44,7 +44,7 @@ class PaymentPresenterTest {
     fun `저장소로부터 유저 정보를 받아온 후 뷰를 초기화한다`() {
         // given
         val user = UserFixture.createUser()
-        val slotInitView = slot<(user: User) -> Unit>()
+        val slotInitView = slot<(user: UserUiModel) -> Unit>()
         val totalPrice = basketProducts.sumOf { it.product.price.value }
 
         every {

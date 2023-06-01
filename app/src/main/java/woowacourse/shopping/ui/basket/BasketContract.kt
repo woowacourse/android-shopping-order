@@ -3,12 +3,12 @@ package woowacourse.shopping.ui.basket
 import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 interface BasketContract {
     interface View {
 
-        fun updateBasketProducts(basketProducts: List<UiBasketProduct>)
+        fun updateBasketProducts(basketProducts: List<BasketProductUiModel>)
 
         fun updateNavigatorEnabled(previous: Boolean, next: Boolean)
 
@@ -22,7 +22,7 @@ interface BasketContract {
 
         fun updateSkeletonState(isLoaded: Boolean)
 
-        fun showPaymentView(basketProducts: List<UiBasketProduct>)
+        fun showPaymentView(basketProducts: List<BasketProductUiModel>)
     }
 
     interface Presenter {
@@ -44,7 +44,7 @@ interface BasketContract {
 
         fun updateNextPage()
 
-        fun deleteBasketProduct(product: UiBasketProduct)
+        fun deleteBasketProduct(product: BasketProductUiModel)
 
         fun startPayment()
     }

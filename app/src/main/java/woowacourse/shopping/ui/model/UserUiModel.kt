@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.model
 
-data class User(
+data class UserUiModel(
     val email: String,
     val point: Int,
     val accumulationRate: Int,

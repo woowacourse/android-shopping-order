@@ -20,8 +20,8 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.basket.BasketActivity
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentProductUiModel
 import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingViewType.MORE_BUTTON
@@ -90,21 +90,21 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         )
     }
 
-    override fun updateProducts(products: List<UiProduct>) {
+    override fun updateProducts(products: List<ProductUiModel>) {
         runOnUiThread {
             productAdapter.submitList(products)
         }
     }
 
-    override fun updateRecentProducts(recentProducts: List<UiRecentProduct>) {
+    override fun updateRecentProducts(recentProducts: List<RecentProductUiModel>) {
         recentProductAdapter.submitList(recentProducts)
         recentProductWrapperAdapter.notifyDataSetChanged()
     }
 
     override fun showProductDetail(
-        currentProduct: UiProduct,
+        currentProduct: ProductUiModel,
         currentProductBasketId: Int?,
-        previousProduct: UiProduct?,
+        previousProduct: ProductUiModel?,
         previousProductBasketId: Int?,
     ) {
         activityResultLauncher.launch(
