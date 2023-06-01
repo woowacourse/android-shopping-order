@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.repository.PointRepository
 
 class PointRepositoryImpl(private val service: PointService) : PointRepository {
+
     override fun getPoint(
         onSuccess: (Point) -> Unit,
         onFailed: (Throwable) -> Unit,

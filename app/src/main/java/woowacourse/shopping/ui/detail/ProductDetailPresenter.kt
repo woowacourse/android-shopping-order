@@ -2,8 +2,8 @@ package woowacourse.shopping.ui.detail
 
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.detail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.detail.ProductDetailContract.View

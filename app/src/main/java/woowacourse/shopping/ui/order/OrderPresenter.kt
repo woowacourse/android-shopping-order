@@ -4,8 +4,8 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.PointRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.UiOrder
 import woowacourse.shopping.model.UiPoint
 import woowacourse.shopping.ui.order.OrderContract.View

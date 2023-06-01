@@ -12,8 +12,8 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiProductCount

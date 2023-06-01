@@ -11,7 +11,7 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.mapper.toDomain
+import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.UiPrice
 

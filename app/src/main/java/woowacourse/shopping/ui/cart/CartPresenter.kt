@@ -9,8 +9,8 @@ import woowacourse.shopping.domain.model.Payment
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.UiCartProduct

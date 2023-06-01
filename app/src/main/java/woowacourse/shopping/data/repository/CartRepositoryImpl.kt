@@ -6,7 +6,7 @@ import retrofit2.Response
 import woowacourse.shopping.data.dto.CartAddRequest
 import woowacourse.shopping.data.dto.CartGetResponse
 import woowacourse.shopping.data.dto.CartPatchRequest
-import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.dto.mapper.toDomain
 import woowacourse.shopping.data.service.cart.CartService
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.ProductCount

@@ -4,8 +4,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.OrderResponse
-import woowacourse.shopping.data.mapper.toOrderRequest
-import woowacourse.shopping.data.mapper.toOrders
+import woowacourse.shopping.data.dto.mapper.toOrderRequest
+import woowacourse.shopping.data.dto.mapper.toOrders
 import woowacourse.shopping.data.service.order.OrderService
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.page.Page

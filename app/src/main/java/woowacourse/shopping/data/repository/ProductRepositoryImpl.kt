@@ -4,10 +4,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.ProductGetResponse
-import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.mapper.toProductDeleteRequest
-import woowacourse.shopping.data.mapper.toProductPostRequest
-import woowacourse.shopping.data.mapper.toProductPutRequest
+import woowacourse.shopping.data.dto.mapper.toDomain
+import woowacourse.shopping.data.dto.mapper.toProductDeleteRequest
+import woowacourse.shopping.data.dto.mapper.toProductPostRequest
+import woowacourse.shopping.data.dto.mapper.toProductPutRequest
 import woowacourse.shopping.data.service.cart.ProductId
 import woowacourse.shopping.data.service.product.ProductService
 import woowacourse.shopping.domain.model.Product
