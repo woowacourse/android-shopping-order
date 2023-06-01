@@ -6,7 +6,7 @@
 //import woowacourse.shopping.data.service.cart.ProductId
 //import woowacourse.shopping.data.util.convertJsonToProduct
 //import woowacourse.shopping.data.util.convertJsonToProducts
-//import woowacourse.shopping.data.util.okhttp.Header.Companion.JSON_MEDIA_TYPE
+//import woowacourse.shopping.data.util.Header.Companion.JSON_MEDIA_TYPE
 //import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient
 //import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.delete
 //import woowacourse.shopping.data.util.okhttp.ShoppingOkHttpClient.get

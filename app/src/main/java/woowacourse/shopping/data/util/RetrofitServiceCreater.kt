@@ -1,17 +1,18 @@
 package woowacourse.shopping.data.util
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.service.cart.CartService
 import woowacourse.shopping.data.service.order.OrderService
 import woowacourse.shopping.data.service.point.PointService
 import woowacourse.shopping.data.service.product.ProductService
-import woowacourse.shopping.data.util.okhttp.Header
-import woowacourse.shopping.data.util.okhttp.Header.AUTHORIZATION
+import woowacourse.shopping.data.util.Header.AUTHORIZATION
+import woowacourse.shopping.data.util.Header.Companion.CONTENT_TYPE_JSON
 
 class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -28,10 +29,19 @@ private fun provideOkHttpClient(interceptor: Interceptor): OkHttpClient {
         .build()
 }
 
+private val json = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+    encodeDefaults = true
+    isLenient = true
+}
+
+private val jsonConverter = json.asConverterFactory(CONTENT_TYPE_JSON)
+
 private val retrofit = Retrofit.Builder()
     .baseUrl(pref.getBaseUrl() ?: "")
     .client(provideOkHttpClient(AuthInterceptor()))
-    .addConverterFactory(GsonConverterFactory.create())
+    .addConverterFactory(jsonConverter)
     .build()
 
 val productService = retrofit.create(ProductService::class.java)

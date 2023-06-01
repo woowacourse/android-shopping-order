@@ -1,3 +1,6 @@
 package woowacourse.shopping.data.dto
 
-data class PointResponse(val availablePoint: Int)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class PointResponse(val availablePoint: Int = 0)

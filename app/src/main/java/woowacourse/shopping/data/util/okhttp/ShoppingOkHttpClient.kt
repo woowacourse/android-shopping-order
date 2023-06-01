@@ -7,7 +7,8 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.util.okhttp.Header.AUTHORIZATION
+import woowacourse.shopping.data.util.Header
+import woowacourse.shopping.data.util.Header.AUTHORIZATION
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.util.okhttp
+package woowacourse.shopping.data.util
 
 import okhttp3.MediaType.Companion.toMediaType
 
@@ -7,7 +7,7 @@ enum class Header {
     CONTENT_TYPE;
 
     companion object {
-        val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+        val CONTENT_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
 
         fun of(header: Header): String = when (header) {
             AUTHORIZATION -> "Authorization"
