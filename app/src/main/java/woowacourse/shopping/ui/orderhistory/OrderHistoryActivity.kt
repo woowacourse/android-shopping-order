@@ -38,7 +38,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         }
     }
 
-    override fun setUpView(orders: List<Order>) {
+    override fun initView(orders: List<Order>) {
         binding.rvOrders.adapter = OrderHistoryAdapter(
             orders = orders,
             onClicked = ::showOrderDetail

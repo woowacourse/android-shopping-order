@@ -6,7 +6,7 @@ interface OrderHistoryContract {
 
     interface View {
 
-        fun setUpView(orders: List<Order>)
+        fun initView(orders: List<Order>)
     }
 
     interface Presenter {

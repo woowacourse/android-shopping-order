@@ -9,7 +9,7 @@ class OrderHistoryPresenter(
 
     override fun getOrders() {
         repository.getOrders(
-            onReceived = view::setUpView
+            onReceived = view::initView
         )
     }
 }
