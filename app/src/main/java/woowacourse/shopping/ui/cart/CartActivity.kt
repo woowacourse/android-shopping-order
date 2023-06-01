@@ -8,7 +8,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.OrderModel
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.model.UiPage
+import woowacourse.shopping.model.PageModel
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener
 import woowacourse.shopping.ui.cart.recyclerview.adapter.CartAdapter
@@ -39,7 +39,7 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.nextButton.isEnabled = nextEnabled
     }
 
-    override fun updatePageNumber(page: UiPage) {
+    override fun updatePageNumber(page: PageModel) {
         binding.pageNumberTextView.text = page.toText()
     }
 
