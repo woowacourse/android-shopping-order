@@ -12,7 +12,4 @@ class OrderResultPresenter(
             view.showOrder(OrderResultUIState.from(order))
         }
     }
-
-    override fun onLoadProduct(productId: Long) {
-    }
 }

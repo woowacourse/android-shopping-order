@@ -12,7 +12,7 @@ import woowacourse.shopping.data.order.OrderRemoteRepository
 import woowacourse.shopping.databinding.ActivityOrderResultBinding
 import woowacourse.shopping.ui.order.adapter.OrderItemListAdapter
 import woowacourse.shopping.ui.order.uistate.OrderResultUIState
-import woowacourse.shopping.ui.products.uistate.ProductUIState
+import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.utils.PRICE_FORMAT
 
 class OrderResultActivity : AppCompatActivity(), OrderResultContract.View {
@@ -26,7 +26,7 @@ class OrderResultActivity : AppCompatActivity(), OrderResultContract.View {
 
     private val orderItemListAdapter: OrderItemListAdapter by lazy {
         OrderItemListAdapter {
-            presenter.onLoadProduct(it)
+            ProductDetailActivity.startActivity(this, it)
         }
     }
 
@@ -53,9 +53,6 @@ class OrderResultActivity : AppCompatActivity(), OrderResultContract.View {
         binding.tvTotalPrice.text =
             getString(R.string.format_price).format(PRICE_FORMAT.format(order.totalPrice))
         orderItemListAdapter.setOrder(order.orderItems)
-    }
-
-    override fun showProduct(product: ProductUIState) {
     }
 
     private fun setActionBar() {
