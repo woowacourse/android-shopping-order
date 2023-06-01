@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.order
 
+import android.util.Log
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.model.OrderProductsModel
 import woowacourse.shopping.repository.OrderRepository
@@ -45,6 +46,7 @@ class OrderPresenter constructor(
     }
 
     override fun addOrder() {
+        Log.d("wooseokOrderPresent", usagePoint.toString() + orderProducts.toString())
         orderRepository.addOrder(usagePoint, orderProducts) {
             view.showAddOrderComplete(it)
         }

@@ -6,5 +6,5 @@ data class Order(
     val orderId: Int,
     val imageUrl: String,
     val orderDate: LocalDateTime,
-    val sendPrice: Price,
+    val spendPrice: Price,
 )

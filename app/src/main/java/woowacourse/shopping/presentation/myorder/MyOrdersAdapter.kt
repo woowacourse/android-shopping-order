@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemMyOrderBinding
 import woowacourse.shopping.presentation.model.OrderModel
 
-class MyOrdersAdapter : ListAdapter<OrderModel, MyOrderItemViewHolder>(diffCallBack()) {
+class MyOrdersAdapter(
+    private val showOrderDetail: (OrderModel) -> Unit,
+) : ListAdapter<OrderModel, MyOrderItemViewHolder>(diffCallBack()) {
     private lateinit var binding: ItemMyOrderBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyOrderItemViewHolder {
         binding = ItemMyOrderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MyOrderItemViewHolder(binding)
+        return MyOrderItemViewHolder(binding, showOrderDetail)
     }
 
     override fun onBindViewHolder(holder: MyOrderItemViewHolder, position: Int) {

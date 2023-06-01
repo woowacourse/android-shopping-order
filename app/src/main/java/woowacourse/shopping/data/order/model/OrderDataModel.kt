@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName
 
 data class OrderDataModel(
     val orderId: Int,
+    val firstProductName: String,
+    val totalQuantity: Int,
     @SerializedName("thumbnail") val imageUrl: String,
-    val orderDate: String,
-    val sendPrice: Int,
+    val createdAt: String,
+    val spendPrice: Int,
 )

@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
 import woowacourse.shopping.databinding.ActivityMyOrderBinding
 import woowacourse.shopping.presentation.model.OrderModel
+import woowacourse.shopping.presentation.myorder.detail.MyOrderDetailActivity
 
 class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
     private lateinit var binding: ActivityMyOrderBinding
@@ -35,9 +37,14 @@ class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
     }
 
     private fun initMyOrderItems() {
-        myOrdersAdapter = MyOrdersAdapter()
+        myOrdersAdapter = MyOrdersAdapter(::showOrderDetail)
         binding.recyclerMyOrder.adapter = myOrdersAdapter
+        binding.recyclerMyOrder.layoutManager = LinearLayoutManager(this)
         presenter.loadOrders()
+    }
+
+    private fun showOrderDetail(orderModel: OrderModel) {
+        presenter.showOrderDetail(orderModel)
     }
 
     private fun setUpToolBar() {
@@ -58,6 +65,10 @@ class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
 
     override fun setOrders(orderModels: List<OrderModel>) {
         myOrdersAdapter.submitList(orderModels)
+    }
+
+    override fun navigateToOrderDetail(orderId: Int) {
+        startActivity(MyOrderDetailActivity.getIntent(this, orderId))
     }
 
     companion object {

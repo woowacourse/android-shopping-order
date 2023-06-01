@@ -36,7 +36,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="10dp"
-                    android:text="@{orderModel.orderId}"
+                    android:text="@{String.valueOf(orderModel.orderId)}"
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="18sp"
@@ -70,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="2018-05-08"
-                    android:text="@{@string/price_format(orderModel.orderDate)}"
+                    android:text="@{orderModel.orderDate}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/text_my_order_payment_price"
                     android:layout_marginEnd="13dp" />
