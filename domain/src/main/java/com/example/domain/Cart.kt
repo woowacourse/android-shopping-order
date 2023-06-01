@@ -1,13 +1,16 @@
 package com.example.domain
 
 class Cart(products: List<CartProduct> = emptyList()) {
-    private val _products: MutableList<CartProduct> by lazy {
-        products.distinctBy { it.productId }.toMutableList()
-    }
+
+    private var _products: MutableList<CartProduct> = products.toMutableList()
     val products: List<CartProduct>
         get() = _products.toList()
 
-    fun addAll(cartProducts: List<CartProduct>): Boolean = _products.addAll(cartProducts)
+    fun updateAll(cartProducts: List<CartProduct>) {
+        _products = cartProducts.toMutableList()
+    }
+
+    fun removeById(id: Long): Boolean = _products.removeIf { it.id == id }
 
     fun getPickedCount(): Int = _products.count { it.isPicked }
 
