@@ -59,4 +59,6 @@ data class Basket(val products: List<BasketProduct>) {
 
     fun getCheckedBasketProducts(): List<BasketProduct> =
         products.filter { it.checked }
+
+    fun getTotalProductsCount(): Int = products.size
 }

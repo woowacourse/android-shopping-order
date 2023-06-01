@@ -13,7 +13,7 @@
 
         <variable
             name="preOrderInfo"
-            type="woowacourse.shopping.ui.model.PreOrderInfo" />
+            type="woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
