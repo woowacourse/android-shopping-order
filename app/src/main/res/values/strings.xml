@@ -31,4 +31,13 @@
     <string name="order_failed_message">주문에 실패하였습니다!</string>
     <string name="black_pepper_server">후추 서버</string>
     <string name="hamad_server">하마드 서버</string>
+    <string name="order_detail_title">주문 상세</string>
+    <string name="payment_title">결제 금액</string>
+    <string name="payment_description">주문 금액</string>
+    <string name="discount_description">할인 금액</string>
+    <string name="final_description">최종 결제 금액</string>
+    <string name="order_btn_text">주 문 하 기</string>
+    <string name="available_point_description">사용 가능한 포인트</string>
+    <string name="use_to_point_description">사용 할 포인트</string>
+    <string name="point_text">포인트</string>
 </resources>

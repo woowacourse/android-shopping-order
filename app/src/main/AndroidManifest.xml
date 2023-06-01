@@ -16,6 +16,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.order.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.order.OrderDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.order.OrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.serversetting.ServerSettingActivity"
             android:exported="true">
             <intent-filter>
