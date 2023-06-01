@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.productlist
 
-// import woowacourse.shopping.view.cart.CartActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -24,6 +24,7 @@ import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.view.cart.CartActivity
+import woowacourse.shopping.view.mypage.MypageActivity
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
@@ -66,13 +67,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun stopLoading() {
-        runOnUiThread {
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.skeletonProducts.root.visibility = View.GONE
-                binding.skeletonProducts.root.clearAnimation()
-                binding.gridProducts.visibility = View.VISIBLE
-            }, 1500L)
-        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            binding.skeletonProducts.root.visibility = View.GONE
+            binding.skeletonProducts.root.clearAnimation()
+            binding.gridProducts.visibility = View.VISIBLE
+        }, 1500L)
     }
 
     private fun setUpBinding() {
@@ -96,32 +95,30 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     override fun showProducts(items: List<ProductListViewItem>) {
-        runOnUiThread {
-            val gridLayoutManager = GridLayoutManagerWrapper(this, 2)
-            gridLayoutManager.spanSizeLookup = GridLayoutManagerSpanSizeLookup(items)
-            binding.gridProducts.layoutManager = gridLayoutManager
-            binding.gridProducts.adapter = ProductListAdapter(
-                items,
-                object : ProductListAdapter.OnItemClick {
-                    override fun onProductClick(product: ProductModel) {
-                        presenter.showProductDetail(product)
-                    }
+        val gridLayoutManager = GridLayoutManagerWrapper(this, 2)
+        gridLayoutManager.spanSizeLookup = GridLayoutManagerSpanSizeLookup(items)
+        binding.gridProducts.layoutManager = gridLayoutManager
+        binding.gridProducts.adapter = ProductListAdapter(
+            items,
+            object : ProductListAdapter.OnItemClick {
+                override fun onProductClick(product: ProductModel) {
+                    presenter.showProductDetail(product)
+                }
 
-                    override fun onShowMoreClick() {
-                        presenter.loadMoreProducts()
-                    }
+                override fun onShowMoreClick() {
+                    presenter.loadMoreProducts()
+                }
 
-                    override fun onProductClickAddFirst(id: Int) {
-                        presenter.insertCartProduct(id)
-                        presenter.fetchCartCount()
-                    }
+                override fun onProductClickAddFirst(id: Int) {
+                    presenter.insertCartProduct(id)
+                    presenter.fetchCartCount()
+                }
 
-                    override fun onProductUpdateCount(cartId: Int, productId: Int, count: Int) {
-                        presenter.updateCartProductCount(cartId, productId, count)
-                    }
-                },
-            )
-        }
+                override fun onProductUpdateCount(cartId: Int, productId: Int, count: Int) {
+                    presenter.updateCartProductCount(cartId, productId, count)
+                }
+            },
+        )
     }
 
     override fun notifyAddProducts(position: Int, size: Int) {
@@ -154,18 +151,25 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.menu_item, menu)
-        val itemActionView = menu?.findItem(R.id.cart)?.actionView
-        if (itemActionView != null) {
-            cartCountInAppBar = itemActionView.findViewById(R.id.text_cart_count)
+        val cartActionView = menu?.findItem(R.id.cart)?.actionView
+        if (cartActionView != null) {
+            cartCountInAppBar = cartActionView.findViewById(R.id.text_cart_count)
             presenter.fetchCartCount()
 
-            val imageButton = itemActionView.findViewById<ImageButton>(R.id.btn_cart)
+            val imageButton = cartActionView.findViewById<ImageButton>(R.id.btn_cart)
             imageButton?.setOnClickListener {
                 val intent = CartActivity.newIntent(this)
                 resultLauncher.launch(intent)
             }
         }
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.mypage -> startActivity(MypageActivity.newIntent(this))
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun showToastAddInCart() {

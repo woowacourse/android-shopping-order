@@ -7,4 +7,11 @@
         app:actionLayout="@layout/layout_cart_badge"
         android:title="@string/shoppingcart"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/mypage"
+        android:icon="@drawable/ic_user_24"
+        android:iconTint="@color/white"
+        android:title="@string/mypage"
+        app:showAsAction="always" />
 </menu>
