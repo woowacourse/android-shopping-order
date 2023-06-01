@@ -1,13 +1,19 @@
 package woowacourse.shopping.ui.cart
 
+import retrofit2.Call
+import retrofit2.Response
+import woowacourse.shopping.data.order.OrderRemoteService
+import woowacourse.shopping.data.order.OrderRequestBody
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.OrderPriceCalculator
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.utils.UserData
 
 class CartPresenter(
     private val view: CartContract.View,
-    private val cartItemRepository: CartItemRepository
+    private val cartItemRepository: CartItemRepository,
+    private val orderRemoteService: OrderRemoteService
 ) : CartContract.Presenter {
 
     private var currentPage: Int = 0
@@ -110,6 +116,36 @@ class CartPresenter(
         }
     }
 
+    override fun onOrderSelectedCartItems() {
+        orderRemoteService.requestOrder(
+            "Basic ${UserData.credential}",
+            OrderRequestBody(selectedCartItems.map { it.id })
+        ).enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful.not()) return
+                val orderId = response.headers()["Location"]
+                    ?.removePrefix("/orders/")
+                    ?.toLong()
+                    ?: return
+                view.showOrderResult(orderId)
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            }
+        })
+    }
+
+    override fun onRefresh() {
+        currentPage = 1
+        cartItemRepository.findAll { cartItems ->
+            selectedCartItems = selectedCartItems.filter { it in cartItems }.toSet()
+            showCartItems(currentPage, selectedCartItems, true)
+            showPageUI(currentPage)
+            showAllSelectionUI(currentPage, selectedCartItems)
+            showOrderUI(selectedCartItems)
+        }
+    }
+
     private fun showCartItems(page: Int, selectedCartItems: Set<CartItem>, initScroll: Boolean) {
         getCartItemsOf(page) { cartItems ->
             val cartItemUIStates =
@@ -132,6 +168,7 @@ class CartPresenter(
     private fun showOrderUI(selectedCartItems: Set<CartItem>) {
         view.setOrderPrice(OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems))
         view.setOrderCount(selectedCartItems.size)
+        view.setCanOrder(selectedCartItems.isNotEmpty())
     }
 
     private fun showPageUI(currentPage: Int) {

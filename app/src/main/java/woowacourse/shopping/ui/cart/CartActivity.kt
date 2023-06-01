@@ -8,13 +8,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemMemoryCache
 import woowacourse.shopping.data.cart.CartItemRemoteRepository
+import woowacourse.shopping.data.order.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartListAdapter
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.order.OrderActivity
 import woowacourse.shopping.utils.PRICE_FORMAT
+import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding by lazy {
@@ -33,7 +38,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private val presenter: CartPresenter by lazy {
-        CartPresenter(this, CartItemRemoteRepository())
+        CartPresenter(
+            this,
+            CartItemRemoteRepository(),
+            Retrofit.Builder()
+                .baseUrl(ServerConfiguration.host.url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(OrderRemoteService::class.java)
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +64,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         if (intent.getBooleanExtra(JUST_ADDED_CART_ITEM, false)) {
             presenter.onLoadCartItemsOfLastPage()
         }
+    }
+
+    override fun onStart() {
+        presenter.onRefresh()
+        super.onStart()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -102,6 +120,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.onChangeSelectionOfAllCartItems(isChecked)
         }
         binding.tvOrder.text = getString(R.string.order)
+        binding.tvOrder.setOnClickListener {
+            presenter.onOrderSelectedCartItems()
+        }
     }
 
     override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
@@ -161,6 +182,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun setCanOrder(canOrder: Boolean) {
         runOnUiThread {
             binding.tvOrder.isEnabled = canOrder
+        }
+    }
+
+    override fun showOrderResult(orderId: Long) {
+        runOnUiThread {
+            OrderActivity.startActivity(this, orderId)
         }
     }
 

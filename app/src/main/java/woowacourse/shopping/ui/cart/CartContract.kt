@@ -21,6 +21,10 @@ interface CartContract {
         fun onPlusCount(cartItemId: Long)
 
         fun onMinusCount(cartItemId: Long)
+
+        fun onOrderSelectedCartItems()
+
+        fun onRefresh()
     }
 
     interface View {
@@ -41,5 +45,7 @@ interface CartContract {
         fun setOrderCount(count: Int)
 
         fun setCanOrder(canOrder: Boolean)
+
+        fun showOrderResult(orderId: Long)
     }
 }
