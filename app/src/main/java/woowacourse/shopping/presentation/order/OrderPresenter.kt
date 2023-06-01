@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.order
 
 import woowacourse.shopping.presentation.mapper.toDomain
+import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.presentation.model.OrderProductsModel
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
@@ -32,6 +33,11 @@ class OrderPresenter constructor(
             usagePoint < MINIMUM_POINT -> view.setUsagePoint("")
             usagePoint > userTotalPoint -> view.setUsagePoint(userTotalPoint.toString())
         }
+    }
+
+    override fun updateOrderProductTotalPrice(orderProductModel: OrderProductModel) {
+        val price = orderProductModel.toDomain().totalPrice
+        view.setOrderProductTotalPrice(price)
     }
 
     override fun showOrderPrice() {

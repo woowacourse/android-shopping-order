@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.myorder.detail
 
+import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.mapper.toPresentation
+import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.repository.OrderRepository
 
 class MyOrderDetailPresenter(
@@ -16,5 +18,10 @@ class MyOrderDetailPresenter(
             view.setOrderProducts(orderDetailModel.orderItems.list)
             view.setPaymentInfo(orderDetailModel)
         }
+    }
+
+    override fun updateProductPrice(orderProductModel: OrderProductModel) {
+        val price = orderProductModel.toDomain().totalPrice
+        view.setProductPrice(price)
     }
 }

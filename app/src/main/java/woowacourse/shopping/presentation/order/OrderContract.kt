@@ -10,6 +10,7 @@ interface OrderContract {
         fun showPaymentPrice()
         fun addOrder()
         fun loadOrderItems()
+        fun updateOrderProductTotalPrice(orderProductModel: OrderProductModel)
     }
 
     interface View {
@@ -19,5 +20,6 @@ interface OrderContract {
         fun setPaymentPrice(price: Int)
         fun showAddOrderComplete(completeMessage: String?)
         fun setOrderItems(orderProductsModel: List<OrderProductModel>)
+        fun setOrderProductTotalPrice(price: Int)
     }
 }

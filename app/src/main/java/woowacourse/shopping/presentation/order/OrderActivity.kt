@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -24,6 +25,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
     private lateinit var presenter: OrderContract.Presenter
     private lateinit var orderAdapter: OrderItemsAdapter
+    private lateinit var productPriceTextView: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
@@ -54,9 +56,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initOrderProductsView() {
-        orderAdapter = OrderItemsAdapter()
+        orderAdapter = OrderItemsAdapter(::updateProductPrice)
         binding.recyclerOrder.adapter = orderAdapter
         presenter.loadOrderItems()
+    }
+
+    private fun updateProductPrice(textView: TextView, orderProductModel: OrderProductModel) {
+        productPriceTextView = textView
+        presenter.updateOrderProductTotalPrice(orderProductModel)
     }
 
     private fun setUpBinding() {
@@ -144,5 +151,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun setOrderItems(orderProductsModel: List<OrderProductModel>) {
         orderAdapter.submitList(orderProductsModel)
+    }
+
+    override fun setOrderProductTotalPrice(price: Int) {
+        productPriceTextView.text = getString(R.string.price_format, price)
     }
 }

@@ -3,8 +3,10 @@ package woowacourse.shopping.presentation.myorder.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import woowacourse.shopping.R
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
@@ -17,6 +19,7 @@ class MyOrderDetailActivity : AppCompatActivity(), MyOrderDetailContract.View {
     private lateinit var binding: ActivityMyOrderDetailBinding
     private lateinit var orderItemsAdapter: OrderItemsAdapter
     private lateinit var presenter: MyOrderDetailContract.Presenter
+    private lateinit var productPriceTextView: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
@@ -39,10 +42,27 @@ class MyOrderDetailActivity : AppCompatActivity(), MyOrderDetailContract.View {
     }
 
     private fun initView() {
-        orderItemsAdapter = OrderItemsAdapter()
+        orderItemsAdapter = OrderItemsAdapter(::updateProductPrice)
         binding.recyclerMyOrderDetail.adapter = orderItemsAdapter
         binding.recyclerMyOrderDetail.layoutManager = LinearLayoutManager(this)
         presenter.loadOrderDetail()
+    }
+
+    private fun updateProductPrice(textView: TextView, orderProductModel: OrderProductModel) {
+        productPriceTextView = textView
+        presenter.updateProductPrice(orderProductModel)
+    }
+
+    override fun setOrderProducts(orderProducts: List<OrderProductModel>) {
+        orderItemsAdapter.submitList(orderProducts)
+    }
+
+    override fun setPaymentInfo(orderDetailModel: OrderDetailModel) {
+        binding.orderDetailModel = orderDetailModel
+    }
+
+    override fun setProductPrice(price: Int) {
+        productPriceTextView.text = getString(R.string.price_format, price)
     }
 
     companion object {
@@ -53,13 +73,5 @@ class MyOrderDetailActivity : AppCompatActivity(), MyOrderDetailContract.View {
             intent.putExtra(ORDER_ID_KEY, orderId)
             return intent
         }
-    }
-
-    override fun setOrderProducts(orderProducts: List<OrderProductModel>) {
-        orderItemsAdapter.submitList(orderProducts)
-    }
-
-    override fun setPaymentInfo(orderDetailModel: OrderDetailModel) {
-        binding.orderDetailModel = orderDetailModel
     }
 }

@@ -2,12 +2,15 @@ package woowacourse.shopping.presentation.order
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemOrderBinding
 import woowacourse.shopping.presentation.model.OrderProductModel
 
-class OrderItemsAdapter() : ListAdapter<OrderProductModel, OrderItemViewHolder>(diffCallBack()) {
+class OrderItemsAdapter(
+    private val updateProductPrice: (TextView, OrderProductModel) -> Unit,
+) : ListAdapter<OrderProductModel, OrderItemViewHolder>(diffCallBack()) {
 
     private lateinit var itemOrderBinding: ItemOrderBinding
     private lateinit var inflater: LayoutInflater
@@ -22,7 +25,7 @@ class OrderItemsAdapter() : ListAdapter<OrderProductModel, OrderItemViewHolder>(
             parent,
             false,
         )
-        return OrderItemViewHolder(itemOrderBinding)
+        return OrderItemViewHolder(itemOrderBinding, updateProductPrice)
     }
 
     override fun onBindViewHolder(holder: OrderItemViewHolder, position: Int) {
