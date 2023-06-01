@@ -1,9 +1,10 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.mapper.toOrderUiModel
-import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.data.mapper.toOrderDomainModel
+import woowacourse.shopping.domain.Order
 
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
@@ -20,6 +21,7 @@ class OrderRepositoryImpl(
             usingPoint = usingPoint.toLong(),
             totalPrice = totalPrice.toLong()
         )
+        Log.d("woogi", "addOrder: $orderRequest")
 
         orderRemoteDataSource.addOrder(orderRequest) { orderId ->
             onAdded(orderId.toInt())
@@ -28,19 +30,19 @@ class OrderRepositoryImpl(
 
     override fun getOrder(
         orderId: Int,
-        onReceived: (order: OrderUiModel) -> Unit,
+        onReceived: (order: Order) -> Unit,
     ) {
         orderRemoteDataSource.getOrder(orderId) {
-            val orderRecord = it.toOrderUiModel()
+            val orderRecord = it.toOrderDomainModel()
 
             onReceived(orderRecord)
         }
     }
 
-    override fun getOrders(onReceived: (orders: List<OrderUiModel>) -> Unit) {
+    override fun getOrders(onReceived: (orders: List<Order>) -> Unit) {
         orderRemoteDataSource.getOrders {
             val orders = it.map { orderResponse ->
-                orderResponse.toOrderUiModel()
+                orderResponse.toOrderDomainModel()
             }
 
             onReceived(orders)

@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.orderdetail
 
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.ui.mapper.toOrderUiModel
 import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderDetailPresenter(
@@ -13,7 +14,7 @@ class OrderDetailPresenter(
     override fun getOrder() {
         if (orderId != -1) {
             orderRepository.getOrder(orderId) {
-                view.initView(it)
+                view.initView(it.toOrderUiModel())
             }
         }
         order?.let {

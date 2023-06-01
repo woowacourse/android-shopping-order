@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.orderhistory
 
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.ui.mapper.toOrderUiModel
 
 class OrderHistoryPresenter(
     private val view: OrderHistoryContract.View,
@@ -8,8 +9,12 @@ class OrderHistoryPresenter(
 ) : OrderHistoryContract.Presenter {
 
     override fun getOrders() {
-        repository.getOrders(
-            onReceived = view::initView
-        )
+        repository.getOrders {
+            view.initView(
+                it.map { order ->
+                    order.toOrderUiModel()
+                }
+            )
+        }
     }
 }

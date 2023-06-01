@@ -4,12 +4,16 @@ import com.google.gson.annotations.SerializedName
 import woowacourse.shopping.data.model.OrderProductEntity
 
 data class OrderResponse(
+    @SerializedName("orderId")
     val orderId: Long,
     @SerializedName("createAt")
     val orderedTime: String?,
     @SerializedName("orderItems")
-    val orderDetails: List<OrderProductEntity>,
+    val orderProducts: List<OrderProductEntity>,
+    @SerializedName("totalPrice")
     val totalPrice: Long,
+    @SerializedName("usedPoint")
     val usedPoint: Long,
+    @SerializedName("earnedPoint")
     val earnedPoint: Long,
 )

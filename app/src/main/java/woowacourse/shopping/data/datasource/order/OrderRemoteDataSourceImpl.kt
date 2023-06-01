@@ -25,6 +25,9 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<OrderResponse>,
                 response: Response<OrderResponse>,
             ) {
+                Log.d("woogi", "headers:\n ${response.headers()}")
+                Log.d("woogi", "상태코드: ${response.code()}")
+                Log.d("woogi", "메시지: ${response.message()}")
                 response.headers()["Location"]?.let {
                     val orderId = it.split("/").last().toLong()
 
@@ -72,7 +75,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<List<OrderResponse>>,
                 response: Response<List<OrderResponse>>,
             ) {
-                Log.d("woogi", "onResponse: ${response.body()}")
+                Log.d("woogi", "주문목록 조회: ${response.body()}")
                 response.body()?.let {
                     onReceived(it)
                 }

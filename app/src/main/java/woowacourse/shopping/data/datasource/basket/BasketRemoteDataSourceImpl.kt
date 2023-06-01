@@ -21,6 +21,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 call: retrofit2.Call<List<BasketProductEntity>>,
                 response: retrofit2.Response<List<BasketProductEntity>>,
             ) {
+                Log.d("woogi", "onResponse: ${response.body()}")
                 response.body()?.let {
                     onReceived(it)
                 }

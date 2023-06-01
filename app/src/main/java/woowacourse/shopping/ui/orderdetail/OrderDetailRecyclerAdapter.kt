@@ -13,9 +13,9 @@ class OrderDetailRecyclerAdapter(
         return OrderDetailViewHolder.from(parent)
     }
 
-    override fun getItemCount(): Int = order.uiOrderProducts.size
+    override fun getItemCount(): Int = order.products.size
 
     override fun onBindViewHolder(holder: OrderDetailViewHolder, position: Int) {
-        holder.bind(order.uiOrderProducts[position])
+        holder.bind(order.products[position])
     }
 }

@@ -3,9 +3,9 @@ package woowacourse.shopping.ui.model
 import java.io.Serializable
 
 data class OrderProductUiModel(
-    val productId: Long,
-    val productName: String,
-    val quantity: String,
-    val price: Long,
+    val id: Int,
+    val name: String,
+    val count: Int,
+    val price: Int,
     val imageUrl: String,
 ) : Serializable

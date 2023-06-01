@@ -6,17 +6,17 @@ object OrderFixture {
 
     fun createOrders() = listOf(
         OrderUiModel(
-            orderId = 1,
-            orderDate = "",
-            uiOrderProducts = listOf(),
+            id = 1,
+            date = "",
+            products = listOf(),
             totalPrice = 0,
             usedPoint = 0,
             earnedPoint = 0
         ),
         OrderUiModel(
-            orderId = 2,
-            orderDate = "",
-            uiOrderProducts = listOf(),
+            id = 2,
+            date = "",
+            products = listOf(),
             totalPrice = 0,
             usedPoint = 0,
             earnedPoint = 0
@@ -24,9 +24,9 @@ object OrderFixture {
     )
 
     fun createOrder() = OrderUiModel(
-        orderId = 1,
-        orderDate = "",
-        uiOrderProducts = listOf(),
+        id = 1,
+        date = "",
+        products = listOf(),
         totalPrice = 0,
         usedPoint = 0,
         earnedPoint = 0

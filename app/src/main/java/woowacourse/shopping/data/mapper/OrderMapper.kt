@@ -1,14 +1,15 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.datasource.response.OrderResponse
-import woowacourse.shopping.ui.model.OrderUiModel
-// todo data layer에서 왜 ui를?
+import woowacourse.shopping.domain.Order
+import woowacourse.shopping.domain.Price
+
 // todo 지금은 분리의 의미가 없긴하다.
-fun OrderResponse.toOrderUiModel() = OrderUiModel(
-    orderId = orderId,
-    orderDate = orderedTime,
-    uiOrderProducts = orderDetails.map { it.toOrderProductUiModel() },
-    totalPrice = totalPrice,
-    usedPoint = usedPoint,
-    earnedPoint = earnedPoint
+fun OrderResponse.toOrderDomainModel() = Order(
+    id = orderId.toInt(),
+    date = orderedTime,
+    products = orderProducts.map { it.toOrderProductDomainModel() },
+    totalPrice = Price(totalPrice.toInt()),
+    usedPoint = usedPoint.toInt(),
+    earnedPoint = earnedPoint.toInt()
 )

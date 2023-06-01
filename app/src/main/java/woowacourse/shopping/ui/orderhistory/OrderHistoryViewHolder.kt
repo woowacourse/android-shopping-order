@@ -16,16 +16,16 @@ class OrderHistoryViewHolder(
         with(binding) {
             tvOrderCount.text = root.context.getString(
                 R.string.tv_order_count,
-                order.uiOrderProducts.size
+                order.products.size
             )
             tvOrderDate.text = root.context.getString(
                 R.string.tv_order_date,
-                order.orderDate
+                order.date
             )
             tvOrderProducts.text = root.context.getString(
                 R.string.tv_order_products,
-                order.uiOrderProducts.first().productName,
-                order.uiOrderProducts.size - COUNT_DIFF
+                order.products.first().name,
+                order.products.size - COUNT_DIFF
             )
             root.setOnClickListener {
                 onClicked(order)

@@ -138,7 +138,7 @@
             android:layout_marginTop="20dp"
             android:ems="10"
             android:hint="@string/et_using_point_hint"
-            android:inputType="textPersonName"
+            android:inputType="number"
             app:layout_constraintEnd_toEndOf="@+id/tv_payment_holding_point"
             app:layout_constraintStart_toStartOf="@+id/tv_payment_holding_point_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_payment_holding_point_title"
