@@ -39,5 +39,7 @@ interface CartContract {
         fun setOrderPrice(price: Int)
 
         fun setOrderCount(count: Int)
+
+        fun setCanOrder(canOrder: Boolean)
     }
 }

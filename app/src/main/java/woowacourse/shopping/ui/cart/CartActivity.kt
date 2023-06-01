@@ -158,6 +158,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun setCanOrder(canOrder: Boolean) {
+        runOnUiThread {
+            binding.tvOrder.isEnabled = canOrder
+        }
+    }
+
     companion object {
         private const val JUST_ADDED_CART_ITEM = "JUST_ADDED_CART_ITEM"
 

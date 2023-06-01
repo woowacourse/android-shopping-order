@@ -40,6 +40,7 @@ class CartPresenter(
     override fun onDeleteCartItem(cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId) {
             selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
+            view.setCanOrder(selectedCartItems.isNotEmpty())
             getCartItemsOf(currentPage) { cartItems ->
                 if (cartItems.isEmpty() && currentPage > 1) currentPage--
                 showPageUI(currentPage)
@@ -57,6 +58,7 @@ class CartPresenter(
             }
             showAllSelectionUI(currentPage, selectedCartItems)
             showOrderUI(selectedCartItems)
+            view.setCanOrder(selectedCartItems.isNotEmpty())
         }
     }
 
@@ -70,6 +72,7 @@ class CartPresenter(
                 selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
                 updateCartUI()
             }
+            view.setCanOrder(selectedCartItems.isNotEmpty())
         }
     }
 
