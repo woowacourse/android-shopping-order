@@ -143,9 +143,10 @@
                 android:id="@+id/tv_order"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@color/woowa_previous_enable"
+                android:background="@color/selectable_color"
                 android:gravity="center"
                 android:includeFontPadding="false"
+                android:enabled="@{checkedCount != 0}"
                 android:text="@{@string/tv_order(checkedCount)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
@@ -153,6 +154,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="122"
                 app:layout_constraintStart_toEndOf="@id/tv_total_price"
+                tools:background="@color/woowa_button"
                 tools:layout_editor_absoluteY="28dp"
                 tools:text="주문하기(2)" />
 
