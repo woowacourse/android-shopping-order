@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.product
 
 import woowacourse.shopping.data.NetworkModule
-import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.data.model.ProductEntity
 import java.lang.Integer.min
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
@@ -11,13 +11,13 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     override fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<DataProduct>) -> Unit,
+        onReceived: (products: List<ProductEntity>) -> Unit,
     ) {
-        productService.requestProducts().enqueue(object : retrofit2.Callback<List<DataProduct>> {
+        productService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
 
             override fun onResponse(
-                call: retrofit2.Call<List<DataProduct>>,
-                response: retrofit2.Response<List<DataProduct>>,
+                call: retrofit2.Call<List<ProductEntity>>,
+                response: retrofit2.Response<List<ProductEntity>>,
             ) {
                 response.body()?.let {
                     onReceived(
@@ -30,7 +30,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<List<DataProduct>>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
             }
         })
     }
@@ -38,8 +38,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     private fun getDataProductsFromCache(
         size: Int,
         lastId: Int,
-        allProducts: List<DataProduct>,
-    ): List<DataProduct> {
+        allProducts: List<ProductEntity>,
+    ): List<ProductEntity> {
         if (lastId == -1) return allProducts.subList(0, min(allProducts.size, size))
         val startIndex = allProducts.indexOfFirst { it.id == lastId } + 1
         return allProducts.subList(startIndex, min(allProducts.size, startIndex + size))

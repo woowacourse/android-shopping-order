@@ -49,14 +49,14 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         return products
     }
 
-    override fun add(recentProduct: RecentProductEntity) {
-        removeByProductId(recentProduct.id)
+    override fun add(product: ProductEntity) {
+        removeByProductId(product.id)
 
         val contentValues = ContentValues().apply {
-            put(RecentProductContract.PRODUCT_ID, recentProduct.id)
-            put(RecentProductContract.COLUMN_NAME, recentProduct.product.name)
-            put(RecentProductContract.COLUMN_PRICE, recentProduct.product.price)
-            put(RecentProductContract.COLUMN_IMAGE_URL, recentProduct.product.imageUrl)
+            put(RecentProductContract.PRODUCT_ID, product.id)
+            put(RecentProductContract.COLUMN_NAME, product.name)
+            put(RecentProductContract.COLUMN_PRICE, product.price)
+            put(RecentProductContract.COLUMN_IMAGE_URL, product.imageUrl)
         }
 
         database.writableDatabase.use { db ->
