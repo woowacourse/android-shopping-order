@@ -235,4 +235,22 @@ class CartPresenterTest {
         assertEquals(expected, actual)
         verify { view.setTotalPriceView(actual) }
     }
+
+    @Test
+    fun `현재 Checked 상태인 장바구니들을 주문한다`() {
+        // given
+        presenter.setPageNation(CartFixture.getFixture(), 1)
+
+        val slot = slot<ArrayList<Long>>()
+        justRun { view.showOrderView(capture(slot)) }
+
+        // when
+        presenter.showOrder()
+
+        // then
+        val actual = slot.captured
+        val expected = arrayListOf(1L, 2L, 3L)
+        assertEquals(expected, actual)
+        verify { view.showOrderView(actual) }
+    }
 }

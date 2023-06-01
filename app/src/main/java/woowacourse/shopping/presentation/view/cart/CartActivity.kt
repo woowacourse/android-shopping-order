@@ -16,6 +16,7 @@ import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSo
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
@@ -63,6 +64,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
+        setOrderButtonClick()
         setAllProductCheckedClick()
     }
 
@@ -133,6 +135,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.setNextPage()
             presenter.loadCartItems()
         }
+    }
+
+    private fun setOrderButtonClick() {
+        binding.btCartOrder.setOnClickListener {
+            presenter.showOrder()
+        }
+    }
+
+    override fun showOrderView(cartIds: ArrayList<Long>) {
+        val intent = OrderActivity.createIntent(this, cartIds, url, token)
+        startActivity(intent)
     }
 
     private fun setAllProductCheckedClick() {

@@ -98,4 +98,8 @@ class CartPresenter(
         pageNation = pageNation.updateAllCartsChecked(isChecked)
         view.setChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
+
+    override fun showOrder() {
+        view.showOrderView(pageNation.getAllCheckedCartIds())
+    }
 }

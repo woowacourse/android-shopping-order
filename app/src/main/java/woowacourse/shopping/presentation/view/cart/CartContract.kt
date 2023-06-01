@@ -12,6 +12,7 @@ interface CartContract {
         fun setPageCountView(page: Int)
         fun setTotalPriceView(totalPrice: Int)
         fun setLayoutVisibility()
+        fun showOrderView(cartIds: ArrayList<Long>)
         fun handleErrorView()
     }
 
@@ -26,5 +27,6 @@ interface CartContract {
         fun updateProductCount(cartId: Long, count: Int)
         fun updateProductChecked(cartId: Long, isChecked: Boolean)
         fun updateCurrentPageAllProductChecked(isChecked: Boolean)
+        fun showOrder()
     }
 }
