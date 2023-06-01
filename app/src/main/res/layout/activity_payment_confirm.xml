@@ -25,7 +25,7 @@
 
         <variable
             name="applyPointMessageCode"
-            type="Integer" />
+            type="woowacourse.shopping.ui.paymentconfirm.ApplyPointMessageCode" />
 
         <variable
             name="pointApplyClickListener"
@@ -181,6 +181,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            app:applyPointMessageCode="@{applyPointMessageCode}"
             app:layout_constraintEnd_toEndOf="@+id/btn_payment_use_point"
             app:layout_constraintStart_toStartOf="@+id/et_payment_using_point"
             app:layout_constraintTop_toBottomOf="@+id/et_payment_using_point"

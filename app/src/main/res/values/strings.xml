@@ -42,6 +42,8 @@
     <string name="tv_payment_earning_rate">고객님의 적립율은 %d%% 입니다</string>
     <string name="tv_payment_on_image_count">+%d</string>
     <string name="tv_payment_product_name_count">%s 외 %d개</string>
+    <string name="ApplyPointMessageOverUsePoint">입력하신 포인트가 보유 포인트보다 많습니다.</string>
+    <string name="ApplyPointMessageAvailableToApply">포인트 적용 되었습니다.</string>
 
 
 </resources>

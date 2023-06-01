@@ -15,7 +15,7 @@ class PaymentConfirmPresenter(
     private lateinit var userPointInfo: UserPointInfo
     private val currentOrderBasket = Basket(currentOrderBasketProducts)
     private var usingPoint = 0
-    private var totalPrice = currentOrderBasket.getTotalPrice()
+    private val totalPrice = currentOrderBasket.getTotalPrice()
     private val actualPayment: Int
         get() = totalPrice - usingPoint
 
@@ -41,7 +41,14 @@ class PaymentConfirmPresenter(
         view.updatePreOrderInfo(PreOrderInfoFactory(currentOrderBasket).getPreOrderInfo())
     }
 
-    override fun applyPoint() {
-        TODO("Not yet implemented")
+    override fun applyPoint(input: Int) {
+        if (input <= userPointInfo.point.value) {
+            usingPoint = input
+            view.updatePointMessageCode(ApplyPointMessageCode.AVAILABLE_TO_APPLY)
+            view.updateUsingPoint(usingPoint)
+            view.updateActualPayment(actualPayment)
+        } else {
+            view.updatePointMessageCode(ApplyPointMessageCode.OVER_USE_POINT)
+        }
     }
 }

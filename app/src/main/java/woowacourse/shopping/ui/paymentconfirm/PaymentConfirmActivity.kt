@@ -29,6 +29,7 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_payment_confirm)
         if (!initExtraData()) return
         initPresenter()
+        initUsePointButtonClickListener()
     }
 
     private fun initExtraData(): Boolean {
@@ -46,6 +47,11 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         )
     }
 
+    private fun initUsePointButtonClickListener() {
+        binding.pointApplyClickListener = { presenter.applyPoint(it.toString().toInt()) }
+        binding.etPaymentUsingPoint.text.clear()
+    }
+
     override fun updateUserPointInfo(userPointInfo: UiUserPointInfo) {
         binding.userPointInfo = userPointInfo
     }
@@ -54,8 +60,8 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         binding.preOrderInfo = preOrderInfo
     }
 
-    override fun updatePointMessageCode(pointMessageCode: Int) {
-        TODO("Not yet implemented")
+    override fun updatePointMessageCode(pointMessageCode: ApplyPointMessageCode) {
+        binding.applyPointMessageCode = pointMessageCode
     }
 
     override fun updateUsingPoint(usingPoint: Int) {

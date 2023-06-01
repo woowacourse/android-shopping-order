@@ -9,7 +9,7 @@ interface PaymentConfirmContract {
 
         fun updatePreOrderInfo(preOrderInfo: UiPreOrderInfo)
 
-        fun updatePointMessageCode(pointMessageCode: Int)
+        fun updatePointMessageCode(pointMessageCode: ApplyPointMessageCode)
 
         fun updateUsingPoint(usingPoint: Int)
 
@@ -23,6 +23,6 @@ interface PaymentConfirmContract {
 
         fun fetchPreOrderInfo()
 
-        fun applyPoint()
+        fun applyPoint(input: Int)
     }
 }

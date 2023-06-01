@@ -3,10 +3,12 @@ package woowacourse.shopping.util
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo
+import woowacourse.shopping.ui.paymentconfirm.ApplyPointMessageCode
 
 @BindingAdapter("app:image")
 fun ImageView.setImage(imgUrl: String) {
@@ -37,5 +39,22 @@ fun TextView.setProductNameCount(preOrderInfo: PreOrderInfo) {
             .format(preOrderInfo.representativeTitle, preOrderInfo.representativeExceptCount)
     } else {
         preOrderInfo.representativeTitle
+    }
+}
+
+@BindingAdapter("app:applyPointMessageCode")
+fun TextView.setApplyPointMessageCode(applyPointMessageCode: ApplyPointMessageCode?) {
+    if (applyPointMessageCode == null) {
+        this.text = ""
+        return
+    }
+    this.text = ApplyPointMessageCode.getMessage(this.context, applyPointMessageCode)
+    when (applyPointMessageCode) {
+        ApplyPointMessageCode.AVAILABLE_TO_APPLY -> {
+            this.setTextColor(ContextCompat.getColor(this.context, R.color.woowa_button))
+        }
+        ApplyPointMessageCode.OVER_USE_POINT -> {
+            this.setTextColor(ContextCompat.getColor(this.context, R.color.woowa_red))
+        }
     }
 }
