@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.order.OrderActivity">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_order_products"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_order_product" />
+
+        <TextView
+            android:id="@+id/tv_order_accumulated_point_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/order_accumulated_point"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_order_products" />
+
+        <TextView
+            android:id="@+id/tv_order_accumulated_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_order_accumulated_point_text"
+            app:layout_constraintTop_toTopOf="@id/tv_order_accumulated_point_text" />
+
+        <TextView
+            android:id="@+id/tv_order_using_point_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/order_using_point"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_order_accumulated_point_text" />
+
+        <EditText
+            android:id="@+id/et_order_using_point"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            app:layout_constraintBottom_toBottomOf="@id/tv_order_using_point_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_order_using_point_text"
+            app:layout_constraintTop_toTopOf="@id/tv_order_using_point_text" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_order"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="@color/toolbar_background"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/button_order"
+                android:layout_width="122dp"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/secondary_color"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="결제하기" />
+
+            <TextView
+                android:id="@+id/text_order_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="12dp"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="180000원" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

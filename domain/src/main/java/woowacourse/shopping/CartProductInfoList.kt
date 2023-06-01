@@ -81,4 +81,12 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         }
         return null
     }
+
+    fun getSelectedCart(): CartProductInfoList {
+        return CartProductInfoList(
+            items.filter {
+                it.isOrdered
+            }
+        )
+    }
 }

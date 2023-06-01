@@ -16,4 +16,10 @@
     <string name="order_format">주문하기(%d)</string>
     <string name="gray_server">그레이 서버</string>
     <string name="glan_server">글렌 서버</string>
+    <string name="order_accumulated_point">가지고 있는 포인트</string>
+    <string name="order_using_point">내가 쓸 포인트</string>
+    <string name="count_format">%,d개</string>
+    <string name="order_cart_model_null_error_message">장바구니 정보가 올바르지 않습니다.</string>
+    <string name="order_success_message">주문을 성공했습니다.</string>
+    <string name="order_fail_message">주문에 실패했습니다 다시 시도해주세요.</string>
 </resources>

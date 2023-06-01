@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.cart
 
 import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.presentation.mapper.toDomain
+import woowacourse.shopping.presentation.mapper.toOrderCartInfo
 import woowacourse.shopping.presentation.mapper.toPresentation
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.repository.CartRepository
@@ -123,6 +124,13 @@ class CartPresenter(
 
     override fun refreshCurrentPage() {
         view.setCartItems(pageProducts.toPresentationList())
+    }
+
+    override fun orderSelectedCart() {
+        val orderCarts = cartProducts.getSelectedCart().items.map {
+            it.toPresentation().toOrderCartInfo()
+        }
+        view.showOrderView(ArrayList(orderCarts))
     }
 
     companion object {

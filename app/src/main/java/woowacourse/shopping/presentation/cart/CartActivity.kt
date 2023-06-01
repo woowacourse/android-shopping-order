@@ -14,12 +14,13 @@ import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoListModel
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var cartAdapter: CartAdapter
     private lateinit var cartProductPriceView: TextView
-    private lateinit var cartProductsModel: List<CartProductInfoModel>
     private val presenter: CartContract.Presenter by lazy { initPresenter() }
 
     private fun initPresenter(): CartContract.Presenter {
@@ -47,6 +48,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         setToolBar()
         updateView()
         allOrderedCheckBoxChange()
+        setOrderButtonClickListener()
     }
 
     private fun initCartAdapter() {
@@ -164,6 +166,17 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun setOrderCount(count: Int) {
         binding.buttonCartOrder.text = getString(R.string.order_format, count)
+    }
+
+    private fun setOrderButtonClickListener() {
+        binding.buttonCartOrder.setOnClickListener {
+            presenter.orderSelectedCart()
+        }
+    }
+
+    override fun showOrderView(orderCarts: ArrayList<OrderCartInfoModel>) {
+        val intent = OrderActivity.getIntent(this, orderCarts)
+        startActivity(intent)
     }
 
     companion object {
