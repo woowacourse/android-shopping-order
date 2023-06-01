@@ -3,8 +3,14 @@ package woowacourse.shopping.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -13,18 +19,36 @@ import woowacourse.shopping.view.productlist.ProductListActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding by lazy { ActivityCartBinding.inflate(layoutInflater) }
-    private lateinit var presenter: CartContract.Presenter
+    private val presenter: CartContract.Presenter by lazy {
+        CartPresenter(
+            this,
+            CartRemoteRepository(ServerPreferencesRepository(this).getServerUrl()),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = CartPresenter(
-            this,
-            CartRemoteRepository(ServerPreferencesRepository(this).getServerUrl()),
-        )
         setUpBinding()
+        setLoadingUi()
         setContentView(binding.root)
         setUpActionBar()
+        presenter.fetchProducts()
+    }
+
+    private fun setLoadingUi() {
+        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.skeleton_anim)
+        binding.skeletonCarts.root.startAnimation(skeletonAnim)
+    }
+
+    override fun stopLoading() {
+        runOnUiThread {
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.skeletonCarts.root.visibility = View.GONE
+                binding.skeletonCarts.root.clearAnimation()
+                binding.recyclerCart.visibility = View.VISIBLE
+            }, 1500L)
+        }
     }
 
     private fun setUpBinding() {

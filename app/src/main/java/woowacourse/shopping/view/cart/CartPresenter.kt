@@ -30,24 +30,21 @@ class CartPresenter(
     private var cartPageStatus =
         CartPageStatus(isPrevEnabled = false, isNextEnabled = false, 1)
 
-    init {
+    override fun fetchProducts() {
         cartRepository.getAll {
             cartPagination = CartPagination(PAGINATION_SIZE, it)
-            fetchProducts()
-        }
-    }
-
-    override fun fetchProducts() {
-        cartPagination.fetchNextItems { cartProducts ->
-            val items = cartProducts.map {
-                CartViewItem.CartProductItem(
-                    it.toUiModel(cartSystem.isSelectedProduct(it)),
-                )
+            cartPagination.fetchNextItems { cartProducts ->
+                val items = cartProducts.map {
+                    CartViewItem.CartProductItem(
+                        it.toUiModel(cartSystem.isSelectedProduct(it)),
+                    )
+                }
+                cartItems.addAll(items)
+                _isCheckedAll.value = getIsCheckedAll()
+                addBottomPagination()
+                view.showProducts(cartItems)
+                view.stopLoading()
             }
-            cartItems.addAll(items)
-            _isCheckedAll.value = getIsCheckedAll()
-            addBottomPagination()
-            view.showProducts(cartItems)
         }
     }
 
@@ -163,7 +160,6 @@ class CartPresenter(
             view.showChangedItem(index)
             _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
             view.showChangedItem(index)
-            // TODO :: 카트 스켈레톤까지 목요일 안에 끝낼 것
         }
     }
 

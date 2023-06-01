@@ -9,6 +9,7 @@ interface CartContract {
         fun showProducts(items: List<CartViewItem>)
         fun showChangedItems()
         fun showChangedItem(position: Int)
+        fun stopLoading()
     }
 
     interface Presenter {
