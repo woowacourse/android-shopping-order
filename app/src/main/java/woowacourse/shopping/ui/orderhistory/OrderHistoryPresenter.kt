@@ -29,6 +29,10 @@ class OrderHistoryPresenter(
         view.navigateToOrderDetail(order)
     }
 
+    override fun navigateToHome() {
+        view.navigateToHome()
+    }
+
     companion object {
         private const val INITIAL_PAGE = 1
         private const val SIZE_PER_PAGE = 10

@@ -7,10 +7,12 @@ interface OrderHistoryContract {
         fun showExtraOrderList(orders: List<UiOrder>)
         fun showLoadOrderFailed()
         fun navigateToOrderDetail(order: UiOrder)
+        fun navigateToHome()
     }
 
     abstract class Presenter(protected val view: View) {
         abstract fun loadMoreOrderList()
         abstract fun inquiryOrderDetail(order: UiOrder)
+        abstract fun navigateToHome()
     }
 }

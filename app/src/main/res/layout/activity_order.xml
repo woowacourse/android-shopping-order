@@ -33,7 +33,8 @@
             app:navigationIcon="@drawable/ic_left_arrow"
             app:navigationIconTint="@color/white"
             app:title="@string/order"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white"
+            bind:onNavigationIconClick="@{() -> presenter.navigateToHome()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/order_recycler_view"
@@ -64,9 +65,9 @@
                 android:background="@color/white"
                 android:gravity="center"
                 android:paddingVertical="18dp"
-                bind:price="@{totalPayment}"
                 android:textColor="@color/woowa_text_black"
                 android:textSize="17sp"
+                bind:price="@{totalPayment}"
                 tools:text="합계: 0원" />
 
             <TextView

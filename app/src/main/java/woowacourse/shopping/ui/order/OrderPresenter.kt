@@ -44,6 +44,10 @@ class OrderPresenter(
         }
     }
 
+    override fun navigateToHome() {
+        view.navigateToHome()
+    }
+
     private fun updateOrder(orderItems: List<ListItem>) {
         view.updateOrder(orderItems)
     }

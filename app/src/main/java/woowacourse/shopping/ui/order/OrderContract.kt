@@ -18,5 +18,6 @@ interface OrderContract {
         fun fetchAll()
         fun order()
         fun applyPoint(point: UiPoint)
+        fun navigateToHome()
     }
 }

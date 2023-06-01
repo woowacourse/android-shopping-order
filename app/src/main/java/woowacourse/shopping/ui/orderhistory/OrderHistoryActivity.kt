@@ -39,6 +39,10 @@ class OrderHistoryActivity : AppCompatActivity(), View {
         startActivity(OrderDetailActivity.getIntent(this, order))
     }
 
+    override fun navigateToHome() {
+        finish()
+    }
+
     companion object {
         fun getIntent(context: Context): Intent =
             Intent(context, OrderHistoryActivity::class.java)
