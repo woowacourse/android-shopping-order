@@ -1,40 +1,45 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
 import android.util.Log
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import woowacourse.shopping.data.mapper.toModel
+import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.product.service.ProductService
 import woowacouse.shopping.model.product.Product
-import java.io.IOException
 
 class ProductRemoteDataSourceImpl(
-    private val url: Server.Url,
+    url: Server.Url,
 ) : ProductRemoteDataSource {
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(url.value)
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .build()
+        .create(ProductService::class.java)
 
     override fun requestDatas(
         onFailure: () -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     ) {
-        val client = OkHttpClient()
-        val path = PRODUCT
-        val request = Request.Builder().url(url.value + path).build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("Request Failed", e.toString())
+        retrofit.requestDatas().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
+            override fun onResponse(
+                call: retrofit2.Call<List<ProductEntity>>,
+                response: retrofit2.Response<List<ProductEntity>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { products ->
+                        onSuccess(products.map { it.toModel() })
+                    } ?: onFailure()
+                } else {
+                    onFailure()
+                }
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val body = response.body?.string() ?: return onFailure()
-                    onSuccess(parseProductList(body))
-                    return
-                }
-                onFailure()
+            override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
             }
         })
     }
@@ -44,47 +49,23 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: Product) -> Unit,
     ) {
-        val client = OkHttpClient()
-        val path = "$PRODUCT/$productId"
-        val request = Request.Builder().url(url.value + path).build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("Request Failed", e.toString())
+        retrofit.requestData(productId).enqueue(object : retrofit2.Callback<ProductEntity> {
+            override fun onResponse(
+                call: retrofit2.Call<ProductEntity>,
+                response: retrofit2.Response<ProductEntity>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { product ->
+                        onSuccess(product.toModel())
+                    } ?: onFailure()
+                } else {
+                    onFailure()
+                }
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val body = response.body?.string() ?: return onFailure()
-                    onSuccess(parseProduct(JSONObject(body)))
-                    return
-                }
-                onFailure()
+            override fun onFailure(call: retrofit2.Call<ProductEntity>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
             }
         })
-    }
-
-    private fun parseProductList(response: String): List<Product> {
-        val products = mutableListOf<Product>()
-        val jsonArray = JSONArray(response)
-
-        for (index in 0 until jsonArray.length()) {
-            val json = jsonArray.getJSONObject(index) ?: continue
-            products.add(parseProduct(json))
-        }
-
-        return products
-    }
-
-    private fun parseProduct(json: JSONObject): Product {
-        val id = json.getLong("id")
-        val name = json.getString("name")
-        val price = json.getInt("price")
-        val image = json.getString("imageUrl")
-
-        return Product(id, name, price, image)
-    }
-
-    companion object {
-        private const val PRODUCT = "/products"
     }
 }
