@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.datasource.basket
 
-import woowacourse.shopping.data.model.DataBasketProduct
-import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.data.model.BasketProductEntity
+import woowacourse.shopping.data.model.ProductEntity
 
 interface BasketRemoteDataSource {
 
-    fun getAll(onReceived: (List<DataBasketProduct>) -> Unit)
+    fun getAll(onReceived: (List<BasketProductEntity>) -> Unit)
 
-    fun add(product: DataProduct, onReceived: (Int) -> Unit)
+    fun add(product: ProductEntity, onReceived: (Int) -> Unit)
 
-    fun update(basketProduct: DataBasketProduct)
+    fun update(basketProduct: BasketProductEntity)
 
-    fun remove(basketProduct: DataBasketProduct)
+    fun remove(basketProduct: BasketProductEntity)
 }

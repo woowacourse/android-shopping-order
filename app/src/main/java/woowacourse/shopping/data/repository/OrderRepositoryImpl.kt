@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.mapper.toOrder
+import woowacourse.shopping.data.mapper.toOrderUiModel
 import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderRepositoryImpl(
@@ -31,7 +31,7 @@ class OrderRepositoryImpl(
         onReceived: (order: OrderUiModel) -> Unit,
     ) {
         orderRemoteDataSource.getOrder(orderId) {
-            val orderRecord = it.toOrder()
+            val orderRecord = it.toOrderUiModel()
 
             onReceived(orderRecord)
         }
@@ -40,7 +40,7 @@ class OrderRepositoryImpl(
     override fun getOrders(onReceived: (orders: List<OrderUiModel>) -> Unit) {
         orderRemoteDataSource.getOrders {
             val orders = it.map { orderResponse ->
-                orderResponse.toOrder()
+                orderResponse.toOrderUiModel()
             }
 
             onReceived(orders)

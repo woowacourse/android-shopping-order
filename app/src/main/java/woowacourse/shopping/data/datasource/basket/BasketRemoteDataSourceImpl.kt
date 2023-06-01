@@ -3,23 +3,23 @@ package woowacourse.shopping.data.datasource.basket
 import android.util.Log
 import okhttp3.ResponseBody
 import woowacourse.shopping.data.NetworkModule
-import woowacourse.shopping.data.model.DataBasketProduct
-import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.data.model.BasketProductEntity
+import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
     private val basketProductService: BasketProductService = NetworkModule.getService()
 
-    override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {
+    override fun getAll(onReceived: (List<BasketProductEntity>) -> Unit) {
         basketProductService.requestBasketProducts(
             // todo: userInfo 어떻게 관리할지도 생각
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
-        ).enqueue(object : retrofit2.Callback<List<DataBasketProduct>> {
+        ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
 
             override fun onResponse(
-                call: retrofit2.Call<List<DataBasketProduct>>,
-                response: retrofit2.Response<List<DataBasketProduct>>,
+                call: retrofit2.Call<List<BasketProductEntity>>,
+                response: retrofit2.Response<List<BasketProductEntity>>,
             ) {
                 response.body()?.let {
                     onReceived(it)
@@ -27,7 +27,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 Log.d("woogi", "onResponse: 장바구니 상품 조회에 성공했습니다.")
             }
 
-            override fun onFailure(call: retrofit2.Call<List<DataBasketProduct>>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
                 Log.d("woogi", "onFailure: ${t.message}")
                 Log.d("woogi", "onResponse: 장바구니 상품 조회에 실패했습니다.")
             }
@@ -35,7 +35,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
     }
 
     override fun add(
-        product: DataProduct,
+        product: ProductEntity,
         onReceived: (Int) -> Unit,
     ) {
         basketProductService.addBasketProduct(
@@ -65,11 +65,11 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         })
     }
 
-    override fun update(basketProduct: DataBasketProduct) {
+    override fun update(basketProduct: BasketProductEntity) {
         basketProductService.updateBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
-            quantity = basketProduct.count.value
+            quantity = basketProduct.count
         ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
 
             override fun onResponse(
@@ -89,7 +89,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         })
     }
 
-    override fun remove(basketProduct: DataBasketProduct) {
+    override fun remove(basketProduct: BasketProductEntity) {
         basketProductService.removeBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             cartItemId = basketProduct.id.toString(),

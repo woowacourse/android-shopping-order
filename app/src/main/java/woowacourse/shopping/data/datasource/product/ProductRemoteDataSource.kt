@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.datasource.product
 
-import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.data.model.ProductEntity
 
 interface ProductRemoteDataSource {
 
     fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<DataProduct>) -> Unit
+        onReceived: (products: List<ProductEntity>) -> Unit,
     )
 }

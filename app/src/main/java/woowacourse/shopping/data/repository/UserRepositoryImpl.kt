@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.user.UserRemoteDataSource
-import woowacourse.shopping.data.mapper.toUser
+import woowacourse.shopping.data.mapper.toUserUiModel
 import woowacourse.shopping.ui.model.UserUiModel
 
 class UserRepositoryImpl(
@@ -10,7 +10,7 @@ class UserRepositoryImpl(
 
     override fun getUser(onReceived: (user: UserUiModel) -> Unit) {
         userRemoteDateSource.getUser {
-            val user = it.toUser()
+            val user = it.toUserUiModel()
 
             onReceived(user)
         }

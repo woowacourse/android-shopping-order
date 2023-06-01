@@ -1,11 +1,10 @@
 package woowacourse.shopping.data.datasource.recentproduct
 
-import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.model.DataRecentProduct
+import woowacourse.shopping.data.model.RecentProductEntity
 
 interface RecentProductLocalDataSource {
     interface Local {
-        fun getPartially(size: Int): List<DataRecentProduct>
-        fun add(product: DataProduct)
+        fun getPartially(size: Int): List<RecentProductEntity>
+        fun add(product: RecentProductEntity)
     }
 }

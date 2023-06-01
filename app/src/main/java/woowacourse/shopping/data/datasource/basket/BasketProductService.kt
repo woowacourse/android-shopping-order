@@ -10,7 +10,7 @@ import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.model.DataBasketProduct
+import woowacourse.shopping.data.model.BasketProductEntity
 
 interface BasketProductService {
 
@@ -18,7 +18,7 @@ interface BasketProductService {
     fun requestBasketProducts(
         @Header("Authorization")
         authorization: String
-    ): Call<List<DataBasketProduct>>
+    ): Call<List<BasketProductEntity>>
 
     @Headers("Content-Type: application/json")
     @POST("cart-items")

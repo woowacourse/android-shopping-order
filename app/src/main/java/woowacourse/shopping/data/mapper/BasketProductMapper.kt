@@ -1,10 +1,17 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.DataBasketProduct
+import woowacourse.shopping.data.model.BasketProductEntity
 import woowacourse.shopping.domain.BasketProduct
+import woowacourse.shopping.domain.Count
 
-fun DataBasketProduct.toDomain(): BasketProduct =
-    BasketProduct(id = id, count = count.toDomain(), product = product.toDomain())
+fun BasketProductEntity.toBasketProductDomainModel() = BasketProduct(
+    id = id,
+    count = Count(count),
+    product = product.toProductDomainModel()
+)
 
-fun BasketProduct.toData(): DataBasketProduct =
-    DataBasketProduct(id = id, count = count.toData(), product = product.toData())
+fun BasketProduct.toBasketProductEntity() = BasketProductEntity(
+    id = id,
+    count = count.value,
+    product = product.toProductEntity()
+)
