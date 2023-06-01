@@ -33,13 +33,14 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/recyclerview_ordered_products"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview_ordered_products"
                     android:layout_width="0dp"
-                    android:layout_height="400dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="20dp"
                     android:padding="18dp"
@@ -127,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:text="결제 금액"
+                    android:text="@string/payment_price"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -228,13 +229,15 @@
                 tools:text="79,400원" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
+        <TextView
             android:id="@+id/btn_order"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#04C09E"
+            android:background="#04C09E"
+            android:gravity="center"
             android:paddingVertical="13dp"
             android:text="@string/cart_order"
+            android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
 
