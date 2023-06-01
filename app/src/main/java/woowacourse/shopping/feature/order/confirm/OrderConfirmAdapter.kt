@@ -13,7 +13,7 @@ class OrderConfirmAdapter :
     }
 
     override fun onBindViewHolder(holder: OrderConfirmViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(getItem(position))
     }
 
     fun setOrderProducts(list: List<CartProductUiModel>) {
