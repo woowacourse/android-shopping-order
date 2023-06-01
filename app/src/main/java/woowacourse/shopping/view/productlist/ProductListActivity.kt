@@ -28,9 +28,9 @@ import woowacourse.shopping.view.mypage.MypageActivity
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
-    private lateinit var binding: ActivityProductListBinding
-    private lateinit var presenter: ProductListContract.Presenter
-    private lateinit var cartCountInAppBar: TextView
+    private val binding: ActivityProductListBinding by lazy {
+        ActivityProductListBinding.inflate(layoutInflater)
+    }
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val id = it.data?.getIntExtra(ID, -1)
@@ -50,10 +50,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 }
             }
         }
+    private lateinit var presenter: ProductListContract.Presenter
+    private lateinit var cartCountInAppBar: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setUpBinding()
         setContentView(binding.root)
         setLoadingUi()
         setUpPresenter()
@@ -72,10 +73,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             binding.skeletonProducts.root.clearAnimation()
             binding.gridProducts.visibility = View.VISIBLE
         }, 1500L)
-    }
-
-    private fun setUpBinding() {
-        binding = ActivityProductListBinding.inflate(layoutInflater)
     }
 
     private fun setUpPresenter() {

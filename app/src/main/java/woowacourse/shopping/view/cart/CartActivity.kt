@@ -36,6 +36,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.fetchProducts()
     }
 
+    override fun finish() {
+        setResult(ProductListActivity.RESULT_VISIT_CART, intent)
+        super.finish()
+    }
+
     private fun setLoadingUi() {
         val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.skeleton_anim)
         binding.skeletonCarts.root.startAnimation(skeletonAnim)
@@ -98,7 +103,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                setResult(ProductListActivity.RESULT_VISIT_CART, intent)
                 finish()
             }
         }
