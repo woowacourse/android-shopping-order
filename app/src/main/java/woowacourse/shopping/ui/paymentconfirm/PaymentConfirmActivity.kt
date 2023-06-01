@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.paymentconfirm
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -13,6 +14,7 @@ import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
+import woowacourse.shopping.util.editTextFocusOutProcess
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
 
@@ -62,6 +64,11 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
 
     override fun updateActualPayment(actualPayment: Int) {
         binding.actualPayment = actualPayment
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        this.editTextFocusOutProcess(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     companion object {
