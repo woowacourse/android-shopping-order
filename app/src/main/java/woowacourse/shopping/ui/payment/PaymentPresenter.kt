@@ -27,7 +27,7 @@ class PaymentPresenter(
         orderRepository.addOrder(
             basketIds = basketProducts.map { it.id },
             usingPoint = usingPoint,
-            totalPrice = basketProducts.sumOf { it.product.price.value },
+            totalPrice = basketProducts.sumOf { it.product.price.value * it.count.value },
             onAdded = view::showOrderDetail
         )
     }
