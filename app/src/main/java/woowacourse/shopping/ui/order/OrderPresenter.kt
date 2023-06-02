@@ -18,10 +18,10 @@ class OrderPresenter(
     order: OrderModel,
     private val orderRepository: OrderRepository,
     private val pointRepository: PointRepository,
+    private var maxAvailablePoint: Discountable = DEFAULT_MAX_POINT
 ) : OrderContract.Presenter {
     private val originOrder: Order = order.toDomain()
     private var discountedOrder: Order = originOrder.copy()
-    private var maxAvailablePoint: Discountable = DEFAULT_MAX_POINT
 
     override fun fetchAll() {
         pointRepository.getPoint(
