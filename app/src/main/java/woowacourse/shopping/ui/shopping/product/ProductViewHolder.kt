@@ -13,11 +13,11 @@ class ProductViewHolder(
     onItemClick: (Int) -> Unit,
     minusClickListener: (ProductUiModel) -> Unit,
     plusClickListener: (ProductUiModel) -> Unit,
-    addClickListener: (ProductUiModel) -> Unit
-) :
-    RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.item_product, parent, false)
-    ) {
+    addClickListener: (ProductUiModel) -> Unit,
+) : RecyclerView.ViewHolder(
+    LayoutInflater.from(parent.context).inflate(R.layout.item_product, parent, false)
+) {
+
     private val binding = ItemProductBinding.bind(itemView)
 
     init {

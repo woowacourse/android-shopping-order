@@ -13,8 +13,7 @@ class ProductAdapter(
     private val minusClickListener: (Product) -> Unit,
     private val plusClickListener: (Product) -> Unit,
     private val addClickListener: (Product) -> Unit
-) :
-    ListAdapter<ProductUiModel, ProductViewHolder>(productDiffUtil) {
+) : ListAdapter<ProductUiModel, ProductViewHolder>(productDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder =
         ProductViewHolder(

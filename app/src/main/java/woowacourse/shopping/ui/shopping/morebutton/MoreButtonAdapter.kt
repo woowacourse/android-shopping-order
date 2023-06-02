@@ -5,12 +5,12 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.ui.shopping.ShoppingViewType
 
 class MoreButtonAdapter(
-    private val onButtonClick: () -> Unit
-) :
-    RecyclerView.Adapter<MoreButtonViewHolder>() {
+    private val onButtonClick: () -> Unit,
+) : RecyclerView.Adapter<MoreButtonViewHolder>() {
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): MoreButtonViewHolder = MoreButtonViewHolder(parent, onButtonClick)
 
     private var hasNext: Boolean = false
