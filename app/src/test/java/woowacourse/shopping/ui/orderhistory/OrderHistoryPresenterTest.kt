@@ -7,8 +7,9 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.domain.Order
 import woowacourse.shopping.ui.OrderFixture
-import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.ui.mapper.toOrderUiModel
 
 class OrderHistoryPresenterTest {
 
@@ -30,7 +31,7 @@ class OrderHistoryPresenterTest {
     fun `주문 목록들을 받아온 후 뷰를 초기화한다`() {
         // given
         val orders = OrderFixture.createOrders()
-        val slotInitView = slot<(orders: List<OrderUiModel>) -> Unit>()
+        val slotInitView = slot<(orders: List<Order>) -> Unit>()
         every {
             repository.getOrders(onReceived = capture(slotInitView))
         } answers {
@@ -41,6 +42,10 @@ class OrderHistoryPresenterTest {
         presenter.getOrders()
 
         // then 뷰가 초기화된다
-        verify { view.initView(orders) }
+        verify {
+            view.initView(
+                orders.map { it.toOrderUiModel() }
+            )
+        }
     }
 }

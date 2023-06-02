@@ -8,8 +8,9 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.domain.Order
 import woowacourse.shopping.ui.OrderFixture
-import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.ui.mapper.toOrderUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract
 import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 
@@ -35,7 +36,7 @@ class OrderDetailPresenterTest {
     fun `저장소로부터 주문 식별번호에 해당하는 주문 정보를 얻어온 후 뷰를 초기화한다`() {
         // given
         val order = OrderFixture.createOrder()
-        val slotInitView = slot<(order: OrderUiModel) -> Unit>()
+        val slotInitView = slot<(order: Order) -> Unit>()
         every {
             repository.getOrder(
                 orderId = 10,
@@ -49,6 +50,6 @@ class OrderDetailPresenterTest {
         presenter.getOrder()
 
         // then: 받아온 주문 정보로 뷰가 초기화된다.
-        verify { view.initView(order) }
+        verify { view.initView(order.toOrderUiModel()) }
     }
 }
