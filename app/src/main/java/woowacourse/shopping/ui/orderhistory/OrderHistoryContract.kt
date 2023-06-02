@@ -7,6 +7,8 @@ interface OrderHistoryContract {
     interface View {
 
         fun initView(orders: List<OrderUiModel>)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {

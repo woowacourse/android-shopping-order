@@ -50,13 +50,17 @@ class OrderRepositoryImpl(
         )
     }
 
-    override fun getOrders(onReceived: (orders: List<Order>) -> Unit) {
-        orderRemoteDataSource.getOrders {
-            val orders = it.map { orderResponse ->
-                orderResponse.toOrderDomainModel()
+    override fun getOrders(
+        onReceived: (orders: List<Order>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
+        orderRemoteDataSource.getOrders(
+            onReceived = { order ->
+                onReceived(order.map { it.toOrderDomainModel() })
+            },
+            onFailed = { errorMessage ->
+                onFailed(errorMessage)
             }
-
-            onReceived(orders)
-        }
+        )
     }
 }

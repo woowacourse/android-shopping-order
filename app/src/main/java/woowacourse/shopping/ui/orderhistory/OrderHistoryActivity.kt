@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.orderhistory
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -11,6 +12,7 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.OrderUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
@@ -43,6 +45,15 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
             orders = orders,
             onClicked = ::showOrderDetail
         )
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        val intent: Intent = ShoppingActivity.getResultIntent().apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        startActivity(intent)
     }
 
     private fun showOrderDetail(order: OrderUiModel) {

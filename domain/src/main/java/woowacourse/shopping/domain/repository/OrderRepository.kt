@@ -18,5 +18,8 @@ interface OrderRepository {
         onFailed: (errorMessage: String) -> Unit,
     )
 
-    fun getOrders(onReceived: (orders: List<Order>) -> Unit)
+    fun getOrders(
+        onReceived: (orders: List<Order>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    )
 }

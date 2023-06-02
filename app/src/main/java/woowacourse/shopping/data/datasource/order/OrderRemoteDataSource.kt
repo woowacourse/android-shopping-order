@@ -8,7 +8,7 @@ interface OrderRemoteDataSource {
     fun addOrder(
         orderRequest: OrderRequest,
         onAdded: (orderId: Long) -> Unit,
-        onFailed: (errorMessage: String) -> Unit
+        onFailed: (errorMessage: String) -> Unit,
     )
 
     fun getOrder(
@@ -17,5 +17,8 @@ interface OrderRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     )
 
-    fun getOrders(onReceived: (List<OrderResponse>) -> Unit)
+    fun getOrders(
+        onReceived: (List<OrderResponse>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    )
 }
