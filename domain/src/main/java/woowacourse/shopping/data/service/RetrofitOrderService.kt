@@ -5,6 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
 import woowacourse.shopping.model.OrderList
+import woowacourse.shopping.model.OrderResponse
 
 interface RetrofitOrderService {
     @GET("cart-items/checkout")
@@ -12,4 +13,9 @@ interface RetrofitOrderService {
         @Header("Authorization") token: String,
         @Query("ids") cartItemIds: String
     ): Call<OrderList>
+
+    @GET("orders")
+    fun getOrders(
+        @Header("Authorization") token: String
+    ): Call<OrderResponse>
 }
