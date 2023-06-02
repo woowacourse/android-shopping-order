@@ -72,9 +72,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             }
 
             override fun onTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val inputPoint = inputValue.getInputPoint()
+                val inputPoint =
+                    if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
                 if (inputPoint > point.value) {
-                    Toast.makeText(this@OrderActivity, "보유한 포인트 값을 초과합니다", Toast.LENGTH_SHORT)
+                    Toast.makeText(this@OrderActivity, OVER_POINT_ERROR, Toast.LENGTH_SHORT)
                         .show()
                     binding.etUsePoint.text = null
                     binding.btnOrder.text = getString(R.string.order_btn, productsPrice)
@@ -89,10 +90,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         })
     }
 
-    private fun CharSequence?.getInputPoint(): Int =
-        if (this.toString() == "") {
-            0
-        } else {
-            this.toString().toInt()
-        }
+    companion object {
+        private const val OVER_POINT_ERROR = "보유한 포인트 값을 초과합니다"
+    }
 }
