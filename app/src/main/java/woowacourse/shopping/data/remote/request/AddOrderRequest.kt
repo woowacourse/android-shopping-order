@@ -2,7 +2,7 @@ package woowacourse.shopping.data.remote.request
 
 import com.google.gson.annotations.SerializedName
 
-data class OrderRequest(
+data class AddOrderRequest(
     @SerializedName("cartIds")
     val cartIds: List<Int>,
     @SerializedName("point")
