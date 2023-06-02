@@ -9,9 +9,9 @@ import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.common.model.ProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.getSerializableByKey
+import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
-import woowacourse.shopping.data.cart.CartRemoteDataSourceOkhttp
 
 class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     private lateinit var binding: DialogAddCartProductBinding
@@ -60,7 +60,7 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
         presenter = CartProductDialogPresenter(
             this,
             product,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceOkhttp()),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
             cartProductAmount = 1
         )
     }

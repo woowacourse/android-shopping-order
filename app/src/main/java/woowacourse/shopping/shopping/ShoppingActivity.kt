@@ -21,7 +21,6 @@ import woowacourse.shopping.common.model.RecentProductModel
 import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
-import woowacourse.shopping.data.cart.CartRemoteDataSourceOkhttp
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
@@ -223,7 +222,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             this,
             productRepository = productRepository,
             recentProductRepository = recentProductRepository,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceOkhttp()),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
             recentProductSize = 10,
             productLoadSize = 20
         )

@@ -3,6 +3,8 @@ package woowacourse.shopping.data.cart
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -40,7 +42,25 @@ class CartRemoteDataSourceRetrofit: CartRemoteDataSource {
     }
 
     override fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
-        TODO("Not yet implemented")
+        val json = JSONObject()
+            .put("productId", id)
+        val body = json.toString().toRequestBody("application/json".toMediaType())
+        cartService.createCartProduct(Storage.credential, body).enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                val header = response.headers()
+                val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
+                if(response.isSuccessful && cartId != null) {
+                    onSuccess(cartId)
+                }
+                else {
+                    onFailure()
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 
     override fun updateCartProductQuantity(

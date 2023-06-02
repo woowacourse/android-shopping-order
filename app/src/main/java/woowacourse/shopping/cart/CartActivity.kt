@@ -10,9 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.common.model.CartProductModel
 import woowacourse.shopping.common.utils.Toaster
+import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.data.cart.CartRemoteDataSourceOkhttp
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -117,7 +117,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter() {
         presenter = CartPresenter(
             this,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceOkhttp()),
+            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
             sizePerPage = SIZE_PER_PAGE
         )
     }
