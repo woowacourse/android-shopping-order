@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui
 
-import woowacourse.shopping.ui.model.UserUiModel
+import woowacourse.shopping.domain.User
 
 object UserFixture {
 
-    fun createUser() = UserUiModel(
+    fun createUser() = User(
         email = "",
         point = 0,
         accumulationRate = 0

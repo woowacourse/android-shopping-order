@@ -8,11 +8,12 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.UserRepository
+import woowacourse.shopping.domain.User
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.UserFixture
 import woowacourse.shopping.ui.mapper.toBasketProductUiModel
+import woowacourse.shopping.ui.mapper.toUserUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
-import woowacourse.shopping.ui.model.UserUiModel
 
 class PaymentPresenterTest {
 
@@ -34,6 +35,7 @@ class PaymentPresenterTest {
         orderRepository = mockk(relaxed = true)
         presenter = PaymentPresenter(
             view = view,
+            totalPrice = basketProducts.sumOf { it.product.price.value },
             basketProducts = basketProducts,
             userRepository = userRepository,
             orderRepository = orderRepository
@@ -44,7 +46,7 @@ class PaymentPresenterTest {
     fun `저장소로부터 유저 정보를 받아온 후 뷰를 초기화한다`() {
         // given
         val user = UserFixture.createUser()
-        val slotInitView = slot<(user: UserUiModel) -> Unit>()
+        val slotInitView = slot<(user: User) -> Unit>()
         val totalPrice = basketProducts.sumOf { it.product.price.value }
 
         every {
@@ -59,7 +61,7 @@ class PaymentPresenterTest {
         // then: 받아온 유저 정보를 가지고 뷰를 초기화한다
         verify {
             view.initView(
-                user = user,
+                user = user.toUserUiModel(),
                 basketProducts = basketProducts,
                 totalPrice = totalPrice
             )
