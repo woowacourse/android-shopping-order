@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.Storage
@@ -21,7 +22,7 @@ class ProductRemoteDataSourceRetrofit : ProductRemoteDataSource {
         .create(ProductService::class.java)
 
     override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
-        productService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
+        productService.requestProducts().enqueue(object : Callback<List<ProductEntity>> {
             override fun onResponse(
                 call: Call<List<ProductEntity>>,
                 response: Response<List<ProductEntity>>
@@ -41,7 +42,7 @@ class ProductRemoteDataSourceRetrofit : ProductRemoteDataSource {
     }
 
     override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
-        productService.requestProduct(id).enqueue(object : retrofit2.Callback<ProductEntity> {
+        productService.requestProduct(id).enqueue(object : Callback<ProductEntity> {
             override fun onResponse(call: Call<ProductEntity>, response: Response<ProductEntity>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.toDomain())

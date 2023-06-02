@@ -3,6 +3,7 @@ package woowacourse.shopping.data.cart
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -25,5 +26,11 @@ interface CartService {
         @Path("id") id: Int,
         @Header("Authorization") authorization: String,
         @Body body: RequestBody
+    ) : Call<Unit>
+
+    @DELETE("cart-items/{id}")
+    fun deleteCartProduct(
+        @Path("id") id: Int,
+        @Header("Authorization") authorization: String
     ) : Call<Unit>
 }
