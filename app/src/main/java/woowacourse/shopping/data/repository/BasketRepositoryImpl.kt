@@ -9,13 +9,21 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 
 class BasketRepositoryImpl(
-    private val basketRemoteDataSource: BasketRemoteDataSource
+    private val basketRemoteDataSource: BasketRemoteDataSource,
 ) : BasketRepository {
 
-    override fun getAll(onReceived: (List<BasketProduct>) -> Unit) {
-        basketRemoteDataSource.getAll { dataBasketProduct ->
-            onReceived(dataBasketProduct.map { it.toBasketProductDomainModel() })
-        }
+    override fun getAll(
+        onReceived: (List<BasketProduct>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
+        basketRemoteDataSource.getAll(
+            onReceived = { dataBasketProduct ->
+                onReceived(dataBasketProduct.map { it.toBasketProductDomainModel() })
+            },
+            onFailed = { errorMessage ->
+                onFailed(errorMessage)
+            }
+        )
     }
 
     override fun add(product: Product, onReceived: (Int) -> Unit) {

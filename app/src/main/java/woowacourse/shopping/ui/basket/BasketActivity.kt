@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -124,6 +125,13 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
             basketProducts = basketProducts.toTypedArray()
         )
 
+        startActivity(intent)
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        val intent = ShoppingActivity.getIntent(this)
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         startActivity(intent)
     }
 

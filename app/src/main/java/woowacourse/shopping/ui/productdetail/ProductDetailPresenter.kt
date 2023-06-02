@@ -12,20 +12,30 @@ class ProductDetailPresenter(
     private var currentProduct: ProductUiModel,
     private var currentProductBasketId: Int?,
     private var previousProduct: ProductUiModel?,
-    private var previousProductBasketId: Int?
+    private var previousProductBasketId: Int?,
 ) : ProductDetailContract.Presenter {
 
     init {
-        basketRepository.getAll { basketProducts ->
-            currentProduct.basketCount =
-                basketProducts.find { it.product.id == currentProduct.id }?.count?.value ?: 0
-        }
-        if (previousProduct != null) {
-            basketRepository.getAll { basketProducts ->
-                previousProduct?.basketCount =
-                    basketProducts.find { it.product.id == requireNotNull(previousProduct).id }?.count?.value
-                        ?: 0
+        basketRepository.getAll(
+            onReceived = { basketProducts ->
+                currentProduct.basketCount =
+                    basketProducts.find { it.product.id == currentProduct.id }?.count?.value ?: 0
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
             }
+        )
+        if (previousProduct != null) {
+            basketRepository.getAll(
+                onReceived = { basketProducts ->
+                    previousProduct?.basketCount =
+                        basketProducts.find { it.product.id == requireNotNull(previousProduct).id }?.count?.value
+                            ?: 0
+                },
+                onFailed = { errorMessage ->
+                    view.showErrorMessage(errorMessage)
+                }
+            )
         }
     }
 

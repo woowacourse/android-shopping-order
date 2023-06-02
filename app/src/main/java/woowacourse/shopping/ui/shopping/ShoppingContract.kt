@@ -23,6 +23,8 @@ interface ShoppingContract {
         fun updateTotalBasketCount(totalBasketCount: Int)
 
         fun updateSkeletonState(isLoaded: Boolean)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {

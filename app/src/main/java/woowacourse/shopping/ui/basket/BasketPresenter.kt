@@ -25,12 +25,17 @@ class BasketPresenter(
     }
 
     private fun updateBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
-            updateBasketProducts()
-            isLoaded = true
-            view.updateSkeletonState(isLoaded)
-        }
+        basketRepository.getAll(
+            onReceived = {
+                basket = Basket(it)
+                updateBasketProducts()
+                isLoaded = true
+                view.updateSkeletonState(isLoaded)
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
+        )
     }
 
     override fun fetchTotalCheckToCurrentPage(totalIsChecked: Boolean) {

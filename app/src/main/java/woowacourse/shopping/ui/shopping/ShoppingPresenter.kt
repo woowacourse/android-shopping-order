@@ -46,20 +46,30 @@ class ShoppingPresenter(
     }
 
     override fun initBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
-            fetchTotalBasketCount()
-            updateProducts()
-        }
+        basketRepository.getAll(
+            onReceived = { basketProducts ->
+                basket = Basket(basketProducts)
+                fetchTotalBasketCount()
+                updateProducts()
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
+        )
     }
 
     override fun updateBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
-            fetchTotalBasketCount()
-            fetchBasketCount()
-            view.updateProducts(totalProducts)
-        }
+        basketRepository.getAll(
+            onReceived = { basketProducts ->
+                basket = Basket(basketProducts)
+                fetchTotalBasketCount()
+                fetchBasketCount()
+                view.updateProducts(totalProducts)
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
+        )
     }
 
     override fun fetchTotalBasketCount() {

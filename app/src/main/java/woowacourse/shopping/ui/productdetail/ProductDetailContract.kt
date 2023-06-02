@@ -13,10 +13,12 @@ interface ProductDetailContract {
             currentProduct: ProductUiModel,
             minusClickListener: () -> Unit,
             plusClickListener: () -> Unit,
-            updateBasketProduct: () -> Unit
+            updateBasketProduct: () -> Unit,
         )
 
         fun updateProductCount(count: Int)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {

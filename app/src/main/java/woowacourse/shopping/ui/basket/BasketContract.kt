@@ -23,6 +23,8 @@ interface BasketContract {
         fun updateSkeletonState(isLoaded: Boolean)
 
         fun showPaymentView(basketProducts: List<BasketProductUiModel>, totalPrice: Int)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {

@@ -11,7 +11,10 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
     private val basketProductService: BasketProductService = NetworkModule.getService()
 
-    override fun getAll(onReceived: (List<BasketProductEntity>) -> Unit) {
+    override fun getAll(
+        onReceived: (List<BasketProductEntity>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
         basketProductService.requestBasketProducts(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
@@ -22,17 +25,18 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             ) {
                 response.body()?.let {
                     onReceived(it)
-                }
+                } ?: onFailed(BASKET_PRODUCTS_ERROR)
             }
 
             override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
+                onFailed(BASKET_PRODUCTS_ERROR)
             }
         })
     }
 
     override fun add(
         product: ProductEntity,
-        onReceived: (Int) -> Unit,
+        onAdded: (Int) -> Unit,
     ) {
         basketProductService.addBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
@@ -46,7 +50,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 response.headers()["Location"]?.let {
                     val productId = it.split("/").last().toInt()
 
-                    onReceived(productId)
+                    onAdded(productId)
                 }
                 Log.d("woogi", "onResponse: 상품 추가에 성공했습니다.")
             }
@@ -105,5 +109,9 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 Log.d("woogi", "onResponse: 상품 삭제에 실패했습니다.")
             }
         })
+    }
+
+    companion object {
+        private const val BASKET_PRODUCTS_ERROR = "장바구니 상품을 불러올 수 없습니다."
     }
 }

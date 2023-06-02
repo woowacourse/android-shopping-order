@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -129,6 +130,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun updateSkeletonState(isLoaded: Boolean) {
         binding.isLoaded = isLoaded
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun initSkeletonAdapter() {

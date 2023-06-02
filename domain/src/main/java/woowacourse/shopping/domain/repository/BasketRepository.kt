@@ -5,7 +5,10 @@ import woowacourse.shopping.domain.Product
 
 interface BasketRepository {
 
-    fun getAll(onReceived: (List<BasketProduct>) -> Unit)
+    fun getAll(
+        onReceived: (List<BasketProduct>) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    )
 
     fun add(product: Product, onReceived: (Int) -> Unit)
 
