@@ -20,4 +20,14 @@
     <string name="gitjjang_server">깃짱의 서버</string>
     <string name="jerry_server">제리의 서버</string>
     <string name="server_select_message">서버를 선택해주세용~♥</string>
+
+    <string name="order_product_text">주문 상품</string>
+    <string name="points_text">포인트</string>
+    <string name="points_available_text">사용 가능한 포인트</string>
+    <string name="use_points_text">사용 할 포인트</string>
+    <string name="payment_price_text">결제 금액</string>
+    <string name="original_price_text">주문 금액</string>
+    <string name="discount_price_text">할인 금액</string>
+    <string name="order_button_text">주문하기</string>
+    <string name="final_price_text">최종 결제 금액</string>
 </resources>
