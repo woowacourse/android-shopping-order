@@ -10,7 +10,11 @@ interface BasketRepository {
         onFailed: (errorMessage: String) -> Unit,
     )
 
-    fun add(product: Product, onReceived: (Int) -> Unit)
+    fun add(
+        product: Product,
+        onAdded: (Int) -> Unit,
+        onFailed: (errorMessage: String) -> Unit
+    )
 
     fun update(basketProduct: BasketProduct)
 

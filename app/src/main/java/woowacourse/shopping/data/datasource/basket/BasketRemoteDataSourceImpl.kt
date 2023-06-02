@@ -37,6 +37,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
     override fun add(
         product: ProductEntity,
         onAdded: (Int) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     ) {
         basketProductService.addBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
@@ -47,20 +48,18 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
             ) {
-                response.headers()["Location"]?.let {
+                response.headers()[LOCATION]?.let {
                     val productId = it.split("/").last().toInt()
 
                     onAdded(productId)
-                }
-                Log.d("woogi", "onResponse: 상품 추가에 성공했습니다.")
+                } ?: onFailed(FAILED_TO_ADD_BASKET)
             }
 
             override fun onFailure(
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 t: Throwable,
             ) {
-                Log.d("woogi", "onFailure: ${t.message}")
-                Log.d("woogi", "onResponse: 상품 추가에 실패했습니다.")
+                onFailed(FAILED_TO_ADD_BASKET)
             }
         })
     }
@@ -112,6 +111,8 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
     }
 
     companion object {
+        private const val LOCATION = "Location"
         private const val BASKET_PRODUCTS_ERROR = "장바구니 상품을 불러올 수 없습니다."
+        private const val FAILED_TO_ADD_BASKET = "장바구니 상품을 불러올 수 없습니다."
     }
 }

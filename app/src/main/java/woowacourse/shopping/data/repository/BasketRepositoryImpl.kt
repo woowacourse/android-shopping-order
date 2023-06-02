@@ -26,8 +26,16 @@ class BasketRepositoryImpl(
         )
     }
 
-    override fun add(product: Product, onReceived: (Int) -> Unit) {
-        basketRemoteDataSource.add(product.toProductEntity(), onReceived)
+    override fun add(
+        product: Product,
+        onAdded: (Int) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
+        basketRemoteDataSource.add(
+            product = product.toProductEntity(),
+            onAdded = onAdded,
+            onFailed = onFailed
+        )
     }
 
     override fun update(basketProduct: BasketProduct) {
