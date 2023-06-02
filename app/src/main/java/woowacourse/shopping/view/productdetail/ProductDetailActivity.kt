@@ -14,7 +14,6 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.getSerializableCompat
 import woowacourse.shopping.model.data.BundleKeys
 import woowacourse.shopping.model.data.db.CartProductDao
-import woowacourse.shopping.model.data.db.MockProductService
 import woowacourse.shopping.model.data.db.RecentProductDao
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.ProductRepositoryImpl
@@ -42,7 +41,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             ProductDetailPresenter(
                 this,
                 recentProductsRepository = RecentProductRepositoryImpl(RecentProductDao(this)),
-                productRepository = ProductRepositoryImpl(MockProductService())
+                productRepository = ProductRepositoryImpl()
             )
 
         presenter.loadProduct(productId)

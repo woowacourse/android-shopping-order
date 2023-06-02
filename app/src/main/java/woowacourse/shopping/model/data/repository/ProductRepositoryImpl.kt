@@ -2,42 +2,47 @@ package woowacourse.shopping.model.data.repository
 
 import com.shopping.domain.Product
 import com.shopping.repository.ProductRepository
-import woowacourse.shopping.model.data.db.ProductService
+import woowacourse.shopping.model.data.dto.ProductDTO
+import woowacourse.shopping.server.retrofit.RetrofitClient
+import woowacourse.shopping.server.retrofit.createResponseCallback
 
-class ProductRepositoryImpl(
-    private val service: ProductService
-) : ProductRepository {
+class ProductRepositoryImpl() : ProductRepository {
 
     override fun loadProducts(
         index: Pair<Int, Int>,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (Exception) -> Unit
     ) {
-        Thread {
-            service.request(
+        RetrofitClient.productsService.getAllProducts().enqueue(
+            createResponseCallback(
                 onSuccess = { products ->
                     if (index.first >= products.size) {
                         onSuccess(emptyList())
                     }
-                    onSuccess(products.subList(index.first, minOf(index.second, products.size)))
+                    onSuccess(
+                        products.map { it.toDomain() }.subList(index.first, minOf(index.second, products.size))
+                    )
                 },
                 onFailure = onFailure
             )
-        }.start()
+        )
     }
 
     override fun getProductById(
         index: Int,
         onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (Exception) -> Unit
     ) {
-        Thread {
-            service.request(
-                onSuccess = { products ->
-                    onSuccess(products[index - 1])
+        RetrofitClient.productsService.getProduct(index.toLong()).enqueue(
+            createResponseCallback(
+                onSuccess = { product ->
+                    onSuccess(product.toDomain())
                 },
                 onFailure = onFailure
             )
-        }.start()
+        )
     }
+
+    private fun ProductDTO.toDomain(): Product =
+        Product(id.toInt(), name, imageUrl, price)
 }

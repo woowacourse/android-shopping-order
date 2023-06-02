@@ -27,7 +27,7 @@ class ServerSelectActivity : AppCompatActivity() {
     }
 
     private fun startShopping(serverUrl: String) {
-        RetrofitClient.baseUrl = serverUrl
+        RetrofitClient.initBaseUrl(serverUrl)
         val intent = ShoppingMainActivity.intent(this)
         startActivity(intent)
         finish()

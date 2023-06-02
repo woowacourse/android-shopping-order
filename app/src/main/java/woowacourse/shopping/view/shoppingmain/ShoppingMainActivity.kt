@@ -3,6 +3,7 @@ package woowacourse.shopping.view.shoppingmain
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -17,7 +18,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingMainBinding
 import woowacourse.shopping.model.data.BundleKeys
 import woowacourse.shopping.model.data.db.CartProductDao
-import woowacourse.shopping.model.data.db.MockProductService
 import woowacourse.shopping.model.data.db.RecentProductDao
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.ProductRepositoryImpl
@@ -42,11 +42,16 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping_main)
 
         setSupportActionBar(binding.tbProductCatalogue)
+
         setPresenter()
         setAdapters()
+        Log.d("bboddo", "3")
         setViewSettings()
+        Log.d("bboddo", "4")
         setButtonOnClick()
+        Log.d("bboddo", "5")
         setScrollView()
+        Log.d("bboddo", "6")
     }
 
     override fun onResume() {
@@ -61,7 +66,7 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
     private fun setPresenter() {
         presenter = ShoppingMainPresenter(
             view = this,
-            productsRepository = ProductRepositoryImpl(MockProductService()),
+            productsRepository = ProductRepositoryImpl(),
             cartProductRepository = CartProductRepositoryImpl(CartProductDao(this)),
             recentProductsRepository = RecentProductRepositoryImpl(RecentProductDao(this))
         )
