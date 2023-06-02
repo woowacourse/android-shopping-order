@@ -20,7 +20,7 @@ class ShoppingPresenter(
     private val pageSize: Int
 ) : ShoppingContract.Presenter {
     private var currentPage = 1
-    private lateinit var currentUser: User
+    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
 
     override fun loadRecentlyViewedProducts() {
         recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
@@ -35,8 +35,6 @@ class ShoppingPresenter(
     }
 
     override fun loadProductsNextPage() {
-        if (!::currentUser.isInitialized) return
-
         currentPage++
         productRepository.findAll(pageSize, calculateOffset()).thenApply { productResult ->
             val products = productResult.getOrThrow()
@@ -52,13 +50,10 @@ class ShoppingPresenter(
     }
 
     override fun refreshProducts() {
-        if (!::currentUser.isInitialized) return
-
-        productRepository.findAll(calculateOffset() + pageSize, 0).thenApply { productsResult ->
+        productRepository.findAll(calculateOffset() + pageSize, 0).thenAccept { productsResult ->
             val products = productsResult.getOrThrow()
             val cartItems = cartItemRepository.findAll(currentUser).get().getOrThrow()
-            createProductUIState(cartItems, products)
-        }.thenAccept { product ->
+            val product = createProductUIState(cartItems, products)
             view.setProducts(product)
             refreshCanLoadMore()
         }.exceptionally {
@@ -68,8 +63,6 @@ class ShoppingPresenter(
     }
 
     override fun addProductToCart(productId: Long) {
-        if (!::currentUser.isInitialized) return
-
         productRepository.findById(productId).thenCompose { productResult ->
             val product = productResult.getOrThrow()
             val cartItem = CartItem(-1, 1, product)
@@ -79,16 +72,12 @@ class ShoppingPresenter(
             view.changeProduct(savedCartItem.toUIState())
             loadCartItemCount()
         }.exceptionally {
-            println(it.stackTraceToString())
-            println(it.message)
             view.showError(it.message.orEmpty())
             null
         }
     }
 
-    override fun plusCount(cartItemId: Long) {
-        if (!::currentUser.isInitialized) return
-
+    override fun plusCartItemQuantity(cartItemId: Long) {
         cartItemRepository.findById(cartItemId, currentUser).thenApply { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             loadedCartItem.plusQuantity()
@@ -101,9 +90,7 @@ class ShoppingPresenter(
         }
     }
 
-    override fun minusCount(cartItemId: Long) {
-        if (!::currentUser.isInitialized) return
-
+    override fun minusCartItemQuantity(cartItemId: Long) {
         cartItemRepository.findById(cartItemId, currentUser).thenApply { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             minusCartItem(loadedCartItem, cartItemId)
@@ -113,8 +100,6 @@ class ShoppingPresenter(
     }
 
     override fun loadCartItemCount() {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.countAll(currentUser).thenAccept { countResult ->
             val count = countResult.getOrThrow()
             view.setCartItemCount(count)
@@ -144,7 +129,6 @@ class ShoppingPresenter(
 
     override fun selectUser(user: User) {
         userRepository.saveCurrent(user)
-        currentUser = user
 
         refreshProducts()
         loadCartItemCount()

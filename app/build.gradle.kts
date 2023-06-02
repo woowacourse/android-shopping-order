@@ -33,20 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
     dataBinding {
         enable = true
-    }
-    tasks.withType(Test::class) {
-        useJUnitPlatform()
-        testLogging {
-            events.addAll(
-                arrayOf(
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-                )
-            )
-        }
     }
 }
 
@@ -63,10 +52,11 @@ dependencies {
     implementation("com.squareup.moshi:moshi:1.14.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     implementation(project(":domain"))
-    testImplementation("org.junit.jupiter", "junit-jupiter", "5.8.2")
-    testImplementation("org.assertj", "assertj-core", "3.22.0")
+
+    testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk-android:1.13.5")
     testImplementation("io.mockk:mockk-agent:1.13.5")
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
