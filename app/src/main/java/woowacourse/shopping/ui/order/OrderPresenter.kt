@@ -40,7 +40,7 @@ class OrderPresenter(
     }
 
     private fun updateOrder(orderItems: List<ListItem>) {
-        view.showMoreOrders(orderItems)
+        view.showOrders(orderItems)
     }
 
     override fun applyPoint(pointModel: PointModel) {

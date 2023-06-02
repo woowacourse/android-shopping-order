@@ -34,7 +34,7 @@ class OrderActivity : AppCompatActivity(), View {
         presenter.fetchAll()
     }
 
-    override fun showMoreOrders(orderItems: List<ListItem>) {
+    override fun showOrders(orderItems: List<ListItem>) {
         binding.adapter?.update(orderItems)
     }
 
