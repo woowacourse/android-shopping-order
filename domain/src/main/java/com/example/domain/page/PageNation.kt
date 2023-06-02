@@ -26,6 +26,11 @@ data class PageNation(
     val isAnyChecked: Boolean
         get() = allList.any { it.checked }
 
+    val isAllCheckedCurrentPage: Boolean
+        get() = currentPageCartProducts.all {
+            it.checked
+        }
+
     val currentPageCartProducts: List<CartProduct>
         get() {
             val fromIndex = (currentPage - 1) * LOAD_ITEM_SIZE_PER_PAGE
@@ -63,7 +68,17 @@ data class PageNation(
 
     fun updateCurrentPageCheckedAll(isChecked: Boolean): PageNation {
         val currentPageCartProductsId = currentPageCartProducts.map { it.id }
-        return copy(cartProducts = cartProducts.updateAllCheckedBy(currentPageCartProductsId, isChecked))
+        return copy(
+            cartProducts = cartProducts.updateAllCheckedBy(
+                currentPageCartProductsId,
+                isChecked,
+            ),
+        )
+    }
+
+    fun updateCheckedState(cartId: Long, isChecked: Boolean): PageNation {
+        val newCartProducts = cartProducts.updateCheckedBy(cartId, isChecked)
+        return copy(cartProducts = newCartProducts)
     }
 
     fun updateCountState(cartId: Long, count: Int): PageNation {

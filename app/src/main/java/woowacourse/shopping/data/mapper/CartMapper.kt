@@ -19,3 +19,5 @@ fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product
 fun CartModel.toDomain(): CartProduct = CartProduct(id, product.toDomain(), count, checked)
 
 fun CartProduct.toUiModel(): CartModel = CartModel(id, product.toUiModel(), count, checked)
+
+fun CartProduct.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toEntity())

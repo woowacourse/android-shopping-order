@@ -13,3 +13,5 @@ fun ProductModel.toEntity(): ProductEntity = ProductEntity(id, title, price, ima
 fun ProductModel.toDomain(): Product = Product(id, title, price, imageUrl)
 
 fun Product.toUiModel(): ProductModel = ProductModel(id, title, price, imageUrl)
+
+fun Product.toEntity(): ProductEntity = ProductEntity(id, title, price, imageUrl)

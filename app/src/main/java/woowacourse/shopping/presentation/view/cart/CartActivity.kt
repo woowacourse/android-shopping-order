@@ -65,10 +65,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(server)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSourceImpl),
+            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
         )
     }
 
