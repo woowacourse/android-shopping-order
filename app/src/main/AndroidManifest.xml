@@ -15,6 +15,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".feature.order.OrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".feature.ServerSettingActivity"
             android:exported="true">
             <intent-filter>
@@ -32,7 +35,6 @@
         <activity
             android:name=".feature.product.MainActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>
