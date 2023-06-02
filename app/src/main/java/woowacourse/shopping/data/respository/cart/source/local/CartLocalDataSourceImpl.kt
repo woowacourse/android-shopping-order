@@ -34,6 +34,16 @@ class CartLocalDataSourceImpl(
         )
     }
 
+    override fun deleteCarts(cartIds: List<Long>) {
+        cartIds.forEach {
+            db.delete(
+                tableName,
+                "${CartContract.Cart.ID} = ?",
+                arrayOf(it.toString())
+            )
+        }
+    }
+
     override fun updateCartChecked(cartId: Long, isChecked: Boolean) {
         val checked = if (isChecked) 1 else 0
 

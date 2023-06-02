@@ -51,6 +51,10 @@ class CartRepositoryImpl(
         cartLocalDataSource.deleteCart(cartId)
     }
 
+    override fun deleteLocalCarts(cartIds: List<Long>) {
+        cartLocalDataSource.deleteCarts(cartIds)
+    }
+
     override fun updateLocalCartChecked(cartId: Long, isChecked: Boolean) {
         cartLocalDataSource.updateCartChecked(cartId, isChecked)
     }

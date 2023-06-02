@@ -73,6 +73,7 @@ class OrderPresenter(
             cards[0],
         )
         orderRepository.addOrder(order.toModel(), ::onFailure) { orderId ->
+            cartRepository.deleteLocalCarts(order.toModel().cartIds)
             view.showOrderDetailView(orderId)
         }
     }

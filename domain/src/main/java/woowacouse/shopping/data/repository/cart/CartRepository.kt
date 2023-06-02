@@ -5,6 +5,7 @@ import woowacouse.shopping.model.cart.CartProduct
 interface CartRepository {
     fun addLocalCart(cartId: Long)
     fun deleteLocalCart(cartId: Long)
+    fun deleteLocalCarts(cartIds: List<Long>)
     fun updateLocalCartChecked(cartId: Long, isChecked: Boolean)
     fun getAllLocalCart(): List<CartProduct>
 
