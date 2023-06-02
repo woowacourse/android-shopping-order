@@ -8,6 +8,171 @@
         android:layout_height="match_parent"
         tools:context=".feature.order.detail.OrderDetailActivity">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/start_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="18dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/end_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="18dp" />
+
+        <TextView
+            android:id="@+id/order_detail_date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/mint"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="15dp"
+            tools:text="2023.5.2"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/order_detail_list"
+            android:layout_width="wrap_content"
+            android:text="@string/order_detail_list"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintTop_toBottomOf="@id/order_detail_date_text_view"
+            android:layout_marginTop="14dp"
+            android:layout_height="wrap_content" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/order_detail_pay_info_layout"
+            android:layout_width="0dp"
+            android:layout_marginTop="7dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintEnd_toEndOf="@id/end_guideline"
+            app:layout_constraintTop_toBottomOf="@id/order_detail_list"
+            android:background="@drawable/sale_info_box"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/order_detail_pay_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="14sp"
+                android:text="@string/pay_info" />
+
+            <TextView
+                android:id="@+id/order_detail_product_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/order_detail_pay_info"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                android:text="@string/product_price" />
+
+            <TextView
+                android:id="@+id/order_detail_product_total_price_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/order_detail_product_total_price"
+                app:layout_constraintBottom_toBottomOf="@id/order_detail_product_total_price"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                tools:text="50,000" />
+
+            <TextView
+                android:id="@+id/order_detail_sale_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/order_detail_product_total_price"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                android:text="@string/sale_amount" />
+
+            <TextView
+                android:id="@+id/order_detail_sale_amount_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/order_detail_sale_amount"
+                app:layout_constraintBottom_toBottomOf="@id/order_detail_sale_amount"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                tools:text="5,000" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/order_pay_middle_divider"
+                app:layout_constraintTop_toBottomOf="@id/order_detail_sale_amount"
+                android:layout_marginTop="27dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <TextView
+                android:id="@+id/total_pay_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_pay_price"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/order_pay_middle_divider"
+                android:layout_marginTop="17dp" />
+
+            <TextView
+                android:id="@+id/total_final_pay_price_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="45,000"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/total_pay_price"
+                app:layout_constraintBottom_toBottomOf="@id/total_pay_price" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/order_item_middle_divider"
+            app:layout_constraintTop_toBottomOf="@id/order_detail_pay_info_layout"
+            android:layout_marginTop="27dp"
+            android:layout_width="match_parent"
+            android:layout_height="7dp" />
+
+        <TextView
+            android:id="@+id/order_detail_product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintTop_toBottomOf="@id/order_item_middle_divider"
+            android:layout_marginTop="27dp"
+            android:text="@string/cart_order_product"
+            android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/order_detail_product_recycler_view"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintEnd_toEndOf="@id/end_guideline"
+            app:layout_constraintTop_toBottomOf="@id/order_detail_product"
+            android:layout_width="0dp"
+            android:layout_marginTop="7dp"
+            tools:listitem="@layout/item_order_confirm_item"
+            android:layout_height="wrap_content" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
