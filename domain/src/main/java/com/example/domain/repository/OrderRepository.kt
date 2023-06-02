@@ -1,6 +1,7 @@
 package com.example.domain.repository
 
 import com.example.domain.model.Order
+import com.example.domain.model.OrderItem
 
 interface OrderRepository {
     fun getOrders(
@@ -8,4 +9,6 @@ interface OrderRepository {
         onSuccess: (List<Order>) -> Unit,
         onFailure: () -> Unit
     )
+
+    fun placeOrder(usedPoint: Int, orderItems: List<OrderItem>)
 }

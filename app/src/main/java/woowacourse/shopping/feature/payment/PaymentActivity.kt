@@ -4,12 +4,17 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.TextView
+import android.widget.Toast
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.RetrofitClient
 import woowacourse.shopping.data.datasource.remote.cart.CartApi
 import woowacourse.shopping.data.datasource.remote.cart.CartRetrofitService
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.repository.order.OrderMockRepository
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.model.CartProductUiModel
@@ -40,14 +45,27 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         presenter = PaymentPresenter(
             this,
             CartRepositoryImpl(CartRetrofitService(cartApi)),
-            PointRepositoryImpl()
+            PointRepositoryImpl(),
+            OrderMockRepository()
         )
     }
 
     private fun setup() {
-        binding.orderPriceTv.text = resources.getString(R.string.price_format)
+        binding.orderPriceTv.text = getString(R.string.price_format)
             .format(intent.getIntExtra(TOTAL_PRICE, 0))
+        binding.recyclerview.setHasFixedSize(true)
+
         presenter.loadPoint()
+
+        binding.payButtonTv.text =
+            getString(R.string.final_pay_amount).format(intent.getIntExtra(TOTAL_PRICE, 0))
+        binding.payButtonTv.setOnClickListener {
+            presenter.placeOrder(binding.pointEt.text.toString().toIntOrNull() ?: 0)
+        }
+
+        binding.allPointBtn.setOnClickListener {
+            presenter.useAllPoint()
+        }
     }
 
     override fun showCartProducts(cartProducts: List<CartProductUiModel>) {
@@ -56,6 +74,40 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
     override fun showPoint(point: PointUiModel) {
         binding.currentPointTv.text = getString(R.string.current_point).format(point.currentPoint)
+        setEditTextState(point, intent.getIntExtra(TOTAL_PRICE, 0))
+    }
+
+    override fun showPaymentDoneScreen() {
+        Toast.makeText(this, "결제완료!!", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun setPoint(usedPoint: Int) {
+        binding.pointEt.setText(usedPoint.toString(), TextView.BufferType.EDITABLE)
+    }
+
+    private fun setEditTextState(point: PointUiModel, productsPrice: Int) {
+        binding.pointEt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+
+            override fun onTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val inputPoint =
+                    if (inputValue.isNullOrBlank()) 0
+                    else inputValue.toString().toInt()
+
+                if (inputPoint > point.currentPoint) {
+                    Toast.makeText(this@PaymentActivity, "보유한 포인트 값을 초과합니다", Toast.LENGTH_SHORT)
+                        .show()
+                    binding.pointEt.text = null
+                    binding.payButtonTv.text =
+                        getString(R.string.final_pay_amount).format(productsPrice)
+                } else {
+                    binding.payButtonTv.text =
+                        getString(R.string.final_pay_amount).format(productsPrice - inputPoint)
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) = Unit
+        })
     }
 
     companion object {

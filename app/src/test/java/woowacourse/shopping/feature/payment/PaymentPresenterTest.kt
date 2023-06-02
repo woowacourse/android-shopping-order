@@ -5,6 +5,7 @@ import com.example.domain.model.CartProducts
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.PointRepository
 import io.mockk.Runs
 import io.mockk.every
@@ -23,13 +24,16 @@ class PaymentPresenterTest {
     private lateinit var view: PaymentContract.View
     private lateinit var cartRepository: CartRepository
     private lateinit var pointRepository: PointRepository
+    private lateinit var orderRepository: OrderRepository
 
     @Before
     fun setup() {
         view = mockk(relaxed = true)
         cartRepository = mockk(relaxed = true)
         pointRepository = mockk(relaxed = true)
-        presenter = PaymentPresenter(view, cartRepository, pointRepository)
+        orderRepository = mockk()
+
+        presenter = PaymentPresenter(view, cartRepository, pointRepository, orderRepository)
     }
 
     @Test
