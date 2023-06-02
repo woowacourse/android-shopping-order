@@ -7,15 +7,19 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.PointRepository
+import woowacourse.shopping.model.mapper.toUi
 
 internal class OrderPresenterTest {
     private lateinit var orderRepository: OrderRepository
+    private lateinit var pointRepository: PointRepository
     private lateinit var presenter: OrderContract.Presenter
     private lateinit var view: OrderContract.View
 
     @Before
     fun setUp() {
         orderRepository = mockk()
+        pointRepository = mockk()
         view = mockk()
     }
 
@@ -25,7 +29,7 @@ internal class OrderPresenterTest {
         val order: Order = mockk(relaxed = true)
         justRun { view.showOrderCompleted() }
         justRun { orderRepository.saveOrder(order, {}, {}) }
-        presenter = OrderPresenter(view, order, orderRepository)
+        presenter = OrderPresenter(view, order.toUi(), orderRepository, pointRepository)
 
         // When: 상품을 주문한다.
         presenter.order()

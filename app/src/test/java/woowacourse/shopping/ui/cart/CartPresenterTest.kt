@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -11,9 +10,6 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.model.PriceModel
-import woowacourse.shopping.model.ProductModel
-import woowacourse.shopping.model.mapper.toDomain
 
 internal class CartPresenterTest {
     private lateinit var presenter: CartContract.Presenter
@@ -26,7 +22,7 @@ internal class CartPresenterTest {
         cartRepository = mockk(relaxed = true)
         productRepository = mockk(relaxed = true)
         view = mockk(relaxed = true)
-        presenter = CartPresenter(view, productRepository, cartRepository)
+        presenter = CartPresenter(view, cartRepository)
     }
 
     @Test
@@ -39,15 +35,14 @@ internal class CartPresenterTest {
 
         // then
         verify(exactly = 1) { view.updateCart(any()) }
-        verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
-        verify(exactly = 1) { view.updatePageNumber(any()) }
+        verify(exactly = 1) { view.updatePageState(any()) }
     }
 
     @Test
     internal fun 이전_장바구니를_불러오면_페이지를_변경하고_장바구니를_갱신한다() {
         // given
         val page = 2
-        presenter = CartPresenter(view, productRepository, cartRepository)
+        presenter = CartPresenter(view, cartRepository)
 
         val currentPage = slot<Page>()
 
@@ -57,15 +52,14 @@ internal class CartPresenterTest {
         // then
         assertEquals(currentPage.captured, Pagination(page - 1))
         verify(exactly = 1) { view.updateCart(any()) }
-        verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
-        verify(exactly = 1) { view.updatePageNumber(any()) }
+        verify(exactly = 1) { view.updatePageState(any()) }
     }
 
     @Test
     internal fun 다음_장바구니를_불러오면_페이지를_변경하고_장바구니를_갱신한다() {
         // given
         val page = 1
-        presenter = CartPresenter(view, productRepository, cartRepository)
+        presenter = CartPresenter(view, cartRepository)
 
         val currentPage = slot<Page>()
 
@@ -75,29 +69,7 @@ internal class CartPresenterTest {
         // then
         assertEquals(currentPage.captured, Pagination(page + 1))
         verify(exactly = 1) { view.updateCart(any()) }
-        verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
-        verify(exactly = 1) { view.updatePageNumber(any()) }
-    }
-
-    @Test
-    internal fun 장바구니_목록에_있는_제품을_제거하면_뷰를_갱신한다() {
-        // given
-        val products = MutableList(8) { id ->
-            ProductModel(id, "상품 $id", PriceModel(1000), "")
-        }
-        val product = ProductModel(0, "상품 0", PriceModel(1000), "")
-        every { cartRepository.decreaseCartCount(product.toDomain(), 1) } answers {
-            products.remove(product)
-        }
-
-        // when
-        presenter.deleteProduct(product)
-
-        // then
-        verify(exactly = 1) { cartRepository.decreaseCartCount(product.toDomain(), 1) }
         verify(exactly = 1) { view.updateCart(any()) }
-        verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
-        verify(exactly = 1) { view.updatePageNumber(any()) }
     }
 
     @Test

@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -55,14 +56,14 @@ internal class ShoppingPresenterTest {
     @Test
     internal fun 제품_상세_내용을_조회한다() {
         // given
-        val product = mockk<woowacourse.shopping.model.Product>(relaxed = true)
+        val cartProduct = mockk<CartProduct>(relaxed = true)
 
         // when
-        presenter.inquiryProductDetail(product)
+        presenter.inquiryProductDetail(cartProduct.toUi())
 
         // then
         verify(exactly = 1) { view.updateRecentProducts(any()) }
-        verify(exactly = 1) { view.navigateToProductDetail(product, any()) }
+        verify(exactly = 1) { view.navigateToProductDetail(cartProduct.product.toUi()) }
         verify(exactly = 1) { recentProductRepository.saveRecentProduct(any()) }
     }
 
@@ -96,7 +97,7 @@ internal class ShoppingPresenterTest {
         presenter.inquiryRecentProductDetail(recentProduct)
 
         // then
-        verify(exactly = 1) { view.navigateToProductDetail(any(), any()) }
+        verify(exactly = 1) { view.navigateToProductDetail(any()) }
         verify(exactly = 1) { recentProductRepository.saveRecentProduct(any()) }
     }
 
@@ -134,7 +135,7 @@ internal class ShoppingPresenterTest {
         presenter.increaseCartCount(product, count)
 
         // then
-        verify(exactly = 1) { cartRepository.increaseCartCount(product.toDomain(), count) }
+        verify(exactly = 1) { cartRepository.updateProductCountById(any(), any()) }
         verify(exactly = 1) { view.updateCartBadge(any()) }
         verify(exactly = 1) { view.updateProducts(any()) }
     }
