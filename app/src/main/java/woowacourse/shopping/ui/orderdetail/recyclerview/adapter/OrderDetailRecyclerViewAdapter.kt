@@ -30,7 +30,8 @@ class OrderDetailRecyclerViewAdapter(
     override fun getItemViewType(position: Int): Int = orderDetails[position].viewType
 
     fun addAll(newOrderDetails: List<ListItem>) {
-        orderDetails.addAll(orderDetails)
+        orderDetails.clear()
+        orderDetails.addAll(newOrderDetails)
         notifyItemRangeInserted(
             (orderDetails.size - newOrderDetails.size).coerceAtLeast(0),
             newOrderDetails.size
