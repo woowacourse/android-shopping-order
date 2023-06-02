@@ -6,7 +6,7 @@ import woowacourse.shopping.data.model.OrderProductEntity
 data class OrderResponse(
     @SerializedName("orderId")
     val orderId: Long,
-    @SerializedName("createAt")
+    @SerializedName("createdAt")
     val orderedTime: String?,
     @SerializedName("orderItems")
     val orderProducts: List<OrderProductEntity>,
