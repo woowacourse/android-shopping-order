@@ -39,6 +39,9 @@
     <string name="tv_order_products">%s외 %d건</string>
     <string name="tv_order_date">주문한 날짜: %s</string>
 
+    <!-- activity_order_detail -->
+    <string name="tv_ordered_product_count">수량: %d</string>
+    <string name="tv_ordered_product_price">가격: %d</string>
 
     <!-- activity_payment_confirm -->
     <string name="tv_over_using_point">보유 포인트 이상을 사용하거나\n총 가격보다 더 많은 포인트를 사용할 수 없습니다.</string>

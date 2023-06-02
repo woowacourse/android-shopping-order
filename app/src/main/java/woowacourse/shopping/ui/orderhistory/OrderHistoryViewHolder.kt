@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderHistoryBinding
 import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.util.setImage
 
 class OrderHistoryViewHolder(
     private val binding: ItemOrderHistoryBinding,
@@ -14,13 +15,11 @@ class OrderHistoryViewHolder(
 
     fun bind(order: OrderUiModel) {
         with(binding) {
-            tvOrderCount.text = root.context.getString(
-                R.string.tv_order_count,
-                order.products.size
-            )
-            tvOrderDate.text = root.context.getString(
-                R.string.tv_order_date,
-                order.date
+            this.order = order
+            ivOrderRepresentProduct.setImage(
+                order.products
+                    .first()
+                    .imageUrl
             )
             tvOrderProducts.text = root.context.getString(
                 R.string.tv_order_products,
