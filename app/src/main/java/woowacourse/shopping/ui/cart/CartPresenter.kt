@@ -55,37 +55,38 @@ class CartPresenter(
         view.navigateToOrder(order)
     }
 
-    override fun deleteProduct(cartProduct: CartProductModel) {
-        cartRepository.deleteCartProductById(cartProduct.id)
-        updateCart(cart.delete(cartProduct.toDomain()))
+    override fun deleteProduct(cartProductModel: CartProductModel) {
+        cartRepository.deleteCartProductById(cartProductModel.id)
+        updateCart(cart.delete(cartProductModel.toDomain()))
     }
 
-    override fun updateProductCount(cartProduct: CartProductModel, count: Int) {
-        val domainCartProduct = cartProduct.toDomain()
-        val newCart = cart.updateProductCount(domainCartProduct, count)
+    override fun updateProductCount(cartProductModel: CartProductModel, count: Int) {
+        val cartProduct = cartProductModel.toDomain()
+        val newCart = cart.updateProductCount(cartProduct, count)
 
-        newCart.findCartProductByProductId(domainCartProduct.productId)?.let { _cartProduct ->
-            cartRepository.updateProductCountById(_cartProduct.id, _cartProduct.selectedCount)
+        newCart.findCartProductByProductId(cartProduct.productId)?.let { cartItem ->
+            cartRepository.updateProductCountById(cartItem.id, cartItem.selectedCount)
         }
         updateCart(newCart)
     }
 
     override fun toggleAllCheckState() {
-        updateCart(
-            if (isAllChecked.value == true) {
-                cart.unselectAll(currentPage)
-            } else {
-                cart.selectAll(currentPage)
-            }
-        )
+        val toggledCart = if (isAllChecked.value == true) {
+            cart.unselectAll(currentPage)
+        } else {
+            cart.selectAll(currentPage)
+        }
+        updateCart(toggledCart)
     }
 
-    override fun updateProductSelectState(cartProduct: CartProductModel, isSelect: Boolean) {
-        updateCart(changeSelectState(cartProduct.product, isSelect))
+    override fun updateProductSelectState(cartProductModel: CartProductModel, isSelect: Boolean) {
+        updateCart(changeSelectState(cartProductModel.product, isSelect))
     }
 
-    private fun changeSelectState(product: ProductModel, isSelect: Boolean): Cart =
-        if (isSelect) cart.select(product.toDomain()) else cart.unselect(product.toDomain())
+    private fun changeSelectState(productModel: ProductModel, isSelect: Boolean): Cart {
+        val product = productModel.toDomain()
+        return if (isSelect) cart.select(product) else cart.unselect(product)
+    }
 
     override fun navigateToHome() {
         view.navigateToHome()
