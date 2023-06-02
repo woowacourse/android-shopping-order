@@ -10,14 +10,14 @@ class OrderDetailViewHolder(
     private val binding: ItemOrderProductBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(uiOrderProduct: OrderProductUiModel) {
-        binding.orderedProduct = uiOrderProduct
+    fun bind(orderProduct: OrderProductUiModel) {
+        binding.orderedProduct = orderProduct
     }
 
     companion object {
         fun from(parent: ViewGroup): OrderDetailViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = ItemOrderProductBinding.inflate(layoutInflater)
+            val binding = ItemOrderProductBinding.inflate(layoutInflater, parent, false)
 
             return OrderDetailViewHolder(binding)
         }
