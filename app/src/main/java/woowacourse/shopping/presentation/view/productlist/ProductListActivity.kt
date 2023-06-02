@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ import woowacourse.shopping.databinding.LayoutToolbarCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.cart.CartActivity
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.view.productlist.adpater.MoreProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAdapter
@@ -119,6 +121,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         menu.findItem(R.id.action_cart)?.run {
             actionView = toolbarCartBinding.root
             setToolbarCart()
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_order_list -> {
+                startActivity(OrderListActivity.createIntent(this, url, token))
+            }
         }
         return true
     }
