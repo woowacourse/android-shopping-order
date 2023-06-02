@@ -7,7 +7,7 @@ interface OrderDetailContract {
         fun showOrderDetail(orders: List<ListItem>)
     }
 
-    abstract class Presenter(protected val view: View) {
-        abstract fun fetchOrderDetail()
+    interface Presenter {
+        fun fetchOrderDetail()
     }
 }

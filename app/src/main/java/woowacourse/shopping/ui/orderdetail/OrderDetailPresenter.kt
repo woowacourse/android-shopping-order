@@ -5,9 +5,9 @@ import woowacourse.shopping.ui.orderdetail.OrderDetailContract.Presenter
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract.View
 
 class OrderDetailPresenter(
-    view: View,
+    private val view: View,
     private val order: OrderModel,
-) : Presenter(view) {
+) : Presenter {
     override fun fetchOrderDetail() {
         view.showOrderDetail(order.orderProducts + order.payment)
     }

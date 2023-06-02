@@ -12,9 +12,9 @@ interface ProductDetailContract {
         fun navigateToHome(product: ProductModel, count: Int)
     }
 
-    abstract class Presenter(protected val view: View) {
-        abstract fun navigateToHome(count: Int)
-        abstract fun inquiryProductCounter()
-        abstract fun inquiryLastViewedProduct()
+    interface Presenter {
+        fun navigateToHome(count: Int)
+        fun inquiryProductCounter()
+        fun inquiryLastViewedProduct()
     }
 }

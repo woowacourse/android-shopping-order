@@ -15,13 +15,13 @@ interface CartContract {
         fun showErrorMessage(message: String)
     }
 
-    abstract class Presenter(protected val view: View) {
-        abstract fun fetchCart(page: Int)
-        abstract fun order()
-        abstract fun deleteProduct(cartProductModel: CartProductModel)
-        abstract fun updateProductCount(cartProductModel: CartProductModel, count: Int)
-        abstract fun toggleAllCheckState()
-        abstract fun updateProductSelectState(cartProductModel: CartProductModel, isSelect: Boolean)
-        abstract fun navigateToHome()
+    interface Presenter {
+        fun fetchCart(page: Int)
+        fun order()
+        fun deleteProduct(cartProductModel: CartProductModel)
+        fun updateProductCount(cartProductModel: CartProductModel, count: Int)
+        fun toggleAllCheckState()
+        fun updateProductSelectState(cartProductModel: CartProductModel, isSelect: Boolean)
+        fun navigateToHome()
     }
 }

@@ -9,10 +9,10 @@ import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.orderhistory.OrderHistoryContract.View
 
 class OrderHistoryPresenter(
-    view: View,
+    private val view: View,
     private val orderRepository: OrderRepository,
     private var page: Page = LoadMore(INITIAL_PAGE, SIZE_PER_PAGE),
-) : Presenter(view) {
+) : Presenter {
 
     override fun loadMoreOrders() {
         orderRepository.getOrders(

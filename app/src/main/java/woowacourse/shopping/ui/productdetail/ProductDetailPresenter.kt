@@ -8,13 +8,12 @@ import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter
 import woowacourse.shopping.ui.productdetail.ProductDetailContract.View
 
-class
-ProductDetailPresenter(
-    view: View,
+class ProductDetailPresenter(
+    private val view: View,
     private val product: ProductModel,
     showLastViewedProduct: Boolean,
     recentProductRepository: RecentProductRepository,
-) : Presenter(view) {
+) : Presenter {
     private val lastViewedProduct =
         recentProductRepository.getRecentProducts(LAST_VIEWED_PRODUCT_SIZE).getLatest()
 

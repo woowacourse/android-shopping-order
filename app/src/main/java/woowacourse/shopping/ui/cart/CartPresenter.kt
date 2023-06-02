@@ -19,10 +19,10 @@ import woowacourse.shopping.ui.cart.CartContract.Presenter
 import woowacourse.shopping.ui.cart.CartContract.View
 
 class CartPresenter(
-    view: View,
+    private val view: View,
     private val cartRepository: CartRepository,
     cartSize: Int = 5,
-) : Presenter(view) {
+) : Presenter {
     private var cart: Cart = Cart(minProductSize = 1)
     private var currentPage: Page = Pagination(sizePerPage = cartSize)
 
