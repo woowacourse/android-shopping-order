@@ -36,7 +36,7 @@ class ShoppingPresenterTest {
         cartItemRepository = mockk()
         userRepository = mockk()
 
-        every { userRepository.findCurrent() } returns async(User())
+        every { userRepository.findAll() } returns async(listOf(User()))
 
         presenter = ShoppingPresenter(
             view,

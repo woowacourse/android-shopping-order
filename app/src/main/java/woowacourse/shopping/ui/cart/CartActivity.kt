@@ -41,7 +41,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         initPageUI()
         initOrderUI()
-        initUser()
         initCartList()
         loadLastPageIfFromCartItemAdd()
     }
@@ -168,10 +167,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.btnOrder.setOnClickListener {
             presenter.checkPayment()
         }
-    }
-
-    private fun initUser() {
-        presenter.loadCurrentUser()
     }
 
     private fun initCartList() {

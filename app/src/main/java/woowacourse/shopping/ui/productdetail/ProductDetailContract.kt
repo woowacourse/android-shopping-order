@@ -9,7 +9,6 @@ interface ProductDetailContract {
         fun addProductToCart(productId: Long, count: Int)
         fun showCartCounter(productId: Long)
         fun loadLastViewedProduct()
-        fun loadCurrentUser()
     }
 
     interface View {

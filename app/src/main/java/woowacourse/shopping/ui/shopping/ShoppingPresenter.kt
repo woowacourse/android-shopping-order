@@ -10,6 +10,7 @@ import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState.Companion.toUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState.Companion.toUIState
+import woowacourse.shopping.utils.ErrorHandler.log
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -20,7 +21,12 @@ class ShoppingPresenter(
     private val pageSize: Int
 ) : ShoppingContract.Presenter {
     private var currentPage = 1
-    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
+    private var currentUser: User
+
+    init {
+        val users = userRepository.findAll().get().getOrThrow()
+        currentUser = users[0]
+    }
 
     override fun loadRecentlyViewedProducts() {
         recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
@@ -44,6 +50,7 @@ class ShoppingPresenter(
             view.addProducts(cart)
             refreshCanLoadMore()
         }.exceptionally {
+            it.log()
             view.showError(it.message.orEmpty())
             null
         }
@@ -129,6 +136,7 @@ class ShoppingPresenter(
 
     override fun selectUser(user: User) {
         userRepository.saveCurrent(user)
+        currentUser = user
 
         refreshProducts()
         loadCartItemCount()

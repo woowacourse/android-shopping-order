@@ -14,25 +14,15 @@ class CartPresenter(
     private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
     private val orderRepository: OrderRepository,
-    private val userRepository: UserRepository,
+    userRepository: UserRepository,
     private val pageSize: Int
 ) : CartContract.Presenter {
     private var selectedCart = Cart(emptySet())
-    private lateinit var currentUser: User
-    var currentPage = 0
+    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
 
-    override fun loadCurrentUser() {
-        val loadedUserResult = userRepository.findCurrent().get()
-        loadedUserResult.onSuccess {
-            currentUser = it
-        }.onFailure {
-            view.showError(it.message.orEmpty())
-        }
-    }
+    private var currentPage = 0
 
     override fun loadCartItemsOfNextPage() {
-        if (!::currentUser.isInitialized) return
-
         currentPage++
         showOrderUI(selectedCart)
         showCartItems(currentPage, selectedCart, true)
@@ -41,8 +31,6 @@ class CartPresenter(
     }
 
     override fun loadCartItemsOfPreviousPage() {
-        if (!::currentUser.isInitialized) return
-
         currentPage--
         showCartItems(currentPage, selectedCart, true)
         showPageUI(currentPage)
@@ -50,8 +38,6 @@ class CartPresenter(
     }
 
     override fun loadCartItemsOfLastPage() {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.countAll(currentUser).thenAccept {
             val count = it.getOrThrow()
             currentPage = (count - 1) / pageSize + 1
@@ -65,8 +51,6 @@ class CartPresenter(
     }
 
     override fun deleteCartItem(cartItemId: Long) {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.deleteById(cartItemId, currentUser).thenAccept {
             selectedCart = Cart(selectedCart.value.filter { it.id != cartItemId }.toSet())
             showPageUI(currentPage)
@@ -78,8 +62,6 @@ class CartPresenter(
     }
 
     override fun updateSelectionCartItem(cartItemId: Long, isSelected: Boolean) {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.findById(cartItemId, currentUser).thenAccept {
             val loadedCartItem = it.getOrThrow()
             selectedCart = if (isSelected) {
@@ -96,8 +78,6 @@ class CartPresenter(
     }
 
     override fun updateSelectionTotalCartItems(isSelected: Boolean) {
-        if (!::currentUser.isInitialized) return
-
         val offset = (currentPage - 1) * pageSize
         cartItemRepository.findAllOrderByAddedTime(
             pageSize, offset, currentUser
@@ -119,8 +99,6 @@ class CartPresenter(
     }
 
     override fun plusCount(cartItemId: Long) {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.plusQuantity()
@@ -132,8 +110,6 @@ class CartPresenter(
     }
 
     override fun minusCount(cartItemId: Long) {
-        if (!::currentUser.isInitialized) return
-
         cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.minusQuantity()
@@ -145,8 +121,6 @@ class CartPresenter(
     }
 
     override fun checkPayment() {
-        if (!::currentUser.isInitialized) return
-
         val totalPrice = selectedCart.calculateTotalPrice()
         orderRepository.findDiscountPolicy(totalPrice, currentUser.rank.toString())
             .thenAccept { orderResult ->
@@ -159,8 +133,6 @@ class CartPresenter(
     }
 
     override fun placeOrder() {
-        if (!::currentUser.isInitialized) return
-
         orderRepository.save(selectedCart.value.map { it.id }, currentUser)
             .thenAccept { orderIdResult ->
                 val orderId = orderIdResult.getOrThrow()

@@ -6,7 +6,6 @@ import woowacourse.shopping.ui.order.uistate.PaymentUIState
 interface CartContract {
 
     interface Presenter {
-        fun loadCurrentUser()
         fun loadCartItemsOfNextPage()
         fun loadCartItemsOfPreviousPage()
         fun loadCartItemsOfLastPage()

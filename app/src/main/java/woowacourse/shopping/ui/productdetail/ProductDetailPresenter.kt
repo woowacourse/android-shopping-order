@@ -14,23 +14,12 @@ class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository,
-    private val userRepository: UserRepository,
+    userRepository: UserRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository
 ) : ProductDetailContract.Presenter {
-    private lateinit var currentUser: User
-
-    override fun loadCurrentUser() {
-        val loadedUserResult = userRepository.findCurrent().get()
-        loadedUserResult.onSuccess {
-            currentUser = it
-        }.onFailure {
-            view.showError(it.message.orEmpty())
-        }
-    }
+    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
 
     override fun loadProduct(productId: Long) {
-        if (!::currentUser.isInitialized) return
-
         productRepository.findById(productId).thenAccept {
             val product = it.getOrThrow()
             val isProductExistInCart =
@@ -44,8 +33,6 @@ class ProductDetailPresenter(
     }
 
     override fun addProductToCart(productId: Long, count: Int) {
-        if (!::currentUser.isInitialized) return
-
         require(count > 0) { ERROR_PRODUCT_COUNT_ZERO }
 
         productRepository.findById(productId).thenCompose {
