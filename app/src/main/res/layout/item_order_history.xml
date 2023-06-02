@@ -92,7 +92,7 @@
                     android:layout_marginTop="12dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{@string/product_total_payment_and_count_format(order.firstProductTotalPayment, order.firstProductQuantity)}"
+                    android:text="@{@string/product_total_payment_and_count_format(order.firstProductTotalPayment.value, order.firstProductQuantity.value)}"
                     android:textColor="@color/woowa_gray_500"
                     app:layout_constraintEnd_toEndOf="@+id/product_name_text_view"
                     app:layout_constraintStart_toStartOf="@+id/product_name_text_view"
