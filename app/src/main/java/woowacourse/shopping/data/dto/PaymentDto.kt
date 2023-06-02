@@ -9,7 +9,7 @@ data class PaymentResponse(
     val originalPayment: Int = 0,
     @SerializedName("finalPayment")
     val finalPayment: Int = 0,
-    @SerializedName("usedPoint")
+    @SerializedName("point")
     val usedPoint: Int = 0,
 )
 
@@ -19,6 +19,6 @@ data class PaymentRequest(
     val originalPayment: Int,
     @SerializedName("finalPayment")
     val finalPayment: Int,
-    @SerializedName("usedPoint")
+    @SerializedName("point")
     val usedPoint: Int,
 )

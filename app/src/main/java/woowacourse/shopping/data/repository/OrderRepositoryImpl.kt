@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,6 +25,7 @@ class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
                     onSuccess()
                     return
                 }
+                Log.d("buna", response.code().toString())
                 onFailed(Throwable(response.message()))
             }
 
