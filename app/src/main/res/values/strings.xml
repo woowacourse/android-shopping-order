@@ -26,6 +26,14 @@
     <string name="order_point_save_title_info_text">적립 포인트</string>
     <string name="order_pay_button_text">결제하기</string>
 
+    <string name="order_detail_date_title_info_text">주문 날짜</string>
+    <string name="order_detail_product_list_title_info_text">상품 목록</string>
+    <string name="order_detail_payment_title_info_text">결제 상세</string>
+    <string name="order_detail_payment_order_price_title_info_text">주문 금액</string>
+    <string name="order_detail_payment_use_point_title_info_text">포인트 사용</string>
+    <string name="order_detail_payment_save_point_title_info_text">포인트 적립</string>
+    <string name="order_detail_payment_total_price_title_info_text">결제 금액</string>
+
     <string name="layout_count_view_minus_text">－</string>
     <string name="layout_count_view_plus_text">＋</string>
 
