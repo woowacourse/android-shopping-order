@@ -49,7 +49,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     override fun showErrorMessage(errorMessage: String) {
-        val intent = ShoppingActivity.getResultIntent()
+        val intent = ShoppingActivity.getIntent(this)
 
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         startActivity(intent)

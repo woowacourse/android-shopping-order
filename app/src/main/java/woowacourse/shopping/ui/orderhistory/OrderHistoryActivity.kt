@@ -48,9 +48,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun showErrorMessage(errorMessage: String) {
-        val intent: Intent = ShoppingActivity.getResultIntent().apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        val intent: Intent = ShoppingActivity.getIntent(this)
 
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         startActivity(intent)

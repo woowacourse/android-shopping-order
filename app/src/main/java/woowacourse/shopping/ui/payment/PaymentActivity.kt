@@ -13,10 +13,10 @@ import woowacourse.shopping.data.datasource.user.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.BasketProductUiModel
 import woowacourse.shopping.ui.model.UserUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.getParcelableArrayExtraCompat
 import woowacourse.shopping.util.handleMissingData
 import woowacourse.shopping.util.setImage
@@ -106,9 +106,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun showOrderFailedMessage(message: String) {
-        val intent = BasketActivity.getIntent(this).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        val intent = ShoppingActivity.getIntent(this)
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         startActivity(intent)

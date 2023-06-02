@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
@@ -210,5 +211,13 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         private const val FROM_ANOTHER_ACTIVITY = "FromAnotherActivity"
 
         fun getResultIntent() = Intent().putExtra(FROM_ANOTHER_ACTIVITY, true)
+
+        fun getIntent(context: Context): Intent {
+            val intent = Intent(context, ShoppingActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+
+            return intent
+        }
     }
 }
