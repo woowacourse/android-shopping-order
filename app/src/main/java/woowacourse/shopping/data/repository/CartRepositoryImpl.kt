@@ -35,7 +35,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
     }
 
     override fun findCartProductByProductId(
-        productId: Int,
+        productId: ProductId,
         onSuccess: (CartProduct) -> Unit,
         onFailed: (Throwable) -> Unit,
     ) {
@@ -76,7 +76,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         })
     }
 
-    override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount) {
+    override fun increaseProductCountByProductId(productId: ProductId, addCount: ProductCount) {
         findCartProductByProductId(
             productId = productId,
             onSuccess = { cartProduct ->
