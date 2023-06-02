@@ -5,34 +5,52 @@ import com.example.domain.model.CartProducts
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.PointRepository
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.mapper.toPresentation
+import woowacourse.shopping.model.CartProductUiModel
 
 class PaymentPresenterTest {
 
     private lateinit var presenter: PaymentContract.Presenter
     private lateinit var view: PaymentContract.View
     private lateinit var cartRepository: CartRepository
+    private lateinit var pointRepository: PointRepository
 
     @Before
     fun setup() {
         view = mockk(relaxed = true)
         cartRepository = mockk(relaxed = true)
-        presenter = PaymentPresenter(view, cartRepository)
+        pointRepository = mockk(relaxed = true)
+        presenter = PaymentPresenter(view, cartRepository, pointRepository)
     }
 
     @Test
     fun `구매할 상품 목록을 노출한다`() {
-        every { view.showCartProducts(any()) } just Runs
+        val slot = slot<List<CartProductUiModel>>()
+        every { view.showCartProducts(capture(slot)) } just Runs
+        every { cartRepository.getAll() } returns fakeCartProducts()
 
-        presenter.loadCartProducts(listOf(1, 2, 4))
+        presenter.loadCartProducts(listOf(1, 2, 3, 4, 5))
 
+        val expected = fakeCartProducts().data.map { it.toPresentation() }
+        val actual = slot.captured
         verify { view.showCartProducts(any()) }
+        assert(actual == expected)
+    }
+
+    @Test
+    fun `보유 포인트를 노출한다`() {
+        presenter.loadPoint()
+
+        verify { view.showPoint(any()) }
     }
 
     private fun fakeCartProducts(): CartProducts {

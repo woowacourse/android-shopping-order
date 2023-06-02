@@ -27,4 +27,5 @@
     <string name="order_price">주문 금액</string>
     <string name="point_to_use">사용 할 포인트</string>
     <string name="use_all">전액 사용</string>
+    <string name="current_point">보유 포인트: %,d원</string>
 </resources>

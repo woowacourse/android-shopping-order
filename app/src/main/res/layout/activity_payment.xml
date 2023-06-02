@@ -101,12 +101,14 @@
                     app:layout_constraintTop_toTopOf="@id/point_title_tv" />
 
                 <EditText
+                    android:id="@+id/point_et"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/bg_round_border"
                     android:importantForAutofill="no"
                     android:inputType="number"
+                    android:padding="6dp"
                     app:layout_constraintBottom_toBottomOf="@id/point_title_tv"
                     app:layout_constraintEnd_toStartOf="@id/all_point_btn"
                     app:layout_constraintTop_toTopOf="@id/point_title_tv" />
