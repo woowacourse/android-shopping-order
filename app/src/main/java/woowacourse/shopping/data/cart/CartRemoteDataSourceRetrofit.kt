@@ -70,7 +70,23 @@ class CartRemoteDataSourceRetrofit: CartRemoteDataSource {
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
-        TODO("Not yet implemented")
+        val json = JSONObject()
+            .put("quantity", quantity)
+        val body = json.toString().toRequestBody("application/json".toMediaType())
+        cartService.updateCartProductQuantity(id, Storage.credential, body).enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if(response.isSuccessful) {
+                    onSuccess()
+                }
+                else {
+                    onFailure()
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 
     override fun deleteCartProduct(
