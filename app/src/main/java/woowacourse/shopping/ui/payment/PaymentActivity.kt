@@ -102,15 +102,19 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     private fun successToApplyPoint(price: Int) {
-        binding.tvPaymentActualAmount.text = price.toString()
-        binding.tvPaymentPointMessage.isVisible = false
-        binding.btnPaymentFinalOrder.isEnabled = true
+        with(binding) {
+            tvPaymentActualAmount.text = price.toString()
+            tvPaymentPointMessage.isVisible = false
+            btnPaymentFinalOrder.isEnabled = true
+        }
     }
 
     private fun failedToApplyPoint(price: Int) {
-        binding.tvPaymentActualAmount.text = price.toString()
-        binding.tvPaymentPointMessage.isVisible = true
-        binding.btnPaymentFinalOrder.isEnabled = false
+        with(binding) {
+            tvPaymentActualAmount.text = price.toString()
+            tvPaymentPointMessage.isVisible = true
+            btnPaymentFinalOrder.isEnabled = false
+        }
     }
 
     companion object {
