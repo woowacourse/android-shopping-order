@@ -41,9 +41,10 @@ class CartRemoteDataSourceRetrofit: CartRemoteDataSource {
         })
     }
 
-    override fun addCartProduct(id: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addCartProduct(id: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         val json = JSONObject()
             .put("productId", id)
+            .put("quantity", quantity)
         val body = json.toString().toRequestBody("application/json".toMediaType())
         cartService.createCartProduct(Storage.credential, body).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {

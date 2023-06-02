@@ -2,7 +2,6 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
 
@@ -20,9 +19,10 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addCartProduct(productId: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         cartRemoteDataSource.addCartProduct(
-            product.id,
+            productId,
+            quantity,
             onSuccess = { onSuccess(it) },
             onFailure = { onFailure() }
         )

@@ -51,7 +51,8 @@ class CartProductDialogPresenter(
 
     private fun addCartProduct() {
         cartRepository.addCartProduct(
-            product = cartProduct.product,
+            productId = cartProduct.product.id,
+            quantity = cartProduct.quantity,
             onSuccess = {
                 view.notifyAddToCartCompleted()
             },

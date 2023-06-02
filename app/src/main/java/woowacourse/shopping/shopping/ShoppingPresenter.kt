@@ -5,7 +5,6 @@ import woowacourse.shopping.common.model.ShoppingProductModel
 import woowacourse.shopping.common.model.mapper.ProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ProductMapper.toView
 import woowacourse.shopping.common.model.mapper.RecentProductMapper.toView
-import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toDomain
 import woowacourse.shopping.common.model.mapper.ShoppingProductMapper.toView
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
@@ -200,10 +199,11 @@ class ShoppingPresenter(
     }
 
     private fun addToCart(shoppingProductModel: ShoppingProductModel) {
+        val shoppingProduct = ShoppingProduct(shoppingProductModel.product.toDomain(), 1)
         cartRepository.addCartProduct(
-            shoppingProductModel.toDomain().product,
+            productId = shoppingProduct.product.id,
+            quantity = shoppingProduct.quantity,
             onSuccess = {
-                val shoppingProduct = ShoppingProduct(shoppingProductModel.product.toDomain(), 1)
                 shoppingProducts = shoppingProducts.replaceShoppingProduct(shoppingProduct)
                 view.updateShoppingProduct(shoppingProduct.toView())
                 updateCartQuantity()
