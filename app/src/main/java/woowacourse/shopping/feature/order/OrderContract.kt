@@ -7,7 +7,8 @@ interface OrderContract {
         fun showProducts(products: List<CartProductUiModel>)
         fun showDiscount(standardPrice: Int, discountAmount: Int)
         fun showNonDiscount()
-        fun showFinalPrice(price: Int)
+        fun showPayAmountInfo(totalPrice: Int, discountAmount: Int = 0)
+        fun showPayAmount(payAmount: Int)
     }
 
     interface Presenter {

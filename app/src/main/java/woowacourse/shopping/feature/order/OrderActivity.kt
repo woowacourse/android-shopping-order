@@ -42,14 +42,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    companion object {
-        private const val PRODUCTS_ID_KEY = "productsId"
-        fun getIntent(context: Context, cartId: List<Long>): Intent {
-            return Intent(context, OrderActivity::class.java)
-                .putExtra(PRODUCTS_ID_KEY, cartId.toLongArray())
-        }
-    }
-
     override fun showProducts(products: List<CartProductUiModel>) {
         adapter = OrderProductAdapter(products)
         binding.recyclerviewOrderedProducts.adapter = adapter
@@ -69,7 +61,21 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.textDiscountAmount.visibility = View.GONE
     }
 
-    override fun showFinalPrice(price: Int) {
-        println()
+    override fun showPayAmountInfo(totalPrice: Int, discountAmount: Int) {
+        binding.textOrderPrice.text = getString(R.string.price_format, totalPrice.toMoneyFormat())
+        binding.textDiscountPrice.text =
+            getString(R.string.price_format, discountAmount.toMoneyFormat())
+    }
+
+    override fun showPayAmount(payAmount: Int) {
+        binding.textFinalPrice.text = getString(R.string.price_format, payAmount.toMoneyFormat())
+    }
+
+    companion object {
+        private const val PRODUCTS_ID_KEY = "productsId"
+        fun getIntent(context: Context, cartId: List<Long>): Intent {
+            return Intent(context, OrderActivity::class.java)
+                .putExtra(PRODUCTS_ID_KEY, cartId.toLongArray())
+        }
     }
 }

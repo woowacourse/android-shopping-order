@@ -23,8 +23,8 @@
     <string name="order_price">주문 금액</string>
     <string name="discount_price">할인 금액</string>
     <string name="final_price">최종 결제 금액</string>
-    <string name="discount_condition">%s 이상 구매 시</string>
-    <string name="discount_amount">%s 할인</string>
+    <string name="discount_condition">%s원 이상 구매 시</string>
+    <string name="discount_amount">%s원 할인</string>
     <string name="discount_price_format">-%s 원</string>
     <string name="cart_count">%s 개</string>
     <string name="payment_price">결제 금액</string>

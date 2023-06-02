@@ -12,6 +12,7 @@ class OrderPresenter(
     private var orderProducts: List<CartProductUiModel> = listOf()
     private var discountCondition: Discount.Condition? = null
     private var totalPrice = 0
+    private var payAmount = 0
 
     override fun requestProducts(cartIds: List<Long>) {
         cartRepository.getAll(
@@ -30,29 +31,40 @@ class OrderPresenter(
         )
     }
 
-    fun calculatePrice() {
+    private fun calculatePrice() {
         totalPrice = orderProducts.sumOf {
             it.productUiModel.price * it.productUiModel.count
         }
-        calculateDiscountedPrice()
+        calculatePayAmount()
     }
 
-    private fun calculateDiscountedPrice() {
+    private fun calculatePayAmount() {
+        calculateDiscount()
+        view.showPayAmount(payAmount)
+    }
+
+    private fun calculateDiscount() {
         val (discountedPrice, discountCondition) = Discount(totalPrice).use()
         this.discountCondition = discountCondition
         when (this.discountCondition) {
-            null -> showNonDiscount()
-            else -> showDiscount(discountedPrice, discountCondition ?: return showNonDiscount())
+            null -> {
+                payAmount = totalPrice
+                showNonDiscount()
+            }
+            else -> {
+                payAmount = discountedPrice
+                showDiscount(discountCondition ?: return showNonDiscount())
+            }
         }
     }
 
     private fun showNonDiscount() {
         view.showNonDiscount()
-        view.showFinalPrice(totalPrice)
+        view.showPayAmountInfo(totalPrice)
     }
 
-    private fun showDiscount(discountedPrice: Int, discountCondition: Discount.Condition) {
+    private fun showDiscount(discountCondition: Discount.Condition) {
         view.showDiscount(discountCondition.standardPrice, discountCondition.amount)
-        view.showFinalPrice(discountedPrice)
+        view.showPayAmountInfo(totalPrice, discountCondition.amount)
     }
 }
