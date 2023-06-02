@@ -16,16 +16,16 @@
         android:name=".MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".shopping.ShoppingActivity"
+            android:name=".ui.shopping.ShoppingActivity"
             android:exported="false" />
         <activity
-            android:name=".cart.CartActivity"
+            android:name=".ui.cart.CartActivity"
             android:exported="false" />
         <activity
-            android:name=".productdetail.ProductDetailActivity"
+            android:name=".ui.productdetail.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".serverselect.SeverSelectActivity"
+            android:name=".ui.serverselect.SeverSelectActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

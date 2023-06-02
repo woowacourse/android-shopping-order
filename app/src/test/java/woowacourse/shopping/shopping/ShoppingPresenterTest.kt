@@ -9,13 +9,15 @@ import io.mockk.runs
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.common.model.mapper.ProductMapper.toView
+import woowacourse.shopping.ui.model.mapper.ProductMapper.toView
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.createRecentProduct
 import woowacourse.shopping.createShoppingProductModel
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.shopping.ShoppingContract
+import woowacourse.shopping.ui.shopping.ShoppingPresenter
 
 class ShoppingPresenterTest {
     private lateinit var presenter: ShoppingPresenter
@@ -160,7 +162,7 @@ class ShoppingPresenterTest {
     fun 카트에_담긴_상품_개수를_증가시키면_카트에_상품이_추가되고_상품과_카트의_총_상품_개수가_업데이트된다() {
         // given
         every { cartRepository.findByProductId(any(), any(), any()) } just runs
-        every { cartRepository.addCartProduct(any(), any(), any()) } just runs
+        every { cartRepository.addCartProduct(any(), any(), any(), any()) } just runs
         every { view.updateShoppingProduct(any()) } just runs
         every { view.updateCartQuantity(any()) } just runs
 
@@ -170,7 +172,7 @@ class ShoppingPresenterTest {
 
         // then
         verify {
-            cartRepository.addCartProduct(any(), any(), any())
+            cartRepository.addCartProduct(any(), any(), any(), any())
             view.updateShoppingProduct(any())
             view.updateCartQuantity(any())
         }

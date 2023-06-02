@@ -7,11 +7,13 @@ import io.mockk.runs
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.common.model.CartProductModel
+import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.createCartProductModel
 import woowacourse.shopping.createProductModel
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.cart.CartContract
+import woowacourse.shopping.ui.cart.CartPresenter
 
 class CartPresenterTest {
     private lateinit var presenter: CartPresenter
