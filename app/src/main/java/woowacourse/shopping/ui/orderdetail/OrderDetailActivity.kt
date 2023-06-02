@@ -35,6 +35,10 @@ class OrderDetailActivity : AppCompatActivity(), View {
         binding.adapter?.addAll(orders)
     }
 
+    override fun navigateToOrderHistory() {
+        finish()
+    }
+
     companion object {
         private const val ORDER_KEY = "order_key"
 

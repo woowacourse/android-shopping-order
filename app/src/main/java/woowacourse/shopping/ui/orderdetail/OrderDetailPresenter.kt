@@ -11,4 +11,8 @@ class OrderDetailPresenter(
     override fun fetchOrderDetail() {
         view.showOrderDetail(order.orderProducts + order.payment)
     }
+
+    override fun navigateToOrderHistory() {
+        view.navigateToOrderHistory()
+    }
 }
