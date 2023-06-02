@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.shoppingmain
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View.GONE
@@ -180,5 +182,8 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
 
     companion object {
         private const val DEPTH_PARENT = 0
+        fun intent(context: Context): Intent {
+            return Intent(context, ShoppingMainActivity::class.java)
+        }
     }
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".serverselect.SeverSelectActivity">
+
+
+        <TextView
+            android:id="@+id/tv_select_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/server_select_message"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_jerry_server"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <Button
+            android:id="@+id/btn_jerry_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="@color/main_color"
+            android:padding="10dp"
+            android:text="@string/jerry_server"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_gitjjang_server"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_select_server" />
+
+        <Button
+            android:id="@+id/btn_gitjjang_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/main_color"
+            android:padding="10dp"
+            android:text="@string/gitjjang_server"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_hoi_server"
+            app:layout_constraintEnd_toEndOf="@id/btn_jerry_server"
+            app:layout_constraintStart_toStartOf="@id/btn_jerry_server"
+            app:layout_constraintTop_toBottomOf="@id/btn_jerry_server" />
+
+        <Button
+            android:id="@+id/btn_hoi_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/main_color"
+            android:padding="10dp"
+            android:text="@string/hoi_server"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/btn_jerry_server"
+            app:layout_constraintStart_toStartOf="@id/btn_jerry_server"
+            app:layout_constraintTop_toBottomOf="@id/btn_gitjjang_server" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

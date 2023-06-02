@@ -13,4 +13,8 @@
     <string name="latest_product_description">마지막으로 본 상품</string>
     <string name="order_format">주문하기(%d)</string>
     <string name="select_all">전체</string>
+    <string name="server_select_message"><![CDATA[서버를 선택해 주세용 ~ >_<]]></string>
+    <string name="jerry_server">제리의 서버</string>
+    <string name="gitjjang_server">깃짱의 서버</string>
+    <string name="hoi_server">호이의 서버</string>
 </resources>
