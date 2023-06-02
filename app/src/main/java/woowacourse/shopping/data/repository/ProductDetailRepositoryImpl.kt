@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.os.Looper
-import android.util.Log
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductDetailRepository
 import retrofit2.Call
@@ -14,9 +12,7 @@ class ProductDetailRepositoryImpl(
 ) : ProductDetailRepository {
     override fun getById(id: Long, onSuccess: (Product) -> Unit, onFailure: (Exception) -> Unit) {
         productDetailSource.getById(id).enqueue(
-            createResponseCallback(onSuccess = {
-                it.toDomain()
-            }, onFailure),
+            createResponseCallback(onSuccess = { onSuccess(it.toDomain()) }, onFailure),
         )
     }
 
@@ -24,24 +20,18 @@ class ProductDetailRepositoryImpl(
         crossinline onSuccess: (T) -> Unit,
         crossinline onFailure: (Exception) -> Unit,
     ): Callback<T> {
-        val handler = android.os.Handler(Looper.getMainLooper())
         return object : Callback<T> {
             override fun onResponse(call: Call<T>, response: retrofit2.Response<T>) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    handler.post {
-                        Log.d("ProductRepositoryImpl", "responseBody: $responseBody")
-                        onSuccess(responseBody)
-                    }
+                    onSuccess(responseBody)
                 } else {
-                    handler.post {
-                        onFailure(Exception("Response unsuccessful"))
-                    }
+                    onFailure(Exception("Response unsuccessful"))
                 }
             }
 
             override fun onFailure(call: Call<T>, t: Throwable) {
-                TODO("Not yet implemented")
+                onFailure(Exception("Response unsuccessful"))
             }
         }
     }

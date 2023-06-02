@@ -34,13 +34,13 @@ class CartAdapter(
 
     fun updateItem(id: Long, count: Int) {
         val index = cartItems.indexOfFirst { it.product.id == id }
-        cartItems[index] = cartItems[index].copy(count = count)
+        cartItems[index] = cartItems[index].copy(quantity = count)
         notifyDataSetChanged()
     }
 
     fun updateChecked(id: Long, isChecked: Boolean) {
-        val index = cartItems.indexOfFirst { it.product.id == id }
-        cartItems[index] = cartItems[index].copy(isChecked = isChecked)
-        notifyDataSetChanged()
+        /* val index = cartItems.indexOfFirst { it.product.id == id }
+         cartItems[index] = cartItems[index].copy(isChecked = isChecked)
+         notifyDataSetChanged()*/
     }
 }

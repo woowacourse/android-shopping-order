@@ -28,19 +28,18 @@ class ProductDetailPresenter(
         repository.getById(
             id,
             onSuccess =
-            {
-                view.setProductDetail(it.toUIModel())
-            },
+            { view.setProductDetail(it.toUIModel()) },
             onFailure = {},
         )
     }
 
     override fun addProductToCart() {
-        /*CartProduct(product.toDomain(), count, true).let {
-            cartRepository.insert(it)
-        }*/
+        cartRepository.findById(id, onSuccess = {
+            if (it != null) {
+                cartRepository.updateCount(it.id, count, {}, {})
+            }
+        })
     }
-
     override fun addProductToRecent() {
         recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)
@@ -75,9 +74,11 @@ class ProductDetailPresenter(
 
     override fun addProductCount(id: Long) {
         count++
+        view.setProductCount(count)
     }
 
     override fun subtractProductCount(id: Long) {
         count--
+        view.setProductCount(count)
     }
 }

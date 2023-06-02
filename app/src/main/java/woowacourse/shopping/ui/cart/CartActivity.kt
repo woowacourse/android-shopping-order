@@ -6,8 +6,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
-import woowacourse.shopping.database.cart.CartDBHelper
-import woowacourse.shopping.database.cart.CartDatabase
+import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.CartUIModel
@@ -26,7 +27,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener
         setContentView(binding.root)
 
         presenter = CartPresenter(
-            CartDatabase(CartDBHelper(this).writableDatabase),
+            CartRepositoryImpl(ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this))),
             this,
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
@@ -69,7 +70,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener
     }
 
     override fun navigateToItemDetail(product: ProductUIModel) {
-        startActivity(ProductDetailActivity.from(this, product))
+        startActivity(ProductDetailActivity.from(this, product.id))
     }
 
     override fun setCartItemsPrice(price: Int) {

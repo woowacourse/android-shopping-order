@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -64,6 +65,7 @@ class ShoppingActivity :
 
     override fun onResume() {
         super.onResume()
+        presenter.initProducts()
         presenter.updateProducts()
         presenter.updateCountSize()
     }
@@ -129,6 +131,7 @@ class ShoppingActivity :
     }
 
     override fun showCountSize(size: Int) {
+        Log.d("ShoppingActivity", "showCountSize: $size")
         cartSize?.text = size.toString()
     }
 

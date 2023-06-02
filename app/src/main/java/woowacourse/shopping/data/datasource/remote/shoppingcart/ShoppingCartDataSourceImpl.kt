@@ -1,34 +1,29 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import okhttp3.Call
-import okhttp3.FormBody
-import okhttp3.RequestBody
-import woowacourse.shopping.data.remote.NetworkModule
+import retrofit2.Call
+import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
+import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.remote.request.CartProductDTO
 
-class ShoppingCartDataSourceImpl : ShoppingCartDataSource {
+class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) :
+    ShoppingCartDataSource {
 
-    override fun getAllProductInCart(): Call {
-        return NetworkModule.getService(CART_PATH)
+    private val token = authInfoDataSource.getAuthInfo() ?: throw IllegalArgumentException()
+
+    override fun getAllProductInCart(): Call<List<CartProductDTO>> {
+        return ServicePool.shoppingCartService.getAllProductInCart(token)
     }
 
-    override fun postProductToCart(productId: Long): Call {
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("productId", "$productId")
-            .build()
-
-        return NetworkModule.postService(POST_PRODUCT_TO_CART, requestBody)
+    override fun postProductToCart(productId: Long): Call<Void> {
+        return ServicePool.shoppingCartService.postProductToCart(token, productId)
     }
 
-    override fun patchProductCount(productId: Long, quantity: Int): Call {
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("quantity", "$quantity")
-            .build()
-
-        return NetworkModule.patchService("$CART_PATH/$productId", requestBody)
+    override fun patchProductCount(cartItemId: Long, quantity: Int): Call<Unit> {
+        return ServicePool.shoppingCartService.patchProductCount(token, cartItemId, quantity)
     }
 
-    override fun deleteProductInCart(productId: Long): Call {
-        return NetworkModule.deleteService("$CART_PATH/$productId")
+    override fun deleteProductInCart(productId: Long): Call<Unit> {
+        return ServicePool.shoppingCartService.deleteProductInCart(token, productId)
     }
 
     companion object {

@@ -1,101 +1,158 @@
 package woowacourse.shopping.data.repository
 
-import android.os.Looper
+import android.util.Log
 import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSource
+import woowacourse.shopping.data.remote.request.CartProductDTO
+import woowacourse.shopping.mapper.toDomain
 import java.io.IOException
 
 class CartRepositoryImpl(
     private val shoppingCartDataSource: ShoppingCartDataSource,
 ) : CartRepository {
-    private val productInCart = mutableListOf<CartProduct>()
+    private val _productInCart = mutableListOf<CartProduct>()
+    private var isCartDataCached = false
     override fun getAllProductInCart(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
+        if (isCartDataCached) {
+            onSuccess(_productInCart)
+            return
+        }
+
         shoppingCartDataSource.getAllProductInCart().enqueue(
-            createResponseCallback(onSuccess, onFailure),
+            object : Callback<List<CartProductDTO>> {
+                override fun onResponse(
+                    call: Call<List<CartProductDTO>>,
+                    response: Response<List<CartProductDTO>>,
+                ) {
+                    onSuccess(response.body()!!.map { it.toDomain() })
+                }
+
+                override fun onFailure(call: Call<List<CartProductDTO>>, t: Throwable) {
+                    onFailure(IOException("Response unsuccessful"))
+                }
+            },
         )
     }
 
     override fun insert(
-        cartProduct: CartProduct,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit,
-    ) {
-        shoppingCartDataSource.postProductToCart(cartProduct.product.id).enqueue(
-            createResponseCallback(onSuccess, onFailure),
-        )
-    }
-
-    override fun remove(
         id: Long,
-        onSuccess: (String) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
-        shoppingCartDataSource.deleteProductInCart(id).enqueue(
-            createResponseCallback(onSuccess, onFailure),
+        shoppingCartDataSource.postProductToCart(id).enqueue(
+            object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onFailure(IOException("Response unsuccessful"))
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    onFailure(IOException("Response unsuccessful"))
+                }
+            },
         )
     }
 
     override fun updateCount(
         id: Long,
         count: Int,
-        onSuccess: (String) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
         shoppingCartDataSource.patchProductCount(id, count).enqueue(
-            createResponseCallback(onSuccess, onFailure),
+            object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onFailure(IOException("Response unsuccessful"))
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure(IOException("Response unsuccessful"))
+                }
+            },
         )
     }
 
-    override fun findById(id: Long): CartProduct? {
-        // 프로퍼티에서 가져옴
-        return null
+    override fun remove(id: Long, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        shoppingCartDataSource.deleteProductInCart(id).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onFailure(IOException("Response unsuccessful"))
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure(IOException("Response unsuccessful"))
+                }
+            },
+        )
     }
 
-    override fun getSubList(offset: Int, step: Int): List<CartProduct> {
-        // 프로퍼티에서 가져옴
-
-        return productInCart
-    }
-
-    private inline fun <reified T> createResponseCallback(
-        crossinline onSuccess: (T) -> Unit,
-        crossinline onFailure: (Exception) -> Unit,
-    ): Callback {
-        val handler = android.os.Handler(Looper.getMainLooper())
-        return object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    Thread {
-                        val result = parseToObject<T>(response.body?.string())
-                        handler.post {
-                            onSuccess.invoke(result)
-                        }
-                    }.start()
-                    return
-                }
-                handler.post {
-                    onFailure.invoke(Exception("Response unsuccessful"))
-                }
-            }
-
-            override fun onFailure(call: Call, e: IOException) {
-                handler.post {
-                    onFailure.invoke(e)
-                }
-            }
+    override fun findById(id: Long, onSuccess: (CartProduct?) -> Unit) {
+        if (!isCartDataCached) {
+            getAllProductInCart(
+                onSuccess = { cartProducts ->
+                    val cartProduct = cartProducts.find { it.product.id == id }
+                    onSuccess(cartProduct)
+                },
+                onFailure = { exception ->
+                    Log.e("CartRepositoryImpl", exception.message.toString())
+                },
+            )
+        } else {
+            val cartProduct = _productInCart.find { it.product.id == id }
+            onSuccess(cartProduct)
         }
     }
 
-    private inline fun <reified T> parseToObject(responseBody: String?): T {
-        return Gson().fromJson(responseBody, object : TypeToken<T>() {}.type)
+    override fun getSubList(offset: Int, step: Int, onSuccess: (List<CartProduct>) -> Unit) {
+        if (!isCartDataCached) {
+            val limitedProducts = _productInCart.subList(
+                offset.coerceAtMost(_productInCart.size),
+                (offset + step).coerceAtMost(_productInCart.size),
+            )
+            onSuccess(limitedProducts)
+        } else {
+            getAllProductInCart(
+                onSuccess = { cartProducts ->
+                    val limitedProducts = cartProducts.subList(
+                        offset.coerceAtMost(cartProducts.size),
+                        (offset + step).coerceAtMost(cartProducts.size),
+                    )
+                    onSuccess(limitedProducts)
+                },
+                onFailure = { exception ->
+                    Log.e("ProductRepositoryImpl", "getMoreProducts: $exception")
+                },
+            )
+        }
+        getAllProductInCart(
+            onSuccess = { cartProducts ->
+                val limitedProducts = cartProducts.subList(
+                    offset.coerceAtMost(cartProducts.size),
+                    (offset + step).coerceAtMost(cartProducts.size),
+                )
+                onSuccess(limitedProducts)
+            },
+            onFailure = { exception ->
+                Log.e("ProductRepositoryImpl", "getMoreProducts: $exception")
+            },
+        )
     }
 }

@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.selectserver
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
-import woowacourse.shopping.ui.login.LoginActivity
 
 class SelectServerActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySelectServerBinding
@@ -29,7 +28,6 @@ class SelectServerActivity : AppCompatActivity() {
     }
 
     private fun navigateToLogin(serverKey: Int) {
-        val intent = LoginActivity.getIntent(this, serverKey)
         startActivity(intent)
         finish()
     }

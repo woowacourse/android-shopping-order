@@ -9,24 +9,24 @@ interface CartRepository {
     )
 
     fun insert(
-        cartProduct: CartProduct,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit,
-    )
-
-    fun remove(
         id: Long,
-        onSuccess: (String) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit,
     )
 
     fun updateCount(
         id: Long,
         count: Int,
-        onSuccess: (String) -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit,
     )
 
-    fun findById(id: Long): CartProduct?
-    fun getSubList(offset: Int, step: Int): List<CartProduct>
+    fun remove(
+        id: Long,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun findById(id: Long, onSuccess: (CartProduct?) -> Unit)
+    fun getSubList(offset: Int, step: Int, onSuccess: (List<CartProduct>) -> Unit)
 }

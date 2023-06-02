@@ -8,10 +8,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailSourceImpl
+import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductDetailRepositoryImpl
-import woowacourse.shopping.database.cart.CartDBHelper
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.model.ProductUIModel
@@ -44,17 +45,19 @@ class ProductDetailActivity :
             ProductDetailRepositoryImpl(
                 ProductDetailSourceImpl(),
             ),
-            CartDatabase(CartDBHelper(this).writableDatabase),
+            CartRepositoryImpl(
+                ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this)),
+            ),
             RecentProductDatabase(this),
         )
-
-        binding.listener = this
-        binding.latestProduct =
-            intent.getSerializableExtraCompat(RECENT_KEY_PRODUCT)
 
         binding.cartButton.setOnClickListener {
             presenter.setProductCountDialog()
         }
+
+        binding.listener = this
+        binding.latestProduct =
+            intent.getSerializableExtraCompat(RECENT_KEY_PRODUCT)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -104,6 +107,10 @@ class ProductDetailActivity :
     override fun navigateToDetail(id: Long) {
         startActivity(from(this, id, null))
         finish()
+    }
+
+    override fun setProductCount(count: Int) {
+        productOrderDialog.setOrderCount(count)
     }
 
     override fun clickLatestProduct() {
