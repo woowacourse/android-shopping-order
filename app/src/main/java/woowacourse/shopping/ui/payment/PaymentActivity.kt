@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
@@ -12,6 +13,7 @@ import woowacourse.shopping.data.datasource.user.UserRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
+import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.BasketProductUiModel
 import woowacourse.shopping.ui.model.UserUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
@@ -96,8 +98,19 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         val intent = OrderDetailActivity.getIntent(
             context = this,
             orderId = orderId
-        )
+        ).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
 
+        startActivity(intent)
+    }
+
+    override fun showOrderFailedMessage(message: String) {
+        val intent = BasketActivity.getIntent(this).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         startActivity(intent)
     }
 

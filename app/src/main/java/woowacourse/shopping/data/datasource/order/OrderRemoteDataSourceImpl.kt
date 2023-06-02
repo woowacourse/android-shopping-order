@@ -15,6 +15,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     override fun addOrder(
         orderRequest: OrderRequest,
         onAdded: (orderId: Long) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.addOrder(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
@@ -25,18 +26,21 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<OrderResponse>,
                 response: Response<OrderResponse>,
             ) {
-                Log.d("woogi", "headers:\n ${response.headers()}")
-                Log.d("woogi", "상태코드: ${response.code()}")
-                Log.d("woogi", "메시지: ${response.message()}")
-                response.headers()["Location"]?.let {
-                    val orderId = it.split("/").last().toLong()
+                if (response.code() == 409) {
+                    onFailed(STOCK_ERROR)
+                } else {
+                    response.headers()[LOCATION]?.let {
+                        val orderId = it.split("/")
+                            .last()
+                            .toLong()
 
-                    onAdded(orderId)
+                        onAdded(orderId)
+                    }
                 }
             }
 
             override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
-                TODO("Not yet implemented")
+                onFailed(RESPONSE_ERROR)
             }
         })
     }
@@ -85,5 +89,11 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 TODO("Not yet implemented")
             }
         })
+    }
+
+    companion object {
+        private const val RESPONSE_ERROR = "서버로부터 응답을 받지 못했습니다."
+        private const val STOCK_ERROR = "상품 재고가 부족해 주문에 실패했습니다."
+        private const val LOCATION = "Location"
     }
 }

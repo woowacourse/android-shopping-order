@@ -6,9 +6,9 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.repository.OrderRepository
-import woowacourse.shopping.data.repository.UserRepository
 import woowacourse.shopping.domain.User
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.UserFixture
 import woowacourse.shopping.ui.mapper.toBasketProductUiModel
@@ -82,7 +82,8 @@ class PaymentPresenterTest {
                 basketIds = basketsId,
                 usingPoint = usingPoint,
                 totalPrice = totalPrice,
-                onAdded = capture(slotShowOrderDetail)
+                onAdded = capture(slotShowOrderDetail),
+                onFailed = {}
             )
         } answers {
             slotShowOrderDetail.captured.invoke(orderId)

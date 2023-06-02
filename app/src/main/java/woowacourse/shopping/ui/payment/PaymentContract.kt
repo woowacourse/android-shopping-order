@@ -14,6 +14,8 @@ interface PaymentContract {
         )
 
         fun showOrderDetail(orderId: Int)
+
+        fun showOrderFailedMessage(message: String)
     }
 
     interface Presenter {

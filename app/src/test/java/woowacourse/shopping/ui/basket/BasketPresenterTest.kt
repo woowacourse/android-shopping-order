@@ -2,11 +2,11 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.repository.OrderRepository
-import woowacourse.shopping.data.repository.UserRepository
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.basket.BasketContract
 import woowacourse.shopping.ui.basket.BasketPresenter

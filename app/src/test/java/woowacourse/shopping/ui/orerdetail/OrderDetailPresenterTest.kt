@@ -7,8 +7,8 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.Order
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
 import woowacourse.shopping.ui.mapper.toOrderUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract

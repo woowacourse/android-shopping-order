@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.payment
 
-import woowacourse.shopping.data.repository.OrderRepository
-import woowacourse.shopping.data.repository.UserRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.mapper.toUserUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 
@@ -28,7 +28,8 @@ class PaymentPresenter(
             basketIds = basketProducts.map { it.id },
             usingPoint = usingPoint,
             totalPrice = basketProducts.sumOf { it.product.price.value * it.count.value },
-            onAdded = view::showOrderDetail
+            onAdded = view::showOrderDetail,
+            onFailed = view::showOrderFailedMessage
         )
     }
 }

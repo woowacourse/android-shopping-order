@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.orderdetail
 
-import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.mapper.toOrderUiModel
 import woowacourse.shopping.ui.model.OrderUiModel
 

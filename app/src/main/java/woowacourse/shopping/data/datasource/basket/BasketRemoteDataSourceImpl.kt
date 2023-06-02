@@ -13,7 +13,6 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
     override fun getAll(onReceived: (List<BasketProductEntity>) -> Unit) {
         basketProductService.requestBasketProducts(
-            // todo: userInfo 어떻게 관리할지도 생각
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
 
@@ -21,16 +20,12 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 call: retrofit2.Call<List<BasketProductEntity>>,
                 response: retrofit2.Response<List<BasketProductEntity>>,
             ) {
-                Log.d("woogi", "onResponse: ${response.body()}")
                 response.body()?.let {
                     onReceived(it)
                 }
-                Log.d("woogi", "onResponse: 장바구니 상품 조회에 성공했습니다.")
             }
 
             override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
-                Log.d("woogi", "onFailure: ${t.message}")
-                Log.d("woogi", "onResponse: 장바구니 상품 조회에 실패했습니다.")
             }
         })
     }

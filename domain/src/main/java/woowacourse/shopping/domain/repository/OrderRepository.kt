@@ -1,8 +1,7 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.Order
 
-// todo: 위치가 어디에?
 interface OrderRepository {
 
     fun addOrder(
@@ -10,6 +9,7 @@ interface OrderRepository {
         usingPoint: Int,
         totalPrice: Int,
         onAdded: (orderId: Int) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     )
 
     fun getOrder(

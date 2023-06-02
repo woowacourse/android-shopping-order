@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.request.OrderRequest
 import woowacourse.shopping.data.mapper.toOrderDomainModel
 import woowacourse.shopping.domain.Order
+import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
@@ -15,17 +15,23 @@ class OrderRepositoryImpl(
         usingPoint: Int,
         totalPrice: Int,
         onAdded: (orderId: Int) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     ) {
         val orderRequest = OrderRequest(
             basketIds = basketIds.map(Int::toLong),
             usingPoint = usingPoint.toLong(),
             totalPrice = totalPrice.toLong()
         )
-        Log.d("woogi", "addOrder: $orderRequest")
 
-        orderRemoteDataSource.addOrder(orderRequest) { orderId ->
-            onAdded(orderId.toInt())
-        }
+        orderRemoteDataSource.addOrder(
+            orderRequest = orderRequest,
+            onAdded = { orderId ->
+                onAdded(orderId.toInt())
+            },
+            onFailed = { errorMessage ->
+                onFailed(errorMessage)
+            }
+        )
     }
 
     override fun getOrder(
