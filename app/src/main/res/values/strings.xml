@@ -28,4 +28,5 @@
     <string name="discount_price_format">-%s 원</string>
     <string name="cart_count">%s 개</string>
     <string name="payment_price">결제 금액</string>
+    <string name="no_discount">적용 가능한 할인이 없습니다.</string>
 </resources>

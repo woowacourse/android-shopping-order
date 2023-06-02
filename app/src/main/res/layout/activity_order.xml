@@ -97,12 +97,20 @@
                     app:layout_constraintTop_toBottomOf="@+id/divider_discount">
 
                     <TextView
+                        android:id="@+id/text_no_discount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_discount"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
                         android:id="@+id/text_discount_condition"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/discount_condition"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        tools:text="@string/discount_condition" />
 
                     <TextView
                         android:id="@+id/text_discount_amount"

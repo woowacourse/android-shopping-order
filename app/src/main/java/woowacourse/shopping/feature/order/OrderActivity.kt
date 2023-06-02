@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -11,6 +12,7 @@ import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.CartProductUiModel
+import woowacourse.shopping.util.toMoneyFormat
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -33,7 +35,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         return when (item.itemId) {
             android.R.id.home -> {
                 this.finish()
-//                presenter.exit()
                 true
             }
 
@@ -52,5 +53,23 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     override fun showProducts(products: List<CartProductUiModel>) {
         adapter = OrderProductAdapter(products)
         binding.recyclerviewOrderedProducts.adapter = adapter
+    }
+
+    override fun showDiscount(standardPrice: Int, discountAmount: Int) {
+        binding.textNoDiscount.visibility = View.GONE
+        binding.textDiscountCondition.text =
+            getString(R.string.discount_condition, standardPrice.toMoneyFormat())
+        binding.textDiscountAmount.text =
+            getString(R.string.discount_amount, discountAmount.toMoneyFormat())
+    }
+
+    override fun showNonDiscount() {
+        binding.textNoDiscount.visibility = View.VISIBLE
+        binding.textDiscountCondition.visibility = View.GONE
+        binding.textDiscountAmount.visibility = View.GONE
+    }
+
+    override fun showFinalPrice(price: Int) {
+        println()
     }
 }

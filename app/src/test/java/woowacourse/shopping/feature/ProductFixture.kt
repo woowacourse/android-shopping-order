@@ -5,6 +5,11 @@ import com.example.domain.model.Price
 import com.example.domain.model.Product
 
 object ProductFixture {
-    val products = listOf(Product(1, "", "", Price(1)))
-    val cartProducts = listOf(CartProduct(1, products[0], 0, false))
+    fun makeProduct(price: Int): Product {
+        return Product(1, "", "", Price(price))
+    }
+
+    fun makeCartProducts(product: Product, size: Int): List<CartProduct> {
+        return List(size) { CartProduct(1, product, 1, false) }
+    }
 }
