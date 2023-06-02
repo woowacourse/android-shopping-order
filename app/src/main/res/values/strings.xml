@@ -30,4 +30,5 @@
     <string name="discount_price_text">할인 금액</string>
     <string name="order_button_text">주문하기</string>
     <string name="final_price_text">최종 결제 금액</string>
+    <string name="order_history_text">주문 내역</string>
 </resources>
