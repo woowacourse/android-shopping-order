@@ -43,9 +43,10 @@ class OrderPresenter(
         view.showMoreOrders(orderItems)
     }
 
-    override fun applyPoint(point: PointModel) {
-        if (maxAvailablePoint.discountable(point.toDomain())) {
-            discountedOrder = originOrder.discount(point.toDomain())
+    override fun applyPoint(pointModel: PointModel) {
+        val point = pointModel.toDomain()
+        if (maxAvailablePoint.discountable(point)) {
+            discountedOrder = originOrder.discount(point)
             view.showFinalPayment(discountedOrder.finalPrice.toUi())
         }
     }

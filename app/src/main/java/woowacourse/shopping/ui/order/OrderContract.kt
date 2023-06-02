@@ -16,7 +16,7 @@ interface OrderContract {
 
     interface Presenter {
         fun fetchAll()
-        fun applyPoint(point: PointModel)
+        fun applyPoint(pointModel: PointModel)
         fun order()
         fun navigateToHome()
     }
