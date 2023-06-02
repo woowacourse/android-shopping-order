@@ -68,7 +68,9 @@ class OrderRemoteDataSourceImpl(
                     response: Response<OrderDetailEntity>
                 ) {
                     if (response.isSuccessful) {
-                        response.body()?.let { onSuccess(it.toModel()) } ?: return onFailure()
+                        response.body()?.let {
+                            onSuccess(it.toModel())
+                        } ?: return onFailure()
                         return
                     }
                     onFailure()

@@ -3,20 +3,28 @@ package woowacourse.shopping.presentation.view.orderdetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
+import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
+import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
+import woowacourse.shopping.presentation.view.util.showToast
 
-class OrderDetailActivity : AppCompatActivity() {
+class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private lateinit var binding: ActivityOrderDetailBinding
 
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
+
+    private lateinit var presenter: OrderDetailContract.Presenter
 
     private val orderId: Long by lazy {
         intent.getLongExtra(KEY_ORDER_ID, -1)
@@ -26,8 +34,69 @@ class OrderDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_detail)
 
+        if (orderId == -1L) return finish()
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+
+        setToolbar()
+        setPresenter()
+        presenter.loadOrderDetail(orderId)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+            }
+        }
+
+        return true
+    }
+
+    private fun setToolbar() {
+        supportActionBar?.title = getString(R.string.toolbar_title_order_detail)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun setPresenter() {
+        val orderDataSource = OrderRemoteDataSourceImpl(url, token)
+        presenter = OrderDetailPresenter(
+            this,
+            orderRepository = OrderRepositoryImpl(orderDataSource)
+        )
+    }
+
+    override fun setOrderProductItemView(orderProducts: List<CartModel>) {
+        binding.rvOrderDetailProductList.post {
+            binding.rvOrderDetailProductList.adapter = OrderProductListAdapter(orderProducts)
+        }
+    }
+
+    override fun setOrderDateView(oderDate: String) {
+        binding.orderDate = oderDate
+    }
+
+    override fun setOrderPriceView(orderPrice: Int) {
+        binding.orderPrice = orderPrice
+    }
+
+    override fun setTotalPriceView(totalPrice: Int) {
+        binding.totalPrice = totalPrice
+    }
+
+    override fun setUsedPointView(usedPoint: Int) {
+        binding.usedPoint = usedPoint
+    }
+
+    override fun setSavedPointView(savedPoint: Int) {
+        binding.savedPoint = savedPoint
+    }
+
+    override fun handleErrorView() {
+        binding.root.post {
+            showToast(getString(R.string.toast_message_system_error))
+            finish()
+        }
     }
 
     companion object {
