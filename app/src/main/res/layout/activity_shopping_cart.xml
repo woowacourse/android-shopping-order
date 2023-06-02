@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.shoppingcart.ShoppingCartActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tb_cart"
+            android:layout_width="0dp"
+            android:theme="@style/ToolBarTheme"
+            android:layout_height="wrap_content"
+            android:background="@color/background_main_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Cart"
+            app:titleTextColor="@color/white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_cart_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/lo_page_count"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tb_cart" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="148dp"
+            android:id="@+id/lo_page_count"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_cart_list"
+            app:layout_constraintBottom_toTopOf="@id/lo_total_information"
+            android:paddingVertical="50dp"
+            android:paddingHorizontal="115dp">
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:id="@+id/tv_page_down"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/page_count_button"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:background="@drawable/selector_page_down_button"/>
+
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:id="@+id/tv_page_counter"
+                tools:text="1"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                app:layout_constraintTop_toTopOf="@id/tv_page_down"
+                app:layout_constraintBottom_toBottomOf="@id/tv_page_up"
+                app:layout_constraintStart_toStartOf="@id/tv_page_down"
+                app:layout_constraintEnd_toEndOf="@id/tv_page_up"/>
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:id="@+id/tv_page_up"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/page_up_button"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:background="@drawable/selector_page_up_button"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lo_total_information"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="@color/background_main_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <CheckBox
+                android:id="@+id/check_box_all"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintBottom_toTopOf="@id/check_all_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+
+            <TextView
+                android:id="@+id/check_all_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@id/check_box_all"
+                app:layout_constraintStart_toStartOf="@id/check_box_all"
+                app:layout_constraintTop_toBottomOf="@id/check_box_all"
+                android:text="@string/select_all" />
+
+            <TextView
+                android:id="@+id/tv_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_order"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@{@string/price_format(0)}" />
+
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/btn_order"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/item_confirm"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@{@string/order_format(0)}"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

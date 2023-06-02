@@ -8,10 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary">#04C09E</color>
-    <color name="toolbar">#555555</color>
-    <color name="pagination_button_disabled">#D6D6D6</color>
-
-    <color name="skeleton_inner">#E2E2E2</color>
-    <color name="skeleton_outer">#F3F3F3</color>
+    <color name="main_color">#04C09E</color>
+    <color name="background_main_color">#555555</color>
+    <color name="load_more_boarder">#AAAAAA</color>
+    <color name="load_more_button_color">#00FFFFFF</color>
+    <color name="deactivate_counter_button">#D6D6D6</color>
 </resources>
