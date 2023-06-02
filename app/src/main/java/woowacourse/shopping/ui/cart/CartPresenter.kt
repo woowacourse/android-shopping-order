@@ -16,12 +16,11 @@ class CartPresenter(
     private val cartItemRepository: CartItemRepository,
     private val orderRepository: OrderRepository,
     userRepository: UserRepository,
-    private val pageSize: Int
+    private val pageSize: Int,
+    private var selectedCart: Cart = Cart(emptySet()),
+    private var currentPage: Int = 0
 ) : CartContract.Presenter {
-    private var selectedCart = Cart(emptySet())
     private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
-
-    private var currentPage = 0
 
     override fun loadCartItemsOfNextPage() {
         currentPage++
@@ -99,7 +98,7 @@ class CartPresenter(
         }
     }
 
-    override fun plusCount(cartItemId: Long) {
+    override fun plusQuantity(cartItemId: Long) {
         cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.plusQuantity()
@@ -110,7 +109,7 @@ class CartPresenter(
         }
     }
 
-    override fun minusCount(cartItemId: Long) {
+    override fun minusQuantity(cartItemId: Long) {
         cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.minusQuantity()
@@ -146,7 +145,8 @@ class CartPresenter(
 
     private fun showCartItems(page: Int, selectedCartItems: Cart, initScroll: Boolean) {
         getCartItemsOf(page).thenAccept { cartItems ->
-            val cartItemUIStates = cartItems.map { it.toUIState(it in selectedCartItems.value) }
+            val cartItemUIStates =
+                cartItems.map { cartItem -> cartItem.toUIState(cartItem.id in selectedCartItems.value.map { it.id }) }
             view.setCartItems(cartItemUIStates, initScroll)
         }
     }
@@ -202,14 +202,10 @@ class CartPresenter(
     }
 
     private fun updateCount(cartItem: CartItem) {
-        cartItemRepository.updateCountById(cartItem.id, cartItem.quantity, currentUser).thenAccept {
-            it.getOrThrow()
-            if (cartItem in selectedCart.value) {
-                selectedCart = selectedCart.updateElement(cartItem, cartItem)
-                showAllSelectionUI(currentPage, selectedCart)
-                showOrderUI(selectedCart)
+        cartItemRepository.updateCountById(cartItem.id, cartItem.quantity, currentUser)
+            .thenAccept { result ->
+                result.getOrThrow()
+                showCartItems(currentPage, selectedCart, false)
             }
-            showCartItems(currentPage, selectedCart, false)
-        }
     }
 }

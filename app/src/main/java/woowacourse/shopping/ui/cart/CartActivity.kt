@@ -192,11 +192,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
 
         override fun onClickPlus(id: Long) {
-            presenter.plusCount(id)
+            presenter.plusQuantity(id)
         }
 
         override fun onClickMinus(id: Long) {
-            presenter.minusCount(id)
+            presenter.minusQuantity(id)
         }
     }
 

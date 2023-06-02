@@ -13,8 +13,8 @@ interface CartContract {
         fun deleteCartItem(cartItemId: Long)
         fun updateSelectionCartItem(cartItemId: Long, isSelected: Boolean)
         fun updateSelectionTotalCartItems(isSelected: Boolean)
-        fun plusCount(cartItemId: Long)
-        fun minusCount(cartItemId: Long)
+        fun plusQuantity(cartItemId: Long)
+        fun minusQuantity(cartItemId: Long)
         fun checkPayment()
         fun placeOrder()
     }
