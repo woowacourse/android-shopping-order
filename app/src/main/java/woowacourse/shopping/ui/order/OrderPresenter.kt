@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.order
 
 import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.domain.model.discount.Discountable
 import woowacourse.shopping.domain.model.discount.Point
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.PointRepository
@@ -20,22 +21,22 @@ class OrderPresenter(
 ) : OrderContract.Presenter {
     private val originOrder: Order = order.toDomain()
     private var discountedOrder: Order = originOrder.copy()
-    private var maxAvailablePoint: Point = DEFAULT_MAX_POINT
+    private var maxAvailablePoint: Discountable = DEFAULT_MAX_POINT
 
     override fun fetchAll() {
         pointRepository.getPoint(
-            onSuccess = { fetchedPoint ->
-                maxAvailablePoint = fetchedPoint
-                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toPointModelUi())
-                view.showFinalPayment(discountedOrder.finalPrice.toUi())
-            },
+            onSuccess = ::updateAvailablePoint,
             onFailed = {
-                maxAvailablePoint = DEFAULT_POINT
-                updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toPointModelUi())
-                view.showFinalPayment(discountedOrder.finalPrice.toUi())
+                updateAvailablePoint(DEFAULT_POINT)
                 view.showOrderLoadFailed()
             }
         )
+    }
+
+    private fun updateAvailablePoint(point: Discountable) {
+        maxAvailablePoint = point
+        updateOrder(discountedOrder.orderProducts.toUi() + maxAvailablePoint.toPointModelUi())
+        view.showFinalPayment(discountedOrder.finalPrice.toUi())
     }
 
     private fun updateOrder(orderItems: List<ListItem>) {

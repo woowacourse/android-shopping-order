@@ -35,7 +35,7 @@ class OrderActivity : AppCompatActivity(), View {
     }
 
     override fun showMoreOrders(orderItems: List<ListItem>) {
-        binding.adapter?.addAll(orderItems)
+        binding.adapter?.update(orderItems)
     }
 
     override fun showOrderLoadFailed() {

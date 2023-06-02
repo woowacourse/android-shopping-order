@@ -29,11 +29,9 @@ class OrderRecyclerViewAdapter(
 
     override fun getItemViewType(position: Int): Int = items[position].viewType
 
-    fun addAll(newItems: List<ListItem>) {
+    fun update(newItems: List<ListItem>) {
+        items.clear()
         items.addAll(newItems)
-        notifyItemRangeInserted(
-            (items.size - newItems.size - 1).coerceAtLeast(0),
-            newItems.size,
-        )
+        notifyItemRangeInserted(0, newItems.size)
     }
 }
