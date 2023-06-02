@@ -1,46 +1,46 @@
 package woowacourse.shopping.data.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProductGetResponse(
-    @SerializedName("id")
+    @SerialName("id")
     val id: Int,
-    @SerializedName("imageUrl")
+    @SerialName("imageUrl")
     val imageUrl: String,
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("price")
+    @SerialName("price")
     val price: Int,
 )
 
 @Serializable
 data class ProductPostRequest(
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("price")
+    @SerialName("price")
     val price: Int,
-    @SerializedName("imageUrl")
+    @SerialName("imageUrl")
     val imageUrl: String,
 )
 
 @Serializable
 data class ProductPutRequest(
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("price")
+    @SerialName("price")
     val price: Int,
-    @SerializedName("imageUrl")
+    @SerialName("imageUrl")
     val imageUrl: String,
 )
 
 @Serializable
 data class ProductDeleteRequest(
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("price")
+    @SerialName("price")
     val price: Int,
-    @SerializedName("imageUrl")
+    @SerialName("imageUrl")
     val imageUrl: String,
 )

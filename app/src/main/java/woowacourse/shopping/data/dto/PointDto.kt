@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PointResponse(
-    @SerializedName("availablePoint")
+    @SerialName("availablePoint")
     val availablePoint: Int = 0,
 )

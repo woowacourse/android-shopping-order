@@ -1,24 +1,24 @@
 package woowacourse.shopping.data.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PaymentResponse(
-    @SerializedName("originalPayment")
+    @SerialName("originalPayment")
     val originalPayment: Int = 0,
-    @SerializedName("finalPayment")
+    @SerialName("finalPayment")
     val finalPayment: Int = 0,
-    @SerializedName("point")
-    val usedPoint: Int = 0,
+    @SerialName("point")
+    val point: Int = 0,
 )
 
 @Serializable
 data class PaymentRequest(
-    @SerializedName("originalPayment")
+    @SerialName("originalPayment")
     val originalPayment: Int,
-    @SerializedName("finalPayment")
+    @SerialName("finalPayment")
     val finalPayment: Int,
-    @SerializedName("point")
+    @SerialName("point")
     val usedPoint: Int,
 )
