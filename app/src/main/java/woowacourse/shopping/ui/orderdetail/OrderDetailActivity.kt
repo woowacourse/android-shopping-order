@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.orderdetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -10,6 +11,7 @@ import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.getSerializableCompat
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
@@ -44,6 +46,13 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     override fun initView(order: OrderUiModel) {
         binding.rvOrderProducts.adapter = OrderDetailRecyclerAdapter(order)
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        val intent = ShoppingActivity.getResultIntent()
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        startActivity(intent)
     }
 
     companion object {

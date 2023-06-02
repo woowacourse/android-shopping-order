@@ -58,14 +58,13 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<OrderResponse>,
                 response: Response<OrderResponse>,
             ) {
-                Log.d("woogi", "onResponse: ${response.body()}")
                 response.body()?.let {
                     onReceived(it)
-                }
+                } ?: onFailed(ORDER_INFO_ERROR)
             }
 
             override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
-                TODO("Not yet implemented")
+                onFailed(ORDER_INFO_ERROR)
             }
         })
     }

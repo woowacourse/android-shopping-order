@@ -15,6 +15,7 @@ interface OrderRepository {
     fun getOrder(
         orderId: Int,
         onReceived: (order: Order) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     )
 
     fun getOrders(onReceived: (orders: List<Order>) -> Unit)

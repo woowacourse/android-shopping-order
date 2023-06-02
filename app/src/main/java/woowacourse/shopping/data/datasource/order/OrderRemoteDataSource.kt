@@ -14,6 +14,7 @@ interface OrderRemoteDataSource {
     fun getOrder(
         orderId: Int,
         onReceived: (order: OrderResponse) -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
     )
 
     fun getOrders(onReceived: (List<OrderResponse>) -> Unit)
