@@ -26,7 +26,11 @@ class ProductRepositoryImpl(
                 call: Call<List<ProductGetResponse>>,
                 response: Response<List<ProductGetResponse>>,
             ) {
-                onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
+                if (response.body() != null && response.isSuccessful) {
+                    onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
+                    return
+                }
+                onFailed(Throwable(response.message()))
             }
 
             override fun onFailure(call: Call<List<ProductGetResponse>>, throwable: Throwable) {
@@ -45,7 +49,11 @@ class ProductRepositoryImpl(
                 call: Call<ProductGetResponse?>,
                 response: Response<ProductGetResponse?>,
             ) {
-                onSuccess(response.body()?.toDomain())
+                if (response.body() != null && response.isSuccessful) {
+                    onSuccess(response.body()?.toDomain())
+                    return
+                }
+                onFailed(Throwable(response.message()))
             }
 
             override fun onFailure(call: Call<ProductGetResponse?>, throwable: Throwable) {

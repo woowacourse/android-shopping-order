@@ -21,7 +21,7 @@ class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
     ) {
         service.saveOrder(order.toOrderRequest()).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
+                if (response.isSuccessful && response.body() != null) {
                     onSuccess()
                     return
                 }
@@ -48,7 +48,7 @@ class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
                 call: Call<List<OrderResponse>>,
                 response: Response<List<OrderResponse>>,
             ) {
-                if (response.isSuccessful) {
+                if (response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()?.toOrders() ?: emptyList())
                     return
                 }
