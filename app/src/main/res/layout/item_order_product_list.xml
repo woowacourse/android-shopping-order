@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginVertical="6dp"
+        android:background="@drawable/cart_product_list_background"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/order_product_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="[든든] 동원 스위트콘 [든든] 동원 스위트콘 [든든] 동원 스위트콘 [든든] 동원 스위트콘" />
+
+        <ImageView
+            android:id="@+id/order_product_picture"
+            android:layout_width="136dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintStart_toStartOf="@id/order_product_title"
+            app:layout_constraintTop_toBottomOf="@id/order_product_title" />
+
+        <TextView
+            android:id="@+id/order_product_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toTopOf="@id/order_product_total_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="2개" />
+
+        <TextView
+            android:id="@+id/order_product_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="99,800원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
