@@ -8,44 +8,47 @@ import woowacourse.shopping.network.retrofit.CartItemRetrofitService
 class CartItemRemoteSource(private val cartItemService: CartItemRetrofitService) :
     CartItemDataSource {
     override fun save(productId: Long, userToken: String): Result<Long> {
-        val response =
-            cartItemService.postCartItem("Basic $userToken", ProductIdEntity(productId)).execute()
-        return response.runCatching {
-            if (code() != 201) throw Throwable(errorBody()?.string())
-            headers()["Location"]?.substringAfterLast("/")?.toLong() ?: throw Throwable(message())
+        return runCatching {
+            val response =
+                cartItemService.postCartItem("Basic $userToken", ProductIdEntity(productId))
+                    .execute()
+            if (response.code() != 201) throw Throwable(response.errorBody()?.string())
+            response.headers()["Location"]?.substringAfterLast("/")?.toLong() ?: throw Throwable(
+                response.message()
+            )
         }
     }
 
     override fun findAll(userToken: String): Result<List<CartItemEntity>> {
-        val response = cartItemService.selectCartItems("Basic $userToken").execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            body() ?: throw Throwable(message())
+        return runCatching {
+            val response = cartItemService.selectCartItems("Basic $userToken").execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            response.body() ?: throw Throwable(response.message())
         }
     }
 
     override fun findAll(limit: Int, offset: Int, userToken: String): Result<List<CartItemEntity>> {
-        val response = cartItemService.selectCartItems("Basic $userToken").execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            val body = body() ?: throw Throwable(message())
+        return runCatching {
+            val response = cartItemService.selectCartItems("Basic $userToken").execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            val body = response.body() ?: throw Throwable(response.message())
             body.slice(offset until body.size).take(limit)
         }
     }
 
     override fun updateCountById(id: Long, count: Int, userToken: String): Result<Unit> {
-        val response =
-            cartItemService.updateCountCartItem("Basic $userToken", id, QuantityEntity(count))
-                .execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
+        return runCatching {
+            val response =
+                cartItemService.updateCountCartItem("Basic $userToken", id, QuantityEntity(count))
+                    .execute()
+            if (response.code() != 200) throw Throwable(response.message())
         }
     }
 
     override fun deleteById(id: Long, userToken: String): Result<Unit> {
-        val response = cartItemService.deleteCartItem("Basic $userToken", id).execute()
-        return response.runCatching {
-            if (code() != 204) throw Throwable(message())
+        return runCatching {
+            val response = cartItemService.deleteCartItem("Basic $userToken", id).execute()
+            if (response.code() != 204) throw Throwable(response.message())
         }
     }
 }

@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.domain.user.User
+import woowacourse.shopping.ui.ErrorView
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
 
@@ -19,16 +20,16 @@ interface ShoppingContract {
         fun selectUser(user: User)
     }
 
-    interface View {
+    interface View : ErrorView {
         fun setRecentlyViewedProducts(recentlyViewedProducts: List<RecentlyViewedProductUIState>)
         fun addProducts(products: List<ProductUIState>)
         fun changeProduct(product: ProductUIState)
         fun setProducts(products: List<ProductUIState>)
         fun setCanLoadMore(canLoadMore: Boolean)
         fun setCartItemCount(count: Int)
-        fun showError(message: String)
         fun showCart()
         fun showOrderList()
         fun showUserList(users: List<User>)
+        override fun showError(message: String)
     }
 }

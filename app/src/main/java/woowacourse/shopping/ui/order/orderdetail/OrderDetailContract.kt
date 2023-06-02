@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.orderdetail
 
+import woowacourse.shopping.ui.ErrorView
 import woowacourse.shopping.ui.order.uistate.OrderUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState
 
@@ -8,8 +9,8 @@ interface OrderDetailContract {
         fun loadOrder(orderId: Long)
     }
 
-    interface View {
+    interface View : ErrorView {
         fun showOrder(order: OrderUIState, payment: PaymentUIState)
-        fun showError(message: String)
+        override fun showError(message: String)
     }
 }

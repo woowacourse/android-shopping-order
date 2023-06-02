@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import woowacourse.shopping.ui.ErrorView
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState
 
@@ -18,7 +19,7 @@ interface CartContract {
         fun placeOrder()
     }
 
-    interface View {
+    interface View : ErrorView {
         fun setStateThatCanRequestPreviousPage(canRequest: Boolean)
         fun setStateThatCanRequestNextPage(canRequest: Boolean)
         fun setStateThatCanRequestPage(canRequest: Boolean)
@@ -29,6 +30,6 @@ interface CartContract {
         fun setOrderCount(count: Int)
         fun showPayment(payment: PaymentUIState, totalPrice: Int)
         fun showOrderDetail(orderId: Long)
-        fun showError(message: String)
+        override fun showError(message: String)
     }
 }

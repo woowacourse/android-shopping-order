@@ -8,10 +8,10 @@ class UserRemoteSource(private val userService: UserRetrofitService) : UserDataS
     }
 
     override fun findAll(): Result<List<UserEntity>> {
-        val response = userService.selectUsers().execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            body() ?: throw Throwable(message())
+        return runCatching {
+            val response = userService.selectUsers().execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            response.body() ?: throw Throwable(response.message())
         }
     }
 }

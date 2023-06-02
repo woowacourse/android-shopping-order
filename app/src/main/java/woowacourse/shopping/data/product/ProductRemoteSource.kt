@@ -5,18 +5,18 @@ import woowacourse.shopping.network.retrofit.ProductRetrofitService
 
 class ProductRemoteSource(private val productService: ProductRetrofitService) : ProductDataSource {
     override fun findAll(): Result<List<ProductEntity>> {
-        val response = productService.selectProducts().execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            body() ?: throw Throwable(message())
+        return runCatching {
+            val response = productService.selectProducts().execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            response.body() ?: throw Throwable(response.message())
         }
     }
 
     override fun findRanged(limit: Int, offset: Int): Result<List<ProductEntity>> {
-        val response = productService.selectProducts().execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            val body = body() ?: throw Throwable(message())
+        return runCatching {
+            val response = productService.selectProducts().execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            val body = response.body() ?: throw Throwable(response.message())
             body.slice(offset until body.size).take(limit)
         }
     }
@@ -28,10 +28,10 @@ class ProductRemoteSource(private val productService: ProductRetrofitService) : 
     }
 
     override fun findById(id: Long): Result<ProductEntity> {
-        val response = productService.selectProduct(id).execute()
-        return response.runCatching {
-            if (code() != 200) throw Throwable(message())
-            body() ?: throw Throwable(message())
+        return runCatching {
+            val response = productService.selectProduct(id).execute()
+            if (response.code() != 200) throw Throwable(response.message())
+            response.body() ?: throw Throwable(response.message())
         }
     }
 }

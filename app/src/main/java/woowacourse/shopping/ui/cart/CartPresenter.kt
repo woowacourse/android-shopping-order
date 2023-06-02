@@ -8,6 +8,7 @@ import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState.Companion.toUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState.Companion.toUIState
+import woowacourse.shopping.utils.ErrorHandler.handle
 import java.util.concurrent.CompletableFuture
 
 class CartPresenter(
@@ -45,7 +46,7 @@ class CartPresenter(
             showPageUI(currentPage)
             showAllSelectionUI(currentPage, selectedCart)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -56,7 +57,7 @@ class CartPresenter(
             showPageUI(currentPage)
             updateCartUI()
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -72,7 +73,7 @@ class CartPresenter(
             showAllSelectionUI(currentPage, selectedCart)
             showOrderUI(selectedCart)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -93,7 +94,7 @@ class CartPresenter(
                 updateCartUI()
             }
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -104,7 +105,7 @@ class CartPresenter(
             val cartItem = loadedCartItem.plusQuantity()
             updateCount(cartItem)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -115,7 +116,7 @@ class CartPresenter(
             val cartItem = loadedCartItem.minusQuantity()
             updateCount(cartItem)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -127,7 +128,7 @@ class CartPresenter(
                 val order = orderResult.getOrThrow()
                 view.showPayment(order.toUIState(), totalPrice - order.calculateDiscountPrice())
             }.exceptionally {
-                view.showError(it.message.orEmpty())
+                it.handle(view)
                 null
             }
     }
@@ -138,7 +139,7 @@ class CartPresenter(
                 val orderId = orderIdResult.getOrThrow()
                 view.showOrderDetail(orderId)
             }.exceptionally {
-                view.showError(it.message.orEmpty())
+                it.handle(view)
                 null
             }
     }

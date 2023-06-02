@@ -8,6 +8,7 @@ import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState.Companion.toUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState.Companion.toUIState
+import woowacourse.shopping.utils.ErrorHandler.handle
 import java.time.LocalDateTime
 
 class ProductDetailPresenter(
@@ -27,7 +28,7 @@ class ProductDetailPresenter(
             view.setProduct(product.toUIState(isProductExistInCart))
             recentlyViewedProductRepository.save(product, LocalDateTime.now())
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -44,7 +45,7 @@ class ProductDetailPresenter(
             it.getOrThrow()
             view.showCartView()
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -54,7 +55,7 @@ class ProductDetailPresenter(
             val product = it.getOrThrow()
             view.openCartCounter(product.toUIState(false))
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -70,7 +71,7 @@ class ProductDetailPresenter(
             val productDetailUIState = recentlyViewedProducts.first().toUIState()
             view.setLastViewedProduct(productDetailUIState)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }

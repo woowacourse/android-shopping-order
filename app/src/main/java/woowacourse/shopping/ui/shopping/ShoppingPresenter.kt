@@ -10,7 +10,7 @@ import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState.Companion.toUIState
 import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState.Companion.toUIState
-import woowacourse.shopping.utils.ErrorHandler.log
+import woowacourse.shopping.utils.ErrorHandler.handle
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -35,7 +35,7 @@ class ShoppingPresenter(
                     recentlyViewedProduct.getOrThrow().map { it.toUIState() }
                 view.setRecentlyViewedProducts(recentlyViewedProductUIStates)
             }.exceptionally {
-                view.showError(it.message.orEmpty())
+                it.handle(view)
                 null
             }
     }
@@ -50,8 +50,7 @@ class ShoppingPresenter(
             view.addProducts(cart)
             refreshCanLoadMore()
         }.exceptionally {
-            it.log()
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -64,7 +63,7 @@ class ShoppingPresenter(
             view.setProducts(product)
             refreshCanLoadMore()
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -79,7 +78,7 @@ class ShoppingPresenter(
             view.changeProduct(savedCartItem.toUIState())
             loadCartItemCount()
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -92,8 +91,7 @@ class ShoppingPresenter(
             cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser).get()
             view.changeProduct(cartItem.toUIState())
         }.exceptionally {
-            println(it.stackTraceToString())
-            view.showError(it.message.orEmpty())
+            it.handle(view)
         }
     }
 
@@ -102,7 +100,7 @@ class ShoppingPresenter(
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             minusCartItem(loadedCartItem, cartItemId)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
         }
     }
 
@@ -111,7 +109,7 @@ class ShoppingPresenter(
             val count = countResult.getOrThrow()
             view.setCartItemCount(count)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
@@ -129,7 +127,7 @@ class ShoppingPresenter(
             val users = usersResult.getOrThrow()
             view.showUserList(users)
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }

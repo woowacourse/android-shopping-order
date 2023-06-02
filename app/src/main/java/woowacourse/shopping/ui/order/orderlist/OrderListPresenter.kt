@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.order.orderlist
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.order.uistate.OrderUIState.Companion.toUIState
+import woowacourse.shopping.utils.ErrorHandler.handle
 
 class OrderListPresenter(
     private val view: OrderListContract.View,
@@ -17,7 +18,7 @@ class OrderListPresenter(
             val orders = ordersResult.getOrThrow()
             view.showOrders(orders.map { it.toUIState() })
         }.exceptionally {
-            view.showError(it.message.orEmpty())
+            it.handle(view)
             null
         }
     }
