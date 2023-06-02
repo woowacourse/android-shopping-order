@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.App
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
@@ -44,9 +45,17 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     override fun showOrder(order: OrderUIState, payment: PaymentUIState) {
-        binding.order = order
-        binding.payment = payment
-        orderListAdapter.setOrders(listOf(order))
+        runOnUiThread {
+            binding.order = order
+            binding.payment = payment
+            orderListAdapter.setOrders(listOf(order))
+        }
+    }
+
+    override fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun validateExtra() {

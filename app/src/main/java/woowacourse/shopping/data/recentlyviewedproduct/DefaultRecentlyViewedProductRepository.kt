@@ -8,19 +8,27 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import java.time.LocalDateTime
+import java.util.concurrent.CompletableFuture
 
 class DefaultRecentlyViewedProductRepository(
     private val recentlyViewedProductDataSource: RecentlyViewedProductDataSource,
     private val productDataSource: ProductDataSource
 ) : RecentlyViewedProductRepository {
 
-    override fun save(product: Product, viewedTime: LocalDateTime): Result<RecentlyViewedProduct> {
-        return recentlyViewedProductDataSource.save(product, viewedTime)
+    override fun save(
+        product: Product,
+        viewedTime: LocalDateTime
+    ): CompletableFuture<Result<RecentlyViewedProduct>> {
+        return CompletableFuture.supplyAsync {
+            recentlyViewedProductDataSource.save(product, viewedTime)
+        }
     }
 
-    override fun findFirst10OrderByViewedTimeDesc(): Result<List<RecentlyViewedProduct>> {
-        return productDataSource.findAll().mapCatching { products ->
-            findFirst10RecentlyViewedProduct(products).getOrThrow()
+    override fun findFirst10OrderByViewedTimeDesc(): CompletableFuture<Result<List<RecentlyViewedProduct>>> {
+        return CompletableFuture.supplyAsync {
+            productDataSource.findAll().mapCatching { products ->
+                findFirst10RecentlyViewedProduct(products).getOrThrow()
+            }
         }
     }
 

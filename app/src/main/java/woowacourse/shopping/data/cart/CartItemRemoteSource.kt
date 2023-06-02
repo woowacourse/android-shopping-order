@@ -3,17 +3,15 @@ package woowacourse.shopping.data.cart
 import woowacourse.shopping.data.entity.CartItemEntity
 import woowacourse.shopping.data.entity.ProductIdEntity
 import woowacourse.shopping.data.entity.QuantityEntity
-import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.network.retrofit.CartItemRetrofitService
 
 class CartItemRemoteSource(private val cartItemService: CartItemRetrofitService) :
     CartItemDataSource {
-    override fun save(productId: Long, user: User): Result<Long> {
+    override fun save(productId: Long, userToken: String): Result<Long> {
         val response =
-            cartItemService.postCartItem("Basic ${user.token}", ProductIdEntity(productId))
-                .execute()
+            cartItemService.postCartItem("Basic $userToken", ProductIdEntity(productId)).execute()
         return response.runCatching {
-            if (code() != 201) throw Throwable(message())
+            if (code() != 201) throw Throwable(errorBody()?.string())
             headers()["Location"]?.substringAfterLast("/")?.toLong() ?: throw Throwable(message())
         }
     }

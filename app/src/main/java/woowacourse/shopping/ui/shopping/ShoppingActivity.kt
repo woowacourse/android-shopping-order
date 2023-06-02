@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.App
@@ -43,6 +44,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initLoadingButton()
         initUsers()
         initRecentlyViewedProducts()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.refreshProducts()
     }
 
     override fun setRecentlyViewedProducts(recentlyViewedProducts: List<RecentlyViewedProductUIState>) {
@@ -93,34 +99,46 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
     }
 
+    override fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun showCart() {
-        CartActivity.startActivity(this)
+        runOnUiThread {
+            CartActivity.startActivity(this)
+        }
     }
 
     override fun showOrderList() {
-        OrderListActivity.startActivity(this)
+        runOnUiThread {
+            OrderListActivity.startActivity(this)
+        }
     }
 
     override fun showUserList(users: List<User>) {
-        binding.shoppingUserSpinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            users.map { it.email }
-        )
-        binding.shoppingUserSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    presenter.selectUser(users[position])
-                }
+        runOnUiThread {
+            binding.shoppingUserSpinner.adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                users.map { it.email }
+            )
+            binding.shoppingUserSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        presenter.selectUser(users[position])
+                    }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
                 }
-            }
+        }
     }
 
     private fun initToolBar() {

@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.shopping
 import woowacourse.shopping.RepositoryContainer
 
 object ShoppingPresenterProvider {
+    private const val PAGE_SIZE = 20
+
     fun create(
         view: ShoppingContract.View,
         repositoryContainer: RepositoryContainer
@@ -12,7 +14,8 @@ object ShoppingPresenterProvider {
             repositoryContainer.recentlyViewedProductRepository,
             repositoryContainer.productRepository,
             repositoryContainer.cartItemRepository,
-            repositoryContainer.userRepository
+            repositoryContainer.userRepository,
+            PAGE_SIZE
         )
     }
 }

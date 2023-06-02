@@ -21,23 +21,15 @@ interface CartContract {
 
     interface View {
         fun setStateThatCanRequestPreviousPage(canRequest: Boolean)
-
         fun setStateThatCanRequestNextPage(canRequest: Boolean)
-
         fun setStateThatCanRequestPage(canRequest: Boolean)
-
         fun setPage(page: Int)
-
         fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean)
-
         fun setStateOfAllSelection(isAllSelected: Boolean)
-
         fun setOrderPrice(price: Int)
-
         fun setOrderCount(count: Int)
-
         fun showPayment(payment: PaymentUIState, totalPrice: Int)
-
         fun showOrderDetail(orderId: Long)
+        fun showError(message: String)
     }
 }

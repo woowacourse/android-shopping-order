@@ -11,5 +11,6 @@ interface OrderListContract {
     interface View {
         fun showOrders(orders: List<OrderUIState>)
         fun showOrderDetail(orderId: Long)
+        fun showError(message: String)
     }
 }

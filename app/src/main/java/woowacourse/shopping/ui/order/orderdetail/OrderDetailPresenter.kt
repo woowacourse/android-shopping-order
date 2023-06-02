@@ -11,17 +11,16 @@ class OrderDetailPresenter(
     private val userRepository: UserRepository
 ) : OrderDetailContract.Presenter {
     override fun loadOrder(orderId: Long) {
-        val currentUser = userRepository.findCurrent().getOrElse {
-            return
+        userRepository.findCurrent().thenAccept {
+            val currentUser = it.getOrThrow()
+            val order = orderRepository.findById(orderId, currentUser).get().getOrThrow()
+            val payment =
+                orderRepository.findDiscountPolicy(order.price, currentUser.rank.toString()).get()
+                    .getOrThrow()
+            view.showOrder(order.toUIState(), payment.toUIState())
+        }.exceptionally {
+            view.showError(it.message.orEmpty())
+            null
         }
-        val order = orderRepository.findById(orderId, currentUser).getOrElse {
-            return
-        }
-        orderRepository.findDiscountPolicy(order.price, currentUser.rank.toString())
-            .onSuccess { payment ->
-                view.showOrder(order.toUIState(), payment.toUIState())
-            }.onFailure {
-                return
-            }
     }
 }

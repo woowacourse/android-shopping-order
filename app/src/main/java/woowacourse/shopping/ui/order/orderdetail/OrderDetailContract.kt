@@ -10,5 +10,6 @@ interface OrderDetailContract {
 
     interface View {
         fun showOrder(order: OrderUIState, payment: PaymentUIState)
+        fun showError(message: String)
     }
 }

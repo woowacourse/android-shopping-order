@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -40,6 +41,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         initPageUI()
         initOrderUI()
+        initUser()
         initCartList()
         loadLastPageIfFromCartItemAdd()
     }
@@ -106,26 +108,36 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showPayment(payment: PaymentUIState, totalPrice: Int) {
-        val orderDialog = CustomOrderBinding.inflate(layoutInflater)
+        runOnUiThread {
+            val orderDialog = CustomOrderBinding.inflate(layoutInflater)
 
-        AlertDialog.Builder(this).apply {
-            setView(orderDialog.root)
-            create()
-            setPositiveButton(getString(R.string.cart_dialog_payment_positive)) { dialog, _ ->
-                presenter.placeOrder()
-                dialog.dismiss()
-            }
-            setNegativeButton(getString(R.string.cart_dialog_payment_negative)) { dialog, _ ->
-                dialog.dismiss()
-            }
-        }.show()
+            AlertDialog.Builder(this).apply {
+                setView(orderDialog.root)
+                create()
+                setPositiveButton(getString(R.string.cart_dialog_payment_positive)) { dialog, _ ->
+                    presenter.placeOrder()
+                    dialog.dismiss()
+                }
+                setNegativeButton(getString(R.string.cart_dialog_payment_negative)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+            }.show()
 
-        orderDialog.totalPrice = totalPrice
-        orderDialog.payment = payment
+            orderDialog.totalPrice = totalPrice
+            orderDialog.payment = payment
+        }
     }
 
     override fun showOrderDetail(orderId: Long) {
-        OrderDetailActivity.startActivity(this, orderId)
+        runOnUiThread {
+            OrderDetailActivity.startActivity(this, orderId)
+        }
+    }
+
+    override fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun loadLastPageIfFromCartItemAdd() {
@@ -156,6 +168,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.btnOrder.setOnClickListener {
             presenter.checkPayment()
         }
+    }
+
+    private fun initUser() {
+        presenter.loadCurrentUser()
     }
 
     private fun initCartList() {

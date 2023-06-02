@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.App
 import woowacourse.shopping.databinding.ActivityOrderListBinding
@@ -42,11 +43,21 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun showOrders(orders: List<OrderUIState>) {
-        orderListAdapter.setOrders(orders)
+        runOnUiThread {
+            orderListAdapter.setOrders(orders)
+        }
     }
 
     override fun showOrderDetail(orderId: Long) {
-        OrderDetailActivity.startActivity(this, orderId)
+        runOnUiThread {
+            OrderDetailActivity.startActivity(this, orderId)
+        }
+    }
+
+    override fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun initToolbar() {

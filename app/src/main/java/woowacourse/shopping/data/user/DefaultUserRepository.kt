@@ -3,6 +3,7 @@ package woowacourse.shopping.data.user
 import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.UserRepository
+import java.util.concurrent.CompletableFuture
 
 class DefaultUserRepository(
     private val cacheDataSource: UserDataSource,
@@ -12,17 +13,21 @@ class DefaultUserRepository(
         currentUser = user
     }
 
-    override fun findAll(): Result<List<User>> {
-        return cacheDataSource.findAll().mapCatching { users ->
-            users.map { it.toDomain() }
-        }.recoverCatching {
-            findAllRemote().getOrThrow()
+    override fun findAll(): CompletableFuture<Result<List<User>>> {
+        return CompletableFuture.supplyAsync {
+            cacheDataSource.findAll().mapCatching { users ->
+                users.map { it.toDomain() }
+            }.recoverCatching {
+                findAllRemote().getOrThrow()
+            }
         }
     }
 
-    override fun findCurrent(): Result<User> {
-        return runCatching {
-            currentUser ?: throw IllegalStateException("User Not Exist!")
+    override fun findCurrent(): CompletableFuture<Result<User>> {
+        return CompletableFuture.supplyAsync {
+            runCatching {
+                currentUser ?: throw IllegalStateException("User Not Exist!")
+            }
         }
     }
 

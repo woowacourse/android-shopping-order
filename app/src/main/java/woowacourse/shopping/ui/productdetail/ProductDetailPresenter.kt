@@ -20,23 +20,27 @@ class ProductDetailPresenter(
     private lateinit var currentUser: User
 
     override fun loadCurrentUser() {
-        currentUser = userRepository.findCurrent().getOrElse {
-            return
+        val loadedUserResult = userRepository.findCurrent().get()
+        loadedUserResult.onSuccess {
+            currentUser = it
+        }.onFailure {
+            view.showError(it.message.orEmpty())
         }
     }
 
     override fun loadProduct(productId: Long) {
         if (!::currentUser.isInitialized) return
 
-        val product = productRepository.findById(productId).getOrElse {
-            return
+        productRepository.findById(productId).thenAccept {
+            val product = it.getOrThrow()
+            val isProductExistInCart =
+                cartItemRepository.existByProductId(product.id, currentUser).get().getOrThrow()
+            view.setProduct(product.toUIState(isProductExistInCart))
+            recentlyViewedProductRepository.save(product, LocalDateTime.now())
+        }.exceptionally {
+            view.showError(it.message.orEmpty())
+            null
         }
-
-        val cartItem = cartItemRepository.existByProductId(product.id, currentUser).getOrElse {
-            return
-        }
-        view.setProduct(product.toUIState(cartItem))
-        recentlyViewedProductRepository.save(product, LocalDateTime.now())
     }
 
     override fun addProductToCart(productId: Long, count: Int) {
@@ -44,38 +48,44 @@ class ProductDetailPresenter(
 
         require(count > 0) { ERROR_PRODUCT_COUNT_ZERO }
 
-        val product = productRepository.findById(productId).getOrElse {
-            return
-        }
-        val cartItem = CartItem(-1, count, product)
-        cartItemRepository.save(cartItem, currentUser).onSuccess { savedCartItem ->
+        productRepository.findById(productId).thenCompose {
+            val product = it.getOrThrow()
+            val cartItem = CartItem(-1, count, product)
+            val savedCartItem = cartItemRepository.save(cartItem, currentUser).get().getOrThrow()
             cartItemRepository.updateCountById(savedCartItem.id, count, currentUser)
+        }.thenAccept {
+            it.getOrThrow()
             view.showCartView()
-        }.onFailure {
-            return
+        }.exceptionally {
+            view.showError(it.message.orEmpty())
+            null
         }
     }
 
     override fun showCartCounter(productId: Long) {
-        productRepository.findById(productId).onSuccess { product ->
+        productRepository.findById(productId).thenAccept {
+            val product = it.getOrThrow()
             view.openCartCounter(product.toUIState(false))
-        }.onFailure {
-            return
+        }.exceptionally {
+            view.showError(it.message.orEmpty())
+            null
         }
     }
 
     override fun loadLastViewedProduct() {
-        val recentlyViewedProducts =
-            recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc().getOrElse {
-                return
+        recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc().thenAccept {
+            val recentlyViewedProducts = it.getOrThrow()
+            if (recentlyViewedProducts.isEmpty()) {
+                view.setLastViewedProduct(null)
+                return@thenAccept
             }
-        if (recentlyViewedProducts.isEmpty()) {
-            view.setLastViewedProduct(null)
-            return
-        }
 
-        val productDetailUIState = recentlyViewedProducts.first().toUIState()
-        view.setLastViewedProduct(productDetailUIState)
+            val productDetailUIState = recentlyViewedProducts.first().toUIState()
+            view.setLastViewedProduct(productDetailUIState)
+        }.exceptionally {
+            view.showError(it.message.orEmpty())
+            null
+        }
     }
 
     companion object {

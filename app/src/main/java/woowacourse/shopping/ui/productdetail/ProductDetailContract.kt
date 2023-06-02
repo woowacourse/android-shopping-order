@@ -17,5 +17,6 @@ interface ProductDetailContract {
         fun setLastViewedProduct(product: LastViewedProductUIState?)
         fun openCartCounter(product: ProductDetailUIState)
         fun showCartView()
+        fun showError(message: String)
     }
 }

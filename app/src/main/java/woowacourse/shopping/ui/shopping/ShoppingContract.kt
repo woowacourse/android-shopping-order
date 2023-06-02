@@ -26,6 +26,7 @@ interface ShoppingContract {
         fun setProducts(products: List<ProductUIState>)
         fun setCanLoadMore(canLoadMore: Boolean)
         fun setCartItemCount(count: Int)
+        fun showError(message: String)
         fun showCart()
         fun showOrderList()
         fun showUserList(users: List<User>)

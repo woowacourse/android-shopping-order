@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.App
@@ -68,14 +69,24 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun openCartCounter(product: ProductDetailUIState) {
-        AddToCartDialog(product) { productId, count ->
-            presenter.addProductToCart(productId, count)
-        }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+        runOnUiThread {
+            AddToCartDialog(product) { productId, count ->
+                presenter.addProductToCart(productId, count)
+            }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
+        }
     }
 
     override fun showCartView() {
-        finish()
-        CartActivity.startActivity(this, true)
+        runOnUiThread {
+            finish()
+            CartActivity.startActivity(this, true)
+        }
+    }
+
+    override fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setActionBar() {
