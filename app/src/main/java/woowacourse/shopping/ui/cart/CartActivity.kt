@@ -34,12 +34,17 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         binding.adapter?.submitList(cartProducts)
     }
 
-    override fun updateNavigatorEnabled(previousEnabled: Boolean, nextEnabled: Boolean) {
+    override fun updatePageState(page: PageModel) {
+        updateNavigatorEnabled(page.hasPrevious, page.hasNext)
+        updatePageNumber(page)
+    }
+
+    private fun updateNavigatorEnabled(previousEnabled: Boolean, nextEnabled: Boolean) {
         binding.previousButton.isEnabled = previousEnabled
         binding.nextButton.isEnabled = nextEnabled
     }
 
-    override fun updatePageNumber(page: PageModel) {
+    private fun updatePageNumber(page: PageModel) {
         binding.pageNumberTextView.text = page.toText()
     }
 

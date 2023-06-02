@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.PageModel
 import woowacourse.shopping.model.PriceModel
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.mapper.toDomain
@@ -40,9 +41,7 @@ class CartPresenter(
 
     override fun fetchCart(page: Int) {
         currentPage = currentPage.update(page)
-
-        view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
-        view.updatePageNumber(currentPage.toUi())
+        view.updatePageState(mapToPageModel(currentPage))
         fetchView()
     }
 
@@ -52,6 +51,7 @@ class CartPresenter(
             orderProducts = cart.getCheckedCartItems().map(OrderProduct::of).toUi(),
             payment = Payment.of(checkedCartItemsPrice).toUi()
         )
+
         view.navigateToOrder(order)
     }
 
@@ -113,10 +113,16 @@ class CartPresenter(
     private fun fetchView() {
         _totalCheckSize.value = cart.checkedCount
         _pageCheckSize.value = currentPage.getCheckedProductSize(cart)
-        view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
+
+        view.updatePageState(mapToPageModel(currentPage))
         view.updateTotalPrice(cart.checkedProductTotalPrice)
         view.updateCart(currentPage.takeItems(cart).toUi())
     }
+
+    private fun mapToPageModel(page: Page): PageModel = page.toUi(
+        hasPrevious = currentPage.hasPrevious(),
+        hasNext = currentPage.hasNext(cart)
+    )
 
     companion object {
         private const val DEFAULT_TOTAL_CHECK_COUNT = 0

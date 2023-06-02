@@ -7,8 +7,7 @@ import woowacourse.shopping.model.PageModel
 interface CartContract {
     interface View {
         fun updateCart(cartProducts: List<CartProductModel>)
-        fun updateNavigatorEnabled(previousEnabled: Boolean, nextEnabled: Boolean)
-        fun updatePageNumber(page: PageModel)
+        fun updatePageState(page: PageModel)
         fun updateTotalPrice(totalPrice: Int)
         fun navigateToOrder(order: OrderModel)
         fun navigateToHome()
