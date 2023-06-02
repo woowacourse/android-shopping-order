@@ -7,10 +7,13 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
+import woowacourse.shopping.data.mapper.toModel
+import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.service.OrderService
 import woowacouse.shopping.model.order.Order
+import woowacouse.shopping.model.order.OrderDetail
 
 class OrderRemoteDataSourceImpl(
     url: Server.Url,
@@ -51,5 +54,29 @@ class OrderRemoteDataSourceImpl(
                 Log.e("Request Failed", t.toString())
             }
         })
+    }
+
+    override fun requestOrderItem(
+        orderId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (OrderDetail) -> Unit
+    ) {
+        retrofit.requestOrderItem(token, orderId)
+            .enqueue(object : retrofit2.Callback<OrderDetailEntity> {
+                override fun onResponse(
+                    call: Call<OrderDetailEntity>,
+                    response: Response<OrderDetailEntity>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { onSuccess(it.toModel()) } ?: return onFailure()
+                        return
+                    }
+                    onFailure()
+                }
+
+                override fun onFailure(call: Call<OrderDetailEntity>, t: Throwable) {
+                    Log.e("Request Failed", t.toString())
+                }
+            })
     }
 }
