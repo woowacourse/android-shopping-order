@@ -15,9 +15,12 @@ import woowacourse.shopping.data.respository.card.CardRepositoryImpl
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.point.PointRepositoryImpl
+import woowacourse.shopping.data.respository.point.source.remote.PointRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CardModel
 import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.PointModel
 import woowacourse.shopping.presentation.view.order.adapter.CardListAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
@@ -65,11 +68,23 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
+        val pointRemoteDataSource = PointRemoteDataSourceImpl(url, token)
 
         presenter = OrderPresenter(
             this,
             cardRepository = CardRepositoryImpl(),
-            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource)
+            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
+            pointRepository = PointRepositoryImpl(pointRemoteDataSource),
+        )
+    }
+
+    override fun setPointTextChangeListener(userPoint: PointModel) {
+        binding.etOrderUsePoint.addTextChangedListener(
+            PointTextWatcher(
+                userPoint,
+                binding.etOrderUsePoint,
+                presenter::setUsePoint
+            )
         )
     }
 
@@ -93,6 +108,22 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.rvOrderCardList.post {
             binding.rvOrderCardList.adapter = CardListAdapter(cards)
         }
+    }
+
+    override fun setUserPointView(userPoint: PointModel) {
+        binding.availablePoint = userPoint
+    }
+
+    override fun setUsePointView(usePoint: PointModel) {
+        binding.usePoint = usePoint
+    }
+
+    override fun setSavePredictionPointView(savePredictionPoint: PointModel) {
+        binding.savingPoint = savePredictionPoint
+    }
+
+    override fun setOrderPriceView(orderPrice: Int) {
+        binding.orderPrice = orderPrice
     }
 
     override fun handleErrorView() {

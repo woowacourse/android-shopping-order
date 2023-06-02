@@ -3,6 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="orderPrice"
+            type="java.lang.Integer" />
+
+        <variable
+            name="availablePoint"
+            type="woowacourse.shopping.presentation.model.PointModel" />
+
+        <variable
+            name="usePoint"
+            type="woowacourse.shopping.presentation.model.PointModel" />
+
+        <variable
+            name="savingPoint"
+            type="woowacourse.shopping.presentation.model.PointModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -11,14 +29,13 @@
             android:id="@+id/layout_skeleton_order"
             layout="@layout/layout_skeleton_order"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <ScrollView
             android:id="@+id/layout_order"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:visibility="gone">
+            android:background="@color/white">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -41,9 +58,12 @@
                     android:id="@+id/rv_order_product_list"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:fadeScrollbars="false"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
                     android:paddingBottom="15dp"
+                    android:scrollbarStyle="outsideInset"
+                    android:scrollbars="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -84,6 +104,7 @@
 
                 <TextView
                     android:id="@+id/tv_order_available_point"
+                    setPrice="@{availablePoint.value}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -117,6 +138,7 @@
                     android:background="@drawable/drawable_order_edit_text"
                     android:gravity="end|center"
                     android:inputType="number"
+                    android:maxLength="12"
                     android:maxLines="1"
                     android:paddingHorizontal="10dp"
                     android:textColor="@color/main_color"
@@ -154,9 +176,12 @@
                     android:id="@+id/rv_order_card_list"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:fadeScrollbars="false"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
                     android:paddingBottom="15dp"
+                    android:scrollbarStyle="outsideInset"
+                    android:scrollbars="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -167,7 +192,6 @@
                     android:id="@+id/view_line_order3"
                     android:layout_width="0dp"
                     android:layout_height="3dp"
-                    android:layout_marginTop="10dp"
                     android:background="@color/product_view_line_color"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -206,6 +230,7 @@
                     android:maxLines="1"
                     android:textColor="@color/order_text_color"
                     android:textSize="14sp"
+                    setPrice="@{orderPrice}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_order_payment_detail_order_price_title_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_payment_detail_order_price_title_info"
@@ -224,6 +249,7 @@
 
                 <TextView
                     android:id="@+id/tv_order_payment_detail_use_point"
+                    setPrice="@{usePoint.value}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -269,6 +295,7 @@
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         android:textStyle="bold"
+                        setPrice="@{orderPrice - usePoint.value}"
                         tools:text="9,000원" />
 
                 </LinearLayout>
@@ -308,6 +335,7 @@
 
                 <TextView
                     android:id="@+id/tv_order_point_save"
+                    setPrice="@{savingPoint.value}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
