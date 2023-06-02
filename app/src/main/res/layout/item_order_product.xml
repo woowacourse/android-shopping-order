@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/back_rounded"
+    android:layout_marginVertical="6dp"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/text_product_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="[든든] 동원 스위트콘" />
+
+    <ImageView
+        android:id="@+id/img_product"
+        android:layout_width="136dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="15dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_product_name" />
+
+    <TextView
+        android:id="@+id/text_product_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@id/text_product_price"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="2개" />
+
+    <TextView
+        android:id="@+id/text_product_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="99,800원" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

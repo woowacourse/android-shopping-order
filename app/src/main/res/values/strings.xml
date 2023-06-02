@@ -20,4 +20,11 @@
     <string name="mypage">마이페이지</string>
     <string name="charge">충전</string>
     <string name="cash_on_hand">보유한 캐시 : %,d캐시</string>
+    <string name="order_product">주문 상품</string>
+    <string name="submit_order">주문하기</string>
+    <string name="cash">캐시</string>
+    <string name="usable_cash">사용 가능한 캐시</string>
+    <string name="use">사용</string>
+    <string name="payment_amount">결제 금액</string>
+    <string name="order_price">주문 금액</string>
 </resources>
