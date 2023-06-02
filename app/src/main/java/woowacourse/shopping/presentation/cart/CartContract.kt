@@ -5,7 +5,7 @@ import woowacourse.shopping.presentation.model.ProductModel
 
 interface CartContract {
     interface Presenter {
-        fun loadCart()
+        fun loadCarts()
         fun deleteCartProductModel(cartProductModel: CartProductModel)
         fun subProductCartCount(cartProductModel: CartProductModel)
         fun addProductCartCount(cartProductModel: CartProductModel)
@@ -14,6 +14,7 @@ interface CartContract {
         fun unselectAllProduct()
         fun plusPage()
         fun minusPage()
+        fun loadCartOrder()
     }
 
     interface View {
@@ -25,5 +26,6 @@ interface CartContract {
         fun showTotalCount(count: Int)
         fun showAllCheckBoxIsChecked(isChecked: Boolean)
         fun stopLoading()
+        fun showOrderPage(cartIds: List<Long>)
     }
 }

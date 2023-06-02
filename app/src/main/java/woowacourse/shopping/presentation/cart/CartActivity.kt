@@ -15,6 +15,7 @@ import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.order.OrderActivity
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -22,11 +23,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private val presenter: CartContract.Presenter by lazy {
         val sharedPref = ShoppingOrderSharedPreference(applicationContext)
-        val productRepository = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
+        val productDataSource = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
         val cartRepository: CartRepository =
             CartRepositoryImpl(
                 CartRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo),
-                productRepository,
+                productDataSource,
             )
         CartPresenter(this, cartRepository)
     }
@@ -73,6 +74,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initLeftClick()
         initRightClick()
         initCheckBoxClick()
+        initOrderClick()
+    }
+
+    private fun initOrderClick() {
+        binding.textOrderCount.setOnClickListener {
+            presenter.loadCartOrder()
+        }
     }
 
     override fun showPageNumber(count: Int) {
@@ -98,7 +106,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initCartAdapter() {
         binding.recyclerCart.adapter = cartAdapter
-        presenter.loadCart()
+        presenter.loadCarts()
     }
 
     override fun showCartProductModels(cartProductModels: List<CartProductModel>) {
@@ -152,6 +160,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun stopLoading() {
         binding.skeletonCarts.isVisible = false
         binding.containerCart.isVisible = true
+    }
+
+    override fun showOrderPage(cartIds: List<Long>) {
+        startActivity(OrderActivity.getIntent(this, cartIds))
     }
 
     companion object {

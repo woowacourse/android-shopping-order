@@ -16,7 +16,7 @@ class CartPresenter(
 ) : CartContract.Presenter {
 
     private lateinit var cartPages: CartPages
-    override fun loadCart() {
+    override fun loadCarts() {
         initCartPages()
     }
 
@@ -97,6 +97,11 @@ class CartPresenter(
     override fun unselectAllProduct() {
         cartPages.unselectPageProducts()
         updateProductsInCurrentPage()
+    }
+
+    override fun loadCartOrder() {
+        val selectedCartIds = cartPages.getSelectedCartIds()
+        view.showOrderPage(selectedCartIds)
     }
 
     private fun updateCart(cartProducts: CartProducts) {

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="cartProductModel"
+            type="woowacourse.shopping.presentation.model.CartProductModel" />
+    </data>
+
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="20dp"
+            app:strokeColor="@color/gray"
+            app:strokeWidth="2dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <TextView
+                    android:id="@+id/text_order_cart_product_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@{cartProductModel.productModel.name}"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="[든든] 동원 스위트콘" />
+
+                <ImageView
+                    android:id="@+id/image_order_cart_product_poster"
+                    android:layout_width="136dp"
+                    android:layout_height="72dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="20dp"
+                    app:imageGlide="@{cartProductModel.productModel.imageUrl}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_order_cart_product_name"
+                    tools:src="@drawable/default_image" />
+
+
+                <TextView
+                    android:id="@+id/text_order_cart_product_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/count_unit_format(cartProductModel.count)}"
+                    app:layout_constraintBottom_toTopOf="@id/text_order_cart_product_price"
+                    app:layout_constraintEnd_toEndOf="@+id/text_order_cart_product_price"
+                    tools:text="2개" />
+
+                <TextView
+                    android:id="@+id/text_order_cart_product_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@{@string/price_format(cartProductModel.productModel.price)}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="99000원" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+</layout>

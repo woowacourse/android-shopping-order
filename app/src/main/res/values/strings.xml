@@ -2,6 +2,7 @@
     <string name="app_name">Shopping</string>
     <string name="toolbar_cart_title">toolbar_cart</string>
     <string name="price_format">%,d원</string>
+    <string name="count_unit_format">%d개</string>
     <string name="count_format">%d</string>
     <string name="order_count_format">주문하기(%d)</string>
     <string name="price_title">금액</string>
@@ -19,4 +20,11 @@
     <string name="put_product">담기</string>
     <string name="sungha_server">성하 서버</string>
     <string name="logan_server">로건 서버</string>
+    <string name="no_cart_error_message">"장바구니에 담긴 상품이 없습니다. 다시 시도해주세요."</string>
+    <string name="order_product_list">주문 상품</string>
+    <string name="edit_hint_cash">0</string>
+    <string name="add_cash_prompt">충전 할 캐시</string>
+    <string name="charge_cash">충전하기</string>
+    <string name="recent_cash_prompt">사용 가능한 캐시</string>
+    <string name="cash_prompt">캐시</string>
 </resources>

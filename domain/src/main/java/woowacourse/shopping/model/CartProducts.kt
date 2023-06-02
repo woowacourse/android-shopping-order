@@ -87,6 +87,10 @@ class CartProducts(cartProducts: List<CartProduct> = listOf()) {
         return _items.filter { it.isChecked }.sumOf { it.quantity }
     }
 
+    fun getSelectedCartIds(): List<Long> {
+        return _items.filter { it.isChecked }.map { it.cartId }
+    }
+
     companion object {
         private const val NOT_FOUND = -1
         private const val MIN_COUNT = 1
