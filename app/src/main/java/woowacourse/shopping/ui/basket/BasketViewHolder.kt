@@ -11,9 +11,8 @@ class BasketViewHolder(
     onItemClick: (BasketProductUiModel) -> Unit,
     minusClickListener: (ProductUiModel) -> Unit,
     plusClickListener: (ProductUiModel) -> Unit,
-    onCheckedChangeListener: (BasketProductUiModel, Boolean) -> Unit
-) :
-    RecyclerView.ViewHolder(binding.root) {
+    onCheckedChangeListener: (BasketProductUiModel, Boolean) -> Unit,
+) : RecyclerView.ViewHolder(binding.root) {
 
     init {
         binding.ivCloseClickListener = onItemClick
