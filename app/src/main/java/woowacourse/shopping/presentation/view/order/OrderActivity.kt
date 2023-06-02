@@ -15,6 +15,8 @@ import woowacourse.shopping.data.respository.card.CardRepositoryImpl
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
+import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.point.PointRepositoryImpl
 import woowacourse.shopping.data.respository.point.source.remote.PointRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -23,6 +25,7 @@ import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.PointModel
 import woowacourse.shopping.presentation.view.order.adapter.CardListAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
+import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
@@ -47,6 +50,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         setToolbar()
         setPresenter()
+        setOrderPayButtonClick()
         presenter.loadOrderProducts(cartIds)
     }
 
@@ -69,12 +73,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
         val pointRemoteDataSource = PointRemoteDataSourceImpl(url, token)
+        val orderRemoteDataSource = OrderRemoteDataSourceImpl(url, token)
 
         presenter = OrderPresenter(
             this,
             cardRepository = CardRepositoryImpl(),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
             pointRepository = PointRepositoryImpl(pointRemoteDataSource),
+            orderRepository = OrderRepositoryImpl(orderRemoteDataSource),
         )
     }
 
@@ -124,6 +130,18 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun setOrderPriceView(orderPrice: Int) {
         binding.orderPrice = orderPrice
+    }
+
+    private fun setOrderPayButtonClick() {
+        binding.btOrderPay.setOnClickListener {
+            presenter.postOrder()
+        }
+    }
+
+    override fun showOrderDetailView(orderId: Long) {
+        val intent = OrderDetailActivity.createIntent(this, orderId, url, token)
+        startActivity(intent)
+        finish()
     }
 
     override fun handleErrorView() {

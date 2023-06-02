@@ -5,9 +5,11 @@ import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.CardModel
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.CartProductsModel
+import woowacourse.shopping.presentation.model.OrderModel
 import woowacourse.shopping.presentation.model.PointModel
 import woowacouse.shopping.data.repository.card.CardRepository
 import woowacouse.shopping.data.repository.cart.CartRepository
+import woowacouse.shopping.data.repository.order.OrderRepository
 import woowacouse.shopping.data.repository.point.PointRepository
 
 class OrderPresenter(
@@ -15,6 +17,7 @@ class OrderPresenter(
     private val cardRepository: CardRepository,
     private val cartRepository: CartRepository,
     private val pointRepository: PointRepository,
+    private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
     private lateinit var orderProducts: List<CartModel>
     private lateinit var point: PointModel
@@ -59,6 +62,18 @@ class OrderPresenter(
     private fun loadSavePredictionPoint(orderPrice: Int) {
         pointRepository.loadPredictionSavePoint(orderPrice, ::onFailure) {
             view.setSavePredictionPointView(it.toUIModel())
+        }
+    }
+
+    override fun postOrder() {
+        val order = OrderModel(
+            999999999L,
+            CartProductsModel(orderProducts),
+            usePoint,
+            cards[0],
+        )
+        orderRepository.addOrder(order.toModel(), ::onFailure) { orderId ->
+            view.showOrderDetailView(orderId)
         }
     }
 

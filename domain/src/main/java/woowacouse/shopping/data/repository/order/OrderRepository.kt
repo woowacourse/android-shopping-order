@@ -1,3 +1,11 @@
 package woowacouse.shopping.data.repository.order
 
-interface OrderRepository
+import woowacouse.shopping.model.order.Order
+
+interface OrderRepository {
+    fun addOrder(
+        orderInfo: Order,
+        onFailure: () -> Unit,
+        onSuccess: (Long) -> Unit,
+    )
+}
