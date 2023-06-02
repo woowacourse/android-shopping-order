@@ -23,7 +23,7 @@ class ShoppingPresenter(
     private var hasNext: Boolean = false,
     private var lastId: Int = -1,
     private var totalProducts: List<ProductUiModel> = listOf(),
-    private var recentProducts: List<RecentProductUiModel> = listOf()
+    private var recentProducts: List<RecentProductUiModel> = listOf(),
 ) : ShoppingContract.Presenter {
     private lateinit var basket: Basket
     private var isLoaded: Boolean = false
@@ -125,8 +125,12 @@ class ShoppingPresenter(
     }
 
     override fun inquiryProductDetail(product: ProductUiModel) {
-        val previousProduct =
-            if (recentProducts.firstOrNull()?.product == product) recentProducts.secondOrNull()?.product else recentProducts.firstOrNull()?.product
+        val previousProduct = if (recentProducts.firstOrNull()?.product == product) {
+            recentProducts.secondOrNull()?.product
+        } else {
+            recentProducts.firstOrNull()?.product
+        }
+
         view.showProductDetail(
             currentProduct = product,
             currentProductBasketId = basket.getProductByProductId(product.id)?.id,
