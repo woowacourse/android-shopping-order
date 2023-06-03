@@ -4,6 +4,7 @@
     <!-- 공통 -->
     <string name="price_format">%,d원</string>
     <string name="tb_shopping">Shopping</string>
+    <string name="binding_error">Binding not initialized to reference the view.</string>
 
     <!-- ShoppingActivity -->
     <string name="tv_more">더보기</string>
@@ -46,5 +47,12 @@
     <string name="ApplyPointMessageAvailableToApply">포인트 적용 되었습니다.</string>
     <string name="FailureAddOrder">주문 실패</string>
     <string name="OrderFailureDialogPositiveButton">확인</string>
+
+    <!-- dialog_order_detail -->
+    <string name="tv_individual_order_title">주문 상세</string>
+    <string name="tv_order_date_time_title">주문 일자</string>
+    <string name="tv_total_price">구매 총액</string>
+    <string name="tv_used_point_title">사용 포인트</string>
+    <string name="tv_earned_point_title">획득 포인트</string>
 
 </resources>

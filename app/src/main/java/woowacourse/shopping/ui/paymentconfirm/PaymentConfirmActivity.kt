@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -19,6 +18,7 @@ import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
+import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
 import woowacourse.shopping.util.editTextFocusOutProcess
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
@@ -85,8 +85,7 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
     }
 
     override fun showOrderSuccessNotification(orderInfo: UiOrder) {
-        Toast.makeText(this, orderInfo.createdAt.toString(), Toast.LENGTH_SHORT).show()
-        finish()
+        OrderDetailDialog().show(supportFragmentManager, OrderDetailDialog::class.java.name)
     }
 
     override fun showOrderLackOfPointFailureNotification(errorMessage: String) {
