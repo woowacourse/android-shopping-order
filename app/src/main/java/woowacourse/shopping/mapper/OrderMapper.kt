@@ -1,17 +1,14 @@
 package woowacourse.shopping.mapper
 
-import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.model.OrderHistoryUIModel
+import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderUIModel
 
-fun List<OrderHistory>.toUIModel(): List<OrderHistoryUIModel> = map { it.toUIModel() }
-
-fun OrderHistory.toUIModel(): OrderHistoryUIModel =
-    OrderHistoryUIModel(
-        id = id,
-        orderItems = orderItems.map { it.toUIModel() },
+fun Order.toUIModel(): OrderUIModel {
+    return OrderUIModel(
+        cartProducts = cartItems.map { it.toUIModel(true) },
         totalPrice = totalPrice,
-        payPrice = payPrice,
+        currentPoints = currentPoints,
         earnedPoints = earnedPoints,
-        usedPoints = usedPoints,
-        orderDate = orderDate
+        availablePoints = availablePoints
     )
+}
