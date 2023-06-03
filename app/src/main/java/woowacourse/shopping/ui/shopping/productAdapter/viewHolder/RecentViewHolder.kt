@@ -12,14 +12,14 @@ class RecentViewHolder(
     binding: ItemProductRecentBinding,
     listener: ProductsListener
 ) : ShoppingViewHolder(binding.root) {
-    private val adapter = RecentProductsAdapter(mutableListOf(), listener::onClickItem)
+    private val adapter = RecentProductsAdapter(listener::onClickItem)
 
     init {
         binding.rvProducts.adapter = adapter
     }
     override fun bind(productItemType: ProductsItemType) {
         (productItemType as ProductsItemType.RecentProducts).let { recentProducts ->
-            adapter.submitList(recentProducts.product.map { RecentProductItem(it) })
+            adapter.submitList(recentProducts.product.map(::RecentProductItem))
         }
     }
 
