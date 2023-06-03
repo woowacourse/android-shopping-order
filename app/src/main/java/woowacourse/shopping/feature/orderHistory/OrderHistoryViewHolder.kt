@@ -10,10 +10,13 @@ class OrderHistoryViewHolder(
     private val binding: ItemOrderHistoryBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(orderProduct: OrderHistoryProductUiModel) {
+    fun bind(
+        orderProduct: OrderHistoryProductUiModel,
+        onClickListener: (Int) -> Unit
+    ) {
         binding.orderProduct = orderProduct
         binding.tvNavigateDetail.setOnClickListener {
-            // navigateToDetail(orderProduct.id)
+            onClickListener(orderProduct.orderId)
         }
     }
 

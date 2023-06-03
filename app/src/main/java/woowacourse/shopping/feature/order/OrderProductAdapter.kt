@@ -2,10 +2,10 @@ package woowacourse.shopping.feature.order
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.model.CartProductUiModel
+import woowacourse.shopping.model.OrderProduct
 
 class OrderProductAdapter(
-    private val products: List<CartProductUiModel>
+    private val products: List<OrderProduct>
 ) : RecyclerView.Adapter<OrderProductViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderProductViewHolder {
         return OrderProductViewHolder.from(parent)

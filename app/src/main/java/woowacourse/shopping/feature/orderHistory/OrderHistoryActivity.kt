@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.feature.main.load.LoadAdapter
+import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
 import woowacourse.shopping.model.OrderHistoryProductUiModel
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
@@ -30,10 +31,17 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     private fun initAdapter() {
-        orderHistoryAdapter = OrderHistoryAdapter(listOf())
+        orderHistoryAdapter = OrderHistoryAdapter(
+            products = listOf(),
+            clickListener = ::navigateToDetail
+        )
         loadAdapter = LoadAdapter { presenter.loadProducts() }
         binding.recyclerviewOrderHistory.adapter =
             ConcatAdapter(orderHistoryAdapter, loadAdapter)
+    }
+
+    private fun navigateToDetail(id: Int) {
+        startActivity(OrderDetailActivity.getIntent(this, id))
     }
 
     override fun addOrderHistory(orderHistory: List<OrderHistoryProductUiModel>) {

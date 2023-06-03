@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemOrderProductBinding
-import woowacourse.shopping.model.CartProductUiModel
+import woowacourse.shopping.model.OrderProduct
 
 class OrderProductViewHolder(
     private val binding: ItemOrderProductBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(product: CartProductUiModel) {
+    fun bind(product: OrderProduct) {
         binding.orderProduct = product
     }
 
