@@ -7,6 +7,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.service.retrofit.cart.RetrofitCartProductService
+import woowacourse.shopping.data.service.retrofit.order.RetrofitOrderService
 import woowacourse.shopping.data.service.retrofit.product.RetrofitProductService
 import java.lang.reflect.Type
 
@@ -39,6 +40,16 @@ object RetrofitUtil {
             .client(okHttpClient)
             .build()
             .create(RetrofitCartProductService::class.java)
+    }
+
+    fun getOrderProductByRetrofit(baseUrl: String): RetrofitOrderService {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(NullOnEmptyConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(RetrofitOrderService::class.java)
     }
 
     class NullOnEmptyConverterFactory : Converter.Factory() {
