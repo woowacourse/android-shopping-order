@@ -11,7 +11,16 @@ interface OrderRepository {
         onFailure: () -> Unit
     )
 
-    fun placeOrder(usedPoint: Int, orderProducts: List<OrderProduct>)
+    fun placeOrder(
+        usedPoint: Int,
+        orderProducts: List<OrderProduct>,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    )
 
-    fun getOrderDetail(orderId: Int): OrderDetail
+    fun getOrderDetail(
+        orderId: Int,
+        onSuccess: (OrderDetail) -> Unit,
+        onFailure: () -> Unit
+    )
 }

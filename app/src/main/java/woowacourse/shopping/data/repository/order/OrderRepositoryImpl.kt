@@ -16,46 +16,57 @@ class OrderRepositoryImpl : OrderRepository {
         onSuccess(orderDataSource.subList(fromIndex, toIndex))
     }
 
-    override fun placeOrder(usedPoint: Int, orderProducts: List<OrderProduct>) {
-
+    override fun placeOrder(
+        usedPoint: Int,
+        orderProducts: List<OrderProduct>,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        onSuccess()
     }
 
-    override fun getOrderDetail(orderId: Int): OrderDetail {
-        return OrderDetail(
-            orderId = 8642,
-            orderAt = "2023-06-03",
-            orderStatus = OrderStatus.PENDING,
-            payAmount = 5953,
-            usedPoint = 9984,
-            savedPoint = 9262,
-            orderProducts = listOf(
-                OrderProduct(
-                    quantity = 4859,
-                    product = Product(
-                        id = 4409,
-                        name = "Frankie Cleveland",
-                        imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
-                        price = Price(value = 9629)
-                    )
-                ),
-                OrderProduct(
-                    quantity = 7031,
-                    product = Product(
-                        id = 4724,
-                        name = "Kelli Porter",
-                        imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
-                        price = Price(value = 9410)
-                    )
-                ),
-                OrderProduct(
-                    quantity = 5760,
-                    product = Product(
-                        id = 9317,
-                        name = "Frederic Abbott",
-                        imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
-                        price = Price(value = 7517)
-                    )
+    override fun getOrderDetail(
+        orderId: Int,
+        onSuccess: (OrderDetail) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        onSuccess(
+            OrderDetail(
+                orderId = 8642,
+                orderAt = "2023-06-03",
+                orderStatus = OrderStatus.PENDING,
+                payAmount = 5953,
+                usedPoint = 9984,
+                savedPoint = 9262,
+                orderProducts = listOf(
+                    OrderProduct(
+                        quantity = 4859,
+                        product = Product(
+                            id = 4409,
+                            name = "Frankie Cleveland",
+                            imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
+                            price = Price(value = 9629)
+                        )
+                    ),
+                    OrderProduct(
+                        quantity = 7031,
+                        product = Product(
+                            id = 4724,
+                            name = "Kelli Porter",
+                            imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
+                            price = Price(value = 9410)
+                        )
+                    ),
+                    OrderProduct(
+                        quantity = 5760,
+                        product = Product(
+                            id = 9317,
+                            name = "Frederic Abbott",
+                            imgUrl = "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1637154387515l0.jpg",
+                            price = Price(value = 7517)
+                        )
 
+                    )
                 )
             )
         )
