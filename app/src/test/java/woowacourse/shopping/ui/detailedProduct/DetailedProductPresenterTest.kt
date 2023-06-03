@@ -44,14 +44,15 @@ class DetailedProductPresenterTest {
         productRepository = mockk()
         cartRepository = mockk()
         recentRepository = mockk()
+        mockProductFindById()
         presenter =
             DetailedProductPresenter(
                 view,
-                fakeProduct.toUIModel(),
                 sharedPreferenceUtils,
                 productRepository,
                 cartRepository,
-                recentRepository
+                recentRepository,
+                fakeProduct.toUIModel().id
             )
     }
 
@@ -85,7 +86,7 @@ class DetailedProductPresenterTest {
     fun `상품을 장바구니에 추가한다`() {
         // given
         every { cartRepository.insert(any()) } answers { nothing }
-        every { productRepository.findById(any(), any()) } answers { Unit }
+        every { productRepository.findById(any(), any()) } answers {}
 
         val successSlot = slot<(Result<Int>) -> Unit>()
         every {
@@ -125,6 +126,7 @@ class DetailedProductPresenterTest {
     @Test
     fun `최근 본 상품으로 이동한다`() {
         // given
+        mockProductFindById()
         every { view.navigateToDetailedProduct(any()) } answers { nothing }
         every { sharedPreferenceUtils.getLastProductId() } returns fakeProduct.id + 1
         every { productRepository.findById(any(), any()) } returns Unit
@@ -159,5 +161,14 @@ class DetailedProductPresenterTest {
         // then
         verify(exactly = 1) { view.navigateToAddToCartDialog(any()) }
         verify(exactly = 1) { cartRepository.insert(any()) }
+    }
+
+    private fun mockProductFindById() {
+        val successSlot = slot<(Result<Product>) -> Unit>()
+        every {
+            productRepository.findById(any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(fakeProduct))
+        }
     }
 }

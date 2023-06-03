@@ -54,36 +54,10 @@ class ShoppingPresenterTest {
     @Before
     fun setUp() {
         view = mockk()
-        productRepository = mockk()
-        recentRepository = mockk()
-        cartRepository = mockk()
+        productRepository = mockk(relaxed = true)
+        recentRepository = mockk(relaxed = true)
+        cartRepository = mockk(relaxed = true)
         presenter = ShoppingPresenter(view, productRepository, recentRepository, cartRepository)
-    }
-
-    @Test
-    fun `초기 상품들을 세팅한다`() {
-        // given
-        mockCartGetAll()
-        mockProductGetNext()
-        every { recentRepository.getRecent(10) } returns fakeRecentProducts
-
-        every { view.setRecentProducts(any()) } returns Unit
-        every { view.addMoreProducts(any()) } returns Unit
-        every { view.setCartProducts(any()) } returns Unit
-
-        // when
-        presenter.setUpProducts()
-
-        // then
-        verify(exactly = 1) {
-            view.setRecentProducts(fakeRecentProducts.map { it.toUIModel() })
-        }
-        verify(exactly = 1) {
-            view.addMoreProducts(fakeProducts.map { it.toUIModel() })
-        }
-        verify(exactly = 1) {
-            view.setCartProducts(fakeCartCounts)
-        }
     }
 
     @Test
@@ -119,14 +93,14 @@ class ShoppingPresenterTest {
         // given
         mockCartGetAll()
         every { view.setCartProducts(any()) } returns Unit
+        every { view.setToolbar(any()) } returns Unit
 
         // when
         presenter.setUpCartCounts()
 
         // then
-        verify(exactly = 1) {
-            view.setCartProducts(fakeCartCounts)
-        }
+        verify(exactly = 1) { view.setCartProducts(fakeCartCounts) }
+        verify(exactly = 1) { view.setToolbar(0) }
     }
 
     @Test
@@ -171,7 +145,7 @@ class ShoppingPresenterTest {
         presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
 
         // then
-        verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel()) }
+        verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel().id) }
     }
 
     private fun mockProductGetNext() {

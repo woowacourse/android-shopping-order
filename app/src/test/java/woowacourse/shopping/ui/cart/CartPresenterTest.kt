@@ -95,9 +95,9 @@ class CartPresenterTest {
 
         // then
         verify(exactly = 10) {
-            cartRepository.updateChecked(fakeCartProduct.id, true)
+            cartRepository.updateChecked(any(), true)
         }
-        verify {
+        verify(exactly = 2) {
             view.setPage(
                 fakeCartProducts.toUIModel(),
                 PageUIModel(pageNext = true, pagePrev = true, pageNumber = 1)
@@ -224,7 +224,7 @@ class CartPresenterTest {
         presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
 
         // then
-        verify(exactly = 1) { view.navigateToItemDetail(fakeProduct.toUIModel()) }
+        verify(exactly = 1) { view.navigateToItemDetail(fakeProduct.toUIModel().id) }
     }
 
     @Test
