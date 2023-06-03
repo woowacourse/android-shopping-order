@@ -16,7 +16,7 @@ class ProductDetailPresenter(
 
     private lateinit var product: ProductUIModel
 
-    override fun loadProduct(productId: Int) {
+    override fun loadProduct(productId: Long) {
         productRepository.getProductById(
             productId,
             onSuccess = {

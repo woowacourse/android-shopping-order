@@ -136,8 +136,8 @@ class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
     }
 
     companion object {
-        fun intent(context: Context) = Intent(context, ShoppingCartActivity::class.java)
-
         private const val INIT_PAGE_COUNTER_VIEW = 1
+
+        fun intent(context: Context) = Intent(context, ShoppingCartActivity::class.java)
     }
 }

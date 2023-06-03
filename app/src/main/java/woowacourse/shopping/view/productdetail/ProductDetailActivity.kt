@@ -35,7 +35,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setPresenter() {
-        val productId = intent.getIntExtra(BundleKeys.KEY_PRODUCT, NONE_VALUE)
+        val productId = intent.getLongExtra(BundleKeys.KEY_PRODUCT, NONE_VALUE)
 
         presenter =
             ProductDetailPresenter(
@@ -113,7 +113,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         private const val NON_FOUND_KEY_ERROR = "일치하는 키가 없습니다."
         private const val DEPTH_PARENT = 0
         private const val DEPTH_CHILD = 1
-        private const val NONE_VALUE = -1
+        private const val NONE_VALUE: Long = 0
         fun intent(context: Context): Intent {
             return Intent(context, ProductDetailActivity::class.java)
         }

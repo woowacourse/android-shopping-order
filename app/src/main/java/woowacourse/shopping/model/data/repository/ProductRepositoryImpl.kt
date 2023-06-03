@@ -31,7 +31,7 @@ class ProductRepositoryImpl(
     }
 
     override fun getProductById(
-        index: Int,
+        index: Long,
         onSuccess: (Product) -> Unit,
         onFailure: (Exception) -> Unit
     ) {

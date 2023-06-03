@@ -17,6 +17,6 @@ interface ProductDetailContract {
         fun showDialog(dialog: CountSelectDialog)
         fun isRecentProductExist(): Boolean
         fun setRecentProductView(product: ProductUIModel): RecentProductUIModel
-        fun loadProduct(productId: Int)
+        fun loadProduct(productId: Long)
     }
 }

@@ -179,6 +179,7 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
     }
 
     companion object {
+        private const val PRODUCT_ID = "productId"
         private const val DEPTH_PARENT = 0
         fun intent(context: Context): Intent {
             return Intent(context, ShoppingMainActivity::class.java)
