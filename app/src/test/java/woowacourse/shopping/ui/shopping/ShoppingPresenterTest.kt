@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
+import io.mockk.invoke
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -77,6 +78,28 @@ class ShoppingPresenterTest {
 
         // then
         verify { view.updateTotalBasketCount(totalBasketProductCount) }
+    }
+
+    @Test
+    fun `저장소로부터 장바구니 상품들을 받아오지 못한 경우 에러 메시지를 보여준다`() {
+        // given
+        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
+        val errorMessage = "장바구니 상품을 불러올 수 없습니다."
+
+        every {
+            basketRepository.getAll(
+                onReceived = any(),
+                onFailed = capture(slotShowErrorMessage)
+            )
+        }.answers {
+            slotShowErrorMessage.captured.invoke(errorMessage)
+        }
+
+        // when
+        presenter.initBasket()
+
+        // then
+        verify { view.showErrorMessage(errorMessage) }
     }
 
     @Test
@@ -158,7 +181,32 @@ class ShoppingPresenterTest {
     }
 
     @Test
-    fun `장바구니에 물품을 빼면 데이터베이스에서도 빼는 로직을 실행하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
+    fun `장바구니 물품 추가에 대해서 실패하면 에러 메시지를 보여준다`() {
+        // given
+        val products = ProductFixture.createProducts()
+        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
+        val errorMessage = "물품을 장바구니에 추가하지 못했습니다."
+
+        setUpBasket(products)
+        every {
+            basketRepository.add(
+                product = products.first(),
+                onAdded = any(),
+                onFailed = capture(slotShowErrorMessage)
+            )
+        } answers {
+            slotShowErrorMessage.invoke(errorMessage)
+        }
+
+        // when
+        presenter.addBasketProduct(products.first())
+
+        // then
+        verify { view.showErrorMessage(errorMessage) }
+    }
+
+    @Test
+    fun `장바구니 물품의 개수를 빼면 데이터베이스에서도 빼는 로직을 실행하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
         // given
         val products = ProductFixture.createProducts()
         val basketProducts = BasketProductFixture.createBasketProducts()
@@ -194,6 +242,36 @@ class ShoppingPresenterTest {
     }
 
     @Test
+    fun `장바구니 물품의 개수를 빼는 것을 실패하면 에러 메시지를 띄운다`() {
+        // given
+        val products = ProductFixture.createProducts()
+        val basketProducts = BasketProductFixture.createBasketProducts()
+        val basketProduct = basketProducts.find { it.product.id == products.first().id }
+        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
+        val errorMessage = "물품의 개수 감소시키는 것을 실패했습니다"
+
+        setUpBasket(
+            products = products,
+            basketProducts = basketProducts
+        )
+        every {
+            basketRepository.update(
+                basketProduct = basketProduct!!,
+                onUpdated = any(),
+                onFailed = capture(slotShowErrorMessage)
+            )
+        } answers {
+            slotShowErrorMessage.invoke(errorMessage)
+        }
+
+        // when
+        presenter.minusBasketProductCount(products.first())
+
+        // then
+        verify { view.showErrorMessage(errorMessage) }
+    }
+
+    @Test
     fun `페이지네이션의 다음페이지가 존재여부를 더보기 버튼의 visibility를 업데이트 하기위해 전달한다`() {
         // given
 
@@ -205,8 +283,8 @@ class ShoppingPresenterTest {
     }
 
     private fun setUpBasket(
-        products: List<Product>? = null,
-        basketProducts: List<BasketProduct>? = null,
+        products: List<Product> = ProductFixture.createProducts(),
+        basketProducts: List<BasketProduct> = BasketProductFixture.createBasketProducts(),
     ) {
         val slotUpdateProduct = slot<(products: List<Product>) -> Unit>()
         val slotUpdateBasketProducts = slot<(products: List<BasketProduct>) -> Unit>()
@@ -218,9 +296,7 @@ class ShoppingPresenterTest {
                 onReceived = capture(slotUpdateProduct)
             )
         }.answers {
-            products?.let {
-                slotUpdateProduct.captured.invoke(it)
-            }
+            slotUpdateProduct.captured.invoke(products)
         }
 
         every {
@@ -229,9 +305,7 @@ class ShoppingPresenterTest {
                 any()
             )
         }.answers {
-            basketProducts?.let {
-                slotUpdateBasketProducts.captured.invoke(it)
-            }
+            slotUpdateBasketProducts.captured.invoke(basketProducts)
         }
         presenter.initBasket()
     }
