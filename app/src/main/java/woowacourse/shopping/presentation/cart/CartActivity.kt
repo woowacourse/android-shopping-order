@@ -51,7 +51,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initView() {
         initCartAdapter()
         setToolBar()
-        allIsOrderedCheckBoxChange()
+        allOrderedCheckBoxChange()
         orderButtonClick()
     }
 
@@ -112,7 +112,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         return true
     }
 
-    private fun allIsOrderedCheckBoxChange() {
+    private fun allOrderedCheckBoxChange() {
         binding.checkboxAllCart.setOnCheckedChangeListener { _, isChecked ->
             presenter.changeCurrentPageProductsOrder(isChecked)
             presenter.updateOrderPrice()
