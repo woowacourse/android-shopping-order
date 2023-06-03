@@ -7,6 +7,7 @@ class MyPagePresenter(
     private val view: MyPageContract.View,
     private val chargeRepository: ChargeRepository,
 ) : MyPageContract.Presenter {
+
     override fun fetchCharge() {
         chargeRepository.fetchCharge { result ->
             when (result) {

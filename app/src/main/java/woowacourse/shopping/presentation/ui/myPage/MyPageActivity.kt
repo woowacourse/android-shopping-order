@@ -18,6 +18,7 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
         binding = ActivityMyPageBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+        presenter.fetchCharge()
         binding.buttonMyPageRecharge.setOnClickListener { requestRecharge() }
     }
 
