@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.view.productdetail
 
 import woowacourse.shopping.presentation.model.CartModel
-import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
 interface ProductDetailContract {

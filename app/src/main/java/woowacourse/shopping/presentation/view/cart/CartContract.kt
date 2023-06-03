@@ -13,6 +13,7 @@ interface CartContract {
         fun setTotalPriceView(totalPrice: Int)
         fun updateAllChecking(startPosition: Int, count: Int)
         fun setLayoutVisibility()
+        fun moveToOrderView(cartIds: List<Long>)
         fun handleErrorView()
     }
 
@@ -23,6 +24,7 @@ interface CartContract {
         fun calculatePreviousPage()
         fun calculateNextPage()
         fun calculateTotalPrice()
+        fun order()
         fun updateProductCount(cartId: Long, count: Int)
         fun updateProductChecked(cartId: Long, isChecked: Boolean)
         fun updateCurrentPageAllProductChecked(isChecked: Boolean)

@@ -114,7 +114,6 @@ class CartPresenter(
         pageNation.currentPageCartProducts.find { it.id == cartId }?.run {
             if (checked == isChecked) return@run
             pageNation = pageNation.updateCheckedState(cartId, isChecked)
-//            checked = isChecked
             cartRepository.updateLocalCartChecked(id, isChecked)
             view.setAllCartChecked(isAllChecked())
         }
@@ -139,8 +138,12 @@ class CartPresenter(
         )
     }
 
+    override fun order() {
+        val ids = pageNation.getCheckedProductIds()
+        view.moveToOrderView(ids)
+    }
+
     companion object {
-        private const val FIRST_PAGE_NUMBER = 1
         private const val DISPLAY_CART_COUNT_CONDITION = 5
     }
 }
