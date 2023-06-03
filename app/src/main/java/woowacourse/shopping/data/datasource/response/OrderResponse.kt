@@ -7,7 +7,7 @@ data class OrderResponse(
     @SerializedName("orderId")
     val orderId: Long,
     @SerializedName("createdAt")
-    val orderedTime: String?,
+    val orderedTime: String,
     @SerializedName("orderItems")
     val orderProducts: List<OrderProductEntity>,
     @SerializedName("totalPrice")
