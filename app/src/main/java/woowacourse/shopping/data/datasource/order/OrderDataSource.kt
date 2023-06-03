@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.datasource.order
 
-import woowacourse.shopping.data.remote.response.addorder.AddOrderResponse
-
 interface OrderDataSource {
     interface Local
 
@@ -10,7 +8,7 @@ interface OrderDataSource {
             basketProductsId: List<Int>,
             usingPoint: Int,
             orderTotalPrice: Int,
-            onReceived: (AddOrderResponse) -> Unit
+            onReceived: (Result<Int>) -> Unit
         )
     }
 }
