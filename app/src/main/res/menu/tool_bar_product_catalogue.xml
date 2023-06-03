@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_my_page"
+        app:actionLayout="@layout/item_home_badge"
+        android:enabled="true"
+        android:title="MyPage"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/menu_cart"
         app:actionLayout="@layout/item_cart_badge"
         android:title="Badge"

@@ -3,7 +3,7 @@
     android:shape="rectangle">
     <stroke
         android:width="2dp"
-        android:color="@color/load_more_boarder" />
+        android:color="@color/boarder_color" />
     <corners android:radius="6dp" />
     <solid
         android:color="@color/load_more_button_color" />

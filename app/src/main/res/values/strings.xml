@@ -17,4 +17,7 @@
     <string name="jerry_server">제리의 서버</string>
     <string name="gitjjang_server">깃짱의 서버</string>
     <string name="hoi_server">호이의 서버</string>
+    <string name="my_page_title">링링님의 마이페이지</string>
+    <string name="point_description">보유 포인트</string>
+    <string name="move_to_order_history"><![CDATA[주문목록 >]]></string>
 </resources>

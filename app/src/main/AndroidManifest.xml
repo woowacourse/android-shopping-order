@@ -15,6 +15,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".view.mypage.MyPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.orderhistory.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.serverselect.ServerSelectActivity"
             android:exported="true">
             <intent-filter>

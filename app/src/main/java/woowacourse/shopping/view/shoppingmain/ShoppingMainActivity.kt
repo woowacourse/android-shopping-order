@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
@@ -22,6 +23,7 @@ import woowacourse.shopping.model.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.model.uimodel.ProductUIModel
 import woowacourse.shopping.server.retrofit.RetrofitClient
+import woowacourse.shopping.view.mypage.MyPageActivity
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 import woowacourse.shopping.view.shoppingcart.ShoppingCartActivity
 
@@ -176,6 +178,17 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
         presenter.updateCartBadge()
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_my_page -> {
+                val intent = MyPageActivity.intent(this)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     companion object {
