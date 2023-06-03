@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.detailedProduct
 
+import java.util.concurrent.locks.ReentrantLock
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
@@ -20,14 +21,16 @@ class DetailedProductPresenter(
     private lateinit var product: ProductUIModel
     private var lastProduct: ProductUIModel? = null
 
+    private val lock = ReentrantLock()
+
     init {
-        var block = false
+        lock.lock()
         productRepository.findById(productId) { result ->
             result.onSuccess { product -> this.product = product.toUIModel() }
                 .onFailure { exception -> LogUtil.logError(exception) }
-                .also { block = true }
+                .also { lock.unlock() }
         }
-        while (!block) { Thread.sleep(100) }
+        while (lock.isLocked) { Thread.sleep(100) }
 
         if (!this::product.isInitialized) {
             view.showProductNotFound()
