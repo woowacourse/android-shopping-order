@@ -27,6 +27,17 @@ class OrderDetailDialog(
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initOrderItemRecyclerViewAdapter()
+    }
+
+    private fun initOrderItemRecyclerViewAdapter() {
+        val adapter = OrderDetailAdapter()
+        adapter.submitList(orderInfo.orderItems)
+        binding.rvOrderItem.adapter = adapter
+    }
+
     override fun onStart() {
         super.onStart()
         setLayout()
@@ -35,7 +46,7 @@ class OrderDetailDialog(
     private fun setLayout() {
         dialog?.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
-            (resources.displayMetrics.heightPixels * 0.7).toInt()
+            (resources.displayMetrics.heightPixels * 0.8).toInt()
         )
     }
 

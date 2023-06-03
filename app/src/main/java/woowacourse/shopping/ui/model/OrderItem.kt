@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 typealias UiOrderItem = OrderItem
 
 @Parcelize
-class OrderItem(
+data class OrderItem(
     val count: UiCount,
     val product: UiProduct
 ) : Parcelable

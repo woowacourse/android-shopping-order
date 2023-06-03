@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 typealias UiUserPointInfo = UserPointInfo
 
 @Parcelize
-class UserPointInfo(
+data class UserPointInfo(
     val point: Point,
     val earnRate: EarnRate
 ) : Parcelable

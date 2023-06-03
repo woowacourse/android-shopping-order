@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 typealias UiOrder = Order
 
 @Parcelize
-class Order(
+data class Order(
     val orderId: Int,
     val createdAt: LocalDateTime,
     val orderItems: List<UiOrderItem>,
