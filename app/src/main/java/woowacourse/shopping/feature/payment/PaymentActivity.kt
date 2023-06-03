@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import woowacourse.shopping.R
@@ -17,6 +18,7 @@ import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
+import woowacourse.shopping.feature.main.MainActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PointUiModel
 
@@ -34,6 +36,9 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         val cartIds = intent.getIntegerArrayListExtra(CART_ITEM_IDS)
         presenter.loadCartProducts(cartIds?.toList() ?: emptyList())
         setup()
+
+        supportActionBar?.title = getString(R.string.payment_page)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initPresenter() {
@@ -78,7 +83,9 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun showPaymentDoneScreen() {
-        Toast.makeText(this, "결제완료!!", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
     }
 
     override fun setPoint(usedPoint: Int) {
@@ -108,6 +115,17 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
             override fun afterTextChanged(p0: Editable?) = Unit
         })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     companion object {
