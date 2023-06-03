@@ -120,15 +120,32 @@
                     app:layout_constraintStart_toStartOf="@id/line_points"
                     app:layout_constraintTop_toBottomOf="@id/tv_points_available" />
 
-                <TextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/use_points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/primary"
+                    style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/cart_product_list_background"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
                     android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/btn_use_all_points"
+                    app:layout_constraintTop_toTopOf="@id/tv_use_points" />
+
+                <Button
+                    android:id="@+id/btn_use_all_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:background="@drawable/order_button_background"
+                    android:text="@string/use_all_points_button"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@id/line_points"
-                    app:layout_constraintTop_toTopOf="@id/tv_use_points"
-                    tools:text="1000 p" />
+                    app:layout_constraintTop_toTopOf="@id/use_points" />
 
                 <View
                     android:id="@+id/space_between_points_payment_price"
@@ -138,7 +155,7 @@
                     android:background="#EBEBEB"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_use_points" />
+                    app:layout_constraintTop_toBottomOf="@id/use_points" />
 
                 <TextView
                     android:id="@+id/tv_payment_price"
