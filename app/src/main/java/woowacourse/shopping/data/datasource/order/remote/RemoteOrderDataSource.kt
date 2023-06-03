@@ -4,8 +4,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.order.OrderDataSource
+import woowacourse.shopping.data.model.DataOrder
 import woowacourse.shopping.data.remote.RetrofitModule
+import woowacourse.shopping.data.remote.mapper.toData
 import woowacourse.shopping.data.remote.request.AddOrderRequest
+import woowacourse.shopping.data.remote.response.order.Individualorder.IndividualOrderResponse
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorBody
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderFailureException
 
@@ -42,6 +45,25 @@ class RemoteOrderDataSource : OrderDataSource.Remote {
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {}
+            }
+        )
+    }
+
+    override fun getIndividualOrderInfo(orderId: Int, onReceived: (DataOrder) -> Unit) {
+        RetrofitModule.orderService.getIndividualOrderInfo(orderId).enqueue(
+            object : Callback<IndividualOrderResponse> {
+                override fun onResponse(
+                    call: Call<IndividualOrderResponse>,
+                    response: Response<IndividualOrderResponse>
+                ) {
+                    val orderInfo = response.body()?.toData()
+
+                    orderInfo?.let {
+                        onReceived(it)
+                    }
+                }
+
+                override fun onFailure(call: Call<IndividualOrderResponse>, t: Throwable) {}
             }
         )
     }

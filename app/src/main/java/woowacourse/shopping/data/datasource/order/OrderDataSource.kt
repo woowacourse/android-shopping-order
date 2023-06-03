@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.datasource.order
 
+import woowacourse.shopping.data.model.DataOrder
+
 interface OrderDataSource {
     interface Local
 
@@ -10,5 +12,7 @@ interface OrderDataSource {
             orderTotalPrice: Int,
             onReceived: (Result<Int>) -> Unit
         )
+
+        fun getIndividualOrderInfo(orderId: Int, onReceived: (DataOrder) -> Unit)
     }
 }
