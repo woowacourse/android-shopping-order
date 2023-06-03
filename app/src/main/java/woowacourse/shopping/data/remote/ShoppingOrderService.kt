@@ -9,9 +9,11 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.dto.request.InsertingProductDto
+import woowacourse.shopping.data.remote.dto.request.RequestChargeDto
 import woowacourse.shopping.data.remote.dto.request.UpdatingProductDto
 import woowacourse.shopping.data.remote.dto.response.ProductDto
 import woowacourse.shopping.data.remote.dto.response.ProductListDto
+import woowacourse.shopping.data.remote.dto.response.ResponseChargeDto
 import woowacourse.shopping.data.remote.dto.response.ShoppingCartDto
 
 interface ShoppingOrderService {
@@ -44,4 +46,12 @@ interface ShoppingOrderService {
     fun deleteCartItem(
         @Path("id") id: Long,
     ): Call<Unit>
+
+    @POST("/members/cash")
+    fun recharge(
+        @Body cashToCharge: RequestChargeDto,
+    ): Call<ResponseChargeDto>
+
+    @GET("/members/cash")
+    fun getCharge(): Call<ResponseChargeDto>
 }
