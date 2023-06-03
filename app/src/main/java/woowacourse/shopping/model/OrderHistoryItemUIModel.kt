@@ -1,6 +1,6 @@
 package woowacourse.shopping.model
 
-data class OrderItem(
+data class OrderHistoryItemUIModel(
     val productId: Long,
     val name: String,
     val price: Int,

@@ -24,13 +24,13 @@
             android:name=".ui.detailedProduct.DetailedProductActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.orders.OrdersActivity"
+            android:name=".ui.orderHistories.OrderHistoriesActivity"
             android:exported="false" />
         <activity
             android:name=".ui.order.OrderActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.orderDetail.OrderDetailActivity"
+            android:name=".ui.orderHistory.OrderHistoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.serverSetting.ServerSettingActivity"

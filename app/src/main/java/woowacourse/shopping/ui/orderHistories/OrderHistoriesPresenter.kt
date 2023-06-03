@@ -1,22 +1,22 @@
-package woowacourse.shopping.ui.orders
+package woowacourse.shopping.ui.orderHistories
 
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.utils.LogUtil
 
-class OrdersPresenter(
-    private val view: OrdersContract.View,
+class OrderHistoriesPresenter(
+    private val view: OrderHistoriesContract.View,
     private val orderRepository: OrderRepository
-) : OrdersContract.Presenter {
-    override fun getOrders() {
+) : OrderHistoriesContract.Presenter {
+    override fun getOrderHistories() {
         orderRepository.getOrders { result ->
             result.onSuccess { orders -> view.showOrderHistories(orders.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
         }
     }
 
-    override fun navigateToOrderDetail(orderId: Long) {
-        view.navigateToOrderDetail(orderId)
+    override fun navigateToOrderHistory(orderId: Long) {
+        view.navigateToOrderHistory(orderId)
     }
 
     override fun navigateToProductDetail(productId: Int) {

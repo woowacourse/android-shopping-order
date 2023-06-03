@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orders
+package woowacourse.shopping.ui.orderHistories
 
 import android.content.Context
 import android.os.Bundle
@@ -6,28 +6,28 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
-import woowacourse.shopping.databinding.ActivityOrdersBinding
-import woowacourse.shopping.model.OrderUIModel
+import woowacourse.shopping.databinding.ActivityOrderHistoriesBinding
+import woowacourse.shopping.model.OrderHistoryUIModel
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
-import woowacourse.shopping.ui.orderDetail.OrderDetailActivity
-import woowacourse.shopping.ui.orders.ordersAdapter.OrdersAdapter
-import woowacourse.shopping.ui.orders.ordersAdapter.OrdersListener
+import woowacourse.shopping.ui.orderHistories.historiesAdapter.HistoriesAdapter
+import woowacourse.shopping.ui.orderHistories.historiesAdapter.HistoriesListener
+import woowacourse.shopping.ui.orderHistory.OrderHistoryActivity
 import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
 import woowacourse.shopping.utils.PhDividerItemDecoration
 import woowacourse.shopping.utils.RetrofitUtil
 
-class OrdersActivity : AppCompatActivity(), OrdersContract.View {
-    private lateinit var binding: ActivityOrdersBinding
-    private lateinit var presenter: OrdersContract.Presenter
+class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View {
+    private lateinit var binding: ActivityOrderHistoriesBinding
+    private lateinit var presenter: OrderHistoriesContract.Presenter
 
-    private val adapter = OrdersAdapter(
-        listener = object : OrdersListener {
+    private val adapter = HistoriesAdapter(
+        listener = object : HistoriesListener {
             override fun onItemClick(productId: Int) {
                 presenter.navigateToProductDetail(productId)
             }
 
             override fun onOrderDetailClick(orderId: Long) {
-                presenter.navigateToOrderDetail(orderId)
+                presenter.navigateToOrderHistory(orderId)
             }
         }
     )
@@ -50,13 +50,13 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
     }
 
     private fun initBinding() {
-        binding = ActivityOrdersBinding.inflate(layoutInflater)
+        binding = ActivityOrderHistoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
 
     private fun initPresenter() {
         RetrofitUtil.url = ServerSettingActivity.SERVER_IO
-        presenter = OrdersPresenter(
+        presenter = OrderHistoriesPresenter(
             this,
             OrderRepositoryImpl(OrderRemoteDataSourceImpl())
         )
@@ -71,15 +71,15 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(PhDividerItemDecoration(20f, 0xffebebeb.toInt()))
 
-        presenter.getOrders()
+        presenter.getOrderHistories()
     }
 
-    override fun showOrderHistories(orders: List<OrderUIModel>) {
-        adapter.submitList(orders)
+    override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
+        adapter.submitList(orderHistories)
     }
 
-    override fun navigateToOrderDetail(orderId: Long) {
-        startActivity(OrderDetailActivity.getIntent(this, orderId))
+    override fun navigateToOrderHistory(orderId: Long) {
+        startActivity(OrderHistoryActivity.getIntent(this, orderId))
     }
 
     override fun navigateToProductDetail(productId: Int) {
@@ -88,7 +88,7 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
 
     companion object {
         fun getIntent(context: Context): android.content.Intent {
-            return android.content.Intent(context, OrdersActivity::class.java)
+            return android.content.Intent(context, OrderHistoriesActivity::class.java)
         }
     }
 }

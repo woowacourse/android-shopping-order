@@ -3,20 +3,20 @@ package woowacourse.shopping.data.repositoryImpl
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.model.Order
-import woowacourse.shopping.model.OrderList
+import woowacourse.shopping.model.OrderHistory
 
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource
 ) : OrderRepository {
-    override fun getOrderList(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
+    override fun getOrderList(cartIds: List<Int>, callback: (Result<Order>) -> Unit) {
         orderRemoteDataSource.getOrderList(cartIds, callback)
     }
 
-    override fun getOrders(callback: (Result<List<Order>>) -> Unit) {
+    override fun getOrders(callback: (Result<List<OrderHistory>>) -> Unit) {
         orderRemoteDataSource.getOrders(callback)
     }
 
-    override fun getOrder(id: Long, callback: (Result<Order>) -> Unit) {
+    override fun getOrder(id: Long, callback: (Result<OrderHistory>) -> Unit) {
         orderRemoteDataSource.getOrder(id, callback)
     }
 

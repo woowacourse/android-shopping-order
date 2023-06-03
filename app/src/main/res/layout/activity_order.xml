@@ -6,7 +6,7 @@
     <data>
         <variable
             name="orderList"
-            type="woowacourse.shopping.model.OrderListUIModel" />
+            type="woowacourse.shopping.model.OrderUIModel" />
 
         <variable
             name="price"

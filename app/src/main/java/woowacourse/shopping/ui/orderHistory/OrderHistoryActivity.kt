@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.orderDetail
+package woowacourse.shopping.ui.orderHistory
 
 import android.content.Context
 import android.content.Intent
@@ -7,16 +7,16 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
-import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.model.OrderUIModel
+import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
+import woowacourse.shopping.model.OrderHistoryUIModel
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
-import woowacourse.shopping.ui.orders.orderItemAdapter.OrderItemAdapter
+import woowacourse.shopping.ui.orderHistories.historyAdapter.HistoryItemAdapter
 
-class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
-    private lateinit var binding: ActivityOrderDetailBinding
-    private lateinit var presenter: OrderDetailContract.Presenter
+class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
+    private lateinit var binding: ActivityOrderHistoryBinding
+    private lateinit var presenter: OrderHistoryContract.Presenter
 
-    private val adapter = OrderItemAdapter(
+    private val adapter = HistoryItemAdapter(
         onItemClick = { productId -> presenter.navigateToProductDetail(productId) }
     )
 
@@ -37,12 +37,12 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun initBinding() {
-        binding = ActivityOrderDetailBinding.inflate(layoutInflater)
+        binding = ActivityOrderHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
 
     private fun initPresenter() {
-        presenter = OrderDetailPresenter(
+        presenter = OrderHistoryPresenter(
             this,
             OrderRepositoryImpl(
                 OrderRemoteDataSourceImpl()
@@ -61,9 +61,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         presenter.getOrderDetail()
     }
 
-    override fun setOrder(order: OrderUIModel) {
-        binding.order = order
-        adapter.submitList(order.orderItems)
+    override fun setOrderHistory(orderHistory: OrderHistoryUIModel) {
+        binding.order = orderHistory
+        adapter.submitList(orderHistory.orderItems)
     }
 
     override fun navigateToProductDetail(productId: Int) {
@@ -74,7 +74,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         private const val KEY_ORDER_ID = "KEY_ORDER_ID"
 
         fun getIntent(context: Context, orderId: Long): Intent =
-            Intent(context, OrderDetailActivity::class.java).apply {
+            Intent(context, OrderHistoryActivity::class.java).apply {
                 putExtra(KEY_ORDER_ID, orderId)
             }
     }

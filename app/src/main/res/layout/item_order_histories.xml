@@ -7,7 +7,7 @@
 
         <variable
             name="order"
-            type="woowacourse.shopping.model.OrderUIModel" />
+            type="woowacourse.shopping.model.OrderHistoryUIModel" />
 
         <variable
             name="onOrderDetailClick"

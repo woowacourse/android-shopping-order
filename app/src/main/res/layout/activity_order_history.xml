@@ -7,7 +7,7 @@
 
         <variable
             name="order"
-            type="woowacourse.shopping.model.OrderUIModel" />
+            type="woowacourse.shopping.model.OrderHistoryUIModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                tools:context=".ui.orderDetail.OrderDetailActivity">
+                tools:context=".ui.orderHistory.OrderHistoryActivity">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:itemCount="3"
-                    tools:listitem="@layout/item_item_orders" />
+                    tools:listitem="@layout/item_order_history" />
 
                 <View
                     android:layout_width="match_parent"

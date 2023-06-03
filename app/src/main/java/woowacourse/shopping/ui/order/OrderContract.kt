@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.order
 
-import woowacourse.shopping.model.OrderListUIModel
+import woowacourse.shopping.model.OrderUIModel
 
 interface OrderContract {
     interface View {
-        fun showOrderList(orderListUIModel: OrderListUIModel)
+        fun showOrderList(orderUIModel: OrderUIModel)
         fun navigateOrder(orderId: Long)
     }
 

@@ -1,11 +1,9 @@
 package woowacourse.shopping.model
 
 data class Order(
-    val id: Long,
-    val orderItems: List<OrderItem>,
+    val cartItems: List<CartProduct>,
     val totalPrice: Int,
-    val payPrice: Int,
+    val currentPoints: Int,
     val earnedPoints: Int,
-    val usedPoints: Int,
-    val orderDate: String
+    val availablePoints: Int
 )

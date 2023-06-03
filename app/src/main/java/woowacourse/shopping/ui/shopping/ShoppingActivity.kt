@@ -22,7 +22,7 @@ import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
-import woowacourse.shopping.ui.orders.OrdersActivity
+import woowacourse.shopping.ui.orderHistories.OrderHistoriesActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
@@ -143,7 +143,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun navigateToOrders() {
-        startActivity(OrdersActivity.getIntent(this))
+        startActivity(OrderHistoriesActivity.getIntent(this))
     }
 
     companion object {

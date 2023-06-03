@@ -8,8 +8,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.model.Order
-import woowacourse.shopping.model.OrderList
-import woowacourse.shopping.model.OrderResponse
+import woowacourse.shopping.model.OrderHistory
+import woowacourse.shopping.model.OrderHistoryResponse
 import woowacourse.shopping.model.PostOrderRequest
 
 interface RetrofitOrderService {
@@ -17,18 +17,18 @@ interface RetrofitOrderService {
     fun getOrderList(
         @Header("Authorization") token: String,
         @Query("ids") cartItemIds: String
-    ): Call<OrderList>
+    ): Call<Order>
 
     @GET("orders")
     fun getOrders(
         @Header("Authorization") token: String
-    ): Call<OrderResponse>
+    ): Call<OrderHistoryResponse>
 
     @GET("orders/{id}")
     fun getOrder(
         @Header("Authorization") token: String,
         @Path("id") id: Long
-    ): Call<Order>
+    ): Call<OrderHistory>
 
     @POST("orders")
     fun postOrder(

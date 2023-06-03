@@ -12,7 +12,7 @@
 
         <variable
             name="orderItem"
-            type="woowacourse.shopping.model.OrderItemUIModel" />
+            type="woowacourse.shopping.model.OrderHistoryItemUIModel" />
     </data>
 
 

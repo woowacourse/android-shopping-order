@@ -1,10 +1,10 @@
-package woowacourse.shopping.ui.orderDetail
+package woowacourse.shopping.ui.orderHistory
 
-import woowacourse.shopping.model.OrderUIModel
+import woowacourse.shopping.model.OrderHistoryUIModel
 
-interface OrderDetailContract {
+interface OrderHistoryContract {
     interface View {
-        fun setOrder(order: OrderUIModel)
+        fun setOrderHistory(orderHistory: OrderHistoryUIModel)
         fun navigateToProductDetail(productId: Int)
     }
 

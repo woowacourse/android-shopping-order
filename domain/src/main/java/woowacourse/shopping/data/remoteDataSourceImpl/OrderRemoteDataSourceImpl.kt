@@ -2,29 +2,29 @@ package woowacourse.shopping.data.remoteDataSourceImpl
 
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.model.Order
-import woowacourse.shopping.model.OrderList
+import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.PostOrderRequest
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     private var credentials = "Basic YUBhLmNvbToxMjM0"
 
-    override fun getOrderList(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
+    override fun getOrderList(cartIds: List<Int>, callback: (Result<Order>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))
             .enqueue(RetrofitUtil.callback(callback))
     }
 
-    override fun getOrders(callback: (Result<List<Order>>) -> Unit) {
+    override fun getOrders(callback: (Result<List<OrderHistory>>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrders(credentials)
             .enqueue(
                 RetrofitUtil.callback { result ->
-                    result.onSuccess { callback(Result.success(it.orders)) }
+                    result.onSuccess { callback(Result.success(it.orderHistories)) }
                         .onFailure { e -> callback(Result.failure(e)) }
                 }
             )
     }
 
-    override fun getOrder(id: Long, callback: (Result<Order>) -> Unit) {
+    override fun getOrder(id: Long, callback: (Result<OrderHistory>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrder(credentials, id)
             .enqueue(RetrofitUtil.callback(callback))
     }

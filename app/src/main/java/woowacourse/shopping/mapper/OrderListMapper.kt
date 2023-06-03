@@ -1,10 +1,10 @@
 package woowacourse.shopping.mapper
 
-import woowacourse.shopping.model.OrderList
-import woowacourse.shopping.model.OrderListUIModel
+import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderUIModel
 
-fun OrderList.toUIModel(): OrderListUIModel {
-    return OrderListUIModel(
+fun Order.toUIModel(): OrderUIModel {
+    return OrderUIModel(
         cartProducts = cartItems.map { it.toUIModel(true) },
         totalPrice = totalPrice,
         currentPoints = currentPoints,

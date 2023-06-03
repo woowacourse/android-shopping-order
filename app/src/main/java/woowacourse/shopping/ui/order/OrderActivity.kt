@@ -10,9 +10,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.model.OrderListUIModel
+import woowacourse.shopping.model.OrderUIModel
 import woowacourse.shopping.ui.order.orderProductAdapter.OrderProductAdapter
-import woowacourse.shopping.ui.orderDetail.OrderDetailActivity
+import woowacourse.shopping.ui.orderHistory.OrderHistoryActivity
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var presenter: OrderContract.Presenter
@@ -62,12 +62,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter.getOrderList()
     }
 
-    override fun showOrderList(orderListUIModel: OrderListUIModel) {
-        adapter.submitList(orderListUIModel.cartProducts)
+    override fun showOrderList(orderUIModel: OrderUIModel) {
+        adapter.submitList(orderUIModel.cartProducts)
     }
 
     override fun navigateOrder(orderId: Long) {
-        startActivity(OrderDetailActivity.getIntent(this, orderId))
+        startActivity(OrderHistoryActivity.getIntent(this, orderId))
     }
 
     companion object {
