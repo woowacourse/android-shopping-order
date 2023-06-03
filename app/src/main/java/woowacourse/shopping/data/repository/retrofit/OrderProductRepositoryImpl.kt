@@ -12,13 +12,12 @@ class OrderProductRepositoryImpl : OrderProductRepository {
         get() = ShoppingApplication.pref.getToken()
 
     override fun orderProduct(
-        token: String,
         orderItems: OrderItems,
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
     ) {
         orderProductDataSource.orderProducts(
-            token = token,
+            token = token!!,
             orderItems = orderItems,
             onSuccess = onSuccess,
             onFailure = onFailure,
@@ -26,25 +25,23 @@ class OrderProductRepositoryImpl : OrderProductRepository {
     }
 
     override fun requestOrders(
-        token: String,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     ) {
         orderProductDataSource.requestOrders(
-            token = token,
+            token = token!!,
             onSuccess = onSuccess,
             onFailure = onFailure,
         )
     }
 
     override fun requestSpecificOrder(
-        token: String,
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
         onFailure: () -> Unit,
     ) {
         orderProductDataSource.requestSpecificOrder(
-            token = token,
+            token = token!!,
             orderId = orderId,
             onSuccess = onSuccess,
             onFailure = onFailure,
