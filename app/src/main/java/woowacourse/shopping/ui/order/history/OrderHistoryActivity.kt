@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order
+package woowacourse.shopping.ui.order.history
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

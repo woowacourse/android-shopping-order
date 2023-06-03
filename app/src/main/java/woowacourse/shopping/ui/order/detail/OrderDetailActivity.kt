@@ -1,12 +1,12 @@
-package woowacourse.shopping.ui.order
+package woowacourse.shopping.ui.order.detail
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 
-class OrderActivity : AppCompatActivity() {
+class OrderDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order)
+        setContentView(R.layout.activity_order_detail)
     }
 }
