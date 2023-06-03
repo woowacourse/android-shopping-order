@@ -12,7 +12,8 @@ interface CartContract {
         fun updateTotalPrice(totalPrice: Int)
         fun showOrderComplete(cartProducts: List<CartProduct>, productCount: Int)
         fun showOrderFailed()
-        fun navigateToHome(cartProducts: List<CartProduct>)
+        fun navigateToHome()
+        fun navigateToOrder(cartProducts: List<CartProduct>)
     }
 
     abstract class Presenter(protected val view: View) {
@@ -23,5 +24,6 @@ interface CartContract {
         abstract fun removeProduct(cartProduct: UiCartProduct)
         abstract fun order()
         abstract fun navigateToHome()
+        abstract fun navigateToOrder()
     }
 }

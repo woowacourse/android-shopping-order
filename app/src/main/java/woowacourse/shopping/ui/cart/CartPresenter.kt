@@ -99,7 +99,11 @@ class CartPresenter(
     }
 
     override fun navigateToHome() {
-        view.navigateToHome(cart.selectCheckedProducts())
+        view.navigateToHome()
+    }
+
+    override fun navigateToOrder() {
+        view.navigateToOrder(cart.selectCheckedProducts())
     }
 
     private fun loadCartProducts() {

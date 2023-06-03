@@ -62,14 +62,18 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
 
     override fun showOrderComplete(cartProducts: List<CartProduct>, productCount: Int) {
         showToast(getString(R.string.order_success_message, productCount))
-        navigateToHome(cartProducts)
+        navigateToOrder(cartProducts)
     }
 
     override fun showOrderFailed() {
         showToast(getString(R.string.order_failed_message))
     }
 
-    override fun navigateToHome(cartProducts: List<CartProduct>) {
+    override fun navigateToHome() {
+        finish()
+    }
+
+    override fun navigateToOrder(cartProducts: List<CartProduct>) {
         val intent = OrderActivity.newIntent(this, cartProducts.map { it.toUi() })
         startActivity(intent)
         finish()
