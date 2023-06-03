@@ -6,12 +6,35 @@
     android:layout_height="wrap_content"
     android:paddingEnd="16dp">
 
-    <ImageView
-        android:id="@+id/ic_shopping_cart"
+    <TextView
+        android:id="@+id/member_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/cart"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="0 p" />
+
+    <ImageView
+        android:id="@+id/ic_order_history"
+        android:layout_width="21dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/ic_order_history"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/member_points" />
+
+    <ImageView
+        android:id="@+id/ic_shopping_cart"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/cart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ic_order_history"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -22,6 +45,7 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/ic_shopping_cart"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="0" />
