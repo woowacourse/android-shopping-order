@@ -12,7 +12,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.cart.CartRemoteRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.order.OrderActivity
 import woowacourse.shopping.model.CartProductState
+import woowacourse.shopping.model.CartState
 import woowacourse.shopping.util.extension.formatPriceWon
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -47,9 +49,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.pageNumberPlusTv.setOnClickListener { presenter.plusPageNumber() }
         binding.pageNumberMinusTv.setOnClickListener { presenter.minusPageNumber() }
         binding.allCheckBox.setOnCheckedChangeListener { _, _ -> presenter.pickAll() }
-
         presenter.loadCart()
         presenter.updatePickedCartProductCount()
+        setOrderButtonClickListener()
     }
 
     override fun updateItem(newItem: CartProductState) {
@@ -116,6 +118,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         setSupportActionBar(binding.cartTb)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.back_24)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun showOrderPage(cart: CartState) {
+        OrderActivity.startActivity(this, cart)
+    }
+
+    private fun setOrderButtonClickListener() {
+        binding.orderBtn.setOnClickListener {
+            presenter.attachCartToOrder()
+        }
     }
 
     companion object {

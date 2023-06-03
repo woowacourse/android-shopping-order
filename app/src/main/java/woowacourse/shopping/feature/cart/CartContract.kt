@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.cart
 
 import woowacourse.shopping.model.CartProductState
+import woowacourse.shopping.model.CartState
 
 interface CartContract {
 
@@ -16,6 +17,7 @@ interface CartContract {
         fun showCartProducts()
         fun hidePageSelectorView()
         fun updateItem(newItem: CartProductState)
+        fun showOrderPage(cart: CartState)
     }
 
     interface Presenter {
@@ -31,5 +33,6 @@ interface CartContract {
         fun deleteCartProduct(cartProductState: CartProductState)
         fun changeAllPicked()
         fun pickAll()
+        fun attachCartToOrder()
     }
 }
