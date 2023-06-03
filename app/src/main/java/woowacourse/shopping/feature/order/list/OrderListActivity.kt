@@ -34,6 +34,8 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         initAdapter()
         supportActionBar?.title = getString(R.string.order_list_bar_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        presenter.loadOrderItems()
     }
 
     private fun initPresenter() {

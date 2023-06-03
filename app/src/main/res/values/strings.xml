@@ -40,4 +40,5 @@
     <string name="product_price">상품 가격</string>
     <string name="total_pay_price">총 결제 금액</string>
     <string name="order_detail_item_description">주문 상세 내역 상품의 이미지입니다</string>
+    <string name="order_detail_navigation_text"><![CDATA[주문 상세보기 >]]></string>
 </resources>

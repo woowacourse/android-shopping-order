@@ -170,6 +170,8 @@
             app:layout_constraintTop_toBottomOf="@id/order_detail_product"
             android:layout_width="0dp"
             android:layout_marginTop="7dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
             tools:listitem="@layout/item_order_confirm_item"
             android:layout_height="wrap_content" />
 

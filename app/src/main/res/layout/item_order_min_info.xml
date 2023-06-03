@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="@id/order_date_text_view"
             app:layout_constraintBottom_toBottomOf="@id/order_date_text_view"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="주문 상세보기 >"
+            android:text="@string/order_detail_navigation_text"
             android:textColor="@color/mint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

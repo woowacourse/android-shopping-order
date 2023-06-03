@@ -18,13 +18,13 @@ data class OrderMinInfoItemDto(
     @SerializedName("date")
     val date: String,
     @SerializedName("price")
-    val price: Int
+    val paymentAmount: Int
 ) {
     fun toDomain(): OrderMinInfoItem {
         val localDateTime = LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
         return OrderMinInfoItem(
             id, mainProductName, mainProductImage, extraProductCount, localDateTime,
-            Price(price)
+            Price(paymentAmount)
         )
     }
 }

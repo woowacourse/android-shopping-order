@@ -10,6 +10,7 @@ import woowacourse.shopping.data.dataSource.remote.order.OrderService
 import woowacourse.shopping.data.model.dto.request.OrderRequestDto
 import woowacourse.shopping.data.model.dto.response.OrderDetailDto
 import woowacourse.shopping.data.model.dto.response.OrderMinInfoItemDto
+import java.net.URI
 
 class OrderRepositoryImpl(
     private val orderService: OrderService
@@ -63,8 +64,9 @@ class OrderRepositoryImpl(
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.isSuccessful.not()) onFailure()
-                    val orderId = response.headers()["Location"] ?: return onFailure()
-                    onSuccess(orderId.toLong())
+                    val responseHeader = response.headers()["Location"] ?: return onFailure()
+                    val orderId = URI(responseHeader).path.substringAfterLast("/").toLong()
+                    onSuccess(orderId)
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
