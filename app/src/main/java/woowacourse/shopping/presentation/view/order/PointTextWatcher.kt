@@ -22,6 +22,11 @@ class PointTextWatcher(
             if (it.isEmpty()) return@let
 
             var primitivePrice = primitivePrice(it.toString())
+            if (primitivePrice.isEmpty()) {
+                editText.setText("")
+                return
+            }
+
             val price = if (primitivePrice.isEmpty()) 0 else primitivePrice.toInt()
 
             if (price > userPoint.value) {
@@ -33,7 +38,7 @@ class PointTextWatcher(
             }
 
             val formattingPrice = formatPrice(primitivePrice)
-            onUsePointChange(price)
+            onUsePointChange(primitivePrice.toInt())
             editText.removeTextChangedListener(this)
             editText.setText(formattingPrice)
             editText.setSelection((editText.text.toString().length - " 원".length).coerceAtLeast(0))
