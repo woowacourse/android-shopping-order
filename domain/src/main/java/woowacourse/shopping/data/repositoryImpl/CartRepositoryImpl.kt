@@ -23,14 +23,14 @@ class CartRepositoryImpl(
         remoteDataSource.getAll { result ->
             result.onSuccess {
                 val cartProducts = it.subList(index * size, min((index + 1) * size, it.size))
-                cartItems.replaceAll(cartProducts)
-                callback(Result.success(cartItems))
+                cartItems.replaceAll(it)
+                callback(Result.success(CartProducts(cartProducts)))
             }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
-        return index <= cartItems.size / size
+        return index < (cartItems.size - 1) / size
     }
 
     override fun hasPrevPage(index: Int, size: Int): Boolean {
