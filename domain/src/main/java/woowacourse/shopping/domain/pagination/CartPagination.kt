@@ -6,8 +6,7 @@ import woowacourse.shopping.domain.model.CartProduct
 class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
     NextPagination<CartProduct>, PrevPagination<CartProduct> {
     private var lastIndex = 0
-    private val page: Int
-        get() = lastIndex / rangeSize
+    private var page: Int = 0
     val status: CartPageStatus
         get() = CartPageStatus(lastIndex > rangeSize, lastIndex < allItems.size, page)
     private val allItems: MutableList<CartProduct> = items.toMutableList()
@@ -20,6 +19,16 @@ class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
             allItems.subList(lastIndex, lastIndex + rangeSize)
         }
         lastIndex += items.size
+        page++
+        callback(items)
+    }
+
+    fun fetchCurrentItems(callback: (List<CartProduct>) -> Unit) {
+        val items: List<CartProduct> = if (allItems.size < lastIndex) { // 범위 초과
+            allItems.subList(lastIndex - rangeSize, allItems.size)
+        } else {
+            allItems.subList(lastIndex - rangeSize, lastIndex)
+        }
         callback(items)
     }
 
@@ -32,6 +41,7 @@ class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
             lastIndex -= lastIndex % rangeSize
         }
         items = allItems.subList(lastIndex - rangeSize, lastIndex)
+        page--
         callback(items)
     }
 
@@ -39,6 +49,7 @@ class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
         val nextItem = allItems.getOrNull(lastIndex)
         if (nextItem == null) lastIndex--
         allItems.remove(cartProduct)
+        if (allItems.isNotEmpty() && allItems.size % rangeSize == 0) page = allItems.size / rangeSize
         return nextItem
     }
 

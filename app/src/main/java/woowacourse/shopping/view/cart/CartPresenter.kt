@@ -87,6 +87,23 @@ class CartPresenter(
         }
     }
 
+    private fun fetchCurrentPage() {
+        cartItems.clear()
+        cartPagination.fetchCurrentItems { cartProducts ->
+            val items = cartProducts.map {
+                CartViewItem.CartProductItem(
+                    it.toUiModel(
+                        cartSystem.isSelectedProduct(it),
+                    ),
+                )
+            }
+            cartItems.addAll(items)
+            addBottomPagination()
+            _isCheckedAll.value = getIsCheckedAll()
+            view.showChangedItems()
+        }
+    }
+
     override fun removeProduct(cartId: Int) {
         cartRepository.remove(cartId) { isSuccess ->
             if (!isSuccess) return@remove
@@ -100,7 +117,10 @@ class CartPresenter(
 
             cartItems.removeLast()
             if (nextItem != null) addNextProduct(nextItem)
-            // 2페이지에서 모든 상품 다 지웠을때 1페이지로 못돌아가는 페이징 버그있음, List로 넘겨서 add할지 고민
+            if (cartItems.isEmpty()) {
+                fetchCurrentPage()
+                return@remove
+            }
             addBottomPagination()
             view.showChangedItems()
         }
