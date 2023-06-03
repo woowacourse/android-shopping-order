@@ -2,11 +2,13 @@ package woowacourse.shopping.feature.order
 
 import com.example.domain.model.Order
 import com.example.domain.repository.OrderRepository
+import com.example.domain.repository.PointRepository
 import woowacourse.shopping.mapper.toPresentation
 
 class OrderPresenter(
     private val view: OrderContract.View,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val pointRepository: PointRepository
 ) : OrderContract.Presenter {
 
     private var orders = mutableListOf<Order>()
@@ -22,5 +24,10 @@ class OrderPresenter(
             },
             onFailure = {}
         )
+    }
+
+    override fun loadPoint() {
+        val point = pointRepository.getPoint()
+        view.showPoint(point = point.toPresentation())
     }
 }

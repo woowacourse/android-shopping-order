@@ -6,10 +6,12 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
+import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.common.load.LoadAdapter
 import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
 import woowacourse.shopping.model.OrderUiModel
+import woowacourse.shopping.model.PointUiModel
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -33,8 +35,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         initPresenter()
 
         presenter.loadOrders()
+        presenter.loadPoint()
 
-        supportActionBar?.title = getString(R.string.order_history)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -46,11 +48,15 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initPresenter() {
-        presenter = OrderPresenter(this, OrderRepositoryImpl())
+        presenter = OrderPresenter(this, OrderRepositoryImpl(), PointRepositoryImpl())
     }
 
     override fun showOrders(orders: List<OrderUiModel>) {
         orderAdapter.submitList(orders)
+    }
+
+    override fun showPoint(point: PointUiModel) {
+        binding.point = point
     }
 
     private fun showOrderDetailScreen(orderId: Int) {
