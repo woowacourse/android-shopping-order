@@ -31,7 +31,7 @@ import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
-import woowacourse.shopping.feature.order.OrderActivity
+import woowacourse.shopping.feature.userInfo.UserInfoActivity
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.user_action -> {
-                startActivity(Intent(this, OrderActivity::class.java))
+                startActivity(Intent(this, UserInfoActivity::class.java))
                 true
             }
 

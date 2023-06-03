@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.userInfo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,17 +13,17 @@ import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
 import woowacourse.shopping.model.OrderUiModel
 import woowacourse.shopping.model.PointUiModel
 
-class OrderActivity : AppCompatActivity(), OrderContract.View {
+class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
     private lateinit var binding: ActivityOrderBinding
-    private lateinit var presenter: OrderContract.Presenter
-    private lateinit var orderAdapter: OrderAdapter
+    private lateinit var presenter: UserInfoContract.Presenter
+    private lateinit var orderHistoryAdapter: OrderHistoryAdapter
     private lateinit var loadAdapter: LoadAdapter
 
     private val concatAdapter: ConcatAdapter by lazy {
         val config = ConcatAdapter.Config.Builder().apply {
             setIsolateViewTypes(false)
         }.build()
-        ConcatAdapter(config, orderAdapter, loadAdapter)
+        ConcatAdapter(config, orderHistoryAdapter, loadAdapter)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,22 +37,23 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter.loadOrders()
         presenter.loadPoint()
 
+        supportActionBar?.title = getString(R.string.user_page)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initAdapter() {
-        orderAdapter = OrderAdapter { showOrderDetailScreen(it) }
+        orderHistoryAdapter = OrderHistoryAdapter { showOrderDetailScreen(it) }
         loadAdapter = LoadAdapter { presenter.loadOrders() }
 
         binding.recyclerview.adapter = concatAdapter
     }
 
     private fun initPresenter() {
-        presenter = OrderPresenter(this, OrderRepositoryImpl(), PointRepositoryImpl())
+        presenter = UserInfoPresenter(this, OrderRepositoryImpl(), PointRepositoryImpl())
     }
 
     override fun showOrders(orders: List<OrderUiModel>) {
-        orderAdapter.submitList(orders)
+        orderHistoryAdapter.submitList(orders)
     }
 
     override fun showPoint(point: PointUiModel) {

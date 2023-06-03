@@ -1,10 +1,10 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.userInfo
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemOrderBinding
 import woowacourse.shopping.model.OrderUiModel
 
-class OrderViewHolder(
+class OrderHistoryViewHolder(
     private val binding: ItemOrderBinding,
     private val onClick: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {

@@ -1,15 +1,15 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.userInfo
 
 import com.example.domain.model.Order
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.PointRepository
 import woowacourse.shopping.mapper.toPresentation
 
-class OrderPresenter(
-    private val view: OrderContract.View,
+class UserInfoPresenter(
+    private val view: UserInfoContract.View,
     private val orderRepository: OrderRepository,
     private val pointRepository: PointRepository
-) : OrderContract.Presenter {
+) : UserInfoContract.Presenter {
 
     private var orders = mutableListOf<Order>()
     private var page = 1

@@ -13,7 +13,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".feature.order.OrderActivity">
+        tools:context=".feature.userInfo.UserInfoActivity">
 
         <TextView
             android:id="@+id/current_point_tv"

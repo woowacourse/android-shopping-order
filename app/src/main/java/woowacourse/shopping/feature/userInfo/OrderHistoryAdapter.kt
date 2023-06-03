@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.userInfo
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,21 +9,21 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderBinding
 import woowacourse.shopping.model.OrderUiModel
 
-class OrderAdapter(
+class OrderHistoryAdapter(
     private val onClick: (Int) -> Unit
-) : ListAdapter<OrderUiModel, OrderViewHolder>(diffUtil) {
+) : ListAdapter<OrderUiModel, OrderHistoryViewHolder>(diffUtil) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderHistoryViewHolder {
         val binding = DataBindingUtil.inflate<ItemOrderBinding>(
             LayoutInflater.from(parent.context),
             R.layout.item_order,
             parent,
             false
         )
-        return OrderViewHolder(binding, onClick)
+        return OrderHistoryViewHolder(binding, onClick)
     }
 
-    override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: OrderHistoryViewHolder, position: Int) {
         val item = getItem(position)
         holder.bind(item)
     }
