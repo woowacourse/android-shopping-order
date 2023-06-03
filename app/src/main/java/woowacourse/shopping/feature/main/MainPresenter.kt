@@ -108,4 +108,8 @@ class MainPresenter(
         view.updateProductsCount(products)
         view.updateCartProductCount(products.size)
     }
+
+    override fun loadPointInfo() {
+        view.createCheckPointDialog(100, 20)
+    }
 }

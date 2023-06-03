@@ -2,16 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/cart_action"
+        android:id="@+id/check_point"
         android:enabled="true"
-        android:title="@string/cart"
-        app:actionLayout="@layout/layout_main_toolbar"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_coin"
+        android:title="@string/point"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/order_history"
         android:enabled="true"
         android:icon="@drawable/ic_order_history"
         android:title="@string/order_history"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/cart_action"
+        android:enabled="true"
+        android:title="@string/cart"
+        app:actionLayout="@layout/layout_main_toolbar"
+        app:showAsAction="ifRoom" />
+
 </menu>

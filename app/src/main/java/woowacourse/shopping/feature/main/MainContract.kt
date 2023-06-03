@@ -13,6 +13,7 @@ interface MainContract {
         fun updateCartProductCount(count: Int)
         fun updateProductsCount(products: List<ProductUiModel>)
         fun updateProductCount(product: ProductUiModel)
+        fun createCheckPointDialog(havePoint: Int, expirePoint: Int)
     }
 
     interface Presenter {
@@ -25,5 +26,6 @@ interface MainContract {
         fun increaseCartProduct(product: ProductUiModel, previousCount: Int)
         fun decreaseCartProduct(product: ProductUiModel, previousCount: Int)
         fun updateProducts()
+        fun loadPointInfo()
     }
 }

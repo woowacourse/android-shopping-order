@@ -2,10 +2,12 @@ package woowacourse.shopping.feature.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
@@ -22,6 +24,7 @@ import woowacourse.shopping.data.service.ProductRemoteService
 import woowacourse.shopping.data.service.ServerInfo
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
+import woowacourse.shopping.databinding.DialogCheckPointBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
 import woowacourse.shopping.feature.main.load.LoadAdapter
@@ -171,8 +174,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.order_history) {
-            navigateToOrderHistory()
+        when (item.itemId) {
+            R.id.order_history -> navigateToOrderHistory()
+            R.id.check_point -> presenter.loadPointInfo()
         }
 
         return super.onOptionsItemSelected(item)
@@ -185,6 +189,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 OrderHistoryActivity::class.java,
             ),
         )
+    }
+
+    override fun createCheckPointDialog(havePoint: Int, expirePoint: Int) {
+        val binding = DialogCheckPointBinding.inflate(LayoutInflater.from(this))
+        AlertDialog.Builder(this).apply {
+            setView(binding.root)
+            binding.tvHavePoint.text = getString(R.string.point_format, havePoint)
+            binding.tvExpirePoint.text = getString(R.string.point_format, expirePoint)
+        }.create().show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

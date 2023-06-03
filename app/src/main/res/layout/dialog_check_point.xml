@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp"
+        android:paddingBottom="30dp">
+
+        <ImageView
+            android:id="@+id/ic_coin"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/ic_coin"
+            android:backgroundTint="@color/black"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.1" />
+
+        <TextView
+            android:id="@+id/tv_have_point_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/have_point_description"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_coin" />
+
+        <TextView
+            android:id="@+id/tv_have_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_have_point_description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_have_point_description"
+            tools:text="1000P" />
+
+        <TextView
+            android:id="@+id/tv_expire_point_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/expire_point_description"
+            android:textColor="@color/red"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="@id/tv_have_point_description"
+            app:layout_constraintTop_toBottomOf="@id/tv_have_point_description" />
+
+        <TextView
+            android:id="@+id/tv_expire_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_expire_point_description"
+            app:layout_constraintEnd_toEndOf="@id/tv_have_point"
+            app:layout_constraintTop_toTopOf="@id/tv_expire_point_description"
+            tools:text="100P" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
