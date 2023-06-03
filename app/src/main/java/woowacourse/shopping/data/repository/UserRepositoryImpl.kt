@@ -9,9 +9,17 @@ class UserRepositoryImpl(
     private val userRemoteDateSource: UserRemoteDataSource,
 ) : UserRepository {
 
-    override fun getUser(onReceived: (user: User) -> Unit) {
-        userRemoteDateSource.getUser {
-            onReceived(it.toUserDomainModel())
-        }
+    override fun getUser(
+        onReceived: (user: User) -> Unit,
+        onFailure: (errorMessage: String) -> Unit,
+    ) {
+        userRemoteDateSource.getUser(
+            onReceived = { user ->
+                onReceived(user.toUserDomainModel())
+            },
+            onFailure = { errorMessage ->
+                onFailure(errorMessage)
+            }
+        )
     }
 }

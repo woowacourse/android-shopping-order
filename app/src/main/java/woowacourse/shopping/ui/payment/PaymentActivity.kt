@@ -106,7 +106,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         startActivity(intent)
     }
 
-    override fun showOrderFailedMessage(message: String) {
+    override fun showErrorMessage(message: String) {
         val intent = ShoppingActivity.getIntent(this)
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.datasource.request.UserRequest
+import woowacourse.shopping.data.datasource.response.UserResponse
 import woowacourse.shopping.domain.User
 
-fun UserRequest.toUserDomainModel() = User(
+fun UserResponse.toUserDomainModel() = User(
     email = email,
     point = point,
     accumulationRate = accumulationRate

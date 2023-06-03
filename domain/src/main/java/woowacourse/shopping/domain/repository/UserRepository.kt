@@ -4,5 +4,8 @@ import woowacourse.shopping.domain.User
 
 interface UserRepository {
 
-    fun getUser(onReceived: (user: User) -> Unit)
+    fun getUser(
+        onReceived: (user: User) -> Unit,
+        onFailure: (errorMessage: String) -> Unit,
+    )
 }
