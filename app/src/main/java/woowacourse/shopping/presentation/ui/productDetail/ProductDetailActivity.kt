@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.product.ProductDao
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.product.recentlyViewed.RecentlyViewedDao
-import woowacourse.shopping.data.product.recentlyViewed.RecentlyViewedRepositoryImpl
-import woowacourse.shopping.data.shoppingCart.ShoppingCartDao
-import woowacourse.shopping.data.shoppingCart.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
+import woowacourse.shopping.data.defaultRepository.DefaultRecentlyViewedRepository
+import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
+import woowacourse.shopping.data.local.recentlyViewed.RecentlyViewedDao
+import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
+import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
@@ -22,18 +22,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         return ProductDetailPresenter(
             this,
             productId,
-            ProductRepositoryImpl(
-                productDataSource = ProductDao(this),
-                shoppingCartDataSource = ShoppingCartDao(this),
-            ),
-            RecentlyViewedRepositoryImpl(
-                recentlyViewedDataSource = RecentlyViewedDao(this),
-                productDataSource = ProductDao(this),
-            ),
-            ShoppingCartRepositoryImpl(
-                shoppingCartDataSource = ShoppingCartDao(this),
-                productDataSource = ProductDao(this),
-            ),
+            DefaultProductRepository(ProductRemoteDataSource()),
+            DefaultRecentlyViewedRepository(RecentlyViewedDao(this)),
+            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
         )
     }
 

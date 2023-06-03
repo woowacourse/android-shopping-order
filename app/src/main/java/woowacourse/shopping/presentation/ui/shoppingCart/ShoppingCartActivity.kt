@@ -18,19 +18,9 @@ class ShoppingCartActivity :
     AppCompatActivity(),
     ShoppingCartContract.View {
     private lateinit var binding: ActivityShoppingCartBinding
-    override val presenter: ShoppingCartContract.Presenter by lazy { initPresenter() }
+    override lateinit var presenter: ShoppingCartContract.Presenter
     private val shoppingCartAdapter by lazy {
         ShoppingCartAdapter(ShoppingCartClickListenerImpl(presenter))
-    }
-
-    private fun initPresenter(): ShoppingCartPresenter {
-        return ShoppingCartPresenter(
-            this,
-            ShoppingCartRepositoryImpl(
-                shoppingCartDataSource = ShoppingCartDao(this),
-                productDataSource = ProductDao(this),
-            ),
-        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,18 +28,16 @@ class ShoppingCartActivity :
         binding = ActivityShoppingCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initView()
+        presenter = initPresenter()
         initClickListeners()
         binding.listShoppingCart.adapter = shoppingCartAdapter
     }
 
-    private fun initView() {
-        presenter.fetchShoppingCart()
-        presenter.setPageNumber()
-        presenter.checkPageMovement()
-        presenter.setOrderCount()
-        presenter.setPayment()
-        presenter.setAllCheck()
+    private fun initPresenter(): ShoppingCartPresenter {
+        return ShoppingCartPresenter(
+            this,
+            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
+        )
     }
 
     private fun initClickListeners() {

@@ -42,18 +42,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
     private fun initPresenter(): HomePresenter {
         return HomePresenter(
             this,
-            ProductRepositoryImpl(
-                productDataSource = ProductService(),
-                shoppingCartDataSource = ShoppingCartDao(this),
-            ),
-            RecentlyViewedRepositoryImpl(
-                productDataSource = ProductDao(this),
-                recentlyViewedDataSource = RecentlyViewedDao(this),
-            ),
-            ShoppingCartRepositoryImpl(
-                shoppingCartDataSource = ShoppingCartDao(this),
-                productDataSource = ProductDao(this),
-            ),
+            DefaultProductRepository(ProductRemoteDataSource()),
+            DefaultRecentlyViewedRepository(RecentlyViewedDao(this)),
+            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
         )
     }
 

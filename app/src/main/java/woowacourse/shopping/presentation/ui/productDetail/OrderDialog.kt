@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import woowacourse.shopping.data.product.ProductDao
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.shoppingCart.ShoppingCartDao
-import woowacourse.shopping.data.shoppingCart.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
+import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
+import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
+import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.DialogOrderBinding
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -21,16 +21,10 @@ import woowacourse.shopping.presentation.ui.shoppingCart.ShoppingCartActivity
 class OrderDialog : DialogFragment() {
     private lateinit var binding: DialogOrderBinding
     private val productRepository: ProductRepository by lazy {
-        ProductRepositoryImpl(
-            ProductDao(requireContext()),
-            ShoppingCartDao(requireContext()),
-        )
+        DefaultProductRepository(ProductRemoteDataSource())
     }
     private val shoppingCartRepository: ShoppingCartRepository by lazy {
-        ShoppingCartRepositoryImpl(
-            ShoppingCartDao(requireContext()),
-            ProductDao(requireContext()),
-        )
+        DefaultShoppingCartRepository(ShoppingCartRemoteDataSource())
     }
 
     override fun onCreateView(
