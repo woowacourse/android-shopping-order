@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.paymentconfirm
 
+import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 
@@ -15,7 +16,7 @@ interface PaymentConfirmContract {
 
         fun updateActualPayment(actualPayment: Int)
 
-        fun showOrderSuccessNotification()
+        fun showOrderSuccessNotification(orderInfo: UiOrder)
 
         fun showOrderLackOfPointFailureNotification(errorMessage: String)
 

@@ -3,5 +3,5 @@ package woowacourse.shopping.util
 import java.time.format.DateTimeFormatter
 
 object LocalDateTimeFormatter {
-    val hyphenColonFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")
+    val isoLocalDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 }

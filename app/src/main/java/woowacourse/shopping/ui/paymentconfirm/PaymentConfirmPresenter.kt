@@ -63,7 +63,11 @@ class PaymentConfirmPresenter(
             orderTotalPrice = totalPrice
         ) { result ->
             result
-                .onSuccess { view.showOrderSuccessNotification() }
+                .onSuccess { orderId ->
+                    orderRepository.getIndividualOrderInfo(orderId) { orderInfo ->
+                        view.showOrderSuccessNotification(orderInfo.toUi())
+                    }
+                }
                 .onFailure {
                     when (it) {
                         is ShortageStockException -> {

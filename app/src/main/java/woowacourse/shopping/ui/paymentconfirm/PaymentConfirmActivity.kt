@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentConfirmBinding
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 import woowacourse.shopping.util.editTextFocusOutProcess
@@ -83,8 +84,8 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         binding.actualPayment = actualPayment
     }
 
-    override fun showOrderSuccessNotification() {
-        Toast.makeText(this, "성공했습니다", Toast.LENGTH_SHORT).show()
+    override fun showOrderSuccessNotification(orderInfo: UiOrder) {
+        Toast.makeText(this, orderInfo.createdAt.toString(), Toast.LENGTH_SHORT).show()
         finish()
     }
 

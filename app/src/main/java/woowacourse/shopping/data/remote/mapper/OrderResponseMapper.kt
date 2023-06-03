@@ -25,7 +25,7 @@ fun OrderItem.toData(): DataOrderItem =
 fun IndividualOrderResponse.toData(): DataOrder =
     DataOrder(
         orderId = orderId,
-        createdAt = LocalDateTime.parse(createdAt, LocalDateTimeFormatter.hyphenColonFormatter),
+        createdAt = LocalDateTime.parse(createdAt, LocalDateTimeFormatter.isoLocalDateTimeFormatter),
         orderItems = orderItems.map { it.toData() },
         totalPrice = DataPrice(totalPrice),
         usedPoint = DataPoint(usedPoint),
