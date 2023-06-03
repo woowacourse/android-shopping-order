@@ -55,4 +55,8 @@
     <string name="tv_used_point_title">사용 포인트</string>
     <string name="tv_earned_point_title">획득 포인트</string>
 
+    <!-- item_individual_order -->
+    <string name="tv_individual_order_price_title">가격:</string>
+    <string name="tv_individual_order_count">수량: %d개</string>
+
 </resources>
