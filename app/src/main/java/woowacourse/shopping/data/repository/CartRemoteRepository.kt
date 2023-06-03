@@ -8,11 +8,12 @@ import woowacourse.shopping.data.retrofit.CartApi
 import woowacourse.shopping.data.retrofit.RequestInsertBody
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class CartRemoteRepository(baseUrl: String) : CartRepository {
+class CartRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : CartRepository {
 
     private val retrofitService = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(serverRepository.getServerUrl())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(CartApi::class.java)
@@ -29,7 +30,7 @@ class CartRemoteRepository(baseUrl: String) : CartRepository {
             }
 
             override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
-                throw t
+                failureCallback(t.message)
             }
         })
     }
@@ -43,7 +44,7 @@ class CartRemoteRepository(baseUrl: String) : CartRepository {
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    throw t
+                    failureCallback(t.message)
                 }
             })
     }
@@ -56,7 +57,7 @@ class CartRemoteRepository(baseUrl: String) : CartRepository {
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    throw t
+                    failureCallback(t.message)
                 }
             })
     }
@@ -68,7 +69,7 @@ class CartRemoteRepository(baseUrl: String) : CartRepository {
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                throw t
+                failureCallback(t.message)
             }
         })
     }

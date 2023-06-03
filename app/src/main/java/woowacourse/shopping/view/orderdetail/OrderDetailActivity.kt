@@ -43,8 +43,15 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             showDataNothingToast()
             finish()
         }
-        val server = ServerPreferencesRepository(this).getServerUrl()
-        presenter = OrderDetailPresenter(orderId, this, OrderRemoteRepository(server))
+        presenter = OrderDetailPresenter(orderId, this, OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast))
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun showDataNothingToast() {

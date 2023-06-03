@@ -31,7 +31,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun setUpPresenter() {
         val products = intent.getParcelableCompat<OrderCartProductsModel>(ORDER_PRODUCTS)
-        val server = ServerPreferencesRepository(this).getServerUrl()
         if (products == null) {
             showDataNothingToast()
             finish()
@@ -40,9 +39,17 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter = OrderPresenter(
             this,
             products,
-            OrderRemoteRepository(server),
-            MypageRemoteRepository(server),
+            OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+            MypageRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
         )
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun setUpBinding() {

@@ -6,15 +6,18 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
+class RecentViewedDBHelper(context: Context, serverRepository: ServerStoreRespository) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
+    private val server = serverRepository.getServerUrl()
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(
             "CREATE TABLE ${RecentViewedContract.TABLE_NAME} (" +
                 "  ${RecentViewedContract.TABLE_COLUMN_ID} Int PRIMARY KEY not null," +
                 "  ${RecentViewedContract.TABLE_COLUMN_NAME} TEXT," +
                 "  ${RecentViewedContract.TABLE_COLUMN_IMAGE} TEXT," +
-                "  ${RecentViewedContract.TABLE_COLUMN_PRICE} Int" +
+                "  ${RecentViewedContract.TABLE_COLUMN_PRICE} Int," +
+                "  ${RecentViewedContract.TABLE_COLUMN_SERVER} String" +
                 ");",
         )
     }
@@ -30,16 +33,17 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
         values.put(RecentViewedContract.TABLE_COLUMN_NAME, product.name)
         values.put(RecentViewedContract.TABLE_COLUMN_IMAGE, product.imageUrl)
         values.put(RecentViewedContract.TABLE_COLUMN_PRICE, product.price.price)
+        values.put(RecentViewedContract.TABLE_COLUMN_SERVER, server)
         writableDatabase.insert(RecentViewedContract.TABLE_NAME, null, values)
     }
 
     fun remove(id: Int) {
-        writableDatabase.execSQL("DELETE FROM ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id")
+        writableDatabase.execSQL("DELETE FROM ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id AND ${RecentViewedContract.TABLE_COLUMN_SERVER}='$server'")
     }
 
     fun selectWhereId(id: Int): Product? {
         val sql =
-            "SELECT * FROM ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id"
+            "SELECT * FROM ${RecentViewedContract.TABLE_NAME} WHERE ${RecentViewedContract.TABLE_COLUMN_ID}=$id AND ${RecentViewedContract.TABLE_COLUMN_SERVER}='$server'"
         val cursor = readableDatabase.rawQuery(sql, null)
         while (cursor.moveToNext()) {
             val id =
@@ -58,7 +62,7 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
 
     fun selectAll(): List<Product> {
         val viewedProducts = mutableListOf<Product>()
-        val sql = "select * from ${RecentViewedContract.TABLE_NAME} order by rowId DESC"
+        val sql = "select * from ${RecentViewedContract.TABLE_NAME} where ${RecentViewedContract.TABLE_COLUMN_SERVER}='$server' order by rowId DESC"
         val cursor = readableDatabase.rawQuery(sql, null)
         while (cursor.moveToNext()) {
             val id =
@@ -73,9 +77,5 @@ class RecentViewedDBHelper(context: Context) : SQLiteOpenHelper(context, "recent
         }
         cursor.close()
         return viewedProducts
-    }
-
-    fun removeOldest() {
-        writableDatabase.execSQL("DELETE FROM ${RecentViewedContract.TABLE_NAME} WHERE rowid = (SELECT MIN(rowid) FROM ${RecentViewedContract.TABLE_NAME});")
     }
 }

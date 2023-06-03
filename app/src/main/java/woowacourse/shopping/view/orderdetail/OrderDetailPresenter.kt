@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.orderdetail
 
-import android.util.Log
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.model.OrderDetailModel
 
@@ -11,7 +10,6 @@ class OrderDetailPresenter(
 ) : OrderDetailContract.Presenter {
     override fun fetchOrder() {
         orderRepository.getOrder(orderId) {
-            Log.d("ORDER", it.toString())
             val model = OrderDetailModel.from(it)
             view.showOrderDetail(model)
         }

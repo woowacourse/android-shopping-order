@@ -7,10 +7,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.retrofit.MypageApi
 import woowacourse.shopping.domain.model.TotalCashDTO
 import woowacourse.shopping.domain.repository.MypageRepository
+import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class MypageRemoteRepository(baseUrl: String) : MypageRepository {
+class MypageRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : MypageRepository {
     private val retrofitService = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(serverRepository.getServerUrl())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(MypageApi::class.java)
@@ -24,7 +25,7 @@ class MypageRemoteRepository(baseUrl: String) : MypageRepository {
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                throw t
+                failureCallback(t.message)
             }
         })
     }
@@ -38,7 +39,7 @@ class MypageRemoteRepository(baseUrl: String) : MypageRepository {
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                throw t
+                failureCallback(t.message)
             }
         })
     }

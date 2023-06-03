@@ -77,14 +77,12 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun setUpPresenter() {
-        val url = ServerPreferencesRepository(this).getServerUrl()
-        val productRemoteRepository = ProductRemoteRepository(url)
         presenter =
             ProductListPresenter(
                 this,
-                productRemoteRepository,
-                RecentViewedDbRepository(this),
-                CartRemoteRepository(url),
+                ProductRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
+                CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
             )
     }
 
@@ -117,6 +115,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 }
             },
         )
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun notifyAddProducts(position: Int, size: Int) {

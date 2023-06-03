@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.OrderRemoteRepository
@@ -28,8 +29,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setUpPresenter() {
-        val server = ServerPreferencesRepository(this).getServerUrl()
-        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(server))
+        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast))
     }
 
     override fun showOrders(orders: List<OrderDetailModel>) {
@@ -40,6 +40,14 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     private fun setUpActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

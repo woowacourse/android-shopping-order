@@ -25,7 +25,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
-            CartRemoteRepository(ServerPreferencesRepository(this).getServerUrl()),
+            CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
         )
     }
 
@@ -93,6 +93,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
             },
         )
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun showChangedItems() {

@@ -4,11 +4,13 @@ import android.content.Context
 import woowacourse.shopping.data.db.RecentViewedDBHelper
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentViewedRepository
+import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class RecentViewedDbRepository(
     context: Context,
+    serverRepository: ServerStoreRespository,
 ) : RecentViewedRepository {
-    private val dbHelper = RecentViewedDBHelper(context)
+    private val dbHelper = RecentViewedDBHelper(context, serverRepository)
 
     override fun findAll(callback: (List<Product>) -> Unit) {
         callback(dbHelper.selectAll())

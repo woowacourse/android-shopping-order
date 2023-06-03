@@ -41,15 +41,14 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setUpPresenter(id: Int) {
-        val url = ServerPreferencesRepository(this).getServerUrl()
         presenter =
             ProductDetailPresenter(
                 INITIAL_COUNT,
                 id,
                 this,
-                ProductRemoteRepository(url),
-                CartRemoteRepository(url),
-                RecentViewedDbRepository(this),
+                ProductRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
             )
     }
 
@@ -67,6 +66,14 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         productDetailBinding.btnPutInCart.setOnClickListener {
             dialog.show()
         }
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun showLastViewedProduct(lastViewedProduct: ProductModel) {

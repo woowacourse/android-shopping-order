@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.MypageRemoteRepository
 import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityMypageBinding
@@ -17,7 +19,7 @@ class MypageActivity : AppCompatActivity() {
     }
     private val presenter: MypageContract.Presenter by lazy {
         MypagePresenter(
-            MypageRemoteRepository(ServerPreferencesRepository(this).getServerUrl()),
+            MypageRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
         )
     }
 
@@ -35,6 +37,14 @@ class MypageActivity : AppCompatActivity() {
         binding.btnSubmit.setOnClickListener {
             presenter.chargeCash(Integer.parseInt(binding.editCash.text.toString()))
         }
+    }
+
+    private fun showErrorMessageToast(message: String?) {
+        if (message == null) {
+            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
+            return
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun setUpActionBar() {
