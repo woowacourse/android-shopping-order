@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.order
 
-import android.util.Log
 import woowacourse.shopping.domain.model.OrderCartItemsDTO
 import woowacourse.shopping.domain.repository.MypageRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -11,7 +10,7 @@ class OrderPresenter(
     private val view: OrderContract.View,
     private val products: OrderCartProductsModel,
     private val orderRepository: OrderRepository,
-    private val mypageRepository: MypageRepository
+    private val mypageRepository: MypageRepository,
 ) : OrderContract.Presenter {
     private val totalPrice = products.orderProducts.sumOf { it.price * it.quantity }
     private var ownCash = 0
@@ -24,7 +23,6 @@ class OrderPresenter(
     }
 
     override fun order() {
-        Log.d("order", "click")
         if (ownCash - totalPrice < 0) {
             view.showUnableToast()
             return
@@ -37,7 +35,7 @@ class OrderPresenter(
         }
     }
 
-    fun OrderCartProductsModel.toDTO(): OrderCartItemsDTO {
+    private fun OrderCartProductsModel.toDTO(): OrderCartItemsDTO {
         return OrderCartItemsDTO(
             orderProducts.map {
                 OrderCartItemsDTO.OrderCartItemDTO(
