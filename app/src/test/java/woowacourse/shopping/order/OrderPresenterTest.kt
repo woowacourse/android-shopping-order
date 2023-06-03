@@ -149,4 +149,46 @@ class OrderPresenterTest {
             view.updateFinalPrice(5000)
         }
     }
+
+    @Test
+    fun `사용 포인트는 사용 가능 포인트를 초과할 수 없다`() {
+        // given
+        val products: List<CartProduct> = listOf(
+            createCartProduct(1, 2),
+            createCartProduct(2, 4),
+            createCartProduct(3, 6)
+        )
+        val cartSuccessSlot = slot<(List<CartProduct>) -> Unit>()
+        every { cartRepository.getAll(capture(cartSuccessSlot), any()) } answers {
+            cartSuccessSlot.captured(products)
+        }
+        every { view.showProducts(any()) } just runs
+        every { view.showOriginalPrice(any()) } just runs
+        presenter.loadProducts(listOf(3))
+
+        val points = 2000
+        val pointsSuccessSlot = slot<(Int) -> Unit>()
+        every { memberRepository.getPoints(capture(pointsSuccessSlot), any()) } answers {
+            pointsSuccessSlot.captured(points)
+        }
+        every { view.showPoints(any()) } just runs
+        presenter.loadPoints()
+
+        every { view.notifyPointsExceeded() } just runs
+        every { view.updatePointsUsed(any()) } just runs
+        every { view.updateDiscountPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
+
+        // when
+        val usePoints = 5000
+        presenter.usePoints(usePoints)
+
+        // then
+        verify {
+            view.notifyPointsExceeded()
+            view.updatePointsUsed(2000)
+            view.updateDiscountPrice(2000)
+            view.updateFinalPrice(4000)
+        }
+    }
 }

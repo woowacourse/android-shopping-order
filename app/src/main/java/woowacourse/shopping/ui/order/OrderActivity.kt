@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
@@ -58,7 +59,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if(binding.usePoints.isFocused && !s.isNullOrEmpty()) {
+                if(binding.usePoints.isFocused && !s.isNullOrEmpty() && s.toString().toInt() != 0) {
                     presenter.usePoints(s.toString().toInt())
                 }
             }
@@ -93,6 +94,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun updateFinalPrice(price: Int) {
         binding.finalPrice.text = getString(R.string.product_price, price)
+    }
+
+    override fun notifyPointsExceeded() {
+        AlertDialog.Builder(this)
+            .setMessage("사용 가능 포인트를 초과할 수 없습니다.")
+            .setPositiveButton("확인", null)
+            .show()
     }
 
     companion object {

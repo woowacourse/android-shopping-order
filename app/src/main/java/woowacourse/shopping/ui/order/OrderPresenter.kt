@@ -38,9 +38,17 @@ class OrderPresenter(
         usePoints(points)
     }
 
-    override fun usePoints(points: Int) {
-        view.updatePointsUsed(points)
-        discountPrice(points)
+    override fun usePoints(use: Int) {
+        val used = if(use > points) {
+            view.notifyPointsExceeded()
+            points
+        }
+        else {
+            use
+        }
+
+        view.updatePointsUsed(used)
+        discountPrice(used)
     }
 
     private fun discountPrice(discountPrice: Int) {

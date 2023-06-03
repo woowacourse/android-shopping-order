@@ -10,7 +10,7 @@ interface OrderContract {
 
         fun useAllPoints()
 
-        fun usePoints(points: Int)
+        fun usePoints(use: Int)
     }
 
     interface View {
@@ -25,5 +25,7 @@ interface OrderContract {
         fun updateDiscountPrice(price: Int)
 
         fun updateFinalPrice(price: Int)
+
+        fun notifyPointsExceeded()
     }
 }
