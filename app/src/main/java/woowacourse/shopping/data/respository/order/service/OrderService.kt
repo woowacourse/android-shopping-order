@@ -25,4 +25,10 @@ interface OrderService {
         @Path("orderId")
         orderId: Long,
     ): Call<OrderDetailEntity>
+
+    @GET("/orders")
+    fun requestOrderList(
+        @Header("Authorization")
+        token: String,
+    ): Call<List<OrderDetailEntity>>
 }

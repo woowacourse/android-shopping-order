@@ -19,4 +19,8 @@ class OrderRepositoryImpl(
     override fun loadOrder(orderId: Long, onFailure: () -> Unit, onSuccess: (OrderDetail) -> Unit) {
         orderRemoteDataSource.requestOrderItem(orderId, onFailure, onSuccess)
     }
+
+    override fun loadOrderList(onFailure: () -> Unit, onSuccess: (List<OrderDetail>) -> Unit) {
+        orderRemoteDataSource.requestOrderList(onFailure, onSuccess)
+    }
 }

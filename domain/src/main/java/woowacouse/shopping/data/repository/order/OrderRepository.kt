@@ -15,4 +15,9 @@ interface OrderRepository {
         onFailure: () -> Unit,
         onSuccess: (OrderDetail) -> Unit,
     )
+
+    fun loadOrderList(
+        onFailure: () -> Unit,
+        onSuccess: (List<OrderDetail>) -> Unit,
+    )
 }

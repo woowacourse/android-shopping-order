@@ -8,6 +8,7 @@
         <variable
             name="orderDate"
             type="java.lang.String" />
+
         <variable
             name="orderPrice"
             type="java.lang.Integer" />
@@ -48,12 +49,12 @@
 
             <TextView
                 android:id="@+id/tv_order_detail_date"
+                setText="@{orderDate}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/order_text_color"
                 android:textSize="14sp"
-                setText="@{orderDate}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date_title_info"
@@ -86,7 +87,8 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="5dp"
-                android:scrollbarStyle="outsideOverlay"
+                android:fadeScrollbars="false"
+                android:scrollbarStyle="outsideInset"
                 android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintDimensionRatio="W, 2:2"

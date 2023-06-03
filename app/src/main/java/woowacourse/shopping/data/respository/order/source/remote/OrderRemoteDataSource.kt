@@ -15,4 +15,9 @@ interface OrderRemoteDataSource {
         onFailure: () -> Unit,
         onSuccess: (OrderDetail) -> Unit,
     )
+
+    fun requestOrderList(
+        onFailure: () -> Unit,
+        onSuccess: (List<OrderDetail>) -> Unit
+    )
 }

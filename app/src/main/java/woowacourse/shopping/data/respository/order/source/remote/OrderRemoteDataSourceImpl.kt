@@ -81,4 +81,26 @@ class OrderRemoteDataSourceImpl(
                 }
             })
     }
+
+    override fun requestOrderList(onFailure: () -> Unit, onSuccess: (List<OrderDetail>) -> Unit) {
+        retrofit.requestOrderList(token)
+            .enqueue(object : retrofit2.Callback<List<OrderDetailEntity>> {
+                override fun onResponse(
+                    call: Call<List<OrderDetailEntity>>,
+                    response: Response<List<OrderDetailEntity>>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { orders ->
+                            onSuccess(orders.map { it.toModel() })
+                        } ?: return onFailure()
+                        return
+                    }
+                    onFailure()
+                }
+
+                override fun onFailure(call: Call<List<OrderDetailEntity>>, t: Throwable) {
+                    Log.e("Request Failed", t.toString())
+                }
+            })
+    }
 }
