@@ -9,7 +9,7 @@ import woowacourse.shopping.databinding.LayoutProductCounterBinding
 class ProductCounter @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
     val binding = LayoutProductCounterBinding.inflate(LayoutInflater.from(context), this, true)
 

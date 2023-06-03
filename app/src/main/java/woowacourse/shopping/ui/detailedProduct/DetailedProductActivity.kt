@@ -49,7 +49,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             SharedPreferenceUtils(this),
             RemoteProductService(ServerURL.url),
             CartRepositoryImpl(RemoteCartService(ServerURL.url)),
-            RecentProductDatabase(this)
+            RecentProductDatabase(this),
         )
         binding.presenter = presenter
         presenter.setUpLastProduct()
@@ -83,7 +83,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
         startActivity(
             getIntent(this, product).apply {
                 flags = FLAG_ACTIVITY_CLEAR_TOP
-            }
+            },
         )
     }
 

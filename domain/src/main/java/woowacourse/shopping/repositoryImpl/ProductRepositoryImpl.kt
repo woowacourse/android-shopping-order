@@ -5,7 +5,7 @@ import woowacourse.shopping.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val localDatabase: ProductRepository,
-    private val remoteDatabase: ProductRepository
+    private val remoteDatabase: ProductRepository,
 ) : ProductRepository {
     override fun getAll(callback: (List<Product>?) -> Unit) {
         remoteDatabase.getAll(callback)

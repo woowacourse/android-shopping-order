@@ -9,7 +9,9 @@ import woowacourse.shopping.database.recentProduct.RecentProductConstant
 
 class ShoppingDBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-    init { onCreate(writableDatabase) }
+    init {
+        onCreate(writableDatabase)
+    }
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(CartConstant.getCreateTableQuery())
@@ -23,6 +25,7 @@ class ShoppingDBHelper(context: Context) :
         db?.execSQL(RecentProductConstant.getUpdateTableQuery())
         onCreate(db)
     }
+
     companion object {
         private const val DATABASE_VERSION = 111
         private const val DATABASE_NAME = "shopping_db"

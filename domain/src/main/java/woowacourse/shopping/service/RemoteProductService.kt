@@ -11,7 +11,7 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
             object : retrofit2.Callback<List<Product>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<Product>>,
-                    response: retrofit2.Response<List<Product>>
+                    response: retrofit2.Response<List<Product>>,
                 ) {
                     callback(response.body())
                 }
@@ -19,7 +19,7 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
                 override fun onFailure(call: retrofit2.Call<List<Product>>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 
@@ -36,7 +36,7 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
             object : retrofit2.Callback<Product> {
                 override fun onResponse(
                     call: retrofit2.Call<Product>,
-                    response: retrofit2.Response<Product>
+                    response: retrofit2.Response<Product>,
                 ) {
                     callback(response.body())
                 }
@@ -44,7 +44,7 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
                 override fun onFailure(call: retrofit2.Call<Product>, t: Throwable) {
                     callback(null)
                 }
-            }
+            },
         )
     }
 }

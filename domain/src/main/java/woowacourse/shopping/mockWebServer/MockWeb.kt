@@ -56,7 +56,7 @@ class MockWeb {
                                 val count = parameters["count"]?.toIntOrNull()
                                 if (offset == null || count == null) {
                                     return MockResponse().setResponseCode(
-                                        400
+                                        400,
                                     )
                                 }
                                 MockResponse()

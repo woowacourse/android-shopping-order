@@ -8,7 +8,7 @@ import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
 
 class ReadMoreViewHolder private constructor(
     binding: ItemProductReadMoreBinding,
-    listener: ProductsListener
+    listener: ProductsListener,
 ) :
     ShoppingViewHolder(binding.root) {
 

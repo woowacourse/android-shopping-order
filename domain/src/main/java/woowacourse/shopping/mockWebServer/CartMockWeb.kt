@@ -33,9 +33,11 @@ class CartMockWeb {
                                     .setResponseCode(201)
                                     .addHeader("Location", locationHeader)
                             }
+
                             else -> MockResponse().setResponseCode(404)
                         }
                     }
+
                     "GET" -> {
                         when (request.path) {
                             "/cart-items" -> MockResponse()
@@ -45,6 +47,7 @@ class CartMockWeb {
                             else -> MockResponse().setResponseCode(404)
                         }
                     }
+
                     "PATCH" -> {
                         val path = request.path ?: return MockResponse().setResponseCode(404)
                         when {
@@ -52,9 +55,11 @@ class CartMockWeb {
                                 MockResponse()
                                     .setResponseCode(200)
                             }
+
                             else -> MockResponse().setResponseCode(404)
                         }
                     }
+
                     "DELETE" -> {
                         val path = request.path ?: return MockResponse().setResponseCode(404)
                         when {
@@ -62,9 +67,11 @@ class CartMockWeb {
                                 MockResponse()
                                     .setResponseCode(200)
                             }
+
                             else -> MockResponse().setResponseCode(404)
                         }
                     }
+
                     else -> MockResponse().setResponseCode(404)
                 }
             }

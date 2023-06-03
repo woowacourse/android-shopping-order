@@ -14,7 +14,7 @@ open class NonNullLiveData<T : Any>(value: T) : LiveData<T>(value) {
             owner,
             Observer {
                 it?.let(observer)
-            }
+            },
         )
     }
 }

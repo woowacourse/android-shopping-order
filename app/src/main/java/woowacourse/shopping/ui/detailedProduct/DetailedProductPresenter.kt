@@ -14,7 +14,7 @@ class DetailedProductPresenter(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentRepository: RecentRepository
+    private val recentRepository: RecentRepository,
 ) : DetailedProductContract.Presenter {
     private var lastProduct: ProductUIModel? = null
 

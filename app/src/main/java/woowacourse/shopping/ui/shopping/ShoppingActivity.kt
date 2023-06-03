@@ -73,10 +73,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             this,
             ProductRepositoryImpl(
                 ProductDatabase(this),
-                RemoteProductService(ServerURL.url)
+                RemoteProductService(ServerURL.url),
             ),
             RecentProductDatabase(this),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url))
+            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()
@@ -93,9 +93,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         override fun onClickItem(productId: Int) {
             presenter.navigateToItemDetail(productId)
         }
+
         override fun onReadMoreClick() {
             presenter.setUpNextProducts()
         }
+
         override fun onAddCartOrUpdateCount(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
             presenter.setUpTotalCount()

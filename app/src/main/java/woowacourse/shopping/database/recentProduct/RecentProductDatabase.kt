@@ -15,7 +15,7 @@ class RecentProductDatabase(context: Context) : RecentRepository {
             id = product.id,
             name = product.name,
             price = product.price,
-            imageUrl = product.imageUrl
+            imageUrl = product.imageUrl,
         )
         db.execSQL(RecentProductConstant.getInsertQuery(recentProducts))
     }

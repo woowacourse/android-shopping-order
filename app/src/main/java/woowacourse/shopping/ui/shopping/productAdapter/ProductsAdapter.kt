@@ -9,7 +9,8 @@ import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ReadMoreViewHo
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.RecentViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ShoppingViewHolder
 
-class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Adapter<ShoppingViewHolder>() {
+class ProductsAdapter(private val listener: ProductsListener) :
+    RecyclerView.Adapter<ShoppingViewHolder>() {
     private val productItems: MutableList<ProductsItemType> = mutableListOf()
     private var cartCounts: Map<Int, Int> = emptyMap()
 

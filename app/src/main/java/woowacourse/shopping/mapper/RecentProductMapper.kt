@@ -8,6 +8,6 @@ fun RecentProduct.toUIModel(): RecentProductUIModel {
         id = this.id,
         name = this.name,
         price = this.price,
-        imageUrl = this.imageUrl
+        imageUrl = this.imageUrl,
     )
 }

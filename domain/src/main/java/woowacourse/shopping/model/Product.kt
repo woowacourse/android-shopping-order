@@ -11,7 +11,7 @@ data class Product(val id: Int, val name: String, val price: Int, val imageUrl: 
                 .put("id", id)
                 .put("name", name)
                 .put("price", price)
-                .put("imageUrl", imageUrl)
+                .put("imageUrl", imageUrl),
         )
         return jsonArray.toString()
     }
@@ -22,7 +22,7 @@ data class Product(val id: Int, val name: String, val price: Int, val imageUrl: 
                 jSONObject.getInt("id"),
                 jSONObject.getString("name"),
                 jSONObject.getInt("price"),
-                jSONObject.getString("imageUrl")
+                jSONObject.getString("imageUrl"),
             )
         }
     }

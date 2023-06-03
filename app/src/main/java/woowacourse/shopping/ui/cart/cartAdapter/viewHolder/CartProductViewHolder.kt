@@ -8,11 +8,12 @@ import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 
 class CartProductViewHolder private constructor(
     private val binding: ItemCartBinding,
-    cartListener: CartListener
+    cartListener: CartListener,
 ) : CartViewHolder(binding.root) {
     init {
         binding.listener = cartListener
     }
+
     override fun bind(data: CartItemType) {
         if (data !is CartItemType.Cart) return
         binding.product = data.product

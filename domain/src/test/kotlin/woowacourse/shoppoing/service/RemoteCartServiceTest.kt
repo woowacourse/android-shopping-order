@@ -15,7 +15,7 @@ class RemoteCartServiceTest {
         // given
         mockWebServer = CartMockWeb()
         remoteCartDataSource = RemoteCartService(
-            mockWebServer.url
+            mockWebServer.url,
         )
     }
 
@@ -31,7 +31,7 @@ class RemoteCartServiceTest {
             assertThat(cartProducts[i].name).isEqualTo("치킨$i")
             assertThat(cartProducts[i].price).isEqualTo(10000)
             assertThat(cartProducts[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
             )
             assertThat(cartProducts[i].count).isEqualTo(i + 1)
             assertThat(cartProducts[i].checked).isEqualTo(true)

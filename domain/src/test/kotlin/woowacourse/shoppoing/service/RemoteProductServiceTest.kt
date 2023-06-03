@@ -17,7 +17,7 @@ class RemoteProductServiceTest {
         // given
         mockWebServer = MockWeb()
         remoteProductRepository = RemoteProductService(
-            mockWebServer.url
+            mockWebServer.url,
         )
     }
 
@@ -33,7 +33,7 @@ class RemoteProductServiceTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
             )
         }
     }
@@ -50,7 +50,7 @@ class RemoteProductServiceTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
             )
         }
     }
@@ -69,7 +69,7 @@ class RemoteProductServiceTest {
             assertThat(products[i].name).isEqualTo("치킨${i + 10}")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
             )
         }
     }
@@ -87,7 +87,7 @@ class RemoteProductServiceTest {
             assertThat(products[i].name).isEqualTo("치킨$i")
             assertThat(products[i].price).isEqualTo(10000)
             assertThat(products[i].imageUrl).isEqualTo(
-                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+                "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
             )
         }
     }
@@ -103,7 +103,7 @@ class RemoteProductServiceTest {
         assertThat(product.name).isEqualTo("치킨1")
         assertThat(product.price).isEqualTo(10000)
         assertThat(product.imageUrl).isEqualTo(
-            "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+            "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
         )
     }
 
@@ -113,7 +113,7 @@ class RemoteProductServiceTest {
             id = 999,
             name = "치킨",
             price = 10000,
-            imageUrl = "http://example.com/chicken.jpg"
+            imageUrl = "http://example.com/chicken.jpg",
         )
 
         // when
