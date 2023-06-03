@@ -5,7 +5,6 @@ import android.view.Window
 import android.view.Window.FEATURE_NO_TITLE
 import android.view.WindowManager.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
-import com.shopping.domain.CartProduct
 import com.shopping.domain.Count
 import com.shopping.repository.CartProductRepository
 import woowacourse.shopping.databinding.DialogCountSelectBinding
@@ -62,7 +61,7 @@ class CountSelectDialog(
     }
 
     private fun saveCartProduct(product: ProductUIModel) {
-        cartProductRepository.add(CartProduct(product.toDomain(), productCount, false))
+        cartProductRepository.add(product.toDomain())
     }
 
     private fun showCartPage() {

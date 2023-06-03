@@ -26,7 +26,7 @@ class ShoppingCartViewHolder(
 
         binding.cbProduct.setOnClickListener {
             val changedState = binding.cbProduct.isChecked
-            cartProduct = CartProductUIModel(cartProduct.productUIModel, cartProduct.count, changedState)
+            cartProduct = CartProductUIModel(cartProduct.id, cartProduct.productUIModel, cartProduct.count, changedState)
             clickListener.onClickCheckBox(cartProduct)
         }
 
@@ -35,7 +35,7 @@ class ShoppingCartViewHolder(
                 if (count == IMPOSSIBLE_COUNT_VALUE) {
                     return MINIMUM_COUNT_VALUE
                 }
-                cartProduct = CartProductUIModel(cartProduct.productUIModel, Count(count), cartProduct.isSelected)
+                cartProduct = CartProductUIModel(cartProduct.id, cartProduct.productUIModel, Count(count), cartProduct.isSelected)
                 clickListener.onClickCountButton(cartProduct, binding.tvPrice)
                 return count
             }

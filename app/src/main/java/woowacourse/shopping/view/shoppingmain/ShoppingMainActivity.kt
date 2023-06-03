@@ -3,7 +3,6 @@ package woowacourse.shopping.view.shoppingmain
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -17,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingMainBinding
 import woowacourse.shopping.model.data.BundleKeys
-import woowacourse.shopping.model.data.db.CartProductDao
 import woowacourse.shopping.model.data.db.RecentProductDao
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.model.uimodel.ProductUIModel
+import woowacourse.shopping.server.retrofit.RetrofitClient
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 import woowacourse.shopping.view.shoppingcart.ShoppingCartActivity
 
@@ -45,13 +44,9 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
 
         setPresenter()
         setAdapters()
-        Log.d("bboddo", "3")
         setViewSettings()
-        Log.d("bboddo", "4")
         setButtonOnClick()
-        Log.d("bboddo", "5")
         setScrollView()
-        Log.d("bboddo", "6")
     }
 
     override fun onResume() {
@@ -66,8 +61,8 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
     private fun setPresenter() {
         presenter = ShoppingMainPresenter(
             view = this,
-            productsRepository = ProductRepositoryImpl(),
-            cartProductRepository = CartProductRepositoryImpl(CartProductDao(this)),
+            productsRepository = ProductRepositoryImpl(RetrofitClient.productsService),
+            cartProductRepository = CartProductRepositoryImpl(RetrofitClient.cartItemsService),
             recentProductsRepository = RecentProductRepositoryImpl(RecentProductDao(this))
         )
     }
@@ -153,9 +148,7 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
     }
 
     override fun showMoreProducts(products: List<ProductUIModel>) {
-        runOnUiThread {
-            productAdapter.update(products)
-        }
+        productAdapter.update(products)
     }
 
     override fun deactivateButton() {

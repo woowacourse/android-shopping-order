@@ -18,20 +18,20 @@ interface CartItemsService {
 
     @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
     @POST("/cart-items")
-    fun addCartItems(
+    fun addCartItem(
+        @Body productId: Long
+    ): Call<Unit>
+
+    @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
+    @PATCH("/cart-items/{cartItemId}")
+    fun patchCartItem(
+        @Path("cartItemId") cartItemId: Long,
         @Body quantity: Int
     ): Call<Unit>
 
     @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
-    @PATCH("/cart-items/{id}")
-    fun patchCartItems(
-        @Path("id") cartId: Long,
-        @Body quantity: Int
-    ): Call<Unit>
-
-    @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
-    @DELETE("/cart-items/{id}")
+    @DELETE("/cart-items/{cartItemId}")
     fun deleteCartItem(
-        @Path("id") cartId: Long
+        @Path("cartItemId") cartItemId: Long
     ): Call<Unit>
 }

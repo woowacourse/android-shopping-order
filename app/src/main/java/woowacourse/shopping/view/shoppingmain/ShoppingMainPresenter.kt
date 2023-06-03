@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.shoppingmain
 
-import com.shopping.domain.CartProduct
-import com.shopping.domain.Count
 import com.shopping.repository.CartProductRepository
 import com.shopping.repository.ProductRepository
 import com.shopping.repository.RecentProductsRepository
@@ -60,13 +58,12 @@ class ShoppingMainPresenter(
     }
 
     override fun addToCart(productUIModel: ProductUIModel) {
-        cartProductRepository.add(CartProduct(productUIModel.toDomain(), Count(1), false))
+        cartProductRepository.add(productUIModel.toDomain())
         updateCartBadge()
     }
 
     override fun updateCart(productUIModel: ProductUIModel, count: Int) {
-        cartProductRepository.updateCount(productUIModel.toDomain(), count)
-        updateCartBadge()
+        cartProductRepository.updateCount(productUIModel.toDomain(), count, ::updateCartBadge)
     }
 
     companion object {

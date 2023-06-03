@@ -23,7 +23,7 @@ class RecentProductDao(context: Context) :
             while (it.moveToNext()) {
                 val recentProduct = RecentProduct(
                     Product(
-                        id = it.getInt(it.getColumnIndexOrThrow(KEY_ID)),
+                        id = it.getLong(it.getColumnIndexOrThrow(KEY_ID)),
                         name = it.getString(it.getColumnIndexOrThrow(KEY_NAME)),
                         url = it.getString(it.getColumnIndexOrThrow(KEY_IMAGE)),
                         price = it.getInt(it.getColumnIndexOrThrow(KEY_PRICE)),

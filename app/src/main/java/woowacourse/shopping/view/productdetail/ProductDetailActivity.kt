@@ -13,12 +13,12 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.getSerializableCompat
 import woowacourse.shopping.model.data.BundleKeys
-import woowacourse.shopping.model.data.db.CartProductDao
 import woowacourse.shopping.model.data.db.RecentProductDao
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.model.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.model.uimodel.ProductUIModel
+import woowacourse.shopping.server.retrofit.RetrofitClient
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     override lateinit var presenter: ProductDetailContract.Presenter
@@ -41,7 +41,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             ProductDetailPresenter(
                 this,
                 recentProductsRepository = RecentProductRepositoryImpl(RecentProductDao(this)),
-                productRepository = ProductRepositoryImpl()
+                productRepository = ProductRepositoryImpl(RetrofitClient.productsService)
             )
 
         presenter.loadProduct(productId)
@@ -82,7 +82,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun setAddToCartClick() {
         binding.btnAddToCart.setOnClickListener {
-            val dialog = CountSelectDialog(this, CartProductRepositoryImpl(CartProductDao(this)))
+            val dialog = CountSelectDialog(this, CartProductRepositoryImpl(RetrofitClient.cartItemsService))
             presenter.showDialog(dialog)
         }
     }

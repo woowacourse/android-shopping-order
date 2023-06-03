@@ -12,11 +12,17 @@ class ShoppingCartPresenter(
     private val view: ShoppingCartContract.View,
     private val cartProductRepository: CartProductRepository
 ) : ShoppingCartContract.Presenter {
-    override val paging: Paging = Paging(cartProductRepository.getAll())
+    override var paging: Paging = Paging(emptyList())
 
     init {
-        view.updateCartProduct(loadCartProducts())
-        setButtonViews()
+        cartProductRepository.getAll(
+            onSuccess = {
+                paging = Paging(it)
+                view.updateCartProduct(loadCartProducts())
+                setButtonViews()
+            },
+            onFailure = { throw IllegalStateException("장바구니 상품을 불러오는데 실패하였습니다.") }
+        )
     }
 
     override fun loadCartProducts(): List<CartProductUIModel> =
@@ -24,8 +30,10 @@ class ShoppingCartPresenter(
 
     override fun removeCartProduct(cartProductUIModel: CartProductUIModel) {
         cartProductRepository.remove(cartProductUIModel.toDomain())
-        paging.updateCartProducts(cartProductRepository.getAll())
-
+        cartProductRepository.getAll(
+            onSuccess = { paging.updateCartProducts(it) },
+            onFailure = { throw IllegalStateException("장바구니 상품을 불러오는데 실패하였습니다.") }
+        )
         if (paging.isLastIndexOfCurrentPage()) {
             paging.subPage()
             view.updatePageCounter(paging.getPageCount())
@@ -72,7 +80,7 @@ class ShoppingCartPresenter(
     override fun changeProductsCheckedState(isSelected: Boolean) {
         paging.loadPageProducts().forEach { cartProduct ->
             cartProductRepository.update(
-                CartProduct(cartProduct.product, cartProduct.count, isSelected)
+                CartProduct(cartProduct.id, cartProduct.product, cartProduct.count, isSelected)
             )
         }
         updateSelectedTotal()
@@ -84,17 +92,11 @@ class ShoppingCartPresenter(
         view.updateTotalCount(getTotalCount())
     }
 
-    override fun getTotalPrice(): Int {
-        return cartProductRepository.getAll()
-            .filter { product -> product.isSelected }
-            .sumOf { product -> product.product.price * product.count.value }
-    }
+    override fun getTotalPrice(): Int =
+        cartProductRepository.getTotalPrice()
 
-    override fun getTotalCount(): Int {
-        return cartProductRepository.getAll()
-            .filter { product -> product.isSelected }
-            .sumOf { product -> product.count.value }
-    }
+    override fun getTotalCount(): Int =
+        cartProductRepository.getTotalCount()
 
     private fun setButtonViews() {
         if (paging.isPossiblePageUp()) {

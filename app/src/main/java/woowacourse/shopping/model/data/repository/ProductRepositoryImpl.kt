@@ -3,17 +3,19 @@ package woowacourse.shopping.model.data.repository
 import com.shopping.domain.Product
 import com.shopping.repository.ProductRepository
 import woowacourse.shopping.model.data.dto.ProductDTO
-import woowacourse.shopping.server.retrofit.RetrofitClient
+import woowacourse.shopping.server.retrofit.ProductsService
 import woowacourse.shopping.server.retrofit.createResponseCallback
 
-class ProductRepositoryImpl() : ProductRepository {
+class ProductRepositoryImpl(
+    private val service: ProductsService
+) : ProductRepository {
 
     override fun loadProducts(
         index: Pair<Int, Int>,
         onSuccess: (List<Product>) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        RetrofitClient.productsService.getAllProducts().enqueue(
+        service.getAllProducts().enqueue(
             createResponseCallback(
                 onSuccess = { products ->
                     if (index.first >= products.size) {
@@ -33,7 +35,7 @@ class ProductRepositoryImpl() : ProductRepository {
         onSuccess: (Product) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        RetrofitClient.productsService.getProduct(index.toLong()).enqueue(
+        service.getProduct(index.toLong()).enqueue(
             createResponseCallback(
                 onSuccess = { product ->
                     onSuccess(product.toDomain())
@@ -44,5 +46,5 @@ class ProductRepositoryImpl() : ProductRepository {
     }
 
     private fun ProductDTO.toDomain(): Product =
-        Product(id.toInt(), name, imageUrl, price)
+        Product(id, name, imageUrl, price)
 }

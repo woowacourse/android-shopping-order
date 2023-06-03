@@ -1,53 +1,102 @@
 package woowacourse.shopping.model.data.repository
 
 import com.shopping.domain.CartProduct
+import com.shopping.domain.Count
 import com.shopping.domain.Product
 import com.shopping.repository.CartProductRepository
-import woowacourse.shopping.model.data.db.CartProductDao
+import woowacourse.shopping.model.data.dto.CartProductDTO
+import woowacourse.shopping.model.data.dto.ProductDTO
+import woowacourse.shopping.server.retrofit.CartItemsService
+import woowacourse.shopping.server.retrofit.createResponseCallback
 
 class CartProductRepositoryImpl(
-    private val cartProductDao: CartProductDao
+    private val service: CartItemsService
 ) : CartProductRepository {
-    private val cartProducts
-        get() = getAll()
+    private var cartProducts = emptyList<CartProduct>()
 
-    override fun getAll(): List<CartProduct> {
-        return cartProductDao.getAll()
+    init {
+        fetchCartProducts()
+    }
+
+    override fun getAll(onSuccess: (List<CartProduct>) -> Unit, onFailure: (Exception) -> Unit) {
+        service.getCartItems().enqueue(
+            createResponseCallback(
+                onSuccess = { received ->
+                    cartProducts = received.map { it.toDomain() }
+                    onSuccess(cartProducts)
+                },
+                onFailure = { throw IllegalStateException("서버 통신 실패") }
+            )
+        )
     }
 
     override fun getAllProductsCount(): Int {
-        return cartProductDao.getAll().sumOf { product -> product.count.value }
+        return cartProducts.sumOf { cartProduct ->
+            cartProduct.count.value
+        }
     }
 
     override fun loadCartProducts(index: Pair<Int, Int>): List<CartProduct> {
         if (index.first >= cartProducts.size) {
             return emptyList()
         }
-
         return cartProducts.subList(index.first, minOf(index.second, cartProducts.size))
     }
 
     override fun update(cartProduct: CartProduct) {
-        cartProductDao.update(cartProduct)
+        service.patchCartItem(cartProduct.id, cartProduct.count.value)
+        fetchCartProducts()
     }
 
-    override fun updateCount(product: Product, count: Int) {
-        cartProductDao.updateCount(product, count)
+    override fun updateCount(product: Product, count: Int, updateCartBadge: () -> Unit) {
+        service.patchCartItem(product.id, count).enqueue(
+            createResponseCallback(
+                onSuccess = {
+                    updateCartBadge()
+                },
+                onFailure = { throw IllegalStateException("update 실패") }
+            )
+        )
+        fetchCartProducts()
     }
 
-    override fun insert(cartProduct: CartProduct) {
-        cartProductDao.insert(cartProduct)
+    override fun add(product: Product) {
+        service.addCartItem(product.id).enqueue(
+            createResponseCallback(
+                onSuccess = {
+                    println("성공")
+                },
+                onFailure = { throw IllegalStateException("add 실패") }
+            )
+        )
+        fetchCartProducts()
     }
 
-    override fun add(cartProduct: CartProduct) {
-        cartProductDao.add(cartProduct)
+    override fun findCountById(id: Long): Int {
+        val cartProduct = cartProducts.find {
+            it.product.id == id
+        } ?: return 0
+        return cartProduct.count.value
     }
 
-    override fun findCountById(id: Int): Int {
-        return cartProductDao.getCountById(id)
-    }
+    override fun getTotalPrice(): Int =
+        cartProducts.filter { it.isSelected }.sumOf { it.product.price * it.count.value }
+
+    override fun getTotalCount(): Int =
+        cartProducts.filter { it.isSelected }.sumOf { it.count.value }
 
     override fun remove(cartProduct: CartProduct) {
-        cartProductDao.remove(cartProduct)
+        service.deleteCartItem(cartProduct.id)
+        fetchCartProducts()
     }
+
+    private fun fetchCartProducts() {
+        getAll(onSuccess = { }, onFailure = { })
+    }
+
+    private fun ProductDTO.toDomain(): Product =
+        Product(id, name, imageUrl, price)
+
+    private fun CartProductDTO.toDomain(): CartProduct =
+        CartProduct(id, product.toDomain(), Count(quantity), true)
 }

@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.model.data.db.CartProductDao
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.uimodel.CartProductUIModel
+import woowacourse.shopping.server.retrofit.RetrofitClient
 
 class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
     override lateinit var presenter: ShoppingCartContract.Presenter
@@ -40,7 +40,7 @@ class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
     private fun setPresenter() {
         presenter = ShoppingCartPresenter(
             view = this,
-            cartProductRepository = CartProductRepositoryImpl(CartProductDao(this))
+            cartProductRepository = CartProductRepositoryImpl(RetrofitClient.cartItemsService)
         )
     }
 
