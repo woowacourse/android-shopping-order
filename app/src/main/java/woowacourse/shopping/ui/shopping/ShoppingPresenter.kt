@@ -62,7 +62,7 @@ class ShoppingPresenter(
     }
 
     companion object {
-        private const val PRODUCT_PAGE_SIZE = 2
+        private const val PRODUCT_PAGE_SIZE = 10
         private const val RECENT_PRODUCT_COUNT = 10
     }
 }

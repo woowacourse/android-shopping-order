@@ -5,7 +5,7 @@ class CartProducts(cartProducts: List<CartProduct>) {
     private var checks = mutableMapOf<Int, Boolean>()
     private val checkedProducts: List<CartProduct>
         get() = cartProducts.filter { checks.getOrPut(it.id) { true } }
-    val size: Int = cartProducts.size
+    val size: Int get() = cartProducts.size
 
     val totalPrice: Int
         get() = checkedProducts.sumOf { it.product.price * it.quantity }

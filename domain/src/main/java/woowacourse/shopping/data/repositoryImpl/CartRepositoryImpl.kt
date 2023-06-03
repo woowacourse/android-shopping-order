@@ -14,7 +14,7 @@ class CartRepositoryImpl(
         remoteDataSource.getAll { result ->
             result.onSuccess { cartProducts ->
                 cartItems.replaceAll(cartProducts)
-                callback(Result.success(CartProducts(cartProducts)))
+                callback(Result.success(cartItems))
             }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
@@ -24,7 +24,7 @@ class CartRepositoryImpl(
             result.onSuccess {
                 val cartProducts = it.subList(index * size, min((index + 1) * size, it.size))
                 cartItems.replaceAll(cartProducts)
-                callback(Result.success(CartProducts(cartProducts)))
+                callback(Result.success(cartItems))
             }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
