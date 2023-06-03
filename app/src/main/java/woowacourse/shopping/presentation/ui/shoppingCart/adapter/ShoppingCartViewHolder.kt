@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Operator
-import woowacourse.shopping.domain.model.ProductInCart
 
 class ShoppingCartViewHolder(
     listener: ShoppingCartClickListener,
@@ -25,9 +25,9 @@ class ShoppingCartViewHolder(
         val runnable = Runnable { task() }
         handler.removeCallbacksAndMessages(token)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            handler.postDelayed(runnable, token, 500)
+            handler.postDelayed(runnable, ++token, 500)
         } else {
-            handler.postAtTime(runnable, token, SystemClock.currentThreadTimeMillis() + 500)
+            handler.postAtTime(runnable, ++token, SystemClock.currentThreadTimeMillis() + 500)
         }
     }
 
