@@ -1,5 +1,5 @@
 package woowacourse.shopping.presentation.model
 
-class CartProductsModel(
+data class CartProductsModel(
     val carts: List<CartModel>
 )

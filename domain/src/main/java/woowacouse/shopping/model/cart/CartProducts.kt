@@ -1,6 +1,6 @@
 package woowacouse.shopping.model.cart
 
-class CartProducts(
+data class CartProducts(
     private val carts: List<CartProduct>
 ) {
     val totalPrice: Int
