@@ -99,10 +99,14 @@
                         android:textColor="@color/black" />
 
                     <EditText
+                        android:hint="@string/order_page_point_hint"
                         android:layout_width="133dp"
                         android:layout_height="25dp"
+                        android:gravity="end"
+                        android:inputType="numberDecimal"
                         android:layout_marginStart="44dp"
-                        android:background="@color/gray_e4e4e4" />
+                        android:background="@color/gray_e4e4e4"
+                        android:importantForAutofill="no" />
 
                     <TextView
                         android:layout_width="wrap_content"
