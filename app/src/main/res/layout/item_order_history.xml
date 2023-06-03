@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="orderProduct"
+            type="woowacourse.shopping.model.OrderHistoryProductUiModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cart_product_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/order_history_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:paddingBottom="4dp"
+            android:text="@{orderProduct.orderAt}"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="2024-10-23" />
+
+        <TextView
+            android:id="@+id/order_history_order_state"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:paddingBottom="4dp"
+            android:text="@{orderProduct.orderStatus.value}"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/order_history_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/order_history_date"
+            tools:text="배송중" />
+
+
+        <ImageView
+            android:id="@+id/product_img"
+            imgUrl="@{orderProduct.productImageUrl}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/product_image"
+            android:maxWidth="136dp"
+            android:maxHeight="72dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/order_history_date"
+            app:layout_constraintTop_toBottomOf="@id/order_history_date"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/product_quantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{@string/order_history_title(orderProduct.productName, orderProduct.totalProductCount)}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/product_img"
+            app:layout_constraintTop_toTopOf="@id/product_img"
+            tools:text="뭐뭐 외 2개" />
+
+        <TextView
+            android:id="@+id/product_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{@string/price_format(orderProduct.payAmount)}"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/product_img"
+            app:layout_constraintStart_toStartOf="@id/product_quantity"
+            app:layout_constraintTop_toBottomOf="@id/product_quantity"
+            tools:text="1,000원" />
+
+        <TextView
+            android:id="@+id/tv_navigate_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/black"
+            android:text="상세보기 >"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/product_img"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

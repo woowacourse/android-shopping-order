@@ -7,4 +7,11 @@
         android:title="@string/cart"
         app:actionLayout="@layout/layout_main_toolbar"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/order_history"
+        android:enabled="true"
+        android:icon="@drawable/ic_order_history"
+        android:title="@string/order_history"
+        app:showAsAction="always" />
 </menu>
