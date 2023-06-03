@@ -6,4 +6,10 @@
         android:icon="@drawable/ic_close"
         android:title="@string/toolbar_item_close"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_order"
+        android:icon="@drawable/ic_order"
+        android:title="@string/toolbar_item_order"
+        app:showAsAction="always" />
 </menu>

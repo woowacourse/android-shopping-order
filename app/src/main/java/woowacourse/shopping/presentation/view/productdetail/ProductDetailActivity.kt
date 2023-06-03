@@ -17,7 +17,6 @@ import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.CartModel
-import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
@@ -64,6 +63,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_close -> exitProductDetailView()
+            R.id.action_order -> {
+                // TODO : 주문 목록 화면으로 이동하는 기능 필요
+            }
         }
 
         return super.onOptionsItemSelected(item)

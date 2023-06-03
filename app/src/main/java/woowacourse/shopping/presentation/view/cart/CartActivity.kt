@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -77,10 +78,18 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         supportActionBar?.title = getString(R.string.toolbar_title_cart)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_product_list_toolbar, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 finish()
+            }
+            R.id.action_order -> {
+                // TODO : 주문 목록 화면으로 이동하는 기능 필요
             }
         }
         return super.onOptionsItemSelected(item)

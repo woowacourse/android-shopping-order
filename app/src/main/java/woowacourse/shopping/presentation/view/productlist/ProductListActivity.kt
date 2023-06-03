@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -117,6 +118,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
             setToolbarCart()
         }
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_order -> {
+                // TODO : 주문 목록 화면으로 이동하는 기능 필요
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setPresenter() {
