@@ -16,4 +16,11 @@
     <string name="inputEmail">이메일을 입력하세요</string>
     <string name="inputPassword">비밀번호를 입력하세요</string>
     <string name="tv_login_title">로그인</string>
+    <string name="tv_coupon">할인쿠폰</string>
+    <string name="tv_order">주문 상품</string>
+    <string name="tv_order_detail">주문 내역</string>
+    <string name="tv_payment_price">결제 금액</string>
+    <string name="tv_order_price">주문 금액</string>
+    <string name="tv_discount_coupon">할인 쿠폰</string>
+    <string name="tv_total_price">최종 결제 금액</string>
 </resources>

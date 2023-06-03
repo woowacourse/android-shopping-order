@@ -115,7 +115,7 @@ class ShoppingActivity :
         )
 
         binding.productRecyclerview.visibility = View.VISIBLE
-        binding.includeShoppingSkeleton.root.visibility = View.GONE
+        binding.includeShoppingSkeleton.rootView.visibility = View.GONE
     }
 
     override fun navigateToProductDetail(id: Long, latestProduct: ProductUIModel?) {

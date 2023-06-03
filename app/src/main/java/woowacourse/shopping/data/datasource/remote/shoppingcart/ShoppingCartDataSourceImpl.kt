@@ -1,33 +1,72 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import retrofit2.Call
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
 import woowacourse.shopping.data.datasource.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.CartProductDTO
+import java.util.concurrent.Executors
 
 class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) :
     ShoppingCartDataSource {
 
     private val token = authInfoDataSource.getAuthInfo() ?: throw IllegalArgumentException()
 
-    override fun getAllProductInCart(): Call<List<CartProductDTO>> {
-        return ServicePool.shoppingCartService.getAllProductInCart(token)
+    override fun getAllProductInCart(): Result<List<CartProductDTO>> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<List<CartProductDTO>>> {
+            val response = ServicePool.shoppingCartService.getAllProductInCart(token).execute()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun postProductToCart(productId: Long): Call<Void> {
-        return ServicePool.shoppingCartService.postProductToCart(token, productId)
+    override fun postProductToCart(productId: Long): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServicePool.shoppingCartService.postProductToCart(token, productId).execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun patchProductCount(cartItemId: Long, quantity: Int): Call<Unit> {
-        return ServicePool.shoppingCartService.patchProductCount(token, cartItemId, quantity)
+    override fun patchProductCount(cartItemId: Long, quantity: Int): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServicePool.shoppingCartService.patchProductCount(token, cartItemId, quantity)
+                    .execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun deleteProductInCart(productId: Long): Call<Unit> {
-        return ServicePool.shoppingCartService.deleteProductInCart(token, productId)
-    }
-
-    companion object {
-        private const val CART_PATH = "/cart-items"
-        private const val POST_PRODUCT_TO_CART = "/cart-items"
+    override fun deleteProductInCart(productId: Long): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServicePool.shoppingCartService.deleteProductInCart(token, productId).execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 }

@@ -10,10 +10,14 @@ import woowacourse.shopping.mapper.toDomain
 class ProductDetailRepositoryImpl(
     private val productDetailSource: ProductDetailSource,
 ) : ProductDetailRepository {
-    override fun getById(id: Long, onSuccess: (Product) -> Unit, onFailure: (Exception) -> Unit) {
-        productDetailSource.getById(id).enqueue(
-            createResponseCallback(onSuccess = { onSuccess(it.toDomain()) }, onFailure),
-        )
+    override fun getById(id: Long): Result<Product> {
+        val result = productDetailSource.getById(id)
+        return if (result.isSuccess) {
+            val productDomain = result.getOrNull()?.toDomain()
+            Result.success(productDomain ?: throw IllegalArgumentException())
+        } else {
+            Result.failure(Throwable(result.exceptionOrNull()?.message))
+        }
     }
 
     private inline fun <reified T> createResponseCallback(

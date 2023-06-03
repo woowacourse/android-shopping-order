@@ -19,21 +19,20 @@ class CartPresenter(
     private var cachedCartProducts = mutableListOf<CartProduct>()
 
     override fun setUpCarts() {
-        repository.getAllProductInCart(onSuccess = {
+        repository.getAllProductInCart().getOrNull()?.let { cartProducts ->
             cachedCartProducts.clear()
-            cachedCartProducts.addAll(it)
+            cachedCartProducts.addAll(cartProducts)
             cartItems.updateItem(cachedCartProducts)
-            repository.getSubList(cartOffset.getOffset(), STEP, onSuccess = { cartProducts ->
-                view.setCarts(
-                    cartProducts.map { it.toUIModel() },
-                    CartUIModel(
-                        cartOffset.getOffset() + 5 < cachedCartProducts.size,
-                        0 < cartOffset.getOffset(),
-                        cartOffset.getOffset() / 5 + 1,
-                    ),
-                )
-            })
-        }, {})
+        }
+        val cartProducts = repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()
+        view.setCarts(
+            cartProducts?.map { it.toUIModel() } ?: emptyList(),
+            CartUIModel(
+                cartOffset.getOffset() + STEP < cachedCartProducts.size,
+                0 < cartOffset.getOffset(),
+                cartOffset.getOffset() / STEP + 1,
+            ),
+        )
     }
 
     override fun pageUp() {
@@ -47,12 +46,13 @@ class CartPresenter(
     }
 
     override fun removeItem(id: Long) {
-        repository.remove(id, onSuccess = {
+        repository.remove(id).getOrNull()?.let {
             if (cartOffset.getOffset() == cachedCartProducts.size) {
                 cartOffset = cartOffset.minus(STEP)
             }
-            setUpCarts()
-        }, onFailure = {})
+        }
+        setUpCarts()
+        updateCartItems()
     }
 
     override fun navigateToItemDetail(id: Long) {
@@ -90,19 +90,19 @@ class CartPresenter(
     }
 
     override fun onAllCheckboxClick(isChecked: Boolean) {
-        repository.getSubList(cartOffset.getOffset(), STEP, onSuccess = { cartProducts ->
+        repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()?.let { cartProducts ->
             cartProducts.map { it.toUIModel() }.forEach {
                 onCheckChanged(it.product.id, isChecked)
                 view.updateChecked(it.product.id, isChecked)
             }
-        })
+        }
     }
 
     override fun setAllCheckbox() {
-        repository.getSubList(cartOffset.getOffset(), STEP, onSuccess = {
+        repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()?.let {
             val allChecked = it.map { it.toUIModel() }.all { cartItems.isContain(it.product.id) }
             view.setAllCheckbox(allChecked)
-        })
+        }
     }
 
     override fun setAllOrderCount() {
@@ -112,28 +112,28 @@ class CartPresenter(
     override fun increaseCount(id: Long) {
         val cartProduct = cachedCartProducts.find { it.product.id == id }
         cartProduct?.id?.let {
-            repository.updateCount(it, getCount(id + 1), {
+            repository.updateCount(it, getCount(id) + 1).getOrNull().let {
                 cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) + 1
                 cartItems.updateItem(cachedCartProducts)
-                view.updateItem(id, getCount(id))
-                if (cartItems.isContain(id)) {
-                    updateCartItems()
-                }
-            }, {})
+            }
+            view.updateItem(id, getCount(id))
+            if (cartItems.isContain(id)) {
+                updateCartItems()
+            }
         }
     }
 
     override fun decreaseCount(id: Long) {
         val cartProduct = cachedCartProducts.find { it.product.id == id }
         cartProduct?.id?.let {
-            repository.updateCount(it, getCount(id - 1), {
+            repository.updateCount(it, getCount(id) - 1).getOrNull().let {
                 cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) - 1
                 cartItems.updateItem(cachedCartProducts)
-                view.updateItem(id, getCount(id))
-                if (cartItems.isContain(id)) {
-                    updateCartItems()
-                }
-            }, {})
+            }
+            view.updateItem(id, getCount(id))
+            if (cartItems.isContain(id)) {
+                updateCartItems()
+            }
         }
     }
 

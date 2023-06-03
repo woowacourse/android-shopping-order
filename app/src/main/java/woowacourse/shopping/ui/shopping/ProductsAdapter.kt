@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.shopping
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.repository.CartRepository
 import woowacourse.shopping.ui.shopping.viewHolder.ItemViewHolder
 import woowacourse.shopping.ui.shopping.viewHolder.ProductsOnClickListener
 import woowacourse.shopping.ui.shopping.viewHolder.ProductsViewHolder
