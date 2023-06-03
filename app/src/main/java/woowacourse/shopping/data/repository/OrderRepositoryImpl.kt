@@ -1,10 +1,12 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.order.OrderDataSource
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorCode
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorCode.LACK_OF_POINT
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorCode.SHORTAGE_STOCK
 import woowacourse.shopping.data.remote.response.order.addorder.AddOrderFailureException
+import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.exception.AddOrderException.LackOfPointException
 import woowacourse.shopping.domain.exception.AddOrderException.ShortageStockException
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -39,5 +41,11 @@ class OrderRepositoryImpl(private val orderDataSource: OrderDataSource.Remote) :
                     }
             }
         )
+    }
+
+    override fun getIndividualOrderInfo(orderId: Int, onReceived: (Order) -> Unit) {
+        orderDataSource.getIndividualOrderInfo(orderId) {
+            onReceived(it.toDomain())
+        }
     }
 }
