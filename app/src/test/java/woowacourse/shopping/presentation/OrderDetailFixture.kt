@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation
 
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.model.ProductModel
 
@@ -11,7 +11,7 @@ object OrderDetailFixture {
         100,
         "2023-06-04T12:00",
         listOf(
-            CartModel(
+            CartProductModel(
                 1L,
                 ProductModel(
                     id = 1L,
@@ -22,7 +22,7 @@ object OrderDetailFixture {
                 1,
                 true
             ),
-            CartModel(
+            CartProductModel(
                 2L,
                 ProductModel(
                     id = 2L,

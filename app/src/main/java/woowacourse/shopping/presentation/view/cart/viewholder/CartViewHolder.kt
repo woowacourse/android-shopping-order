@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCartListBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.cart.CartProductListener
 
 class CartViewHolder(
@@ -24,7 +24,7 @@ class CartViewHolder(
         }
     }
 
-    fun bind(cart: CartModel) {
+    fun bind(cart: CartProductModel) {
         binding.cart = cart
         binding.cbCartListItem.isChecked = cart.checked
         binding.countViewCartListItem.updateCount(cart.count)

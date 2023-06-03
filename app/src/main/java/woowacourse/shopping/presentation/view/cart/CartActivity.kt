@@ -14,7 +14,7 @@ import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
@@ -98,14 +98,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setCartItemsView(carts: List<CartModel>) {
+    override fun setCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter = CartAdapter(carts, cartProductListener)
             binding.rvCart.adapter = cartAdapter
         }
     }
 
-    override fun setChangedCartItemsView(carts: List<CartModel>) {
+    override fun setChangedCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter.updateList(carts)
         }

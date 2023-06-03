@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.model
 
-data class CartModel(
+data class CartProductModel(
     val id: Long,
     val product: ProductModel,
     val count: Int,
@@ -10,8 +10,8 @@ data class CartModel(
         private const val TEMPORARY_ID = 900000
         private const val DEFAULT_COUNT = 0
 
-        fun getNoHasCountCartProduct(product: ProductModel): CartModel {
-            return CartModel(
+        fun getNoHasCountCartProduct(product: ProductModel): CartProductModel {
+            return CartProductModel(
                 TEMPORARY_ID + product.id,
                 product,
                 DEFAULT_COUNT,

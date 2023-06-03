@@ -1,13 +1,13 @@
 package woowacourse.shopping.presentation.view.order
 
 import woowacourse.shopping.presentation.model.CardModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.PointModel
 
 interface OrderContract {
     interface View {
         fun setLayoutVisibility()
-        fun setProductItemsView(products: List<CartModel>)
+        fun setProductItemsView(products: List<CartProductModel>)
         fun setCardItemsView(cards: List<CardModel>)
         fun setUserPointView(userPoint: PointModel)
         fun setUsePointView(usePoint: PointModel)

@@ -1,12 +1,12 @@
 package woowacourse.shopping.presentation
 
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 
 object CartFixture {
-    fun getFixture(): List<CartModel> {
+    fun getFixture(): List<CartProductModel> {
         return listOf(
-            CartModel(
+            CartProductModel(
                 1L,
                 ProductModel(
                     id = 1L,
@@ -17,7 +17,7 @@ object CartFixture {
                 1,
                 true
             ),
-            CartModel(
+            CartProductModel(
                 2L,
                 ProductModel(
                     id = 2L,
@@ -28,7 +28,7 @@ object CartFixture {
                 1,
                 true
             ),
-            CartModel(
+            CartProductModel(
                 3L,
                 ProductModel(
                     id = 3L,

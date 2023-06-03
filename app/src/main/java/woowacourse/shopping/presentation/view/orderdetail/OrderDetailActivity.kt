@@ -11,7 +11,7 @@ import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
@@ -66,7 +66,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         )
     }
 
-    override fun setOrderProductItemView(orderProducts: List<CartModel>) {
+    override fun setOrderProductItemView(orderProducts: List<CartProductModel>) {
         binding.rvOrderDetailProductList.post {
             binding.rvOrderDetailProductList.adapter = OrderProductListAdapter(orderProducts)
         }

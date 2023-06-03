@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.view.cart
 
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.model.page.PageNation
@@ -32,7 +32,7 @@ class CartPresenter(
         view.setEnableOrderButton(pageNation.currentItems.isNotEmpty())
     }
 
-    override fun setPageNation(cartProducts: List<CartModel>, currentPage: Int) {
+    override fun setPageNation(cartProducts: List<CartProductModel>, currentPage: Int) {
         pageNation = PageNation(
             CartProductsModel(cartProducts).toModel(),
             currentPage

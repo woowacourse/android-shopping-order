@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.view.productlist
 
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
@@ -55,11 +55,11 @@ class ProductListPresenter(
     }
 
     private fun List<ProductModel>.updateCartProductsInfo(
-        cartProducts: List<CartModel>
-    ): List<CartModel> {
+        cartProducts: List<CartProductModel>
+    ): List<CartProductModel> {
         return map { product ->
             cartProducts.find { it.product.id == product.id }
-                ?: CartModel.getNoHasCountCartProduct(product)
+                ?: CartProductModel.getNoHasCountCartProduct(product)
         }
     }
 
@@ -67,7 +67,7 @@ class ProductListPresenter(
         view.handleErrorView()
     }
 
-    override fun setCartProductItems(products: List<CartModel>) {
+    override fun setCartProductItems(products: List<CartProductModel>) {
         cartProducts = CartProductsModel(products)
     }
 

@@ -21,7 +21,7 @@ import woowacourse.shopping.data.respository.point.PointRepositoryImpl
 import woowacourse.shopping.data.respository.point.source.remote.PointRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CardModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.PointModel
 import woowacourse.shopping.presentation.view.order.adapter.CardListAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
@@ -105,7 +105,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun setProductItemsView(products: List<CartModel>) {
+    override fun setProductItemsView(products: List<CartProductModel>) {
         binding.rvOrderProductList.post {
             binding.rvOrderProductList.adapter = OrderProductListAdapter(products)
         }

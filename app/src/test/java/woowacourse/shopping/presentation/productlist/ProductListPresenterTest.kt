@@ -12,7 +12,7 @@ import woowacourse.shopping.presentation.CartFixture
 import woowacourse.shopping.presentation.ProductFixture
 import woowacourse.shopping.presentation.RecentProductFixture
 import woowacourse.shopping.presentation.mapper.toModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.model.RecentProductsModel
@@ -129,7 +129,7 @@ class ProductListPresenterTest {
     @Test
     fun `데이터가 더 존재한다면 추가 데이터를 가져와 갱신한다`() {
         // given
-        val slotDisplayProducts = slot<List<CartModel>>()
+        val slotDisplayProducts = slot<List<CartProductModel>>()
         justRun {
             view.setProductItemsView(capture(slotDisplayProducts))
         }

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductListBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.productlist.ProductListener
 
 class ProductListViewHolder(
@@ -25,7 +25,7 @@ class ProductListViewHolder(
         }
     }
 
-    fun bind(cartProduct: CartModel) {
+    fun bind(cartProduct: CartProductModel) {
         binding.product = cartProduct.product
         binding.productCountView.setCount(cartProduct.count)
     }

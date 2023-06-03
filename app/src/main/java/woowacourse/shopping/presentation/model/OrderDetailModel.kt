@@ -9,7 +9,7 @@ data class OrderDetailModel(
     val usedPoint: Int,
     val savedPoint: Int,
     val orderDateTime: String,
-    val products: List<CartModel>,
+    val products: List<CartProductModel>,
 ) {
     fun getSummaryTitle(): String {
         var summary = products[0].product.title

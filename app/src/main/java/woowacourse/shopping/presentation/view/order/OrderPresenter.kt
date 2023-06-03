@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.view.order
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.CardModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.CartProductsModel
 import woowacourse.shopping.presentation.model.OrderModel
 import woowacourse.shopping.presentation.model.PointModel
@@ -19,7 +19,7 @@ class OrderPresenter(
     private val pointRepository: PointRepository,
     private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
-    private lateinit var orderProducts: List<CartModel>
+    private lateinit var orderProducts: List<CartProductModel>
     private lateinit var point: PointModel
     private lateinit var cards: List<CardModel>
     private var orderPrice: Int = 0

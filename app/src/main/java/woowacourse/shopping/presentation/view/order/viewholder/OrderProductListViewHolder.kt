@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderProductListBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 
 class OrderProductListViewHolder(
     parent: ViewGroup,
@@ -15,7 +15,7 @@ class OrderProductListViewHolder(
 ) {
     private val binding = ItemOrderProductListBinding.bind(itemView)
 
-    fun bind(cart: CartModel) {
+    fun bind(cart: CartProductModel) {
         binding.cart = cart
     }
 }

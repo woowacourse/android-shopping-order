@@ -3,12 +3,12 @@ package woowacourse.shopping.presentation.view.cart.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.cart.CartProductListener
 import woowacourse.shopping.presentation.view.cart.viewholder.CartViewHolder
 
 class CartAdapter(
-    items: List<CartModel>,
+    items: List<CartProductModel>,
     private val cartProductListener: CartProductListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
     private val items = items.toMutableList()
@@ -28,7 +28,7 @@ class CartAdapter(
     override fun getItemCount(): Int = items.size
     override fun getItemId(position: Int): Long = items[position].id
 
-    fun updateList(newItems: List<CartModel>) {
+    fun updateList(newItems: List<CartProductModel>) {
         val diffUtilCallback = CartDiffUtil(items, newItems)
         val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
 

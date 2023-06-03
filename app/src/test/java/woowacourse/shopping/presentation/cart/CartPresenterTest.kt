@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.presentation.CartFixture
 import woowacourse.shopping.presentation.mapper.toModel
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.view.cart.CartContract
 import woowacourse.shopping.presentation.view.cart.CartPresenter
@@ -46,7 +46,7 @@ class CartPresenterTest {
             slotCartProducts.captured(CartFixture.getFixture().map { it.toModel() })
         }
 
-        val slotItems = slot<List<CartModel>>()
+        val slotItems = slot<List<CartProductModel>>()
         val slotTotalPrice = slot<Int>()
 
         every { cartRepository.getAllLocalCart() } returns CartFixture.getFixture()
@@ -94,7 +94,7 @@ class CartPresenterTest {
         justRun { view.setEnableLeftButton(false) }
         justRun { view.setEnableRightButton(false) }
 
-        val slotItems = slot<List<CartModel>>()
+        val slotItems = slot<List<CartProductModel>>()
         justRun { view.setChangedCartItemsView(capture(slotItems)) }
 
         // when
@@ -103,7 +103,7 @@ class CartPresenterTest {
         // then
         val actual = slotItems.captured
         val expected = listOf(
-            CartModel(
+            CartProductModel(
                 2L,
                 ProductModel(
                     id = 2L,
@@ -114,7 +114,7 @@ class CartPresenterTest {
                 1,
                 true
             ),
-            CartModel(
+            CartProductModel(
                 3L,
                 ProductModel(
                     id = 3L,
@@ -170,7 +170,7 @@ class CartPresenterTest {
         // given
         presenter.setPageNation(CartFixture.getFixture(), 1)
 
-        val targetCart = CartModel(
+        val targetCart = CartProductModel(
             1L,
             ProductModel(
                 id = 1L,
