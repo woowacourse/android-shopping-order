@@ -1,11 +1,13 @@
 package woowacourse.shopping.data.datasource.order
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
+import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
+import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.NetworkModule.orderService
 import woowacourse.shopping.data.datasource.request.OrderRequest
 import woowacourse.shopping.data.datasource.response.OrderResponse
-import woowacourse.shopping.data.remote.OkHttpModule
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
@@ -15,7 +17,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.addOrder(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             orderRequest = orderRequest
         ).enqueue(object : retrofit2.Callback<OrderResponse> {
 
@@ -23,6 +25,11 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<OrderResponse>,
                 response: Response<OrderResponse>,
             ) {
+                Log.d("woogi", "onResponse: $orderRequest")
+                Log.d(
+                    "woogi",
+                    "onResponse: ${response.code()}, ${response.headers()}, ${response.message()}"
+                )
                 if (response.code() == 409) {
                     onFailed(STOCK_ERROR)
                 } else {
@@ -48,7 +55,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.getOrder(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             orderId = orderId
         ).enqueue(object : retrofit2.Callback<OrderResponse> {
 
@@ -72,7 +79,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.getOrders(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<List<OrderResponse>> {
 
             override fun onResponse(

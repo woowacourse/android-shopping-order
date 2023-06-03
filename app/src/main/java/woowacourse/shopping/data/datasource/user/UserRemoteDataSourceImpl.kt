@@ -2,9 +2,10 @@ package woowacourse.shopping.data.datasource.user
 
 import retrofit2.Call
 import retrofit2.Response
+import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
+import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.NetworkModule.userService
 import woowacourse.shopping.data.datasource.response.UserResponse
-import woowacourse.shopping.data.remote.OkHttpModule
 
 class UserRemoteDataSourceImpl : UserRemoteDataSource {
 
@@ -13,7 +14,7 @@ class UserRemoteDataSourceImpl : UserRemoteDataSource {
         onFailure: (errorMessage: String) -> Unit,
     ) {
         userService.getUser(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<UserResponse> {
 
             override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {

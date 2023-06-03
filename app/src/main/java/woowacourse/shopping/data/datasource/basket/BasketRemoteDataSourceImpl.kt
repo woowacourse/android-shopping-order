@@ -1,10 +1,11 @@
 package woowacourse.shopping.data.datasource.basket
 
 import okhttp3.ResponseBody
+import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.basketProductService
+import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.model.BasketProductEntity
 import woowacourse.shopping.data.model.ProductEntity
-import woowacourse.shopping.data.remote.OkHttpModule
 
 class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
@@ -13,7 +14,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketProductService.requestBasketProducts(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo)
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
         ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
 
             override fun onResponse(
@@ -37,7 +38,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketProductService.addBasketProduct(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             productId = product.id
         ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
 
@@ -67,7 +68,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketProductService.updateBasketProduct(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
             quantity = basketProduct.count
         ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
@@ -98,7 +99,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketProductService.removeBasketProduct(
-            authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
         ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
 
