@@ -50,7 +50,10 @@ class PaymentPresenterTest {
         val totalPrice = basketProducts.sumOf { it.product.price.value }
 
         every {
-            userRepository.getUser(onReceived = capture(slotInitView))
+            userRepository.getUser(
+                onReceived = capture(slotInitView),
+                onFailure = any()
+            )
         } answers {
             slotInitView.captured.invoke(user)
         }
@@ -65,6 +68,30 @@ class PaymentPresenterTest {
                 basketProducts = basketProducts,
                 totalPrice = totalPrice
             )
+        }
+    }
+
+    @Test
+    fun `유저 정보를 받지 못한 경우 에러 메시지를 띄운다`() {
+        // given
+        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
+        val errorMessage = "유저 정보를 불러올 수 없습니다."
+
+        every {
+            userRepository.getUser(
+                onReceived = any(),
+                onFailure = capture(slotShowErrorMessage)
+            )
+        } answers {
+            slotShowErrorMessage.captured.invoke(errorMessage)
+        }
+
+        // when: 유저 정보를 저장소로부터 받아온다
+        presenter.getUser()
+
+        // then: 받아오지 못한 경우 에러 메시지를 띄운다
+        verify {
+            view.showErrorMessage(errorMessage)
         }
     }
 
@@ -117,7 +144,7 @@ class PaymentPresenterTest {
         // when: 주문을 추가한다
         presenter.addOrder(0)
 
-        // then: 받아온 주문 식별번호를 가지고 주문 상세 화면을 보여준다
-        verify { view.showOrderFailedMessage(errorMessage) }
+        // then: 실패한 경우 에러메시지를 띄운다
+        verify { view.showErrorMessage(errorMessage) }
     }
 }
