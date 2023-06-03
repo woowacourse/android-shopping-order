@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -50,6 +51,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun showProducts(products: List<CartProductModel>) {
         binding.rvOrderProduct.adapter = OrderProductAdapter(products)
+    }
+
+    override fun showOriginalPrice(price: Int) {
+        binding.originalPrice.text = getString(R.string.product_price, price)
     }
 
     companion object {

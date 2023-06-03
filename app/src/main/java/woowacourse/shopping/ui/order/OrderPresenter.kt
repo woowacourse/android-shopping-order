@@ -15,6 +15,7 @@ class OrderPresenter(
             onSuccess = {products ->
                 cart = Cart(products.filter { ids.contains(it.id) })
                 view.showProducts(cart.cartProducts.map { it.toView() })
+                view.showOriginalPrice(cart.totalPrice)
             },
             onFailure = {}
         )

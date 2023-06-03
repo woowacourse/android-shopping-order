@@ -9,5 +9,7 @@ interface OrderContract {
 
     interface View {
         fun showProducts(products: List<CartProductModel>)
+
+        fun showOriginalPrice(price: Int)
     }
 }

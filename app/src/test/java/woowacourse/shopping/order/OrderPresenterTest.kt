@@ -21,7 +21,7 @@ class OrderPresenterTest {
     private val presenter: OrderContract.Presenter = OrderPresenter(view, cartRepository)
 
     @Test
-    fun `주문 상품 목록을 노출한다`() {
+    fun `주문 상품을 목록과 주문 금액을 노출한다`() {
         // given
         val products: List<CartProduct> = listOf(
             createCartProduct(1, 2),
@@ -33,15 +33,22 @@ class OrderPresenterTest {
             successSlot.captured(products)
         }
         every { view.showProducts(any()) } just runs
+        every { view.showOriginalPrice(any()) } just runs
 
         // when
         val ids: List<Int> = listOf(1, 3)
         presenter.loadProducts(ids)
 
         // then
-        val expected: List<CartProductModel> = listOf(createCartProductModel(1, 2), createCartProductModel(3, 6))
+        val expectedProducts: List<CartProductModel> = listOf(createCartProductModel(1, 2), createCartProductModel(3, 6))
         verify {
-            view.showProducts(expected)
+            view.showProducts(expectedProducts)
+        }
+
+        // and
+        val expectedOriginalPrice = 8000
+        verify {
+            view.showOriginalPrice(expectedOriginalPrice)
         }
     }
 }
