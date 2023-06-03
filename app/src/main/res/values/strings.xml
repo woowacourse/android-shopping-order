@@ -44,6 +44,7 @@
     <string name="tv_payment_product_name_count">%s 외 %d개</string>
     <string name="ApplyPointMessageOverUsePoint">입력하신 포인트가 보유 포인트보다 많습니다.</string>
     <string name="ApplyPointMessageAvailableToApply">포인트 적용 되었습니다.</string>
-
+    <string name="FailureAddOrder">주문 실패</string>
+    <string name="OrderFailureDialogPositiveButton">확인</string>
 
 </resources>

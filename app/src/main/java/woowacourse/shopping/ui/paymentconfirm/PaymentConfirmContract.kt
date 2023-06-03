@@ -14,6 +14,12 @@ interface PaymentConfirmContract {
         fun updateUsingPoint(usingPoint: Int)
 
         fun updateActualPayment(actualPayment: Int)
+
+        fun showOrderSuccessNotification()
+
+        fun showOrderLackOfPointFailureNotification(errorMessage: String)
+
+        fun showOrderShortageStockFailureNotification(errorMessage: String)
     }
 
     interface Presenter {
@@ -24,5 +30,7 @@ interface PaymentConfirmContract {
         fun fetchPreOrderInfo()
 
         fun applyPoint(input: Int)
+
+        fun addOrder()
     }
 }

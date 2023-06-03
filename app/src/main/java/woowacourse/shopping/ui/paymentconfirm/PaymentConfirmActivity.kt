@@ -4,11 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.order.remote.RemoteOrderDataSource
 import woowacourse.shopping.data.datasource.userpointdata.remote.RemoteUserPointInfoDataSource
-import woowacourse.shopping.data.repository.PointRepository
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
+import woowacourse.shopping.data.repository.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentConfirmBinding
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiBasketProduct
@@ -17,6 +21,7 @@ import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 import woowacourse.shopping.util.editTextFocusOutProcess
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
+import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View {
 
@@ -30,6 +35,7 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         if (!initExtraData()) return
         initPresenter()
         initUsePointButtonClickListener()
+        initFinalOrderButtonClickListener()
     }
 
     private fun initExtraData(): Boolean {
@@ -42,7 +48,8 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
     private fun initPresenter() {
         presenter = PaymentConfirmPresenter(
             this,
-            PointRepository(RemoteUserPointInfoDataSource()),
+            PointRepositoryImpl(RemoteUserPointInfoDataSource()),
+            OrderRepositoryImpl(RemoteOrderDataSource()),
             currentOrderBasketProducts.map { it.toDomain() }
         )
     }
@@ -50,6 +57,10 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
     private fun initUsePointButtonClickListener() {
         binding.pointApplyClickListener = { presenter.applyPoint(it.toString().toInt()) }
         binding.etPaymentUsingPoint.text.clear()
+    }
+
+    private fun initFinalOrderButtonClickListener() {
+        binding.btnPaymentFinalOrder.setThrottleFirstOnClickListener { presenter.addOrder() }
     }
 
     override fun updateUserPointInfo(userPointInfo: UiUserPointInfo) {
@@ -70,6 +81,30 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
 
     override fun updateActualPayment(actualPayment: Int) {
         binding.actualPayment = actualPayment
+    }
+
+    override fun showOrderSuccessNotification() {
+        Toast.makeText(this, "성공했습니다", Toast.LENGTH_SHORT).show()
+        finish()
+    }
+
+    override fun showOrderLackOfPointFailureNotification(errorMessage: String) {
+        setAlertDialog(errorMessage) { presenter.applyPoint(0) }
+    }
+
+    override fun showOrderShortageStockFailureNotification(errorMessage: String) {
+        setAlertDialog(errorMessage) { finish() }
+    }
+
+    private fun setAlertDialog(errorMessage: String, onClickListener: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle(this.getString(R.string.FailureAddOrder))
+            .setMessage(errorMessage)
+            .setPositiveButton(
+                this.getString(R.string.OrderFailureDialogPositiveButton)
+            ) { _, _ -> onClickListener() }
+            .create()
+            .show()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
