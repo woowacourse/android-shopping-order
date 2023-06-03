@@ -91,6 +91,9 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
                         .toInt()
                 )
             }
+            ivPaymentClose.setOnClickListener {
+                finish()
+            }
         }
     }
 
@@ -98,9 +101,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         val intent = OrderDetailActivity.getIntent(
             context = this,
             orderId = orderId
-        ).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        )
 
         startActivity(intent)
     }
