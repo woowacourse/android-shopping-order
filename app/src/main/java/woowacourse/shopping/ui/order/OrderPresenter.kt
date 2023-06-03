@@ -10,7 +10,7 @@ class OrderPresenter(
     private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
     override fun getOrder() {
-        orderRepository.getOrderList(cartIds) { result ->
+        orderRepository.getOrder(cartIds) { result ->
             result.onSuccess { orderList -> view.showOrder(orderList.toUIModel()) }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }

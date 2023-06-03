@@ -11,7 +11,7 @@ class OrderHistoryPresenter(
 ) : OrderHistoryContract.Presenter {
 
     override fun getOrderDetail() {
-        orderRepository.getOrder(orderId) { result ->
+        orderRepository.getOrderHistory(orderId) { result ->
             result.onSuccess { order -> view.setOrderHistory(order.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
         }

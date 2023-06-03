@@ -24,6 +24,12 @@ interface RetrofitOrderService {
         @Header("Authorization") token: String
     ): Call<OrderHistoryResponse>
 
+    @GET("orders")
+    fun getOrdersNext(
+        @Header("Authorization") token: String,
+        @Query("last-id") lastOrderId: Long
+    ): Call<OrderHistoryResponse>
+
     @GET("orders/{id}")
     fun getOrder(
         @Header("Authorization") token: String,

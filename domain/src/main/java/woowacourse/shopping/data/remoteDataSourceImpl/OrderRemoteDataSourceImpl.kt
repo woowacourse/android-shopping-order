@@ -9,22 +9,47 @@ import woowacourse.shopping.utils.RetrofitUtil
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     private var credentials = "Basic YUBhLmNvbToxMjM0"
 
-    override fun getOrderList(cartIds: List<Int>, callback: (Result<Order>) -> Unit) {
+    private var lastOrderId: Long = 0
+
+    override fun getOrder(cartIds: List<Int>, callback: (Result<Order>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))
             .enqueue(RetrofitUtil.callback(callback))
     }
 
-    override fun getOrders(callback: (Result<List<OrderHistory>>) -> Unit) {
-        RetrofitUtil.retrofitOrderService.getOrders(credentials)
+    override fun getOrderHistoriesNext(callback: (Result<List<OrderHistory>>) -> Unit) {
+        when (lastOrderId) {
+            0L -> getOrderHistoriesFirst(callback)
+            else -> getOrderHistories(callback)
+        }
+    }
+
+    private fun getOrderHistoriesFirst(callback: (Result<List<OrderHistory>>) -> Unit) {
+        RetrofitUtil.retrofitOrderService
+            .getOrders(credentials)
             .enqueue(
                 RetrofitUtil.callback { result ->
-                    result.onSuccess { callback(Result.success(it.orderHistories)) }
-                        .onFailure { e -> callback(Result.failure(e)) }
+                    result.onSuccess {
+                        callback(Result.success(it.orderHistories))
+                        lastOrderId = it.lastOrderId
+                    }.onFailure { e -> callback(Result.failure(e)) }
                 }
             )
     }
 
-    override fun getOrder(id: Long, callback: (Result<OrderHistory>) -> Unit) {
+    private fun getOrderHistories(callback: (Result<List<OrderHistory>>) -> Unit) {
+        RetrofitUtil.retrofitOrderService
+            .getOrdersNext(credentials, lastOrderId)
+            .enqueue(
+                RetrofitUtil.callback { result ->
+                    result.onSuccess {
+                        callback(Result.success(it.orderHistories))
+                        lastOrderId = it.lastOrderId
+                    }.onFailure { e -> callback(Result.failure(e)) }
+                }
+            )
+    }
+
+    override fun getOrderHistory(id: Long, callback: (Result<OrderHistory>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrder(credentials, id)
             .enqueue(RetrofitUtil.callback(callback))
     }

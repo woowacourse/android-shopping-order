@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoriesBinding
@@ -71,11 +73,29 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
         binding.rvOrderHistories.adapter = adapter
         binding.rvOrderHistories.addItemDecoration(PhDividerItemDecoration(20f, 0xffebebeb.toInt()))
 
+        binding.rvOrderHistories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+                    loadMoreData()
+                }
+            }
+        })
+        presenter.getOrderHistories()
+    }
+
+    private fun loadMoreData() {
         presenter.getOrderHistories()
     }
 
     override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
-        adapter.submitList(orderHistories)
+        adapter.submitList(adapter.currentList + orderHistories)
     }
 
     override fun navigateToOrderHistory(orderId: Long) {
