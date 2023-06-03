@@ -1,45 +1,52 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
 import android.util.Log
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.model.CartRemoteEntity
-import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.model.Server
-import java.io.IOException
+import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.view.util.RetrofitService
 
 class ProductRemoteDataSourceImpl(
-    private val server: Server,
+    server: Server,
 ) : ProductRemoteDataSource {
+
+    private val productService =
+        Retrofit.Builder()
+            .baseUrl(server.url)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RetrofitService::class.java)
 
     override fun requestDatas(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val path = PRODUCT
-            val request = Request.Builder().url(server.url + path).build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        productService.requestProductsData()
+            .enqueue(object : retrofit2.Callback<List<ProductModel>> {
+                override fun onResponse(
+                    call: retrofit2.Call<List<ProductModel>>,
+                    response: retrofit2.Response<List<ProductModel>>,
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body() ?: return onFailure()
+                        val products = body.map { productModel ->
+                            CartRemoteEntity(
+                                DUMMY_CART_ID,
+                                DEFAULT_QUANTITY,
+                                productModel.toEntity(),
+                            )
+                        }
+                        onSuccess(products)
+                    }
                 }
 
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseCartEntities(body))
-                        return
-                    }
-                    onFailure()
+                override fun onFailure(call: retrofit2.Call<List<ProductModel>>, t: Throwable) {
+                    Log.d("krrong", "Fail")
                 }
             })
-        }.start()
     }
 
     override fun requestData(
@@ -47,52 +54,27 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: CartRemoteEntity) -> Unit,
     ) {
-        Thread {
-            val client = OkHttpClient()
-            val path = "$PRODUCT/$productId"
-            val request = Request.Builder().url(server.url + path).build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("krrong", e.toString())
+        productService.requestDataById(productId)
+            .enqueue(object : retrofit2.Callback<ProductModel> {
+                override fun onResponse(
+                    call: retrofit2.Call<ProductModel>,
+                    response: retrofit2.Response<ProductModel>,
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body() ?: return onFailure()
+                        val product =
+                            CartRemoteEntity(DUMMY_CART_ID, DEFAULT_QUANTITY, body.toEntity())
+                        onSuccess(product)
+                    }
                 }
 
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: return onFailure()
-                        onSuccess(parseCartEntity(JSONObject(body)))
-                        return
-                    }
-                    onFailure()
+                override fun onFailure(call: retrofit2.Call<ProductModel>, t: Throwable) {
+                    Log.d("krrong", "Fail")
                 }
             })
-        }.start()
-    }
-
-    private fun parseCartEntities(response: String): List<CartRemoteEntity> {
-        val products = mutableListOf<CartRemoteEntity>()
-        val jsonArray = JSONArray(response)
-
-        for (index in 0 until jsonArray.length()) {
-            val json = jsonArray.getJSONObject(index) ?: continue
-            products.add(parseCartEntity(json))
-        }
-
-        return products
-    }
-
-    private fun parseCartEntity(json: JSONObject): CartRemoteEntity {
-        val id = json.getLong("id")
-        val name = json.getString("name")
-        val price = json.getInt("price")
-        val image = json.getString("imageUrl")
-
-        val productEntity = ProductEntity(id, name, price, image)
-
-        return CartRemoteEntity(DUMMY_CART_ID, DEFAULT_QUANTITY, productEntity)
     }
 
     companion object {
-        private const val PRODUCT = "/products"
         private const val DUMMY_CART_ID = 99999L
         private const val DEFAULT_QUANTITY = 1
     }
