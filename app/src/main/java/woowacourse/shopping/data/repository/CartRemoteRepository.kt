@@ -35,7 +35,7 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
         })
     }
 
-    override fun insert(productId: Int, quantity: Int, callback: (cartItemId: Int) -> Unit) {
+    override fun insert(productId: Int, quantity: Int, callback: (Int) -> Unit) {
         retrofitService.requestInsertCart(RequestInsertBody(productId, quantity))
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {

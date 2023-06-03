@@ -5,9 +5,7 @@ import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 
 interface ProductRepository {
-//    fun getAll(callBack: (List<Product>) -> Unit)
-//    fun getProduct(id: Int, callBack: (Product?) -> Unit)
     fun getProductsByRange(lastId: Int, pageItemCount: Int, callBack: (ProductsWithCartItemDTO) -> Unit)
-    fun getProductsById(ids: List<Int>, callBack: (List<Product>) -> Unit)
+    fun getProductsById(ids: List<Int>, callback: (List<Product>) -> Unit)
     fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit)
 }
