@@ -28,6 +28,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         super.onCreate(savedInstanceState)
         initBinding()
         initPresenter()
+        initToolbar()
         presenter.getOrderDetail(19)
     }
 
@@ -48,14 +49,19 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         )
     }
 
+    private fun initToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.exit_menu, menu)
+        menuInflater.inflate(R.menu.empty_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.exit -> finish()
+            android.R.id.home -> finish()
             else -> super.onOptionsItemSelected(item)
         }
         return true

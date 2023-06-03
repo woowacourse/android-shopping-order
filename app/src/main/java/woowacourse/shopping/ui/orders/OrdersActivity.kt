@@ -35,6 +35,7 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
 
         initBinding()
         initPresenter()
+        initToolbar()
         binding.recyclerView.adapter = adapter
         presenter.getOrderHistoryList()
     }
@@ -58,6 +59,11 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
             this,
             OrderRepositoryImpl(OrderRemoteDataSourceImpl())
         )
+    }
+
+    private fun initToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun showOrderHistories(orders: List<OrderUIModel>) {
