@@ -2,6 +2,7 @@ package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import woowacourse.shopping.domain.cartsystem.CartSystemResult
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.CartProductModel
 
 interface CartContract {
@@ -10,6 +11,8 @@ interface CartContract {
         fun showChangedItems()
         fun showChangedItem(position: Int)
         fun stopLoading()
+        fun showOrderActivity(selectedCartProducts: List<CartProduct>)
+        fun showProductsNothingToast()
     }
 
     interface Presenter {
@@ -23,5 +26,6 @@ interface CartContract {
         fun updateCartProductCount(cartId: Int, quantity: Int)
         fun checkProduct(product: CartProductModel)
         fun checkProductsAll()
+        fun order()
     }
 }

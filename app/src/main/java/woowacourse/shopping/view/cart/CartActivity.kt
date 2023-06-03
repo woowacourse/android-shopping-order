@@ -9,12 +9,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRemoteRepository
 import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.productlist.ProductListActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -98,6 +101,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun showChangedItem(position: Int) {
         binding.recyclerCart.adapter?.notifyItemChanged(position)
+    }
+
+    override fun showOrderActivity(selectedCartProducts: List<CartProduct>) {
+        startActivity(OrderActivity.newIntent(this, selectedCartProducts))
+        finish()
+    }
+
+    override fun showProductsNothingToast() {
+        Toast.makeText(this, R.string.products_nothing, Toast.LENGTH_LONG).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

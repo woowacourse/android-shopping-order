@@ -25,6 +25,7 @@ import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.mypage.MypageActivity
+import woowacourse.shopping.view.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.view.productdetail.ProductDetailActivity
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
@@ -165,6 +166,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.mypage -> startActivity(MypageActivity.newIntent(this))
+            R.id.order_history -> startActivity(OrderHistoryActivity.newIntent(this))
         }
         return super.onOptionsItemSelected(item)
     }

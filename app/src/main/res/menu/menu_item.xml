@@ -9,6 +9,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/order_history"
+        android:icon="@drawable/ic_list_bulleted_24"
+        android:title="@string/order_history"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/mypage"
         android:icon="@drawable/ic_user_24"
         android:iconTint="@color/white"

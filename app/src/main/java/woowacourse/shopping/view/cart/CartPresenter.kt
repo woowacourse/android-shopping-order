@@ -163,6 +163,14 @@ class CartPresenter(
         }
     }
 
+    override fun order() {
+        if (cartSystem.selectedProducts.isEmpty()) {
+            view.showProductsNothingToast()
+            return
+        }
+        view.showOrderActivity(cartSystem.selectedProducts)
+    }
+
     private fun convertItemsToCartProducts(items: List<CartViewItem>): List<CartProduct> =
         items.filterIsInstance<CartViewItem.CartProductItem>().map { it.product.toDomain() }
 
