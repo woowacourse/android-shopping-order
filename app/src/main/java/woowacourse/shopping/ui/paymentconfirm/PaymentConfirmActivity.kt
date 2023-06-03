@@ -19,6 +19,7 @@ import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
+import woowacourse.shopping.ui.orderdetail.OrderDetailDialogFragmentFactory
 import woowacourse.shopping.util.editTextFocusOutProcess
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.intentDataNullProcess
@@ -85,7 +86,11 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
     }
 
     override fun showOrderSuccessNotification(orderInfo: UiOrder) {
-        OrderDetailDialog().show(supportFragmentManager, OrderDetailDialog::class.java.name)
+        supportFragmentManager.fragmentFactory =
+            OrderDetailDialogFragmentFactory(orderInfo) { finish() }
+        val fragment: OrderDetailDialog = supportFragmentManager.fragmentFactory
+            .instantiate(classLoader, OrderDetailDialog::class.java.name) as OrderDetailDialog
+        fragment.show(supportFragmentManager, OrderDetailDialog::class.java.name)
     }
 
     override fun showOrderLackOfPointFailureNotification(errorMessage: String) {
