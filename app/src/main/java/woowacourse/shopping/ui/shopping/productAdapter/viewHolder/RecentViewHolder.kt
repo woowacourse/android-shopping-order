@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.shopping.productAdapter.viewHolder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import woowacourse.shopping.databinding.ItemProductRecentBinding
-import woowacourse.shopping.ui.shopping.productAdapter.ProductsItemType
+import woowacourse.shopping.ui.shopping.productAdapter.ProductsItemType.RecentProducts
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
 import woowacourse.shopping.ui.shopping.recentProductAdapter.RecentProductItem
 import woowacourse.shopping.ui.shopping.recentProductAdapter.RecentProductsAdapter
@@ -17,10 +17,8 @@ class RecentViewHolder(
     init {
         binding.rvProducts.adapter = adapter
     }
-    override fun bind(productItemType: ProductsItemType) {
-        (productItemType as ProductsItemType.RecentProducts).let { recentProducts ->
-            adapter.submitList(recentProducts.product.map(::RecentProductItem))
-        }
+    fun bind(recentProducts: RecentProducts) {
+        adapter.submitList(recentProducts.product.map(::RecentProductItem))
     }
 
     companion object {

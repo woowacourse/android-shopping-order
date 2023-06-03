@@ -4,12 +4,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
+import woowacourse.shopping.ui.shopping.productAdapter.ProductsItemType.RecentProducts
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ProductsViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ReadMoreViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.RecentViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ShoppingViewHolder
 
-class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Adapter<ShoppingViewHolder>() {
+class ProductsAdapter(
+    private val listener: ProductsListener
+) : RecyclerView.Adapter<ShoppingViewHolder>() {
     private val productItems: MutableList<ProductsItemType> = mutableListOf()
     private var cartCounts: Map<Int, Int> = emptyMap()
 
@@ -23,7 +26,11 @@ class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: ShoppingViewHolder, position: Int) {
-        holder.bind(productItems[position])
+        when (holder) {
+            is RecentViewHolder -> holder.bind(productItems[position] as RecentProducts)
+            is ProductsViewHolder -> holder.bind(productItems[position] as ProductsItemType.Product)
+            is ReadMoreViewHolder -> Unit
+        }
     }
 
     override fun getItemCount(): Int {
@@ -42,12 +49,12 @@ class ProductsAdapter(private val listener: ProductsListener) : RecyclerView.Ada
     }
 
     fun updateRecentProducts(recentProducts: List<RecentProductUIModel>) {
-        if (productItems.size > 0 && productItems[0] is ProductsItemType.RecentProducts) {
+        if (productItems.size > 0 && productItems[0] is RecentProducts) {
             productItems.removeAt(0)
         }
 
         if (recentProducts.isNotEmpty()) {
-            productItems.add(0, ProductsItemType.RecentProducts(recentProducts))
+            productItems.add(0, RecentProducts(recentProducts))
         }
 
         if (productItems.size > 0) {
