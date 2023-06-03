@@ -5,10 +5,10 @@ import woowacourse.shopping.domain.util.WoowaResult
 
 interface ProductRepository {
 
-    fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Int)
+    fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Long)
     fun fetchPagedProducts(
         callback: (products: WoowaResult<List<CartProduct>>, isLast: Boolean) -> Unit,
         pageItemCount: Int,
-        lastId: Int,
+        lastId: Long,
     )
 }

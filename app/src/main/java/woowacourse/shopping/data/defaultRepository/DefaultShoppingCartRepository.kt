@@ -35,12 +35,12 @@ class DefaultShoppingCartRepository(
 
     override fun update(
         callback: (WoowaResult<Boolean>) -> Unit,
-        productId: Long,
+        id: Long,
         updatedQuantity: Int,
     ) {
         shoppingCartDataSource.update(
             callback = { callback(it) },
-            productId = productId,
+            id = id,
             updatedQuantity = updatedQuantity,
         )
     }

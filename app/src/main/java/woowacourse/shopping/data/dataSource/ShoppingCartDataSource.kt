@@ -14,7 +14,7 @@ interface ShoppingCartDataSource {
 
     fun update(
         callback: (WoowaResult<Boolean>) -> Unit,
-        productId: Long,
+        id: Long,
         updatedQuantity: Int,
     )
 }

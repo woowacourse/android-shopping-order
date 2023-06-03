@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.util.WoowaResult
 class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
 ) : ProductRepository {
-    override fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Int) {
+    override fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Long) {
         productDataSource.fetchProduct(id) { result ->
             when (result) {
                 is WoowaResult.SUCCESS -> callback(WoowaResult.SUCCESS(result.data.toCartProduct()))
@@ -22,13 +22,13 @@ class DefaultProductRepository(
     override fun fetchPagedProducts(
         callback: (products: WoowaResult<List<CartProduct>>, isLast: Boolean) -> Unit,
         pageItemCount: Int,
-        lastId: Int,
+        lastId: Long,
     ) {
-        productDataSource.fetchPagedProducts(pageItemCount, lastId) { result, isLast ->
+        productDataSource.fetchPagedProducts(pageItemCount, lastId) { result ->
             when (result) {
                 is WoowaResult.SUCCESS ->
-                    callback(WoowaResult.SUCCESS(result.data.toCartProducts()), isLast)
-                is WoowaResult.FAIL -> callback(result, isLast)
+                    callback(WoowaResult.SUCCESS(result.data.toCartProducts()), result.data.last)
+                is WoowaResult.FAIL -> callback(result, false)
             }
         }
     }
