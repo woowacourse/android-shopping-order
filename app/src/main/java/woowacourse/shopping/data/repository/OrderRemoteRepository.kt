@@ -61,8 +61,6 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
                     onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
                     return
                 }
-                Log.d("LOGAN", response.headers().toString())
-                Log.d("LOGAN", response.toString())
                 callback(response.headers()["Location"]?.substringAfterLast("/")?.toInt())
             }
 
