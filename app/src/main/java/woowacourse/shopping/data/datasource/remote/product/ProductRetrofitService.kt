@@ -7,11 +7,11 @@ import woowacourse.shopping.data.model.ProductDto
 import woowacourse.shopping.data.model.toDomain
 
 class ProductRetrofitService(
-    private val productApi: ProductApi
+    private val productService: ProductService
 ) : ProductRemoteDataSource {
 
     override fun requestProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
-        productApi.requestProducts().enqueue(object : retrofit2.Callback<List<ProductDto>> {
+        productService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductDto>> {
             override fun onResponse(
                 call: Call<List<ProductDto>>,
                 response: Response<List<ProductDto>>

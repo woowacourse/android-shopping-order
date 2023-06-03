@@ -7,7 +7,7 @@ import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSour
 import java.lang.Thread.sleep
 
 class ProductRepositoryImpl(
-    private val service: ProductRemoteDataSource,
+    private val remoteDataSource: ProductRemoteDataSource,
     private val productCache: ProductCache
 ) : ProductRepository {
     override fun getProducts(
@@ -16,7 +16,7 @@ class ProductRepositoryImpl(
         onFailure: () -> Unit
     ) {
         if (productCache.productList.isEmpty()) {
-            service.requestProducts(
+            remoteDataSource.requestProducts(
                 onSuccess = {
                     productCache.addProducts(it)
                     sleep(2000)

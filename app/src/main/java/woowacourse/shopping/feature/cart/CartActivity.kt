@@ -11,8 +11,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.cart.CartApi
-import woowacourse.shopping.data.datasource.remote.cart.CartRetrofitService
+import woowacourse.shopping.data.datasource.remote.cart.CartService
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.payment.PaymentActivity
 import woowacourse.shopping.model.CartProductUiModel
@@ -39,12 +39,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter() {
         val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
 
-        val cartApi = RetrofitClient.getInstanceWithToken(token)
-            .create(CartApi::class.java)
+        val cartService = RetrofitClient.getInstanceWithToken(token)
+            .create(CartService::class.java)
 
         val cartPresenter = CartPresenter(
             this,
-            CartRepositoryImpl(CartRetrofitService(cartApi))
+            CartRepositoryImpl(CartDataSourceImpl(cartService))
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter

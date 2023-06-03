@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import woowacourse.shopping.data.model.ProductDto
 
-interface ProductApi {
+interface ProductService {
     @GET("/products")
     fun requestProducts(): Call<List<ProductDto>>
 }

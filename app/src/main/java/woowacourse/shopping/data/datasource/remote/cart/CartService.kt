@@ -9,7 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.model.CartProductDto
 
-interface CartApi {
+interface CartService {
     @GET("/cart-items")
     fun getAll(): Call<List<CartProductDto>>
 
