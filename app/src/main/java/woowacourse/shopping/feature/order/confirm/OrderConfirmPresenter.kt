@@ -49,7 +49,7 @@ class OrderConfirmPresenter(
         val originPrice = cartProducts.sumOf { it.count * it.product.price.value }
         val paymentInfo = moneySalePolicy.saleApply(cartProducts)
         val saleInfo = paymentInfo.first.toPresentation()
-        val saleApplyPrice = paymentInfo.second.value
+        paymentPrice = paymentInfo.second.value
         when (saleInfo.saleAmount) {
             ZERO_MONEY -> view.showNoneSaleInfo()
             else -> {
@@ -57,8 +57,8 @@ class OrderConfirmPresenter(
                 view.setSaleInfo(saleInfo)
             }
         }
-        view.setPayInfo(originPrice, saleApplyPrice)
-        view.setFinalPayInfo(saleApplyPrice)
+        view.setPayInfo(originPrice, originPrice - paymentPrice)
+        view.setFinalPayInfo(paymentPrice)
     }
 
     companion object {
