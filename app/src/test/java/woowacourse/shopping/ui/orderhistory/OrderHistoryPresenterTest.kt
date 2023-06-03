@@ -68,10 +68,10 @@ class OrderHistoryPresenterTest {
             slotShowErrorMessage.captured.invoke(errorMessage)
         }
 
-        // when 저장소로부터 주문 목록을 받아온다.
+        // when: 저장소로부터 주문 목록을 받아온다.
         presenter.getOrders()
 
-        // then 뷰가 초기화된다
+        // then: 주문 목록을 받아오지 못한 경우 에러 메시지를 띄운다.
         verify { view.showErrorMessage(errorMessage) }
     }
 }

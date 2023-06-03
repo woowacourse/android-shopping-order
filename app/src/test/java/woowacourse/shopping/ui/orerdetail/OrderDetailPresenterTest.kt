@@ -73,7 +73,7 @@ class OrderDetailPresenterTest {
         // when: 저장소로부터 주문 정보룰 받아온다.
         presenter.getOrder()
 
-        // then: 받아온 주문 정보로 뷰가 초기화된다.
+        // then: 받아오지 못한 경우 에러메시지를 띄운다
         verify { view.showErrorMessage(errorMessage) }
     }
 }
