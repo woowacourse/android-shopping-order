@@ -27,7 +27,12 @@ class UserInfoPresenter(
     }
 
     override fun loadPoint() {
-        val point = pointRepository.getPoint()
-        view.showPoint(point = point.toPresentation())
+        pointRepository.getPoint(
+            onSuccess = {
+                view.showPoint(point = it.toPresentation())
+            },
+            onFailure = {}
+        )
+
     }
 }

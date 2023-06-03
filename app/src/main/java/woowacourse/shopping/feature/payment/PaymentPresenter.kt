@@ -33,8 +33,14 @@ class PaymentPresenter(
     }
 
     override fun loadPoint() {
-        point = pointRepository.getPoint()
-        view.showPoint(point.toPresentation())
+        pointRepository.getPoint(
+            onSuccess = {
+                point = it
+                view.showPoint(it.toPresentation())
+            },
+            onFailure = {}
+        )
+
     }
 
     override fun placeOrder(usedPoint: Int) {
