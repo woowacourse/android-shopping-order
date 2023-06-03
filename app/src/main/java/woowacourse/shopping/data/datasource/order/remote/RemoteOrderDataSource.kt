@@ -6,8 +6,8 @@ import retrofit2.Response
 import woowacourse.shopping.data.datasource.order.OrderDataSource
 import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.request.AddOrderRequest
-import woowacourse.shopping.data.remote.response.addorder.AddOrderErrorBody
-import woowacourse.shopping.data.remote.response.addorder.AddOrderFailureException
+import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorBody
+import woowacourse.shopping.data.remote.response.order.addorder.AddOrderFailureException
 
 class RemoteOrderDataSource : OrderDataSource.Remote {
     override fun addOrder(
