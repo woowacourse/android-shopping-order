@@ -11,9 +11,8 @@ import woowacourse.shopping.model.mapper.toUi
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private val cart: Cart = Cart()
 ) : CartContract.Presenter {
-
+    private val cart: Cart = Cart()
     private val maxProductsPerPage: Int = 5
     private val minPageNumber: Int = 1
     // todo 추가 필요
@@ -107,9 +106,10 @@ class CartPresenter(
 
     override fun deleteCartProduct(cartProductState: CartProductState) {
         cartRepository.deleteCartProduct(
-            id = cartProductState.id, onFailure = {}, onSuccess = {
-            loadCart()
-        },
+            id = cartProductState.id, onFailure = {},
+            onSuccess = {
+                loadCart()
+            },
         )
     }
 
@@ -127,6 +127,7 @@ class CartPresenter(
                 cart.setAllPicked(false)
                 view.setAllPickChecked(false)
             }
+
             false -> {
                 cart.setAllPicked(true)
                 view.setAllPickChecked(true)
@@ -135,6 +136,10 @@ class CartPresenter(
         updatePaymentAmount()
         updatePickedCartProductCount()
         view.setCartProducts(cart.products.map(CartProduct::toUi))
+    }
+
+    override fun attachCartToOrder() {
+        view.showOrderPage(cart.getPickedProducts().toUi())
     }
 
     private fun getMaxPageNumber(cartsSize: Int): Int {
