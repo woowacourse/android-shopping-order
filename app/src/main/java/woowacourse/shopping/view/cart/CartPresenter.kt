@@ -56,35 +56,36 @@ class CartPresenter(
     override fun fetchNextPage() {
         cartItems.clear()
         cartPagination.fetchNextItems { cartProducts ->
-            val items = cartProducts.map {
-                CartViewItem.CartProductItem(
-                    it.toUiModel(
-                        cartSystem.isSelectedProduct(it),
-                    ),
-                )
-            }
-            cartItems.addAll(items)
-            addBottomPagination()
-            _isCheckedAll.value = getIsCheckedAll()
-            view.showChangedItems()
+            fetchNewItems(cartProducts)
         }
     }
 
     override fun fetchPrevPage() {
         cartItems.clear()
         cartPagination.fetchPrevItems { cartProducts ->
-            val items = cartProducts.map {
-                CartViewItem.CartProductItem(
-                    it.toUiModel(
-                        cartSystem.isSelectedProduct(it),
-                    ),
-                )
-            }
-            cartItems.addAll(items)
-            addBottomPagination()
-            _isCheckedAll.value = getIsCheckedAll()
-            view.showChangedItems()
+            fetchNewItems(cartProducts)
         }
+    }
+
+    private fun fetchCurrentPage() {
+        cartItems.clear()
+        cartPagination.fetchCurrentItems { cartProducts ->
+            fetchNewItems(cartProducts)
+        }
+    }
+
+    private fun fetchNewItems(cartProducts: List<CartProduct>) {
+        val items = cartProducts.map {
+            CartViewItem.CartProductItem(
+                it.toUiModel(
+                    cartSystem.isSelectedProduct(it),
+                ),
+            )
+        }
+        cartItems.addAll(items)
+        addBottomPagination()
+        _isCheckedAll.postValue(getIsCheckedAll())
+        view.showChangedItems()
     }
 
     override fun removeProduct(cartId: Int) {
@@ -100,7 +101,10 @@ class CartPresenter(
 
             cartItems.removeLast()
             if (nextItem != null) addNextProduct(nextItem)
-            // 2페이지에서 모든 상품 다 지웠을때 1페이지로 못돌아가는 페이징 버그있음, List로 넘겨서 add할지 고민
+            if (cartItems.isEmpty()) {
+                fetchCurrentPage()
+                return@remove
+            }
             addBottomPagination()
             view.showChangedItems()
         }
