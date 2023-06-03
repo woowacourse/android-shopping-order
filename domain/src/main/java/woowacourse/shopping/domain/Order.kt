@@ -1,10 +1,10 @@
 package woowacourse.shopping.domain
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class Order(
     val orderId: Int,
-    val createdAt: LocalDate,
+    val createdAt: LocalDateTime,
     val orderItems: List<OrderItem>,
     val totalPrice: Price,
     val usedPoint: Point,
