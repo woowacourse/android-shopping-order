@@ -36,11 +36,11 @@ class OrderPresenter(
 
     override fun useAllPoints() {
         usePoints(points)
-        discountPrice(points)
     }
 
-    private fun usePoints(points: Int) {
+    override fun usePoints(points: Int) {
         view.updatePointsUsed(points)
+        discountPrice(points)
     }
 
     private fun discountPrice(discountPrice: Int) {

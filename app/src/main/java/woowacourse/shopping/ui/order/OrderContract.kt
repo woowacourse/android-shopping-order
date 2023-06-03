@@ -9,6 +9,8 @@ interface OrderContract {
         fun loadPoints()
 
         fun useAllPoints()
+
+        fun usePoints(points: Int)
     }
 
     interface View {

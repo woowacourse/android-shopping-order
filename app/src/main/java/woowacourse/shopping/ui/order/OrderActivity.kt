@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -52,6 +54,17 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter.loadProducts(ids.toList())
         presenter.loadPoints()
 
+        binding.usePoints.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if(binding.usePoints.isFocused && !s.isNullOrEmpty()) {
+                    presenter.usePoints(s.toString().toInt())
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
         binding.btnUseAllPoints.setOnClickListener { presenter.useAllPoints() }
     }
 
@@ -68,7 +81,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun updatePointsUsed(points: Int) {
+        binding.usePoints.clearFocus()
         binding.usePoints.setText(points.toString())
+        binding.usePoints.setSelection(binding.usePoints.length())
+        binding.usePoints.requestFocus()
     }
 
     override fun updateDiscountPrice(price: Int) {

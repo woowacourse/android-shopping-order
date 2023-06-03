@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.ui.model.CartProductModel
-import woowacourse.shopping.ui.model.mapper.CartProductMapper.toDomain
-import woowacourse.shopping.ui.model.mapper.CartProductMapper.toView
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.model.CartProductModel
+import woowacourse.shopping.ui.model.mapper.CartProductMapper.toDomain
+import woowacourse.shopping.ui.model.mapper.CartProductMapper.toView
 import kotlin.math.min
 
 class CartPresenter(
