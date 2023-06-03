@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.order
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.model.Point
@@ -26,6 +27,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         binding = ActivityOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportActionBar?.title = getString(R.string.order_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         initPresenter()
 
@@ -88,6 +92,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun afterTextChanged(p0: Editable?) {
             }
         })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     companion object {

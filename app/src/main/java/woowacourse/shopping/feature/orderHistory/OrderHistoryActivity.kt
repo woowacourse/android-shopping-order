@@ -1,8 +1,10 @@
 package woowacourse.shopping.feature.orderHistory
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.feature.main.load.LoadAdapter
 import woowacourse.shopping.model.OrderHistoryProductUiModel
@@ -20,6 +22,9 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
         presenter = OrderHistoryPresenter(this)
 
+        supportActionBar?.title = getString(R.string.order_history)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         initAdapter()
         presenter.loadOrderHistory()
     }
@@ -33,5 +38,15 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     override fun addOrderHistory(orderHistory: List<OrderHistoryProductUiModel>) {
         orderHistoryAdapter.addItems(orderHistory)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

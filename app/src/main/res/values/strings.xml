@@ -27,6 +27,7 @@
     <string name="point_initial_value">0</string>
     <string name="point_unit">P</string>
     <string name="use_all">전액사용</string>
-    <string name="order_history">order_history</string>
+    <string name="order_history">Order History</string>
     <string name="order_history_title">%s 외 %d 개</string>
+    <string name="order_title">Order</string>
 </resources>
