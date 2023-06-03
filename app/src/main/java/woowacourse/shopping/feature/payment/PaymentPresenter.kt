@@ -38,7 +38,12 @@ class PaymentPresenter(
     }
 
     override fun placeOrder(usedPoint: Int) {
-        orderRepository.placeOrder(usedPoint, orderProducts)
+        orderRepository.placeOrder(
+            usedPoint,
+            orderProducts,
+            onSuccess = {},
+            onFailure = {}
+        )
         view.showPaymentDoneScreen()
     }
 

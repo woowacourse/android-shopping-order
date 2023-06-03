@@ -8,7 +8,12 @@ class OrderDetailPresenter(
     private val orderRepository: OrderRepository
 ) : OrderDetailContract.Presenter {
     override fun loadOrderDetail(orderId: Int) {
-        val orderDetail = orderRepository.getOrderDetail(orderId)
-        view.showOrderDetail(orderDetail = orderDetail.toPresentation())
+        orderRepository.getOrderDetail(
+            orderId = orderId,
+            onSuccess = {
+                view.showOrderDetail(orderDetail = it.toPresentation())
+            },
+            onFailure = {}
+        )
     }
 }
