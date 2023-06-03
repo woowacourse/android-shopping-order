@@ -15,11 +15,11 @@ class CartItemViewHolder(
     private lateinit var cartProductModel: CartProductInfoModel
     private val counterListener = object : CounterListener {
         override fun onPlus(count: Int) {
-            updateCart(count)
+            updateProductCount(count)
         }
 
         override fun onMinus(count: Int) {
-            updateCart(count)
+            updateProductCount(count)
         }
     }
 
@@ -27,7 +27,7 @@ class CartItemViewHolder(
         deleteButtonClick()
     }
 
-    private fun updateCart(count: Int) {
+    private fun updateProductCount(count: Int) {
         presenter.updateProductCount(cartProductModel, count)
     }
 
@@ -57,17 +57,9 @@ class CartItemViewHolder(
         binding.checkboxProductCart.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 presenter.addProductInOrder(cartProductModel)
-                updateOrderView()
             } else {
                 presenter.deleteProductInOrder(cartProductModel)
-                updateOrderView()
             }
         }
-    }
-
-    private fun updateOrderView() {
-        presenter.updateOrderCount()
-        presenter.updateOrderPrice()
-        presenter.checkCurrentPageProductsOrderState()
     }
 }

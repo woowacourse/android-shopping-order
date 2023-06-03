@@ -33,12 +33,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
+        managePaging()
+        initView()
     }
 
     override fun onStart() {
         super.onStart()
         setLoadingViewVisible(true)
-        initView()
+        presenter.loadCartItems()
     }
 
     private fun setUpBinding() {
@@ -49,9 +51,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initView() {
         initCartAdapter()
         setToolBar()
-        presenter.initViewByLoadedItems()
-        managePaging()
-        allOrderedCheckBoxChange()
+        allIsOrderedCheckBoxChange()
         orderButtonClick()
     }
 
@@ -63,21 +63,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.recyclerCart.adapter = cartAdapter
     }
 
+    private fun updateProductPrice(textView: TextView, cartProductInfoModel: CartProductInfoModel) {
+        cartProductPriceView = textView
+        presenter.updateProductPrice(cartProductInfoModel)
+    }
+
     private fun setToolBar() {
         setSupportActionBar(binding.toolbarCart.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_back_24)
-    }
-
-    private fun updateView() {
-        with(presenter) {
-            refreshCurrentPage()
-            checkPlusPageAble()
-            checkMinusPageAble()
-            checkCurrentPageProductsOrderState()
-            updateOrderPrice()
-            updateOrderCount()
-        }
     }
 
     private fun managePaging() {
@@ -88,19 +82,28 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun onPlusPage() {
         binding.buttonPlusPage.setOnClickListener {
             presenter.plusPage()
-            updateView()
+            onPageChanged()
+        }
+    }
+
+    private fun onPageChanged() {
+        with(presenter) {
+            refreshCurrentPageItems()
+            checkPlusPageAble()
+            checkMinusPageAble()
+            checkCurrentPageProductsIsOrdered()
         }
     }
 
     private fun onMinusPage() {
         binding.buttonMinusPage.setOnClickListener {
             presenter.minusPage()
-            updateView()
+            onPageChanged()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        when (item.itemId) { // 뒤로가기
             android.R.id.home -> {
                 finish()
             }
@@ -109,7 +112,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         return true
     }
 
-    private fun allOrderedCheckBoxChange() {
+    private fun allIsOrderedCheckBoxChange() {
         binding.checkboxAllCart.setOnCheckedChangeListener { _, isChecked ->
             presenter.changeCurrentPageProductsOrder(isChecked)
             presenter.updateOrderPrice()
@@ -119,14 +122,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun orderButtonClick() {
         binding.buttonCartOrder.setOnClickListener {
-            presenter.orderItems()
+            presenter.order()
         }
     }
-
-    override fun showDeletedCartView() {
-        updateView()
-    }
-
     override fun setCartItems(productModels: List<CartProductInfoModel>) {
         cartAdapter.submitList(productModels)
     }
@@ -149,15 +147,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setAllOrderState(isAllOrdered: Boolean) {
+    override fun setAllIsOrderCheck(isAllOrdered: Boolean) {
         binding.checkboxAllCart.isChecked = isAllOrdered
     }
-
-    private fun updateProductPrice(textView: TextView, cartProductInfoModel: CartProductInfoModel) {
-        cartProductPriceView = textView
-        presenter.updateProductPrice(cartProductInfoModel)
-    }
-
     override fun setProductPrice(price: Int) {
         cartProductPriceView.text = getString(R.string.price_format, price)
     }
@@ -175,13 +167,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             binding.flCartList.visibility = View.GONE
         }
     }
-
-    override fun showInitView(currentPage: String, loadingState: Boolean) {
-        updateView()
-        setPage(currentPage)
-        setLoadingViewVisible(loadingState)
-    }
-
     override fun setOrderPrice(totalPrice: Int) {
         binding.textCartPrice.text = getString(R.string.price_format, totalPrice)
     }
