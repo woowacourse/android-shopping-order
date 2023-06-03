@@ -33,7 +33,7 @@ class OrderPresenterTest {
     @Test
     fun `주문 내역을 가져온다`() {
         // given
-        mockkStatic("woowacourse.shopping.mapper.OrderListMapperKt")
+        mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
 
         mockOrderGetOrder()
         every { fakeOrder.toUIModel() } answers { fakeOrderUIModel }
@@ -50,7 +50,7 @@ class OrderPresenterTest {
     @Test
     fun `주문을 하면 `() {
         // given
-        mockkStatic("woowacourse.shopping.mapper.OrderListMapperKt")
+        mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
 
         mockOrderPostOrder()
         justRun { view.navigateOrder() }
