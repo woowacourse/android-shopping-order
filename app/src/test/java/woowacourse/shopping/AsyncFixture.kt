@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
@@ -31,6 +32,10 @@ fun CartItem(
     quantity: Int = 1,
     product: Product = Product()
 ): CartItem = CartItem(id, quantity, product)
+
+fun Cart(
+    value: Set<CartItem> = emptySet()
+): Cart = Cart(value)
 
 fun RecentlyViewedProduct(
     id: Long = 0,
