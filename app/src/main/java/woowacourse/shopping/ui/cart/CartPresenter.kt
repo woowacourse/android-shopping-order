@@ -87,14 +87,19 @@ class CartPresenter(
         cart.items.forEach {
             cartRepository.deleteCartProductById(
                 it.id,
-                onSuccess = { view.showOrderComplete(_totalCheckSize.value ?: 0) },
+                onSuccess = {
+                    view.showOrderComplete(
+                        cart.selectCheckedProducts(),
+                        _totalCheckSize.value ?: 0,
+                    )
+                },
                 onFailure = {},
             )
         }
     }
 
     override fun navigateToHome() {
-        view.navigateToHome()
+        view.navigateToHome(cart.selectCheckedProducts())
     }
 
     private fun loadCartProducts() {

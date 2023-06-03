@@ -6,11 +6,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.mapper.toUi
 import woowacourse.shopping.model.UiCartProduct
 import woowacourse.shopping.model.UiPage
 import woowacourse.shopping.ui.cart.CartContract.View
 import woowacourse.shopping.ui.cart.listener.CartClickListener
 import woowacourse.shopping.ui.cart.recyclerview.adapter.CartAdapter
+import woowacourse.shopping.ui.order.main.OrderActivity
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectCartPresenter
@@ -57,17 +60,18 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         presenter.removeProduct(cartProduct)
     }
 
-    override fun showOrderComplete(productCount: Int) {
+    override fun showOrderComplete(cartProducts: List<CartProduct>, productCount: Int) {
         showToast(getString(R.string.order_success_message, productCount))
-        navigateToHome()
+        navigateToHome(cartProducts)
     }
 
     override fun showOrderFailed() {
         showToast(getString(R.string.order_failed_message))
     }
 
-    override fun navigateToHome() {
-        setResult(RESULT_OK)
+    override fun navigateToHome(cartProducts: List<CartProduct>) {
+        val intent = OrderActivity.newIntent(this, cartProducts.map { it.toUi() })
+        startActivity(intent)
         finish()
     }
 
