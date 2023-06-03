@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.productDetail
 
+import android.util.Log
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -22,11 +23,14 @@ class ProductDetailPresenter(
         productRepository.fetchProduct(
             callback = { result ->
                 when (result) {
-                    is SUCCESS -> product = result.data.product
+                    is SUCCESS -> {
+                        product = result.data.product
+                        Log.d("asdf", "product: $product")
+                        fetchLastViewedProduct(view, recentlyViewedRepository)
+                        recentlyViewedRepository.addRecentlyViewedProduct(product)
+                    }
                     is FAIL -> view.handleNoSuchProductError()
                 }
-                fetchLastViewedProduct(view, recentlyViewedRepository)
-                recentlyViewedRepository.addRecentlyViewedProduct(product)
             },
             id = productId,
         )
