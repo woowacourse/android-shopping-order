@@ -3,10 +3,8 @@ package woowacourse.shopping.ui.orderDetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
 import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
@@ -24,18 +22,25 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         onItemClick = { productId -> presenter.navigateToProductDetail(productId) }
     )
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+            else -> super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
         initPresenter()
         initToolbar()
-        presenter.getOrderDetail(19)
+        initView()
     }
 
     private fun initBinding() {
         binding = ActivityOrderDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.rvOrderProduct.adapter = adapter
     }
 
     private fun initPresenter() {
@@ -54,17 +59,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.empty_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-            else -> super.onOptionsItemSelected(item)
-        }
-        return true
+    private fun initView() {
+        binding.rvOrderProduct.adapter = adapter
+        presenter.getOrderDetail(19)
     }
 
     override fun setOrder(order: OrderUIModel) {

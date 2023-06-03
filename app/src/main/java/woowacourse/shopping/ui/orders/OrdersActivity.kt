@@ -30,22 +30,21 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
         }
     )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        initBinding()
-        initPresenter()
-        initToolbar()
-        binding.recyclerView.adapter = adapter
-        presenter.getOrderHistoryList()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
             else -> return false
         }
         return true
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        initBinding()
+        initPresenter()
+        initToolbar()
+        initView()
     }
 
     private fun initBinding() {
@@ -64,6 +63,11 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
     private fun initToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun initView() {
+        binding.recyclerView.adapter = adapter
+        presenter.getOrderHistoryList()
     }
 
     override fun showOrderHistories(orders: List<OrderUIModel>) {

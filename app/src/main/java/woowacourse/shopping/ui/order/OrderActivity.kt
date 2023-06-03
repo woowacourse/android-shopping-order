@@ -19,23 +19,20 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private val adapter = OrderProductAdapter()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order)
-
-        initPresenter()
-        initBinding()
-        binding.rvOrders.adapter = adapter
-        initToolbar()
-        presenter.getOrderList()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
             else -> return false
         }
         return true
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initPresenter()
+        initBinding()
+        initToolbar()
+        initView()
     }
 
     private fun initPresenter() {
@@ -50,12 +47,21 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
-        binding.price = 1000
+        setContentView(binding.root)
     }
 
     private fun initToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun initView() {
+        binding.rvOrders.adapter = adapter
+        presenter.getOrderList()
+    }
+
+    override fun showOrderList(orderListUIModel: OrderListUIModel) {
+        adapter.submitList(orderListUIModel.cartProducts)
     }
 
     companion object {
@@ -65,9 +71,5 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                 putIntegerArrayListExtra(KEY_CART_IDS, cartIds as ArrayList<Int>)
             }
         }
-    }
-
-    override fun showOrderList(orderListUIModel: OrderListUIModel) {
-        adapter.submitList(orderListUIModel.cartProducts)
     }
 }
