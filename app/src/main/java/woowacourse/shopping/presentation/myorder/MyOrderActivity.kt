@@ -39,6 +39,7 @@ class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
     private fun initMyOrderItems() {
         myOrdersAdapter = MyOrdersAdapter(::showOrderDetail)
         binding.recyclerMyOrder.adapter = myOrdersAdapter
+        binding.recyclerMyOrder.setHasFixedSize(true)
         binding.recyclerMyOrder.layoutManager = LinearLayoutManager(this)
         presenter.loadOrders()
     }
