@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -80,6 +81,14 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     override fun setFinalPayInfo(saleApplyMoney: Int) {
         binding.finalPayAmountPrice.text =
             getString(R.string.price_format, saleApplyMoney.toMoneyFormat())
+    }
+
+    override fun showSaleInfo() {
+        binding.saleInfoLayout.visibility = View.VISIBLE
+    }
+
+    override fun showNoneSaleInfo() {
+        binding.noneSaleLayout.visibility = View.VISIBLE
     }
 
     override fun showOrderSuccess(cartIds: List<Long>) {

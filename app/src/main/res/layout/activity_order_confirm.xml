@@ -95,10 +95,34 @@
                     app:layout_constraintTop_toBottomOf="@id/sale_text_view" />
 
                 <LinearLayout
+                    android:id="@+id/none_sale_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginVertical="10dp"
+                    android:visibility="invisible"
+                    android:background="@drawable/sale_info_box"
+                    app:layout_constraintStart_toStartOf="@id/start_guideline"
+                    app:layout_constraintEnd_toEndOf="@id/end_guideline"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="27dp"
+                    app:layout_constraintTop_toBottomOf="@id/order_sale_middle_divider">
+
+                    <TextView
+                        android:id="@+id/none_sale_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/none_apply_sale"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/sale_info_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:visibility="invisible"
                     android:layout_marginVertical="10dp"
                     android:background="@drawable/sale_info_box"
                     app:layout_constraintStart_toStartOf="@id/start_guideline"

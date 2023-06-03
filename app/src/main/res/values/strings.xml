@@ -41,4 +41,6 @@
     <string name="total_pay_price">총 결제 금액</string>
     <string name="order_detail_item_description">주문 상세 내역 상품의 이미지입니다</string>
     <string name="order_detail_navigation_text"><![CDATA[주문 상세보기 >]]></string>
+    <string name="order_detail_bar_title">Order Detail</string>
+    <string name="none_apply_sale">적용 가능한 할인이 없습니다.</string>
 </resources>

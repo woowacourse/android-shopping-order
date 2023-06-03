@@ -9,6 +9,8 @@ interface OrderConfirmContract {
         fun setSaleInfo(moneySaleUiModel: MoneySaleUiModel)
         fun setPayInfo(originMoney: Int, saleApplyMoney: Int)
         fun setFinalPayInfo(saleApplyMoney: Int)
+        fun showSaleInfo()
+        fun showNoneSaleInfo()
         fun showOrderSuccess(cartIds: List<Long>)
         fun showOrderFailed()
         fun exitScreen()

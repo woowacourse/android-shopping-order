@@ -47,10 +47,21 @@ class OrderConfirmPresenter(
 
     private fun payInfo(cartProducts: List<CartProduct>) {
         val originPrice = cartProducts.sumOf { it.count * it.product.price.value }
-        val saleInfo = moneySalePolicy.saleApply(cartProducts)
-        paymentPrice = saleInfo.second.value
-        view.setSaleInfo(saleInfo.first.toPresentation())
-        view.setPayInfo(originPrice, saleInfo.second.value)
-        view.setFinalPayInfo(saleInfo.second.value)
+        val paymentInfo = moneySalePolicy.saleApply(cartProducts)
+        val saleInfo = paymentInfo.first.toPresentation()
+        val saleApplyPrice = paymentInfo.second.value
+        when (saleInfo.saleAmount) {
+            ZERO_MONEY -> view.showNoneSaleInfo()
+            else -> {
+                view.showSaleInfo()
+                view.setSaleInfo(saleInfo)
+            }
+        }
+        view.setPayInfo(originPrice, saleApplyPrice)
+        view.setFinalPayInfo(saleApplyPrice)
+    }
+
+    companion object {
+        private const val ZERO_MONEY = "0"
     }
 }

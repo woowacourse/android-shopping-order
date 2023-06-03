@@ -14,7 +14,7 @@ class MoneySalePolicy {
     companion object {
         enum class MoneySale(val boundary: Int, val saleAmount: Int) {
             FIVE(50000, 5000),
-            THREE(30000, 3000),
+            THREE(30000, 2000),
             NONE(0, 0),
         }
     }
