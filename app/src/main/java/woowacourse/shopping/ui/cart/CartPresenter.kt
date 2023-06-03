@@ -2,6 +2,8 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProductUIModel
@@ -24,13 +26,14 @@ class CartPresenter(
 
     private val currentPage = mutableListOf<CartProductUIModel>()
 
-    private val pageUIModel get() = PageUIModel(
-        cartRepository.hasNextPage(index, STEP),
-        cartRepository.hasPrevPage(index, STEP),
-        index + 1
-    )
+    private val pageUIModel
+        get() = PageUIModel(
+            cartRepository.hasNextPage(index, STEP),
+            cartRepository.hasPrevPage(index, STEP),
+            index + 1
+        )
 
-    private var isChangingItemCheck = false
+    private val lock = ReentrantLock()
 
     private fun fetchCartProducts(callback: () -> Unit) {
         cartRepository.getPage(index, STEP) { result ->
@@ -68,12 +71,14 @@ class CartPresenter(
     }
 
     override fun setUpProductsCheck(checked: Boolean) {
-        if (isChangingItemCheck) { return }
-        currentPage.map {
-            cartRepository.updateChecked(it.id, checked)
-            updateItemCheck(it.id, checked)
+        if (lock.isLocked) return
+        lock.withLock {
+            currentPage.map { updateItemCheck(it.id, checked) }
+            setUpCarts()
+            setUpCheckedCount()
+            setUPTotalPrice()
+            setUpAllButton()
         }
-        setUpCarts()
     }
 
     override fun moveToPageNext() {
@@ -95,8 +100,7 @@ class CartPresenter(
     override fun updateItemCount(productId: Int, count: Int) {
         cartRepository.updateCountWithProductId(productId, count) { result ->
             result.onSuccess {
-                currentPage.indexOfFirst { it.productId == productId }
-                    .takeIf { it != -1 }
+                currentPage.indexOfFirst { it.productId == productId }.takeIf { it != -1 }
                     ?.let { currentPage[it] = currentPage[it].copy(count = count) }
                 fetchCartProducts {
                     setUpCheckedCount()
@@ -107,15 +111,16 @@ class CartPresenter(
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
-        isChangingItemCheck = true
         cartRepository.updateChecked(productId, checked)
         currentPage.indexOfFirst { it.id == productId }
             .takeIf { it != -1 }
             ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-        setUpCheckedCount()
-        setUPTotalPrice()
-        setUpAllButton()
-        isChangingItemCheck = false
+        if (lock.isLocked) return
+        lock.withLock {
+            setUpCheckedCount()
+            setUPTotalPrice()
+            setUpAllButton()
+        }
     }
 
     override fun removeItem(productId: Int) {
