@@ -82,7 +82,7 @@
                 app:layout_constraintStart_toStartOf="@id/center_guideline"
                 app:layout_constraintTop_toTopOf="@id/order_item_main_image_view"
                 tools:text="바나나 1kg 외 2종"
-                android:text="@{@string/order_items_info(orderItem.mainProductName,orderItem.extraProductCount)}"
+                android:text="@{(orderItem.extraProductCount == 0) ? orderItem.mainProductName : @string/order_items_info(orderItem.mainProductName,orderItem.extraProductCount)}"
                 android:layout_marginStart="20dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
