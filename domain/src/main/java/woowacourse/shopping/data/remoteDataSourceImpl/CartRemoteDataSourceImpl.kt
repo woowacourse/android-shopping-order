@@ -19,7 +19,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         RetrofitUtil.retrofitCartService
             .postCart(credentials, ProductIdBody(itemId))
             .enqueue(
-                RetrofitUtil.callbackWithNoBody { result ->
+                RetrofitUtil.callbackNullable { result ->
                     result.onSuccess { callback(Result.success(1)) }
                         .onFailure { e -> callback(Result.failure(e)) }
                 }
@@ -30,7 +30,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         RetrofitUtil.retrofitCartService
             .patchCart(itemId, credentials, QuantityBody(quantity))
             .enqueue(
-                RetrofitUtil.callbackWithNoBody { result ->
+                RetrofitUtil.callbackNullable { result ->
                     result.onSuccess { callback(Result.success(quantity)) }
                         .onFailure { e -> callback(Result.failure(e)) }
                 }
@@ -41,7 +41,7 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
         RetrofitUtil.retrofitCartService
             .deleteCart(itemId, credentials)
             .enqueue(
-                RetrofitUtil.callbackWithNoBody { result ->
+                RetrofitUtil.callbackNullable { result ->
                     result.onSuccess { callback(Result.success(0)) }
                         .onFailure { e -> callback(Result.failure(e)) }
                 }
