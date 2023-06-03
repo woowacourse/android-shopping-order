@@ -30,6 +30,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initToolbar()
         initPresenter(savedInstanceState)
         initObserve()
+        initView()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -49,8 +50,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        binding.rvProducts.adapter = adapter
-        binding.rvProducts.itemAnimator = null
     }
 
     private fun initToolbar() {
@@ -66,10 +65,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             ),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
         )
-        presenter.setUpView()
-
-        binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
-        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.navigateToOrder() }
     }
 
     private fun initObserve() {
@@ -94,6 +89,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.allCheck.observe(this) {
             binding.cartBottom.cbCheckAll.isChecked = it
         }
+    }
+
+    private fun initView() {
+        binding.rvProducts.adapter = adapter
+        binding.rvProducts.itemAnimator = null
+
+        presenter.setUpView()
+
+        binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
+        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.navigateToOrder() }
     }
 
     private fun getCartListener() = object : CartListener {

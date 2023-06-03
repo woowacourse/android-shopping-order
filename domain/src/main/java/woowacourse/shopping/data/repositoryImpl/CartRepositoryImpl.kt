@@ -30,7 +30,7 @@ class CartRepositoryImpl(
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
-        return index < cartItems.size / size
+        return index <= cartItems.size / size
     }
 
     override fun hasPrevPage(index: Int, size: Int): Boolean {

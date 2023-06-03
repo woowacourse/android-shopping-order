@@ -43,6 +43,7 @@ class CartPresenter(
     }
 
     private fun setUpCarts() {
+        println(pageUIModel)
         view.setPage(currentPage, pageUIModel)
     }
 
