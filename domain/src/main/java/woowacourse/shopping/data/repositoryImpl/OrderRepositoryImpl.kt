@@ -15,4 +15,8 @@ class OrderRepositoryImpl(
     override fun getOrders(callback: (Result<List<Order>>) -> Unit) {
         orderRemoteDataSource.getOrders(callback)
     }
+
+    override fun getOrder(id: Long, callback: (Result<Order>) -> Unit) {
+        orderRemoteDataSource.getOrder(id, callback)
+    }
 }

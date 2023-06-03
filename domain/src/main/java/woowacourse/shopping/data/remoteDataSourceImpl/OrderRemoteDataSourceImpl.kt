@@ -22,4 +22,9 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 }
             )
     }
+
+    override fun getOrder(id: Long, callback: (Result<Order>) -> Unit) {
+        RetrofitUtil.retrofitOrderService.getOrder(credentials, id)
+            .enqueue(RetrofitUtil.callback(callback))
+    }
 }

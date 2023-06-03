@@ -20,9 +20,7 @@ import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
-import woowacourse.shopping.utils.ActivityUtils
 import woowacourse.shopping.utils.SharedPreferenceUtils
-import woowacourse.shopping.utils.getSerializableExtraCompat
 
 class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.View {
     private lateinit var binding: ActivityDetailedProductBinding
@@ -46,8 +44,6 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
     private fun initPresenter() {
         presenter = DetailedProductPresenter(
             this,
-            intent.getSerializableExtraCompat(KEY_PRODUCT)
-                ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
             productRepository = ProductRepositoryImpl(
                 localDataSource = ProductSqliteDataSource(this),
@@ -58,7 +54,8 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             ),
             recentRepository = RecentRepositoryImpl(
                 localDataSource = RecentSqliteProductDataSource(this)
-            )
+            ),
+            intent.getIntExtra(KEY_PRODUCT_ID, -1)
         )
         binding.presenter = presenter
         presenter.setUpLastProduct()
@@ -108,9 +105,16 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
 
     companion object {
         private const val KEY_PRODUCT = "KEY_PRODUCT"
+        private const val KEY_PRODUCT_ID = "KEY_PRODUCT"
         fun getIntent(context: Context, product: ProductUIModel): Intent {
             return Intent(context, DetailedProductActivity::class.java).apply {
                 putExtra(KEY_PRODUCT, product)
+            }
+        }
+
+        fun getIntent(context: Context, productId: Int): Intent {
+            return Intent(context, DetailedProductActivity::class.java).apply {
+                putExtra(KEY_PRODUCT_ID, productId)
             }
         }
     }

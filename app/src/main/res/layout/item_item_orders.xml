@@ -7,6 +7,10 @@
     <data>
 
         <variable
+            name="onProductClick"
+            type="kotlin.jvm.functions.Function1" />
+
+        <variable
             name="orderItem"
             type="woowacourse.shopping.model.OrderItemUIModel" />
     </data>
@@ -14,7 +18,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="324dp"
-        android:layout_height="118dp">
+        android:layout_height="118dp"
+        android:onClick="@{() -> onProductClick.invoke(orderItem.productId)}">
 
         <TextView
             android:id="@+id/tv_product_title"

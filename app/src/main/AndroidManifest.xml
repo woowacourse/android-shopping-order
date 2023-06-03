@@ -30,6 +30,9 @@
             android:name=".ui.order.OrderActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.orderDetail.OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.orders.OrdersActivity"
             android:exported="true">
             <intent-filter>

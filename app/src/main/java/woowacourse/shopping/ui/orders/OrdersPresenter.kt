@@ -14,4 +14,12 @@ class OrdersPresenter(
                 .onFailure { e -> LogUtil.logError(e) }
         }
     }
+
+    override fun navigateToOrderDetail(orderId: Long) {
+        view.navigateToOrderDetail(orderId)
+    }
+
+    override fun navigateToProductDetail(productId: Int) {
+        view.navigateToProductDetail(productId)
+    }
 }

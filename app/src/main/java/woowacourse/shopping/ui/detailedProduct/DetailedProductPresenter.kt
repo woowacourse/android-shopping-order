@@ -11,14 +11,21 @@ import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(
     private val view: DetailedProductContract.View,
-    private val product: ProductUIModel,
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentRepository: RecentRepository
+    private val recentRepository: RecentRepository,
+    productId: Int
 ) : DetailedProductContract.Presenter {
+    private lateinit var product: ProductUIModel
     private var lastProduct: ProductUIModel? = null
 
+    init {
+        productRepository.findById(productId) { result ->
+            result.onSuccess { product -> this.product = product.toUIModel() }
+                .onFailure { exception -> LogUtil.logError(exception) }
+        }
+    }
     override fun setUpLastProduct() {
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }

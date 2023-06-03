@@ -4,12 +4,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.model.OrderItemUIModel
-import woowacourse.shopping.ui.order.orderProductAdapter.viewHolder.OrderItemViewHolder
+import woowacourse.shopping.ui.orders.orderItemAdapter.viewHolder.OrderItemViewHolder
 
-class OrderItemAdapter :
+class OrderItemAdapter(
+    private val onItemClick: (Int) -> Unit
+) :
     ListAdapter<OrderItemUIModel, OrderItemViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderItemViewHolder {
-        return OrderItemViewHolder.from(parent)
+        return OrderItemViewHolder.from(parent, onItemClick)
     }
 
     override fun onBindViewHolder(holder: OrderItemViewHolder, position: Int) {
