@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
 
 interface CartContract {
 
@@ -25,6 +26,8 @@ interface CartContract {
         fun onOrderSelectedCartItems()
 
         fun onRefresh()
+
+        fun onLoadOrderPriceInfo()
     }
 
     interface View {
@@ -47,5 +50,9 @@ interface CartContract {
         fun setCanOrder(canOrder: Boolean)
 
         fun showOrderResult(orderId: Long)
+
+        fun setCanSeeOrderPriceInfo(canSeeOrderPriceInfo: Boolean)
+
+        fun showOrderPriceInfo(orderPriceInfo: OrderPriceInfoUIState)
     }
 }

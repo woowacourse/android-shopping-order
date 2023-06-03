@@ -152,10 +152,21 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginEnd="10dp"
-                app:layout_constraintEnd_toStartOf="@id/tv_order"
+                app:layout_constraintEnd_toStartOf="@id/btn_order_price_info"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="184,200원" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_order_price_info"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"
+                android:background="@drawable/icon_order_price_info"
+                app:layout_constraintEnd_toStartOf="@id/tv_order"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <TextView
                 android:id="@+id/tv_order"

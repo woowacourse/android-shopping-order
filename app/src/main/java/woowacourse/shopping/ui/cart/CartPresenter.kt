@@ -1,19 +1,25 @@
 package woowacourse.shopping.ui.cart
 
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.discount.DiscountInfoDto
+import woowacourse.shopping.data.discount.DiscountRemoteService
 import woowacourse.shopping.data.order.OrderRemoteService
 import woowacourse.shopping.data.order.OrderRequestBody
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.OrderPriceCalculator
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
 import woowacourse.shopping.utils.UserData
+import java.lang.Integer.max
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
-    private val orderRemoteService: OrderRemoteService
+    private val orderRemoteService: OrderRemoteService,
+    private val discountRemoteService: DiscountRemoteService
 ) : CartContract.Presenter {
 
     private var currentPage: Int = 0
@@ -65,6 +71,7 @@ class CartPresenter(
             showAllSelectionUI(currentPage, selectedCartItems)
             showOrderUI(selectedCartItems)
             view.setCanOrder(selectedCartItems.isNotEmpty())
+            view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
         }
     }
 
@@ -79,6 +86,7 @@ class CartPresenter(
                 updateCartUI()
             }
             view.setCanOrder(selectedCartItems.isNotEmpty())
+            view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
         }
     }
 
@@ -120,7 +128,7 @@ class CartPresenter(
         orderRemoteService.requestToPostOrder(
             "Basic ${UserData.credential}",
             OrderRequestBody(selectedCartItems.map { it.id })
-        ).enqueue(object : retrofit2.Callback<Unit> {
+        ).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful.not()) return
                 val orderId = response.headers()["Location"]
@@ -146,6 +154,29 @@ class CartPresenter(
         }
     }
 
+    override fun onLoadOrderPriceInfo() {
+        val orderPrice =
+            OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+        discountRemoteService.requestDiscountInfo(orderPrice, UserData.grade)
+            .enqueue(object : Callback<DiscountInfoDto> {
+                override fun onResponse(
+                    call: Call<DiscountInfoDto>,
+                    response: Response<DiscountInfoDto>
+                ) {
+                    if (response.isSuccessful.not()) return
+                    val orderPriceInfo = response.body()?.toDomain() ?: return
+                    val orderPriceInfoUIState = OrderPriceInfoUIState.create(
+                        orderPriceInfo,
+                        OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+                    )
+                    view.showOrderPriceInfo(orderPriceInfoUIState)
+                }
+
+                override fun onFailure(call: Call<DiscountInfoDto>, t: Throwable) {
+                }
+            })
+    }
+
     private fun showCartItems(page: Int, selectedCartItems: Set<CartItem>, initScroll: Boolean) {
         getCartItemsOf(page) { cartItems ->
             val cartItemUIStates =
@@ -166,6 +197,27 @@ class CartPresenter(
     }
 
     private fun showOrderUI(selectedCartItems: Set<CartItem>) {
+        val totalPrice =
+            OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+        discountRemoteService.requestDiscountInfo(totalPrice, UserData.grade)
+            .enqueue(object : Callback<DiscountInfoDto> {
+                override fun onResponse(
+                    call: Call<DiscountInfoDto>,
+                    response: Response<DiscountInfoDto>
+                ) {
+                    if (response.isSuccessful.not()) return
+                    val orderPriceInfo = response.body()?.toDomain() ?: return
+                    val orderPrice = orderPriceInfo.discountResults
+                        .map { it.discountPrice }
+                        .fold(totalPrice) { total, discountPrice ->
+                            total - discountPrice
+                        }
+                    view.setOrderPrice(max(0, orderPrice))
+                }
+
+                override fun onFailure(call: Call<DiscountInfoDto>, t: Throwable) {
+                }
+            })
         view.setOrderPrice(OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems))
         view.setOrderCount(selectedCartItems.size)
         view.setCanOrder(selectedCartItems.isNotEmpty())
