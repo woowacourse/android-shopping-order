@@ -95,4 +95,29 @@ class PaymentPresenterTest {
         // then: 받아온 주문 식별번호를 가지고 주문 상세 화면을 보여준다
         verify { view.showOrderDetail(orderId = 1) }
     }
+
+    @Test
+    fun `주문을 추가에 실패한 경우 에러 메시지를 띄운다`() {
+        // given
+        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
+        val errorMessage = "주문 추가에 실패했습니다"
+
+        every {
+            orderRepository.addOrder(
+                basketIds = any(),
+                usingPoint = any(),
+                totalPrice = any(),
+                onAdded = any(),
+                onFailed = capture(slotShowErrorMessage)
+            )
+        } answers {
+            slotShowErrorMessage.captured.invoke(errorMessage)
+        }
+
+        // when: 주문을 추가한다
+        presenter.addOrder(0)
+
+        // then: 받아온 주문 식별번호를 가지고 주문 상세 화면을 보여준다
+        verify { view.showOrderFailedMessage(errorMessage) }
+    }
 }
