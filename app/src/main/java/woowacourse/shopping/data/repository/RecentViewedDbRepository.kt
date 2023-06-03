@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository
 import android.content.Context
 import woowacourse.shopping.data.db.RecentViewedDBHelper
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentViewedRepository
 
 class RecentViewedDbRepository(

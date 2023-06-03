@@ -3,7 +3,6 @@ package woowacourse.shopping.view.orderdetail
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.databinding.ItemOrderDetailProductBinding
-import woowacourse.shopping.databinding.ItemOrderProductBinding
 import woowacourse.shopping.model.OrderDetailProductModel
 
 class OrderProductViewHolder(

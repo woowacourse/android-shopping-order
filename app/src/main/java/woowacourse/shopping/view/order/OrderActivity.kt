@@ -83,7 +83,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         return super.onOptionsItemSelected(item)
     }
 
-
     companion object {
         private const val ORDER_PRODUCTS = "ORDER_PRODUCT"
         fun newIntent(context: Context, selectedCartProduct: List<CartProduct>): Intent {

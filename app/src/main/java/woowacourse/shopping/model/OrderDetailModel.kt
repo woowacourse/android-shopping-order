@@ -1,7 +1,6 @@
 package woowacourse.shopping.model
 
 import woowacourse.shopping.domain.model.OrderDTO
-import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
