@@ -18,6 +18,8 @@ class Cart(products: List<CartProduct> = emptyList()) {
         .filter { it.isPicked }
         .sumOf { it.quantity * it.productPrice }
 
+    fun getPickedProducts(): Cart = Cart(_products.filter { it.isPicked })
+
     fun updatePickedByIndex(cartId: Long, picked: Boolean) {
         val index = getIndexById(cartId)
         _products[index].isPicked = picked
