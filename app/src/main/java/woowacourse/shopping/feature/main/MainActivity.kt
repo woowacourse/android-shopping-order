@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter = MainPresenter(
             ProductRepositoryImpl(productService),
             CartRepositoryImpl(cartProductRemoteService),
-            RecentProductRepositoryImpl(RecentDao(this)),
+            RecentProductRepositoryImpl(RecentDao(this), productService),
         )
     }
 

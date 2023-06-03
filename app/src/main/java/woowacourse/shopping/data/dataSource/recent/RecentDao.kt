@@ -33,9 +33,6 @@ class RecentDao(
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
-                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL)),
-                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_NAME)),
-                cursor.getInt(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRICE)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
             recentlyShownProducts.add(data)
@@ -55,9 +52,6 @@ class RecentDao(
         while (cursor.moveToNext()) {
             val data = RecentProductEntity(
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID)),
-                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL)),
-                cursor.getString(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_NAME)),
-                cursor.getInt(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_RECENT_PRICE)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecentTableContract.TABLE_COLUMN_DATE_TIME)),
             )
             recentlyShownProducts.add(data)
@@ -81,9 +75,6 @@ class RecentDao(
         val timeSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         val values = ContentValues().apply {
             put(RecentTableContract.TABLE_COLUMN_RECENT_PRODUCT_ID, product.id)
-            put(RecentTableContract.TABLE_COLUMN_RECENT_IMAGE_URL, product.imgUrl)
-            put(RecentTableContract.TABLE_COLUMN_RECENT_NAME, product.name)
-            put(RecentTableContract.TABLE_COLUMN_RECENT_PRICE, product.price.value)
             put(RecentTableContract.TABLE_COLUMN_DATE_TIME, timeSecond)
         }
         writableDatabase.insert(RecentTableContract.TABLE_NAME, null, values)
@@ -99,6 +90,6 @@ class RecentDao(
 
     companion object {
         private const val DB_NAME = "recent_db"
-        private const val VERSION = 2
+        private const val VERSION = 3
     }
 }

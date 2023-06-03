@@ -33,18 +33,6 @@ class OrderConfirmPresenter(
         )
     }
 
-    override fun requestOrder() {
-        orderRepository.addOrder(
-            cartIds,
-            paymentPrice,
-            onSuccess = {
-                view.showOrderSuccess(cartIds)
-                view.exitScreen()
-            },
-            onFailure = { view.showOrderFailed() }
-        )
-    }
-
     private fun payInfo(cartProducts: List<CartProduct>) {
         val originPrice = cartProducts.sumOf { it.count * it.product.price.value }
         val paymentInfo = moneySalePolicy.saleApply(cartProducts)
@@ -59,6 +47,18 @@ class OrderConfirmPresenter(
         }
         view.setPayInfo(originPrice, originPrice - paymentPrice)
         view.setFinalPayInfo(paymentPrice)
+    }
+
+    override fun requestOrder() {
+        orderRepository.addOrder(
+            cartIds,
+            paymentPrice,
+            onSuccess = {
+                view.showOrderSuccess(cartIds)
+                view.exitScreen()
+            },
+            onFailure = { view.showOrderFailed() }
+        )
     }
 
     companion object {

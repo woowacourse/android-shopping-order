@@ -70,8 +70,13 @@ class MainPresenter(
     }
 
     override fun loadRecentProducts() {
-        val recentProductUiModels = recentProductRepository.getAll().map { it.toPresentation() }
-        _recentProducts.postValue(recentProductUiModels)
+        recentProductRepository.getAll(
+            onSuccess = { recentProducts ->
+                val recentProductUiModels = recentProducts.map { it.toPresentation() }
+                _recentProducts.postValue(recentProductUiModels)
+            },
+            onFailure = {}
+        )
     }
 
     override fun showCartCount() {
@@ -84,9 +89,14 @@ class MainPresenter(
             onSuccess = { product ->
                 val productUiModel = product.toPresentation()
                 val recentProduct = _recentProducts.value?.firstOrNull()
-                recentProductRepository.addRecentProduct(productUiModel.toDomain())
-                _mainScreenEvent.postValue(
-                    MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct)
+                recentProductRepository.addRecentProduct(
+                    productUiModel.toDomain(),
+                    onSuccess = {
+                        _mainScreenEvent.postValue(
+                            MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct)
+                        )
+                    },
+                    onFailure = {}
                 )
             },
             onFailure = {}

@@ -51,10 +51,11 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     }
 
     private fun initPresenter(productId: Long, recentProductUiModel: RecentProductUiModel?) {
+        val productService = ApiModule.createProductService()
         presenter = DetailPresenter(
             this,
             ProductRepositoryImpl(ApiModule.createProductService()),
-            RecentProductRepositoryImpl(RecentDao(this)),
+            RecentProductRepositoryImpl(RecentDao(this), productService),
             CartRepositoryImpl(ApiModule.createCartService()),
             productId,
             recentProductUiModel,
