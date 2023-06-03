@@ -5,7 +5,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.retrofit.ProductApi
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -35,24 +34,6 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
                     failureCallback(t.message)
                 }
             })
-    }
-
-    override fun getProductsById(ids: List<Int>, callback: (List<Product>) -> Unit) {
-        retrofitService.requestProducts().enqueue(object : retrofit2.Callback<List<Product>> {
-            override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
-                if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
-                    return
-                }
-                response.body()?.let { products ->
-                    callback(ids.map { id -> products.first { product -> product.id == id } })
-                }
-            }
-
-            override fun onFailure(call: Call<List<Product>>, t: Throwable) {
-                failureCallback(t.message)
-            }
-        })
     }
 
     override fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit) {

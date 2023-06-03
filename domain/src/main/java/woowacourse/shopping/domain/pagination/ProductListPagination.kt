@@ -14,7 +14,7 @@ class ProductListPagination(
 
     override fun fetchNextItems(callback: (List<ProductWithCartInfo>) -> Unit) {
         productRepository.getProductsByRange(lastId, rangeSize) {
-            lastId = it.products.last().product.id
+            lastId = it.products.lastOrNull()?.product?.id ?: 0
             _isNextEnabled = !it.last
             callback(it.products)
         }
