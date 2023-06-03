@@ -57,7 +57,12 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
     override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {
         retrofitService.requestOrderCartItems(cartProducts).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (!response.isSuccessful) {
+                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    return
+                }
                 Log.d("LOGAN", response.headers().toString())
+                Log.d("LOGAN", response.toString())
                 callback(response.headers()["Location"]?.substringAfterLast("/")?.toInt())
             }
 
@@ -65,5 +70,9 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
                 failureCallback(t.message)
             }
         })
+    }
+
+    companion object {
+        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

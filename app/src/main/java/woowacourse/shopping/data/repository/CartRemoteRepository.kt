@@ -24,6 +24,10 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
                 call: Call<List<CartProduct>>,
                 response: Response<List<CartProduct>>,
             ) {
+                if (!response.isSuccessful) {
+                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    return
+                }
                 response.body()?.let { cartProducts ->
                     callback(cartProducts)
                 }
@@ -39,6 +43,10 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
         retrofitService.requestInsertCart(RequestInsertBody(productId, quantity))
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
                     val cartId = response.headers()["Location"]?.substringAfterLast("/")?.toInt()
                     callback(cartId ?: -1)
                 }
@@ -53,6 +61,10 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
         retrofitService.requestUpdateCart(cartId, quantity)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
                     callback(response.isSuccessful)
                 }
 
@@ -65,6 +77,10 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
     override fun remove(cartId: Int, callback: (Boolean) -> Unit) {
         retrofitService.requestDeleteCart(cartId).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (!response.isSuccessful) {
+                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    return
+                }
                 callback(response.isSuccessful)
             }
 
@@ -72,5 +88,9 @@ class CartRemoteRepository(serverRepository: ServerStoreRespository, private val
                 failureCallback(t.message)
             }
         })
+    }
+
+    companion object {
+        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

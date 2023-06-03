@@ -20,6 +20,10 @@ class MypageRemoteRepository(serverRepository: ServerStoreRespository, private v
         retrofitService.requestCash().enqueue(object : retrofit2.Callback<TotalCashDTO> {
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
                     callback(it.totalCash)
                 }
             }
@@ -34,6 +38,10 @@ class MypageRemoteRepository(serverRepository: ServerStoreRespository, private v
         retrofitService.requestChargeCash(cash).enqueue(object : retrofit2.Callback<TotalCashDTO> {
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
                     callback(it.totalCash)
                 }
             }
@@ -42,5 +50,8 @@ class MypageRemoteRepository(serverRepository: ServerStoreRespository, private v
                 failureCallback(t.message)
             }
         })
+    }
+    companion object {
+        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

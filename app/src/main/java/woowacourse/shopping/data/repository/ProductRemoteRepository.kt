@@ -22,6 +22,10 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
         retrofitService.requestProductsByRange(lastId, pageItemCount)
             .enqueue(object : retrofit2.Callback<ProductsWithCartItemDTO> {
                 override fun onResponse(call: Call<ProductsWithCartItemDTO>, response: Response<ProductsWithCartItemDTO>) {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
                     response.body()?.let {
                         callback(it)
                     }
@@ -36,6 +40,10 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
     override fun getProductsById(ids: List<Int>, callback: (List<Product>) -> Unit) {
         retrofitService.requestProducts().enqueue(object : retrofit2.Callback<List<Product>> {
             override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
+                if (!response.isSuccessful) {
+                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    return
+                }
                 response.body()?.let { products ->
                     callback(ids.map { id -> products.first { product -> product.id == id } })
                 }
@@ -53,6 +61,10 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
                 call: Call<ProductWithCartInfo>,
                 response: Response<ProductWithCartInfo>,
             ) {
+                if (!response.isSuccessful) {
+                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    return
+                }
                 response.body()?.let { productWithCartInfo ->
                     callback(productWithCartInfo)
                 }
@@ -62,5 +74,8 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
                 failureCallback(t.message)
             }
         })
+    }
+    companion object {
+        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }
