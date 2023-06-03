@@ -1,14 +1,12 @@
 package woowacourse.shopping.data.datasource.basket
 
 import okhttp3.ResponseBody
-import woowacourse.shopping.data.NetworkModule
+import woowacourse.shopping.data.NetworkModule.basketProductService
 import woowacourse.shopping.data.model.BasketProductEntity
 import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
-
-    private val basketProductService: BasketProductService = NetworkModule.getService()
 
     override fun getAll(
         onReceived: (List<BasketProductEntity>) -> Unit,

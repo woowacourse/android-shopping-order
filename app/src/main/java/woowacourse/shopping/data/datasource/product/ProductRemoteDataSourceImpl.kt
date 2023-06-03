@@ -1,12 +1,10 @@
 package woowacourse.shopping.data.datasource.product
 
-import woowacourse.shopping.data.NetworkModule
+import woowacourse.shopping.data.NetworkModule.productService
 import woowacourse.shopping.data.model.ProductEntity
 import java.lang.Integer.min
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
-
-    private val productService: ProductService = NetworkModule.getService()
 
     override fun getPartially(
         size: Int,

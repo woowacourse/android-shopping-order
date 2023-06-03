@@ -2,14 +2,12 @@ package woowacourse.shopping.data.datasource.order
 
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.data.NetworkModule
+import woowacourse.shopping.data.NetworkModule.orderService
 import woowacourse.shopping.data.datasource.request.OrderRequest
 import woowacourse.shopping.data.datasource.response.OrderResponse
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-
-    private val orderService: OrderService = NetworkModule.getService()
 
     override fun addOrder(
         orderRequest: OrderRequest,

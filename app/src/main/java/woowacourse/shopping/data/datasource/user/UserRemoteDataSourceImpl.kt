@@ -2,13 +2,11 @@ package woowacourse.shopping.data.datasource.user
 
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.data.NetworkModule
+import woowacourse.shopping.data.NetworkModule.userService
 import woowacourse.shopping.data.datasource.response.UserResponse
 import woowacourse.shopping.data.remote.OkHttpModule
 
 class UserRemoteDataSourceImpl : UserRemoteDataSource {
-
-    private val userService = NetworkModule.getService<UserService>()
 
     override fun getUser(
         onReceived: (user: UserResponse) -> Unit,
