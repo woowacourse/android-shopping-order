@@ -7,8 +7,9 @@ import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.OrderRequestDto
 import woowacourse.shopping.data.dto.OrderResponseDto
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.mapper.toDto
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil
-import woowacourse.shopping.domain.model.OrderItems
+import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
 class OrderDataSourceImpl : OrderDataSource {
@@ -17,11 +18,11 @@ class OrderDataSourceImpl : OrderDataSource {
 
     override fun orderProducts(
         token: String,
-        orderItems: OrderItems,
+        orderRequest: OrderRequest,
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.orderProducts(token, orderItems)
+        val call = retrofitService.orderProducts(token, orderRequest.toDto())
         call.enqueue(object : retrofit2.Callback<OrderRequestDto> {
             override fun onResponse(call: Call<OrderRequestDto>, response: Response<OrderRequestDto>) {
                 if (response.isSuccessful) {
@@ -32,7 +33,7 @@ class OrderDataSourceImpl : OrderDataSource {
             }
 
             override fun onFailure(call: Call<OrderRequestDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패 ${t.message}")
+                Log.d("test", "onFailure retrofit 실패 ${t.message}")
                 onFailure()
             }
         })

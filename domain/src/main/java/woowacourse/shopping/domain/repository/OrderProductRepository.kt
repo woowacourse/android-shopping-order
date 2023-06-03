@@ -1,11 +1,11 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.OrderItems
+import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
 interface OrderProductRepository {
     fun orderProduct(
-        orderItems: OrderItems,
+        orderRequest: OrderRequest,
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
     )

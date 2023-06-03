@@ -11,7 +11,8 @@ interface OrderContract {
         fun watchUsedPoints()
         fun showTotalPayment(totalPayment: UiPrice)
         fun showFinalPayment(finalPayment: UiPrice)
-        fun navigateToHome()
+        fun onOrderClickListener()
+        fun navigateToHome(orderedProductCount: Int)
     }
 
     abstract class Presenter(protected val view: View) {

@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
 class OrderRequest(
-    val orderItems: OrderItems,
+    val orderItems: List<OrderItems>,
     val payment: Payment,
 )

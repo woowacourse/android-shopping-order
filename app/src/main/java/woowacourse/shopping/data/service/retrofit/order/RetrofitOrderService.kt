@@ -8,13 +8,12 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.dto.OrderRequest
 import woowacourse.shopping.data.dto.OrderResponse
-import woowacourse.shopping.domain.model.OrderItems
 
 interface RetrofitOrderService {
     @POST("/orders")
     fun orderProducts(
         @Header("Authorization") token: String,
-        @Body orderItems: OrderItems,
+        @Body orderRequest: OrderRequest,
     ): Call<OrderRequest>
 
     @GET("/orders")

@@ -61,7 +61,6 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
     }
 
     override fun showOrderComplete(cartProducts: List<CartProduct>, productCount: Int) {
-        showToast(getString(R.string.order_success_message, productCount))
         navigateToOrder(cartProducts)
     }
 

@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.model.UiCartProduct
@@ -19,6 +21,7 @@ import woowacourse.shopping.ui.order.main.recyclerview.adapter.OrderAdapter
 import woowacourse.shopping.util.bindingadapter.setDiscount
 import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
+import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectOrderPresenter
 
 class OrderActivity : AppCompatActivity(), View {
@@ -39,6 +42,7 @@ class OrderActivity : AppCompatActivity(), View {
         presenter.loadAvailablePoints()
         presenter.loadPayment()
         watchUsedPoints()
+        onOrderClickListener()
     }
 
     private fun setActionBar() {
@@ -83,12 +87,22 @@ class OrderActivity : AppCompatActivity(), View {
         binding.finalPrice = finalPayment
     }
 
+    override fun onOrderClickListener() {
+        binding.orderBtn.setOnClickListener {
+            Log.d("test", "onOrderClickListener 호출")
+            presenter.order()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         presenter.navigateToHome(item.itemId)
         return super.onOptionsItemSelected(item)
     }
 
-    override fun navigateToHome() {
+    override fun navigateToHome(orderedProductCount: Int) {
+        if (orderedProductCount > 0) {
+            showToast(getString(R.string.order_success_message, orderedProductCount))
+        }
         finish()
     }
 

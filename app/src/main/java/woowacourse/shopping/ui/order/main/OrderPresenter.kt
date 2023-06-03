@@ -1,5 +1,8 @@
 package woowacourse.shopping.ui.order.main
 
+import woowacourse.shopping.domain.model.OrderItems
+import woowacourse.shopping.domain.model.OrderRequest
+import woowacourse.shopping.domain.model.Payment
 import woowacourse.shopping.domain.repository.OrderProductRepository
 import woowacourse.shopping.domain.repository.PointRepository
 import woowacourse.shopping.model.UiCartProduct
@@ -42,12 +45,20 @@ class OrderPresenter(
     }
 
     override fun order() {
+        val orderItems = mutableListOf<OrderItems>()
+        cartProducts.forEach { orderItems.add(OrderItems(it.id)) }
+        val payment = Payment(originalPayment, finalPayment, discountPayment)
+        orderProductRepository.orderProduct(
+            orderRequest = OrderRequest(orderItems.toList(), payment),
+            onSuccess = { view.navigateToHome(cartProducts.sumOf { it.selectedCount.value }) },
+            onFailure = { },
+        )
     }
 
     override fun navigateToHome(itemId: Int) {
         when (itemId) {
             android.R.id.home -> {
-                view.navigateToHome()
+                view.navigateToHome(0)
             }
         }
     }

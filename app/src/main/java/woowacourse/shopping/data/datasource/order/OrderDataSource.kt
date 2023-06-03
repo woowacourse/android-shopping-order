@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.datasource.order
 
-import woowacourse.shopping.domain.model.OrderItems
+import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
 interface OrderDataSource {
     fun orderProducts(
         token: String,
-        orderItems: OrderItems,
+        orderRequest: OrderRequest,
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
     )

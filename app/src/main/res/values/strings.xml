@@ -46,10 +46,10 @@
     <string name="available_point_description">사용 가능한 포인트</string>
     <string name="use_to_point_description">사용 할 포인트</string>
     <string name="point_text">포인트</string>
-    <string name="point_format">%d p</string>
+    <string name="point_format">%,d p</string>
     <string name="tv_order">Order</string>
     <string name="count_text">%d개</string>
-    <string name="discount_text">- %d원</string>
+    <string name="discount_text">- %,d원</string>
     <string name="default_discount_value">- 0원</string>
     <string name="default_final_payment">0원</string>
     <string name="hint_discount_payment">1000p</string>
