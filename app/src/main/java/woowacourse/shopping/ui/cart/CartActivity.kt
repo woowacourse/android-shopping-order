@@ -119,6 +119,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
         override fun onItemCheckChanged(productId: Int, checked: Boolean) {
             presenter.updateItemCheck(productId, checked)
+            println("onItemCheckChanged: $productId, $checked")
         }
     }
 

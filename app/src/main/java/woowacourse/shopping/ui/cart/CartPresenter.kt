@@ -43,7 +43,6 @@ class CartPresenter(
     }
 
     private fun setUpCarts() {
-        println(pageUIModel)
         view.setPage(currentPage, pageUIModel)
     }
 
@@ -70,9 +69,9 @@ class CartPresenter(
 
     override fun setUpProductsCheck(checked: Boolean) {
         if (isChangingItemCheck) { return }
-        currentPage.replaceAll {
+        currentPage.map {
             cartRepository.updateChecked(it.id, checked)
-            it.copy(checked = checked)
+            updateItemCheck(it.id, checked)
         }
         setUpCarts()
     }
