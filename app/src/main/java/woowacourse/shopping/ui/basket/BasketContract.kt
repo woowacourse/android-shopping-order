@@ -22,6 +22,8 @@ interface BasketContract {
 
         fun updateSkeletonState(isLoaded: Boolean)
 
+        fun updateOrderButtonState(isAvailable: Boolean)
+
         fun showPaymentView(basketProducts: List<BasketProductUiModel>, totalPrice: Int)
 
         fun showErrorMessage(errorMessage: String)

@@ -47,6 +47,7 @@ class BasketPresenter(
     override fun updateBasketProductCheckState(basketProduct: BasketProduct) {
         basket.updateCheck(basketProduct)
         updateOrderInformation()
+        updateStateToOrder()
         view.updateTotalCheckBox(getTotalIsChecked())
     }
 
@@ -135,6 +136,12 @@ class BasketPresenter(
                 view.showErrorMessage(errorMessage)
             }
         )
+    }
+
+    private fun updateStateToOrder() {
+        val hasCheckedProduct = basket.products.any { it.checked }
+
+        view.updateOrderButtonState(hasCheckedProduct)
     }
 
     private fun amendStartId() {

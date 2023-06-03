@@ -115,6 +115,10 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         binding.isLoaded = isLoaded
     }
 
+    override fun updateOrderButtonState(isAvailable: Boolean) {
+        binding.btnOrder.isEnabled = isAvailable
+    }
+
     override fun showPaymentView(
         basketProducts: List<BasketProductUiModel>,
         totalPrice: Int,
@@ -136,7 +140,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
     }
 
     private fun initOrderButtonListener() {
-        binding.tvOrder.setOnClickListener {
+        binding.btnOrder.setOnClickListener {
             presenter.startPayment()
         }
     }
