@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.cash
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -16,7 +15,7 @@ class CashRemoteDataSource(
         .build()
         .create(CashRetrofitService::class.java)
 
-    override fun getCash(callback: (Int) -> Unit) {
+    override fun loadCash(callback: (Int) -> Unit) {
         retrofitService.getCash(userId)
             .enqueue(
                 object : retrofit2.Callback<TotalCash> {
@@ -41,7 +40,6 @@ class CashRemoteDataSource(
                         call: Call<TotalCash>,
                         response: Response<TotalCash>,
                     ) {
-                        Log.d("asdf", response.body().toString())
                         val totalCash = response.body()?.totalCash ?: 0
                         callback(totalCash)
                     }

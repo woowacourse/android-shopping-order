@@ -7,7 +7,6 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface CashRetrofitService {
-
     @POST("/members/cash")
     fun chargeCash(
         @Header("Authorization") authorization: String,
