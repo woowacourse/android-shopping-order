@@ -86,7 +86,11 @@ class ProductDetailPresenter(
 
     private fun updateCurrentProduct() {
         basketRepository.update(
-            getAddableCurrentProduct()
+            basketProduct = getAddableCurrentProduct(),
+            onUpdated = {},
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
         )
     }
 

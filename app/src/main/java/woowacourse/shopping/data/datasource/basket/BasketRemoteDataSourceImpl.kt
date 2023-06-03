@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.basket
 
-import android.util.Log
 import okhttp3.ResponseBody
 import woowacourse.shopping.data.NetworkModule
 import woowacourse.shopping.data.model.BasketProductEntity
@@ -64,7 +63,11 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         })
     }
 
-    override fun update(basketProduct: BasketProductEntity) {
+    override fun update(
+        basketProduct: BasketProductEntity,
+        onUpdated: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
         basketProductService.updateBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
@@ -75,37 +78,48 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
             ) {
-                Log.d("woogi", "onResponse: 수량 변경에 성공했습니다.")
+                if (response.isSuccessful) {
+                    onUpdated()
+                } else {
+                    onFailed(FAILED_TO_UPDATE_COUNT)
+                }
             }
 
             override fun onFailure(
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 t: Throwable,
             ) {
-                Log.d("woogi", "onFailure: ${t.message}")
-                Log.d("woogi", "onResponse: 수량 변경에 실패했습니다.")
+                onFailed(FAILED_TO_UPDATE_COUNT)
             }
         })
     }
 
-    override fun remove(basketProduct: BasketProductEntity) {
+    override fun remove(
+        basketProduct: BasketProductEntity,
+        onRemoved: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
         basketProductService.removeBasketProduct(
             authorization = OkHttpModule.AUTHORIZATION_FORMAT.format(OkHttpModule.encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
         ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
+
             override fun onResponse(
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
             ) {
-                Log.d("woogi", "onResponse: 상품 삭제에 성공했습니다.")
+                if (response.isSuccessful) {
+                    onRemoved()
+                } else {
+                    onFailed(FAILED_TO_REMOVE_PRODUCT)
+                }
             }
 
             override fun onFailure(
                 call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
                 t: Throwable,
             ) {
-                Log.d("woogi", "onFailure: ${t.message}")
-                Log.d("woogi", "onResponse: 상품 삭제에 실패했습니다.")
+                onFailed(FAILED_TO_REMOVE_PRODUCT)
             }
         })
     }
@@ -114,5 +128,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         private const val LOCATION = "Location"
         private const val BASKET_PRODUCTS_ERROR = "장바구니 상품을 불러올 수 없습니다."
         private const val FAILED_TO_ADD_BASKET = "장바구니 상품을 불러올 수 없습니다."
+        private const val FAILED_TO_UPDATE_COUNT = "장바구니 상품의 수량을 변경에 실패했습니다."
+        private const val FAILED_TO_REMOVE_PRODUCT = "장바구니 상품 삭제에 실패했습니다."
     }
 }

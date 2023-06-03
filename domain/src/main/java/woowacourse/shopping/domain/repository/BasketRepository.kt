@@ -13,10 +13,18 @@ interface BasketRepository {
     fun add(
         product: Product,
         onAdded: (Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit
+        onFailed: (errorMessage: String) -> Unit,
     )
 
-    fun update(basketProduct: BasketProduct)
+    fun update(
+        basketProduct: BasketProduct,
+        onUpdated: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    )
 
-    fun remove(basketProduct: BasketProduct)
+    fun remove(
+        basketProduct: BasketProduct,
+        onRemoved: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    )
 }

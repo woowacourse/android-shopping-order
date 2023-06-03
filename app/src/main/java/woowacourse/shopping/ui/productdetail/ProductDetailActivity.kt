@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -54,7 +55,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         currentProduct: ProductUiModel,
         minusClickListener: () -> Unit,
         plusClickListener: () -> Unit,
-        updateBasketProduct: () -> Unit
+        updateBasketProduct: () -> Unit,
     ) {
         dialogViewBinding = DialogProductDetailBinding.inflate(layoutInflater)
         alertDialog = AlertDialog.Builder(this)
@@ -71,6 +72,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     override fun updateProductCount(count: Int) {
         dialogViewBinding.dialogCounter.count = count
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        val intent = ShoppingActivity.getIntent(this).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        startActivity(intent)
     }
 
     private fun initPreviousProductClickListener() {
@@ -126,7 +136,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             currentProduct: ProductUiModel,
             currentProductBasketId: Int? = null,
             previousProduct: ProductUiModel?,
-            previousProductBasketId: Int? = null
+            previousProductBasketId: Int? = null,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(CURRENT_PRODUCT_KEY, currentProduct)

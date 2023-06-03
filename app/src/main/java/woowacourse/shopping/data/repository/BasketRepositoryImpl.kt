@@ -38,11 +38,29 @@ class BasketRepositoryImpl(
         )
     }
 
-    override fun update(basketProduct: BasketProduct) {
-        basketRemoteDataSource.update(basketProduct.toBasketProductEntity())
+    override fun update(
+        basketProduct: BasketProduct,
+        onUpdated: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
+        basketRemoteDataSource.update(
+            basketProduct = basketProduct.toBasketProductEntity(),
+            onUpdated = onUpdated,
+            onFailed = onFailed
+        )
     }
 
-    override fun remove(basketProduct: BasketProduct) {
-        basketRemoteDataSource.remove(basketProduct.toBasketProductEntity())
+    override fun remove(
+        basketProduct: BasketProduct,
+        onRemoved: () -> Unit,
+        onFailed: (errorMessage: String) -> Unit,
+    ) {
+        basketRemoteDataSource.remove(
+            basketProduct = basketProduct.toBasketProductEntity(),
+            onRemoved = onRemoved,
+            onFailed = { errorMessage ->
+                onFailed(errorMessage)
+            }
+        )
     }
 }

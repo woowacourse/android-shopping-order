@@ -78,26 +78,38 @@ class ShoppingPresenter(
 
     override fun plusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
+            basketProduct = basket.getProductByProductId(product.id)?.plusCount()
+                ?: throw IllegalStateException(
+                    NOT_EXIST_PRODUCT_ERROR
+                ),
+            onUpdated = {
+                basket = basket.plus(BasketProduct(count = Count(1), product = product))
+                fetchBasketCount()
+                fetchTotalBasketCount()
+                view.updateProducts(totalProducts)
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
         )
-        basket = basket.plus(BasketProduct(count = Count(1), product = product))
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
     }
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
+            basketProduct = basket.getProductByProductId(product.id)?.minusCount()
+                ?: throw IllegalStateException(
+                    NOT_EXIST_PRODUCT_ERROR
+                ),
+            onUpdated = {
+                basket = basket.minus(BasketProduct(count = Count(1), product = product))
+                fetchBasketCount()
+                fetchTotalBasketCount()
+                view.updateProducts(totalProducts)
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
         )
-        basket = basket.minus(BasketProduct(count = Count(1), product = product))
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
     }
 
     override fun addBasketProduct(product: Product) {

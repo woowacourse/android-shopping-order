@@ -60,22 +60,34 @@ class BasketPresenter(
 
     override fun plusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
+            basketProduct = basket.getProductByProductId(product.id)?.plusCount()
+                ?: throw IllegalStateException(
+                    NOT_EXIST_PRODUCT_ERROR
+                ),
+            onUpdated = {
+                basket = basket.plus(BasketProduct(count = Count(1), product = product))
+                updateBasketProductViewData()
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
         )
-        basket = basket.plus(BasketProduct(count = Count(1), product = product))
-        updateBasketProductViewData()
     }
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
+            basketProduct = basket.getProductByProductId(product.id)?.minusCount()
+                ?: throw IllegalStateException(
+                    NOT_EXIST_PRODUCT_ERROR
+                ),
+            onUpdated = {
+                basket = basket.minus(BasketProduct(count = Count(1), product = product))
+                updateBasketProductViewData()
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
         )
-        basket = basket.minus(BasketProduct(count = Count(1), product = product))
-        updateBasketProductViewData()
     }
 
     override fun updateBasketProducts() {
@@ -112,10 +124,17 @@ class BasketPresenter(
     override fun deleteBasketProduct(
         product: BasketProductUiModel,
     ) {
-        basketRepository.remove(product.toBasketProductDomainModel())
-        basket = basket.remove(product.toBasketProductDomainModel())
-        amendStartId()
-        updateBasketProductViewData()
+        basketRepository.remove(
+            basketProduct = product.toBasketProductDomainModel(),
+            onRemoved = {
+                basket = basket.remove(product.toBasketProductDomainModel())
+                amendStartId()
+                updateBasketProductViewData()
+            },
+            onFailed = { errorMessage ->
+                view.showErrorMessage(errorMessage)
+            }
+        )
     }
 
     private fun amendStartId() {
