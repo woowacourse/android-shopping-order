@@ -1,6 +1,6 @@
 package woowacourse.shopping.feature.payment
 
-import com.example.domain.model.OrderItem
+import com.example.domain.model.OrderProduct
 import com.example.domain.model.Point
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.OrderRepository
@@ -15,20 +15,20 @@ class PaymentPresenter(
     private val orderRepository: OrderRepository
 ) : PaymentContract.Presenter {
 
-    private lateinit var orderItems: List<OrderItem>
+    private lateinit var orderProducts: List<OrderProduct>
     private lateinit var point: Point
 
     override fun loadCartProducts(cartProductIds: List<Int>) {
         val cartProducts = mutableListOf<CartProductUiModel>()
-        val orders = mutableListOf<OrderItem>()
+        val orders = mutableListOf<OrderProduct>()
         val all = cartRepository.getAll()
         cartProductIds.forEach { id ->
             all.findById(id)?.let {
                 cartProducts.add(it.toPresentation())
-                orders.add(OrderItem(it.product.id.toInt(), it.count))
+                orders.add(OrderProduct(it.count, it.product))
             }
         }
-        orderItems = orders
+        orderProducts = orders
         view.showCartProducts(cartProducts.toList())
     }
 
@@ -38,7 +38,7 @@ class PaymentPresenter(
     }
 
     override fun placeOrder(usedPoint: Int) {
-        orderRepository.placeOrder(usedPoint, orderItems)
+        orderRepository.placeOrder(usedPoint, orderProducts)
         view.showPaymentDoneScreen()
     }
 

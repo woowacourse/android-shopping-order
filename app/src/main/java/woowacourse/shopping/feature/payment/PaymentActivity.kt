@@ -14,7 +14,7 @@ import woowacourse.shopping.data.datasource.remote.RetrofitClient
 import woowacourse.shopping.data.datasource.remote.cart.CartApi
 import woowacourse.shopping.data.datasource.remote.cart.CartRetrofitService
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.repository.order.OrderMockRepository
+import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.model.CartProductUiModel
@@ -46,7 +46,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
             this,
             CartRepositoryImpl(CartRetrofitService(cartApi)),
             PointRepositoryImpl(),
-            OrderMockRepository()
+            OrderRepositoryImpl()
         )
     }
 

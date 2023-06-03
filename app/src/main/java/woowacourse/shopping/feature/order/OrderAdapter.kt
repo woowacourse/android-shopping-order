@@ -9,7 +9,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderBinding
 import woowacourse.shopping.model.OrderUiModel
 
-class OrderAdapter() : ListAdapter<OrderUiModel, OrderViewHolder>(diffUtil) {
+class OrderAdapter(
+    private val onClick: (Int) -> Unit
+) : ListAdapter<OrderUiModel, OrderViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
         val binding = DataBindingUtil.inflate<ItemOrderBinding>(
@@ -18,7 +20,7 @@ class OrderAdapter() : ListAdapter<OrderUiModel, OrderViewHolder>(diffUtil) {
             parent,
             false
         )
-        return OrderViewHolder(binding)
+        return OrderViewHolder(binding, onClick)
     }
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {

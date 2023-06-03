@@ -3,9 +3,10 @@ package woowacourse.shopping.feature.order
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
-import woowacourse.shopping.data.repository.order.OrderMockRepository
+import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.common.load.LoadAdapter
+import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
 import woowacourse.shopping.model.OrderUiModel
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -33,21 +34,21 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initAdapter() {
-        orderAdapter = OrderAdapter()
+        orderAdapter = OrderAdapter { showOrderDetailScreen(it) }
         loadAdapter = LoadAdapter { presenter.loadOrders() }
 
         binding.recyclerview.adapter = concatAdapter
     }
 
     private fun initPresenter() {
-        presenter = OrderPresenter(this, OrderMockRepository())
+        presenter = OrderPresenter(this, OrderRepositoryImpl())
     }
 
     override fun showOrders(orders: List<OrderUiModel>) {
         orderAdapter.submitList(orders)
     }
 
-    override fun showOrderDetailScreen(orderId: Int) {
-        TODO("Not yet implemented")
+    private fun showOrderDetailScreen(orderId: Int) {
+        startActivity(OrderDetailActivity.getIntent(this, orderId))
     }
 }

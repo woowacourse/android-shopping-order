@@ -29,4 +29,8 @@
     <string name="use_all">전액 사용</string>
     <string name="current_point">보유 포인트: %,d원</string>
     <string name="final_pay_amount">%,d원 결제하기</string>
+    <string name="point_used">사용한 포인트</string>
+    <string name="order_history">주문 내역</string>
+    <string name="payment_info">결제 정보</string>
+    <string name="order_at">주문 일시</string>
 </resources>

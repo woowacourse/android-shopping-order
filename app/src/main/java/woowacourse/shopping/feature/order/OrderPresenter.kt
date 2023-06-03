@@ -23,8 +23,4 @@ class OrderPresenter(
             onFailure = {}
         )
     }
-
-    override fun moveToOrderDetail(orderId: Int) {
-        view.showOrderDetailScreen(orderId)
-    }
 }
