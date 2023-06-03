@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
@@ -21,6 +22,7 @@ import woowacourse.shopping.presentation.ui.home.adapter.GridWeightLookedUp
 import woowacourse.shopping.presentation.ui.home.adapter.HomeAdapter
 import woowacourse.shopping.presentation.ui.home.adapter.ProductClickListener
 import woowacourse.shopping.presentation.ui.home.adapter.RecentlyViewedProductAdapter
+import woowacourse.shopping.presentation.ui.myPage.MyPageActivity
 import woowacourse.shopping.presentation.ui.productDetail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shoppingCart.ShoppingCartActivity
 
@@ -56,6 +58,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         startSkeletonAnim()
         initLayoutManager()
         clickShoppingCart()
+        clickMyPage()
         presenter.setHome()
     }
 
@@ -136,5 +139,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         if (size == 0) binding.textHomeCartSize.visibility = View.GONE
         if (size == 1) binding.textHomeCartSize.visibility = View.VISIBLE
         binding.textHomeCartSize.text = size.toString()
+    }
+
+    private fun clickMyPage() {
+        binding.buttonHomeMyPage.setOnClickListener {
+            startActivity(Intent(this, MyPageActivity::class.java))
+        }
     }
 }
