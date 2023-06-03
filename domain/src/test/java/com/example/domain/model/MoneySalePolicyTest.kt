@@ -23,7 +23,7 @@ internal class MoneySalePolicyTest {
     }
 
     @Test
-    fun `saleApply_구입 금액이 3만원 이상이면_3000원 할인 된다`() {
+    fun `saleApply_구입 금액이 3만원 이상이면_2000원 할인 된다`() {
         // given 총 30000원의 장바구니 상품들이 준비되어 있다
         val moneySalePolicy = MoneySalePolicy()
         val cartProducts = listOf(
@@ -36,12 +36,12 @@ internal class MoneySalePolicyTest {
         val actual = moneySalePolicy.saleApply(cartProducts)
 
         // then
-        val expected = Price((2000 * 1 + 5000 * 2 + 6000 * 3) - 3000)
+        val expected = Price((2000 * 1 + 5000 * 2 + 6000 * 3) - 2000)
         assertEquals(expected, actual.second)
     }
 
     @Test
-    fun `saleApply_구입 금액이 5만원 이상이면_3000원 할인 된다`() {
+    fun `saleApply_구입 금액이 5만원 이상이면_5000원 할인 된다`() {
         // given 총 54000원의 장바구니 상품들이 준비되어 있다
         val moneySalePolicy = MoneySalePolicy()
         val cartProducts = listOf(
