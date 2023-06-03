@@ -65,8 +65,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
     }
 
-    override fun showOrderComplete() {
-        startActivity(OrderDetailActivity.newIntent(this))
+    override fun showOrderComplete(orderId: Int) {
+        startActivity(OrderDetailActivity.newIntent(this, orderId))
         finish()
     }
 

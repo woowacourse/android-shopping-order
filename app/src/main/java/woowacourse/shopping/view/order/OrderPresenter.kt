@@ -13,7 +13,7 @@ class OrderPresenter(
     private val orderRepository: OrderRepository,
     private val mypageRepository: MypageRepository
 ) : OrderContract.Presenter {
-    private val totalPrice = products.orderProducts.sumOf { it.price }
+    private val totalPrice = products.orderProducts.sumOf { it.price * it.quantity }
     private var ownCash = 0
 
     override fun fetchOrder() {
@@ -31,8 +31,8 @@ class OrderPresenter(
         }
         val orderCartItemsDTO = products.toDTO()
         orderRepository.order(orderCartItemsDTO) {
-            if (it) {
-                view.showOrderComplete()
+            if (it != null) {
+                view.showOrderComplete(it)
             }
         }
     }

@@ -32,4 +32,5 @@
     <string name="notify_nothing_data">데이터가 없습니다. 다시 시도해주세요.</string>
     <string name="product_quantity">%d개</string>
     <string name="products_nothing">선택한 상품이 없습니다.</string>
+    <string name="order_multiple_name">%s 외 %d개</string>
 </resources>

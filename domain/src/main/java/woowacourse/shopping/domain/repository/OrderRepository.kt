@@ -7,5 +7,5 @@ import woowacourse.shopping.domain.model.OrdersDTO
 interface OrderRepository {
     fun getAll(callback: (OrdersDTO) -> Unit)
     fun getOrder(id: Int, callback: (OrderDTO) -> Unit)
-    fun order(cartProducts: OrderCartItemsDTO, callback: (Boolean) -> Unit)
+    fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit)
 }

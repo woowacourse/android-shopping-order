@@ -6,7 +6,7 @@ interface OrderContract {
     interface View {
         fun showOrder(orderModel: OrderModel)
         fun showUnableToast()
-        fun showOrderComplete()
+        fun showOrderComplete(orderId: Int)
     }
     interface Presenter {
         fun fetchOrder()

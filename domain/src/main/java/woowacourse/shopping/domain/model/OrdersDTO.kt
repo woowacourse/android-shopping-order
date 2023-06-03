@@ -1,3 +1,3 @@
 package woowacourse.shopping.domain.model
 
-data class OrdersDTO(val orders: OrderDTO)
+data class OrdersDTO(val orders: List<OrderDTO>)

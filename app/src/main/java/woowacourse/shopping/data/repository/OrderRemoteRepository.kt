@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -41,6 +42,7 @@ class OrderRemoteRepository(baseUrl: String) : OrderRepository {
                 call: Call<OrderDTO>,
                 response: Response<OrderDTO>,
             ) {
+                Log.d("OrderRemoteRepository", response.body().toString())
                 response.body()?.let {
                     callback(it)
                 }
@@ -52,12 +54,11 @@ class OrderRemoteRepository(baseUrl: String) : OrderRepository {
         })
     }
 
-    override fun order(cartProducts: OrderCartItemsDTO, callback: (Boolean) -> Unit) {
+    override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {
         retrofitService.requestOrderCartItems(cartProducts).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.headers().get("Location") != null) {
-                    callback(true)
-                }
+                Log.d("orderId", response.headers().toString())
+                callback(response.headers()["Location"]?.substringAfterLast("/")?.toInt())
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
