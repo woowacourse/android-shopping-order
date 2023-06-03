@@ -140,18 +140,22 @@ class CartPresenter(
     }
 
     override fun changeAllChecked(isChecked: Boolean) {
-        val cartProducts = getCartProductsInPage()
-        cartProducts.forEach {
-            if(it.isChecked != isChecked) {
-                updateCartProduct(it.changeChecked(isChecked))
+        if(::cart.isInitialized) {
+            val cartProducts = getCartProductsInPage()
+            cartProducts.forEach {
+                if(it.isChecked != isChecked) {
+                    updateCartProduct(it.changeChecked(isChecked))
+                }
             }
+            updateTotalPrice()
+            updateTotalQuantity()
         }
-        updateTotalPrice()
-        updateTotalQuantity()
     }
 
     override fun order() {
-        val orderCart = cart.selectedCart
-        view.showOrder(orderCart.cartProducts.map { it.id })
+        if(::cart.isInitialized) {
+            val orderCart = cart.selectedCart
+            view.showOrder(orderCart.cartProducts.map { it.id })
+        }
     }
 }
