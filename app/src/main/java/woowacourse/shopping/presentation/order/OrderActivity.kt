@@ -18,6 +18,7 @@ import woowacourse.shopping.data.user.UserServiceHelper
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.presentation.model.OrderProductsModel
+import woowacourse.shopping.presentation.productlist.ProductListActivity
 import woowacourse.shopping.util.getParcelableExtraCompat
 import woowacourse.shopping.util.noIntentExceptionHandler
 
@@ -58,6 +59,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun initOrderProductsView() {
         orderAdapter = OrderItemsAdapter(::updateProductPrice)
         binding.recyclerOrder.adapter = orderAdapter
+        binding.recyclerOrder.setHasFixedSize(true)
         presenter.loadOrderItems()
     }
 
@@ -92,7 +94,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun paymentButtonClick() {
         binding.buttonOrderPayment.setOnClickListener {
-            presenter.addOrder()
+            presenter.order()
         }
     }
 
@@ -105,19 +107,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
         return true
     }
-
-    companion object {
-        private const val ORDER_PRODUCTS_KEY = "ORDER_PRODUCTS_KEY"
-        fun getIntent(
-            context: Context,
-            orderProductsModel: OrderProductsModel
-        ): Intent {
-            val intent = Intent(context, OrderActivity::class.java)
-            intent.putExtra(ORDER_PRODUCTS_KEY, orderProductsModel)
-            return intent
-        }
-    }
-
     override fun setUserTotalPoint(point: Int?) {
         if (point == -1) binding.textOrderTotalPoint.text =
             getString(R.string.not_load_error_message)
@@ -145,7 +134,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             Toast.makeText(this, "결제가 이루어지지 않았어요 ㅠㅠ", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, completeMessage, Toast.LENGTH_SHORT).show()
-            finish()
+            val intent = Intent(this, ProductListActivity::class.java).apply {
+                flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            startActivity(intent)
         }
     }
 
@@ -155,5 +147,17 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun setOrderProductTotalPrice(price: Int) {
         productPriceTextView.text = getString(R.string.price_format, price)
+    }
+
+    companion object {
+        private const val ORDER_PRODUCTS_KEY = "ORDER_PRODUCTS_KEY"
+        fun getIntent(
+            context: Context,
+            orderProductsModel: OrderProductsModel
+        ): Intent {
+            val intent = Intent(context, OrderActivity::class.java)
+            intent.putExtra(ORDER_PRODUCTS_KEY, orderProductsModel)
+            return intent
+        }
     }
 }

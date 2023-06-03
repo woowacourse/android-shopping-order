@@ -1,6 +1,6 @@
 package woowacourse.shopping
 
-class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
+data class CartProductInfoList(private val cartProductInfos: List<CartProductInfo>) {
     private val _items = cartProductInfos.toMutableList()
     val items get() = _items.toList()
 

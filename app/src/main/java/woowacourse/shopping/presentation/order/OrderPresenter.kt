@@ -11,10 +11,10 @@ class OrderPresenter constructor(
     private val orderProductsModel: OrderProductsModel,
     private val orderRepository: OrderRepository,
     private val userRepository: UserRepository,
+    private var userTotalPoint: Int = MINIMUM_POINT,
+    private var usagePoint: Int = MINIMUM_POINT,
 ) : OrderContract.Presenter {
     private val orderProducts = orderProductsModel.toDomain()
-    private var userTotalPoint = 2000
-    private var usagePoint = 0
 
     override fun loadOrderItems() {
         view.setOrderItems(orderProductsModel.list)
@@ -22,13 +22,13 @@ class OrderPresenter constructor(
 
     override fun showUserTotalPoint() {
         userRepository.getUserPoint {
-            userTotalPoint = it?.point?.value ?: 2000
+            userTotalPoint = it?.point?.value ?: MINIMUM_POINT
             view.setUserTotalPoint(userTotalPoint)
         }
     }
 
     override fun checkPointAble(usePointText: String) {
-        usagePoint = usePointText.toIntOrNull() ?: 0
+        usagePoint = usePointText.toIntOrNull() ?: userTotalPoint
         when {
             usagePoint < MINIMUM_POINT -> view.setUsagePoint("")
             usagePoint > userTotalPoint -> view.setUsagePoint(userTotalPoint.toString())
@@ -50,7 +50,7 @@ class OrderPresenter constructor(
         view.setPaymentPrice(price)
     }
 
-    override fun addOrder() {
+    override fun order() {
         orderRepository.addOrder(usagePoint, orderProducts) {
             view.showAddOrderComplete(it)
         }

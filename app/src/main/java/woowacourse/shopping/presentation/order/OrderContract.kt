@@ -8,7 +8,7 @@ interface OrderContract {
         fun checkPointAble(usePointText: String)
         fun showOrderPrice()
         fun showPaymentPrice()
-        fun addOrder()
+        fun order()
         fun loadOrderItems()
         fun updateOrderProductTotalPrice(orderProductModel: OrderProductModel)
     }
