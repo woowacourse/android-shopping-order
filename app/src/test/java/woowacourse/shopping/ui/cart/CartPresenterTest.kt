@@ -31,7 +31,8 @@ class CartPresenterTest {
             product = Product(
                 price = 1000
             )
-        ), CartItem(
+        ),
+        CartItem(
             id = 1,
             quantity = 3,
             product = Product(
@@ -261,7 +262,8 @@ class CartPresenterTest {
                 product = Product(
                     price = 1000
                 )
-            ), CartItem(
+            ),
+            CartItem(
                 id = 1,
                 quantity = 3,
                 product = Product(
@@ -309,7 +311,8 @@ class CartPresenterTest {
                 product = Product(
                     price = 1000
                 )
-            ), CartItem(
+            ),
+            CartItem(
                 id = 1,
                 quantity = 3,
                 product = Product(

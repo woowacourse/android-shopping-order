@@ -86,7 +86,6 @@ class ProductDetailPresenterTest {
         val product = Product()
         every { productRepository.findById(any()) } returns async(product)
 
-
         // when
         presenter.showCartCounter(0)
 
@@ -108,6 +107,5 @@ class ProductDetailPresenterTest {
         // then
         val expect = LastViewedProductUIState(0, "", 0)
         verify { view.setLastViewedProduct(expect) }
-
     }
 }

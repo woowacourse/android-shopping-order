@@ -48,5 +48,4 @@ class OrderDetailPresenterTest {
 
         verify { view.showOrder(orderExpect, paymentExpect) }
     }
-
 }
