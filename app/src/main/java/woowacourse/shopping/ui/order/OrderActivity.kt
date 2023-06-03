@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.model.OrderInfoUIModel
 import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.service.RemoteCartService
+import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
 import woowacourse.shopping.utils.ServerURL
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -19,7 +21,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         super.onCreate(savedInstanceState)
         initBinding()
         initPresenter()
-        initOrderItems()
+        initOrderInfo()
     }
 
     private fun initBinding() {
@@ -30,9 +32,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter = OrderPresenter(this, CartRepositoryImpl(RemoteCartService(ServerURL.url)))
     }
 
-    private fun initOrderItems() {
+    private fun initOrderInfo() {
         val ids: List<Int> = intent.getIntegerArrayListExtra(KEY_ORDER_ID_LIST)?.toList() ?: return
         presenter.getOrderInfo(ids)
+    }
+
+    override fun initOrderPageInfo(orderInfo: OrderInfoUIModel) {
+        binding.orderInfo = orderInfo
+        binding.rvOrderItems.adapter = OrderAdapter(orderInfo.cartItems)
     }
 
     companion object {

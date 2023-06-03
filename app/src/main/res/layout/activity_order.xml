@@ -3,219 +3,243 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
+    <data>
+
+        <variable
+            name="orderInfo"
+            type="woowacourse.shopping.model.OrderInfoUIModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        tools:context=".ui.order.OrderActivity">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.order.OrderActivity">
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@id/btn_order"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/tv_order"
-                android:layout_width="0dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:layout_marginStart="22dp"
-                android:text="주문 목록"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:paddingBottom="20dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_order_items"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="35dp"
-                android:layout_marginTop="15dp"
-                app:layout_constraintBottom_toTopOf="@id/divider1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_order"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_order" />
+                <TextView
+                    android:id="@+id/tv_order"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="22dp"
+                    android:text="@string/order_title_list"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider1"
-                android:layout_width="0dp"
-                android:layout_height="10dp"
-                android:layout_marginVertical="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rv_order_items" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_order_items"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="35dp"
+                    android:layout_marginTop="15dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/divider1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_order"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_order" />
 
-            <TextView
-                android:id="@+id/tv_discount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:layout_marginStart="22dp"
-                android:text="할인"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider1" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider1"
+                    android:layout_width="0dp"
+                    android:layout_height="10dp"
+                    android:layout_marginVertical="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rv_order_items" />
 
-            <TextView
-                android:id="@+id/tv_discount_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="15dp"
-                android:layout_marginStart="35dp"
-                android:text="포인트 사용"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_discount" />
+                <TextView
+                    android:id="@+id/tv_discount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="22dp"
+                    android:text="@string/order_title_discount"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider1" />
 
-            <TextView
-                android:id="@+id/tv_discount_point_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="35dp"
-                android:text="원"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_discount"
-                app:layout_constraintTop_toTopOf="@id/tv_discount_point" />
+                <TextView
+                    android:id="@+id/tv_discount_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="15dp"
+                    android:layout_marginStart="35dp"
+                    android:text="@string/order_title_point"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount" />
 
-            <EditText
-                android:id="@+id/et_discount_point"
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toStartOf="@id/tv_discount_point_unit"
-                app:layout_constraintTop_toBottomOf="@id/tv_discount" />
+                <TextView
+                    android:id="@+id/tv_discount_point_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="35dp"
+                    android:text="@string/price_unit"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount"
+                    app:layout_constraintTop_toTopOf="@id/tv_discount_point" />
 
-            <TextView
-                android:id="@+id/tv_discount_remain_point"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                android:layout_marginStart="35dp"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
-                app:layout_constraintTop_toBottomOf="@id/tv_discount_point_unit"
-                tools:text="보유 포인트 7,000원" />
+                <EditText
+                    android:id="@+id/et_discount_point"
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount" />
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider2"
-                android:layout_width="0dp"
-                android:layout_height="10dp"
-                android:layout_marginVertical="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_discount_remain_point" />
+                <TextView
+                    android:id="@+id/tv_discount_remain_point"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginStart="35dp"
+                    android:text="@{@string/order_remain_point(orderInfo.currentPoints)}"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount_point_unit"
+                    tools:text="보유 포인트 7,000원" />
 
-            <TextView
-                android:id="@+id/tv_purchase"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:layout_marginStart="22dp"
-                android:text="총 결제 금액"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/tv_purchase_order"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider2" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider2"
+                    android:layout_width="0dp"
+                    android:layout_height="10dp"
+                    android:layout_marginVertical="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount_remain_point" />
 
-            <TextView
-                android:id="@+id/tv_purchase_order"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:text="주문 금액"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:layout_constraintStart_toStartOf="@id/tv_discount_point"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase" />
+                <TextView
+                    android:id="@+id/tv_purchase"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="22dp"
+                    android:text="@string/order_title_purchase"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/tv_purchase_order"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider2" />
 
-            <TextView
-                android:id="@+id/tv_purchase_order_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase"
-                tools:text="95,000원" />
+                <TextView
+                    android:id="@+id/tv_purchase_order"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="@string/order_price_all"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@id/tv_discount_point"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase" />
 
-            <TextView
-                android:id="@+id/tv_purchase_discount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:text="할인 금액"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:layout_constraintStart_toStartOf="@id/tv_discount_point"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase_order" />
+                <TextView
+                    android:id="@+id/tv_purchase_order_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="@{@string/product_price(orderInfo.totalPrice)}"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase"
+                    tools:text="95,000원" />
 
-            <TextView
-                android:id="@+id/tv_purchase_discount_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase_order"
-                tools:text="4,000원" />
+                <TextView
+                    android:id="@+id/tv_purchase_discount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="@string/order_price_discount"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@id/tv_discount_point"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase_order" />
 
-            <TextView
-                android:id="@+id/tv_purchase_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:text="총 결제 금액"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@id/tv_discount_point"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase_discount" />
+                <TextView
+                    android:id="@+id/tv_purchase_discount_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase_order"
+                    tools:text="4,000원" />
 
-            <TextView
-                android:id="@+id/tv_purchase_total_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
-                app:layout_constraintTop_toBottomOf="@id/tv_purchase_discount"
-                tools:text="91,000원" />
+                <TextView
+                    android:id="@+id/tv_purchase_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="@string/order_price_total"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@id/tv_discount_point"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase_discount" />
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="@color/blue_green_04c09e"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="주문하기"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <TextView
+                    android:id="@+id/tv_purchase_total_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_purchase_discount"
+                    tools:text="91,000원" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+        <Button
+            android:id="@+id/btn_order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/blue_green_04c09e"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/order_btn_order"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
