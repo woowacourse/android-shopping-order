@@ -6,7 +6,6 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.model.Point
 import woowacourse.shopping.R
 import woowacourse.shopping.data.CartCache
 import woowacourse.shopping.data.CartRemoteRepositoryImpl
@@ -52,12 +51,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         )
     }
 
-    override fun setUpView(point: Point, productsPrice: Int) {
+    override fun setUpView(point: Int, productsPrice: Int) {
         with(binding) {
             tvProductsPrice.text = getString(R.string.price_format, productsPrice)
-            tvHavePoint.text = getString(R.string.holding_point, point.value)
+            tvHavePoint.text = getString(R.string.holding_point, point)
             btnUseAll.setOnClickListener {
-                etUsePoint.setText(point.value.toString())
+                etUsePoint.setText(point.toString())
             }
             btnOrder.text = getString(R.string.order_btn, productsPrice)
 
@@ -70,7 +69,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         setEditTextState(point, productsPrice)
     }
 
-    private fun setEditTextState(point: Point, productsPrice: Int) {
+    private fun setEditTextState(point: Int, productsPrice: Int) {
         binding.etUsePoint.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -78,7 +77,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun onTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val inputPoint =
                     if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
-                if (inputPoint > point.value) {
+                if (inputPoint > point) {
                     Toast.makeText(this@OrderActivity, OVER_POINT_ERROR, Toast.LENGTH_SHORT)
                         .show()
                     binding.etUsePoint.text = null

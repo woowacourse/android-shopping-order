@@ -26,7 +26,7 @@ class OrderPresenter(
 //        val orderProducts = cartProducts.filter { it.isSelected }.map { it.toPresentation() }
         val sumOfProductPrice = orderProducts.sumOf { it.totalPrice() }
         pointRepository.getPoint(
-            onSuccess = { view.setUpView(it, sumOfProductPrice) },
+            onSuccess = { view.setUpView(it.value, sumOfProductPrice) },
             onFailure = {}
         )
     }
