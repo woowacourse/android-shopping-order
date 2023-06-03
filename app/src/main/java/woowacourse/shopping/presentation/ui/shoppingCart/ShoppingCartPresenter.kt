@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingCart
 
-import android.util.Log
 import woowacourse.shopping.domain.model.CartPagination
 import woowacourse.shopping.domain.model.Operator
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -10,12 +9,23 @@ class ShoppingCartPresenter(
     private val view: ShoppingCartContract.View,
     private val shoppingCartRepository: ShoppingCartRepository,
 ) : ShoppingCartContract.Presenter {
-    private val cartPagination: CartPagination
+    private lateinit var cartPagination: CartPagination
 
     init {
-        cartPagination = CartPagination(shoppingCartRepository.getAll())
-        Log.d("asdf", "getAll: ${shoppingCartRepository.getAll()}")
-        Log.d("asdf", "cartPagination: ${cartPagination.shoppingCart}")
+        shoppingCartRepository.fetchAll { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> {
+                    cartPagination = CartPagination(result.data)
+                    fetchShoppingCart()
+                    setPageNumber()
+                    checkPageMovement()
+                    setOrderCount()
+                    setPayment()
+                    setAllCheck()
+                }
+                is WoowaResult.FAIL -> view.showUnExpectedError()
+            }
+        }
     }
 
     override fun fetchShoppingCart() {
@@ -51,12 +61,19 @@ class ShoppingCartPresenter(
     }
 
     override fun deleteProductInCart(index: Int) {
-        val result = shoppingCartRepository.deleteProductInCart(cartPagination[index].product.id)
-        if (result) {
-            cartPagination.removeFromCurrentPage(index)
-            checkPageEmpty()
-            updateView()
-        }
+        shoppingCartRepository.delete(
+            callback = { result ->
+                when (result) {
+                    is WoowaResult.SUCCESS -> {
+                        cartPagination.removeFromCurrentPage(index)
+                        checkPageEmpty()
+                        updateView()
+                    }
+                    is WoowaResult.FAIL -> view.showUnExpectedError()
+                }
+            },
+            id = cartPagination[index].cartItem.id,
+        )
     }
 
     private fun checkPageEmpty() {
@@ -78,16 +95,17 @@ class ShoppingCartPresenter(
     }
 
     override fun applyQuantityChanged(index: Int) {
-        val result = shoppingCartRepository.updateProductQuantity(
-            cartPagination[index].product.id,
-            cartPagination[index].quantity,
-        )
-        when (result) {
-            is WoowaResult.SUCCESS -> Unit
-            is WoowaResult.FAIL -> {
-                view.showUnExpectedError()
+        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> Unit
+                is WoowaResult.FAIL -> view.showUnExpectedError()
             }
         }
+        shoppingCartRepository.update(
+            id = cartPagination[index].cartItem.id,
+            updatedQuantity = cartPagination[index].cartItem.quantity,
+            callback = callback,
+        )
     }
 
     private fun updateView() {
@@ -95,6 +113,7 @@ class ShoppingCartPresenter(
         setOrderCount()
         setPayment()
         setAllCheck()
+        setPageNumber()
     }
 
     override fun setAllCheck() {

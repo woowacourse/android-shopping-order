@@ -52,9 +52,9 @@ class ShoppingCartViewHolder(
         binding.customShoppingCartCounter.setMinValue(1)
     }
 
-    fun bind(product: ProductInCart) {
+    fun bind(product: CartProduct) {
         binding.product = product
-        // binding.customShoppingCartCounter.setQuantityText(product.quantity)
+        binding.customShoppingCartCounter.setQuantityText(product.cartItem.quantity)
     }
 
     companion object {

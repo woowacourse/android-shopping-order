@@ -3,16 +3,14 @@ package woowacourse.shopping.presentation.ui.shoppingCart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.product.ProductDao
-import woowacourse.shopping.data.shoppingCart.ShoppingCartDao
-import woowacourse.shopping.data.shoppingCart.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
+import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.domain.model.ProductInCart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.presentation.ui.productDetail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shoppingCart.adapter.ShoppingCartAdapter
 
@@ -61,8 +59,7 @@ class ShoppingCartActivity :
         clickBackButton()
     }
 
-    override fun setShoppingCart(shoppingCart: List<ProductInCart>) {
-        Log.d("asdf", "shoppingCart: $shoppingCart")
+    override fun setShoppingCart(shoppingCart: List<CartProduct>) {
         shoppingCartAdapter.submitList(shoppingCart)
     }
 
@@ -91,8 +88,8 @@ class ShoppingCartActivity :
         }
     }
 
-    override fun goProductDetailActivity(productInCart: ProductInCart) {
-        val intent = ProductDetailActivity.getIntent(this, productInCart.product.id)
+    override fun goProductDetailActivity(cartProduct: CartProduct) {
+        val intent = ProductDetailActivity.getIntent(this, cartProduct.product.id)
         startActivity(intent)
     }
 

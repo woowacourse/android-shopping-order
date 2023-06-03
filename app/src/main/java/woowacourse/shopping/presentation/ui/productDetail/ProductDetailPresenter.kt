@@ -20,13 +20,17 @@ class ProductDetailPresenter(
     private lateinit var product: Product
 
     init {
-        val woowaResult = productRepository.getProduct(productId)
-        when (woowaResult) {
-            is SUCCESS -> product = woowaResult.data
-            is FAIL -> view.handleNoSuchProductError()
-        }
-        fetchLastViewedProduct(view, recentlyViewedRepository)
-        recentlyViewedRepository.addRecentlyViewedProduct(productId)
+        productRepository.fetchProduct(
+            callback = { result ->
+                when (result) {
+                    is SUCCESS -> product = result.data.product
+                    is FAIL -> view.handleNoSuchProductError()
+                }
+                fetchLastViewedProduct(view, recentlyViewedRepository)
+                recentlyViewedRepository.addRecentlyViewedProduct(product)
+            },
+            id = productId,
+        )
     }
 
     private fun fetchLastViewedProduct(
@@ -42,6 +46,10 @@ class ProductDetailPresenter(
     }
 
     override fun addProductInCart() {
-        shoppingCartRepository.insertProductInCart(ProductInCart(product, 1))
+        shoppingCartRepository.insert(
+            callback = {},
+            productId = product.id,
+            quantity = 1,
+        )
     }
 }

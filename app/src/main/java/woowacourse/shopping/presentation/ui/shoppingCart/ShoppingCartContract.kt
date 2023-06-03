@@ -1,13 +1,13 @@
 package woowacourse.shopping.presentation.ui.shoppingCart
 
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Operator
-import woowacourse.shopping.domain.model.ProductInCart
 
 interface ShoppingCartContract {
     interface View {
         val presenter: Presenter
 
-        fun setShoppingCart(shoppingCart: List<ProductInCart>)
+        fun setShoppingCart(shoppingCart: List<CartProduct>)
         fun setPage(pageNumber: Int)
         fun setPageButtonEnable(previous: Boolean, next: Boolean)
         fun deleteProduct(index: Int)
@@ -16,7 +16,7 @@ interface ShoppingCartContract {
         fun updatePayment(payment: Int)
         fun updateAllCheck(isChecked: Boolean)
         fun showUnExpectedError()
-        fun goProductDetailActivity(productInCart: ProductInCart)
+        fun goProductDetailActivity(cartProduct: CartProduct)
     }
 
     interface Presenter {

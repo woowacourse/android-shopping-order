@@ -1,8 +1,6 @@
 package woowacourse.shopping.presentation.ui.home
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -10,14 +8,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.TestServer
-import woowacourse.shopping.data.ProductService
-import woowacourse.shopping.data.product.ProductDao
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.product.recentlyViewed.RecentlyViewedDao
-import woowacourse.shopping.data.product.recentlyViewed.RecentlyViewedRepositoryImpl
-import woowacourse.shopping.data.shoppingCart.ShoppingCartDao
-import woowacourse.shopping.data.shoppingCart.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
+import woowacourse.shopping.data.defaultRepository.DefaultRecentlyViewedRepository
+import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
+import woowacourse.shopping.data.local.recentlyViewed.RecentlyViewedDao
+import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
+import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.presentation.model.HomeData
@@ -65,17 +61,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //
-        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.anim_skeleton)
-        binding.skeletonHomeProducts.startAnimation(skeletonAnim)
         initAdapter()
+        startSkeletonAnim()
         initLayoutManager()
-        // 목 데이터 추가 함수 :
-        // initProducts(this)
         clickShoppingCart()
         presenter.setHome()
-        presenter.fetchProducts()
-        TestServer().getProducts()
     }
 
     override fun onStart() {
@@ -83,12 +73,15 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         presenter.fetchRecentlyViewed()
     }
 
-    override fun changeSkeletonVisibility() {
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.skeletonHomeProducts.clearAnimation()
-            binding.skeletonHomeProducts.visibility = View.GONE
-            binding.listHomeProducts.visibility = View.VISIBLE
-        }, 3000L)
+    private fun startSkeletonAnim() {
+        val skeletonAnim: Animation = AnimationUtils.loadAnimation(this, R.anim.anim_skeleton)
+        binding.skeletonHomeProducts.startAnimation(skeletonAnim)
+    }
+
+    override fun notifyLoadingFinished() {
+        binding.skeletonHomeProducts.clearAnimation()
+        binding.skeletonHomeProducts.visibility = View.GONE
+        binding.listHomeProducts.visibility = View.VISIBLE
     }
 
     private fun initAdapter() {
@@ -136,7 +129,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
     }
 
     private fun clickShowMore() {
-        presenter.fetchProducts()
+        presenter.fetchMoreProducts()
     }
 
     override fun showUnexpectedError() {

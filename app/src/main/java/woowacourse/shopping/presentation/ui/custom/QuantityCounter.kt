@@ -48,6 +48,7 @@ class QuantityCounter(context: Context, attrs: AttributeSet) : ConstraintLayout(
 
     fun setMinValue(min: Int) {
         minValue = min
+        binding.textCounterQuantity.text = minValue.toString()
     }
 
     fun setMaxValue(max: Int) {

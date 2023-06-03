@@ -16,12 +16,12 @@ interface HomeContract {
         fun showUnexpectedError()
         fun updateProductQuantity(position: Int)
         fun updateTotalQuantity(size: Int)
-        fun changeSkeletonVisibility()
+        fun notifyLoadingFinished()
     }
 
     interface Presenter {
         fun setHome()
-        fun fetchProducts()
+        fun fetchMoreProducts()
         fun fetchRecentlyViewed()
         fun updateProductQuantity(position: Int, operator: Operator)
         fun fetchTotalQuantity()

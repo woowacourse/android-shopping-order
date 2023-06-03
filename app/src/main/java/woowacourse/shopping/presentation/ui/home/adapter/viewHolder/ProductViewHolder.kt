@@ -17,24 +17,31 @@ class ProductViewHolder(
 
     init {
         binding.listener = productClickListener
+        binding.customItemProductCounter.setMinValue(0)
         binding.buttonItemProductInsertProduct.setOnClickListener {
             quantityChangeListener(absoluteAdapterPosition, Operator.INCREASE)
         }
+        binding.customItemProductCounter.setMinValue(0)
         binding.customItemProductCounter.setIncreaseClickListener {
             quantityChangeListener(absoluteAdapterPosition, Operator.INCREASE)
         }
         binding.customItemProductCounter.setDecreaseClickListener {
+            setVisibility(binding.customItemProductCounter.currentQuantity)
             quantityChangeListener(absoluteAdapterPosition, Operator.DECREASE)
         }
+    }
+
+    private fun setVisibility(quantity: Int) {
+        binding.buttonItemProductInsertProduct.visibility =
+            if (quantity == 0) View.VISIBLE else View.GONE
+        binding.customItemProductCounter.visibility =
+            if (quantity == 0) View.GONE else View.VISIBLE
     }
 
     fun bind(data: ProductItem) {
         binding.product = data
         binding.customItemProductCounter.setQuantityText(data.quantity)
-        binding.buttonItemProductInsertProduct.visibility =
-            if (data.quantity == 0) View.VISIBLE else View.GONE
-        binding.customItemProductCounter.visibility =
-            if (data.quantity == 0) View.GONE else View.VISIBLE
+        setVisibility(data.quantity)
     }
 
     companion object {

@@ -61,41 +61,7 @@ class HomeAdapter(
         }
     }
 
-    /*fun initProducts(products: List<ProductItem>) {
-        val preSize = items.size
-        items.addAll(products)
-        notifyItemRangeInserted(preSize, items.size - 1)
-    }
-
-    fun initRecentlyViewedProducts(products: List<RecentlyViewedProduct>) {
-        if (items.isNotEmpty() and (items[0] is RecentlyViewedItem)) {
-            items.removeFirst()
-            notifyItemRemoved(0)
-        }
-        items.add(0, RecentlyViewedItem(recentlyViewedProducts = products))
-        notifyItemInserted(0)
-        recentlyViewedAdapter.submitList((items.first() as RecentlyViewedItem).recentlyViewedProducts)
-    }
-
-    fun initShowMoreItem() {
-        items.add(ShowMoreItem())
-        notifyItemInserted(itemCount - 1)
-    }
-
-    private fun showMoreProducts() {
-        deleteShowMore()
-        clickShowMore()
-    }
-
-    private fun deleteShowMore() {
-        val lastItem = items.last()
-        if (lastItem.viewType == SHOW_MORE) {
-            items.removeLast()
-            notifyItemRemoved(itemCount)
-        }
-    }*/
-
-    class HomeComparator() : DiffUtil.ItemCallback<HomeData>() {
+    class HomeComparator : DiffUtil.ItemCallback<HomeData>() {
         override fun areItemsTheSame(oldItem: HomeData, newItem: HomeData): Boolean {
             return oldItem.viewType == newItem.viewType
         }

@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.ui.home
 
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Operator
-import woowacourse.shopping.domain.model.ProductInCart
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedRepository
@@ -26,7 +26,7 @@ class HomePresenter(
     private var recentlyViewedItem = listOf<RecentlyViewedProduct>()
 
     override fun setHome() {
-        view.setHomeData(homeData)
+        fetchFirstProducts()
         fetchTotalQuantity()
     }
 
@@ -37,19 +37,53 @@ class HomePresenter(
         view.updateRecentlyViewedProducts(recentlyViewedItem.toList())
     }
 
-    override fun fetchProducts() {
-        deleteShowMoreItem()
-        val startPosition = homeData.size
-        val products = productRepository.getProducts(UNIT, lastProductId).map { it.toProductItem() }
-        lastProductId = products.lastOrNull()?.id ?: lastProductId
-        homeData.addAll(products)
-        view.appendProductItems(startPosition, products.size)
-        checkIsLastProduct()
-        view.changeSkeletonVisibility()
+    private fun fetchProducts(callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit) {
+        productRepository.fetchPagedProducts(
+            pageItemCount = UNIT,
+            lastId = lastProductId,
+            callback = callback,
+        )
     }
 
-    private fun checkIsLastProduct() {
-        val isLast = productRepository.isLastProduct(lastProductId)
+    private fun fetchFirstProducts() {
+        val callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
+            when (result) {
+                is WoowaResult.SUCCESS -> {
+                    val products = result.data.map { it.toProductItem() }
+                    lastProductId = products.lastOrNull()?.productId ?: lastProductId
+                    homeData.addAll(products)
+                    view.setHomeData(homeData)
+                    checkIsLastProduct(isLast)
+                    view.notifyLoadingFinished()
+                }
+                is WoowaResult.FAIL -> view.showUnexpectedError()
+            }
+        }
+        fetchProducts(callback)
+    }
+
+    override fun fetchMoreProducts() {
+        deleteShowMoreItem()
+        val startPosition = homeData.size
+        val callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
+            when (result) {
+                is WoowaResult.SUCCESS -> {
+                    val products = result.data.map { it.toProductItem() }
+                    lastProductId = products.lastOrNull()?.productId ?: lastProductId
+                    homeData.addAll(products)
+                    view.appendProductItems(startPosition, products.size)
+                    checkIsLastProduct(isLast)
+                    view.notifyLoadingFinished()
+                }
+                is WoowaResult.FAIL -> {
+                    view.showUnexpectedError()
+                }
+            }
+        }
+        fetchProducts(callback)
+    }
+
+    private fun checkIsLastProduct(isLast: Boolean) {
         if (!isLast) addShowMoreItem()
     }
 
@@ -73,51 +107,92 @@ class HomePresenter(
     }
 
     override fun updateProductQuantity(position: Int, operator: Operator) {
-        val productInCart = updatedQuantity(position, operator) ?: return
-        if (productInCart.quantity == 0) {
-            deleteProductInCart(position, productInCart)
+        val cartProduct: CartProduct = updatedQuantity(position, operator) ?: return
+        if (cartProduct.cartItem.quantity == 0) {
+            deleteProductInCart(position, cartProduct)
             return
         }
-        updateProductItem(position, productInCart)
+        if (operator == Operator.INCREASE && cartProduct.cartItem.quantity == 1) {
+            putProductInCart(position, cartProduct)
+            return
+        }
+        updateProductItem(position, cartProduct)
     }
 
-    private fun updatedQuantity(position: Int, operator: Operator): ProductInCart? {
+    private fun updatedQuantity(position: Int, operator: Operator): CartProduct? {
         if (homeData[position].viewType != PRODUCT) {
             view.showUnexpectedError()
             return null
         }
-        return operator.operate((homeData[position] as ProductItem).productInCart)
+        return operator.operate((homeData[position] as ProductItem).cartProduct)
     }
 
-    private fun updateProductItem(position: Int, product: ProductInCart) {
-        val result =
-            shoppingCartRepository.updateProductQuantity(product.product.id, product.quantity)
-        when (result) {
-            is WoowaResult.SUCCESS -> update(position, product)
-            is WoowaResult.FAIL -> {
-                view.showUnexpectedError()
-                println("[ERROR] " + "error message : ${result.error.errorMessage}")
+    private fun putProductInCart(position: Int, cartProduct: CartProduct) {
+        val callback: (WoowaResult<Long>) -> Unit = { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> {
+                    val cartItem = cartProduct.cartItem.copy(id = result.data)
+                    homeData[position] = ProductItem(cartProduct.copy(cartItem = cartItem))
+                    view.updateProductQuantity(position)
+                }
+                is WoowaResult.FAIL -> view.showUnexpectedError()
             }
         }
+
+        shoppingCartRepository.insert(
+            callback = callback,
+            productId = cartProduct.product.id,
+            quantity = cartProduct.cartItem.quantity,
+        )
     }
 
-    private fun update(position: Int, productInCart: ProductInCart) {
-        homeData[position] = ProductItem(productInCart)
-        view.updateProductQuantity(position)
-    }
-
-    private fun deleteProductInCart(position: Int, productInCart: ProductInCart) {
-        val result =
-            shoppingCartRepository.deleteProductInCart((homeData[position] as ProductItem).id)
-        if (result) {
-            homeData[position] = ProductItem(productInCart)
-            view.updateProductQuantity(position)
+    private fun updateProductItem(position: Int, cartProduct: CartProduct) {
+        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> {
+                    homeData[position] = ProductItem(cartProduct)
+                    view.updateProductQuantity(position)
+                }
+                is WoowaResult.FAIL -> view.showUnexpectedError()
+            }
         }
+
+        shoppingCartRepository.update(
+            id = cartProduct.cartItem.id,
+            updatedQuantity = cartProduct.cartItem.quantity,
+            callback = callback,
+        )
+    }
+
+    private fun deleteProductInCart(position: Int, cartProduct: CartProduct) {
+        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
+            when (result) {
+                is WoowaResult.SUCCESS<Boolean> -> {
+                    if (result.data) {
+                        homeData[position] = ProductItem(cartProduct)
+                        view.updateProductQuantity(position)
+                    } else {
+                        view.showUnexpectedError()
+                    }
+                }
+                is WoowaResult.FAIL -> view.showUnexpectedError()
+            }
+        }
+        shoppingCartRepository.delete(
+            id = (homeData[position] as ProductItem).cartId,
+            callback = callback,
+        )
     }
 
     override fun fetchTotalQuantity() {
-        val size = shoppingCartRepository.getTotalQuantity()
-        view.updateTotalQuantity(size)
+        shoppingCartRepository.fetchAll { result ->
+            when (result) {
+                is WoowaResult.SUCCESS<List<CartProduct>> -> {
+                    view.updateTotalQuantity(result.data.size)
+                }
+                is WoowaResult.FAIL -> view.showUnexpectedError()
+            }
+        }
     }
 
     companion object {

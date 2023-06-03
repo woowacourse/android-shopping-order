@@ -67,13 +67,20 @@ class OrderDialog : DialogFragment() {
 
     private fun clickPut() {
         binding.buttonOrderDialogPut.setOnClickListener {
-            shoppingCartRepository.increaseProductQuantity(
-                binding.product?.id ?: return@setOnClickListener,
-                binding.customOrderDialogCounter.currentQuantity,
+            shoppingCartRepository.insert(
+                callback = { result ->
+                    when (result) {
+                        is WoowaResult.SUCCESS -> {
+                            startActivity(ShoppingCartActivity.getIntent(requireContext()))
+                            requireActivity().finish()
+                        }
+                        is WoowaResult.FAIL -> Unit
+                    }
+                    dismiss()
+                },
+                productId = binding.product?.id ?: 0,
+                quantity = binding.customOrderDialogCounter.currentQuantity,
             )
-            dismiss()
-            startActivity(ShoppingCartActivity.getIntent(requireContext()))
-            requireActivity().finish()
         }
     }
 
@@ -94,11 +101,15 @@ class OrderDialog : DialogFragment() {
 
     private fun getData() {
         val productId: Long = arguments?.getLong(PRODUCT_ID) ?: return dismiss()
-        val result = productRepository.getProduct(productId)
-        when (result) {
-            is WoowaResult.SUCCESS -> binding.product = result.data
-            is WoowaResult.FAIL -> return dismiss()
-        }
+        productRepository.fetchProduct(
+            callback = { result ->
+                when (result) {
+                    is WoowaResult.SUCCESS -> binding.product = result.data.product
+                    is WoowaResult.FAIL -> dismiss()
+                }
+            },
+            id = productId,
+        )
     }
 
     private fun calculateTotalPrice() {
