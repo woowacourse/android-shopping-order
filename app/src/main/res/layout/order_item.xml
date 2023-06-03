@@ -39,5 +39,14 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_product_name"
             tools:text="수량: 2개" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_product_name"
+            tools:text="20,000원" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

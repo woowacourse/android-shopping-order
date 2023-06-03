@@ -23,4 +23,6 @@
     <string name="tv_order_price">주문 금액</string>
     <string name="tv_discount_coupon">할인 쿠폰</string>
     <string name="tv_total_price">최종 결제 금액</string>
+    <string name="tv_order_history">주문 목록</string>
+    <string name="tv_order_detail_view"><![CDATA[상세 보기 >]]></string>
 </resources>
