@@ -14,5 +14,7 @@
     <string name="orderCount">주문하기(%d)</string>
     <string name="lastViewedProduct">마지막으로 본 상품</string>
     <string name="put">담기</string>
+    <string name="sungha">Sungha</string>
+    <string name="logeon">logeon</string>
 
 </resources>
