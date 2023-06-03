@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.ui.productDetail
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ProductInCart
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedRepository
