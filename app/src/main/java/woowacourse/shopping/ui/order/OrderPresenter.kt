@@ -19,6 +19,7 @@ class OrderPresenter(
                 cart = Cart(products.filter { ids.contains(it.id) })
                 view.showProducts(cart.cartProducts.map { it.toView() })
                 view.showOriginalPrice(cart.totalPrice)
+                view.updateFinalPrice(cart.totalPrice)
             },
             onFailure = {}
         )

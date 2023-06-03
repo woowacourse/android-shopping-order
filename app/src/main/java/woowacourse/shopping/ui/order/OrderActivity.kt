@@ -59,14 +59,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if(binding.usePoints.isFocused && !s.isNullOrEmpty() && s.toString().toInt() != 0) {
-                    presenter.usePoints(s.toString().toInt())
+                if(binding.usePoints.isFocused && s != null) {
+                    presenter.usePoints(s.toString().toIntOrNull() ?: 0)
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
         binding.btnUseAllPoints.setOnClickListener { presenter.useAllPoints() }
+
+        updateDiscountPrice(0)
     }
 
     override fun showProducts(products: List<CartProductModel>) {
@@ -82,6 +84,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun updatePointsUsed(points: Int) {
+        if(points == 0) return
         binding.usePoints.clearFocus()
         binding.usePoints.setText(points.toString())
         binding.usePoints.setSelection(binding.usePoints.length())
