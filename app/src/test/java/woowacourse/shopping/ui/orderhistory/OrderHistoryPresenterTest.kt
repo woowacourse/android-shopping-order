@@ -32,8 +32,12 @@ class OrderHistoryPresenterTest {
         // given
         val orders = OrderFixture.createOrders()
         val slotInitView = slot<(orders: List<Order>) -> Unit>()
+
         every {
-            repository.getOrders(onReceived = capture(slotInitView))
+            repository.getOrders(
+                onReceived = capture(slotInitView),
+                onFailed = any()
+            )
         } answers {
             slotInitView.captured.invoke(orders)
         }

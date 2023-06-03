@@ -89,7 +89,7 @@ class BasketPresenterTest {
             .products
             .map { it.toBasketProductUiModel() }
 
-        verify { basketRepository.update(basketProduct.plusCount()) }
+        verify { basketRepository.update(basketProduct.plusCount(), any(), any()) }
         verify { view.updateBasketProducts(expected) }
     }
 
@@ -114,7 +114,7 @@ class BasketPresenterTest {
             .products
             .map { it.toBasketProductUiModel() }
 
-        verify { basketRepository.update(basketProduct.minusCount()) }
+        verify { basketRepository.update(basketProduct.minusCount(), any(), any()) }
         verify { view.updateBasketProducts(expected) }
     }
 
@@ -194,7 +194,7 @@ class BasketPresenterTest {
             .products
             .map { it.toBasketProductUiModel() }
 
-        verify { basketRepository.remove(basketProduct) }
+        verify { basketRepository.remove(basketProduct, any(), any()) }
         verify { view.updateNavigatorEnabled(any(), any()) }
         verify { view.updateBasketProducts(expected) }
     }

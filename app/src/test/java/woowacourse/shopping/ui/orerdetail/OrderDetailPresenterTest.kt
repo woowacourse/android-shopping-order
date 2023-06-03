@@ -40,7 +40,8 @@ class OrderDetailPresenterTest {
         every {
             repository.getOrder(
                 orderId = 10,
-                onReceived = capture(slotInitView)
+                onReceived = capture(slotInitView),
+                onFailed = any()
             )
         }.answers {
             slotInitView.invoke(order)

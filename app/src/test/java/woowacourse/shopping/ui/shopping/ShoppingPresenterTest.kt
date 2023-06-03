@@ -60,12 +60,13 @@ class ShoppingPresenterTest {
     fun `저장소로부터 장바구니 상품들을 받아와 장바구니 개수를 갱신한다`() {
         // given
         val basketProducts = BasketProductFixture.createBasketProducts()
-        val slotUpdateProducts = slot<(products: List<BasketProduct>) -> Unit>()
+        val slotUpdateProducts = slot<(List<BasketProduct>) -> Unit>()
         val totalBasketProductCount = basketProducts.sumOf { it.count.value }
 
         every {
             basketRepository.getAll(
-                onReceived = capture(slotUpdateProducts)
+                onReceived = capture(slotUpdateProducts),
+                onFailed = any()
             )
         }.answers {
             slotUpdateProducts.captured.invoke(basketProducts)
@@ -83,7 +84,12 @@ class ShoppingPresenterTest {
         // given
         val products = ProductFixture.createProducts()
         val slotUpdateProducts = slot<(products: List<Product>) -> Unit>()
-        setUpBasket(products)
+
+        setUpBasket(
+            products = products,
+            basketProducts = listOf()
+        )
+
         every {
             productRepository.getPartially(
                 any(),
@@ -142,7 +148,13 @@ class ShoppingPresenterTest {
 
         verify { view.updateProducts(expected) }
         verify { view.updateTotalBasketCount(basketProducts.sumOf { it.count.value }) }
-        verify { basketRepository.update(basketProducts.find { it.product.id == products.first().id }!!) }
+        verify {
+            basketRepository.update(
+                basketProduct = basketProducts.find { it.product.id == products.first().id }!!,
+                any(),
+                any()
+            )
+        }
     }
 
     @Test
@@ -172,7 +184,13 @@ class ShoppingPresenterTest {
 
         verify { view.updateProducts(expected) }
         verify { view.updateTotalBasketCount(basketProducts.sumOf { it.count.value }) }
-        verify { basketRepository.update(basketProducts.find { it.product.id == products.first().id }!!) }
+        verify {
+            basketRepository.update(
+                basketProducts.find { it.product.id == products.first().id }!!,
+                any(),
+                any()
+            )
+        }
     }
 
     @Test
@@ -207,14 +225,14 @@ class ShoppingPresenterTest {
 
         every {
             basketRepository.getAll(
-                onReceived = capture(slotUpdateBasketProducts)
+                onReceived = capture(slotUpdateBasketProducts),
+                any()
             )
         }.answers {
             basketProducts?.let {
                 slotUpdateBasketProducts.captured.invoke(it)
             }
         }
-
         presenter.initBasket()
     }
 }

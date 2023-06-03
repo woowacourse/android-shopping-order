@@ -83,7 +83,7 @@ class PaymentPresenterTest {
                 usingPoint = usingPoint,
                 totalPrice = totalPrice,
                 onAdded = capture(slotShowOrderDetail),
-                onFailed = {}
+                onFailed = any()
             )
         } answers {
             slotShowOrderDetail.captured.invoke(orderId)
