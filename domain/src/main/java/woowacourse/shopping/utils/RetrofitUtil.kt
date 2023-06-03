@@ -71,11 +71,11 @@ object RetrofitUtil {
         }
     }
 
-    fun <T> callbackWithNoBody(block: (Result<T>?) -> Unit): Callback<T> {
+    fun <T> callbackWithNoBody(block: (Result<T?>) -> Unit): Callback<T> {
         return object : Callback<T> {
             override fun onResponse(call: Call<T>, response: Response<T>) {
                 if (response.isSuccessful) {
-                    block(null)
+                    block(Result.success(null))
                 } else {
                     block(Result.failure(Throwable(response.message())))
                 }

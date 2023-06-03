@@ -1,11 +1,10 @@
 package woowacourse.shoppoing.data.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.json.JSONArray
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.utils.RetrofitUtil
 import woowacourse.shopping.utils.mockWebServer.MockWeb
 
 class ProductRemoteDataSourceImplTest {
@@ -16,120 +15,47 @@ class ProductRemoteDataSourceImplTest {
     fun setUp() {
         // given
         mockWebServer = MockWeb()
-        remoteProductRepository = ProductRemoteDataSourceImpl(
-            mockWebServer.url
-        )
+        RetrofitUtil.url = mockWebServer.url
+        remoteProductRepository = ProductRemoteDataSourceImpl()
     }
 
     @Test
     fun `상품 목록을 가져온다`() {
         // when
-        val products = remoteProductRepository.getAll()
-
-        // then
-        assertThat(products).hasSize(100)
-        for (i in 0..99) {
-            assertThat(products[i].id).isEqualTo(i)
-            assertThat(products[i].name).isEqualTo("치킨$i")
-            assertThat(products[i].price).isEqualTo(10000)
-            assertThat(products[i].imageUrl).isEqualTo(
-                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
-            )
+        var lock = true
+        remoteProductRepository.getAll {
+            // then
+            it.onSuccess { products ->
+                assertThat(products).hasSize(100)
+                for (i in 0..99) {
+                    assertThat(products[i].id).isEqualTo(i)
+                    assertThat(products[i].name).isEqualTo("치킨$i")
+                    assertThat(products[i].price).isEqualTo(10000)
+                    assertThat(products[i].imageUrl).isEqualTo(
+                        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
+                    )
+                }
+            }.onFailure { e -> throw e }
+            lock = false
         }
-    }
-
-    @Test
-    fun `다음 상품들을 가져온다_1`() {
-        // when
-        val products = remoteProductRepository.getNext(10)
-
-        // then
-        assertThat(products).hasSize(10)
-        for (i in 0..9) {
-            assertThat(products[i].id).isEqualTo(i)
-            assertThat(products[i].name).isEqualTo("치킨$i")
-            assertThat(products[i].price).isEqualTo(10000)
-            assertThat(products[i].imageUrl).isEqualTo(
-                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
-            )
-        }
-    }
-
-    @Test
-    fun `다음 상품들을 가져온다_2`() {
-        // when
-        remoteProductRepository.getNext(10)
-        val products = remoteProductRepository.getNext(10)
-
-        // then
-        println(products)
-        assertThat(products).hasSize(10)
-        for (i in 0..9) {
-            assertThat(products[i].id).isEqualTo(i + 10)
-            assertThat(products[i].name).isEqualTo("치킨${i + 10}")
-            assertThat(products[i].price).isEqualTo(10000)
-            assertThat(products[i].imageUrl).isEqualTo(
-                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
-            )
-        }
-    }
-
-    @Test
-    fun `다음 상품드을 가져온다_3`() {
-        // when
-        val products = remoteProductRepository.getNext(20)
-
-        // then
-        println(products)
-        assertThat(products).hasSize(20)
-        for (i in 0..9) {
-            assertThat(products[i].id).isEqualTo(i)
-            assertThat(products[i].name).isEqualTo("치킨$i")
-            assertThat(products[i].price).isEqualTo(10000)
-            assertThat(products[i].imageUrl).isEqualTo(
-                "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
-            )
-        }
+        while (lock) { Thread.sleep(100) }
     }
 
     @Test
     fun `ID로 상품을 가져온다`() {
         // when
-        val product = remoteProductRepository.findById(1)
-
-        // then
-        println(product)
-        assertThat(product.id).isEqualTo(1)
-        assertThat(product.name).isEqualTo("치킨1")
-        assertThat(product.price).isEqualTo(10000)
-        assertThat(product.imageUrl).isEqualTo(
-            "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
-        )
-    }
-
-    @Test
-    fun `상품을 등록할 수 있다`() {
-        val product = Product(
-            id = 999,
-            name = "치킨",
-            price = 10000,
-            imageUrl = "http://example.com/chicken.jpg"
-        )
-
-        // when
-        remoteProductRepository.insert(product)
-
-        // then
-        val request = mockWebServer.takeRequest()
-        val json = JSONArray(request.body.readUtf8()).getJSONObject(0)
-        json.let {
-            println(it)
-            assertThat(it.getInt("id")).isEqualTo(999)
-            assertThat(it.getString("name")).isEqualTo("치킨")
-            assertThat(it.getInt("price")).isEqualTo(10000)
-            assertThat(it.getString("imageUrl")).isEqualTo("http://example.com/chicken.jpg")
+        var lock = true
+        remoteProductRepository.findById(1) {
+            it.onSuccess { product ->
+                assertThat(product.id).isEqualTo(1)
+                assertThat(product.name).isEqualTo("치킨1")
+                assertThat(product.price).isEqualTo(10000)
+                assertThat(product.imageUrl).isEqualTo(
+                    "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
+                )
+            }.onFailure { e -> throw e }
+            lock = false
         }
-
-        assertThat(request.path).isEqualTo("/products")
+        while (lock) { Thread.sleep(100) }
     }
 }

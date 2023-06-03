@@ -15,10 +15,6 @@ class MockWeb {
         mockWebServer.url("/")
     }
 
-    fun takeRequest(): RecordedRequest {
-        return mockWebServer.takeRequest()
-    }
-
     companion object {
         val dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {

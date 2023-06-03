@@ -22,7 +22,7 @@ interface RetrofitCartService {
     fun postCart(
         @Header("Authorization") token: String,
         @Body productId: ProductIdBody
-    ): Call<Int>
+    ): Call<Void>
 
     @PATCH("cart-items/{cartId}")
     fun patchCart(

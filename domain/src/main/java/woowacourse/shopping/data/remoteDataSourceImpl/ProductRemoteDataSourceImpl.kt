@@ -19,6 +19,11 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     }
 
     override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
-        RetrofitUtil.retrofitProductService.getProduct(id).enqueue(RetrofitUtil.callback(callback))
+        RetrofitUtil.retrofitProductService.getProduct(id).enqueue(
+            RetrofitUtil.callback { result ->
+                result.onSuccess { callback(Result.success(it[0])) }
+                    .onFailure { e -> callback(Result.failure(e)) }
+            }
+        )
     }
 }

@@ -18,7 +18,12 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
     override fun postItem(itemId: Int, callback: (Result<Int>) -> Unit) {
         RetrofitUtil.retrofitCartService
             .postCart(credentials, ProductIdBody(itemId))
-            .enqueue(RetrofitUtil.callback(callback))
+            .enqueue(
+                RetrofitUtil.callbackWithNoBody { result ->
+                    result.onSuccess { callback(Result.success(1)) }
+                        .onFailure { e -> callback(Result.failure(e)) }
+                }
+            )
     }
 
     override fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Result<Int>) -> Unit) {
@@ -26,11 +31,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             .patchCart(itemId, credentials, QuantityBody(quantity))
             .enqueue(
                 RetrofitUtil.callbackWithNoBody { result ->
-                    RetrofitUtil.callback(callback)
-                    when (result) {
-                        null -> callback(Result.success(quantity))
-                        else -> callback(Result.failure(NullPointerException()))
-                    }
+                    result.onSuccess { callback(Result.success(quantity)) }
+                        .onFailure { e -> callback(Result.failure(e)) }
                 }
             )
     }
@@ -40,11 +42,8 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
             .deleteCart(itemId, credentials)
             .enqueue(
                 RetrofitUtil.callbackWithNoBody { result ->
-                    RetrofitUtil.callback(callback)
-                    when (result) {
-                        null -> callback(Result.success(0))
-                        else -> callback(Result.failure(NullPointerException()))
-                    }
+                    result.onSuccess { callback(Result.success(0)) }
+                        .onFailure { e -> callback(Result.failure(e)) }
                 }
             )
     }

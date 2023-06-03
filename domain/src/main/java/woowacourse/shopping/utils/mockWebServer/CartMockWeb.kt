@@ -15,10 +15,6 @@ class CartMockWeb {
         mockWebServer.url("/")
     }
 
-    fun takeRequest(): RecordedRequest {
-        return mockWebServer.takeRequest()
-    }
-
     companion object {
         val dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
@@ -27,8 +23,7 @@ class CartMockWeb {
                         val path = request.path ?: return MockResponse().setResponseCode(404)
                         when {
                             path.startsWith("/cart-items") -> {
-                                val cartItemId = path.substringAfterLast("/").toInt()
-                                val locationHeader = "/cart-items/$cartItemId"
+                                val locationHeader = "/cart-items/1"
                                 MockResponse()
                                     .setResponseCode(201)
                                     .addHeader("Location", locationHeader)
