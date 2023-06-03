@@ -161,7 +161,6 @@ class CartPresenter(
             cartItems[index] = CartViewItem.CartProductItem(newProduct)
             cartPagination.updateItem(cartId, quantity)
             cartSystem.updateProduct(cartId, quantity)
-            view.showChangedItem(index)
             _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
             view.showChangedItem(index)
         }
