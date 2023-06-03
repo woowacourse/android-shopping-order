@@ -152,6 +152,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showOrderView(cartIds: ArrayList<Long>) {
         val intent = OrderActivity.createIntent(this, cartIds, url, token)
         startActivity(intent)
+        finish()
     }
 
     private fun setAllProductCheckedClick() {
