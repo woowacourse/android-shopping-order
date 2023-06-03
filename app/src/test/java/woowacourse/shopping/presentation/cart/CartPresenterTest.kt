@@ -51,6 +51,7 @@ class CartPresenterTest {
 
         every { cartRepository.getAllLocalCart() } returns CartFixture.getFixture()
             .map { it.toModel() }
+        justRun { view.setEnableOrderButton(true) }
         justRun { view.setCartItemsView(capture(slotItems)) }
         justRun { view.setTotalPriceView(capture(slotTotalPrice)) }
         justRun { view.setEnableLeftButton(false) }
@@ -71,6 +72,7 @@ class CartPresenterTest {
         assertEquals(expectedTotalPrice, actualTotalPrice)
 
         verify { cartRepository.getAllLocalCart() }
+        verify { view.setEnableOrderButton(true) }
         verify { view.setCartItemsView(slotItems.captured) }
         verify { view.setTotalPriceView(slotTotalPrice.captured) }
         verify { view.setEnableLeftButton(false) }
@@ -87,6 +89,8 @@ class CartPresenterTest {
 
         justRun { cartRepository.deleteLocalCart(targetCartId) }
         justRun { cartRepository.deleteCart(targetCartId) }
+
+        justRun { view.setEnableOrderButton(true) }
         justRun { view.setEnableLeftButton(false) }
         justRun { view.setEnableRightButton(false) }
 
@@ -125,6 +129,7 @@ class CartPresenterTest {
         assertEquals(expected, actual)
         verify { cartRepository.deleteLocalCart(targetCartId) }
         verify { cartRepository.deleteCart(targetCartId) }
+        verify { view.setEnableOrderButton(true) }
         verify { view.setEnableLeftButton(false) }
         verify { view.setEnableRightButton(false) }
         verify { view.setChangedCartItemsView(actual) }

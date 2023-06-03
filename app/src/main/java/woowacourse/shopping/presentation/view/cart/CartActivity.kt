@@ -123,6 +123,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun setEnableOrderButton(isEnabled: Boolean) {
+        binding.btCartListPageRight.post {
+            binding.btCartOrder.isEnabled = isEnabled
+        }
+    }
+
     private fun setLeftButtonClick() {
         binding.btCartListPageLeft.setOnClickListener {
             presenter.setPreviousPage()

@@ -20,11 +20,16 @@ class CartPresenter(
     override fun initCartItems() {
         cartRepository.loadAllCarts(::onFailure) {
             setPageNation(it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() }, 1)
+            setEnabledOrder()
             loadLocalCartItemChecked()
             loadCartItems()
             calculateTotalPrice()
             view.setLayoutVisibility()
         }
+    }
+
+    private fun setEnabledOrder() {
+        view.setEnableOrderButton(pageNation.currentItems.isNotEmpty())
     }
 
     override fun setPageNation(cartProducts: List<CartModel>, currentPage: Int) {
@@ -55,6 +60,7 @@ class CartPresenter(
         cartRepository.deleteLocalCart(cartId)
         cartRepository.deleteCart(cartId)
 
+        setEnabledOrder()
         view.setEnableLeftButton(pageNation.hasPreviousPage())
         view.setEnableRightButton(pageNation.hasNextPage())
 

@@ -8,6 +8,7 @@ interface CartContract {
         fun setChangedCartItemsView(carts: List<CartModel>)
         fun setEnableLeftButton(isEnabled: Boolean)
         fun setEnableRightButton(isEnabled: Boolean)
+        fun setEnableOrderButton(isEnabled: Boolean)
         fun setAllCartChecked(isChecked: Boolean)
         fun setPageCountView(page: Int)
         fun setTotalPriceView(totalPrice: Int)
