@@ -11,7 +11,7 @@ import woowacourse.shopping.data.repository.MypageRemoteRepository
 import woowacourse.shopping.data.repository.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityMypageBinding
 
-class MypageActivity : AppCompatActivity() {
+class MypageActivity : AppCompatActivity(), MypageContract.View {
     private val binding: ActivityMypageBinding by lazy {
         ActivityMypageBinding.inflate(
             layoutInflater,
@@ -19,6 +19,7 @@ class MypageActivity : AppCompatActivity() {
     }
     private val presenter: MypageContract.Presenter by lazy {
         MypagePresenter(
+            this,
             MypageRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
         )
     }
@@ -50,6 +51,11 @@ class MypageActivity : AppCompatActivity() {
     private fun setUpActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
+    override fun showNegativeIntErrorToast() {
+        Toast.makeText(this, getString(R.string.unable_use_negative_int), Toast.LENGTH_LONG).show()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
