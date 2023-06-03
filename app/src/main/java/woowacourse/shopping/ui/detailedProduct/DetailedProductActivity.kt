@@ -26,11 +26,25 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
     private lateinit var binding: ActivityDetailedProductBinding
     private lateinit var presenter: DetailedProductContract.Presenter
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.exit_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.exit -> finish()
+            else -> super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
         initPresenter()
         initToolbar()
+        initView()
     }
 
     private fun initBinding() {
@@ -57,23 +71,13 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             ),
             intent.getIntExtra(KEY_PRODUCT_ID, -1)
         )
+    }
+
+    private fun initView() {
         binding.presenter = presenter
         presenter.setUpLastProduct()
         presenter.setUpProductDetail()
         presenter.addProductToRecent()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.exit_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.exit -> finish()
-            else -> super.onOptionsItemSelected(item)
-        }
-        return true
     }
 
     override fun setProductDetail(product: ProductUIModel, lastProduct: ProductUIModel?) {
@@ -81,13 +85,17 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
         binding.lastProduct = lastProduct
     }
 
+    override fun showProductNotFound() {
+        finish()
+    }
+
     override fun navigateToCart() {
         startActivity(CartActivity.getIntent(this))
     }
 
-    override fun navigateToDetailedProduct(product: ProductUIModel) {
+    override fun navigateToDetailedProduct(productId: Int) {
         startActivity(
-            getIntent(this, product).apply {
+            getIntent(this, productId).apply {
                 flags = FLAG_ACTIVITY_CLEAR_TOP
             }
         )
@@ -104,13 +112,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
     }
 
     companion object {
-        private const val KEY_PRODUCT = "KEY_PRODUCT"
-        private const val KEY_PRODUCT_ID = "KEY_PRODUCT"
-        fun getIntent(context: Context, product: ProductUIModel): Intent {
-            return Intent(context, DetailedProductActivity::class.java).apply {
-                putExtra(KEY_PRODUCT, product)
-            }
-        }
+        private const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
 
         fun getIntent(context: Context, productId: Int): Intent {
             return Intent(context, DetailedProductActivity::class.java).apply {

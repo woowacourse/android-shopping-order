@@ -130,8 +130,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         adapter.updateCartCounts(cartCounts)
     }
 
-    override fun navigateToProductDetail(product: ProductUIModel) {
-        startActivity(DetailedProductActivity.getIntent(this, product))
+    override fun navigateToProductDetail(productId: Int) {
+        startActivity(DetailedProductActivity.getIntent(this, productId))
     }
 
     override fun setToolbar(totalCount: Int) {
@@ -143,7 +143,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun navigateToOrders() {
-        println("navigateToOrders")
         startActivity(OrdersActivity.getIntent(this))
     }
 

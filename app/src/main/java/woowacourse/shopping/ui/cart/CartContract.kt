@@ -3,13 +3,12 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.LiveData
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
 
 interface CartContract {
 
     interface View {
         fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel)
-        fun navigateToItemDetail(product: ProductUIModel)
+        fun navigateToItemDetail(productId: Int)
         fun navigateToOrder(cartIds: List<Int>)
     }
 

@@ -32,9 +32,12 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
     }
 
     override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
+        println(id)
+        println(ProductConstant.getGetQuery(id))
         db.rawQuery(ProductConstant.getGetQuery(id), null).use {
             it.moveToNext()
-            callback(Result.success(ProductConstant.fromCursor(it)))
+            runCatching { callback(Result.success(ProductConstant.fromCursor(it))) }
+                .onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }
 

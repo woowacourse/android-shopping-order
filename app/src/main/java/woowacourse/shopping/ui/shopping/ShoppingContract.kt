@@ -9,7 +9,7 @@ interface ShoppingContract {
         fun setRecentProducts(recentProductsData: List<RecentProductUIModel>)
         fun setCartProducts(cartCounts: Map<Int, Int>)
         fun setToolbar(totalCount: Int)
-        fun navigateToProductDetail(product: ProductUIModel)
+        fun navigateToProductDetail(productId: Int)
         fun navigateToOrders()
     }
 

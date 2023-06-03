@@ -54,10 +54,7 @@ class ShoppingPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        productRepository.findById(productId) { result ->
-            result.onSuccess { view.navigateToProductDetail(it.toUIModel()) }
-                .onFailure { throwable -> LogUtil.logError(throwable) }
-        }
+        view.navigateToProductDetail(productId)
     }
 
     override fun navigateToOrders() {

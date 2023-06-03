@@ -13,7 +13,6 @@ import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -124,8 +123,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         adapter.submitList(page, pageUIModel)
     }
 
-    override fun navigateToItemDetail(product: ProductUIModel) {
-        startActivity(DetailedProductActivity.getIntent(this, product))
+    override fun navigateToItemDetail(productId: Int) {
+        startActivity(DetailedProductActivity.getIntent(this, productId))
     }
 
     override fun navigateToOrder(cartIds: List<Int>) {

@@ -21,11 +21,19 @@ class DetailedProductPresenter(
     private var lastProduct: ProductUIModel? = null
 
     init {
+        var block = false
         productRepository.findById(productId) { result ->
             result.onSuccess { product -> this.product = product.toUIModel() }
                 .onFailure { exception -> LogUtil.logError(exception) }
+                .also { block = true }
+        }
+        while (!block) { Thread.sleep(100) }
+
+        if (!this::product.isInitialized) {
+            view.showProductNotFound()
         }
     }
+
     override fun setUpLastProduct() {
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }
@@ -59,7 +67,7 @@ class DetailedProductPresenter(
     override fun navigateToDetailedProduct() {
         lastProduct?.let {
             sharedPreferenceUtils.setLastProductId(-1)
-            view.navigateToDetailedProduct(it)
+            view.navigateToDetailedProduct(it.id)
         }
     }
 

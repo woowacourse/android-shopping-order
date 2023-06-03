@@ -138,12 +138,7 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        cartRepository.getAll { result ->
-            result.onSuccess { cartProducts ->
-                cartProducts.all().first { it.product.id == productId }.product
-                    .let { view.navigateToItemDetail(it.toUIModel()) }
-            }.onFailure { throwable -> LogUtil.logError(throwable) }
-        }
+        view.navigateToItemDetail(productId)
     }
 
     override fun navigateToOrder() {
