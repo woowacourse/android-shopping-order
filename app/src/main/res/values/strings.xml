@@ -16,5 +16,8 @@
     <string name="put">담기</string>
     <string name="sungha">Sungha</string>
     <string name="logeon">logeon</string>
+    <string name="currentChange">현재 잔액</string>
+    <string name="recharge">충전하기</string>
+    <string name="hintRechargeValue">10,000</string>
 
 </resources>
