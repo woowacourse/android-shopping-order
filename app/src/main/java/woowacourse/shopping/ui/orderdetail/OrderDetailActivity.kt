@@ -22,7 +22,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             orderRepository = OrderRepositoryImpl(
                 orderRemoteDataSource = OrderRemoteDataSourceImpl()
             ),
-            orderId = intent.getIntExtra(ORDER_ID, -1),
+            orderId = intent.getIntExtra(ORDER_ID, DEFAULT_VALUE),
             order = intent.getSerializableCompat(ORDER_RECORD)
         )
     }
@@ -40,7 +40,15 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     private fun initToolbar() {
         binding.tbOrder.setNavigationOnClickListener {
-            finish()
+            // 주문 목록 화면에서 온 경우에는 바로 이전 화면으로 이동
+            if (intent.getIntExtra(ORDER_ID, DEFAULT_VALUE) == DEFAULT_VALUE) {
+
+                return@setNavigationOnClickListener finish()
+            }
+            // 결제 화면에서 주문 상세 화면으로 온 경우에는 액티비티 종료 시 바로 shoppingActivity로 이동
+            val intent = ShoppingActivity.getIntent(this)
+
+            startActivity(intent)
         }
     }
 
@@ -58,6 +66,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     companion object {
         private const val ORDER_ID = "order_id"
         private const val ORDER_RECORD = "order_record"
+        private const val DEFAULT_VALUE = -1
 
         fun getIntent(
             context: Context,
@@ -75,7 +84,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         fun getIntent(
             context: Context,
-            orderId: Int? = 1,
+            orderId: Int?,
         ): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
                 .apply {
