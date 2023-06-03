@@ -3,7 +3,7 @@ package woowacourse.shopping.model
 class CartProducts(cartProducts: List<CartProduct>) {
     private val cartProducts: MutableList<CartProduct>
     private var checks = mutableMapOf<Int, Boolean>()
-    private val checkedProducts: List<CartProduct>
+    val checkedProducts: List<CartProduct>
         get() = cartProducts.filter { checks.getOrPut(it.id) { true } }
     val size: Int get() = cartProducts.size
 

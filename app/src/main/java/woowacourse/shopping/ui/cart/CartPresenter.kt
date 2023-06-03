@@ -144,7 +144,7 @@ class CartPresenter(
     override fun navigateToOrder() {
         cartRepository.getAll { result ->
             result.onSuccess { cartProducts ->
-                view.navigateToOrder(cartProducts.all().map { it.id })
+                view.navigateToOrder(cartProducts.checkedProducts.map { it.id })
             }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
