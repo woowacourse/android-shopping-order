@@ -34,6 +34,5 @@ interface MainContract {
         fun changeProductCartCount(productId: Long, count: Int)
         fun moveToCart()
         fun moveToOrderList()
-        fun resetProducts()
     }
 }

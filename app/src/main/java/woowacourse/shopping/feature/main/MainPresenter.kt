@@ -168,10 +168,6 @@ class MainPresenter(
         _mainScreenEvent.value = MainScreenEvent.ShowOrderListScreen
     }
 
-    override fun resetProducts() {
-        productRepository.resetCache()
-    }
-
     private fun createCartProductUiModels(
         products: List<Product>,
         cartInfo: List<CartProduct>

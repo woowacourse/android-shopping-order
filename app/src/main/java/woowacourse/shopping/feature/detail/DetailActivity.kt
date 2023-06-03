@@ -54,7 +54,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         val productService = ApiModule.createProductService()
         presenter = DetailPresenter(
             this,
-            ProductRepositoryImpl(ApiModule.createProductService()),
+            ProductRepositoryImpl(ApiModule.createProductService(), null),
             RecentProductRepositoryImpl(RecentDao(this), productService),
             CartRepositoryImpl(ApiModule.createCartService()),
             productId,

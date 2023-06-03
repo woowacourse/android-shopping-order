@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repository
 
 import com.example.domain.cache.ProductCache
-import com.example.domain.cache.ProductLocalCache
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
@@ -13,14 +12,14 @@ import woowacourse.shopping.data.model.dto.response.ProductDto
 
 class ProductRepositoryImpl(
     private val service: ProductService,
-    override val cache: ProductCache = ProductLocalCache,
+    private val cache: ProductCache?,
 ) : ProductRepository {
     private val allProducts: MutableList<Product> = mutableListOf()
     override fun fetchFirstProducts(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        if (cache.productList.isEmpty()) {
+        if (cache?.productList?.isEmpty() != false) {
             service.getAllProducts().enqueue(object : Callback<List<ProductDto>> {
                 override fun onResponse(
                     call: Call<List<ProductDto>>,
@@ -36,7 +35,7 @@ class ProductRepositoryImpl(
                         }
                     )
                     val nextProducts = allProducts.take(UNIT_SIZE)
-                    cache.addProducts(nextProducts)
+                    cache?.addProducts(nextProducts)
                     onSuccess(nextProducts)
                 }
 
@@ -56,7 +55,7 @@ class ProductRepositoryImpl(
     ) {
         val nextProducts = allProducts.filter { it.id > lastProductId }.take(UNIT_SIZE)
         if (nextProducts.isEmpty()) onFailure()
-        cache.addProducts(nextProducts)
+        cache?.addProducts(nextProducts)
         onSuccess(nextProducts)
     }
 
@@ -79,10 +78,6 @@ class ProductRepositoryImpl(
                 onFailure()
             }
         })
-    }
-
-    override fun resetCache() {
-        cache.clear()
     }
 
     companion object {

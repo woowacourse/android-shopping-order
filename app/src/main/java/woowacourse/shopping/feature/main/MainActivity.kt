@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.domain.cache.ProductLocalCache
 import woowacourse.shopping.R
 import woowacourse.shopping.commonUi.CartCounterBadge
 import woowacourse.shopping.data.dataSource.recent.RecentDao
@@ -100,7 +101,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val productService = ApiModule.createProductService()
         val cartProductRemoteService = ApiModule.createCartService()
         presenter = MainPresenter(
-            ProductRepositoryImpl(productService),
+            ProductRepositoryImpl(productService, ProductLocalCache()),
             CartRepositoryImpl(cartProductRemoteService),
             RecentProductRepositoryImpl(RecentDao(this), productService),
         )
@@ -181,13 +182,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         recentWrapperAdapter.onRestoreState(savedInstanceState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) {
-            presenter.resetProducts()
-        }
     }
 
     companion object {
