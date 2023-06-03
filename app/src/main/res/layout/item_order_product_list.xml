@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="cartProduct"
+            type="woowacourse.shopping.ui.model.CartProductModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,6 +24,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{cartProduct.product.title}"
             android:textColor="#333333"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -27,11 +35,12 @@
 
         <ImageView
             android:id="@+id/order_product_picture"
+            loadPicture="@{cartProduct.product.picture}"
             android:layout_width="136dp"
             android:layout_height="56dp"
             android:layout_marginTop="10dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
+            tools:src="@drawable/ic_launcher_background"
             app:layout_constraintStart_toStartOf="@id/order_product_title"
             app:layout_constraintTop_toBottomOf="@id/order_product_title" />
 
@@ -39,6 +48,7 @@
             android:id="@+id/order_product_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/product_quantity(cartProduct.quantity)}"
             android:textColor="#333333"
             android:textSize="13sp"
             app:layout_constraintBottom_toTopOf="@id/order_product_total_price"
@@ -49,6 +59,7 @@
             android:id="@+id/order_product_total_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/product_price(cartProduct.product.price)}"
             android:textColor="#333333"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

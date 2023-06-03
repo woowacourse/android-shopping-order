@@ -8,17 +8,29 @@
         android:layout_height="match_parent"
         tools:context=".ui.order.OrderActivity">
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/order_toolbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingVertical="20dp"
+            android:background="@color/toolbar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Order"
+            app:titleTextColor="@color/white" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_final_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/order_toolbar">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingVertical="20dp">
 
                 <TextView
                     android:id="@+id/tv_order_product"
@@ -36,6 +48,8 @@
                     android:id="@+id/rv_order_product"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_order_product" />
@@ -195,6 +209,7 @@
         </androidx.core.widget.NestedScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_final_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="#D6D6D6"

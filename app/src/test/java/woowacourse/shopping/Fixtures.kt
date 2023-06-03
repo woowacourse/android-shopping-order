@@ -9,11 +9,15 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.URL
 import java.time.LocalDateTime
 
-fun createProductModel(): ProductModel = ProductModel(0, "", "", 1000)
+fun createProductModel(): ProductModel = ProductModel(0, "", "글로", 1000)
 fun createShoppingProductModel(): ShoppingProductModel =
     ShoppingProductModel(createProductModel(), 1)
-fun createCartProductModel(): CartProductModel =
-    CartProductModel(0, 0, true, createProductModel())
+fun createCartProductModel(
+    id: Int = 0,
+    quantity: Int = 0,
+    isChecked: Boolean = true,
+    product: ProductModel = createProductModel()
+): CartProductModel = CartProductModel(id, quantity, isChecked, product)
 
 fun createProduct(): Product = Product(0, URL(""), "글로", 1000)
 fun createRecentProduct(): RecentProduct =

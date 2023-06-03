@@ -33,4 +33,5 @@
     <string name="order_detail_text">주문 내역</string>
     <string name="show_order_history_detail_text">상세 보기 &gt;</string>
     <string name="order_history_text">주문 목록</string>
+    <string name="product_quantity">%d개</string>
 </resources>
