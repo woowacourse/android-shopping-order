@@ -43,9 +43,10 @@ internal class OrderConfirmPresenterTest {
 
         val mockCartProducts = CartFixture.getMockCarts()
         val successSlot = slot<(List<CartProduct>) -> Unit>()
-        every { cartRepository.getAll(capture(successSlot), any()) } answers {
+        every { cartRepository.fetchAll(capture(successSlot), any()) } answers {
             successSlot.captured(mockCartProducts)
         }
+        every { view.showSaleInfo() } just Runs
         every { view.setSaleInfo(any()) } just Runs
         every { view.setPayInfo(any(), any()) } just Runs
         every { view.setFinalPayInfo(any()) } just Runs
@@ -60,6 +61,7 @@ internal class OrderConfirmPresenterTest {
 
         // and
         verify { view.setSaleInfo(any()) }
+        verify { view.showSaleInfo() }
         // and
         verify { view.setPayInfo(any(), any()) }
         // and

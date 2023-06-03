@@ -41,7 +41,7 @@ internal class OrderDetailPresenterTest {
             )
         )
         val successSlot = slot<(OrderDetail) -> Unit>()
-        every { orderRepository.getOrderDetailById(orderId, capture(successSlot), any()) } answers {
+        every { orderRepository.fetchOrderDetailById(orderId, capture(successSlot), any()) } answers {
             successSlot.captured(mockOrderDetail)
         }
         val slot = slot<List<OrderProductUiModel>>()
