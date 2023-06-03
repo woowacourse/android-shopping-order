@@ -50,7 +50,7 @@ class CartRepositoryImpl(
     }
 
     override fun insert(productId: Int) {
-        if (cartItems.findByProductId(productId) != null) {
+        if (cartItems.firstOrNull { it.product.id == productId } != null) {
             return
         }
         remoteDataSource.postItem(productId) { getAll {} }
@@ -71,7 +71,7 @@ class CartRepositoryImpl(
                     .onFailure { throwable -> callback(Result.failure(throwable)) }
             }
         }
-        val cartItem = cartItems.findByProductId(productId)
+        val cartItem = cartItems.firstOrNull { it.product.id == productId }
         when {
             cartItem == null && count == 1 -> remoteDataSource.postItem(productId, callback)
             cartItem == null -> return
@@ -82,6 +82,6 @@ class CartRepositoryImpl(
     }
 
     override fun updateChecked(id: Int, checked: Boolean) {
-        cartItems.changeChecked(id, checked)
+        cartItems.setCheck(id, checked)
     }
 }

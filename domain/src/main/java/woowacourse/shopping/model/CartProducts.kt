@@ -1,6 +1,6 @@
 package woowacourse.shopping.model
 
-class CartProducts(private val value: MutableList<CartProduct>) {
+class CartProducts(private val value: MutableList<CartProduct>) : MutableList<CartProduct> by value {
     private val checks = value.associateBy({ it.id }, { true }).toMutableMap()
 
     val checkedProducts: List<CartProduct>
@@ -15,30 +15,12 @@ class CartProducts(private val value: MutableList<CartProduct>) {
     val totalQuantity: Int
         get() = value.sumOf { it.quantity }
 
-    val size: Int get() = value.size
-
-    operator fun get(index: Int): CartProduct {
-        return value[index]
-    }
-
-    fun toList(): List<CartProduct> {
-        return value.toList()
-    }
-
-    fun map(transform: (CartProduct) -> CartProduct): CartProducts {
-        return CartProducts(value.map(transform).toMutableList())
-    }
-
-    fun changeChecked(id: Int, checked: Boolean) {
+    fun setCheck(id: Int, checked: Boolean) {
         checks[id] = checked
     }
 
     fun getCheck(id: Int): Boolean {
         return checks.getOrDefault(id, false)
-    }
-
-    fun findByProductId(productId: Int): CartProduct? {
-        return value.firstOrNull { it.product.id == productId }
     }
 
     fun replaceAll(cartProducts: List<CartProduct>) {
@@ -47,16 +29,12 @@ class CartProducts(private val value: MutableList<CartProduct>) {
         cartProducts.forEach { checks.putIfAbsent(it.id, true) }
     }
 
-    fun isEmpty(): Boolean {
-        return value.isEmpty()
-    }
-
-    fun subList(offset: Int, size: Int): CartProducts {
+    override fun subList(fromIndex: Int, toIndex: Int): CartProducts {
         val lastIndex = value.lastIndex
-        val endIndex = (lastIndex + 1).coerceAtMost(offset + size)
+        val endIndex = (lastIndex + 1).coerceAtMost(fromIndex + toIndex)
 
-        return when (offset) {
-            in 0..lastIndex -> CartProducts(value.subList(offset, endIndex))
+        return when (fromIndex) {
+            in 0..lastIndex -> CartProducts(value.subList(fromIndex, endIndex))
             else -> CartProducts(mutableListOf())
         }
     }
