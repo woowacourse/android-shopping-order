@@ -21,7 +21,13 @@ class OrdersViewHolder(
 
     fun bind(order: OrderUIModel) {
         adapter.submitList(order.orderItems)
-        binding.order = order
+        binding.order = modifyFormat(order)
+    }
+
+    private fun modifyFormat(order: OrderUIModel): OrderUIModel {
+        val orderDate = order.orderDate
+        val newOrderDate = orderDate.substring(0, 10).replace("-", ".")
+        return order.copy(orderDate = newOrderDate)
     }
 
     companion object {

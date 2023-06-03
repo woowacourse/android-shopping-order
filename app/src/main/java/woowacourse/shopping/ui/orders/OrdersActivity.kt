@@ -13,6 +13,7 @@ import woowacourse.shopping.ui.orderDetail.OrderDetailActivity
 import woowacourse.shopping.ui.orders.ordersAdapter.OrdersAdapter
 import woowacourse.shopping.ui.orders.ordersAdapter.OrdersListener
 import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
+import woowacourse.shopping.utils.PhDividerItemDecoration
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrdersActivity : AppCompatActivity(), OrdersContract.View {
@@ -68,6 +69,8 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
 
     private fun initView() {
         binding.recyclerView.adapter = adapter
+        binding.recyclerView.addItemDecoration(PhDividerItemDecoration(20f, 0xffebebeb.toInt()))
+
         presenter.getOrders()
     }
 
