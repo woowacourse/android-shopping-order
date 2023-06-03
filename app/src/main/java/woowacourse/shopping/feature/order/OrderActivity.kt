@@ -2,7 +2,9 @@ package woowacourse.shopping.feature.order
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.recyclerview.widget.ConcatAdapter
+import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.common.load.LoadAdapter
@@ -31,6 +33,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         initPresenter()
 
         presenter.loadOrders()
+
+        supportActionBar?.title = getString(R.string.order_history)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initAdapter() {
@@ -50,5 +55,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun showOrderDetailScreen(orderId: Int) {
         startActivity(OrderDetailActivity.getIntent(this, orderId))
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

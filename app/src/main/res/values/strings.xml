@@ -19,6 +19,7 @@
     <string name="password">Password</string>
     <string name="sign_in">sign in</string>
     <string name="order_detail">주문 상세 ></string>
+    <string name="order_detail_title">주문 상세</string>
     <string name="order_title">%s 외 %s건</string>
     <string name="product_name">상품명</string>
     <string name="payment">결제 금액</string>
