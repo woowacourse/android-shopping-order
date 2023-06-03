@@ -3,12 +3,12 @@ package com.example.domain.repository
 import com.example.domain.model.CartProduct
 
 interface CartRepository {
-    fun getAll(
+    fun fetchAll(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit,
     )
 
-    fun getSize(
+    fun fetchSize(
         onSuccess: (cartCount: Int) -> Unit,
         onFailure: () -> Unit
     )

@@ -23,7 +23,7 @@ class OrderConfirmPresenter(
     private var paymentPrice: Int = 0
 
     override fun loadSelectedCarts() {
-        cartRepository.getAll(
+        cartRepository.fetchAll(
             onSuccess = { cartProducts ->
                 val selectedCartItems = cartProducts.filter { it.cartId in cartIds }
                 _cartProducts.postValue(selectedCartItems.map { it.toPresentation() })

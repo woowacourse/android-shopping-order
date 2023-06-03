@@ -35,7 +35,7 @@ class DetailPresenter(
         productRepository.fetchProductById(
             productId,
             onSuccess = { product ->
-                cartRepository.getAll(
+                cartRepository.fetchAll(
                     onSuccess = { cartProducts ->
                         val productUiModel =
                             cartProducts.find { it.product.id == productId }
@@ -68,7 +68,7 @@ class DetailPresenter(
 
     override fun handleAddCartClick() {
         _product.value?.let {
-            cartRepository.getAll(
+            cartRepository.fetchAll(
                 onSuccess = { carts ->
                     val cartProductId =
                         carts.find { it.product.id == productId }?.cartId

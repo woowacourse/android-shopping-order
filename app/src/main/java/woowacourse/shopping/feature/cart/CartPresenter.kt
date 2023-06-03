@@ -44,7 +44,7 @@ class CartPresenter(
 
     override fun loadInitCartProduct() {
         view.showLoadingView()
-        cartRepository.getAll(
+        cartRepository.fetchAll(
             onSuccess = {
                 _page = Pagination(CartProducts(it), 1).toPresentation()
                 view.hideLoadingView()

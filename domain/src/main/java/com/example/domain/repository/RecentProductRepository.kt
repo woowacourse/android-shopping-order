@@ -4,7 +4,7 @@ import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 
 interface RecentProductRepository {
-    fun getAll(onSuccess: (List<RecentProduct>) -> Unit, onFailure: () -> Unit)
+    fun fetchAllRecentProduct(onSuccess: (List<RecentProduct>) -> Unit, onFailure: () -> Unit)
 
     fun addRecentProduct(
         product: Product,

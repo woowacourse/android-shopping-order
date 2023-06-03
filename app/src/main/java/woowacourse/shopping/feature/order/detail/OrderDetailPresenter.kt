@@ -11,7 +11,7 @@ class OrderDetailPresenter(
     private val orderId: Long,
 ) : OrderDetailContract.Presenter {
     override fun loadOrderInfo() {
-        orderRepository.getOrderDetailById(
+        orderRepository.fetchOrderDetailById(
             orderId,
             onSuccess = { orderDetail ->
                 val orderDetailUiModel = orderDetail.toPresentation()

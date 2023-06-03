@@ -9,7 +9,7 @@ class OrderListPresenter(
     private val orderRepository: OrderRepository,
 ) : OrderListContract.Presenter {
     override fun loadOrderItems() {
-        orderRepository.getAllOrders(
+        orderRepository.fetchAllOrders(
             onSuccess = { orders ->
                 view.setOrderListItems(orders.map(OrderMinInfoItem::toPresentation))
             },

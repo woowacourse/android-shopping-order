@@ -14,7 +14,7 @@ import java.net.URI
 class CartRepositoryImpl(
     private val cartProductService: CartProductService,
 ) : CartRepository {
-    override fun getAll(
+    override fun fetchAll(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: () -> Unit,
     ) {
@@ -35,7 +35,7 @@ class CartRepositoryImpl(
         })
     }
 
-    override fun getSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
+    override fun fetchSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
         cartProductService.getAllCartProduct().enqueue(object : Callback<List<CartProductDto>> {
             override fun onResponse(
                 call: Call<List<CartProductDto>>,

@@ -17,7 +17,7 @@ class RecentProductRepositoryImpl(
     private val recentDao: RecentDao,
     private val productService: ProductService,
 ) : RecentProductRepository {
-    override fun getAll(onSuccess: (List<RecentProduct>) -> Unit, onFailure: () -> Unit) {
+    override fun fetchAllRecentProduct(onSuccess: (List<RecentProduct>) -> Unit, onFailure: () -> Unit) {
         kotlin.runCatching { recentDao.selectAllRecent() }
             .onSuccess { getProductsInfo(it, onSuccess, onFailure) }
             .onFailure { onFailure() }

@@ -58,7 +58,7 @@ class MainPresenter(
     }
 
     private fun loadCartInfo(products: List<Product>) {
-        cartRepository.getAll(
+        cartRepository.fetchAll(
             onSuccess = { cartsInfo ->
                 val cartProductUiModels = createCartProductUiModels(products, cartsInfo)
                 _products.postValue(cartProductUiModels)
@@ -70,7 +70,7 @@ class MainPresenter(
     }
 
     override fun loadRecentProducts() {
-        recentProductRepository.getAll(
+        recentProductRepository.fetchAllRecentProduct(
             onSuccess = { recentProducts ->
                 val recentProductUiModels = recentProducts.map { it.toPresentation() }
                 _recentProducts.postValue(recentProductUiModels)
@@ -154,7 +154,7 @@ class MainPresenter(
     }
 
     private fun updateCartCountBadge() {
-        cartRepository.getSize(
+        cartRepository.fetchSize(
             onSuccess = { size -> _badgeCount.postValue(size) },
             onFailure = {}
         )

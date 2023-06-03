@@ -15,7 +15,7 @@ import java.net.URI
 class OrderRepositoryImpl(
     private val orderService: OrderService
 ) : OrderRepository {
-    override fun getAllOrders(onSuccess: (List<OrderMinInfoItem>) -> Unit, onFailure: () -> Unit) {
+    override fun fetchAllOrders(onSuccess: (List<OrderMinInfoItem>) -> Unit, onFailure: () -> Unit) {
         orderService.getOrders().enqueue(object : Callback<List<OrderMinInfoItemDto>> {
             override fun onResponse(
                 call: Call<List<OrderMinInfoItemDto>>,
@@ -31,7 +31,7 @@ class OrderRepositoryImpl(
         })
     }
 
-    override fun getOrderDetailById(
+    override fun fetchOrderDetailById(
         orderId: Long,
         onSuccess: (OrderDetail) -> Unit,
         onFailure: () -> Unit
