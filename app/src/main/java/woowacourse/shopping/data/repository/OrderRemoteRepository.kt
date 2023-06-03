@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -61,8 +60,6 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
                     onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
                     return
                 }
-                Log.d("LOGAN", response.headers().toString())
-                Log.d("LOGAN", response.toString())
                 callback(response.headers()["Location"]?.substringAfterLast("/")?.toInt())
             }
 
