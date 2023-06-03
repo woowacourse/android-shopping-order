@@ -37,7 +37,7 @@ class ProductCountView @JvmOverloads constructor(
         binding.countViewProductCount.visibility = View.GONE
     }
 
-    fun updateCountViewVisibility(count: Int) {
+    private fun updateCountViewVisibility(count: Int) {
         if (count == 0) {
             binding.fabProductCount.visibility = View.VISIBLE
             binding.countViewProductCount.visibility = View.GONE
@@ -45,14 +45,6 @@ class ProductCountView @JvmOverloads constructor(
             binding.fabProductCount.visibility = View.GONE
             binding.countViewProductCount.visibility = View.VISIBLE
         }
-    }
-
-    fun setMinCount(minCount: Int) {
-        binding.countViewProductCount.setMinCount(minCount)
-    }
-
-    fun setMaxCount(maxCount: Int) {
-        binding.countViewProductCount.setMaxCount(maxCount)
     }
 
     fun setCount(count: Int) {
