@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.serverSetting
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -27,7 +28,11 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun startMain(server: String) {
-        startActivity(ShoppingActivity.getIntent(this, server))
+        startActivity(
+            ShoppingActivity.getIntent(this, server).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+        )
         finish()
     }
 

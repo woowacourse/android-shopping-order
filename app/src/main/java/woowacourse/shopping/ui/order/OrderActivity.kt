@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -12,7 +14,7 @@ import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.OrderUIModel
 import woowacourse.shopping.ui.order.orderProductAdapter.OrderProductAdapter
-import woowacourse.shopping.ui.orderHistory.OrderHistoryActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var presenter: OrderContract.Presenter
@@ -58,16 +60,40 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initView() {
         binding.rvOrders.adapter = adapter
-        binding.confirmOrder = { presenter.confirmOrder(0) }
-        presenter.getOrderList()
+        binding.confirmOrder = {
+            presenter.confirmOrder(binding.etUsedPoint.text.toString().toIntOrNull() ?: 0)
+        }
+        presenter.getOrder()
     }
 
-    override fun showOrderList(orderUIModel: OrderUIModel) {
-        adapter.submitList(orderUIModel.cartProducts)
+    override fun showOrder(order: OrderUIModel) {
+        binding.order = order
+        binding.etUsedPoint.addTextChangedListener(
+            textWatcher(order.availablePoints)
+        )
+        adapter.submitList(order.cartProducts)
+    }
+
+    private fun textWatcher(maxPoint: Int) = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+        override fun afterTextChanged(s: Editable?) {
+            val currentPoint = s.toString().toIntOrNull() ?: 0
+            when {
+                currentPoint < 0 -> binding.etUsedPoint.setText("0")
+                currentPoint > maxPoint -> binding.etUsedPoint.setText(maxPoint.toString())
+                else -> Unit
+            }
+            binding.discountPrice = currentPoint
+        }
     }
 
     override fun navigateOrder(orderId: Long) {
-        startActivity(OrderHistoryActivity.getIntent(this, orderId))
+        startActivity(
+            ShoppingActivity.getIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        )
     }
 
     companion object {

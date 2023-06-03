@@ -147,8 +147,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context, server: String): Intent {
-            RetrofitUtil.url = server
+        fun getIntent(context: Context, server: String = ""): Intent {
+            if (server.isNotEmpty()) {
+                RetrofitUtil.url = server
+            }
             return Intent(context, ShoppingActivity::class.java)
         }
     }

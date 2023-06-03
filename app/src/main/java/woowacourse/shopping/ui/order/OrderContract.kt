@@ -4,12 +4,12 @@ import woowacourse.shopping.model.OrderUIModel
 
 interface OrderContract {
     interface View {
-        fun showOrderList(orderUIModel: OrderUIModel)
+        fun showOrder(order: OrderUIModel)
         fun navigateOrder(orderId: Long)
     }
 
     interface Presenter {
-        fun getOrderList()
+        fun getOrder()
         fun confirmOrder(point: Int)
     }
 }

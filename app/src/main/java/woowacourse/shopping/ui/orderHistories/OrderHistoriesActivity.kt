@@ -68,8 +68,8 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
     }
 
     private fun initView() {
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.addItemDecoration(PhDividerItemDecoration(20f, 0xffebebeb.toInt()))
+        binding.rvOrderHistories.adapter = adapter
+        binding.rvOrderHistories.addItemDecoration(PhDividerItemDecoration(20f, 0xffebebeb.toInt()))
 
         presenter.getOrderHistories()
     }

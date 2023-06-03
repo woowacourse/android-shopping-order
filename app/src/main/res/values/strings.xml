@@ -34,17 +34,24 @@
     <string name="server_setting_io_server">이오 서버</string>
     <string name="server_setting_jito_server">지토 서버</string>
 
-    <!-- Strings related to order page -->
-    <string name="order_page_order_list">주문 목록</string>
-    <string name="order_page_discount">할인</string>
-    <string name="order_page_point_use">포인트 사용</string>
-    <string name="order_page_money_suffix">원</string>
-    <string name="order_page_available_points">보유 포인트</string>
-    <string name="order_page_order_price">주문 금액</string>
-    <string name="order_page_discount_price">할인 금액</string>
-    <string name="order_page_total_price">총 결제 금액</string>
-    <string name="order_page_order_btn">주문하기</string>
+    <!-- Strings related to order -->
+    <string name="order_order_list_title">주문 목록</string>
+    <string name="order_discount_title">할인</string>
+    <string name="order_point_prefix">포인트 사용</string>
+    <string name="order_point_suffix">원</string>
+    <string name="order_available_points">보유 포인트 %,d원</string>
+    <string name="order_order_price_prefix">주문 금액</string>
+    <string name="order_discount_price_prefix">할인 금액</string>
+    <string name="order_total_price_prefix">총 결제 금액</string>
+    <string name="order_confirm_btn">주문 하기</string>
+
     <string name="order_history_navigate_to_detail">주문 상세</string>
     <string name="order_page_point_hint">0</string>
+    <string name="order_total_price_title">총 결제 금액</string>
+
+    <!-- Strings related to order history -->
+    <string name="order_history_title">주문 내역</string>
+    <string name="order_history_detail">주문 상세</string>
+    <string name="order_history_data_date">주문 일자</string>
 
 </resources>

@@ -62,8 +62,14 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setOrderHistory(orderHistory: OrderHistoryUIModel) {
-        binding.order = orderHistory
+        binding.orderHistory = modifyFormat(orderHistory)
         adapter.submitList(orderHistory.orderItems)
+    }
+
+    private fun modifyFormat(order: OrderHistoryUIModel): OrderHistoryUIModel {
+        val orderDate = order.orderDate
+        val newOrderDate = orderDate.substring(0, 10).replace("-", ".")
+        return order.copy(orderDate = newOrderDate)
     }
 
     override fun navigateToProductDetail(productId: Int) {
