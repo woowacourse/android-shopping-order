@@ -1,13 +1,10 @@
-package woowacourse.shopping
+package woowacourse.shopping.presentation.common
 
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.presentation.common.CounterContract
-import woowacourse.shopping.presentation.common.CounterListener
-import woowacourse.shopping.presentation.common.CounterPresenter
 
 class CounterPresenterTest {
     private lateinit var view: CounterContract.View

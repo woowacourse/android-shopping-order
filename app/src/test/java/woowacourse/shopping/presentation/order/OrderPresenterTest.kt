@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presentation.order
 
 import io.mockk.every
 import io.mockk.mockk
@@ -6,12 +6,12 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.Point
+import woowacourse.shopping.User
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.presentation.model.OrderProductsModel
 import woowacourse.shopping.presentation.model.ProductModel
-import woowacourse.shopping.presentation.order.OrderContract
-import woowacourse.shopping.presentation.order.OrderPresenter
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
 

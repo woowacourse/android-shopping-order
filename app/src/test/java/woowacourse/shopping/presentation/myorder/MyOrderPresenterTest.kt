@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presentation.myorder
 
 import io.mockk.every
 import io.mockk.mockk
@@ -6,9 +6,9 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.Order
+import woowacourse.shopping.Price
 import woowacourse.shopping.presentation.mapper.toPresentation
-import woowacourse.shopping.presentation.myorder.MyOrderContract
-import woowacourse.shopping.presentation.myorder.MyOrderPresenter
 import woowacourse.shopping.repository.OrderRepository
 import java.time.LocalDateTime
 
