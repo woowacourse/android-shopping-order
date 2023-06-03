@@ -3,10 +3,11 @@ package woowacourse.shopping.data.remoteDataSourceImpl
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.OrderList
+import woowacourse.shopping.model.PostOrderRequest
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-    private var credentials = "Basic cmljaEBtYWlsLmNvbToxMjM0"
+    private var credentials = "Basic YUBhLmNvbToxMjM0"
 
     override fun getOrderList(cartIds: List<Int>, callback: (Result<OrderList>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))
@@ -26,5 +27,11 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     override fun getOrder(id: Long, callback: (Result<Order>) -> Unit) {
         RetrofitUtil.retrofitOrderService.getOrder(credentials, id)
             .enqueue(RetrofitUtil.callback(callback))
+    }
+
+    override fun postOrder(point: Int, cartIds: List<Int>, callback: (Result<Long>) -> Unit) {
+        RetrofitUtil.retrofitOrderService
+            .postOrder(credentials, PostOrderRequest(point, cartIds))
+            .enqueue(RetrofitUtil.callbackWithLocationHeader(callback))
     }
 }

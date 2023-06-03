@@ -11,8 +11,6 @@ import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.OrderUIModel
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.orders.orderItemAdapter.OrderItemAdapter
-import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
-import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private lateinit var binding: ActivityOrderDetailBinding
@@ -44,7 +42,6 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun initPresenter() {
-        RetrofitUtil.url = ServerSettingActivity.SERVER_IO
         presenter = OrderDetailPresenter(
             this,
             OrderRepositoryImpl(

@@ -13,6 +13,7 @@ class ShoppingPresenter(
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
     override fun setUpProducts() {
+        productRepository.clearCache()
         setUpCartCounts()
         setUpNextProducts()
         setUpRecentProducts()

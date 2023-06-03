@@ -4,10 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="orderList"
+            type="woowacourse.shopping.model.OrderListUIModel" />
 
         <variable
             name="price"
             type="int" />
+        
+        <variable
+            name="confirmOrder"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -203,6 +210,7 @@
             android:gravity="center"
             android:text="@string/product_detail_add_to_cart_btn"
             android:textColor="@color/white"
+            android:onClick = "@{() -> confirmOrder.invoke(orderList)}"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent" />

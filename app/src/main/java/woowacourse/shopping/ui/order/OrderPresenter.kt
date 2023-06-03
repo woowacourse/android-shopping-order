@@ -15,4 +15,11 @@ class OrderPresenter(
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
+
+    override fun confirmOrder(point: Int) {
+        orderRepository.postOrder(point, cartIds) { result ->
+            result.onSuccess { orderId -> view.navigateOrder(orderId) }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
+        }
+    }
 }
