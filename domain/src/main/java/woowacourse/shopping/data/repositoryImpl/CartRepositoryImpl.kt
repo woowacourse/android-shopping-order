@@ -8,7 +8,7 @@ import woowacourse.shopping.model.CartProducts
 class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource
 ) : CartRepository {
-    private val cartItems = CartProducts(emptyList())
+    private val cartItems = CartProducts(mutableListOf())
 
     override fun getAll(callback: (Result<CartProducts>) -> Unit) {
         remoteDataSource.getAll { result ->
@@ -24,7 +24,7 @@ class CartRepositoryImpl(
             result.onSuccess {
                 val cartProducts = it.subList(index * size, min((index + 1) * size, it.size))
                 cartItems.replaceAll(it)
-                callback(Result.success(CartProducts(cartProducts)))
+                callback(Result.success(CartProducts(cartProducts.toMutableList())))
             }.onFailure { throwable -> callback(Result.failure(throwable)) }
         }
     }

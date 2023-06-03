@@ -48,11 +48,11 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
-        return cartProducts.hasNextPage(index, size)
+        return cartProducts.size > (index + 1) * size
     }
 
     override fun hasPrevPage(index: Int, size: Int): Boolean {
-        return cartProducts.hasPrevPage(index, size)
+        return index > 0
     }
 
     override fun getTotalCount(): Int {

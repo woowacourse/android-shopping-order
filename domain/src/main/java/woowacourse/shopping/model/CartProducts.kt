@@ -1,71 +1,63 @@
 package woowacourse.shopping.model
 
-class CartProducts(cartProducts: List<CartProduct>) {
-    private val cartProducts: MutableList<CartProduct>
-    private var checks = mutableMapOf<Int, Boolean>()
+class CartProducts(private val value: MutableList<CartProduct>) {
+    private val checks = value.associateBy({ it.id }, { true }).toMutableMap()
+
     val checkedProducts: List<CartProduct>
-        get() = cartProducts.filter { checks.getOrPut(it.id) { true } }
-    val size: Int get() = cartProducts.size
+        get() = value.filter { checks.getOrPut(it.id) { true } }
 
     val totalPrice: Int
         get() = checkedProducts.sumOf { it.product.price * it.quantity }
 
-    val totalQuantity: Int
-        get() = cartProducts.sumOf { it.quantity }
-
     val totalCheckedQuantity: Int
         get() = checkedProducts.sumOf { it.quantity }
 
-    init {
-        checks = cartProducts.associateBy({ it.id }, { true }).toMutableMap()
-        this.cartProducts = cartProducts.toMutableList()
-    }
+    val totalQuantity: Int
+        get() = value.sumOf { it.quantity }
+
+    val size: Int get() = value.size
 
     operator fun get(index: Int): CartProduct {
-        return cartProducts[index]
+        return value[index]
     }
 
-    fun all(): List<CartProduct> {
-        return cartProducts.toList()
+    fun toList(): List<CartProduct> {
+        return value.toList()
+    }
+
+    fun map(transform: (CartProduct) -> CartProduct): CartProducts {
+        return CartProducts(value.map(transform).toMutableList())
     }
 
     fun changeChecked(id: Int, checked: Boolean) {
         checks[id] = checked
     }
 
-    fun getCheckedById(id: Int): Boolean {
-        return checks[id] ?: false
+    fun getCheck(id: Int): Boolean {
+        return checks.getOrDefault(id, false)
     }
 
     fun findByProductId(productId: Int): CartProduct? {
-        return cartProducts.firstOrNull { it.product.id == productId }
+        return value.firstOrNull { it.product.id == productId }
     }
 
     fun replaceAll(cartProducts: List<CartProduct>) {
-        this.cartProducts.clear()
-        this.cartProducts.addAll(cartProducts)
+        this.value.clear()
+        this.value.addAll(cartProducts)
         cartProducts.forEach { checks.putIfAbsent(it.id, true) }
     }
 
     fun isEmpty(): Boolean {
-        return cartProducts.isEmpty()
+        return value.isEmpty()
     }
 
     fun subList(offset: Int, size: Int): CartProducts {
-        val lastIndex = cartProducts.lastIndex
+        val lastIndex = value.lastIndex
         val endIndex = (lastIndex + 1).coerceAtMost(offset + size)
 
         return when (offset) {
-            in 0..lastIndex -> CartProducts(cartProducts.subList(offset, endIndex))
-            else -> CartProducts(emptyList())
+            in 0..lastIndex -> CartProducts(value.subList(offset, endIndex))
+            else -> CartProducts(mutableListOf())
         }
-    }
-
-    fun hasNextPage(index: Int, size: Int): Boolean {
-        return index * size + size < cartProducts.size
-    }
-
-    fun hasPrevPage(index: Int, size: Int): Boolean {
-        return index * size - size >= 0
     }
 }

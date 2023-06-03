@@ -45,7 +45,7 @@ class ShoppingPresenterTest {
 
     private val fakeProducts = List(10) { fakeProduct }
     private val fakeRecentProducts = List(10) { fakeRecentProduct }
-    private val fakeCartProducts = CartProducts(List(10) { fakeCartProduct })
+    private val fakeCartProducts = CartProducts(MutableList(10) { fakeCartProduct })
 
     private val fakeCartCounts = fakeCartProducts.toUIModel()
         .associateBy { it.id }

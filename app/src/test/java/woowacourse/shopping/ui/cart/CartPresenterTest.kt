@@ -37,7 +37,7 @@ class CartPresenterTest {
         fakeProduct
     )
 
-    private val fakeCartProducts = CartProducts(List(10) { fakeCartProduct })
+    private val fakeCartProducts = CartProducts(MutableList(10) { fakeCartProduct })
 
     @Rule
     @JvmField
