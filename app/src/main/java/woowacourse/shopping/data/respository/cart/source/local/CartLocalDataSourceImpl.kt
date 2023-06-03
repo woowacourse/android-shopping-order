@@ -19,11 +19,33 @@ class CartLocalDataSourceImpl(
     private val tableName = getTableName(url)
 
     override fun insertCart(cartId: Long) {
+        if (hasCartId(cartId)) return
+
         val value = ContentValues().apply {
             put(CartContract.Cart.ID, cartId)
             put(CartContract.Cart.CHECKED, 1)
         }
         db.insert(tableName, null, value)
+    }
+
+    private fun hasCartId(id: Long): Boolean {
+        val cursor = db.query(
+            tableName,
+            null,
+            "${CartContract.Cart.ID} = ?",
+            arrayOf(id.toString()),
+            null,
+            null,
+            null,
+        )
+
+        if (cursor.moveToFirst().not()) {
+            cursor.close()
+            return false
+        }
+        cursor.close()
+
+        return true
     }
 
     override fun deleteCart(cartId: Long) {
