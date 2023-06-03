@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.remote.dto.ShoppingCartDto
+import woowacourse.shopping.data.remote.dto.response.ShoppingCartDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartProduct
 

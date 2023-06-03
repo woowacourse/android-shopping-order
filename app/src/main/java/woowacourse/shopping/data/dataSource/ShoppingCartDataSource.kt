@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.dataSource
 
-import woowacourse.shopping.data.remote.dto.ShoppingCartDto
+import woowacourse.shopping.data.remote.dto.response.ShoppingCartDto
 import woowacourse.shopping.domain.util.WoowaResult
 
 interface ShoppingCartDataSource {
