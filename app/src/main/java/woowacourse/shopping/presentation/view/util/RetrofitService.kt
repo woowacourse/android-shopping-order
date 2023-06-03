@@ -6,14 +6,14 @@ import retrofit2.http.Path
 import woowacourse.shopping.presentation.model.ProductModel
 
 interface RetrofitService {
-    @GET(PRODUCT)
-    fun requestProductsData(): Call<List<ProductModel>>
+    @GET(PATH_PRODUCT)
+    fun requestProducts(): Call<List<ProductModel>>
 
-    @GET("$PRODUCT/{$ID}")
-    fun requestDataById(@Path(ID) id: Long): Call<ProductModel>
+    @GET("$PATH_PRODUCT/{$PATH_ID}")
+    fun requestProductById(@Path(PATH_ID) id: Long): Call<ProductModel>
 
     companion object {
-        private const val PRODUCT = "/products"
-        private const val ID = "id"
+        private const val PATH_PRODUCT = "/products"
+        private const val PATH_ID = "id"
     }
 }

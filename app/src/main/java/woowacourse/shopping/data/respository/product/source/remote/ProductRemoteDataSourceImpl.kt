@@ -24,7 +24,7 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
-        productService.requestProductsData()
+        productService.requestProducts()
             .enqueue(object : retrofit2.Callback<List<ProductModel>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<ProductModel>>,
@@ -54,7 +54,7 @@ class ProductRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: CartRemoteEntity) -> Unit,
     ) {
-        productService.requestDataById(productId)
+        productService.requestProductById(productId)
             .enqueue(object : retrofit2.Callback<ProductModel> {
                 override fun onResponse(
                     call: retrofit2.Call<ProductModel>,
