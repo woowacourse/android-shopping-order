@@ -5,21 +5,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ServicePool {
-    lateinit var retrofitService: ShoppingOrderService
-        private set
-
     private val client by lazy {
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
             .build()
     }
+    var retrofitService: ShoppingOrderService = buildRetrofit(UrlPool.LOGEON)
+        private set
 
-    init {
-        retrofitService = buildRetrofit(UrlPool.LOGEON)
-    }
+    var server: UrlPool = UrlPool.LOGEON
+        private set
 
     fun init(tag: UrlPool) {
         retrofitService = buildRetrofit(tag)
+        server = tag
     }
 
     private fun buildRetrofit(tag: UrlPool): ShoppingOrderService {

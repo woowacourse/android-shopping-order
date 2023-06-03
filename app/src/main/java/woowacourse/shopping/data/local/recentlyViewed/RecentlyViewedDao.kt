@@ -10,9 +10,11 @@ import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABL
 import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_NAME
 import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRICE
 import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_PRODUCT_ID
+import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_SERVER
 import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_COLUMN_VIEWED_DATE_TIME
 import woowacourse.shopping.data.local.WoowaShoppingContract.RecentlyViewed.TABLE_NAME
 import woowacourse.shopping.data.local.WoowaShoppingDbHelper
+import woowacourse.shopping.data.remote.ServicePool
 import woowacourse.shopping.domain.model.Product
 import java.time.LocalDateTime
 
@@ -20,7 +22,8 @@ class RecentlyViewedDao(context: Context) : RecentlyViewedDataSource {
     private val shoppingDb by lazy { WoowaShoppingDbHelper(context).readableDatabase }
 
     override fun getRecentlyViewedProducts(unit: Int): List<RecentlyViewedEntity> {
-        val query = "SELECT * FROM $TABLE_NAME ORDER BY ${BaseColumns._ID} DESC LIMIT $unit"
+        val server = ServicePool.server.name
+        val query = "SELECT * FROM $TABLE_NAME WHERE $TABLE_COLUMN_SERVER = '$server' ORDER BY ${BaseColumns._ID} DESC LIMIT $unit"
         val cursor = shoppingDb.rawQuery(query, null)
         val itemContainer = mutableListOf<RecentlyViewedEntity>()
         while (cursor.moveToNext()) {
@@ -31,8 +34,9 @@ class RecentlyViewedDao(context: Context) : RecentlyViewedDataSource {
     }
 
     override fun getLastViewedProduct(): RecentlyViewedEntity? {
+        val server = ServicePool.server.name
         val query =
-            "SELECT * FROM $TABLE_NAME ORDER BY $TABLE_COLUMN_VIEWED_DATE_TIME DESC LIMIT 1"
+            "SELECT * FROM $TABLE_NAME WHERE $TABLE_COLUMN_SERVER = '$server' ORDER BY $TABLE_COLUMN_VIEWED_DATE_TIME DESC LIMIT 1"
         val cursor: Cursor = shoppingDb.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             return readRecentlyViewed(cursor)
@@ -48,6 +52,7 @@ class RecentlyViewedDao(context: Context) : RecentlyViewedDataSource {
         data.put(TABLE_COLUMN_IMAGE_URL, product.imageUrl)
         data.put(TABLE_COLUMN_NAME, product.name)
         data.put(TABLE_COLUMN_PRICE, product.price)
+        data.put(TABLE_COLUMN_SERVER, ServicePool.server.name)
         val id =
             shoppingDb.insertWithOnConflict(TABLE_NAME, null, data, CONFLICT_REPLACE)
         return id
