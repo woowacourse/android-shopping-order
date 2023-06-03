@@ -14,6 +14,9 @@ import woowacourse.shopping.ui.cart.cartAdapter.viewHolder.NavigationViewHolder
 class CartAdapter(
     private val cartListener: CartListener
 ) : ListAdapter<CartItemType, CartViewHolder>(CartDiffCallback()) {
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         return when (viewType) {
