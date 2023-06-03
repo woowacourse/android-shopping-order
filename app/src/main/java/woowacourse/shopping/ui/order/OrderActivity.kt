@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
+import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.model.CartProductModel
 
@@ -34,7 +36,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initPresenter() {
         val cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit())
-        presenter = OrderPresenter(this, cartRepository)
+        val memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit())
+        presenter = OrderPresenter(this, cartRepository, memberRepository)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -47,6 +50,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun setupView() {
         val ids = intent.getIntegerArrayListExtra(EXTRA_KEY_IDS) ?: return finish()
         presenter.loadProducts(ids.toList())
+        presenter.loadPoints()
     }
 
     override fun showProducts(products: List<CartProductModel>) {
@@ -55,6 +59,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun showOriginalPrice(price: Int) {
         binding.originalPrice.text = getString(R.string.product_price, price)
+    }
+
+    override fun showPoints(points: Int) {
+        binding.pointsAvailable.text = getString(R.string.points, points)
     }
 
     companion object {
