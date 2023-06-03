@@ -1,11 +1,27 @@
 package woowacourse.shopping.presentation.ui.myPage
 
-class MyPagePresenter : MyPageContract.Presenter {
+import woowacourse.shopping.domain.repository.ChargeRepository
+import woowacourse.shopping.domain.util.WoowaResult
+
+class MyPagePresenter(
+    private val view: MyPageContract.View,
+    private val chargeRepository: ChargeRepository,
+) : MyPageContract.Presenter {
     override fun fetchCharge() {
-        TODO("Not yet implemented")
+        chargeRepository.fetchCharge { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> view.showCharge(result.data)
+                is WoowaResult.FAIL -> view.showError()
+            }
+        }
     }
 
-    override fun recharge() {
-        TODO("Not yet implemented")
+    override fun recharge(amount: Long) {
+        chargeRepository.recharge(amount) { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> view.showCharge(result.data)
+                is WoowaResult.FAIL -> view.showError()
+            }
+        }
     }
 }
