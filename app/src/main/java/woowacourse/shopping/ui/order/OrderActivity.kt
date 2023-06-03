@@ -51,6 +51,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val ids = intent.getIntegerArrayListExtra(EXTRA_KEY_IDS) ?: return finish()
         presenter.loadProducts(ids.toList())
         presenter.loadPoints()
+
+        binding.btnUseAllPoints.setOnClickListener { presenter.useAllPoints() }
     }
 
     override fun showProducts(products: List<CartProductModel>) {
@@ -63,6 +65,18 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun showPoints(points: Int) {
         binding.pointsAvailable.text = getString(R.string.points, points)
+    }
+
+    override fun updatePointsUsed(points: Int) {
+        binding.usePoints.setText(points.toString())
+    }
+
+    override fun updateDiscountPrice(price: Int) {
+        binding.discountPrice.text = getString(R.string.discount_price, price)
+    }
+
+    override fun updateFinalPrice(price: Int) {
+        binding.finalPrice.text = getString(R.string.product_price, price)
     }
 
     companion object {

@@ -7,6 +7,8 @@ interface OrderContract {
         fun loadProducts(ids: List<Int>)
 
         fun loadPoints()
+
+        fun useAllPoints()
     }
 
     interface View {
@@ -15,5 +17,11 @@ interface OrderContract {
         fun showOriginalPrice(price: Int)
 
         fun showPoints(points: Int)
+
+        fun updatePointsUsed(points: Int)
+
+        fun updateDiscountPrice(price: Int)
+
+        fun updateFinalPrice(price: Int)
     }
 }

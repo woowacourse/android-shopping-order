@@ -1,11 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.ui.model.ProductModel
-import woowacourse.shopping.ui.model.ShoppingProductModel
-import woowacourse.shopping.ui.model.mapper.ProductMapper.toDomain
-import woowacourse.shopping.ui.model.mapper.ProductMapper.toView
-import woowacourse.shopping.ui.model.mapper.RecentProductMapper.toView
-import woowacourse.shopping.ui.model.mapper.ShoppingProductMapper.toView
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentProduct
@@ -14,6 +8,12 @@ import woowacourse.shopping.domain.ShoppingProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.model.ProductModel
+import woowacourse.shopping.ui.model.ShoppingProductModel
+import woowacourse.shopping.ui.model.mapper.ProductMapper.toDomain
+import woowacourse.shopping.ui.model.mapper.ProductMapper.toView
+import woowacourse.shopping.ui.model.mapper.RecentProductMapper.toView
+import woowacourse.shopping.ui.model.mapper.ShoppingProductMapper.toView
 import java.time.LocalDateTime
 import kotlin.math.min
 

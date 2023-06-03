@@ -11,6 +11,7 @@ class OrderPresenter(
     private val memberRepository: MemberRepository
 ) : OrderContract.Presenter {
     private lateinit var cart: Cart
+    private var points: Int = 0
 
     override fun loadProducts(ids: List<Int>) {
         cartRepository.getAll(
@@ -26,9 +27,24 @@ class OrderPresenter(
     override fun loadPoints() {
         memberRepository.getPoints(
             onSuccess = {
+                points = it
                 view.showPoints(it)
             },
             onFailure = {}
         )
+    }
+
+    override fun useAllPoints() {
+        usePoints(points)
+        discountPrice(points)
+    }
+
+    private fun usePoints(points: Int) {
+        view.updatePointsUsed(points)
+    }
+
+    private fun discountPrice(discountPrice: Int) {
+        view.updateDiscountPrice(discountPrice)
+        view.updateFinalPrice(cart.totalPrice - discountPrice)
     }
 }

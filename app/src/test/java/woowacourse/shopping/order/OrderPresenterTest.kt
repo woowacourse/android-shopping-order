@@ -70,4 +70,43 @@ class OrderPresenterTest {
         // then
         verify { view.showPoints(points) }
     }
+
+    @Test
+    fun `포인트 전액을 사용한다`() {
+        // given
+        val products: List<CartProduct> = listOf(
+            createCartProduct(1, 2),
+            createCartProduct(2, 4),
+            createCartProduct(3, 6)
+        )
+        val cartSuccessSlot = slot<(List<CartProduct>) -> Unit>()
+        every { cartRepository.getAll(capture(cartSuccessSlot), any()) } answers {
+            cartSuccessSlot.captured(products)
+        }
+        every { view.showProducts(any()) } just runs
+        every { view.showOriginalPrice(any()) } just runs
+        presenter.loadProducts(listOf(3))
+
+        val points = 2000
+        val pointsSuccessSlot = slot<(Int) -> Unit>()
+        every { memberRepository.getPoints(capture(pointsSuccessSlot), any()) } answers {
+            pointsSuccessSlot.captured(points)
+        }
+        every { view.showPoints(any()) } just runs
+        presenter.loadPoints()
+
+        every { view.updatePointsUsed(any()) } just runs
+        every { view.updateDiscountPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
+
+        // when
+        presenter.useAllPoints()
+
+        // then
+        verify {
+            view.updatePointsUsed(2000)
+            view.updateDiscountPrice(2000)
+            view.updateFinalPrice(4000)
+        }
+    }
 }
