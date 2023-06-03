@@ -18,4 +18,9 @@ fun createCartProductModel(): CartProductModel =
 fun createProduct(): Product = Product(0, URL(""), "글로", 1000)
 fun createRecentProduct(): RecentProduct =
     RecentProduct(LocalDateTime.now(), createProduct())
-fun createCartProduct(): CartProduct = CartProduct(0, 0, true, createProduct())
+fun createCartProduct(
+    id: Int = 0,
+    quantity: Int = 0,
+    isChecked: Boolean = true,
+    product: Product = createProduct()
+): CartProduct = CartProduct(id, quantity, isChecked, product)

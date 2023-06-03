@@ -13,6 +13,7 @@ import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.ui.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -33,6 +34,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initCartAdapter()
 
         setupCartProductAllCheckbox()
+
+        setupCartOrderButton()
 
         initPresenter()
     }
@@ -63,6 +66,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun updateCartTotalQuantity(amount: Int) {
         binding.cartOrderButton.text = getString(R.string.order_button, amount)
+        binding.cartOrderButton.isClickable = amount > 0
     }
 
     override fun setResultForChange() {
@@ -81,6 +85,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         runOnUiThread {
             Toaster.showToast(this, "장바구니 상품을 불러오는데 실패했습니다!")
         }
+    }
+
+    override fun showOrder(ids: List<Int>) {
+        val intent = OrderActivity.createIntent(this, ids)
+        startActivity(intent)
     }
 
     private fun initCartAdapter() {
@@ -112,6 +121,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cartProductAllCheckbox.setOnClickListener {
             presenter.changeAllChecked(binding.cartProductAllCheckbox.isChecked)
         }
+    }
+
+    private fun setupCartOrderButton() {
+        binding.cartOrderButton.setOnClickListener { presenter.order() }
     }
 
     private fun initPresenter() {

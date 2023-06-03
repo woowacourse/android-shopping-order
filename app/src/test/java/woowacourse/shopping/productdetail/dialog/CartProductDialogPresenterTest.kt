@@ -8,6 +8,8 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.productdetail.dialog.CartProductDialogContract
+import woowacourse.shopping.ui.productdetail.dialog.CartProductDialogPresenter
 
 class CartProductDialogPresenterTest {
     private lateinit var presenter: CartProductDialogPresenter
@@ -103,7 +105,7 @@ class CartProductDialogPresenterTest {
 
         // then
         verify {
-            cartRepository.addCartProduct(any(), any(), any())
+            cartRepository.addCartProduct(any(), any(), any(), any())
             view.notifyAddToCartCompleted()
         }
     }

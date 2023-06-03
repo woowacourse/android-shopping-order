@@ -149,18 +149,9 @@ class CartPresenter(
         updateTotalPrice()
         updateTotalQuantity()
     }
-//
-//    private fun updateChecked(cartProducts: List<CartProduct>, isChecked: Boolean) {
-//        val startIndex = currentPage * sizePerPage
-//        cartProducts.subList(startIndex, startIndex + sizePerPage).forEach {
-//            val cartProduct = cart.findCartProduct(it)!!
-//            cart = if (cartProduct.isChecked != isChecked) {
-//                val newCartProduct = cartProduct.changeChecked(isChecked)
-//                updateCartProduct(newCartProduct)
-//                cart.replaceCartProduct(newCartProduct)
-//            } else {
-//                cart.replaceCartProduct(cartProduct)
-//            }
-//        }
-//    }
+
+    override fun order() {
+        val orderCart = cart.selectedCart
+        view.showOrder(orderCart.cartProducts.map { it.id })
+    }
 }

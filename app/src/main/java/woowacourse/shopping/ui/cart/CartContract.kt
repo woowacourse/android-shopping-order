@@ -19,6 +19,8 @@ interface CartContract {
         fun increaseCartProductQuantity(cartProductModel: CartProductModel)
 
         fun changeAllChecked(isChecked: Boolean)
+
+        fun order()
     }
 
     interface View {
@@ -37,5 +39,7 @@ interface CartContract {
         fun updateAllChecked(isAllChecked: Boolean)
 
         fun notifyLoadFailed()
+
+        fun showOrder(ids: List<Int>)
     }
 }
