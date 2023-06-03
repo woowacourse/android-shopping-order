@@ -112,6 +112,8 @@
                     android:layout_marginEnd="8dp"
                     android:importantForAutofill="no"
                     android:inputType="number"
+                    android:text="@string/order_initial_point"
+                    android:textAlignment="textEnd"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@id/tv_discount_point_unit"
@@ -130,6 +132,32 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_discount_point_unit"
                     tools:text="보유 포인트 7,000원" />
 
+                <TextView
+                    android:id="@+id/tv_discount_available_point"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginStart="35dp"
+                    android:text="@{@string/order_available_point(orderInfo.availablePoints)}"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount_remain_point"
+                    tools:text="사용 가능 포인트 7,000원" />
+
+                <TextView
+                    android:id="@+id/tv_discount_earning_point"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginStart="35dp"
+                    android:text="@{@string/order_earned_point(orderInfo.earnedPoints)}"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_discount_point_unit"
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount_available_point"
+                    tools:text="적립 예정 포인트 7,000원" />
+
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider2"
                     android:layout_width="0dp"
@@ -137,7 +165,7 @@
                     android:layout_marginVertical="20dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_discount_remain_point" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_discount_earning_point" />
 
                 <TextView
                     android:id="@+id/tv_purchase"
@@ -231,6 +259,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/blue_green_04c09e"
+            android:enabled="true"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/order_btn_order"
