@@ -26,17 +26,17 @@ class OrderHistoriesPresenterTest {
     @Test
     fun `주문 내역 조회`() {
         // given
-        val fakeOrderHistory = mockk<OrderHistory>()
-        val fakeOrderHistoryUIModel = mockk<OrderHistoryUIModel>()
+        val mockOrderHistory = mockk<OrderHistory>()
+        val mockOrderHistoryUIModel = mockk<OrderHistoryUIModel>()
 
         mockkStatic("woowacourse.shopping.mapper.OrderHistoryMapperKt")
-        every { fakeOrderHistory.toUIModel() } answers { fakeOrderHistoryUIModel }
+        every { mockOrderHistory.toUIModel() } answers { mockOrderHistoryUIModel }
 
         val successSlot = slot<(Result<List<OrderHistory>>) -> Unit>()
         every {
             orderRepository.getOrderHistoriesNext(capture(successSlot))
         } answers {
-            successSlot.captured.invoke(Result.success(listOf(fakeOrderHistory)))
+            successSlot.captured.invoke(Result.success(listOf(mockOrderHistory)))
         }
 
         every { view.showOrderHistories(any()) } answers { }
@@ -45,7 +45,7 @@ class OrderHistoriesPresenterTest {
         presenter.getOrderHistories()
 
         // then
-        view.showOrderHistories(listOf(fakeOrderHistoryUIModel))
+        view.showOrderHistories(listOf(mockOrderHistoryUIModel))
     }
 
     @Test

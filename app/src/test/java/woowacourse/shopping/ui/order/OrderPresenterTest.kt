@@ -19,32 +19,37 @@ class OrderPresenterTest {
 
     private lateinit var presenter: OrderPresenter
 
-    private val fakeOrder: Order = mockk()
-    private val fakeOrderUIModel: OrderUIModel = mockk()
-
     @Before
     fun setUp() {
         view = mockk()
         orderRepository = mockk()
-        val cartIds = listOf(1, 2, 3)
-        presenter = OrderPresenter(view, cartIds, orderRepository)
+        presenter = OrderPresenter(view, mockk(), orderRepository)
     }
 
     @Test
     fun `주문 내역을 가져온다`() {
         // given
-        mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
+        val mockOrder: Order = mockk()
+        val mockOrderUIModel: OrderUIModel = mockk()
 
-        mockOrderGetOrder()
-        every { fakeOrder.toUIModel() } answers { fakeOrderUIModel }
-        every { fakeOrder.cartItems } returns listOf()
+        mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
+        every { mockOrder.toUIModel() } answers { mockOrderUIModel }
+
+        val successSlot = slot<(Result<Order>) -> Unit>()
+        every {
+            orderRepository.getOrder(any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(mockOrder))
+        }
+
+        every { mockOrder.cartItems } returns listOf()
         justRun { view.showOrder(any()) }
 
         // when
         presenter.getOrder()
 
         // then
-        verify(exactly = 1) { view.showOrder(fakeOrderUIModel) }
+        verify(exactly = 1) { view.showOrder(mockOrderUIModel) }
     }
 
     @Test
@@ -52,7 +57,12 @@ class OrderPresenterTest {
         // given
         mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
 
-        mockOrderPostOrder()
+        val successSlot = slot<(Result<Long>) -> Unit>()
+        every {
+            orderRepository.postOrder(any(), any(), capture(successSlot))
+        } answers {
+            successSlot.captured.invoke(Result.success(1))
+        }
         justRun { view.navigateOrder() }
 
         // when
@@ -60,23 +70,5 @@ class OrderPresenterTest {
 
         // then
         verify(exactly = 1) { view.navigateOrder() }
-    }
-
-    private fun mockOrderGetOrder() {
-        val successSlot = slot<(Result<Order>) -> Unit>()
-        every {
-            orderRepository.getOrder(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(fakeOrder))
-        }
-    }
-
-    private fun mockOrderPostOrder() {
-        val successSlot = slot<(Result<Long>) -> Unit>()
-        every {
-            orderRepository.postOrder(any(), any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(1))
-        }
     }
 }
