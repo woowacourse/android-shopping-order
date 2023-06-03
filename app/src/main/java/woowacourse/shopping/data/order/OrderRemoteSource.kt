@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.order
 
+import woowacourse.shopping.data.Authorization
 import woowacourse.shopping.data.entity.CartItemIdsEntity
 import woowacourse.shopping.data.entity.DiscountsEntity
 import woowacourse.shopping.data.entity.OrderEntity
@@ -9,7 +10,7 @@ class OrderRemoteSource(private val orderService: OrderRetrofitService) : OrderD
     override fun save(cartItemIds: List<Long>, userToken: String): Result<Long> {
         return runCatching {
             val response =
-                orderService.postOrder("Basic $userToken", CartItemIdsEntity(cartItemIds)).execute()
+                orderService.postOrder(Authorization.KEY_FORMAT.format(userToken), CartItemIdsEntity(cartItemIds)).execute()
             if (response.code() != 201) throw Throwable(response.message())
             response.headers()["Location"]?.substringAfterLast("/")?.toLong() ?: throw Throwable(
                 response.message()
@@ -19,7 +20,7 @@ class OrderRemoteSource(private val orderService: OrderRetrofitService) : OrderD
 
     override fun findById(id: Long, userToken: String): Result<OrderEntity> {
         return runCatching {
-            val response = orderService.selectOrderById("Basic $userToken", id).execute()
+            val response = orderService.selectOrderById(Authorization.KEY_FORMAT.format(userToken), id).execute()
             if (response.code() != 200) throw Throwable(response.message())
             response.body() ?: throw Throwable(response.message())
         }
@@ -27,7 +28,7 @@ class OrderRemoteSource(private val orderService: OrderRetrofitService) : OrderD
 
     override fun findAll(userToken: String): Result<List<OrderEntity>> {
         return runCatching {
-            val response = orderService.selectOrders("Basic $userToken").execute()
+            val response = orderService.selectOrders(Authorization.KEY_FORMAT.format(userToken)).execute()
             if (response.code() != 200) throw Throwable(response.message())
             response.body() ?: throw Throwable(response.message())
         }
