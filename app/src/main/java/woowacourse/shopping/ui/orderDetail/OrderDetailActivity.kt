@@ -61,7 +61,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     private fun initView() {
         binding.rvOrderProduct.adapter = adapter
-        presenter.getOrderDetail(19)
+        presenter.getOrderDetail()
     }
 
     override fun setOrder(order: OrderUIModel) {

@@ -67,7 +67,7 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
 
     private fun initView() {
         binding.recyclerView.adapter = adapter
-        presenter.getOrderHistoryList()
+        presenter.getOrders()
     }
 
     override fun showOrderHistories(orders: List<OrderUIModel>) {

@@ -9,7 +9,7 @@ interface OrderDetailContract {
     }
 
     interface Presenter {
-        fun getOrderDetail(id: Long)
+        fun getOrderDetail()
         fun navigateToProductDetail(productId: Int)
     }
 }

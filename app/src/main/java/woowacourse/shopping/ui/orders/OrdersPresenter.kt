@@ -8,7 +8,7 @@ class OrdersPresenter(
     private val view: OrdersContract.View,
     private val orderRepository: OrderRepository
 ) : OrdersContract.Presenter {
-    override fun getOrderHistoryList() {
+    override fun getOrders() {
         orderRepository.getOrders { result ->
             result.onSuccess { orders -> view.showOrderHistories(orders.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }

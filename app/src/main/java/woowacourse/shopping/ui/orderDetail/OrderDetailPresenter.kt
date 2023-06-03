@@ -7,15 +7,11 @@ import woowacourse.shopping.utils.LogUtil
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
     private val orderRepository: OrderRepository,
-    orderId: Long
+    private val orderId: Long
 ) : OrderDetailContract.Presenter {
 
-    init {
-        getOrderDetail(orderId)
-    }
-
-    override fun getOrderDetail(id: Long) {
-        orderRepository.getOrder(id) { result ->
+    override fun getOrderDetail() {
+        orderRepository.getOrder(orderId) { result ->
             result.onSuccess { order -> view.setOrder(order.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
         }
