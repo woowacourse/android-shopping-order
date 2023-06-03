@@ -18,6 +18,9 @@
             android:name=".presentation.view.orderlist.OrderListActivity"
             android:exported="false" />
         <activity
+            android:name=".presentation.view.order.OrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.view.cart.CartActivity"
             android:exported="true" />
         <activity

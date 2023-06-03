@@ -29,4 +29,16 @@
     <string name="item_product_list_more_text">더보기</string>
     <string name="toolbar_item_order">주문목록</string>
     <string name="order_detail">주문상세</string>
+    <string name="order_product_title_info_text">주문상품</string>
+    <string name="order_point_title_info_text">포인트</string>
+    <string name="order_available_point_info_text">보유</string>
+    <string name="order_use_point_title_info_text">사용</string>
+    <string name="order_payment_title_info_text">결제수단</string>
+    <string name="order_payment_detail_title_info_text">주문금액</string>
+    <string name="order_payment_detail_order_price_title_info_text">총 금액</string>
+    <string name="order_payment_detail_total_price_title_info_text">최종 금액</string>
+    <string name="order_point_benefit_title_info_text">포인트</string>
+    <string name="order_point_save_title_info_text">예상 적립 포인트</string>
+    <string name="order_pay_button_text">주문하기</string>
+    <string name="order_payment_detail_use_point_title_info_text">사용 포인트</string>
 </resources>
