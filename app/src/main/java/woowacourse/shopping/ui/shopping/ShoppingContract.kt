@@ -10,15 +10,16 @@ interface ShoppingContract {
         fun setCartProducts(cartCounts: Map<Int, Int>)
         fun setToolbar(totalCount: Int)
         fun navigateToProductDetail(product: ProductUIModel)
+        fun navigateToOrders()
     }
 
     interface Presenter {
-        fun setUpProducts()
         fun setUpNextProducts()
         fun setUpRecentProducts()
         fun setUpCartCounts()
         fun setUpTotalCount()
         fun updateItemCount(productId: Int, count: Int)
         fun navigateToItemDetail(productId: Int)
+        fun navigateToOrders()
     }
 }

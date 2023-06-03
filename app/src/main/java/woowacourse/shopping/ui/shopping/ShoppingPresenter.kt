@@ -12,11 +12,8 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
-    override fun setUpProducts() {
+    init {
         productRepository.clearCache()
-        setUpCartCounts()
-        setUpNextProducts()
-        setUpRecentProducts()
     }
 
     override fun setUpCartCounts() {
@@ -61,6 +58,10 @@ class ShoppingPresenter(
             result.onSuccess { view.navigateToProductDetail(it.toUIModel()) }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
+    }
+
+    override fun navigateToOrders() {
+        view.navigateToOrders()
     }
 
     companion object {

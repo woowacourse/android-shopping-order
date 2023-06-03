@@ -22,6 +22,7 @@ import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
+import woowacourse.shopping.ui.orders.OrdersActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
@@ -41,6 +42,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initToolbar()
         initPresenter()
         initLayoutManager()
+        initView()
     }
 
     override fun onResume() {
@@ -61,8 +63,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping)
-        binding.rvProducts.adapter = adapter
-        binding.rvProducts.itemAnimator = null
     }
 
     private fun initToolbar() {
@@ -83,15 +83,22 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 localDataSource = RecentSqliteProductDataSource(this)
             )
         )
-        presenter.setUpRecentProducts()
-        presenter.setUpNextProducts()
-        presenter.setUpCartCounts()
     }
 
     private fun initLayoutManager() {
         val layoutManager = binding.rvProducts.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = getSpanSizeLookup(layoutManager, adapter)
         binding.rvProducts.addItemDecoration(getItemDecoration(layoutManager, resources))
+    }
+
+    private fun initView() {
+        presenter.setUpRecentProducts()
+        presenter.setUpNextProducts()
+        presenter.setUpCartCounts()
+
+        binding.rvProducts.adapter = adapter
+        binding.rvProducts.itemAnimator = null
+        binding.bottom.navigateToOrders = presenter::navigateToOrders
     }
 
     private fun getAdapterListener() = object : ProductsListener {
@@ -133,6 +140,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun navigateToCart() {
         startActivity(CartActivity.getIntent(this))
+    }
+
+    override fun navigateToOrders() {
+        println("navigateToOrders")
+        startActivity(OrdersActivity.getIntent(this))
     }
 
     companion object {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="navigateToOrders"
+            type="kotlin.jvm.functions.Function0" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:background="@color/gray_555555"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_to_Orders"
+            android:layout_width="122dp"
+            android:layout_height="match_parent"
+            android:background="@color/blue_green_04c09e"
+            android:gravity="center"
+            android:onClick="@{() -> navigateToOrders.invoke()}"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            tools:text="주문하기(0)" />
+    </LinearLayout>
+
+</layout>

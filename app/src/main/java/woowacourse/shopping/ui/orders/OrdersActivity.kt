@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.orders
 
+import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -80,5 +81,11 @@ class OrdersActivity : AppCompatActivity(), OrdersContract.View {
 
     override fun navigateToProductDetail(productId: Int) {
         startActivity(DetailedProductActivity.getIntent(this, productId))
+    }
+
+    companion object {
+        fun getIntent(context: Context): android.content.Intent {
+            return android.content.Intent(context, OrdersActivity::class.java)
+        }
     }
 }
