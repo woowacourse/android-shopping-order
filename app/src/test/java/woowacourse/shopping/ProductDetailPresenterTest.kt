@@ -1,4 +1,3 @@
-/*
 package woowacourse.shopping
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -9,156 +8,137 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductWithCartInfo
+import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentViewedRepository
-import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.toUiModel
 import woowacourse.shopping.view.productdetail.ProductDetailContract
 import woowacourse.shopping.view.productdetail.ProductDetailPresenter
 
 class ProductDetailPresenterTest {
     private lateinit var view: ProductDetailContract.View
     private lateinit var presenter: ProductDetailContract.Presenter
+    private lateinit var cartRepository: CartRepository
+    private lateinit var productRepository: ProductRepository
+    private lateinit var recentViewedRepository: RecentViewedRepository
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private val products = mutableListOf(
-        CartProduct(
-            0,
-            1,
-        ),
-        CartProduct(
-            0,
-            1,
-        ),
-        CartProduct(
-            0,
-            1,
-        ),
-        CartProduct(
-            0,
-            1,
-        ),
-    )
-
-    private val recentViewedRepository = object : RecentViewedRepository {
-        private val mIds = mutableListOf(0, 1, 2)
-        override fun findAll(): List<Int> {
-            return mIds.toList()
-        }
-
-        override fun add(id: Int) {
-            mIds.add(id)
-        }
-
-        override fun remove(id: Int) {
-            mIds.find { it == id }?.let {
-                mIds.remove(it)
-            }
-        }
-    }
-
-    private val cartRepository = object : CartRepository {
-        private val mProducts = products
-        override fun findAll(): List<CartProduct> {
-            return mProducts
-        }
-
-        override fun find(id: Int): CartProduct? {
-            return mProducts.find { it.cartId == id }
-        }
-
-        override fun add(id: Int, count: Int) {
-            mProducts.add(CartProduct(id, count))
-        }
-
-        override fun update(id: Int, count: Int) {
-            val index = mProducts.indexOfFirst { it.cartId == id }
-            if (index == -1) {
-                mProducts.add(CartProduct(id, count))
-                return
-            }
-            mProducts[index] = CartProduct(id, count)
-        }
-
-        override fun remove(id: Int) {
-            mProducts.filter { it.cartId != id }.toList()
-        }
-
-        override fun findRange(mark: Int, rangeSize: Int): List<CartProduct> {
-            return mProducts.subList(mark, mark + rangeSize)
-        }
-
-        override fun isExistByMark(mark: Int): Boolean {
-            return mProducts.find { it.cartId == mark } != null
-        }
-    }
-
     @Before
     fun setUp() {
         view = mockk(relaxed = true)
-        presenter = ProductDetailPresenter(1, view, cartRepository, recentViewedRepository)
-    }
+        productRepository = object : ProductRepository {
+            override fun getProductsByRange(
+                lastId: Int,
+                pageItemCount: Int,
+                callback: (ProductsWithCartItemDTO) -> Unit,
+            ) {
+                callback(
+                    ProductsWithCartItemDTO(
+                        ProductListFixture.products.map {
+                            ProductWithCartInfo(
+                                it,
+                                ProductWithCartInfo.CartItem(1, 1),
+                            )
+                        },
+                        false,
+                    ),
+                )
+            }
 
-    @Test
-    fun `장바구니 담기 버튼을 클릭하면 장바구니에 상품이 담긴다`() {
-        val product = ProductModel(
-            10,
-            "락토핏",
-            "https://thumbnail6.coupangcdn.com/thumbnails/remote/230x230ex/image/retail/images/6769030628798948-183ad194-f24c-44e6-b92f-1ed198b347cd.jpg",
-            10000,
-            10
+            override fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit) {
+                callback(ProductWithCartInfo(ProductListFixture.products[0], null))
+            }
+        }
+
+        recentViewedRepository = object : RecentViewedRepository {
+            override fun findAll(callback: (List<Product>) -> Unit) {
+                callback(ProductListFixture.products)
+            }
+
+            override fun add(product: Product) {
+            }
+
+            override fun remove(id: Int) {
+            }
+        }
+
+        cartRepository = object : CartRepository {
+            override fun getAll(callback: (List<CartProduct>) -> Unit) {
+                callback(CartProductsFixture.cartProducts)
+            }
+
+            override fun insert(productId: Int, quantity: Int, callback: (Int) -> Unit) {
+                callback(1)
+            }
+
+            override fun update(cartId: Int, quantity: Int, callback: (Boolean) -> Unit) {
+                callback(true)
+            }
+
+            override fun remove(cartId: Int, callback: (Boolean) -> Unit) {
+                callback(true)
+            }
+        }
+
+        presenter = ProductDetailPresenter(
+            1,
+            1,
+            view,
+            productRepository,
+            cartRepository,
+            recentViewedRepository,
         )
-        presenter.putInCart(product)
-        val expectedSize = 5
-        val actualSize = cartRepository.findAll().size
-
-        assertEquals(expectedSize, actualSize)
-        verify { view.finishActivity(true) }
     }
 
     @Test
-    fun `상품 상세 페이지로 들어가면 최근 본 상품에 해당 상품이 등록된다`() {
-        val id = 1
-        presenter.updateRecentViewedProducts(id)
+    fun 상품_상세_정보를_띄울_수_있다() {
+        // given
 
-        val expectedSize = 4
-        val actualSize = recentViewedRepository.findAll().size
+        // when
+        presenter.fetchProductDetail()
 
-        assertEquals(expectedSize, actualSize)
+        // then
+        verify(exactly = 1) { view.showProductDetail(any(), any()) }
     }
 
     @Test
-    fun `현재 선택한 개수가 1이상 100 미만의 값이라면 개수 증가를 할 수 있다`() {
-        presenter = ProductDetailPresenter(3, view, cartRepository, recentViewedRepository)
+    fun 장바구니에_상품을_추가할_수_있다() {
+        // given
+
+        // when
+        presenter.putInCart(ProductListFixture.products[1].toUiModel(null, 2))
+
+        // then
+        verify(exactly = 1) { view.finishActivity(true) }
+    }
+
+    @Test
+    fun 상품_개수를_추가할_수_있다() {
+        // given
+
+        // when
         presenter.plusCount()
 
-        val expectedCount = 4
-        val actualCount = presenter.count.value
-
-        assertEquals(expectedCount, actualCount)
+        // then
+        assertEquals(2, presenter.quantity.value)
     }
 
     @Test
-    fun `현재 선택한 개수가 100이라면 개수 증가를 할 수 없다`() {
-        presenter = ProductDetailPresenter(100, view, cartRepository, recentViewedRepository)
+    fun 상품_개수를_뺄_수_있다() {
+        // given
+        presenter.plusCount()
+        presenter.plusCount()
         presenter.plusCount()
 
-        val expectedCount = 100
-        val actualCount = presenter.count.value
-
-        assertEquals(expectedCount, actualCount)
-    }
-
-    @Test
-    fun `현재 선택한 개수가 1이라면 개수 감소를 할 수 없다`() {
-        presenter = ProductDetailPresenter(1, view, cartRepository, recentViewedRepository)
+        // when
         presenter.minusCount()
 
-        val expectedCount = 1
-        val actualCount = presenter.count.value
-
-        assertEquals(expectedCount, actualCount)
+        // then
+        assertEquals(3, presenter.quantity.value)
     }
 }
-*/
