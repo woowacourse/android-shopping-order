@@ -19,5 +19,7 @@
 
     <color name="order_text_color">#555555</color>
 
+    <color name="button_disabled_color">#AAAAAA</color>
+
     <color name="main_color">#04C09E</color>
 </resources>
