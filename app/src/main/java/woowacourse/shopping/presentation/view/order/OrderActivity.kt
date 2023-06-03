@@ -84,9 +84,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         )
     }
 
-    override fun setPointTextChangeListener(userPoint: PointModel) {
+    override fun setPointTextChangeListener(orderPrice: Int, userPoint: PointModel) {
         binding.etOrderUsePoint.addTextChangedListener(
             PointTextWatcher(
+                orderPrice,
                 userPoint,
                 binding.etOrderUsePoint,
                 presenter::setUsePoint

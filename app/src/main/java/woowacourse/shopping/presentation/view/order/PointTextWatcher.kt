@@ -6,6 +6,7 @@ import android.widget.EditText
 import woowacourse.shopping.presentation.model.PointModel
 
 class PointTextWatcher(
+    private val orderPrice: Int,
     private val userPoint: PointModel,
     private val editText: EditText,
     private val onUsePointChange: (Int) -> Unit,
@@ -25,6 +26,10 @@ class PointTextWatcher(
 
             if (price > userPoint.value) {
                 primitivePrice = userPoint.value.toString()
+            }
+
+            if (primitivePrice.toInt() > orderPrice) {
+                primitivePrice = orderPrice.toString()
             }
 
             val formattingPrice = formatPrice(primitivePrice)

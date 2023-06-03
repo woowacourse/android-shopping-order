@@ -11,7 +11,7 @@ interface OrderContract {
         fun setCardItemsView(cards: List<CardModel>)
         fun setUserPointView(userPoint: PointModel)
         fun setUsePointView(usePoint: PointModel)
-        fun setPointTextChangeListener(userPoint: PointModel)
+        fun setPointTextChangeListener(orderPrice: Int, userPoint: PointModel)
         fun setOrderPriceView(orderPrice: Int)
         fun setSavePredictionPointView(savePredictionPoint: PointModel)
         fun showOrderDetailView(orderId: Long)

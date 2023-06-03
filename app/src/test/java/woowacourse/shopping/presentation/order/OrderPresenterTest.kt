@@ -118,7 +118,7 @@ class OrderPresenterTest {
 
         justRun { view.setCardItemsView(CardFixture.getFixture()) }
         justRun { view.setUserPointView(userPoint.toUIModel()) }
-        justRun { view.setPointTextChangeListener(userPoint.toUIModel()) }
+        justRun { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         justRun { view.setSavePredictionPointView(predictionPoint.toUIModel()) }
         justRun { view.setOrderPriceView(orderPrice) }
         justRun { view.setProductItemsView(carts.map { it.toUIModel() }) }
@@ -130,7 +130,7 @@ class OrderPresenterTest {
         // then
         verify { view.setCardItemsView(CardFixture.getFixture()) }
         verify { view.setUserPointView(userPoint.toUIModel()) }
-        verify { view.setPointTextChangeListener(userPoint.toUIModel()) }
+        verify { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         verify { view.setSavePredictionPointView(predictionPoint.toUIModel()) }
         verify { view.setOrderPriceView(orderPrice) }
         verify { view.setProductItemsView(carts.map { it.toUIModel() }) }
@@ -198,7 +198,7 @@ class OrderPresenterTest {
 
         justRun { view.setCardItemsView(CardFixture.getFixture()) }
         justRun { view.setUserPointView(userPoint.toUIModel()) }
-        justRun { view.setPointTextChangeListener(userPoint.toUIModel()) }
+        justRun { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         justRun { view.setSavePredictionPointView(predictionPoint.toUIModel()) }
         justRun { view.setOrderPriceView(orderPrice) }
         justRun { view.setProductItemsView(carts.map { it.toUIModel() }) }
@@ -227,7 +227,7 @@ class OrderPresenterTest {
         // then
         verify { view.setCardItemsView(CardFixture.getFixture()) }
         verify { view.setUserPointView(userPoint.toUIModel()) }
-        verify { view.setPointTextChangeListener(userPoint.toUIModel()) }
+        verify { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         verify { view.setSavePredictionPointView(predictionPoint.toUIModel()) }
         verify { view.setOrderPriceView(orderPrice) }
         verify { view.setProductItemsView(carts.map { it.toUIModel() }) }

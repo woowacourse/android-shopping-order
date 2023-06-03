@@ -22,6 +22,7 @@ class OrderPresenter(
     private lateinit var orderProducts: List<CartModel>
     private lateinit var point: PointModel
     private lateinit var cards: List<CardModel>
+    private var orderPrice: Int = 0
     private var usePoint = PointModel(0)
 
     override fun setUsePoint(usePoint: Int) {
@@ -33,7 +34,7 @@ class OrderPresenter(
         cartRepository.loadCartsByCartIds(cartIds, ::onFailure) { carts ->
             orderProducts = carts.map { it.toUIModel() }
 
-            val orderPrice = orderProducts.sumOf { it.product.price }
+            orderPrice = orderProducts.sumOf { it.product.price }
 
             loadCards()
             loadUserPoint()
@@ -55,7 +56,7 @@ class OrderPresenter(
         pointRepository.loadPoint(::onFailure) {
             point = it.toUIModel()
             view.setUserPointView(it.toUIModel())
-            view.setPointTextChangeListener(point)
+            view.setPointTextChangeListener(orderPrice, point)
         }
     }
 
