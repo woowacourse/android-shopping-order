@@ -4,18 +4,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.databinding.ItemOrderProductBinding
-import woowacourse.shopping.domain.model.ProductWithQuantity
+import woowacourse.shopping.databinding.ItemOrderDetailProductBinding
+import woowacourse.shopping.model.OrderDetailProductModel
 
 class OrderProductsAdapter(
-    private val items: List<ProductWithQuantity>,
+    private val items: List<OrderDetailProductModel>,
 ) :
     RecyclerView.Adapter<OrderProductViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderProductViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_order_product, parent, false)
-        return OrderProductViewHolder(ItemOrderProductBinding.bind(view))
+            LayoutInflater.from(parent.context).inflate(R.layout.item_order_detail_product, parent, false)
+        return OrderProductViewHolder(ItemOrderDetailProductBinding.bind(view))
     }
 
     override fun getItemCount(): Int {

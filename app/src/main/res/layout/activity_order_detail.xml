@@ -53,7 +53,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/text_order_product"
                         tools:itemCount="2"
-                        tools:listitem="@layout/item_order_product" />
+                        tools:listitem="@layout/item_order_detail_product" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout

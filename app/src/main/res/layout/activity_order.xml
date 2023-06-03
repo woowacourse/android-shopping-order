@@ -60,7 +60,7 @@
                         app:layout_constraintTop_toBottomOf="@id/text_order_product"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:itemCount="2"
-                        tools:listitem="@layout/item_order_product" />
+                        tools:listitem="@layout/item_order_detail_product" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout

@@ -21,9 +21,11 @@ class OrderHistoryViewHolder(
         if (item.products.size > 1) {
             binding.textOrderName.text = binding.root.context.getString(
                 R.string.order_multiple_name,
-                item.products[0].product.name,
+                item.products[0].name,
                 item.products.size - 1,
             )
+        } else {
+            binding.textOrderName.text = item.products[0].name
         }
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         binding.textOrderDatetime.text = formatter.format(item.orderedDateTime)

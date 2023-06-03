@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 class OrderDetailModel(
     val orderId: Int,
     val orderedDateTime: LocalDateTime,
-    val products: List<ProductWithQuantity>,
+    val products: List<OrderDetailProductModel>,
     val totalPrice: Int,
 ) {
     companion object {
@@ -17,7 +17,7 @@ class OrderDetailModel(
             return OrderDetailModel(
                 orderDto.orderId,
                 LocalDateTime.parse(orderDto.orderedDateTime, formatter),
-                orderDto.products,
+                orderDto.products.map { OrderDetailProductModel.of(it) },
                 orderDto.totalPrice,
             )
         }
