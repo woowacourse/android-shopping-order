@@ -18,6 +18,7 @@ class PointRepositoryImpl(
     ) {
         service.getPoint().enqueue(object : Callback<PointDto> {
             override fun onResponse(call: Call<PointDto>, response: Response<PointDto>) {
+                if (response.code() >= 400) onFailure()
                 response.body()?.let {
                     onSuccess(it.toDomain())
                 }

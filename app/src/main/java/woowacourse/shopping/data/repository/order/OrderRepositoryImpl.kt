@@ -20,6 +20,7 @@ class OrderRepositoryImpl(
     override fun getOrders(page: Int, onSuccess: (List<Order>) -> Unit, onFailure: () -> Unit) {
         service.getAll(page).enqueue(object : Callback<OrderListDto> {
             override fun onResponse(call: Call<OrderListDto>, response: Response<OrderListDto>) {
+                if (response.code() >= 400) onFailure()
                 response.body()?.let { orderListDto ->
                     onSuccess(orderListDto.contents.map { it.toDomain() })
                 }
@@ -42,6 +43,7 @@ class OrderRepositoryImpl(
 
         service.placeOrder(orderRequest).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.code() >= 400) onFailure()
                 onSuccess()
             }
 
@@ -61,6 +63,7 @@ class OrderRepositoryImpl(
                 call: Call<OrderDetailDto>,
                 response: Response<OrderDetailDto>
             ) {
+                if (response.code() >= 400) onFailure()
                 response.body()?.let {
                     onSuccess(it.toDomain())
                 }
@@ -75,6 +78,7 @@ class OrderRepositoryImpl(
     override fun cancelOrder(orderId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
         service.deleteOrder(orderId).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.code() >= 400) onFailure()
                 onSuccess()
             }
 
