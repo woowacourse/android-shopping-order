@@ -3,7 +3,9 @@ package com.example.domain.repository
 import com.example.domain.Product
 
 interface ProductRepository {
-    fun requestFetchAllProducts(
+    fun requestFetchProductsUnit(
+        unitSize: Int,
+        page: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     )

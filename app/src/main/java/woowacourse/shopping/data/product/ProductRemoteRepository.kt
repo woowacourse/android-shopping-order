@@ -5,6 +5,9 @@ import com.example.domain.repository.ProductRepository
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.model.product.ProductDto
+import woowacourse.shopping.data.model.product.ProductsResponse
+import woowacourse.shopping.data.model.product.toDomain
 
 class ProductRemoteRepository(
     url: String,
@@ -18,25 +21,30 @@ class ProductRemoteRepository(
         .build()
         .create(RetrofitProductService::class.java)
 
-    override fun requestFetchAllProducts(
+    override fun requestFetchProductsUnit(
+        unitSize: Int,
+        page: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     ) {
-        retrofitProductService.requestFetchAllProducts()
-            .enqueue(object : retrofit2.Callback<List<Product>> {
-                override fun onResponse(
-                    call: Call<List<Product>>,
-                    response: retrofit2.Response<List<Product>>
-                ) {
-                    val result = response.body() ?: emptyList()
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result)
-                }
+        retrofitProductService.requestFetchProductsUnit(
+            unitSize = unitSize,
+            page = page
+        ).enqueue(object : retrofit2.Callback<ProductsResponse> {
+            override fun onResponse(
+                call: Call<ProductsResponse>,
+                response: retrofit2.Response<ProductsResponse>
+            ) {
+                val result: ProductsResponse = response.body() ?: return
+                val products: List<Product> = result.products.map(ProductDto::toDomain)
+                if (400 <= response.code()) return onFailure()
+                onSuccess(products)
+            }
 
-                override fun onFailure(call: Call<List<Product>>, t: Throwable) {
-                    onFailure()
-                }
-            })
+            override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
+                onFailure()
+            }
+        })
     }
 
     override fun requestFetchProductById(
