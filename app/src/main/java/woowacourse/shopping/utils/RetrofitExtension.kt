@@ -7,14 +7,14 @@ import retrofit2.Response
 
 fun <ResponseType> Call<ResponseType>.enqueueUtil(
     onSuccess: (ResponseType) -> Unit,
-    onFailure: ((stateCode: Int) -> Unit)? = null,
+    onFailure: ((stateMessage: String) -> Unit)? = null,
 ) {
     this.enqueue(object : Callback<ResponseType> {
         override fun onResponse(call: Call<ResponseType>, response: Response<ResponseType>) {
             if (response.isSuccessful) {
                 onSuccess.invoke(response.body() ?: return)
             } else {
-                onFailure?.invoke(response.code())
+                onFailure?.invoke(response.message())
             }
         }
 

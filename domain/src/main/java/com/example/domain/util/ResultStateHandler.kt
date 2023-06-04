@@ -6,6 +6,6 @@ sealed class CustomResult<out T : Any> {
 }
 
 sealed class Error(val errorMessage: String) {
+    data class Disconnect(val error: String) : Error(error)
     object NoSuchId : Error("해당 ID가 없습니다")
-    object Disconnect : Error("서버가 연결되지 않았습니다")
 }
