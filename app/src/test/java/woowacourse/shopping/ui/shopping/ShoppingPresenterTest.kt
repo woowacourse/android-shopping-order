@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -9,6 +10,8 @@ import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.domain.BasketProduct
+import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentProduct
@@ -25,12 +28,6 @@ class ShoppingPresenterTest() {
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var basketRepository: BasketRepository
     private lateinit var presenter: ShoppingPresenter
-    private val pagingSize = 10
-    private val hasNextStandard = 1
-    private val onceLoadingSize = pagingSize + hasNextStandard
-
-    // 초기화 할때 한번 불리기 때문에 verify test시 더해줘야한다.
-    private val initialUpdateTotalBasketCount = 1
 
     @Before
     fun initPresenter() {
@@ -38,33 +35,36 @@ class ShoppingPresenterTest() {
         productRepository = mockk(relaxed = true)
         recentProductRepository = mockk(relaxed = true)
         basketRepository = mockk(relaxed = true)
+
+        // 기본 basket 더미데이터
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(listOf())
+        }
+
         presenter =
             ShoppingPresenter(view, productRepository, recentProductRepository, basketRepository)
     }
 
     @Test
-    fun `상품 데이터를 불러오면 화면이 업데이트 된다`() {
+    fun `장바구니 데이터를 불러오면 화면이 업데이트 된다`() {
         // given
+        clearMocks(view)
+        every { view.updateTotalBasketCount(any()) } just runs
         every { view.updateProducts(any()) } just runs
-        every { productRepository.getPartially(any(), any()) } returns List(onceLoadingSize) {
-            Product(
-                1,
-                "더미입니다만",
-                Price(1000),
-                "url"
-            )
-        }
 
         // when
-        presenter.initProducts()
+        presenter.updateBasket()
 
         // then
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
         verify(exactly = 1) { view.updateProducts(any()) }
     }
 
     @Test
     fun `최근 본 상품 목록을 업데이트 하면 화면 업데이트 로직도 호출된다`() {
         // given
+        clearMocks(view)
         every { view.updateRecentProducts(any()) } just runs
         every { recentProductRepository.getPartially(any()) } returns listOf(
             RecentProduct(
@@ -82,52 +82,84 @@ class ShoppingPresenterTest() {
     @Test
     fun `장바구니를 업데이트하면 관련 데이터인 상품이 장바구니에 담긴 갯수 전체 장바구니 count 수가 업데이트 된다`() {
         // given
+        clearMocks(view)
         every { view.updateProducts(any()) } just runs
         every { view.updateTotalBasketCount(any()) } just runs
+
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(listOf())
+        }
+
+        every { productRepository.getPartially(any(), any(), any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(2)
+            callback(listOf())
+        }
+
         // when
         presenter.initBasket()
+
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
     }
 
     @Test
     fun `장바구니 물품 총 갯수를 계산하고 뷰에 업데이트 한다`() {
         // given
+        clearMocks(view)
         every { view.updateTotalBasketCount(any()) } just runs
 
         // when
         presenter.fetchTotalBasketCount()
         // then
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
     }
 
     @Test
-    fun `장바구니에 물품을 추가하면 데이터베이스에 저장하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
+    fun `장바구니에 이미 존재하는 물품을 더하면 데이터베이스 혹은 서버에 저장하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
         // given
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(listOf(BasketProduct(1, Count(2), Product(1, "더미입니다만", Price(1), "url"))))
+        }
+
+        presenter =
+            ShoppingPresenter(view, productRepository, recentProductRepository, basketRepository)
+
+        clearMocks(view)
         every { view.updateProducts(any()) } just runs
         every { view.updateTotalBasketCount(any()) } just runs
-        every { basketRepository.add(any()) } just runs
+        every { basketRepository.update(any()) } just runs
         // when
         presenter.plusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
-        verify(exactly = 1) { basketRepository.add(any()) }
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
+        verify(exactly = 1) { basketRepository.update(any()) }
     }
 
     @Test
     fun `장바구니에 물품을 빼면 데이터베이스에서도 빼는 로직을 실행하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
         // given
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(listOf(BasketProduct(1, Count(2), Product(1, "더미입니다만", Price(1), "url"))))
+        }
+
+        presenter =
+            ShoppingPresenter(view, productRepository, recentProductRepository, basketRepository)
+
+        clearMocks(view)
         every { view.updateProducts(any()) } just runs
         every { view.updateTotalBasketCount(any()) } just runs
-        every { basketRepository.minus(any()) } just runs
+        every { basketRepository.update(any()) } just runs
         // when
         presenter.minusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
         // then
         verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
-        verify(exactly = 1) { basketRepository.minus(any()) }
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
+        verify(exactly = 1) { basketRepository.update(any()) }
     }
 
     @Test
@@ -149,7 +181,9 @@ class ShoppingPresenterTest() {
         every {
             view.showProductDetail(
                 capture(currentProductSlot),
-                capture(previousProductSlot)
+                any(),
+                capture(previousProductSlot),
+                any()
             )
         } just runs
 
@@ -181,7 +215,9 @@ class ShoppingPresenterTest() {
         every {
             view.showProductDetail(
                 capture(currentProductSlot),
-                capture(previousProductSlot)
+                any(),
+                capture(previousProductSlot),
+                any()
             )
         } just runs
 
