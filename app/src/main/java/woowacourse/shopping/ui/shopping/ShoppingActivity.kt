@@ -24,6 +24,7 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.UiProduct
 import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingViewType.MORE_BUTTON
 import woowacourse.shopping.ui.shopping.ShoppingViewType.PRODUCT
@@ -69,6 +70,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initRecentProductsData()
         initButtonBasketClickListener()
         initShoppingRecyclerViewScrollListener()
+        initButtonOrderHistoryClickListener()
     }
 
     override fun onResume() {
@@ -195,6 +197,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private fun initButtonBasketClickListener() {
         binding.ivBasket.setThrottleFirstOnClickListener {
             activityResultLauncher.launch(BasketActivity.getIntent(this))
+        }
+    }
+
+    private fun initButtonOrderHistoryClickListener() {
+        binding.ivOrderHistory.setThrottleFirstOnClickListener {
+            startActivity(OrderHistoryActivity.getIntent(this))
         }
     }
 
