@@ -11,4 +11,6 @@ interface OrderRepository {
     )
 
     fun getIndividualOrderInfo(orderId: Int, onReceived: (Order) -> Unit)
+
+    fun getOrdersInfo(onReceived: (List<Order>) -> Unit)
 }

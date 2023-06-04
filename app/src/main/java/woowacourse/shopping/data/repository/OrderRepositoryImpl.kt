@@ -48,4 +48,10 @@ class OrderRepositoryImpl(private val orderDataSource: OrderDataSource.Remote) :
             onReceived(it.toDomain())
         }
     }
+
+    override fun getOrdersInfo(onReceived: (List<Order>) -> Unit) {
+        orderDataSource.getOrdersInfo { ordersInfo ->
+            onReceived(ordersInfo.map { it.toDomain() })
+        }
+    }
 }
