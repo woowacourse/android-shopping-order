@@ -144,7 +144,6 @@ class CartPresenter(
     }
 
     override fun onRefresh() {
-        currentPage = 1
         cartItemRepository.findAll { cartItems ->
             selectedCartItems = selectedCartItems.filter { it in cartItems }.toSet()
             showCartItems(currentPage, selectedCartItems, true)
