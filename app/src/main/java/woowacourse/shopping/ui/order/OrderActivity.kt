@@ -8,6 +8,8 @@ import android.text.TextWatcher
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -24,6 +26,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
+        initToolBar()
         initPresenter()
         initOrderInfo()
         setPointInput()
@@ -31,6 +34,17 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
+    }
+
+    private fun initToolBar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val navigationIcon = binding.toolbar.navigationIcon?.mutate()
+        DrawableCompat.setTint(
+            navigationIcon!!,
+            ContextCompat.getColor(this, android.R.color.white),
+        )
+        binding.toolbar.navigationIcon = navigationIcon
     }
 
     private fun initPresenter() {
