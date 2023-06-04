@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
-import com.example.domain.model.Order
 import com.example.domain.model.OrderDetail
+import com.example.domain.model.OrderPreview
 
 interface OrderRepository {
 
@@ -13,7 +13,7 @@ interface OrderRepository {
     )
 
     fun getAll(
-        onSuccess: (orders: List<Order>) -> Unit,
+        onSuccess: (orders: List<OrderPreview>) -> Unit,
         onFailure: () -> Unit,
     )
 

@@ -31,5 +31,9 @@
     <string name="no_discount">적용 가능한 할인이 없습니다.</string>
     <string name="order_detail">주문 상세</string>
     <string name="order_info">주문 내역</string>
-    <string name="payment_info">결제 정보</string>\
+    <string name="payment_info">결제 정보</string>
+    <string name="order_list">주문 목록</string>
+    <string name="order_id">주문 번호 %d</string>
+    <string name="go_order_detail"><![CDATA[주문 상세 보기 >]]></string>
+    <string name="order_main_product_name_more_than_one">%s 외 %d 종</string>
 </resources>

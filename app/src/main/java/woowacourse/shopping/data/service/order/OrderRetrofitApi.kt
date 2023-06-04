@@ -8,6 +8,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.dto.request.OrderRequestDTO
 import woowacourse.shopping.data.dto.response.OrderDetailDto
+import woowacourse.shopping.data.dto.response.OrderPreviewDto
 
 interface OrderRetrofitApi {
     @POST("orders")
@@ -22,6 +23,10 @@ interface OrderRetrofitApi {
         @Path("id") orderId: Long,
     ): Call<OrderDetailDto>
 
+    @GET("orders")
+    fun requestAll(
+        @Header("Authorization") authorization: String,
+    ): Call<List<OrderPreviewDto>>
 //    @POST("cart-items")
 //    fun requestAddCartProduct(
 //        @Header("Authorization") authorization: String,
