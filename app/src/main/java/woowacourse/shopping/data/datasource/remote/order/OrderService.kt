@@ -13,7 +13,7 @@ import woowacourse.shopping.data.model.OrderRequestDto
 
 interface OrderService {
     @GET("/orders")
-    fun getAll(@Query("page") page: Int): Call<List<OrderListDto>>
+    fun getAll(@Query("page") page: Int): Call<OrderListDto>
 
     @GET("/orders/{orderId}")
     fun getOrderDetail(@Path("orderId") orderId: Int): Call<OrderDetailDto>
@@ -22,5 +22,5 @@ interface OrderService {
     fun deleteOrder(@Path("orderId") orderId: Int): Call<Unit>
 
     @POST("/orders")
-    fun placeOrder(@Body orderRequest: OrderRequestDto)
+    fun placeOrder(@Body orderRequest: OrderRequestDto): Call<Unit>
 }

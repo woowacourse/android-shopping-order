@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.RetrofitClient
+import woowacourse.shopping.data.datasource.remote.order.OrderService
+import woowacourse.shopping.data.datasource.remote.point.PointService
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -49,15 +53,27 @@ class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
     }
 
     private fun initPresenter() {
-        presenter = UserInfoPresenter(this, OrderRepositoryImpl(), PointRepositoryImpl())
+
+        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
+        val orderService = RetrofitClient.getInstanceWithToken(token)
+            .create(OrderService::class.java)
+
+        val pointService = RetrofitClient.getInstanceWithToken(token)
+            .create(PointService::class.java)
+
+        presenter = UserInfoPresenter(
+            this,
+            OrderRepositoryImpl(orderService),
+            PointRepositoryImpl(pointService)
+        )
     }
 
     override fun showOrders(orders: List<OrderUiModel>) {
-        orderHistoryAdapter.submitList(orders)
+        runOnUiThread { orderHistoryAdapter.submitList(orders) }
     }
 
     override fun showPoint(point: PointUiModel) {
-        binding.point = point
+        runOnUiThread { binding.point = point }
     }
 
     private fun showOrderDetailScreen(orderId: Int) {

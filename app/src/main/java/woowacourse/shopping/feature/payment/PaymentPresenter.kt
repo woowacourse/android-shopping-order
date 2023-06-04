@@ -53,10 +53,11 @@ class PaymentPresenter(
         orderRepository.placeOrder(
             usedPoint,
             orderProducts,
-            onSuccess = {},
+            onSuccess = {
+                view.showPaymentDoneScreen()
+            },
             onFailure = {}
         )
-        view.showPaymentDoneScreen()
     }
 
     override fun useAllPoint() {

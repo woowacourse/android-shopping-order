@@ -1,5 +1,9 @@
 package woowacourse.shopping.data.model
 
+import com.example.domain.model.Order
+import com.example.domain.model.OrderStatus
+import com.example.domain.model.Price
+
 data class OrderDto(
     val orderId: Int,
     val payAmount: Int,
@@ -8,4 +12,14 @@ data class OrderDto(
     val productName: String,
     val productImageUrl: String,
     val totalProductCount: Int
+)
+
+fun OrderDto.toDomain(): Order = Order(
+    orderId,
+    Price(payAmount),
+    orderAt,
+    OrderStatus.PENDING,
+    productName,
+    productImageUrl,
+    totalProductCount
 )
