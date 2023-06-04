@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="orderItem"
+            type="woowacourse.shopping.uimodel.OrderProductUIModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,6 +20,7 @@
             android:id="@+id/tv_order_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:text="@{orderItem.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -27,6 +35,7 @@
             android:layout_height="72dp"
             android:layout_marginTop="10dp"
             android:scaleType="centerCrop"
+            app:imageUrl="@{orderItem.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1.8"
             app:layout_constraintStart_toStartOf="@id/tv_order_item_name"
@@ -38,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="@{@string/product_price(orderItem.price)}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/tv_order_item_count"
@@ -48,6 +58,7 @@
             android:id="@+id/tv_order_item_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/order_item_quantity(orderItem.quantity)}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -2,7 +2,6 @@ package woowacourse.shopping.mapper
 
 import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.uimodel.OrderHistoryUIModel
-import java.time.LocalDateTime
 
 fun OrderHistory.toUIModel() = OrderHistoryUIModel(
     id = id,
@@ -11,5 +10,5 @@ fun OrderHistory.toUIModel() = OrderHistoryUIModel(
     payPrice = payPrice,
     earnedPoints = earnedPoints,
     usedPoints = usedPoints,
-    orderDate = LocalDateTime.parse(orderDate),
+    orderDate = orderDate,
 )

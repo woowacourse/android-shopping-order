@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.dataSource
 
+import retrofit2.Call
+import retrofit2.Response
+import woowacourse.shopping.data.model.OrderListResponse
 import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitOrderService
@@ -12,13 +15,13 @@ class RemoteOrderDataSource(
         service.orderCart(ids).enqueue(
             object : retrofit2.Callback<OrderInfo> {
                 override fun onResponse(
-                    call: retrofit2.Call<OrderInfo>,
-                    response: retrofit2.Response<OrderInfo>,
+                    call: Call<OrderInfo>,
+                    response: Response<OrderInfo>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: retrofit2.Call<OrderInfo>, t: Throwable) {
+                override fun onFailure(call: Call<OrderInfo>, t: Throwable) {
                     callback(null)
                 }
             },
@@ -29,14 +32,31 @@ class RemoteOrderDataSource(
         service.postOrderItem(orderRequest).enqueue(
             object : retrofit2.Callback<Unit> {
                 override fun onResponse(
-                    call: retrofit2.Call<Unit>,
-                    response: retrofit2.Response<Unit>,
+                    call: Call<Unit>,
+                    response: Response<Unit>,
                 ) {
                     callback()
                 }
 
-                override fun onFailure(call: retrofit2.Call<Unit>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     callback()
+                }
+            },
+        )
+    }
+
+    override fun getOrderHistories(callback: (OrderListResponse?) -> Unit) {
+        service.getOrders().enqueue(
+            object : retrofit2.Callback<OrderListResponse> {
+                override fun onResponse(
+                    call: Call<OrderListResponse>,
+                    response: Response<OrderListResponse>,
+                ) {
+                    callback(response.body())
+                }
+
+                override fun onFailure(call: Call<OrderListResponse>, t: Throwable) {
+                    callback(null)
                 }
             },
         )
