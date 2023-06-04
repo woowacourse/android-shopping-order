@@ -18,4 +18,8 @@ class OrderHistoryPresenter(
         )
 
     }
+
+    override fun openDetail(id: Int) {
+        view.showDetail(id)
+    }
 }

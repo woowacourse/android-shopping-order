@@ -24,7 +24,6 @@ class OrderHistoryPresenterTest {
     fun `주문 목록을 노출한다`() {
         // given
         presenter = OrderHistoryPresenter(view, memberRepository)
-        every { view.showHistories(any()) } just runs
 
         val histories: List<OrderHistory> = listOf(createOrderHistory(id = 1), createOrderHistory(id = 2))
         val successSlot = slot<(List<OrderHistory>) -> Unit>()
@@ -32,11 +31,28 @@ class OrderHistoryPresenterTest {
             successSlot.captured(histories)
         }
 
+        every { view.showHistories(any()) } just runs
+
         // when
         presenter.loadHistories()
 
         // then
         val expected: List<OrderHistoryModel> = listOf(createOrderHistoryModel(id = 1), createOrderHistoryModel(id = 2))
         verify { view.showHistories(expected) }
+    }
+
+    @Test
+    fun `주문 상세를 보여준다`() {
+        // given
+        presenter = OrderHistoryPresenter(view, memberRepository)
+
+        every { view.showDetail(any()) } just runs
+
+        // when
+        val id = 1
+        presenter.openDetail(id)
+
+        // then
+        verify { view.showDetail(id) }
     }
 }

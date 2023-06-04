@@ -10,6 +10,7 @@ import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
 import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.OrderHistoryModel
+import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private lateinit var binding: ActivityOrderHistoryBinding
@@ -53,13 +54,21 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun showHistories(histories: List<OrderHistoryModel>) {
-        binding.rvOrderHistory.adapter = OrderHistoryAdapter(histories)
+        binding.rvOrderHistory.adapter = OrderHistoryAdapter(
+            histories,
+            onShowDetailListener = { presenter.openDetail(it) }
+        )
     }
 
     override fun notifyLoadFailed() {
         runOnUiThread {
             Toaster.showToast(this, "주문 목록을 불러오는데 실패했습니다!")
         }
+    }
+
+    override fun showDetail(id: Int) {
+        val intent = OrderDetailActivity.createIntent(this, id)
+        startActivity(intent)
     }
 
     companion object {
