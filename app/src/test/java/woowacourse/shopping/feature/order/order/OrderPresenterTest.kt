@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.order.order
 
 import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository

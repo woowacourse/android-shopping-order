@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.orderdetail
+package woowacourse.shopping.feature.order.detail
 
 import android.content.Context
 import android.content.Intent
@@ -10,7 +10,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.OrderRepositoryImpl
 import woowacourse.shopping.data.service.order.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
-import woowacourse.shopping.feature.order.OrderProductAdapter
+import woowacourse.shopping.feature.order.order.OrderProductAdapter
 import woowacourse.shopping.model.OrderDetailUiModel
 import woowacourse.shopping.model.OrderProductUiModel
 import woowacourse.shopping.model.ProductUiModel

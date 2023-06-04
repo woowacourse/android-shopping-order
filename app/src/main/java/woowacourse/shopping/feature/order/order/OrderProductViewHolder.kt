@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.order.order
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

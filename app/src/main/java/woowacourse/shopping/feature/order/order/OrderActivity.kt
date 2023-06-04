@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.order
+package woowacourse.shopping.feature.order.order
 
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,7 @@ import woowacourse.shopping.data.repository.remote.OrderRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.data.service.order.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.feature.orderdetail.OrderDetailActivity
+import woowacourse.shopping.feature.order.detail.OrderDetailActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.util.toMoneyFormat
 

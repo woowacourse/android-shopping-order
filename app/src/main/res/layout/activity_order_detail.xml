@@ -13,7 +13,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".feature.orderdetail.OrderDetailActivity">
+        tools:context=".feature.order.detail.OrderDetailActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

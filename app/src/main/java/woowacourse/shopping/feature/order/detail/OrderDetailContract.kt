@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.orderdetail
+package woowacourse.shopping.feature.order.detail
 
 import woowacourse.shopping.model.OrderDetailUiModel
 
