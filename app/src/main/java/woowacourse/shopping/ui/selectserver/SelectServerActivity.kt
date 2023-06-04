@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.selectserver
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.remote.NetworkModule
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
@@ -25,6 +26,7 @@ class SelectServerActivity : AppCompatActivity() {
 
         binding.btnSelectServerHongsil.setOnClickListener {
             NetworkModule.setBaseUrlNew(HONGSIL_SERVER)
+            Log.d("123123", "123123")
             navigateToShopping()
         }
     }
