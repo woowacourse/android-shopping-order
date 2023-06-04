@@ -38,4 +38,5 @@
     <string name="user_page">User Page</string>
     <string name="payment_page">결제하기</string>
     <string name="cancel_order">주문 취소</string>
+    <string name="order_status">주문 상태</string>
 </resources>
