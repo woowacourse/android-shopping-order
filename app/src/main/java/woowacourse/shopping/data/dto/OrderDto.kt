@@ -3,13 +3,13 @@ package woowacourse.shopping.data.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class OrdersResponse(
-    @SerialName("pageInfo")
-    val pageInfo: PageInfoResponse,
-    @SerialName("orders")
-    val orders: List<OrderResponse> = listOf(),
-)
+//@Serializable
+//data class OrdersResponse(
+//    @SerialName("pageInfo")
+//    val pageInfo: PageInfoResponse,
+//    @SerialName("orders")
+//    val orders: List<OrderResponse> = listOf(),
+//)
 
 @Serializable
 data class OrderResponse(

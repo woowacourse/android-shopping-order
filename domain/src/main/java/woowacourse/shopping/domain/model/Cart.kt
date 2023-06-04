@@ -40,6 +40,9 @@ data class Cart(
     fun update(cartProducts: List<CartProduct>): Cart =
         copy(items = cartProducts.distinctBy { it.productId })
 
+    fun addAll(cartProducts: List<CartProduct>): Cart =
+        copy(items = (items + cartProducts).distinctBy { it.product.id })
+
     fun delete(cartProduct: CartProduct): Cart =
         copy(items = items.filter { it.productId != cartProduct.productId })
 

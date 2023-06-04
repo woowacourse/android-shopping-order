@@ -4,7 +4,7 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.OrdersResponse
+import woowacourse.shopping.data.dto.OrderResponse
 import woowacourse.shopping.data.dto.mapper.toOrderRequest
 import woowacourse.shopping.data.dto.mapper.toOrders
 import woowacourse.shopping.data.service.order.OrderService
@@ -42,21 +42,21 @@ class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
         service.getOrders(
             page = page.value,
             size = page.sizePerPage
-        ).enqueue(object : Callback<OrdersResponse> {
+        ).enqueue(object : Callback<List<OrderResponse>> {
             override fun onResponse(
-                call: Call<OrdersResponse>,
-                response: Response<OrdersResponse>,
+                call: Call<List<OrderResponse>>,
+                response: Response<List<OrderResponse>>,
             ) {
                 if (response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()?.orders?.toOrders() ?: emptyList())
+//                    onSuccess(response.body()?.orders?.toOrders() ?: emptyList())
+                    onSuccess(response.body()?.toOrders() ?: emptyList())
                     return
                 }
-                Log.d("buna", "onResponse: ${response.code()}")
                 onFailed(Throwable(response.message()))
             }
 
-            override fun onFailure(call: Call<OrdersResponse>, throwable: Throwable) {
-                Log.d("buna", "onResponse")
+            override fun onFailure(call: Call<List<OrderResponse>>, throwable: Throwable) {
+                Log.d("buna", "$throwable ")
                 onFailed(throwable)
             }
         })
