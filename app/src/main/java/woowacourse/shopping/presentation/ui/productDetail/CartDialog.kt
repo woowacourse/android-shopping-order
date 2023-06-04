@@ -12,14 +12,14 @@ import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
 import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
 import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
-import woowacourse.shopping.databinding.DialogOrderBinding
+import woowacourse.shopping.databinding.DialogCartBinding
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.util.WoowaResult
 import woowacourse.shopping.presentation.ui.shoppingCart.ShoppingCartActivity
 
-class OrderDialog : DialogFragment() {
-    private lateinit var binding: DialogOrderBinding
+class CartDialog : DialogFragment() {
+    private lateinit var binding: DialogCartBinding
     private val productRepository: ProductRepository by lazy {
         DefaultProductRepository(ProductRemoteDataSource())
     }
@@ -32,7 +32,7 @@ class OrderDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = DialogOrderBinding.inflate(layoutInflater)
+        binding = DialogCartBinding.inflate(layoutInflater)
         return binding.root
     }
 
@@ -114,8 +114,8 @@ class OrderDialog : DialogFragment() {
 
     companion object {
         private const val PRODUCT_ID = "PRODUCT_ID"
-        fun makeDialog(productId: Long): OrderDialog {
-            return OrderDialog().apply {
+        fun makeDialog(productId: Long): CartDialog {
+            return CartDialog().apply {
                 val bundle = Bundle()
                 bundle.putLong("PRODUCT_ID", productId)
                 arguments = bundle

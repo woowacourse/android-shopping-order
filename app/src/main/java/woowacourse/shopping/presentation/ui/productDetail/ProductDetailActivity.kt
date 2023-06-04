@@ -59,10 +59,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun clickShoppingCart() {
         binding.buttonProductDetailPutInShoppingCart.setOnClickListener {
-            /*presenter.addProductInCart()
-            startActivity(Intent(this, ShoppingCartActivity::class.java))*/
-            OrderDialog.makeDialog(binding.product?.id ?: -1).show(supportFragmentManager, "order")
-            // finish()
+            CartDialog.makeDialog(binding.product?.id ?: -1).show(supportFragmentManager, "order")
         }
     }
 
