@@ -34,7 +34,7 @@ class OrderPresenter(
         cartRepository.loadCartsByCartIds(cartIds, ::onFailure) { carts ->
             orderProducts = carts.map { it.toUIModel() }
 
-            orderPrice = orderProducts.sumOf { it.product.price }
+            orderPrice = orderProducts.sumOf { it.product.price * it.count }
 
             loadCards()
             loadUserPoint()
