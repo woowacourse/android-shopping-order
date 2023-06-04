@@ -6,6 +6,7 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.ShoppingProducts
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.MemberRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.model.ProductModel
@@ -22,6 +23,7 @@ class ShoppingPresenter(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
+    private val memberRepository: MemberRepository,
     private val recentProductSize: Int,
     private val productLoadSize: Int,
 ) : ShoppingContract.Presenter {
@@ -161,6 +163,15 @@ class ShoppingPresenter(
                     )
                     updateCartProductQuantity(cartProduct)
                 }
+            },
+            onFailure = {}
+        )
+    }
+
+    override fun loadPoints() {
+        memberRepository.getPoints(
+            onSuccess = {
+                view.showPoints(it)
             },
             onFailure = {}
         )

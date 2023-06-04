@@ -15,20 +15,22 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.model.ProductModel
-import woowacourse.shopping.ui.model.RecentProductModel
-import woowacourse.shopping.ui.model.ShoppingProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
 import woowacourse.shopping.data.database.dao.RecentProductDao
+import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
+import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.model.ProductModel
+import woowacourse.shopping.ui.model.RecentProductModel
+import woowacourse.shopping.ui.model.ShoppingProductModel
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.recyclerview.LoadMoreAdapter
 import woowacourse.shopping.ui.shopping.recyclerview.ProductAdapter
@@ -39,6 +41,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var presenter: ShoppingContract.Presenter
     private var shoppingCartAmount: TextView? = null
+    private var tvPoints: TextView? = null
 
     private val productAdapter: ProductAdapter by lazy {
         ProductAdapter(
@@ -132,8 +135,18 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
 
         shoppingCartAmount = shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
+        tvPoints = shoppingCartAction?.actionView?.findViewById(R.id.member_points)
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        setupMenuView()
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun setupMenuView() {
+        presenter.loadPoints()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -196,6 +209,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
     }
 
+    override fun showPoints(points: Int) {
+        tvPoints?.text = getString(R.string.points, points)
+    }
+
     private fun startCartActivity() {
         val intent = CartActivity.createIntent(this)
         activityResultLauncher.launch(intent)
@@ -223,6 +240,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             productRepository = productRepository,
             recentProductRepository = recentProductRepository,
             cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
+            memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit()),
             recentProductSize = 10,
             productLoadSize = 20
         )
