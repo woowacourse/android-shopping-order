@@ -1,4 +1,4 @@
-package woowacourse.shopping.database.cart
+package woowacourse.shopping.database.product
 
 import android.database.Cursor
 import android.provider.BaseColumns

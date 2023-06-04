@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import woowacourse.shopping.database.cart.CartConstant
-import woowacourse.shopping.database.cart.ProductConstant
+import woowacourse.shopping.database.product.ProductConstant
 import woowacourse.shopping.database.recentProduct.RecentProductConstant
 
 class ShoppingDBHelper(context: Context) :
