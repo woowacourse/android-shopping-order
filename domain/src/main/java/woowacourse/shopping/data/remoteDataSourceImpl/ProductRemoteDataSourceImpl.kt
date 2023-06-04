@@ -8,7 +8,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getAll(): Result<List<Product>> = runCatching {
         RetrofitUtil.getInstance().retrofitProductService
-            .getProducts().execute().body()!!
+            .getProducts().execute().body()!!.map { it.toDomain() }
     }
 
     override fun getNext(count: Int): Result<List<Product>> {
@@ -21,6 +21,6 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun findById(id: Int): Result<Product> = runCatching {
         RetrofitUtil.getInstance().retrofitProductService
-            .getProduct(id).execute().body()!![0]
+            .getProduct(id).execute().body()!![0].toDomain()
     }
 }
