@@ -36,7 +36,7 @@ class ProductMockWebService : ProductRemoteDataSource {
 
     override fun requestProducts(
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (t: Throwable) -> Unit
     ) {
         synchronized(this) {
             mockWebServer = MockWebServer()
@@ -50,11 +50,11 @@ class ProductMockWebService : ProductRemoteDataSource {
         okHttpClient.newCall(request).enqueue(
             object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    onFailure()
+                    onFailure(Throwable("failure: mock web"))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    if (response.code >= 400) return onFailure()
+                    if (response.code >= 400) return onFailure(Throwable("failure"))
                     val responseBody = response.body?.string()
                     response.close()
 

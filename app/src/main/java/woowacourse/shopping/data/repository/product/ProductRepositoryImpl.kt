@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.product
 
+import android.util.Log
 import com.example.domain.ProductCache
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
@@ -22,7 +23,7 @@ class ProductRepositoryImpl(
                     sleep(2000)
                     onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
                 },
-                onFailure = {}
+                onFailure = { Log.d("Hash", "failure: $it") }
             )
         } else {
             onSuccess(productCache.getSubProducts(page, LOAD_SIZE))

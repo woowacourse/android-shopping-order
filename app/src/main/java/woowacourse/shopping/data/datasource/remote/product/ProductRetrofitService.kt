@@ -10,7 +10,7 @@ class ProductRetrofitService(
     private val productService: ProductService
 ) : ProductRemoteDataSource {
 
-    override fun requestProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    override fun requestProducts(onSuccess: (List<Product>) -> Unit, onFailure: (t: Throwable) -> Unit) {
         productService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductDto>> {
             override fun onResponse(
                 call: Call<List<ProductDto>>,
@@ -24,7 +24,7 @@ class ProductRetrofitService(
             }
 
             override fun onFailure(call: Call<List<ProductDto>>, t: Throwable) {
-                onFailure()
+                onFailure(t)
             }
         })
     }
