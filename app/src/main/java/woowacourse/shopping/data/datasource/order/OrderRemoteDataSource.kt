@@ -11,7 +11,7 @@ import woowacourse.shopping.data.util.retrofit.RetrofitUtil
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
-class OrderDataSourceImpl : OrderDataSource {
+class OrderRemoteDataSource : OrderDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
     private val retrofitService = RetrofitUtil.getOrderProductByRetrofit(baseUrl)
 

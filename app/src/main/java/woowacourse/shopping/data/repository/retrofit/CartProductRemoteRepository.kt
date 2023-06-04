@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.repository.retrofit
 
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.datasource.cart.CartProductDataSourceImpl
+import woowacourse.shopping.data.datasource.cart.CartProductRemoteDataSource
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.repository.CartProductId
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductId
 
-class CartProductRepositoryImpl : CartRepository {
-    private val cartProductDataSource = CartProductDataSourceImpl()
+class CartProductRemoteRepository : CartRepository {
+    private val cartProductDataSource = CartProductRemoteDataSource()
     private val token: String?
         get() = ShoppingApplication.pref.getToken()
 

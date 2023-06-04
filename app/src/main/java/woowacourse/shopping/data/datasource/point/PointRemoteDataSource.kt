@@ -9,7 +9,7 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil
 import woowacourse.shopping.domain.model.Point
 
-class PointDataSourceImpl : PointDataSource {
+class PointRemoteDataSource : PointDataSource {
     private val baseUrl: String = ShoppingApplication.pref.getBaseUrl().toString()
     private val retrofitService = RetrofitUtil.getPointByRetrofit(baseUrl)
 

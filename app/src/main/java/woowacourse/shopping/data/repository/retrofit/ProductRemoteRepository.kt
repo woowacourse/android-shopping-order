@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.repository.retrofit
 
-import woowacourse.shopping.data.datasource.product.ProductDataSourceImpl
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.mapper.toDto
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class ProductRepositoryImpl(
-    private val productDataSource: ProductDataSourceImpl,
+class ProductRemoteRepository(
+    private val productDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
 
     override fun getAllProducts(

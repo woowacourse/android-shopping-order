@@ -2,12 +2,12 @@ package woowacourse.shopping.util.inject
 
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
-import woowacourse.shopping.data.datasource.product.ProductDataSourceImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.repository.retrofit.CartProductRepositoryImpl
-import woowacourse.shopping.data.repository.retrofit.OrderProductRepositoryImpl
-import woowacourse.shopping.data.repository.retrofit.PointRepositoryImpl
-import woowacourse.shopping.data.repository.retrofit.ProductRepositoryImpl
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
+import woowacourse.shopping.data.repository.RecentProductLocalRepository
+import woowacourse.shopping.data.repository.retrofit.CartProductRemoteRepository
+import woowacourse.shopping.data.repository.retrofit.OrderProductRemoteRepository
+import woowacourse.shopping.data.repository.retrofit.PointRemoteRepository
+import woowacourse.shopping.data.repository.retrofit.ProductRemoteRepository
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
@@ -32,11 +32,11 @@ fun inject(
 ): ShoppingContract.Presenter {
     return ShoppingPresenter(
         view = view,
-        productRepository = ProductRepositoryImpl(ProductDataSourceImpl()),
-        recentProductRepository = RecentProductRepositoryImpl(
+        productRepository = ProductRemoteRepository(ProductRemoteDataSource()),
+        recentProductRepository = RecentProductLocalRepository(
             dao = RecentProductDaoImpl(createShoppingDatabase(context)),
         ),
-        cartRepository = CartProductRepositoryImpl(),
+        cartRepository = CartProductRemoteRepository(),
     )
 }
 
@@ -48,7 +48,7 @@ fun inject(
 ): ProductDetailContract.Presenter = ProductDetailPresenter(
     view = view,
     product = detailProduct,
-    recentProductRepository = RecentProductRepositoryImpl(
+    recentProductRepository = RecentProductLocalRepository(
         dao = RecentProductDaoImpl(createShoppingDatabase(context)),
     ),
     showLastViewedProduct = showLastViewedProduct,
@@ -59,7 +59,7 @@ fun injectCartPresenter(
 ): CartPresenter {
     return CartPresenter(
         view = view,
-        cartRepository = CartProductRepositoryImpl(),
+        cartRepository = CartProductRemoteRepository(),
     )
 }
 
@@ -77,15 +77,15 @@ fun injectOrderPresenter(
 ): OrderContract.Presenter = OrderPresenter(
     view = view,
     cartProducts = cartProducts.items,
-    orderProductRepository = OrderProductRepositoryImpl(),
-    pointRepository = PointRepositoryImpl(),
+    orderProductRepository = OrderProductRemoteRepository(),
+    pointRepository = PointRemoteRepository(),
 )
 
 fun injectOrderHistoryPresenter(
     view: OrderHistoryContract.View,
 ): OrderHistoryContract.Presenter = OrderHistoryPresenter(
     view = view,
-    orderProductRepository = OrderProductRepositoryImpl(),
+    orderProductRepository = OrderProductRemoteRepository(),
 )
 
 fun injectOrderDetailPresenter(
@@ -94,5 +94,5 @@ fun injectOrderDetailPresenter(
 ): OrderDetailContract.Presenter = OrderDetailPresenter(
     view = view,
     orderId = orderId,
-    orderProductRepository = OrderProductRepositoryImpl(),
+    orderProductRepository = OrderProductRemoteRepository(),
 )

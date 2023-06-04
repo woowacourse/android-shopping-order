@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.repository.retrofit
 
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.datasource.order.OrderDataSourceImpl
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 import woowacourse.shopping.domain.repository.OrderProductRepository
 
-class OrderProductRepositoryImpl : OrderProductRepository {
-    private val orderProductDataSource = OrderDataSourceImpl()
+class OrderProductRemoteRepository : OrderProductRepository {
+    private val orderProductDataSource = OrderRemoteDataSource()
     private val token: String?
         get() = ShoppingApplication.pref.getToken()
 

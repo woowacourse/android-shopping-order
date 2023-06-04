@@ -9,7 +9,7 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getCartProductByRetrofit
 import woowacourse.shopping.domain.model.CartProduct
 
-class CartProductDataSourceImpl : CartProductDataSource {
+class CartProductRemoteDataSource : CartProductDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
     private val retrofitService = getCartProductByRetrofit(baseUrl)
 

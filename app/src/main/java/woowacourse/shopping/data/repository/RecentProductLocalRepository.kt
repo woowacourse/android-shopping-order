@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentProductRepository {
+class RecentProductLocalRepository(private val dao: RecentProductDao) : RecentProductRepository {
     override fun add(recentProduct: RecentProduct) {
         while (dao.getSize() >= STORED_DATA_SIZE) {
             dao.removeLast()

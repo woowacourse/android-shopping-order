@@ -10,7 +10,7 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
 import woowacourse.shopping.domain.model.Product
 
-class ProductDataSourceImpl : ProductDataSource {
+class ProductRemoteDataSource : ProductDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
     private val retrofitService = getProductByRetrofit(baseUrl)
 
