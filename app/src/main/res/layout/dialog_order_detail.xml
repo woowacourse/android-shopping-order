@@ -159,7 +159,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_earned_point_title"
             tools:itemCount="10"
-            tools:listitem="@layout/item_individual_order" />
+            tools:listitem="@layout/item_order_item" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

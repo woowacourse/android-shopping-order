@@ -8,7 +8,7 @@ import woowacourse.shopping.databinding.ItemIndividualOrderBinding
 import woowacourse.shopping.ui.model.OrderItem
 
 class OrderDetailViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate((R.layout.item_individual_order), parent, false)
+    LayoutInflater.from(parent.context).inflate((R.layout.item_order_item), parent, false)
 ) {
     private val binding = ItemIndividualOrderBinding.bind(itemView)
 
