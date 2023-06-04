@@ -23,5 +23,6 @@ interface OrderContract {
         fun initCartProducts()
         fun initOrderDetail()
         fun setPoint(s: Editable?, availablePoint: Int)
+        fun order(usedPoint: Int)
     }
 }

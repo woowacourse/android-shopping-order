@@ -1,10 +1,13 @@
 package woowacourse.shopping.presentation.view.order
 
 import android.text.Editable
+import android.util.Log
 import com.example.domain.cart.CartProducts
 import woowacourse.shopping.R
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toUiModel
+import woowacourse.shopping.data.model.OrderPostEntity
+import woowacourse.shopping.data.respository.order.OrderRepository
 import woowacourse.shopping.data.respository.point.PointRepository
 import woowacourse.shopping.presentation.model.CartModel
 
@@ -12,6 +15,7 @@ class OrderPresenter(
     private val view: OrderContract.View,
     cartItems: List<CartModel>,
     private val pointRepository: PointRepository,
+    private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
     private val cartItemsDomain = CartProducts(cartItems.map { it.toDomain() })
 
@@ -56,8 +60,21 @@ class OrderPresenter(
         view.setOrderPriceView(usedPoint, totalPrice)
     }
 
+    override fun order(usedPoint: Int) {
+        val cartIds = cartItemsDomain.getCheckedCartProductsId()
+        val orderPostEntity = OrderPostEntity(cartIds, DUMMY_CARD_NUMBER, DUMMY_CARD_CVC, usedPoint)
+        orderRepository.requestOrder(orderPostEntity, ::onFailure) {
+            Log.d("krrong", "$it")
+        }
+    }
+
     fun onFailure() {
         val message = view.getMessage(R.string.toast_message_system_error)
         view.handleErrorView(message)
+    }
+
+    companion object {
+        private const val DUMMY_CARD_NUMBER = "1234-1234-1234-1234"
+        private const val DUMMY_CARD_CVC = 327
     }
 }

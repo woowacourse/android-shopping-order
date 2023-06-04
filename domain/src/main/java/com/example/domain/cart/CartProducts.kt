@@ -59,4 +59,8 @@ class CartProducts(private val cartProducts: List<CartProduct>) {
         newAll.add(index, newProduct)
         return CartProducts(newAll)
     }
+
+    fun getCheckedCartProductsId(): List<Long> {
+        return all.filter { it.checked }.map { it.id }
+    }
 }

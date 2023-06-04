@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.respository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartModel
@@ -46,8 +47,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             ?: return finish()
 
         val pointRepository = PointRepositoryImpl(server)
+        val orderRepository = OrderRepositoryImpl(server)
 
-        presenter = OrderPresenter(this, cartItems, pointRepository)
+        presenter = OrderPresenter(this, cartItems, pointRepository, orderRepository)
     }
 
     private fun setListener() {
@@ -64,6 +66,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                 presenter.setPoint(s, availablePoint)
             }
         })
+
+        binding.btOrderPay.setOnClickListener {
+            val usedPoint =
+                binding.tvOrderPaymentDetailUsePoint.text.toString().substringBeforeLast("포")
+                    .toInt()
+            presenter.order(usedPoint)
+        }
     }
 
     override fun setAvailablePointView(point: Int) {
