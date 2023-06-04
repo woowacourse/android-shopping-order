@@ -13,6 +13,7 @@ import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
+import woowacourse.shopping.ui.order.history.OrderHistoryActivity
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore.LoadMoreAdapter
@@ -61,6 +62,11 @@ class ShoppingActivity :
     private fun initMenuClickListener() {
         val cartItemView = binding.shoppingToolBar.findItemActionView(R.id.cart)
         cartItemView?.setOnClickListener { presenter.navigateToCart() }
+
+        binding.shoppingToolBar.setOnMenuItemClickListener { item ->
+            if (item?.itemId == R.id.order_history) presenter.navigateToOrderHistory()
+            true
+        }
     }
 
     private fun initRecyclerView() {
@@ -85,6 +91,11 @@ class ShoppingActivity :
 
     override fun navigateToCart() {
         cartActivityLauncher.launch(CartActivity.getIntent(this))
+    }
+
+    override fun navigateToOrderHistory() {
+        val intent = OrderHistoryActivity.getIntent(this)
+        startActivity(intent)
     }
 
     override fun showLoadMoreButton() {

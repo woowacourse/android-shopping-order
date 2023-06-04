@@ -63,6 +63,10 @@ class ShoppingPresenter(
         view.navigateToCart()
     }
 
+    override fun navigateToOrderHistory() {
+        view.navigateToOrderHistory()
+    }
+
     override fun addCartProduct(product: UiProduct, addCount: Int) {
         cartRepository.addCartProductByProductId(
             product.toDomain().id,

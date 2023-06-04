@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/order_history"
+        android:title="@string/order_histor_menu_title"
+        android:icon="@drawable/baseline_history_24"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/cart"
         android:title="@string/cart"
         app:actionLayout="@layout/layout_cart_badge"

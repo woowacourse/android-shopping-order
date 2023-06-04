@@ -54,4 +54,5 @@
     <string name="default_final_payment">0원</string>
     <string name="hint_discount_payment">1000p</string>
     <string name="order_history_title">주문 목록</string>
+    <string name="order_histor_menu_title">주문 내역</string>
 </resources>
