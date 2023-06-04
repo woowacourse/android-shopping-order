@@ -5,7 +5,9 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.domain.BasketProduct
@@ -14,6 +16,7 @@ import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.ui.mapper.toUi
+import woowacourse.shopping.ui.model.UiBasketProduct
 
 class BasketPresenterTest() {
     private lateinit var view: BasketContract.View
@@ -248,5 +251,78 @@ class BasketPresenterTest() {
         verify(exactly = 1) { basketRepository.remove(any()) }
         verify(exactly = 1) { view.updateNavigatorEnabled(any(), any()) }
         verify(exactly = 1) { view.updateBasketProducts(any()) }
+    }
+
+    @Test
+    fun `주문을 요청하면 체크되어있는 상품들을 전달한다`() {
+        // given
+        val basket = listOf(
+            BasketProduct(
+                id = 1,
+                count = Count(3),
+                product = Product(1, "더미입니다만", Price(1000), "url")
+            ),
+            BasketProduct(
+                id = 2,
+                count = Count(3),
+                product = Product(2, "더미입니다만", Price(1000), "url"),
+                checked = true
+            ),
+            BasketProduct(
+                id = 3,
+                count = Count(3),
+                product = Product(3, "더미입니다만", Price(1000), "url")
+            ),
+            BasketProduct(
+                id = 4,
+                count = Count(3),
+                product = Product(4, "더미입니다만", Price(1000), "url"),
+                checked = true
+            ),
+            BasketProduct(
+                id = 5,
+                count = Count(3),
+                product = Product(5, "더미입니다만", Price(1000), "url"),
+                checked = true
+            )
+        )
+
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(basket)
+        }
+
+        val checkedItems = listOf(
+            BasketProduct(
+                id = 2,
+                count = Count(3),
+                product = Product(2, "더미입니다만", Price(1000), "url"),
+                checked = true
+            ),
+            BasketProduct(
+                id = 4,
+                count = Count(3),
+                product = Product(4, "더미입니다만", Price(1000), "url"),
+                checked = true
+            ),
+            BasketProduct(
+                id = 5,
+                count = Count(3),
+                product = Product(5, "더미입니다만", Price(1000), "url"),
+                checked = true
+            )
+        ).map { it.toUi() }
+        presenter =
+            BasketPresenter(view = view, basketRepository = basketRepository)
+
+        val slot = slot<List<UiBasketProduct>>()
+        every { view.showPaymentConfirm(capture(slot)) } just Runs
+
+        // when
+        presenter.transportCheckedBasketProducts()
+
+        // then
+        assertThat(slot.captured).isEqualTo(checkedItems)
+        verify(exactly = 1) { view.showPaymentConfirm(any()) }
     }
 }
