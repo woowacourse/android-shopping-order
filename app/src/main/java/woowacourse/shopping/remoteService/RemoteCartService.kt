@@ -1,11 +1,11 @@
-package woowacourse.shopping.service
+package woowacourse.shopping.remoteService
 
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
-import woowacourse.shopping.utils.RetrofitUtil
+import woowacourse.shopping.service.RetrofitUtil
 
-class RemoteCartService(baseUrl: String) {
+class RemoteCartService {
     private var credentials = "BASIC YUBhLmNvbToxMjM0"
 
     fun getAll(callback: (List<CartProduct>?) -> Unit) {

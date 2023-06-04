@@ -1,12 +1,11 @@
-package woowacourse.shopping.service
+package woowacourse.shopping.remoteService
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.utils.RetrofitUtil
+import woowacourse.shopping.service.RetrofitUtil
 
-class RemoteProductService(baseUrl: String) : ProductRepository {
+class RemoteProductService {
 
-    override fun getAll(callback: (List<Product>?) -> Unit) {
+    fun getAll(callback: (List<Product>?) -> Unit) {
         RetrofitUtil.retrofitProductService.getProducts().enqueue(
             object : retrofit2.Callback<List<Product>> {
                 override fun onResponse(
@@ -23,15 +22,7 @@ class RemoteProductService(baseUrl: String) : ProductRepository {
         )
     }
 
-    override fun getNext(count: Int, callback: (List<Product>?) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun insert(product: Product, callback: (Int) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun findById(id: Int, callback: (Product?) -> Unit) {
+    fun findById(id: Int, callback: (Product?) -> Unit) {
         RetrofitUtil.retrofitProductService.getProduct(id).enqueue(
             object : retrofit2.Callback<Product> {
                 override fun onResponse(

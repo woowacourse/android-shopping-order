@@ -1,7 +1,7 @@
-package woowacourse.shopping.service
+package woowacourse.shopping.remoteService
 
 import woowacourse.shopping.model.OrderInfo
-import woowacourse.shopping.utils.RetrofitUtil
+import woowacourse.shopping.service.RetrofitUtil
 
 class RemoteOrderService {
     private var credentials = "BASIC YUBhLmNvbToxMjM0"

@@ -14,8 +14,8 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.OrderInfoUIModel
-import woowacourse.shopping.repositoryImpl.OrderRepositoryImpl
-import woowacourse.shopping.service.RemoteOrderService
+import woowacourse.shopping.remoteService.RemoteOrderService
+import woowacourse.shopping.repository.OrderRepositoryImpl
 import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -75,7 +75,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun setPointInput() {
         binding.etDiscountPoint.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 presenter.checkPointAvailable(s.toString().toIntOrNull())

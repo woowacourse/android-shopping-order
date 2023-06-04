@@ -1,8 +1,7 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.service.RemoteCartService
+import woowacourse.shopping.remoteService.RemoteCartService
 
 class CartRepositoryImpl(
     private val remoteDatabase: RemoteCartService,

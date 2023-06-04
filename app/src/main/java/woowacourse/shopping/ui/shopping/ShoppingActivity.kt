@@ -10,15 +10,14 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.database.product.ProductDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.model.RecentProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
-import woowacourse.shopping.service.RemoteProductService
+import woowacourse.shopping.remoteService.RemoteCartService
+import woowacourse.shopping.remoteService.RemoteProductService
+import woowacourse.shopping.repository.CartRepositoryImpl
+import woowacourse.shopping.repository.ProductRepositoryImpl
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
@@ -72,11 +71,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                ProductDatabase(this),
-                RemoteProductService(ServerURL.url),
+                RemoteProductService(),
             ),
             RecentProductDatabase(this),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
+            CartRepositoryImpl(RemoteCartService()),
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

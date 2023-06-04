@@ -1,8 +1,7 @@
-package woowacourse.shopping.repositoryImpl
+package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.OrderInfo
-import woowacourse.shopping.repository.OrderRepository
-import woowacourse.shopping.service.RemoteOrderService
+import woowacourse.shopping.remoteService.RemoteOrderService
 
 class OrderRepositoryImpl(
     private val remoteDatabase: RemoteOrderService,

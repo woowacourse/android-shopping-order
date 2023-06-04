@@ -15,13 +15,12 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
+import woowacourse.shopping.remoteService.RemoteCartService
+import woowacourse.shopping.repository.CartRepositoryImpl
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.order.OrderActivity
-import woowacourse.shopping.utils.ServerURL
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -72,7 +71,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
+            CartRepositoryImpl(RemoteCartService()),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
         presenter.setUpView()
