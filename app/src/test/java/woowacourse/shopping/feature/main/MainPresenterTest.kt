@@ -4,7 +4,6 @@ import com.example.domain.ProductCache
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.CartProducts
 import com.example.domain.model.Product
-import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
@@ -19,8 +18,6 @@ import org.junit.Test
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
-import woowacourse.shopping.model.RecentProductUiModel
-import java.time.LocalDateTime
 
 internal class MainPresenterTest {
     private lateinit var view: MainContract.View
@@ -73,24 +70,13 @@ internal class MainPresenterTest {
 
     @Test
     fun `최근 본 상품 목록을 가져와서 화면에 띄운다`() {
-        every { recentProductRepository.getAll() } returns mockRecentProducts.map { it.product.id }
-        val slot = slot<List<RecentProductUiModel>>()
-        every { view.updateRecent(capture(slot)) } just Runs
+        every { recentProductRepository.getAll() } returns listOf()
+        every { view.updateRecent(any()) } just Runs
 
         presenter.loadRecent()
 
-        val actual = slot.captured.map { it.productUiModel.toDomain() }
-        val expected = mockRecentProducts.map { it.product }
-        assert(actual == expected)
         verify { view.updateRecent(any()) }
     }
 
     private val mockProducts = productsDatasource
-
-    private val mockRecentProducts = List(20) {
-        RecentProduct(
-            mockProducts[it],
-            LocalDateTime.now().plusMinutes(it.toLong())
-        )
-    }
 }

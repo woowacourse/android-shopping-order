@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         initLayoutManager()
         initPresenter()
 
-        presenter.loadProducts()
+        Thread { presenter.loadProducts() }.start()
     }
 
     private fun initAdapters() {
@@ -67,15 +67,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             listOf(),
             object : MainProductClickListener {
                 override fun onPlusClick(product: ProductUiModel, previousCount: Int) {
-                    presenter.increaseCartProduct(product, previousCount)
+                    Thread { presenter.increaseCartProduct(product, previousCount) }.start()
                 }
 
                 override fun onMinusClick(product: ProductUiModel, previousCount: Int) {
-                    presenter.decreaseCartProduct(product, previousCount)
+                    Thread { presenter.decreaseCartProduct(product, previousCount) }.start()
                 }
 
                 override fun onProductClick(product: ProductUiModel) {
-                    presenter.moveToDetail(product)
+                    Thread { presenter.moveToDetail(product) }.start()
                 }
             }
         )
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
         loadAdapter = LoadAdapter {
-            presenter.loadProducts()
+            Thread { presenter.loadProducts() }.start()
         }
         binding.productRv.adapter = concatAdapter
     }
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter.updateProducts()
+        Thread { presenter.updateProducts() }.start()
     }
 
     override fun showCartScreen() {
@@ -133,18 +133,20 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         product: ProductUiModel,
         recentProduct: ProductUiModel?
     ) {
-        startActivity(DetailActivity.getIntent(this, product, recentProduct))
+        runOnUiThread { startActivity(DetailActivity.getIntent(this, product, recentProduct)) }
     }
 
     override fun addProducts(products: List<ProductUiModel>) {
-        binding.mainSkeleton.visibility = View.GONE
-        binding.productRv.visibility = View.VISIBLE
-        mainProductAdapter.addItems(products)
-        presenter.loadRecent()
+        runOnUiThread {
+            binding.mainSkeleton.visibility = View.GONE
+            binding.productRv.visibility = View.VISIBLE
+            mainProductAdapter.addItems(products)
+            Thread { presenter.loadRecent() }.start()
+        }
     }
 
     override fun updateRecent(recent: List<RecentProductUiModel>) {
-        recentAdapter.setItems(recent)
+        runOnUiThread { recentAdapter.setItems(recent) }
     }
 
     override fun showProductDetailScreenByRecent(recentProduct: RecentProductUiModel) {
@@ -153,18 +155,20 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun updateCartProductCount(count: Int) {
         if (::cartProductCountTv.isInitialized) {
-            if (count == 0) cartProductCountTv.visibility = View.GONE
-            else cartProductCountTv.visibility = View.VISIBLE
-            cartProductCountTv.text = count.toString()
+            runOnUiThread {
+                if (count == 0) cartProductCountTv.visibility = View.GONE
+                else cartProductCountTv.visibility = View.VISIBLE
+                cartProductCountTv.text = count.toString()
+            }
         }
     }
 
     override fun updateProductsCount(products: List<ProductUiModel>) {
-        mainProductAdapter.updateItems(products)
+        runOnUiThread { mainProductAdapter.updateItems(products) }
     }
 
     override fun updateProductCount(product: ProductUiModel) {
-        mainProductAdapter.updateItem(product)
+        runOnUiThread { mainProductAdapter.updateItem(product) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

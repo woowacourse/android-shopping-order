@@ -29,6 +29,5 @@ class PointRepositoryImpl(
             }
 
         })
-        onSuccess(Point(3000, 2000))
     }
 }

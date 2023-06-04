@@ -36,7 +36,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
         initPresenter()
         val cartIds = intent.getIntegerArrayListExtra(CART_ITEM_IDS)
-        presenter.loadCartProducts(cartIds?.toList() ?: emptyList())
+        Thread { presenter.loadCartProducts(cartIds?.toList() ?: emptyList()) }.start()
         setup()
 
         supportActionBar?.title = getString(R.string.payment_page)
@@ -82,7 +82,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun showCartProducts(cartProducts: List<CartProductUiModel>) {
-        binding.recyclerview.adapter = PaymentAdapter(cartProducts)
+        runOnUiThread { binding.recyclerview.adapter = PaymentAdapter(cartProducts) }
     }
 
     override fun showPoint(point: PointUiModel) {
