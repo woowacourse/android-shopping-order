@@ -18,7 +18,7 @@ data class OrderDetailDto(
 fun OrderDetailDto.toDomain() = OrderDetail(
     orderId,
     orderAt,
-    OrderStatus.PENDING,
+    OrderStatus.of(orderStatus),
     payAmount,
     usedPoint,
     savedPoint,
