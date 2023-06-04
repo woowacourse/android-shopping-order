@@ -2,9 +2,8 @@ package woowacourse.shopping.data.repository
 
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.retrofit.OrderApi
+import woowacourse.shopping.data.retrofit.RetrofitGenerator
 import woowacourse.shopping.domain.model.OrderCartItemsDTO
 import woowacourse.shopping.domain.model.OrderDTO
 import woowacourse.shopping.domain.model.OrdersDTO
@@ -13,11 +12,8 @@ import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class OrderRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : OrderRepository {
 
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(serverRepository.getServerUrl())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(OrderApi::class.java)
+    private val retrofitService =
+        RetrofitGenerator.create(serverRepository.getServerUrl(), OrderApi::class.java)
 
     override fun getAll(callback: (OrdersDTO) -> Unit) {
         retrofitService.requestOrders().enqueue(object : retrofit2.Callback<OrdersDTO> {

@@ -2,21 +2,20 @@ package woowacourse.shopping.data.repository
 
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.retrofit.CartApi
 import woowacourse.shopping.data.retrofit.RequestInsertBody
+import woowacourse.shopping.data.retrofit.RetrofitGenerator
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class CartRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : CartRepository {
+class CartRemoteRepository(
+    serverRepository: ServerStoreRespository,
+    private val failureCallback: (String?) -> Unit,
+) : CartRepository {
 
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(serverRepository.getServerUrl())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(CartApi::class.java)
+    private val retrofitService =
+        RetrofitGenerator.create(serverRepository.getServerUrl(), CartApi::class.java)
 
     override fun getAll(callback: (List<CartProduct>) -> Unit) {
         retrofitService.requestCartItems().enqueue(object : retrofit2.Callback<List<CartProduct>> {

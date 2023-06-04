@@ -2,25 +2,31 @@ package woowacourse.shopping.data.repository
 
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.retrofit.ProductApi
+import woowacourse.shopping.data.retrofit.RetrofitGenerator
 import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class ProductRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : ProductRepository {
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(serverRepository.getServerUrl())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ProductApi::class.java)
+class ProductRemoteRepository(
+    serverRepository: ServerStoreRespository,
+    private val failureCallback: (String?) -> Unit,
+) : ProductRepository {
+    private val retrofitService =
+        RetrofitGenerator.create(serverRepository.getServerUrl(), ProductApi::class.java)
 
-    override fun getProductsByRange(lastId: Int, pageItemCount: Int, callback: (ProductsWithCartItemDTO) -> Unit) {
+    override fun getProductsByRange(
+        lastId: Int,
+        pageItemCount: Int,
+        callback: (ProductsWithCartItemDTO) -> Unit,
+    ) {
         retrofitService.requestProductsByRange(lastId, pageItemCount)
             .enqueue(object : retrofit2.Callback<ProductsWithCartItemDTO> {
-                override fun onResponse(call: Call<ProductsWithCartItemDTO>, response: Response<ProductsWithCartItemDTO>) {
+                override fun onResponse(
+                    call: Call<ProductsWithCartItemDTO>,
+                    response: Response<ProductsWithCartItemDTO>,
+                ) {
                     if (!response.isSuccessful) {
                         onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
                         return
@@ -37,25 +43,27 @@ class ProductRemoteRepository(serverRepository: ServerStoreRespository, private 
     }
 
     override fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit) {
-        retrofitService.requestProductById(id).enqueue(object : retrofit2.Callback<ProductWithCartInfo> {
-            override fun onResponse(
-                call: Call<ProductWithCartInfo>,
-                response: Response<ProductWithCartInfo>,
-            ) {
-                if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
-                    return
+        retrofitService.requestProductById(id)
+            .enqueue(object : retrofit2.Callback<ProductWithCartInfo> {
+                override fun onResponse(
+                    call: Call<ProductWithCartInfo>,
+                    response: Response<ProductWithCartInfo>,
+                ) {
+                    if (!response.isSuccessful) {
+                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        return
+                    }
+                    response.body()?.let { productWithCartInfo ->
+                        callback(productWithCartInfo)
+                    }
                 }
-                response.body()?.let { productWithCartInfo ->
-                    callback(productWithCartInfo)
-                }
-            }
 
-            override fun onFailure(call: Call<ProductWithCartInfo>, t: Throwable) {
-                failureCallback(t.message)
-            }
-        })
+                override fun onFailure(call: Call<ProductWithCartInfo>, t: Throwable) {
+                    failureCallback(t.message)
+                }
+            })
     }
+
     companion object {
         private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
