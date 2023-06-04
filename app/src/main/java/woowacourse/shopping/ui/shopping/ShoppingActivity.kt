@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -18,6 +19,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
+import woowacourse.shopping.ui.orderlist.OrderListActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
@@ -47,13 +49,24 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.cart_menu, menu)
+        menuInflater.inflate(R.menu.shopping_menu, menu)
         menu?.findItem(R.id.cart)?.actionView?.let { view ->
             view.setOnClickListener { navigateToCart() }
             view.findViewById<TextView>(R.id.tv_counter)?.let { tvCount = it }
         }
         presenter.setUpTotalCount()
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.order -> {
+                navigateToOrderList()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun initBinding() {
@@ -127,6 +140,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     private fun navigateToCart() {
         startActivity(CartActivity.getIntent(this))
+    }
+
+    private fun navigateToOrderList() {
+        startActivity(OrderListActivity.getIntent(this))
     }
 
     companion object {

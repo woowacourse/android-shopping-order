@@ -16,7 +16,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/cart_menu"
+            app:menu="@menu/shopping_menu"
             app:title="@string/shopping_toolbar_title"
             app:titleTextColor="@color/white" />
 
