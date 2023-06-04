@@ -8,9 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
 
@@ -44,10 +42,4 @@ interface RetrofitCartService {
         @Path("cartId") cartId: Int,
         @Header("Authorization") token: String,
     ): Call<Int>
-
-    @GET("cart-items/checkout")
-    fun orderCart(
-        @Query("ids") itemIds: List<Int>,
-        @Header("Authorization") token: String,
-    ): Call<OrderInfo>
 }

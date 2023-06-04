@@ -1,7 +1,6 @@
 package woowacourse.shopping.service
 
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.model.ProductIdBody
 import woowacourse.shopping.model.QuantityBody
 import woowacourse.shopping.utils.RetrofitUtil
@@ -80,23 +79,6 @@ class RemoteCartService(baseUrl: String) {
                 }
 
                 override fun onFailure(call: retrofit2.Call<Int>, t: Throwable) {
-                    callback(null)
-                }
-            },
-        )
-    }
-
-    fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
-        RetrofitUtil.retrofitCartService.orderCart(ids, credentials).enqueue(
-            object : retrofit2.Callback<OrderInfo> {
-                override fun onResponse(
-                    call: retrofit2.Call<OrderInfo>,
-                    response: retrofit2.Response<OrderInfo>,
-                ) {
-                    callback(response.body())
-                }
-
-                override fun onFailure(call: retrofit2.Call<OrderInfo>, t: Throwable) {
                     callback(null)
                 }
             },

@@ -1,7 +1,6 @@
 package woowacourse.shopping.repositoryImpl
 
 import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.service.RemoteCartService
 
@@ -95,12 +94,6 @@ class CartRepositoryImpl(
         remoteDatabase.getAll {
             cartItems.replaceAll(it ?: emptyList())
             callback(CartProducts(it ?: emptyList()))
-        }
-    }
-
-    override fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
-        remoteDatabase.getOrderItemsInfo(ids) {
-            callback(it)
         }
     }
 }

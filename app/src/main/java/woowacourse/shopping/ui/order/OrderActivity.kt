@@ -14,10 +14,9 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.OrderInfoUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
+import woowacourse.shopping.repositoryImpl.OrderRepositoryImpl
+import woowacourse.shopping.service.RemoteOrderService
 import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
-import woowacourse.shopping.utils.ServerURL
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -48,7 +47,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initPresenter() {
-        presenter = OrderPresenter(this, CartRepositoryImpl(RemoteCartService(ServerURL.url)))
+        presenter = OrderPresenter(this, OrderRepositoryImpl(RemoteOrderService()))
     }
 
     private fun initOrderInfo() {

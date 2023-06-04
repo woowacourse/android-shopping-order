@@ -5,6 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.service.RetrofitCartService
+import woowacourse.shopping.service.RetrofitOrderService
 import woowacourse.shopping.service.RetrofitProductService
 
 object RetrofitUtil {
@@ -17,6 +18,10 @@ object RetrofitUtil {
 
     val retrofitCartService: RetrofitCartService by lazy {
         getRetrofit().create(RetrofitCartService::class.java)
+    }
+
+    val retrofitOrderService: RetrofitOrderService by lazy {
+        getRetrofit().create(RetrofitOrderService::class.java)
     }
 
     private val okHttpClient: OkHttpClient by lazy {

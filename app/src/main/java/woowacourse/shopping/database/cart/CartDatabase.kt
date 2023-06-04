@@ -6,7 +6,6 @@ import android.database.Cursor
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.CartRepository
 
@@ -76,10 +75,6 @@ class CartDatabase(context: Context) : CartRepository {
     // TODO: ??? 이게 맞나,, 같은 인터페이스 쓰는 게 맞나,,?
     override fun getCheckedIds(): List<Int> {
         return cartProducts.checkedIds
-    }
-
-    override fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
-        //
     }
 
     override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
