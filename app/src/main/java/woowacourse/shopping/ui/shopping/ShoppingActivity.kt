@@ -124,11 +124,15 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun setRecentProducts(recentProductsData: List<RecentProductUIModel>) {
-        adapter.updateRecentProducts(recentProductsData)
+        runOnUiThread {
+            adapter.updateRecentProducts(recentProductsData)
+        }
     }
 
     override fun setCartProducts(cartCounts: Map<Int, Int>) {
-        adapter.updateCartCounts(cartCounts)
+        runOnUiThread {
+            adapter.updateCartCounts(cartCounts)
+        }
     }
 
     override fun navigateToProductDetail(productId: Int) {
@@ -136,7 +140,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun setToolbar(totalCount: Int) {
-        tvCount?.text = totalCount.toString()
+        runOnUiThread {
+            tvCount?.text = totalCount.toString()
+        }
     }
 
     private fun navigateToCart() {
