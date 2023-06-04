@@ -11,7 +11,6 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
 
@@ -45,7 +44,7 @@ class ShoppingPresenterTest {
 
     private val fakeProducts = List(10) { fakeProduct }
     private val fakeRecentProducts = List(10) { fakeRecentProduct }
-    private val fakeCartProducts = CartProducts(MutableList(10) { fakeCartProduct })
+    private val fakeCartProducts = MutableList(10) { fakeCartProduct }
 
     private val fakeCartCounts = fakeCartProducts.toUIModel()
         .associateBy { it.id }
@@ -107,7 +106,7 @@ class ShoppingPresenterTest {
     fun `상품의 개수를 장바구니 저장한다`() {
         // given
         justRun { cartRepository.updateCountWithProductId(any(), any()) }
-        every { cartRepository.getTotalSelectedCount() } returns 10
+        every { cartRepository.getTotalCheckedCount() } returns 10
         every { cartRepository.getAll() } returns Result.success(fakeCartProducts)
         justRun { view.setToolbar(any()) }
 

@@ -51,7 +51,6 @@ class DetailedProductPresenter(
     }
 
     override fun addProductToCart(count: Int) {
-        cartRepository.insert(product.id)
         CompletableFuture.supplyAsync {
             cartRepository.updateCountWithProductId(product.id, count)
         }.thenAccept { result ->
@@ -75,7 +74,6 @@ class DetailedProductPresenter(
     }
 
     override fun navigateToAddToCartDialog() {
-        cartRepository.insert(product.toDomain().id)
         view.navigateToAddToCartDialog(product)
     }
 }

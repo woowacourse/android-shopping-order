@@ -66,7 +66,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:contentDescription="@string/cart_item_product_remove_btn_description"
-            android:onClick="@{() -> listener.onItemRemove(cartProduct.id)}"
+            android:onClick="@{() -> listener.onItemRemove(cartProduct.productId)}"
             android:src="@drawable/ic_cart_close_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

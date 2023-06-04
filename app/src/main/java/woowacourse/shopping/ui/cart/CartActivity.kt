@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.localDataSource.CartDefaultLocalDataSource
 import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -61,6 +62,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter = CartPresenter(
             this,
             cartRepository = CartRepositoryImpl(
+                localDataSource = CartDefaultLocalDataSource(),
                 remoteDataSource = CartRemoteDataSourceImpl()
             ),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
@@ -95,10 +97,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.rvProducts.adapter = adapter
         binding.rvProducts.itemAnimator = null
 
-        presenter.setUpView()
-
         binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
         binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.navigateToOrder() }
+
+        presenter.fetchCartProducts()
     }
 
     private fun getCartListener() = object : CartListener {
@@ -109,7 +111,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.moveToPagePrev()
         }
         override fun onItemRemove(productId: Int) {
-            presenter.removeItem(productId)
+            presenter.updateItemCount(productId, 0)
         }
         override fun onItemClick(product: CartProductUIModel) {
             presenter.navigateToItemDetail(product.productId)
@@ -123,9 +125,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel) {
-        binding.rvProducts.isVisible = true
-        binding.skeletonLayout.isVisible = false
-        adapter.submitList(page, pageUIModel)
+        runOnUiThread {
+            binding.rvProducts.isVisible = true
+            binding.skeletonLayout.isVisible = false
+            adapter.submitList(page, pageUIModel)
+        }
     }
 
     override fun navigateToItemDetail(productId: Int) {

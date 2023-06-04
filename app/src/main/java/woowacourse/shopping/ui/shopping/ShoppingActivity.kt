@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.localDataSource.CartDefaultLocalDataSource
 import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
@@ -76,6 +77,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 remoteDataSource = ProductRemoteDataSourceImpl()
             ),
             cartRepository = CartRepositoryImpl(
+                localDataSource = CartDefaultLocalDataSource(),
                 remoteDataSource = CartRemoteDataSourceImpl()
             ),
             recentRepository = RecentRepositoryImpl(

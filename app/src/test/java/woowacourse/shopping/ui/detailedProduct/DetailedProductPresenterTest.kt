@@ -85,7 +85,9 @@ class DetailedProductPresenterTest {
     @Test
     fun `상품을 장바구니에 추가한다`() {
         // given
-        every { cartRepository.insert(any()) } answers { Result.success(0) }
+        every {
+            cartRepository.updateCountWithProductId(any(), any())
+        } answers { Result.success(0) }
 
         every { cartRepository.updateCountWithProductId(any(), any()) }
             .answers { Result.success(fakeProduct.id) }
@@ -137,13 +139,11 @@ class DetailedProductPresenterTest {
     fun `장바구니에 상품을 추가하는 다이얼로그로 이동한다`() {
         // given
         every { view.navigateToAddToCartDialog(any()) } answers { nothing }
-        every { cartRepository.insert(any()) } answers { Result.success(0) }
 
         // when
         presenter.navigateToAddToCartDialog()
 
         // then
         verify(exactly = 1) { view.navigateToAddToCartDialog(any()) }
-        verify(exactly = 1) { cartRepository.insert(any()) }
     }
 }
