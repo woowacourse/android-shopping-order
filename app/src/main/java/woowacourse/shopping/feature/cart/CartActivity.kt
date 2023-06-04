@@ -48,7 +48,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter
-        presenter.setup()
+        runOnUiThread {
+
+        }
+        Thread {
+            presenter.setup()
+        }.start()
     }
 
     private fun initAdapter() {
@@ -56,11 +61,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             listOf(),
             object : CartProductClickListener {
                 override fun onPlusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.increaseCartProduct(cartProduct, previousCount)
+                    Thread { presenter.increaseCartProduct(cartProduct, previousCount) }.start()
                 }
 
                 override fun onMinusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.decreaseCartProduct(cartProduct, previousCount)
+                    Thread { presenter.decreaseCartProduct(cartProduct, previousCount) }.start()
                 }
 
                 override fun onCheckClick(cartProduct: CartProductUiModel, isSelected: Boolean) {
@@ -68,7 +73,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
 
                 override fun onDeleteClick(cartProduct: CartProductUiModel) {
-                    presenter.deleteCartProduct(cartProduct)
+                    Thread { presenter.deleteCartProduct(cartProduct) }.start()
                 }
             }
         )
@@ -76,16 +81,20 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun changeCartProducts(newItems: List<CartProductUiModel>) {
-        binding.cartListGroup.visibility = View.VISIBLE
-        binding.skeletonLayout.visibility = View.GONE
-        cartProductAdapter.setItems(newItems)
+        runOnUiThread {
+            binding.cartListGroup.visibility = View.VISIBLE
+            binding.skeletonLayout.visibility = View.GONE
+            cartProductAdapter.setItems(newItems)
+        }
     }
 
     override fun setPageState(hasPrevious: Boolean, hasNext: Boolean, pageNumber: Int) {
-        binding.apply {
-            previousPageBtn.isEnabled = hasPrevious
-            nextPageBtn.isEnabled = hasNext
-            pageCountTextView.text = pageNumber.toString()
+        runOnUiThread {
+            binding.apply {
+                previousPageBtn.isEnabled = hasPrevious
+                nextPageBtn.isEnabled = hasNext
+                pageCountTextView.text = pageNumber.toString()
+            }
         }
     }
 
