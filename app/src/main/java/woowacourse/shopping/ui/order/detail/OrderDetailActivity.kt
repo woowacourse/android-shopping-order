@@ -5,17 +5,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.UiOrderedProduct
 import woowacourse.shopping.model.UiPayment
 import woowacourse.shopping.ui.order.detail.OrderDetailContract.View
+import woowacourse.shopping.ui.order.detail.recyclerview.adapter.DetailAdapter
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.injectOrderDetailPresenter
 
 class OrderDetailActivity : AppCompatActivity(), View {
     private lateinit var binding: ActivityOrderDetailBinding
-
-    // private lateinit var adapter: OrderAdapter
+    private lateinit var adapter: DetailAdapter
     private val presenter: OrderDetailContract.Presenter by lazy {
         injectOrderDetailPresenter(
             view = this,
@@ -40,6 +41,10 @@ class OrderDetailActivity : AppCompatActivity(), View {
     }
 
     override fun showOrderDetailProducts(orderedProducts: List<UiOrderedProduct>) {
+        binding.rvProducts.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        adapter = DetailAdapter(orderedProducts)
+        binding.rvProducts.adapter = adapter
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
