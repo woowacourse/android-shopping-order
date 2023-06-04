@@ -80,7 +80,7 @@ class MyPageActivity : AppCompatActivity() {
                 binding.spinnerUserEmails.adapter = ArrayAdapter(
                     this@MyPageActivity,
                     android.R.layout.simple_spinner_item,
-                    members.map(MemberDto::email)
+                    members.map(MemberDto::email).sorted()
                 )
                 binding.spinnerUserEmails.onItemSelectedListener =
                     object : AdapterView.OnItemSelectedListener {
