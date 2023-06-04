@@ -38,6 +38,7 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
         initPresenter()
         initUsePointButtonClickListener()
         initFinalOrderButtonClickListener()
+        initCloseButtonClickListener()
     }
 
     private fun initExtraData(): Boolean {
@@ -63,6 +64,12 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
 
     private fun initFinalOrderButtonClickListener() {
         binding.btnPaymentFinalOrder.setThrottleFirstOnClickListener { presenter.addOrder() }
+    }
+
+    private fun initCloseButtonClickListener() {
+        binding.ivPaymentClose.setThrottleFirstOnClickListener {
+            finish()
+        }
     }
 
     override fun updateUserPointInfo(userPointInfo: UiUserPointInfo) {
