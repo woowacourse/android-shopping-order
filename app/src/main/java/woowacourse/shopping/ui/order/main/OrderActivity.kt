@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -89,7 +88,6 @@ class OrderActivity : AppCompatActivity(), View {
 
     override fun onOrderClickListener() {
         binding.orderBtn.setOnClickListener {
-            Log.d("test", "onOrderClickListener 호출")
             presenter.order()
         }
     }
