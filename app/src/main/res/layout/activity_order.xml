@@ -9,7 +9,7 @@
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/btn_order"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +18,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="50dp"
+                android:paddingBottom="30dp"
                 tools:context=".feature.order.OrderActivity">
 
                 <TextView
@@ -26,7 +26,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:paddingTop="20dp"
                     android:layout_marginTop="20dp"
                     android:text="@string/order_products_description"
                     android:textColor="@color/black"
@@ -45,7 +44,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_order_products"
-                    tools:listitem="@layout/item_order_product" />
+                     />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider1"
