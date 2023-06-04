@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.remote
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.remote.api.ProductService
-import woowacourse.shopping.data.remote.api.ProductDetailService
-import woowacourse.shopping.data.remote.api.ShoppingCartService
 
-object RetrofitClient {
+object NetworkModule {
 
-    private var BASE_URL = "http://3.34.134.115:8080/"
+    private var BASE_URL = ""
     internal var retrofit: Retrofit = createRetrofit()
 
     fun createRetrofit(): Retrofit {
@@ -18,16 +18,21 @@ object RetrofitClient {
             .build()
     }
 
+    val retrofitNew = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    inline fun <reified T> createNew(): T = retrofitNew.create<T>(T::class.java)
+
+    fun setBaseUrlNew(baseUrl: String) {
+        BASE_URL = baseUrl
+    }
+
     fun setBaseUrl(baseUrl: String) {
         BASE_URL = baseUrl
         retrofit = createRetrofit()
     }
 
     internal inline fun <reified T> create(): T = retrofit.create<T>(T::class.java)
-}
-
-object ServicePool {
-    val productService = RetrofitClient.create<ProductService>()
-    val productDetailService = RetrofitClient.create<ProductDetailService>()
-    val shoppingCartService = RetrofitClient.create<ShoppingCartService>()
 }

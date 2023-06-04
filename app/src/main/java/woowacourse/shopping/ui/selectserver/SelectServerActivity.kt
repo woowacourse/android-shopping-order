@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.selectserver
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.remote.RetrofitClient
+import woowacourse.shopping.data.remote.NetworkModule
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
@@ -19,14 +19,14 @@ class SelectServerActivity : AppCompatActivity() {
 
     private fun setClickEventOnHongsil() {
         binding.btnSelectServerHongsil.setOnClickListener {
-            RetrofitClient.setBaseUrl(HONGSIL_SERVER)
+            NetworkModule.setBaseUrl(HONGSIL_SERVER)
             navigateToShopping()
         }
     }
 
     private fun setClickEventOnMatthew() {
         binding.btnSelectServerMatthew.setOnClickListener {
-            RetrofitClient.setBaseUrl(MATTHEW_SERVER)
+            NetworkModule.setBaseUrl(MATTHEW_SERVER)
             navigateToShopping()
         }
     }

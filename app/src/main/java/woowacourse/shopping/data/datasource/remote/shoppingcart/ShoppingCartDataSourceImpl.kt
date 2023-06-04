@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
-import woowacourse.shopping.data.remote.ServicePool
+import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 import java.util.concurrent.Executors
@@ -14,7 +14,7 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
     override fun getAllProductInCart(): Result<List<CartProductDTO>> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<List<CartProductDTO>>> {
-            val response = ServicePool.shoppingCartService.getAllProductInCart(token).execute()
+            val response = ServiceFactory.shoppingCartService.getAllProductInCart(token).execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: emptyList())
             } else {
@@ -29,7 +29,7 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.postProductToCart(token, CartItemRequest(productId, quantity)).execute()
+                ServiceFactory.shoppingCartService.postProductToCart(token, CartItemRequest(productId, quantity)).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
@@ -44,7 +44,7 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.patchProductCount(token, cartItemId, quantity)
+                ServiceFactory.shoppingCartService.patchProductCount(token, cartItemId, quantity)
                     .execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
@@ -60,7 +60,7 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.deleteProductInCart(token, productId).execute()
+                ServiceFactory.shoppingCartService.deleteProductInCart(token, productId).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
