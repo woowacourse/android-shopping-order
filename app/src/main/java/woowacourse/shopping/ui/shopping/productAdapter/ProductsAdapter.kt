@@ -2,12 +2,12 @@ package woowacourse.shopping.ui.shopping.productAdapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.model.RecentProductUIModel
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ProductsViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ReadMoreViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.RecentViewHolder
 import woowacourse.shopping.ui.shopping.productAdapter.viewHolder.ShoppingViewHolder
+import woowacourse.shopping.uimodel.ProductUIModel
+import woowacourse.shopping.uimodel.RecentProductUIModel
 
 class ProductsAdapter(private val listener: ProductsListener) :
     RecyclerView.Adapter<ShoppingViewHolder>() {

@@ -11,16 +11,16 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.remoteService.RemoteCartService
-import woowacourse.shopping.repository.CartRepositoryImpl
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.order.OrderActivity
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
+import woowacourse.shopping.uimodel.ProductUIModel
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -71,7 +71,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(RemoteCartService()),
+            CartRepositoryImpl(RemoteCartDataSource()),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
         presenter.setUpView()

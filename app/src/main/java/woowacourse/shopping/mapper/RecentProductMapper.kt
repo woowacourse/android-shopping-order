@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
 import woowacourse.shopping.model.RecentProduct
-import woowacourse.shopping.model.RecentProductUIModel
+import woowacourse.shopping.uimodel.RecentProductUIModel
 
 fun RecentProduct.toUIModel(): RecentProductUIModel {
     return RecentProductUIModel(

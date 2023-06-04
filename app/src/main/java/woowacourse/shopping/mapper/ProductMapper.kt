@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.uimodel.ProductUIModel
 
 fun Product.toUIModel(): ProductUIModel {
     return ProductUIModel(

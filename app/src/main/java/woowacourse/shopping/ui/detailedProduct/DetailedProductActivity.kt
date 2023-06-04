@@ -9,15 +9,15 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.dataSource.RemoteProductDataSource
+import woowacourse.shopping.data.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.remoteService.RemoteCartService
-import woowacourse.shopping.remoteService.RemoteProductService
-import woowacourse.shopping.repository.CartRepositoryImpl
-import woowacourse.shopping.repository.ProductRepositoryImpl
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
+import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.utils.ActivityUtils
 import woowacourse.shopping.utils.SharedPreferenceUtils
 import woowacourse.shopping.utils.getSerializableExtraCompat
@@ -47,8 +47,8 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             intent.getSerializableExtraCompat(KEY_PRODUCT)
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
-            ProductRepositoryImpl(RemoteProductService()),
-            CartRepositoryImpl(RemoteCartService()),
+            ProductRepositoryImpl(RemoteProductDataSource()),
+            CartRepositoryImpl(RemoteCartDataSource()),
             RecentProductDatabase(this),
         )
         binding.presenter = presenter

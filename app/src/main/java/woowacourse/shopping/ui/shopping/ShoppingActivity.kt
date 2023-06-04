@@ -10,20 +10,20 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.dataSource.RemoteProductDataSource
+import woowacourse.shopping.data.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.model.RecentProductUIModel
-import woowacourse.shopping.remoteService.RemoteCartService
-import woowacourse.shopping.remoteService.RemoteProductService
-import woowacourse.shopping.repository.CartRepositoryImpl
-import woowacourse.shopping.repository.ProductRepositoryImpl
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
+import woowacourse.shopping.uimodel.ProductUIModel
+import woowacourse.shopping.uimodel.RecentProductUIModel
 import woowacourse.shopping.utils.ServerURL
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
@@ -71,10 +71,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                RemoteProductService(),
+                RemoteProductDataSource(),
             ),
             RecentProductDatabase(this),
-            CartRepositoryImpl(RemoteCartService()),
+            CartRepositoryImpl(RemoteCartDataSource()),
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()

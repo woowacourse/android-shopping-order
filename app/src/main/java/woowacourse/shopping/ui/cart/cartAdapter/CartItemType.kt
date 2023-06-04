@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.cart.cartAdapter
 
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
 
 sealed class CartItemType {
     val viewType: Int

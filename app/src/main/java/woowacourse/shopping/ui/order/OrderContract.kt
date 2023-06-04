@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.order
 
-import woowacourse.shopping.model.OrderInfoUIModel
+import woowacourse.shopping.uimodel.OrderInfoUIModel
 
 interface OrderContract {
     interface View {

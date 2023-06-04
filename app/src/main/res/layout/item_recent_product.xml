@@ -11,7 +11,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.model.RecentProductUIModel" />
+            type="woowacourse.shopping.uimodel.RecentProductUIModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

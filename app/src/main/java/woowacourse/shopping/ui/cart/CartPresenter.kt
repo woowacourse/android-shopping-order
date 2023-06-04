@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
 import woowacourse.shopping.utils.NonNullLiveData
 import woowacourse.shopping.utils.NonNullMutableLiveData
 

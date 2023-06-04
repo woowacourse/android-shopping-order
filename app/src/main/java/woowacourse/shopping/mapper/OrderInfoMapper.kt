@@ -2,7 +2,7 @@ package woowacourse.shopping.mapper
 
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.OrderInfo
-import woowacourse.shopping.model.OrderInfoUIModel
+import woowacourse.shopping.uimodel.OrderInfoUIModel
 
 fun OrderInfo.toUIModel() = OrderInfoUIModel(
     cartItems = CartProducts(cartItems).toUIModel(),

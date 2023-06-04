@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart.cartAdapter
 
-import woowacourse.shopping.model.CartProductUIModel
+import woowacourse.shopping.uimodel.CartProductUIModel
 
 interface CartListener {
     fun onItemClick(product: CartProductUIModel)

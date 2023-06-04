@@ -12,11 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.dataSource.RemoteOrderDataSource
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.model.OrderInfoUIModel
-import woowacourse.shopping.remoteService.RemoteOrderService
-import woowacourse.shopping.repository.OrderRepositoryImpl
 import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
+import woowacourse.shopping.uimodel.OrderInfoUIModel
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -47,7 +47,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initPresenter() {
-        presenter = OrderPresenter(this, OrderRepositoryImpl(RemoteOrderService()))
+        presenter = OrderPresenter(this, OrderRepositoryImpl(RemoteOrderDataSource()))
     }
 
     private fun initOrderInfo() {

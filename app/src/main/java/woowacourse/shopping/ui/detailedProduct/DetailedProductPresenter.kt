@@ -2,10 +2,10 @@ package woowacourse.shopping.ui.detailedProduct
 
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentRepository
+import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(

@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.order
 
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.OrderInfoUIModel
 import woowacourse.shopping.repository.OrderRepository
+import woowacourse.shopping.uimodel.OrderInfoUIModel
 
 class OrderPresenter(
     private val view: OrderContract.View,

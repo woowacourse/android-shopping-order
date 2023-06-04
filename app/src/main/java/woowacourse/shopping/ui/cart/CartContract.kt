@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
+import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.utils.NonNullLiveData
 
 interface CartContract {
