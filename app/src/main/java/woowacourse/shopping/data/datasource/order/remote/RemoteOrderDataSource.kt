@@ -67,4 +67,23 @@ class RemoteOrderDataSource : OrderDataSource.Remote {
             }
         )
     }
+
+    override fun getOrdersInfo(onReceived: (List<DataOrder>) -> Unit) {
+        RetrofitModule.orderService.getOrdersInfo().enqueue(
+            object : Callback<List<IndividualOrderResponse>> {
+                override fun onResponse(
+                    call: Call<List<IndividualOrderResponse>>,
+                    response: Response<List<IndividualOrderResponse>>
+                ) {
+                    val ordersInfo = response.body()?.map { it.toData() }
+
+                    ordersInfo?.let {
+                        onReceived(it)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<IndividualOrderResponse>>, t: Throwable) {}
+            }
+        )
+    }
 }

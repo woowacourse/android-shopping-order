@@ -18,4 +18,7 @@ interface OrderService {
     fun getIndividualOrderInfo(
         @Path("id") orderId: Int
     ): Call<IndividualOrderResponse>
+
+    @GET("/orders")
+    fun getOrdersInfo(): Call<List<IndividualOrderResponse>>
 }

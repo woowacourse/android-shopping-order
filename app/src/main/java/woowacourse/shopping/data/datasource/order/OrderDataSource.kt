@@ -14,5 +14,7 @@ interface OrderDataSource {
         )
 
         fun getIndividualOrderInfo(orderId: Int, onReceived: (DataOrder) -> Unit)
+
+        fun getOrdersInfo(onReceived: (List<DataOrder>) -> Unit)
     }
 }
