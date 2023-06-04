@@ -8,9 +8,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.Storage
+import woowacourse.shopping.data.entity.OrderHistoryEntity
 import woowacourse.shopping.data.entity.PointEntity
+import woowacourse.shopping.data.entity.mapper.OrderHistoryMapper.toDomain
 import woowacourse.shopping.data.server.MemberRemoteDataSource
 import woowacourse.shopping.data.server.Server
+import woowacourse.shopping.domain.OrderHistory
 
 class MemberRemoteDataSourceRetrofit : MemberRemoteDataSource {
     private val memberService: MemberService = Retrofit.Builder()
@@ -31,6 +34,26 @@ class MemberRemoteDataSourceRetrofit : MemberRemoteDataSource {
             }
 
             override fun onFailure(call: Call<PointEntity>, t: Throwable) {
+                onFailure()
+            }
+        })
+    }
+
+    override fun getHistories(onSuccess: (List<OrderHistory>) -> Unit, onFailure: () -> Unit) {
+        memberService.requestHistories(Storage.credential).enqueue(object : Callback<List<OrderHistoryEntity>> {
+            override fun onResponse(
+                call: Call<List<OrderHistoryEntity>>,
+                response: Response<List<OrderHistoryEntity>>
+            ) {
+                if(response.isSuccessful && response.body() != null) {
+                    onSuccess(response.body()!!.map { it.toDomain() })
+                }
+                else {
+                    onFailure()
+                }
+            }
+
+            override fun onFailure(call: Call<List<OrderHistoryEntity>>, t: Throwable) {
                 onFailure()
             }
         })

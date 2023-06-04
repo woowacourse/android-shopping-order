@@ -37,4 +37,6 @@
     <string name="points">%d p</string>
     <string name="use_all_points_button">전액 사용</string>
     <string name="discount_price">- %,d원</string>
+    <string name="order_id">주문 번호 : %d</string>
+    <string name="total_quantity">총 %d개</string>
 </resources>

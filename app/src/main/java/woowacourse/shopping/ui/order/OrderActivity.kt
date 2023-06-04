@@ -31,8 +31,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         initPresenter()
 
-        setSupportActionBar(binding.orderToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setupToolbar()
 
         setupView()
     }
@@ -46,6 +45,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit())
         val orderRepository = OrderRepositoryImpl(OrderRemoteDataSourceRetrofit())
         presenter = OrderPresenter(this, cartRepository, memberRepository, orderRepository)
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(binding.orderToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

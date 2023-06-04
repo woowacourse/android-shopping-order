@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="history"
+            type="woowacourse.shopping.ui.model.OrderHistoryModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +29,7 @@
             app:layout_constraintEnd_toStartOf="@id/show_order_history_detail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:text="@{@string/order_id(history.id)}"
             tools:text="주문 번호 : 3" />
 
         <TextView
@@ -33,6 +40,7 @@
             android:maxLines="1"
             android:textColor="#333333"
             android:textSize="15sp"
+            android:text="@{history.name}"
             app:layout_constraintEnd_toStartOf="@id/order_history_final_price"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -54,6 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:textColor="#333333"
+            android:text="@{@string/total_quantity(history.quantity)}"
             android:textSize="13sp"
             app:layout_constraintBottom_toTopOf="@id/order_history_final_price"
             app:layout_constraintEnd_toEndOf="parent"
@@ -66,6 +75,7 @@
             android:layout_height="wrap_content"
             android:textColor="#333333"
             android:textSize="13sp"
+            android:text="@{@string/product_price(history.price)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="183,400원" />
