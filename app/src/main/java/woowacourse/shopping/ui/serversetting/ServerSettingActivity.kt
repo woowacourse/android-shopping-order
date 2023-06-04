@@ -18,15 +18,10 @@ class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
         binding = ActivityServerSettingBinding.inflate(layoutInflater).setContentView(this)
         binding.presenter = presenter
 
-        // val token = "Basic dG1kZ2gxNTkyQG5hdmVyLmNvbToxMjM0"
         val token = "Basic aGoyNzcyMEBnbWFpbC5jb206MTIzNA=="
         ShoppingPreference(this).setToken(token)
 
-//        OrderProductRepositoryImpl().orderProduct(
-//            OrderRequest(
-//                listOf(OrderItems(10), OrderItems(11)),
-//                Payment(10000, 8000, 2000),
-//            ),
+//        OrderProductRepositoryImpl().requestOrders(
 //            onSuccess = { },
 //            onFailure = { },
 //        )

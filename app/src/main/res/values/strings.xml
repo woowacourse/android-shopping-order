@@ -55,4 +55,9 @@
     <string name="hint_discount_payment">1000p</string>
     <string name="order_history_title">주문 목록</string>
     <string name="order_histor_menu_title">주문 내역</string>
+
+    <!--  order_history_activity   -->
+    <string name="order_id_text">주문 번호 : %d</string>
+    <string name="order_count_text">총 %d개</string>
+    <string name="order_history_navigate_detail_text"><![CDATA[상세 보기 >]]></string>
 </resources>

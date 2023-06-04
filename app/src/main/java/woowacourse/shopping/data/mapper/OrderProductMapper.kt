@@ -4,11 +4,13 @@ import woowacourse.shopping.data.dto.OrderRequestDto
 import woowacourse.shopping.data.dto.OrderResponseDto
 import woowacourse.shopping.data.dto.OrderedProductDto
 import woowacourse.shopping.data.dto.PaymentDto
-import woowacourse.shopping.data.model.DataOrderedProduct
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 import woowacourse.shopping.domain.model.OrderedProduct
 import woowacourse.shopping.domain.model.Payment
+import woowacourse.shopping.model.UiOrderResponse
+import woowacourse.shopping.model.UiOrderedProduct
+import woowacourse.shopping.model.UiPayment
 
 fun OrderRequestDto.toDomain(): OrderRequest =
     OrderRequest(
@@ -25,15 +27,22 @@ fun OrderRequest.toDto(): OrderRequestDto =
 fun OrderResponseDto.toDomain(): OrderResponse =
     OrderResponse(
         orderId = orderId,
-        orderedProducts = orderedProducts.toDomain(),
+        orderedProducts = orderedProducts.map { it.toDomain() },
         payment = payment.toDomain(),
     )
 
 fun OrderResponse.toDto(): OrderResponseDto =
     OrderResponseDto(
         orderId = orderId,
-        orderedProducts = orderedProducts.toDto(),
+        orderedProducts = orderedProducts.map { it.toDto() },
         payment = payment.toDto(),
+    )
+
+fun OrderResponse.toUiModel(): UiOrderResponse =
+    UiOrderResponse(
+        orderId = orderId,
+        orderedProducts = orderedProducts.map { it.toUiModel() },
+        payment = payment.toUiModel(),
     )
 
 fun OrderedProductDto.toDomain(): OrderedProduct =
@@ -52,8 +61,8 @@ fun OrderedProduct.toDto(): OrderedProductDto =
         imageUrl = imageUrl,
     )
 
-fun OrderedProduct.toUiModel(): DataOrderedProduct =
-    DataOrderedProduct(
+fun OrderedProduct.toUiModel(): UiOrderedProduct =
+    UiOrderedProduct(
         name = name,
         price = price,
         quantity = quantity,
@@ -69,6 +78,13 @@ fun PaymentDto.toDomain(): Payment =
 
 fun Payment.toDto(): PaymentDto =
     PaymentDto(
+        originalPayment = originalPayment,
+        finalPayment = finalPayment,
+        point = point,
+    )
+
+fun Payment.toUiModel(): UiPayment =
+    UiPayment(
         originalPayment = originalPayment,
         finalPayment = finalPayment,
         point = point,

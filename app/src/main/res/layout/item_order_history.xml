@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="orderedProduct"
+            type="woowacourse.shopping.model.OrderResponse" />
 
+        <variable
+            name="onHistoryDetailClickListener"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +28,7 @@
             android:layout_marginStart="13dp"
             android:layout_marginTop="17dp"
             tools:text="주문번호 : 3"
+            bind:order_id="@{orderedProduct.orderId}"
             android:textColor="@color/woowa_text_black"
             android:textSize="17sp"
             android:textStyle="bold"
@@ -34,6 +42,7 @@
             android:layout_marginStart="13dp"
             android:layout_marginTop="44dp"
             android:layout_marginBottom="17dp"
+            bind:history_names="@{orderedProduct.orderedProducts}"
             tools:text="[든든] 동원 스위트콘, PET 귀여운 동물 컵, [동원]"
             android:textSize="16sp"
             android:textColor="@color/woowa_text_black"
@@ -49,7 +58,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="11dp"
-            tools:text="상세 보기 >"
+            android:text="@string/order_history_navigate_detail_text"
+            android:onClick="@{() -> onHistoryDetailClickListener.invoke(orderedProduct.orderId)}"
             android:textColor="@color/more_detail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -61,6 +71,7 @@
             android:layout_marginTop="28dp"
             android:layout_marginEnd="13dp"
             tools:text="총 5개"
+            bind:history_count="@{orderedProduct.orderedProducts}"
             android:textColor="@color/woowa_text_black"
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -73,6 +84,7 @@
             android:layout_marginTop="11dp"
             android:layout_marginEnd="13dp"
             tools:text="183,000원"
+            bind:history_price="@{orderedProduct.payment.originalPayment}"
             android:textSize="16sp"
             android:textColor="@color/woowa_text_black"
             app:layout_constraintEnd_toEndOf="parent"

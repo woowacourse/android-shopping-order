@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.model
 
-typealias DataOrderedProduct = OrderedProduct
+typealias UiOrderedProduct = OrderedProduct
 
 class OrderedProduct(
     val name: String,
