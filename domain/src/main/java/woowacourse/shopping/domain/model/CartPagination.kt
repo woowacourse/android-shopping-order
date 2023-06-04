@@ -90,6 +90,10 @@ class CartPagination(productInCarts: List<CartProduct>) {
         _shoppingCart[position] = operator.operate(shoppingCart[position])
     }
 
+    fun getCheckedItem(): List<CartProduct> {
+        return shoppingCart.filter { it.isChecked }
+    }
+
     companion object {
         private const val PAGE_UNIT = 5
     }

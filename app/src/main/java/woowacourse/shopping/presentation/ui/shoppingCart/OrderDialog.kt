@@ -9,15 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import woowacourse.shopping.data.defaultRepository.DefaultChargeRepository
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.DialogOrderBinding
-import woowacourse.shopping.domain.repository.ChargeRepository
-import woowacourse.shopping.domain.util.WoowaResult
 import woowacourse.shopping.presentation.ui.myPage.MyPageActivity
 
 class OrderDialog : DialogFragment() {
     private lateinit var binding: DialogOrderBinding
-    private val chargeRepository: ChargeRepository by lazy { DefaultChargeRepository() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,7 +27,7 @@ class OrderDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fetchChange()
+        setLackAmount()
         binding.buttonShoppingCartRecharge.setOnClickListener { goToRecharge() }
     }
 
@@ -39,44 +36,14 @@ class OrderDialog : DialogFragment() {
         setWidth()
     }
 
-    private fun fetchChange() {
-        val orderAmount: Long = arguments?.getLong(ORDER_AMOUNT) ?: return dismiss()
-        chargeRepository.fetchCharge { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> setOrderState(orderAmount, result.data)
-                is WoowaResult.FAIL -> dismiss()
-            }
-        }
-    }
-
-    private fun setOrderState(orderAmount: Long, change: Long) {
-        if (change - orderAmount < 0) {
-            setOrderImpossible()
-            return
-        }
-        setOrderPossible()
-    }
-
-    private fun setOrderImpossible() {
-        binding.textShoppingCartLack.visibility = View.VISIBLE
-        binding.textShoppingCartLackValue.visibility = View.VISIBLE
-        binding.buttonShoppingCartOrder.visibility = View.GONE
-        binding.buttonShoppingCartRecharge.visibility = View.VISIBLE
-    }
-
-    private fun setOrderPossible() {
-        binding.textShoppingCartLack.visibility = View.GONE
-        binding.textShoppingCartLackValue.visibility = View.GONE
-        binding.buttonShoppingCartOrder.visibility = View.VISIBLE
-        binding.buttonShoppingCartRecharge.visibility = View.GONE
-    }
-
     private fun goToRecharge() {
         startActivity(Intent(requireContext(), MyPageActivity::class.java))
         dismiss()
     }
 
-    private fun order() {
+    private fun setLackAmount() {
+        val lackAmount: Int = arguments?.getInt(LACK_AMOUNT) ?: return dismiss()
+        binding.textShoppingCartLackValue.text = getString(R.string.detailPriceFormat, lackAmount)
     }
 
     private fun setWidth() {
@@ -91,12 +58,13 @@ class OrderDialog : DialogFragment() {
     }
 
     companion object {
-        private const val ORDER_AMOUNT = "ORDER_AMOUNT"
+        private const val LACK_AMOUNT = "LACK_AMOUNT"
+        const val TAG = "ORDER_DIALOG"
 
-        fun makeDialog(orderAmount: Long): OrderDialog {
+        fun makeDialog(lackAmount: Int): OrderDialog {
             return OrderDialog().apply {
                 val bundle = Bundle()
-                bundle.putLong(ORDER_AMOUNT, orderAmount)
+                bundle.putInt(LACK_AMOUNT, lackAmount)
                 arguments = bundle
             }
         }

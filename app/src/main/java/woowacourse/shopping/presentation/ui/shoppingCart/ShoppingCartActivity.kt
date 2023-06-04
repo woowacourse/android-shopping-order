@@ -7,10 +7,13 @@ import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.defaultRepository.DefaultChargeRepository
+import woowacourse.shopping.data.defaultRepository.DefaultOrderRepository
 import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.presentation.ui.order.OrderDetailActivity
 import woowacourse.shopping.presentation.ui.productDetail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shoppingCart.adapter.ShoppingCartAdapter
 
@@ -37,6 +40,8 @@ class ShoppingCartActivity :
         return ShoppingCartPresenter(
             this,
             DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
+            DefaultChargeRepository(),
+            DefaultOrderRepository(),
         )
     }
 
@@ -45,6 +50,7 @@ class ShoppingCartActivity :
         clickPreviousPage()
         checkAllProduct()
         clickBackButton()
+        clickOrderButton()
     }
 
     override fun setShoppingCart(shoppingCart: List<CartProduct>) {
@@ -105,6 +111,19 @@ class ShoppingCartActivity :
 
     private fun clickBackButton() {
         binding.buttonShoppingCartBack.setOnClickListener { finish() }
+    }
+
+    override fun showChangeLack(lackAmount: Int) {
+        OrderDialog.makeDialog(lackAmount).show(supportFragmentManager, OrderDialog.TAG)
+    }
+
+    override fun showOrderComplete(orderId: Long) {
+        startActivity(OrderDetailActivity.getIntent(this, orderId))
+        finish()
+    }
+
+    private fun clickOrderButton() {
+        binding.textShoppingCartOrder.setOnClickListener { presenter.requestOrder() }
     }
 
     companion object {

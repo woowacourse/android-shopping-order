@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp">
+
+        <TextView
+            android:id="@+id/textOrderItemName"
+            style="@style/woowaPro20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:layout_constraintBottom_toTopOf="@+id/textOrderItemPrice"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/imageOrderItem"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            tools:text="샐러드" />
+
+        <TextView
+            android:id="@+id/textOrderItemPrice"
+            style="@style/woowaPro20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:layout_constraintBottom_toTopOf="@+id/textOrderItemQuantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textOrderItemName"
+            app:layout_constraintTop_toBottomOf="@+id/textOrderItemName"
+            tools:text="2,000원" />
+
+        <ImageView
+            android:id="@+id/imageOrderItem"
+            android:layout_width="120dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/textOrderItemQuantity"
+            style="@style/woowaPro20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:layout_constraintBottom_toTopOf="@+id/textOrderItemTotalPrice"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textOrderItemPrice"
+            app:layout_constraintTop_toBottomOf="@+id/textOrderItemPrice"
+            tools:text="4개" />
+
+        <TextView
+            android:id="@+id/textOrderItemTotalPrice"
+            style="@style/woowaPro20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:layout_constraintBottom_toBottomOf="@+id/imageOrderItem"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textOrderItemQuantity"
+            app:layout_constraintTop_toBottomOf="@+id/textOrderItemQuantity"
+            tools:text="총 8,000원" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

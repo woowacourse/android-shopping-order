@@ -1,15 +1,21 @@
 package woowacourse.shopping.presentation.ui.shoppingCart
 
+import android.util.Log
 import woowacourse.shopping.domain.model.CartPagination
 import woowacourse.shopping.domain.model.Operator
+import woowacourse.shopping.domain.repository.ChargeRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.util.WoowaResult
 
 class ShoppingCartPresenter(
     private val view: ShoppingCartContract.View,
     private val shoppingCartRepository: ShoppingCartRepository,
+    private val chargeRepository: ChargeRepository,
+    private val orderRepository: OrderRepository,
 ) : ShoppingCartContract.Presenter {
     private lateinit var cartPagination: CartPagination
+    private var change: Int = 0
 
     init {
         shoppingCartRepository.fetchAll { result ->
@@ -26,6 +32,7 @@ class ShoppingCartPresenter(
                 is WoowaResult.FAIL -> view.showUnExpectedError()
             }
         }
+        fetchChange()
     }
 
     override fun fetchShoppingCart() {
@@ -97,7 +104,7 @@ class ShoppingCartPresenter(
     override fun applyQuantityChanged(index: Int) {
         val callback: (WoowaResult<Boolean>) -> Unit = { result ->
             when (result) {
-                is WoowaResult.SUCCESS -> Unit
+                is WoowaResult.SUCCESS -> updateView()
                 is WoowaResult.FAIL -> view.showUnExpectedError()
             }
         }
@@ -130,5 +137,34 @@ class ShoppingCartPresenter(
 
     override fun setOrderCount() {
         view.updateOrder(cartPagination.getOrderCount())
+    }
+
+    override fun requestOrder() {
+        val orderAmount = cartPagination.getPayment()
+        val lack = change - orderAmount
+        Log.d("asdf", "orderAmount: ${cartPagination.getPayment()}, change: $change, lack: $lack")
+        if (lack < 0) {
+            view.showChangeLack(lack * -1)
+            return
+        }
+        order()
+    }
+
+    private fun order() {
+        orderRepository.order(cartPagination.getCheckedItem()) { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> view.showOrderComplete(result.data)
+                is WoowaResult.FAIL -> view.showUnExpectedError()
+            }
+        }
+    }
+
+    private fun fetchChange() {
+        chargeRepository.fetchCharge { result ->
+            when (result) {
+                is WoowaResult.SUCCESS -> change = result.data
+                is WoowaResult.FAIL -> view.showUnExpectedError()
+            }
+        }
     }
 }

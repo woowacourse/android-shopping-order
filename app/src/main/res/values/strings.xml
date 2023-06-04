@@ -22,5 +22,6 @@
     <string name="orderAmount">주문 금액</string>
     <string name="lackAmount">부족한 금액</string>
     <string name="order">주문하기</string>
+    <string name="orderedDateTime">주문 날짜</string>
 
 </resources>

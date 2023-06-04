@@ -13,52 +13,13 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/textShoppingCartOrderAmount"
-            style="@style/woowaPro20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/orderAmount"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textShoppingCartOrderAmountValue"
-            style="@style/woowaPro20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="0원" />
-
-        <TextView
-            android:id="@+id/textShoppingCartChange"
-            style="@style/woowaPro20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/currentChange"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textShoppingCartOrderAmount" />
-
-        <TextView
-            android:id="@+id/textShoppingCartChangeValue"
-            style="@style/woowaPro20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/textShoppingCartChange"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textShoppingCartChange"
-            tools:text="0원" />
-
-        <TextView
             android:id="@+id/textShoppingCartLack"
             style="@style/woowaPro20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:text="@string/lackAmount"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textShoppingCartChange" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textShoppingCartLackValue"
@@ -71,23 +32,13 @@
             tools:text="0원" />
 
         <Button
-            android:id="@+id/buttonShoppingCartOrder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/order"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textShoppingCartLack" />
-
-        <Button
             android:id="@+id/buttonShoppingCartRecharge"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="12dp"
             android:text="@string/recharge"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonShoppingCartOrder" />
+            app:layout_constraintTop_toBottomOf="@+id/textShoppingCartLack" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

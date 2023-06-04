@@ -17,6 +17,8 @@ interface ShoppingCartContract {
         fun updateAllCheck(isChecked: Boolean)
         fun showUnExpectedError()
         fun goProductDetailActivity(cartProduct: CartProduct)
+        fun showOrderComplete(orderId: Long)
+        fun showChangeLack(lackAmount: Int)
     }
 
     interface Presenter {
@@ -34,5 +36,6 @@ interface ShoppingCartContract {
         fun setOrderCount()
         fun setPayment()
         fun setAllCheck()
+        fun requestOrder()
     }
 }
