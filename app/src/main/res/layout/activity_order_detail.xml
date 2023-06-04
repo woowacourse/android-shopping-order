@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/woowa_dealer_gray_200"
-        tools:context=".presentation.ui.order.OrderDetailActivity">
+        tools:context=".presentation.ui.order.detail.OrderDetailActivity">
 
         <TextView
             android:id="@+id/textOrderDateTime"

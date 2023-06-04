@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.order
+package woowacourse.shopping.presentation.ui.order.detail
 
 import woowacourse.shopping.domain.model.Order
 

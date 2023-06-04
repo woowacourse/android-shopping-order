@@ -13,7 +13,7 @@ import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.presentation.ui.order.OrderDetailActivity
+import woowacourse.shopping.presentation.ui.order.detail.OrderDetailActivity
 import woowacourse.shopping.presentation.ui.productDetail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shoppingCart.adapter.ShoppingCartAdapter
 
