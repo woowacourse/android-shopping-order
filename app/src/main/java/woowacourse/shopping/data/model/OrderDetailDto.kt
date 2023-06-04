@@ -2,7 +2,9 @@ package woowacourse.shopping.data.model
 
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderStatus
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class OrderDetailDto(
     val orderId: Int,
     val orderAt: String,

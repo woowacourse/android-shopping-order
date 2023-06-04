@@ -1,14 +1,16 @@
 package woowacourse.shopping.data.datasource.remote
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ServerInfo.currentBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     private var retrofitWithToken: Retrofit? = null
@@ -26,7 +28,7 @@ object RetrofitClient {
             val retrofit = Retrofit.Builder()
                 .baseUrl(ServerInfo.currentBaseUrl)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
                 .build()
             retrofitWithToken = retrofit
             retrofit

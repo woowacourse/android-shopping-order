@@ -2,13 +2,15 @@ package woowacourse.shopping.data.model
 
 import com.example.domain.model.Price
 import com.example.domain.model.Product
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ProductDto(
     val id: Int,
     val name: String,
     val price: Int,
-    @SerializedName("imageUrl")
+    @SerialName("imageUrl")
     val imgUrl: String
 )
 

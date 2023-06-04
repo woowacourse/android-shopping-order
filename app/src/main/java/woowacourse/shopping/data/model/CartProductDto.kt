@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.model
 
 import com.example.domain.model.CartProduct
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CartProductDto(
     val id: Int,
     val quantity: Int,
