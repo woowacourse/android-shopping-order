@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.cart
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -49,12 +48,17 @@ class CartPresenterTest {
         cartRepository = mockk()
         productRepository = mockk()
         presenter = CartPresenter(view, cartRepository)
+
+        every {
+            cartRepository.getPage(any(), any(), any())
+        } answers {
+            arg<(Result<CartProducts>) -> Unit>(2)(Result.success(fakeCartProducts))
+        }
     }
 
     @Test
     fun `화면의 초기값들을 설정한다`() {
         // given
-        mockCartGetPage()
         every { cartRepository.getTotalPrice() } returns 12000
         every { cartRepository.getTotalSelectedCount() } returns 10
         every { cartRepository.hasNextPage(any(), any()) } returns true
@@ -80,7 +84,6 @@ class CartPresenterTest {
     @Test
     fun `현재 페이지의 상품들을 모두 선택한다`() {
         // given
-        mockCartGetPage()
         every { cartRepository.getTotalPrice() } returns 12000
         every { cartRepository.getTotalSelectedCount() } returns 10
         every { cartRepository.hasNextPage(any(), any()) } returns true
@@ -108,7 +111,6 @@ class CartPresenterTest {
     @Test
     fun `다음 페이지로 넘어가면 새로 불러온다`() {
         // given
-        mockCartGetPage()
         every { cartRepository.getTotalPrice() } returns 12000
         every { cartRepository.getTotalSelectedCount() } returns 10
         every { cartRepository.hasNextPage(any(), any()) } returns true
@@ -133,7 +135,6 @@ class CartPresenterTest {
     @Test
     fun `이전 페이지로 가면 새로 불러온다`() {
         // given
-        mockCartGetPage()
         every { cartRepository.getTotalPrice() } returns 12000
         every { cartRepository.getTotalSelectedCount() } returns 10
         every { cartRepository.hasNextPage(any(), any()) } returns true
@@ -158,8 +159,12 @@ class CartPresenterTest {
     @Test
     fun `아이템의 개수를 변경한다`() {
         // given
-        mockCartUpdateCountWithProductId()
-        mockCartGetPage()
+        every {
+            cartRepository.updateCountWithProductId(any(), any(), any())
+        } answers {
+            arg<(Result<Int>) -> Unit>(2)(Result.success(10))
+        }
+
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
         every { cartRepository.getTotalPrice() } returns 12000
@@ -178,7 +183,6 @@ class CartPresenterTest {
     fun `아이템의 체크를 변경한다`() {
         // given
         every { cartRepository.updateChecked(any(), any()) } returns Unit
-        mockCartGetPage()
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
         every { cartRepository.getTotalPrice() } returns 12000
@@ -197,8 +201,12 @@ class CartPresenterTest {
     @Test
     fun `장바구니에 담긴 상품을 삭제한다`() {
         // given
-        mockCartRemove()
-        mockCartGetPage()
+        every {
+            cartRepository.remove(any(), any())
+        } answers {
+            arg<(() -> Unit)>(1)()
+        }
+
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
         every { cartRepository.getTotalPrice() } returns 12000
@@ -216,8 +224,18 @@ class CartPresenterTest {
     @Test
     fun `상세 페이지로 이동한다`() {
         // given
-        mockProductFindById()
-        mockCartGetAll()
+        every {
+            productRepository.findById(any(), any())
+        } answers {
+            arg<(Result<Product>) -> Unit>(1)(Result.success(fakeProduct))
+        }
+
+        every {
+            cartRepository.getAll(any())
+        } answers {
+            arg<(Result<CartProducts>) -> Unit>(0)(Result.success(fakeCartProducts))
+        }
+
         every { view.navigateToItemDetail(any()) } answers { nothing }
 
         // when
@@ -237,50 +255,5 @@ class CartPresenterTest {
 
         // then
         assertEquals(presenter.getPageIndex(), index)
-    }
-
-    private fun mockProductFindById() {
-        val successSlot = slot<(Result<Product>) -> Unit>()
-        every {
-            productRepository.findById(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(fakeProduct))
-        }
-    }
-
-    private fun mockCartGetAll() {
-        val successSlot = slot<(Result<CartProducts>) -> Unit>()
-        every {
-            cartRepository.getAll(capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(fakeCartProducts))
-        }
-    }
-
-    private fun mockCartUpdateCountWithProductId() {
-        val successSlot = slot<(Result<Int>) -> Unit>()
-        every {
-            cartRepository.updateCountWithProductId(1, any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(10))
-        }
-    }
-
-    private fun mockCartGetPage() {
-        val successSlot = slot<(Result<CartProducts>) -> Unit>()
-        every {
-            cartRepository.getPage(any(), any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(fakeCartProducts))
-        }
-    }
-
-    private fun mockCartRemove() {
-        val successSlot = slot<() -> Unit>()
-        every {
-            cartRepository.remove(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke()
-        }
     }
 }
