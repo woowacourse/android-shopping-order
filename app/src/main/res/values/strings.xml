@@ -20,4 +20,8 @@
     <string name="my_page_title">링링님의 마이페이지</string>
     <string name="point_description">보유 포인트</string>
     <string name="move_to_order_history"><![CDATA[주문목록 >]]></string>
+    <string name="order_id">주문 번호 : %d</string>
+    <string name="move_to_order_detail"><![CDATA[상세보기 >]]></string>
+    <string name="order_history">주문 목록</string>
+    <string name="order_summary">%s 외 %d</string>
 </resources>

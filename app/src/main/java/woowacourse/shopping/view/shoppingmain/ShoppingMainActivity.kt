@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
@@ -177,18 +176,11 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
         cartBadge = menu.findItem(R.id.menu_cart).actionView?.findViewById(R.id.tv_badge_cart)
         presenter.updateCartBadge()
 
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_my_page -> {
-                val intent = MyPageActivity.intent(this)
-                startActivity(intent)
-                true
+        menu.findItem(R.id.menu_my_page).actionView?.findViewById<ImageView>(R.id.iv_my_page)
+            ?.setOnClickListener {
+                startActivity(MyPageActivity.intent(this))
             }
-            else -> super.onOptionsItemSelected(item)
-        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     companion object {

@@ -16,7 +16,7 @@ interface MembersService {
 
     @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
     @GET("/members/orders")
-    fun getOrders(): Call<OrderDTO>
+    fun getOrders(): Call<List<OrderDTO>>
 
     @Headers("Authorization: Basic cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1")
     @GET("/members/orders/{orderId}")
