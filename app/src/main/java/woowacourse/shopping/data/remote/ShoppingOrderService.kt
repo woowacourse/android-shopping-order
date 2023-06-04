@@ -10,11 +10,14 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.dto.request.InsertingProductDto
 import woowacourse.shopping.data.remote.dto.request.RequestChargeDto
+import woowacourse.shopping.data.remote.dto.request.RequestOrderDto
 import woowacourse.shopping.data.remote.dto.request.UpdatingProductDto
 import woowacourse.shopping.data.remote.dto.response.ProductDto
 import woowacourse.shopping.data.remote.dto.response.ProductListDto
 import woowacourse.shopping.data.remote.dto.response.ResponseChargeDto
+import woowacourse.shopping.data.remote.dto.response.ResponseOrdersDto
 import woowacourse.shopping.data.remote.dto.response.ShoppingCartDto
+import woowacourse.shopping.domain.model.Order
 
 interface ShoppingOrderService {
     @GET("/products/cart-items")
@@ -54,4 +57,17 @@ interface ShoppingOrderService {
 
     @GET("/members/cash")
     fun getCharge(): Call<ResponseChargeDto>
+
+    @POST("/orders")
+    fun order(
+        @Body requestOrderDto: RequestOrderDto,
+    ): Call<Unit>
+
+    @GET("/orders")
+    fun getOrders(): Call<ResponseOrdersDto>
+
+    @GET("/orders/{id}")
+    fun getOrder(
+        @Path("id") id: Long,
+    ): Call<Order>
 }
