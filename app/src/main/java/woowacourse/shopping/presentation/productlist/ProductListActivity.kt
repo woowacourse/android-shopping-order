@@ -20,6 +20,7 @@ import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.ProductViewType
+import woowacourse.shopping.presentation.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.product.ProductClickListener
 import woowacourse.shopping.presentation.productlist.product.ProductListAdapter
@@ -120,6 +121,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             R.id.icon_cart -> {
                 startActivity(CartActivity.getIntent(this))
                 finish()
+            }
+            R.id.icon_user -> {
+                startActivity(OrderListActivity.getIntent(this))
             }
             else -> return super.onOptionsItemSelected(item)
         }

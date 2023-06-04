@@ -31,11 +31,11 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_counter"
-            android:layout_marginStart="100dp"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="180dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/text_cart_product_name"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_cart_product_price">
 
             <TextView
@@ -63,9 +63,9 @@
 
             <ImageView
                 android:id="@+id/image_cart_count_remove"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/remove_24"
+                android:layout_width="95dp"
+                android:layout_height="34dp"
+                android:src="@drawable/ic_remove_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/text_cart_count"
                 app:layout_constraintStart_toStartOf="parent"

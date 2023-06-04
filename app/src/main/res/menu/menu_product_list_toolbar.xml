@@ -3,10 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/icon_cart"
+        android:id="@+id/icon_user"
+        android:enabled="true"
+        android:icon="@drawable/ic_person_24"
         android:title="@string/toolbar_cart_title"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/icon_cart"
         android:enabled="true"
         android:icon="@drawable/ic_shopping_cart_24"
-        app:showAsAction="always"/>
+        android:title="@string/toolbar_cart_title"
+        app:showAsAction="always" />
 
 </menu>
