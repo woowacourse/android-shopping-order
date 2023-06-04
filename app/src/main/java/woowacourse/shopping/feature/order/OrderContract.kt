@@ -4,7 +4,7 @@ import woowacourse.shopping.model.CartState
 
 interface OrderContract {
     interface View {
-        fun setOrderPedningCart(orderProducts: CartState)
+        fun setOrderPendingCart(orderPendingCart: CartState)
         fun setProductsSum(productsSum: Int)
         fun setDiscountPrice(discountPrice: Int)
         fun setFinalPrice(finalPrice: Int)

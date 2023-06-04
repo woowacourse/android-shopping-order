@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.order.model.dto.request.OrderRequest
-import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPoliciesResponse
+import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyResponse
 import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse
 
 interface RetrofitOrderService {
@@ -27,6 +27,6 @@ interface RetrofitOrderService {
         @Body request: OrderRequest
     ): Call<Unit>
 
-    @POST("/orders/discount-policies")
-    fun requestFetchDiscountPolicy(): Call<FixedDiscountPoliciesResponse>
+    @GET("/orders/discount-policies")
+    fun requestFetchDiscountPolicy(): Call<FixedDiscountPolicyResponse>
 }
