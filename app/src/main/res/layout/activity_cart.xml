@@ -12,6 +12,10 @@
         <variable
             name="count"
             type="int" />
+
+        <variable
+            name="listener"
+            type="woowacourse.shopping.ui.cart.viewHolder.CartClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -96,6 +100,7 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:onClick="@{() -> listener.onOrderClick()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="주문하기(2)" />

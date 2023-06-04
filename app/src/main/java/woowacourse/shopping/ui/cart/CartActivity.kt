@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
@@ -10,15 +11,17 @@ import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.model.CartItemsUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.CartUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.contract.CartContract
 import woowacourse.shopping.ui.cart.contract.presenter.CartPresenter
-import woowacourse.shopping.ui.cart.viewHolder.OnCartClickListener
+import woowacourse.shopping.ui.cart.viewHolder.CartClickListener
+import woowacourse.shopping.ui.order.OrderActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
-class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener {
+class CartActivity : AppCompatActivity(), CartContract.View, CartClickListener {
     private lateinit var binding: ActivityCartBinding
     private lateinit var presenter: CartContract.Presenter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener
         binding.allCheckBox.setOnClickListener {
             presenter.onAllCheckboxClick(binding.allCheckBox.isChecked)
         }
+        binding.listener = this
     }
 
     private fun setToolbar() {
@@ -103,6 +107,10 @@ class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener
         }
     }
 
+    override fun navigateToOrder(cartItems: CartItemsUIModel) {
+        startActivity(OrderActivity.from(this, cartItems))
+    }
+
     override fun setAllOrderCount(count: Int) {
         binding.count = count
     }
@@ -117,6 +125,10 @@ class CartActivity : AppCompatActivity(), CartContract.View, OnCartClickListener
 
     override fun onCheckChanged(id: Long, isChecked: Boolean) {
         presenter.onCheckChanged(id, isChecked)
+    }
+
+    override fun onOrderClick() {
+        presenter.navigateToOrder()
     }
 
     override fun increaseCount(id: Long) {

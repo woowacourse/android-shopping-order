@@ -4,11 +4,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.ui.cart.viewHolder.CartViewHolder
-import woowacourse.shopping.ui.cart.viewHolder.OnCartClickListener
+import woowacourse.shopping.ui.cart.viewHolder.CartClickListener
 
 class CartAdapter(
     cartItems: List<CartProductUIModel>,
-    private val onCartClickListener: OnCartClickListener,
+    private val onCartClickListener: CartClickListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
 
     private var cartItems: MutableList<CartProductUIModel> = cartItems.toMutableList()
