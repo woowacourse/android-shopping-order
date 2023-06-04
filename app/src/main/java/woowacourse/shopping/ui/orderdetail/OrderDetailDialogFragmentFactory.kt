@@ -6,7 +6,7 @@ import woowacourse.shopping.ui.model.UiOrder
 
 class OrderDetailDialogFragmentFactory(
     private val orderInfo: UiOrder,
-    private val dismissListener: (() -> Unit)?
+    private val dismissListener: (() -> Unit)? = null
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return when (className) {

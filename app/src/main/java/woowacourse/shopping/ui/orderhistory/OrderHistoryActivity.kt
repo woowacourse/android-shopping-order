@@ -10,15 +10,30 @@ import woowacourse.shopping.data.datasource.order.remote.RemoteOrderDataSource
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.UiOrder
+import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
+import woowacourse.shopping.ui.orderdetail.OrderDetailDialogFragmentFactory
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     private lateinit var binding: ActivityOrderHistoryBinding
     private lateinit var presenter: OrderHistoryContract.Presenter
+    private lateinit var orderHistoryAdapter: OrderHistoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_history)
+        initOrderHistoryAdapter()
+        initPresenter()
+    }
+
+    private fun initOrderHistoryAdapter() {
+        orderHistoryAdapter = OrderHistoryAdapter {
+            supportFragmentManager.fragmentFactory = OrderDetailDialogFragmentFactory(it)
+            val fragment: OrderDetailDialog = supportFragmentManager.fragmentFactory
+                .instantiate(classLoader, OrderDetailDialog::class.java.name) as OrderDetailDialog
+            fragment.show(supportFragmentManager, OrderDetailDialog::class.java.name)
+        }
+        binding.rvOrderHistory.adapter = orderHistoryAdapter
     }
 
     private fun initPresenter() {
@@ -26,7 +41,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun updateOrdersInfo(ordersInfo: List<UiOrder>) {
-        TODO("Not yet implemented")
+        orderHistoryAdapter.submitList(ordersInfo)
     }
 
     companion object {
