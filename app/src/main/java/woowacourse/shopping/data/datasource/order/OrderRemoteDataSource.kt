@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.OrderResponseDto
+import woowacourse.shopping.data.dto.OrderResponsesDto
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toDto
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil
@@ -44,24 +45,24 @@ class OrderRemoteDataSource : OrderDataSource {
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.requestOrders(token)
-        call.enqueue(object : retrofit2.Callback<List<OrderResponseDto>> {
+        val call = retrofitService.requestOrders(token, 1, 10)
+        call.enqueue(object : retrofit2.Callback<OrderResponsesDto> {
             override fun onResponse(
-                call: Call<List<OrderResponseDto>>,
-                response: Response<List<OrderResponseDto>>,
+                call: Call<OrderResponsesDto>,
+                response: Response<OrderResponsesDto>,
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
                     Log.d("test", "retrofit requestOrders result : $response")
                     if (result != null) {
-                        onSuccess(result.map { it.toDomain() })
+                        onSuccess(result.orders.map { it.toDomain() })
                     }
                 } else {
                     Log.d("test", "retrofit 실패")
                 }
             }
 
-            override fun onFailure(call: Call<List<OrderResponseDto>>, t: Throwable) {
+            override fun onFailure(call: Call<OrderResponsesDto>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
                 onFailure()
             }

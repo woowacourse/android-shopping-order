@@ -6,8 +6,10 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import woowacourse.shopping.data.dto.OrderRequest
 import woowacourse.shopping.data.dto.OrderResponse
+import woowacourse.shopping.data.dto.OrderResponsesDto
 
 interface RetrofitOrderService {
     @POST("/orders")
@@ -19,7 +21,9 @@ interface RetrofitOrderService {
     @GET("/orders")
     fun requestOrders(
         @Header("Authorization") token: String,
-    ): Call<List<OrderResponse>>
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Call<OrderResponsesDto>
 
     @GET("/orders/{orderId}")
     fun requestSpecificOrder(
