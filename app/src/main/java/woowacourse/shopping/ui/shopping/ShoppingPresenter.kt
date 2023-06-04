@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
@@ -17,17 +18,21 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        cartRepository.getAll { result ->
+        CompletableFuture.supplyAsync {
+            cartRepository.getAll()
+        }.thenAccept { result ->
             result.onSuccess { carts ->
-                val cartProducts = carts.toList().associateBy({ it.product.id }, { it.quantity })
-                view.setCartProducts(cartProducts)
+                val cartCounts = carts.toList().associateBy({ it.product.id }, { it.quantity })
+                view.setCartProducts(cartCounts)
                 setUpTotalCount()
             }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
     override fun setUpNextProducts() {
-        productRepository.getNext(PRODUCT_PAGE_SIZE) { result ->
+        CompletableFuture.supplyAsync {
+            productRepository.getNext(PRODUCT_PAGE_SIZE)
+        }.thenAccept { result ->
             result.onSuccess { products -> view.addMoreProducts(products.map { it.toUIModel() }) }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
@@ -46,10 +51,12 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCountWithProductId(productId, count) {
-            cartRepository.getAll {
-                setUpTotalCount()
-            }
+        CompletableFuture.supplyAsync {
+            cartRepository.updateCountWithProductId(productId, count)
+            cartRepository.getAll()
+        }.thenAccept { result ->
+            result.onSuccess { setUpTotalCount() }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 

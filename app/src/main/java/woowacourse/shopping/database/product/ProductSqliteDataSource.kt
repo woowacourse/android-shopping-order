@@ -10,17 +10,17 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private var offset = 0
-    override fun getAll(callback: (Result<List<Product>>) -> Unit) {
+    override fun getAll(): Result<List<Product>> {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetAllQuery(), null).use {
             while (it.moveToNext()) {
                 products.add(ProductConstant.fromCursor(it))
             }
         }
-        callback(Result.success(products))
+        return Result.success(products)
     }
 
-    override fun getNext(count: Int, callback: (Result<List<Product>>) -> Unit) {
+    override fun getNext(count: Int): Result<List<Product>> {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetNextQuery(count, offset), null).use {
             while (it.moveToNext()) {
@@ -28,17 +28,19 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
                 offset++
             }
         }
-        callback(Result.success(products))
+        return Result.success(products)
     }
 
-    override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
-        println(id)
-        println(ProductConstant.getGetQuery(id))
-        db.rawQuery(ProductConstant.getGetQuery(id), null).use {
-            it.moveToNext()
-            runCatching { callback(Result.success(ProductConstant.fromCursor(it))) }
-                .onFailure { throwable -> callback(Result.failure(throwable)) }
+    override fun findById(id: Int): Result<Product> {
+        runCatching {
+            db.rawQuery(ProductConstant.getGetQuery(id), null).use {
+                it.moveToNext()
+                return Result.success(ProductConstant.fromCursor(it))
+            }
+        }.onFailure { throwable ->
+            return Result.failure(throwable)
         }
+        return Result.failure(IllegalStateException())
     }
 
     override fun clear() {
@@ -64,8 +66,9 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
         }
     }
 
-    override fun insert(product: Product, callback: (Int) -> Unit) {
-        db.execSQL(ProductConstant.getInsertQuery(product))
-        callback(product.id)
+    override fun insert(product: Product): Result<Int> {
+        runCatching { db.execSQL(ProductConstant.getInsertQuery(product)) }
+            .onFailure { throwable -> return Result.failure(throwable) }
+        return Result.success(product.id)
     }
 }

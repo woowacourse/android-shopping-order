@@ -3,8 +3,8 @@ package woowacourse.shopping.data.remoteDataSource
 import woowacourse.shopping.model.CartProduct
 
 interface CartRemoteDataSource {
-    fun getAll(callback: (Result<List<CartProduct>>) -> Unit)
-    fun postItem(itemId: Int, callback: (Result<Int>) -> Unit)
-    fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Result<Int>) -> Unit)
-    fun deleteItem(itemId: Int, callback: (Result<Int>) -> Unit)
+    fun getAll(): Result<List<CartProduct>>
+    fun postItem(itemId: Int): Result<Int>
+    fun patchItemQuantity(itemId: Int, quantity: Int): Result<Int>
+    fun deleteItem(itemId: Int): Result<Int>
 }

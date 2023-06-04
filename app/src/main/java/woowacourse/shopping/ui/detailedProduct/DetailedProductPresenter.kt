@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.detailedProduct
 
-import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentRepository
@@ -21,31 +21,28 @@ class DetailedProductPresenter(
     private lateinit var product: ProductUIModel
     private var lastProduct: ProductUIModel? = null
 
-    private val lock = ReentrantLock()
-
     init {
-        lock.lock()
-        productRepository.findById(productId) { result ->
+        CompletableFuture.supplyAsync {
+            productRepository.findById(productId)
+        }.thenAccept { result ->
             result.onSuccess { product -> this.product = product.toUIModel() }
                 .onFailure { exception -> LogUtil.logError(exception) }
-                .also { lock.unlock() }
-        }
-        while (lock.isLocked) { Thread.sleep(100) }
-
-        if (!this::product.isInitialized) {
-            view.showProductNotFound()
         }
     }
 
     override fun setUpLastProduct() {
-        sharedPreferenceUtils.getLastProductId()
-            .takeIf { it != product.id && it != -1 }
-            ?.let {
-                productRepository.findById(it) { result ->
-                    result.onSuccess { product -> lastProduct = product.toUIModel() }
-                        .onFailure { exception -> LogUtil.logError(exception) }
-                }
-            }
+        val lastId = sharedPreferenceUtils.getLastProductId()
+        if (lastId == product.id || lastId == -1) {
+            lastProduct = null
+            return
+        }
+
+        CompletableFuture.supplyAsync {
+            productRepository.findById(lastId)
+        }.thenAccept { result ->
+            result.onSuccess { product -> this.lastProduct = product.toUIModel() }
+                .onFailure { exception -> LogUtil.logError(exception) }
+        }
         sharedPreferenceUtils.setLastProductId(product.id)
     }
 
@@ -55,8 +52,11 @@ class DetailedProductPresenter(
 
     override fun addProductToCart(count: Int) {
         cartRepository.insert(product.id)
-        cartRepository.updateCountWithProductId(product.id, count) {
-            view.navigateToCart()
+        CompletableFuture.supplyAsync {
+            cartRepository.updateCountWithProductId(product.id, count)
+        }.thenAccept { result ->
+            result.onSuccess { view.navigateToCart() }
+                .onFailure { exception -> LogUtil.logError(exception) }
         }
     }
 

@@ -49,11 +49,7 @@ class CartPresenterTest {
         productRepository = mockk()
         presenter = CartPresenter(view, cartRepository)
 
-        every {
-            cartRepository.getPage(any(), any(), any())
-        } answers {
-            arg<(Result<CartProducts>) -> Unit>(2)(Result.success(fakeCartProducts))
-        }
+        every { cartRepository.getPage(any(), any()) } answers { Result.success(fakeCartProducts) }
     }
 
     @Test
@@ -159,11 +155,8 @@ class CartPresenterTest {
     @Test
     fun `아이템의 개수를 변경한다`() {
         // given
-        every {
-            cartRepository.updateCountWithProductId(any(), any(), any())
-        } answers {
-            arg<(Result<Int>) -> Unit>(2)(Result.success(10))
-        }
+        every { cartRepository.updateCountWithProductId(any(), any()) }
+            .answers { Result.success(10) }
 
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
@@ -201,12 +194,7 @@ class CartPresenterTest {
     @Test
     fun `장바구니에 담긴 상품을 삭제한다`() {
         // given
-        every {
-            cartRepository.remove(any(), any())
-        } answers {
-            arg<(() -> Unit)>(1)()
-        }
-
+        every { cartRepository.remove(any()) } answers { Result.success(0) }
         every { cartRepository.hasNextPage(any(), any()) } returns true
         every { cartRepository.hasPrevPage(any(), any()) } returns true
         every { cartRepository.getTotalPrice() } returns 12000
@@ -223,18 +211,7 @@ class CartPresenterTest {
 
     @Test
     fun `상세 페이지로 이동한다`() {
-        // given
-        every {
-            productRepository.findById(any(), any())
-        } answers {
-            arg<(Result<Product>) -> Unit>(1)(Result.success(fakeProduct))
-        }
-
-        every {
-            cartRepository.getAll(any())
-        } answers {
-            arg<(Result<CartProducts>) -> Unit>(0)(Result.success(fakeCartProducts))
-        }
+        every { cartRepository.getAll() } answers { Result.success(fakeCartProducts) }
 
         every { view.navigateToItemDetail(any()) } answers { nothing }
 

@@ -10,23 +10,28 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private val cartItems = CartProducts(mutableListOf())
 
-    override fun getAll(callback: (Result<CartProducts>) -> Unit) {
-        remoteDataSource.getAll { result ->
-            result.onSuccess { cartProducts ->
-                cartItems.replaceAll(cartProducts)
-                callback(Result.success(cartItems))
-            }.onFailure { throwable -> callback(Result.failure(throwable)) }
+    override fun getAll(): Result<CartProducts> {
+        val result = remoteDataSource.getAll()
+        result.onSuccess {
+            cartItems.replaceAll(it)
+            return Result.success(CartProducts(it.toMutableList()))
         }
+        return Result.failure(Throwable("Failed to get all"))
     }
 
-    override fun getPage(index: Int, size: Int, callback: (Result<CartProducts>) -> Unit) {
-        remoteDataSource.getAll { result ->
-            result.onSuccess {
-                val cartProducts = it.subList(index * size, min((index + 1) * size, it.size))
-                cartItems.replaceAll(it)
-                callback(Result.success(CartProducts(cartProducts.toMutableList())))
-            }.onFailure { throwable -> callback(Result.failure(throwable)) }
-        }
+    override fun getPage(index: Int, size: Int): Result<CartProducts> {
+        remoteDataSource.getAll()
+            .onSuccess { cartProducts ->
+                val cartItems = cartProducts.subList(
+                    index * size,
+                    min((index + 1) * size, cartProducts.size)
+                )
+                this.cartItems.replaceAll(cartProducts)
+                return Result.success(CartProducts(cartItems.toMutableList()))
+            }.onFailure { throwable ->
+                return Result.failure(throwable)
+            }
+        return Result.failure(Throwable("Failed to get page"))
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
@@ -49,35 +54,30 @@ class CartRepositoryImpl(
         return cartItems.totalPrice
     }
 
-    override fun insert(productId: Int) {
+    override fun insert(productId: Int): Result<Int> {
         if (cartItems.firstOrNull { it.product.id == productId } != null) {
-            return
+            return Result.failure(Throwable("Already exist"))
         }
-        remoteDataSource.postItem(productId) { getAll {} }
+        return remoteDataSource.postItem(productId)
     }
 
-    override fun remove(id: Int, callback: () -> Unit) {
-        remoteDataSource.deleteItem(id) { callback() }
+    override fun remove(id: Int): Result<Int> {
+        return remoteDataSource.deleteItem(id)
     }
 
-    override fun updateCountWithProductId(
-        productId: Int,
-        count: Int,
-        callback: (Result<Int>) -> Unit
-    ) {
+    override fun updateCountWithProductId(productId: Int, count: Int): Result<Int> {
         if (cartItems.isEmpty()) {
-            remoteDataSource.getAll { result ->
-                result.onSuccess { cartProducts -> cartItems.replaceAll(cartProducts) }
-                    .onFailure { throwable -> callback(Result.failure(throwable)) }
-            }
+            remoteDataSource.getAll()
+                .onSuccess { cartItems.replaceAll(it) }
+                .onFailure { throwable -> return Result.failure(throwable) }
         }
         val cartItem = cartItems.firstOrNull { it.product.id == productId }
-        when {
-            cartItem == null && count == 1 -> remoteDataSource.postItem(productId, callback)
-            cartItem == null -> return
-            count == 0 -> remoteDataSource.deleteItem(cartItem.id, callback)
-            count < 1 -> return
-            else -> remoteDataSource.patchItemQuantity(cartItem.id, count, callback)
+        return when {
+            cartItem == null && count == 1 -> remoteDataSource.postItem(productId)
+            cartItem == null -> Result.success(-1)
+            count == 0 -> remoteDataSource.deleteItem(cartItem.id)
+            count < 1 -> Result.success(-1)
+            else -> remoteDataSource.patchItemQuantity(cartItem.id, count)
         }
     }
 

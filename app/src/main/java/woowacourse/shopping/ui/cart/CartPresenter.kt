@@ -2,6 +2,8 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.lang.Thread.sleep
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import woowacourse.shopping.data.repository.CartRepository
@@ -36,7 +38,11 @@ class CartPresenter(
     private val lock = ReentrantLock()
 
     private fun fetchCartProducts(callback: () -> Unit) {
-        cartRepository.getPage(index, STEP) { result ->
+        val completableFuture = CompletableFuture.supplyAsync {
+            cartRepository.getPage(index, STEP)
+        }
+        sleep(100)
+        completableFuture.thenAccept { result ->
             result.onSuccess {
                 currentPage.clear()
                 currentPage.addAll(it.toUIModel())
@@ -98,7 +104,9 @@ class CartPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCountWithProductId(productId, count) { result ->
+        CompletableFuture.supplyAsync {
+            cartRepository.updateCountWithProductId(productId, count)
+        }.thenAccept { result ->
             result.onSuccess {
                 currentPage.indexOfFirst { it.productId == productId }.takeIf { it != -1 }
                     ?.let { currentPage[it] = currentPage[it].copy(count = count) }
@@ -124,17 +132,21 @@ class CartPresenter(
     }
 
     override fun removeItem(productId: Int) {
-        cartRepository.remove(productId) {
-            currentPage.removeIf { it.id == productId }
-            if (currentPage.isEmpty() && index > 0) {
-                moveToPagePrev()
-            } else {
-                fetchCartProducts {
-                    setUpCarts()
-                    setUpCheckedCount()
-                    setUPTotalPrice()
+        CompletableFuture.supplyAsync {
+            cartRepository.remove(productId)
+        }.thenAccept { result ->
+            result.onSuccess {
+                currentPage.removeIf { it.id == productId }
+                if (currentPage.isEmpty() && index > 0) {
+                    moveToPagePrev()
+                } else {
+                    fetchCartProducts {
+                        setUpCarts()
+                        setUpCheckedCount()
+                        setUPTotalPrice()
+                    }
                 }
-            }
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
@@ -147,7 +159,9 @@ class CartPresenter(
     }
 
     override fun navigateToOrder() {
-        cartRepository.getAll { result ->
+        CompletableFuture.supplyAsync {
+            cartRepository.getAll()
+        }.thenAccept { result ->
             result.onSuccess { cartProducts ->
                 view.navigateToOrder(cartProducts.checkedProducts.map { it.id })
             }.onFailure { throwable -> LogUtil.logError(throwable) }

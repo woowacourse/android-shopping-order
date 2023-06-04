@@ -6,24 +6,17 @@ import woowacourse.shopping.utils.RetrofitUtil
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
-    override fun getAll(callback: (Result<List<Product>>) -> Unit) {
-        RetrofitUtil.retrofitProductService.getProducts().enqueue(RetrofitUtil.callback(callback))
-    }
+    override fun getAll(): Result<List<Product>> =
+        runCatching { RetrofitUtil.retrofitProductService.getProducts().execute().body()!! }
 
-    override fun getNext(count: Int, callback: (Result<List<Product>>) -> Unit) {
+    override fun getNext(count: Int): Result<List<Product>> {
         TODO("Not yet implemented")
     }
 
-    override fun insert(product: Product, callback: (Result<Int>) -> Unit) {
+    override fun insert(product: Product): Result<Int> {
         TODO("Not yet implemented")
     }
 
-    override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
-        RetrofitUtil.retrofitProductService.getProduct(id).enqueue(
-            RetrofitUtil.callback { result ->
-                result.onSuccess { callback(Result.success(it[0])) }
-                    .onFailure { e -> callback(Result.failure(e)) }
-            }
-        )
-    }
+    override fun findById(id: Int): Result<Product> =
+        runCatching { RetrofitUtil.retrofitProductService.getProduct(id).execute().body()!![0] }
 }

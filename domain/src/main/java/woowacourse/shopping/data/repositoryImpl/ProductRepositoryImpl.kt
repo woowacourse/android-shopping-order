@@ -13,38 +13,41 @@ class ProductRepositoryImpl(
         localDataSource.clear()
     }
 
-    override fun getAll(callback: (Result<List<Product>>) -> Unit) {
-        when (localDataSource.isCached()) {
-            true -> localDataSource.getAll(callback)
-            false -> remoteDataSource.getAll { result ->
-                result.onSuccess { products ->
-                    localDataSource.insertAll(products)
-                    localDataSource.getAll(callback)
-                }.onFailure { throwable -> callback(Result.failure(throwable)) }
+    override fun getAll(): Result<List<Product>> {
+        return when (localDataSource.isCached()) {
+            true -> return localDataSource.getAll()
+            false -> {
+                remoteDataSource.getAll()
+                    .onSuccess { products ->
+                        localDataSource.insertAll(products)
+                        return localDataSource.getAll()
+                    }.onFailure { throwable ->
+                        return Result.failure(throwable)
+                    }
             }
         }
     }
 
-    override fun getNext(count: Int, callback: (Result<List<Product>>) -> Unit) {
-        when (localDataSource.isEndOfCache()) {
-            true -> remoteDataSource.getAll { result ->
-                result.onSuccess { products ->
-                    localDataSource.insertAll(products)
-                    localDataSource.getNext(count, callback)
-                }.onFailure { throwable -> callback(Result.failure(throwable)) }
+    override fun getNext(count: Int): Result<List<Product>> {
+        return when (localDataSource.isEndOfCache()) {
+            true -> remoteDataSource.getAll().onSuccess { products ->
+                localDataSource.insertAll(products)
+                return localDataSource.getNext(count)
+            }.onFailure { throwable -> return Result.failure(throwable) }
+            false -> {
+                return localDataSource.getNext(count)
             }
-            false -> localDataSource.getNext(count, callback)
         }
     }
 
-    override fun insert(product: Product, callback: (Result<Int>) -> Unit) {
-        remoteDataSource.insert(product, callback)
+    override fun insert(product: Product): Result<Int> {
+        return remoteDataSource.insert(product)
     }
 
-    override fun findById(id: Int, callback: (Result<Product>) -> Unit) {
-        when (localDataSource.isCached()) {
-            true -> localDataSource.findById(id, callback)
-            false -> remoteDataSource.findById(id, callback)
+    override fun findById(id: Int): Result<Product> {
+        return when (localDataSource.isCached()) {
+            true -> localDataSource.findById(id)
+            false -> remoteDataSource.findById(id)
         }
     }
 }

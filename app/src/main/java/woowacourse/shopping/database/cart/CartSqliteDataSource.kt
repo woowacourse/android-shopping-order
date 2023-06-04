@@ -13,14 +13,14 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
 
     private lateinit var cartProducts: CartProducts
 
-    override fun getAll(callback: (Result<CartProducts>) -> Unit) {
+    override fun getAll(): Result<CartProducts> {
         val cartProducts = mutableListOf<CartProduct>()
         getCartCursor().use {
             while (it.moveToNext()) {
                 cartProducts.add(getCartProduct(it))
             }
             this.cartProducts = CartProducts(cartProducts)
-            callback(Result.success(CartProducts(cartProducts)))
+            return (Result.success(CartProducts(cartProducts)))
         }
     }
 
@@ -43,8 +43,8 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         return db.rawQuery(CartConstant.getGetAllQuery(), null)
     }
 
-    override fun getPage(index: Int, size: Int, callback: (Result<CartProducts>) -> Unit) {
-        callback(Result.success(cartProducts.subList(index * size, size)))
+    override fun getPage(index: Int, size: Int): Result<CartProducts> {
+        return Result.success(cartProducts.subList(index * size, size))
     }
 
     override fun hasNextPage(index: Int, size: Int): Boolean {
@@ -67,23 +67,18 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         return cartProducts.totalPrice
     }
 
-    override fun insert(cartProduct: CartProduct) {
-        db.execSQL(CartConstant.getInsertQuery(cartProduct)).let {
-            getAll {}
-        }
+    override fun insert(cartProduct: CartProduct) = runCatching {
+        db.execSQL(CartConstant.getInsertQuery(cartProduct))
+        1
     }
 
-    override fun updateCount(id: Int, count: Int, callback: (Result<Int>) -> Unit) {
-        db.execSQL(CartConstant.getUpdateCountQuery(id, count)).let {
-            getAll {}
-            callback(Result.success(count))
-        }
+    override fun updateCount(id: Int, count: Int): Result<Int> = runCatching {
+        db.execSQL(CartConstant.getUpdateCountQuery(id, count))
+        count
     }
 
-    override fun remove(id: Int, callback: () -> Unit) {
-        db.execSQL(CartConstant.getDeleteQuery(id)).let {
-            getAll {}
-            callback()
-        }
+    override fun remove(id: Int) = runCatching {
+        db.execSQL(CartConstant.getDeleteQuery(id))
+        0
     }
 }

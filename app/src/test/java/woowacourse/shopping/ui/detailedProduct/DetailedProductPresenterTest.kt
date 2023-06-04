@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.detailedProduct
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -45,12 +44,7 @@ class DetailedProductPresenterTest {
         cartRepository = mockk()
         recentRepository = mockk()
 
-        every {
-            productRepository.findById(any(), any())
-        } answers {
-            arg<(Result<Product>) -> Unit>(1)(Result.success(fakeProduct))
-        }
-
+        every { productRepository.findById(any()) } answers { Result.success(fakeProduct) }
         presenter =
             DetailedProductPresenter(
                 view,
@@ -65,7 +59,7 @@ class DetailedProductPresenterTest {
     @Test
     fun `마지막으로 본 상품을 세팅한다`() {
         // given
-        every { sharedPreferenceUtils.getLastProductId() } returns fakeProduct.id
+        every { sharedPreferenceUtils.getLastProductId() } returns -2
         every { sharedPreferenceUtils.setLastProductId(any()) } answers { nothing }
 
         // when
@@ -91,15 +85,10 @@ class DetailedProductPresenterTest {
     @Test
     fun `상품을 장바구니에 추가한다`() {
         // given
-        every { cartRepository.insert(any()) } answers { nothing }
-        every { productRepository.findById(any(), any()) } answers {}
+        every { cartRepository.insert(any()) } answers { Result.success(0) }
 
-        every {
-            cartRepository.updateCountWithProductId(any(), any(), any())
-        } answers {
-            arg<(Result<Int>) -> Unit>(2)(Result.success(fakeProduct.id))
-            firstArg()
-        }
+        every { cartRepository.updateCountWithProductId(any(), any()) }
+            .answers { Result.success(fakeProduct.id) }
 
         every { view.navigateToCart() } answers { nothing }
 
@@ -107,18 +96,16 @@ class DetailedProductPresenterTest {
         presenter.addProductToCart(fakeProduct.id)
 
         // then
-        verify(exactly = 1) {
-            cartRepository.updateCountWithProductId(fakeProduct.id, any(), any())
-        }
+        verify(exactly = 1) { cartRepository.updateCountWithProductId(fakeProduct.id, any()) }
         verify(exactly = 1) { view.navigateToCart() }
     }
 
     @Test
     fun `상품을 최근 본 상품에 추가한다`() {
         // given
-        every { recentRepository.findById(any()) } answers { fakeRecentProduct }
         every { recentRepository.insert(any()) } answers { nothing }
         every { recentRepository.delete(any()) } answers { nothing }
+        every { recentRepository.findById(any()) } answers { fakeRecentProduct }
 
         // when
         presenter.addProductToRecent()
@@ -132,17 +119,9 @@ class DetailedProductPresenterTest {
     @Test
     fun `최근 본 상품으로 이동한다`() {
         // given
+        every { productRepository.findById(any()) } answers { Result.success(fakeProduct) }
         every { view.navigateToDetailedProduct(any()) } answers { nothing }
-        every { sharedPreferenceUtils.getLastProductId() } returns fakeProduct.id + 1
-        every { productRepository.findById(any(), any()) } returns Unit
-
-        val successSlot = slot<(Result<Product>) -> Unit>()
-        every {
-            productRepository.findById(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(fakeProduct))
-        }
-
+        every { sharedPreferenceUtils.getLastProductId() } returns -2
         every { sharedPreferenceUtils.setLastProductId(any()) } answers { nothing }
 
         // when
@@ -158,7 +137,7 @@ class DetailedProductPresenterTest {
     fun `장바구니에 상품을 추가하는 다이얼로그로 이동한다`() {
         // given
         every { view.navigateToAddToCartDialog(any()) } answers { nothing }
-        every { cartRepository.insert(any()) } answers { nothing }
+        every { cartRepository.insert(any()) } answers { Result.success(0) }
 
         // when
         presenter.navigateToAddToCartDialog()
