@@ -84,23 +84,10 @@ class CartPresenter(
         if (_totalCheckSize.value == 0) {
             view.showOrderFailed(); return
         }
-        cart.items.forEach {
-            view.showOrderComplete(
-                cart.selectCheckedProducts(),
-                _totalCheckSize.value ?: 0,
-            )
-
-//            cartRepository.deleteCartProductById(
-//                it.id,
-//                onSuccess = {
-//                    view.showOrderComplete(
-//                        cart.selectCheckedProducts(),
-//                        _totalCheckSize.value ?: 0,
-//                    )
-//                },
-//                onFailure = {},
-//            )
-        }
+        view.showOrderComplete(
+            cart.selectCheckedProducts(),
+            _totalCheckSize.value ?: 0,
+        )
     }
 
     override fun navigateToHome() {
