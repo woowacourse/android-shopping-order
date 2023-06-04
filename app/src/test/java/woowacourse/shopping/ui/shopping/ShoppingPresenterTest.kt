@@ -239,4 +239,49 @@ class ShoppingPresenterTest() {
         assertEquals(currentProductSlot.captured, selectedProducts)
         assertEquals(previousProductSlot.captured, UiProduct(0, "더미입니다만", UiPrice(1000), "url"))
     }
+
+    @Test
+    fun `장바구니에 없는 상품을 추가한다`() {
+        // given
+        every { basketRepository.getAll(any()) } answers {
+            val callback: (List<BasketProduct>) -> Unit = arg(0)
+            callback(listOf(BasketProduct(1, Count(2), Product(1, "더미입니다만", Price(1), "url"))))
+        }
+
+        presenter =
+            ShoppingPresenter(view, productRepository, recentProductRepository, basketRepository)
+
+        clearMocks(view)
+        every { view.updateProducts(any()) } just runs
+        every { view.updateTotalBasketCount(any()) } just runs
+        every { basketRepository.add(any(), any()) } answers {
+            val callback: (Int) -> Unit = arg(1)
+            callback(2)
+        }
+        // when
+        presenter.addBasketProduct(Product(2, "더미입니다만2", Price(30), "url"))
+        // then
+        verify(exactly = 1) { view.updateProducts(any()) }
+        verify(exactly = 1) { view.updateTotalBasketCount(any()) }
+        verify(exactly = 1) { basketRepository.add(any(), any()) }
+    }
+
+    @Test
+    fun `제품 데이터를 업데이트 하면 skeleton 상태값과 제품 데이터값이 화면에서 최신화된다 `() {
+        // given
+        clearMocks(productRepository)
+        clearMocks(view)
+        every { view.updateProducts(any()) } just runs
+        every { view.updateSkeletonState(any()) } just runs
+        every { productRepository.getPartially(any(), any(), any()) } answers {
+            val callback: (List<Product>) -> Unit = arg(2)
+            callback(listOf())
+        }
+        // when
+        presenter.updateProducts()
+        // then
+        verify(exactly = 1) { view.updateProducts(any()) }
+        verify(exactly = 1) { view.updateSkeletonState(any()) }
+        verify(exactly = 1) { productRepository.getPartially(any(), any(), any()) }
+    }
 }
