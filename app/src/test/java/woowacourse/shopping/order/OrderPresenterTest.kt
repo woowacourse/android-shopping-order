@@ -12,6 +12,7 @@ import woowacourse.shopping.createCartProductModel
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.MemberRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.order.OrderContract
 import woowacourse.shopping.ui.order.OrderPresenter
@@ -20,7 +21,9 @@ class OrderPresenterTest {
     private val view: OrderContract.View = mockk()
     private val cartRepository: CartRepository = mockk()
     private val memberRepository: MemberRepository = mockk()
-    private val presenter: OrderContract.Presenter = OrderPresenter(view, cartRepository, memberRepository)
+    private val orderRepository: OrderRepository = mockk()
+    private val presenter: OrderContract.Presenter =
+        OrderPresenter(view, cartRepository, memberRepository, orderRepository)
 
     @Test
     fun `주문 상품을 목록과 주문 금액을 노출한다`() {
@@ -36,6 +39,7 @@ class OrderPresenterTest {
         }
         every { view.showProducts(any()) } just runs
         every { view.showOriginalPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
 
         // when
         val ids: List<Int> = listOf(1, 3)
@@ -85,6 +89,7 @@ class OrderPresenterTest {
         }
         every { view.showProducts(any()) } just runs
         every { view.showOriginalPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
         presenter.loadProducts(listOf(3))
 
         val points = 2000
@@ -97,7 +102,6 @@ class OrderPresenterTest {
 
         every { view.updatePointsUsed(any()) } just runs
         every { view.updateDiscountPrice(any()) } just runs
-        every { view.updateFinalPrice(any()) } just runs
 
         // when
         presenter.useAllPoints()
@@ -124,6 +128,7 @@ class OrderPresenterTest {
         }
         every { view.showProducts(any()) } just runs
         every { view.showOriginalPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
         presenter.loadProducts(listOf(3))
 
         val points = 2000
@@ -136,7 +141,6 @@ class OrderPresenterTest {
 
         every { view.updatePointsUsed(any()) } just runs
         every { view.updateDiscountPrice(any()) } just runs
-        every { view.updateFinalPrice(any()) } just runs
 
         // when
         val usePoints = 1000
@@ -164,6 +168,7 @@ class OrderPresenterTest {
         }
         every { view.showProducts(any()) } just runs
         every { view.showOriginalPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
         presenter.loadProducts(listOf(3))
 
         val points = 2000
@@ -177,7 +182,6 @@ class OrderPresenterTest {
         every { view.notifyPointsExceeded() } just runs
         every { view.updatePointsUsed(any()) } just runs
         every { view.updateDiscountPrice(any()) } just runs
-        every { view.updateFinalPrice(any()) } just runs
 
         // when
         val usePoints = 5000
@@ -190,5 +194,36 @@ class OrderPresenterTest {
             view.updateDiscountPrice(2000)
             view.updateFinalPrice(4000)
         }
+    }
+
+    @Test
+    fun `주문을 하면 주문 상세를 보여준다`() {
+        // given
+        val products: List<CartProduct> = listOf(
+            createCartProduct(1, 2),
+            createCartProduct(2, 4),
+            createCartProduct(3, 6)
+        )
+        val cartSuccessSlot = slot<(List<CartProduct>) -> Unit>()
+        every { cartRepository.getAll(capture(cartSuccessSlot), any()) } answers {
+            cartSuccessSlot.captured(products)
+        }
+        every { view.showProducts(any()) } just runs
+        every { view.showOriginalPrice(any()) } just runs
+        every { view.updateFinalPrice(any()) } just runs
+        presenter.loadProducts(listOf(3))
+
+        val orderId = 10
+        val orderSuccessSlot = slot<(Int) -> Unit>()
+        every { orderRepository.order(any(), any(), capture(orderSuccessSlot), any()) } answers {
+            orderSuccessSlot.captured(orderId)
+        }
+        every { view.showOrderDetail(any()) } just runs
+
+        // when
+        presenter.order()
+
+        // then
+        verify { view.showOrderDetail(orderId) }
     }
 }

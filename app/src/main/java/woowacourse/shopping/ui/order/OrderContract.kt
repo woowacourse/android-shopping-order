@@ -11,6 +11,8 @@ interface OrderContract {
         fun useAllPoints()
 
         fun usePoints(use: Int)
+
+        fun order()
     }
 
     interface View {
@@ -27,5 +29,9 @@ interface OrderContract {
         fun updateFinalPrice(price: Int)
 
         fun notifyPointsExceeded()
+
+        fun showOrderDetail(id: Int)
+
+        fun notifyOrderFailed()
     }
 }

@@ -9,12 +9,16 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
 import woowacourse.shopping.data.member.MemberRepositoryImpl
+import woowacourse.shopping.data.order.OrderRemoteDataSourceRetrofit
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.model.CartProductModel
+import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -40,7 +44,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun initPresenter() {
         val cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit())
         val memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit())
-        presenter = OrderPresenter(this, cartRepository, memberRepository)
+        val orderRepository = OrderRepositoryImpl(OrderRemoteDataSourceRetrofit())
+        presenter = OrderPresenter(this, cartRepository, memberRepository, orderRepository)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,6 +74,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.btnUseAllPoints.setOnClickListener { presenter.useAllPoints() }
 
         updateDiscountPrice(0)
+
+        binding.orderButton.setOnClickListener { presenter.order() }
     }
 
     override fun showProducts(products: List<CartProductModel>) {
@@ -104,6 +111,17 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             .setMessage("사용 가능 포인트를 초과할 수 없습니다.")
             .setPositiveButton("확인", null)
             .show()
+    }
+
+    override fun showOrderDetail(id: Int) {
+        val intent = OrderDetailActivity.createIntent(this, id)
+        startActivity(intent)
+    }
+
+    override fun notifyOrderFailed() {
+        runOnUiThread {
+            Toaster.showToast(this, "서버 문제로 주문을 실패했습니다!")
+        }
     }
 
     companion object {

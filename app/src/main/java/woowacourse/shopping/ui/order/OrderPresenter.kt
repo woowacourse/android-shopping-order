@@ -3,15 +3,18 @@ package woowacourse.shopping.ui.order
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.MemberRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.model.mapper.CartProductMapper.toView
 
 class OrderPresenter(
     private val view: OrderContract.View,
     private val cartRepository: CartRepository,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
     private lateinit var cart: Cart
     private var points: Int = 0
+    private var usePoints: Int = 0
 
     override fun loadProducts(ids: List<Int>) {
         cartRepository.getAll(
@@ -36,11 +39,13 @@ class OrderPresenter(
     }
 
     override fun useAllPoints() {
-        usePoints(points)
+        if(::cart.isInitialized) {
+            usePoints(points)
+        }
     }
 
     override fun usePoints(use: Int) {
-        val used = if(use > points) {
+        usePoints = if(use > points) {
             view.notifyPointsExceeded()
             points
         }
@@ -48,12 +53,27 @@ class OrderPresenter(
             use
         }
 
-        view.updatePointsUsed(used)
-        discountPrice(used)
+        view.updatePointsUsed(usePoints)
+        discountPrice(usePoints)
     }
 
     private fun discountPrice(discountPrice: Int) {
         view.updateDiscountPrice(discountPrice)
         view.updateFinalPrice(cart.totalPrice - discountPrice)
+    }
+
+    override fun order() {
+        if(::cart.isInitialized) {
+            orderRepository.order(
+                cart,
+                usePoints,
+                onSuccess = {
+                    view.showOrderDetail(it)
+                },
+                onFailure = {
+                    view.notifyOrderFailed()
+                }
+            )
+        }
     }
 }
