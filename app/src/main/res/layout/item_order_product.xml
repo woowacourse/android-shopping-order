@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="cartProduct"
-            type="woowacourse.shopping.model.CartProductUiModel" />
+            name="product"
+            type="woowacourse.shopping.model.ProductUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,7 +45,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingVertical="4dp"
-            android:text="@{cartProduct.productUiModel.name}"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -56,7 +56,7 @@
 
         <ImageView
             android:id="@+id/cart_product_img"
-            imgUrl="@{cartProduct.productUiModel.imgUrl}"
+            imgUrl="@{product.imgUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
@@ -74,7 +74,7 @@
             android:id="@+id/product_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/cart_count(cartProduct.productUiModel.count)}"
+            android:text="@{@string/cart_count(product.count)}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/product_price"
@@ -85,7 +85,7 @@
             android:id="@+id/product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/price_format(cartProduct.productUiModel.toMoneyFormat())}"
+            android:text="@{@string/price_format(product.toMoneyFormat())}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/cart_product_img"

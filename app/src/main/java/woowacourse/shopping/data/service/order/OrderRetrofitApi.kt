@@ -2,9 +2,12 @@ package woowacourse.shopping.data.service.order
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import woowacourse.shopping.data.dto.request.OrderRequestDTO
+import woowacourse.shopping.data.dto.response.OrderDetailDto
 
 interface OrderRetrofitApi {
     @POST("orders")
@@ -12,6 +15,12 @@ interface OrderRetrofitApi {
         @Header("Authorization") authorization: String,
         @Body orderRequestDTO: OrderRequestDTO,
     ): Call<Unit>
+
+    @GET("orders/{id}")
+    fun requestOrderDetail(
+        @Header("Authorization") authorization: String,
+        @Path("id") orderId: Long,
+    ): Call<OrderDetailDto>
 
 //    @POST("cart-items")
 //    fun requestAddCartProduct(

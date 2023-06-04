@@ -57,7 +57,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showProducts(products: List<CartProductUiModel>) {
-        adapter = OrderProductAdapter(products)
+        adapter = OrderProductAdapter(products.map { it.productUiModel })
         binding.recyclerviewOrderedProducts.adapter = adapter
     }
 

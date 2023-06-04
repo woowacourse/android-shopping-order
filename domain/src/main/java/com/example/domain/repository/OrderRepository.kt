@@ -1,6 +1,7 @@
 package com.example.domain.repository
 
 import com.example.domain.model.Order
+import com.example.domain.model.OrderDetail
 
 interface OrderRepository {
 
@@ -17,6 +18,8 @@ interface OrderRepository {
     )
 
     fun getOrderDetail(
-        onSuccess: (order: Order) -> Unit,
+        orderId: Long,
+        onSuccess: (orderDetail: OrderDetail) -> Unit,
+        onFailure: () -> Unit,
     )
 }

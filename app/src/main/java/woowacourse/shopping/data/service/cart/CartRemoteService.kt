@@ -9,7 +9,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.CartProductDto
 import woowacourse.shopping.data.service.RetrofitApiGenerator
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.user.ServerInfo
 import java.net.URI
 

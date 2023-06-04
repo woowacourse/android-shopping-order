@@ -30,4 +30,6 @@
     <string name="payment_price">결제 금액</string>
     <string name="no_discount">적용 가능한 할인이 없습니다.</string>
     <string name="order_detail">주문 상세</string>
+    <string name="order_info">주문 내역</string>
+    <string name="payment_info">결제 정보</string>\
 </resources>
