@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.ProductsDto
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
 import woowacourse.shopping.domain.model.Product
@@ -17,15 +18,15 @@ class ProductDataSourceImpl : ProductDataSource {
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.requestProducts()
-        call.enqueue(object : retrofit2.Callback<List<ProductDto>> {
+        val call = retrofitService.requestProducts(1, 20)
+        call.enqueue(object : retrofit2.Callback<ProductsDto> {
             override fun onResponse(
-                call: Call<List<ProductDto>>,
-                response: Response<List<ProductDto>>,
+                call: Call<ProductsDto>,
+                response: Response<ProductsDto>,
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
-                    val products = result?.map { it.toDomain() }
+                    val products = result?.products?.map { it.toDomain() }
                     products?.let { onSuccess(it) }
                     Log.d("test", "retrofit result: $result")
                 } else {
@@ -33,7 +34,7 @@ class ProductDataSourceImpl : ProductDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<List<ProductDto>>, t: Throwable) {
+            override fun onFailure(call: Call<ProductsDto>, t: Throwable) {
                 Log.d("test", "retrofit 실패: ${t.message}")
             }
         })
