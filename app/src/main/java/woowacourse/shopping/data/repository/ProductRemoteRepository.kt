@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class ProductRemoteRepository(
     serverRepository: ServerStoreRespository,
-    private val failureCallback: (String?) -> Unit,
 ) : ProductRepository {
     private val retrofitService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), ProductApi::class.java)
@@ -37,7 +36,7 @@ class ProductRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<ProductsWithCartItemDTO>, t: Throwable) {
-                    failureCallback(t.message)
+                    throw t
                 }
             })
     }
@@ -59,7 +58,7 @@ class ProductRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<ProductWithCartInfo>, t: Throwable) {
-                    failureCallback(t.message)
+                    throw t
                 }
             })
     }

@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class CartRemoteRepository(
     serverRepository: ServerStoreRespository,
-    private val failureCallback: (String?) -> Unit,
 ) : CartRepository {
 
     private val retrofitService =
@@ -33,7 +32,7 @@ class CartRemoteRepository(
             }
 
             override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }
@@ -51,7 +50,7 @@ class CartRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    failureCallback(t.message)
+                    throw t
                 }
             })
     }
@@ -68,7 +67,7 @@ class CartRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    failureCallback(t.message)
+                    throw t
                 }
             })
     }
@@ -84,7 +83,7 @@ class CartRemoteRepository(
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }

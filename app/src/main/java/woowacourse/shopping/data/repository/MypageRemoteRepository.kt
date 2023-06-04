@@ -10,7 +10,6 @@ import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class MypageRemoteRepository(
     serverRepository: ServerStoreRespository,
-    private val failureCallback: (String?) -> Unit,
 ) : MypageRepository {
     private val retrofitService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), MypageApi::class.java)
@@ -28,7 +27,7 @@ class MypageRemoteRepository(
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }
@@ -46,7 +45,7 @@ class MypageRemoteRepository(
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }

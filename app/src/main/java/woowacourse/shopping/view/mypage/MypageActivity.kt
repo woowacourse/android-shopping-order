@@ -20,7 +20,7 @@ class MypageActivity : AppCompatActivity(), MypageContract.View {
     private val presenter: MypageContract.Presenter by lazy {
         MypagePresenter(
             this,
-            MypageRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+            MypageRemoteRepository(ServerPreferencesRepository(this)),
         )
     }
 

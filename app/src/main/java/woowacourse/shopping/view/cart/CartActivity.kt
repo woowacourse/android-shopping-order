@@ -25,7 +25,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
-            CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+            CartRemoteRepository(ServerPreferencesRepository(this)),
         )
     }
 

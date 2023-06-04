@@ -80,9 +80,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         presenter =
             ProductListPresenter(
                 this,
-                ProductRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                ProductRemoteRepository(ServerPreferencesRepository(this)),
                 RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
-                CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                CartRemoteRepository(ServerPreferencesRepository(this)),
             )
     }
 
@@ -117,7 +117,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         )
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return

@@ -43,7 +43,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             showDataNothingToast()
             finish()
         }
-        presenter = OrderDetailPresenter(orderId, this, OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast))
+        presenter = OrderDetailPresenter(orderId, this, OrderRemoteRepository(ServerPreferencesRepository(this)))
     }
 
     private fun showErrorMessageToast(message: String?) {

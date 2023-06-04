@@ -46,8 +46,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 INITIAL_COUNT,
                 id,
                 this,
-                ProductRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
-                CartRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+                ProductRemoteRepository(ServerPreferencesRepository(this)),
+                CartRemoteRepository(ServerPreferencesRepository(this)),
                 RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
             )
     }

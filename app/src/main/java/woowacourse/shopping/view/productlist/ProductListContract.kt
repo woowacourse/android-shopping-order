@@ -12,6 +12,7 @@ interface ProductListContract {
         fun notifyRecentViewedChanged()
         fun notifyDataChanged(position: Int)
         fun stopLoading()
+        fun showErrorMessageToast(message: String?)
     }
 
     interface Presenter {

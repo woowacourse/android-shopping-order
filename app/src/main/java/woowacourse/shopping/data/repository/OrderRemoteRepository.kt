@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.model.OrdersDTO
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ServerStoreRespository
 
-class OrderRemoteRepository(serverRepository: ServerStoreRespository, private val failureCallback: (String?) -> Unit) : OrderRepository {
+class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRepository {
 
     private val retrofitService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), OrderApi::class.java)
@@ -27,7 +27,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
             }
 
             override fun onFailure(call: Call<OrdersDTO>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }
@@ -44,7 +44,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
             }
 
             override fun onFailure(call: Call<OrderDTO>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }
@@ -60,7 +60,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository, private va
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                failureCallback(t.message)
+                throw t
             }
         })
     }

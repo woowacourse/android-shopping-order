@@ -29,7 +29,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setUpPresenter() {
-        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast))
+        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(ServerPreferencesRepository(this)))
     }
 
     override fun showOrders(orders: List<OrderDetailModel>) {

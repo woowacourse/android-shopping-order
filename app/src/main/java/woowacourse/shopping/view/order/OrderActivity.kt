@@ -39,8 +39,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter = OrderPresenter(
             this,
             products,
-            OrderRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
-            MypageRemoteRepository(ServerPreferencesRepository(this), ::showErrorMessageToast),
+            OrderRemoteRepository(ServerPreferencesRepository(this)),
+            MypageRemoteRepository(ServerPreferencesRepository(this)),
         )
     }
 
