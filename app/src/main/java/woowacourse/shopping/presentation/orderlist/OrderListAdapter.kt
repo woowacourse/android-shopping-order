@@ -7,13 +7,14 @@ import woowacourse.shopping.presentation.model.OrderModel
 
 class OrderListAdapter(
     private val orderModels: List<OrderModel>,
+    private val showOrderDetail: (OrderModel) -> Unit,
 ) : RecyclerView.Adapter<OrderItemViewHolder>() {
 
     private lateinit var inflater: LayoutInflater
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderItemViewHolder {
         initLayoutInflater(parent)
-        return OrderItemViewHolder(parent, inflater)
+        return OrderItemViewHolder(parent, inflater, showOrderDetail)
     }
 
     private fun initLayoutInflater(parent: ViewGroup) {

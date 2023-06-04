@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="onItemClick"
+            type="kotlin.jvm.functions.Function1" />
+
+        <variable
             name="orderModel"
             type="woowacourse.shopping.presentation.model.OrderModel" />
     </data>
@@ -14,6 +18,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{() -> onItemClick.invoke(orderModel)}"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="20dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -11,6 +11,7 @@ import woowacourse.shopping.data.order.OrderRepositoryDefault
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderModel
+import woowacourse.shopping.presentation.orderdetail.OrderDetailActivity
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
@@ -32,7 +33,11 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun showOrderList(orderModels: List<OrderModel>) {
-        binding.recyclerOrderList.adapter = OrderListAdapter(orderModels)
+        binding.recyclerOrderList.adapter = OrderListAdapter(orderModels, ::showOrderDetail)
+    }
+
+    private fun showOrderDetail(orderModel: OrderModel) {
+        startActivity(OrderDetailActivity.getIntent(this, orderModel.orderId))
     }
 
     private fun setToolBar() {

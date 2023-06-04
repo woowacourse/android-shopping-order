@@ -28,8 +28,8 @@ class OrderPresenter(
     }
 
     override fun orderCartProducts() {
-        orderRepository.orderCartProducts(totalCartProducts.items) {
-            view.showOrderDetail()
+        orderRepository.orderCartProducts(totalCartProducts.items) { orderId ->
+            view.showOrderDetail(orderId)
         }
     }
 
