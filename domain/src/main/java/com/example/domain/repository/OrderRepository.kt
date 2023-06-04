@@ -23,4 +23,10 @@ interface OrderRepository {
         onSuccess: (OrderDetail) -> Unit,
         onFailure: () -> Unit
     )
+
+    fun cancelOrder(
+        orderId: Int,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    )
 }

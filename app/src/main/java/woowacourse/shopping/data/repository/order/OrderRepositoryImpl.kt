@@ -71,4 +71,8 @@ class OrderRepositoryImpl : OrderRepository {
             )
         )
     }
+
+    override fun cancelOrder(orderId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        onSuccess()
+    }
 }

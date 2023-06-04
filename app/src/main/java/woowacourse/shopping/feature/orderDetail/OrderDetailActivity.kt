@@ -8,7 +8,9 @@ import android.view.MenuItem
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
+import woowacourse.shopping.feature.main.MainActivity
 import woowacourse.shopping.model.OrderDetailUiModel
+import woowacourse.shopping.model.OrderStatusUiModel
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
@@ -32,9 +34,22 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     override fun showOrderDetail(orderDetail: OrderDetailUiModel) {
         binding.apply {
             recyclerview.adapter = OrderDetailAdapter(orderDetail.orderProducts)
-            recyclerview.setHasFixedSize(true)
             item = orderDetail
+            when (orderDetail.orderStatus) {
+                OrderStatusUiModel.PENDING.value -> {
+                    cancelOrderBtn.isEnabled = true
+                    cancelOrderBtn.setOnClickListener { presenter.cancelOrder() }
+                }
+
+                else -> cancelOrderBtn.isEnabled = false
+            }
         }
+    }
+
+    override fun moveToMainScreen() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
