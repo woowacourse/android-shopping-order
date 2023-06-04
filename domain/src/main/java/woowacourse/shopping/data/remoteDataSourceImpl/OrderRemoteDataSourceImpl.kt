@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.remoteDataSourceImpl
 
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
+import woowacourse.shopping.dto.PostOrderRequestDto
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.model.PostOrderRequest
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
@@ -25,29 +25,29 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     private fun getOrderHistoriesFirst(): Result<List<OrderHistory>> = runCatching {
         RetrofitUtil.getInstance().retrofitOrderService
             .getOrders().execute().body()!!
-            .let {
-                lastOrderId = it.lastOrderId
-                return Result.success(it.orderHistories)
+            .let { response ->
+                lastOrderId = response.lastOrderId
+                return Result.success(response.orderHistories.map { it.toDomain() })
             }
     }
 
     private fun getOrderHistories(): Result<List<OrderHistory>> = runCatching {
         RetrofitUtil.getInstance().retrofitOrderService
             .getOrdersNext(lastOrderId).execute().body()!!
-            .let {
-                lastOrderId = it.lastOrderId
-                return Result.success(it.orderHistories)
+            .let { response ->
+                lastOrderId = response.lastOrderId
+                return Result.success(response.orderHistories.map { it.toDomain() })
             }
     }
 
     override fun getOrderHistory(id: Long): Result<OrderHistory> = runCatching {
         RetrofitUtil.getInstance().retrofitOrderService
-            .getOrder(id).execute().body()!!
+            .getOrder(id).execute().body()!!.toDomain()
     }
 
     override fun postOrder(point: Int, cartIds: List<Int>): Result<Long> = runCatching {
         RetrofitUtil.getInstance().retrofitOrderService
-            .postOrder(PostOrderRequest(point, cartIds))
+            .postOrder(PostOrderRequestDto(point, cartIds))
             .execute().headers()["Location"]!!.split("/").last().toLong()
     }
 }

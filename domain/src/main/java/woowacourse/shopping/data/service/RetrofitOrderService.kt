@@ -6,10 +6,10 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.dto.OrderHistoryDto
+import woowacourse.shopping.dto.OrderHistoryResponseDto
+import woowacourse.shopping.dto.PostOrderRequestDto
 import woowacourse.shopping.model.Order
-import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.model.OrderHistoryResponse
-import woowacourse.shopping.model.PostOrderRequest
 
 interface RetrofitOrderService {
     @GET("cart-items/checkout")
@@ -18,20 +18,20 @@ interface RetrofitOrderService {
     ): Call<Order>
 
     @GET("orders")
-    fun getOrders(): Call<OrderHistoryResponse>
+    fun getOrders(): Call<OrderHistoryResponseDto>
 
     @GET("orders")
     fun getOrdersNext(
         @Query("last-id") lastOrderId: Long
-    ): Call<OrderHistoryResponse>
+    ): Call<OrderHistoryResponseDto>
 
     @GET("orders/{id}")
     fun getOrder(
         @Path("id") id: Long
-    ): Call<OrderHistory>
+    ): Call<OrderHistoryDto>
 
     @POST("orders")
     fun postOrder(
-        @Body request: PostOrderRequest
+        @Body request: PostOrderRequestDto
     ): Call<Unit>
 }
