@@ -31,7 +31,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tv_order_available_point_info"
+                    android:id="@+id/tv_order_detail_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -48,7 +48,7 @@
                     android:background="@color/product_view_line_color"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_order_available_point_info" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date" />
 
                 <TextView
                     android:id="@+id/tv_order_detail_product_list_title_info"

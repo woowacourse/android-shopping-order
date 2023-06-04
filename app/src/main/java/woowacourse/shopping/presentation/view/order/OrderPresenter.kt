@@ -62,7 +62,7 @@ class OrderPresenter(
     override fun order(usedPoint: Int) {
         val cartIds = cartItemsDomain.getCheckedCartProductsId()
         val orderPostEntity = OrderPostEntity(cartIds, DUMMY_CARD_NUMBER, DUMMY_CARD_CVC, usedPoint)
-        orderRepository.requestOrder(orderPostEntity, ::onFailure) { orderId ->
+        orderRepository.requestPostOrder(orderPostEntity, ::onFailure) { orderId ->
             view.moveToOrderDetail(orderId)
         }
     }

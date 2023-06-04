@@ -1,9 +1,11 @@
 package woowacourse.shopping.data.respository.order
 
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.presentation.view.util.RetrofitService
@@ -17,12 +19,12 @@ class OrderRepositoryImpl(
         .build()
         .create(RetrofitService::class.java)
 
-    override fun requestOrder(
+    override fun requestPostOrder(
         orderPostEntity: OrderPostEntity,
         onFailure: () -> Unit,
         onSuccess: (orderId: Long) -> Unit,
     ) {
-        orderService.requestOrder("Basic ${Server.TOKEN}", orderPostEntity)
+        orderService.requestPostOrder("Basic ${Server.TOKEN}", orderPostEntity)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.isSuccessful) {
@@ -33,6 +35,29 @@ class OrderRepositoryImpl(
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure()
+                }
+            })
+    }
+
+    override fun requestOrder(
+        orderId: Long,
+        onFailure: () -> Unit,
+        onSuccess: (orderDetailEntity: OrderDetailEntity) -> Unit,
+    ) {
+        orderService.requestOrder("Basic ${Server.TOKEN}", orderId)
+            .enqueue(object : Callback<OrderDetailEntity> {
+                override fun onResponse(
+                    call: Call<OrderDetailEntity>,
+                    response: Response<OrderDetailEntity>,
+                ) {
+                    if (response.isSuccessful) {
+                        val orderDetailEntity = response.body() ?: return onFailure()
+                        onSuccess(orderDetailEntity)
+                    }
+                }
+
+                override fun onFailure(call: Call<OrderDetailEntity>, t: Throwable) {
                     onFailure()
                 }
             })

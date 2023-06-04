@@ -11,6 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 import woowacourse.shopping.data.model.PointEntity
 import woowacourse.shopping.data.model.SavingPointEntity
@@ -61,10 +62,16 @@ interface RetrofitService {
 
     @Headers(HEADER_JSON)
     @POST(PATH_ORDER_POST)
-    fun requestOrder(
+    fun requestPostOrder(
         @Header(AUTHORIZATION) token: String,
         @Body orderPost: OrderPostEntity,
     ): Call<Unit>
+
+    @GET("$PATH_ORDER/{$PATH_ORDER_ID}")
+    fun requestOrder(
+        @Header(AUTHORIZATION) token: String,
+        @Path(PATH_ORDER_ID) orderId: Long,
+    ): Call<OrderDetailEntity>
 
     companion object {
         private const val HEADER_JSON = "Content-Type: application/json"
@@ -72,10 +79,12 @@ interface RetrofitService {
         private const val PATH_PRODUCT = "/products"
         private const val PATH_CART = "/cart-items"
         private const val PATH_ID = "id"
+        private const val PATH_ORDER_ID = "id"
         private const val PATH_CART_ID = "cartItemId"
         private const val PATH_TOTAL_PRICE = "totalPrice"
         private const val PATH_POINT = "/points"
         private const val PATH_SAVING_POINT = "/saving-point"
+        private const val PATH_ORDER = "/orders"
         private const val PATH_ORDER_POST = "/orders"
 
         private const val AUTHORIZATION = "Authorization"
