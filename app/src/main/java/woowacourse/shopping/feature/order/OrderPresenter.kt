@@ -12,7 +12,7 @@ class OrderPresenter(
     private var finalPrice = 0
 
     override fun loadOrderPendingCart() {
-        view.setOrderPedningCart(orderPendingCart.toUi())
+        view.setOrderPendingCart(orderPendingCart.toUi())
     }
 
     override fun calculatePrice() {

@@ -1,6 +1,6 @@
 package com.example.domain.repository
 
-import com.example.domain.FixedDiscountPolicies
+import com.example.domain.FixedDiscountPolicy
 import com.example.domain.order.Order
 import com.example.domain.order.OrderSummary
 
@@ -25,7 +25,7 @@ interface OrderRepository {
     )
 
     fun requestFetchDiscountPolicy(
-        onSuccess: (fixedDiscountPolicies: FixedDiscountPolicies) -> Unit,
+        onSuccess: (fixedDiscountPolicy: FixedDiscountPolicy) -> Unit,
         onFailure: () -> Unit
     )
 }

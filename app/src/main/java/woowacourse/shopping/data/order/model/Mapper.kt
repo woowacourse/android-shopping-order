@@ -1,22 +1,22 @@
 package woowacourse.shopping.data.order.model
 
-import com.example.domain.FixedDiscountPolicies
 import com.example.domain.FixedDiscountPolicy
+import com.example.domain.FixedDiscountPolicyUnit
 import com.example.domain.order.OrderSummary
-import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPoliciesResponse
 import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyResponse
+import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyUnitResponse
 import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse
 
-fun FixedDiscountPolicyResponse.toDomain(): FixedDiscountPolicy {
-    return FixedDiscountPolicy(
+fun FixedDiscountPolicyUnitResponse.toDomain(): FixedDiscountPolicyUnit {
+    return FixedDiscountPolicyUnit(
         minimumPrice = minimumPrice,
         discountPrice = discountPrice
     )
 }
 
-fun FixedDiscountPoliciesResponse.toDomain(): FixedDiscountPolicies {
-    return FixedDiscountPolicies(
-        fixedDiscountPolicies = fixedDiscountPolicies.map { it.toDomain() }
+fun FixedDiscountPolicyResponse.toDomain(): FixedDiscountPolicy {
+    return FixedDiscountPolicy(
+        fixedDiscountPolicyUnits = fixedDiscountPolicy.map { it.toDomain() }
     )
 }
 

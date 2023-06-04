@@ -66,7 +66,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         )
     }
 
-    override fun setOrderPedningCart(orderPendingCart: CartState) {
+    override fun setOrderPendingCart(orderPendingCart: CartState) {
         adapter = OrderPendingCartListAdapter(orderPendingCart)
         binding.orderPendingCartRv.adapter = adapter
     }
@@ -76,7 +76,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun setDiscountPrice(discountPrice: Int) {
-        binding.discountPriceTv.text = discountPrice.toString()
+        binding.discountPriceTv.text = getString(R.string.order_price_format, discountPrice)
     }
 
     override fun setFinalPrice(finalPrice: Int) {

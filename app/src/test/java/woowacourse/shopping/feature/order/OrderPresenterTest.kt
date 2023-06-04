@@ -2,7 +2,7 @@ package woowacourse.shopping.feature.order
 
 import com.example.domain.Cart
 import com.example.domain.CartProduct
-import com.example.domain.FixedDiscountPolicies
+import com.example.domain.FixedDiscountPolicy
 import com.example.domain.repository.OrderRepository
 import io.mockk.every
 import io.mockk.justRun
@@ -31,13 +31,13 @@ class OrderPresenterTest {
     @Test
     fun `주문할 상품들을 화면에 표시한다`() {
         // given
-        justRun { view.setOrderPedningCart(any()) }
+        justRun { view.setOrderPendingCart(any()) }
 
         // when
         presenter.loadOrderPendingCart()
 
         // then
-        verify { view.setOrderPedningCart(any()) }
+        verify { view.setOrderPendingCart(any()) }
     }
 
     @Test
@@ -47,15 +47,15 @@ class OrderPresenterTest {
         val discountPrice = 5000
         val finalPrice = 95000
 
-        val fixedDiscountPolicies = mockk<FixedDiscountPolicies>()
+        val fixedDiscountPolicy = mockk<FixedDiscountPolicy>()
         every { orderRepository.requestFetchDiscountPolicy(captureLambda(), any()) } answers {
-            val onSuccess = lambda<(FixedDiscountPolicies) -> Unit>().captured
-            onSuccess.invoke(fixedDiscountPolicies)
+            val onSuccess = lambda<(FixedDiscountPolicy) -> Unit>().captured
+            onSuccess.invoke(fixedDiscountPolicy)
         }
 
         every { orderPendingCart.getPickedProductsTotalPrice() } returns productsSum
-        every { fixedDiscountPolicies.getDiscountPrice(productsSum) } returns 5000
-        every { fixedDiscountPolicies.getFinalPrice(productsSum) } returns 95000
+        every { fixedDiscountPolicy.getDiscountPrice(productsSum) } returns 5000
+        every { fixedDiscountPolicy.getFinalPrice(productsSum) } returns 95000
 
         justRun { view.setProductsSum(productsSum) }
         justRun { view.setDiscountPrice(discountPrice) }

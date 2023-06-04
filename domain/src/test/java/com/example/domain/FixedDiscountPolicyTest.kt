@@ -4,17 +4,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class FixedDiscountPoliciesTest {
+class FixedDiscountPolicyTest {
 
-    private lateinit var fixedDiscountPolicies: FixedDiscountPolicies
+    private lateinit var fixedDiscountPolicy: FixedDiscountPolicy
 
     @BeforeEach
     fun setUp() {
-        fixedDiscountPolicies = FixedDiscountPolicies(
+        fixedDiscountPolicy = FixedDiscountPolicy(
             listOf(
-                FixedDiscountPolicy(50000, 2000),
-                FixedDiscountPolicy(100000, 5000),
-                FixedDiscountPolicy(200000, 12000),
+                FixedDiscountPolicyUnit(50000, 2000),
+                FixedDiscountPolicyUnit(100000, 5000),
+                FixedDiscountPolicyUnit(200000, 12000),
             )
         )
     }
@@ -25,7 +25,7 @@ class FixedDiscountPoliciesTest {
         val productsSum = 50000
 
         // when
-        val actual = fixedDiscountPolicies.getDiscountPrice(productsSum)
+        val actual = fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(2000)
@@ -37,7 +37,7 @@ class FixedDiscountPoliciesTest {
         val productsSum = 49999
 
         // when
-        val actual = fixedDiscountPolicies.getDiscountPrice(productsSum)
+        val actual = fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(0)
@@ -49,7 +49,7 @@ class FixedDiscountPoliciesTest {
         val productsSum = 210000
 
         // when
-        val actual = fixedDiscountPolicies.getDiscountPrice(productsSum)
+        val actual = fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(12000)
@@ -59,10 +59,10 @@ class FixedDiscountPoliciesTest {
     fun `상품 가격이 50000이면 할인된 최종 가격은 48000이다`() {
         // given
         val productsSum = 50000
-        fixedDiscountPolicies.getDiscountPrice(productsSum)
+        fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // when
-        val actual = fixedDiscountPolicies.getFinalPrice(productsSum)
+        val actual = fixedDiscountPolicy.getFinalPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(48000)
@@ -72,10 +72,10 @@ class FixedDiscountPoliciesTest {
     fun `상품 가격이 49999이면 할인되지 않고 최종 가격은 49999이다`() {
         // given
         val productsSum = 49999
-        fixedDiscountPolicies.getDiscountPrice(productsSum)
+        fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // when
-        val actual = fixedDiscountPolicies.getFinalPrice(productsSum)
+        val actual = fixedDiscountPolicy.getFinalPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(49999)
@@ -85,10 +85,10 @@ class FixedDiscountPoliciesTest {
     fun `상품 가격이 200000이면 할인된 최종 가격은 188000이다`() {
         // given
         val productsSum = 200000
-        fixedDiscountPolicies.getDiscountPrice(productsSum)
+        fixedDiscountPolicy.getDiscountPrice(productsSum)
 
         // when
-        val actual = fixedDiscountPolicies.getFinalPrice(productsSum)
+        val actual = fixedDiscountPolicy.getFinalPrice(productsSum)
 
         // then
         assertThat(actual).isEqualTo(188000)
