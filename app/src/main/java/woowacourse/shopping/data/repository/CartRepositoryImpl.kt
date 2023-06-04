@@ -51,44 +51,89 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         )
     }
 
-    override fun saveCartProductByProductId(productId: ProductId) {
+    override fun saveCartProductByProductId(
+        productId: ProductId,
+        onSuccess: () -> Unit,
+        onFailed: (Throwable) -> Unit,
+    ) {
         service.saveCartProduct(requestBody = CartAddRequest(productId))
             .enqueue(object : Callback<Unit> {
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
-                override fun onFailure(call: Call<Unit>, throwable: Throwable) {}
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        onSuccess()
+                        return
+                    }
+                    onFailed(Throwable(response.message()))
+                }
+
+                override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                    onFailed(throwable)
+                }
             })
     }
 
-    override fun updateProductCountById(cartProductId: CartProductId, count: ProductCount) {
+    override fun updateProductCountById(
+        cartProductId: CartProductId,
+        count: ProductCount,
+        onSuccess: () -> Unit,
+        onFailed: (Throwable) -> Unit,
+    ) {
         service.updateProductCountById(
             cartItemId = cartProductId,
             requestBody = CartPatchRequest(count.value)
         ).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
-            override fun onFailure(call: Call<Unit>, throwable: Throwable) {}
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful && response.body() != null) {
+                    onSuccess()
+                    return
+                }
+                onFailed(Throwable(response.message()))
+            }
+
+            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                onFailed(throwable)
+            }
         })
     }
 
-    override fun deleteCartProductById(cartProductId: CartProductId) {
+    override fun deleteCartProductById(
+        cartProductId: CartProductId,
+        onSuccess: () -> Unit,
+        onFailed: (Throwable) -> Unit,
+    ) {
         service.deleteCartProductById(cartProductId).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {}
-            override fun onFailure(call: Call<Unit>, throwable: Throwable) {}
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful && response.body() != null) {
+                    onSuccess()
+                    return
+                }
+                onFailed(Throwable(response.message()))
+            }
+
+            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                onFailed(throwable)
+            }
         })
     }
 
-    override fun increaseProductCountByProductId(productId: ProductId, addCount: ProductCount) {
+    override fun increaseProductCountByProductId(
+        productId: ProductId,
+        addCount: ProductCount,
+        onSuccess: () -> Unit,
+        onFailed: (Throwable) -> Unit,
+    ) {
         findCartProductByProductId(
             productId = productId,
             onSuccess = { cartProduct ->
                 val updatedCount = cartProduct.selectedCount + addCount
-                updateProductCountById(cartProduct.id, updatedCount)
+                updateProductCountById(cartProduct.id, updatedCount, onSuccess, onFailed)
             },
             onFailed = {
-                saveCartProductByProductId(productId)
+                saveCartProductByProductId(productId, onSuccess, onFailed)
                 findCartProductByProductId(
                     productId = productId,
                     onSuccess = { newCartProduct ->
-                        updateProductCountById(newCartProduct.id, addCount)
+                        updateProductCountById(newCartProduct.id, addCount, onSuccess, onFailed)
                     },
                     onFailed = {}
                 )

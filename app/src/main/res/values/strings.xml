@@ -48,4 +48,8 @@
     <string name="order_point_usage_title">포인트 사용</string>
     <string name="final_payment_title">최종 결제 금액</string>
     <string name="detail_order_product_list_title">상세 주문 내역</string>
+    <string name="cart_product_count_change_failed">장바구니 제품 개수 변경에 실패하였습니다.</string>
+    <string name="cart_product_delete_failed">상품 제거에 실패하였습니다.</string>
+    <string name="cart_product_save_failed">장바구니 상품 추가에 실패하였습니다.</string>
+    <string name="product_load_failed">상품 목록을 불러오는 데에 실패하였습니다.</string>
 </resources>

@@ -14,8 +14,10 @@ interface ShoppingContract {
         fun showLoadMoreButton()
         fun hideLoadMoreButton()
         fun updateCartBadge(count: ProductCountModel)
-        fun showErrorMessage(message: String)
         fun navigateToOrderList()
+        fun showCartProductSaveFailed()
+        fun showCartCountChangedFailed()
+        fun showProductLoadFailed()
     }
 
     interface Presenter {

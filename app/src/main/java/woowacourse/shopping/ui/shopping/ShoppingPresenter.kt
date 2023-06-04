@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.DomainCartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.model.RecentProduct
@@ -50,18 +49,26 @@ class ShoppingPresenter(
     }
 
     override fun addCartProduct(product: ProductModel, addCount: Int) {
-        cartRepository.saveCartProductByProductId(product.toDomain().id)
-        fetchAllCartProducts()
+        cartRepository.saveCartProductByProductId(
+            productId = product.toDomain().id,
+            onSuccess = ::fetchAllCartProducts,
+            onFailed = { view.showCartProductSaveFailed() })
     }
 
     override fun updateCartCount(cartProduct: CartProductModel, changedCount: Int) {
-        cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
-        fetchAllCartProducts()
+        cartRepository.updateProductCountById(
+            cartProductId = cartProduct.toDomain().id,
+            count = ProductCount(changedCount),
+            onSuccess = ::fetchAllCartProducts,
+            onFailed = { view.showCartCountChangedFailed() })
     }
 
     override fun increaseCartCount(product: ProductModel, addCount: Int) {
-        cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        fetchAllCartProducts()
+        cartRepository.increaseProductCountByProductId(
+            productId = product.id,
+            addCount = ProductCount(addCount),
+            onSuccess = ::fetchAllCartProducts,
+            onFailed = { view.showCartCountChangedFailed() })
     }
 
     override fun navigateToCart() {
@@ -83,9 +90,10 @@ class ShoppingPresenter(
     }
 
     private fun fetchAllCartProducts() {
-        productRepository.getAllProducts(
+        productRepository.getProductsByPage(
+            page = currentPage.getPageForCheckHasNext(),
             onSuccess = { products -> transformCountedCartProduct(products, ::updateCart) },
-            onFailed = { view.showErrorMessage(it.message ?: "") }
+            onFailed = { view.showProductLoadFailed() }
         )
     }
 
@@ -96,14 +104,14 @@ class ShoppingPresenter(
         cartRepository.getAllCartProducts(
             onSuccess = { fetchedCartProducts ->
                 val countedCartProduct = products.map { product ->
-                    fetchedCartProducts.find { it.productId == product.id } ?: DomainCartProduct(
+                    fetchedCartProducts.find { it.productId == product.id } ?: CartProduct(
                         product = product,
                         selectedCount = ProductCount(0)
                     )
                 }
                 onSuccess(countedCartProduct)
             },
-            onFailed = { view.showErrorMessage(it.message ?: "") },
+            onFailed = { view.showProductLoadFailed() },
         )
     }
 

@@ -2,8 +2,6 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.page.Page
 
-typealias DomainCart = Cart
-
 data class Cart(
     val items: List<CartProduct> = emptyList(),
     val minProductSize: Int = 0,
@@ -48,7 +46,7 @@ data class Cart(
     fun findCartProductByProductId(productId: Int): CartProduct? =
         items.find { it.productId == productId }
 
-    fun updateProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
+    fun updateProductCount(cartProduct: CartProduct, count: Int): Cart {
         return copy(items = items.map { item ->
             if (item.productId == cartProduct.productId) item.changeCount(count) else item
         })

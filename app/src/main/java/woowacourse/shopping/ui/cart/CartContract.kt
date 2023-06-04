@@ -12,6 +12,8 @@ interface CartContract {
         fun navigateToOrder(order: OrderModel)
         fun navigateToHome()
         fun showErrorMessage(message: String)
+        fun showCartProductDeleteFailed()
+        fun showCartCountChangedFailed()
     }
 
     interface Presenter {

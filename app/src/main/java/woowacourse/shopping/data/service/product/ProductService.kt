@@ -7,15 +7,23 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import woowacourse.shopping.data.dto.ProductDeleteRequest
 import woowacourse.shopping.data.dto.ProductItemResponse
 import woowacourse.shopping.data.dto.ProductPostRequest
 import woowacourse.shopping.data.dto.ProductPutRequest
+import woowacourse.shopping.data.dto.ProductsResponse
 import woowacourse.shopping.data.service.cart.ProductId
 
 interface ProductService {
     @GET("/products")
-    fun getAllProduct(): Call<List<ProductItemResponse>>
+    fun getProductByPage(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<ProductsResponse>
+
+    @GET("/products")
+    fun getAllProduct(): Call<ProductsResponse>
 
     @GET("/products/{productId}")
     fun findProductById(@Path("productId") id: ProductId): Call<ProductItemResponse?>

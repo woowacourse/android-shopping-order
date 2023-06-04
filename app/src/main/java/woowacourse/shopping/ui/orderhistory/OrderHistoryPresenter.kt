@@ -16,7 +16,7 @@ class OrderHistoryPresenter(
 
     override fun loadMoreOrders() {
         orderRepository.getOrders(
-            page = page,
+            page = page.getPageForCheckHasNext(),
             onSuccess = { orders ->
                 view.showMoreOrders(orders.toUi())
                 page = page.next()

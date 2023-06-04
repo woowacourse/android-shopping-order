@@ -101,12 +101,20 @@ class ShoppingActivity : AppCompatActivity(), View,
         loadMoreAdapter.hideButton()
     }
 
-    override fun showErrorMessage(message: String) {
-        showToast(message)
+    override fun showProductLoadFailed() {
+        showToast(getString(R.string.product_load_failed))
     }
 
     override fun navigateToOrderList() {
         startActivity(OrderHistoryActivity.getIntent(this))
+    }
+
+    override fun showCartProductSaveFailed() {
+        showToast(getString(R.string.cart_product_save_failed))
+    }
+
+    override fun showCartCountChangedFailed() {
+        showToast(getString(R.string.cart_product_count_change_failed))
     }
 
     override fun updateCartBadge(count: ProductCountModel) {

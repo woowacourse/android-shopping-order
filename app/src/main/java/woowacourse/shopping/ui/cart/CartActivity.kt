@@ -78,6 +78,14 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         showToast(message)
     }
 
+    override fun showCartProductDeleteFailed() {
+        showToast(getString(R.string.cart_product_delete_failed))
+    }
+
+    override fun showCartCountChangedFailed() {
+        showToast(getString(R.string.cart_product_count_change_failed))
+    }
+
     companion object {
         private const val START_PAGE = 1
 

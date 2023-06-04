@@ -56,8 +56,14 @@ class CartPresenter(
     }
 
     override fun deleteProduct(cartProductModel: CartProductModel) {
-        cartRepository.deleteCartProductById(cartProductModel.id)
-        updateCart(cart.delete(cartProductModel.toDomain()))
+        cartRepository.deleteCartProductById(
+            cartProductId = cartProductModel.id,
+            onSuccess = {
+                updateCart(cart.delete(cartProductModel.toDomain()))
+            },
+            onFailed = {
+                view.showCartProductDeleteFailed()
+            })
     }
 
     override fun updateProductCount(cartProductModel: CartProductModel, count: Int) {
@@ -65,7 +71,15 @@ class CartPresenter(
         val newCart = cart.updateProductCount(cartProduct, count)
 
         newCart.findCartProductByProductId(cartProduct.productId)?.let { cartItem ->
-            cartRepository.updateProductCountById(cartItem.id, cartItem.selectedCount)
+            cartRepository.updateProductCountById(
+                cartProductId = cartItem.id,
+                count = cartItem.selectedCount,
+                onSuccess = {
+                    updateCart(newCart)
+                },
+                onFailed = {
+                    view.showCartCountChangedFailed()
+                })
         }
         updateCart(newCart)
     }

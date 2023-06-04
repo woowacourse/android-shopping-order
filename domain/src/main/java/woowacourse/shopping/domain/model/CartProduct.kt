@@ -1,7 +1,5 @@
 package woowacourse.shopping.domain.model
 
-typealias DomainCartProduct = CartProduct
-
 data class CartProduct(
     val id: Int = 0,
     val product: Product,
