@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.selectserver
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.remote.NetworkModule
+import woowacourse.shopping.data.remote.NetworkModuleUsingGson
+import woowacourse.shopping.data.remote.NetworkModuleUsingSerialization
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
@@ -19,26 +19,17 @@ class SelectServerActivity : AppCompatActivity() {
     }
 
     private fun setClickEventOnHongsil() {
-//        binding.btnSelectServerHongsil.setOnClickListener {
-//            NetworkModule.setBaseUrl(HONGSIL_SERVER)
-//            navigateToShopping()
-//        } origin
-
         binding.btnSelectServerHongsil.setOnClickListener {
-            NetworkModule.setBaseUrlNew(HONGSIL_SERVER)
-            Log.d("123123", "123123")
+            NetworkModuleUsingGson.setBaseUrl(HONGSIL_SERVER)
+            NetworkModuleUsingSerialization.setBaseUrlNew(HONGSIL_SERVER)
             navigateToShopping()
         }
     }
 
     private fun setClickEventOnMatthew() {
-//        binding.btnSelectServerMatthew.setOnClickListener {
-//            NetworkModule.setBaseUrl(MATTHEW_SERVER)
-//            navigateToShopping()
-//        } origin
-
         binding.btnSelectServerMatthew.setOnClickListener {
-            NetworkModule.setBaseUrlNew(MATTHEW_SERVER)
+            NetworkModuleUsingGson.setBaseUrl(MATTHEW_SERVER)
+            NetworkModuleUsingSerialization.setBaseUrlNew(MATTHEW_SERVER)
             navigateToShopping()
         }
     }
