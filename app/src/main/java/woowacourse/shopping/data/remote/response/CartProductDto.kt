@@ -1,7 +1,6 @@
-package woowacourse.shopping.data.remote.request
+package woowacourse.shopping.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import woowacourse.shopping.data.remote.response.ProductResponseDto
 
 data class CartProductDto(
     val id: Long,

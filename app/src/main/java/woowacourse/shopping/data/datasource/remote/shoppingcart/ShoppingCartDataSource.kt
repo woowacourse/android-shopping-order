@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import woowacourse.shopping.data.remote.request.CartProductDto
+import woowacourse.shopping.data.remote.response.CartProductDto
 
 interface ShoppingCartDataSource {
     fun getAllProductInCart(): Result<List<CartProductDto>>

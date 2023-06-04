@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.remote.shoppingcart
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
 import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.remote.request.CartItemRequest
-import woowacourse.shopping.data.remote.request.CartProductDto
+import woowacourse.shopping.data.remote.response.CartProductDto
 import java.util.concurrent.Executors
 
 class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) :

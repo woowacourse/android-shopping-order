@@ -9,7 +9,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.remote.request.CartItemRequest
-import woowacourse.shopping.data.remote.request.CartProductDto
+import woowacourse.shopping.data.remote.response.CartProductDto
 
 interface ShoppingCartService {
     @GET("/cart-items")
