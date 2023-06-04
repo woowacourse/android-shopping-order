@@ -1,27 +1,26 @@
 package woowacourse.shopping.ui.serverSetting
 
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSettingActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityServerSettingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_server_setting)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_server_setting)
         setupView()
     }
 
     private fun setupView() {
-        val buttonJames = findViewById<Button>(R.id.btn_james_server)
-        val buttonLeah = findViewById<Button>(R.id.btn_leah_server)
-        buttonJames.setOnClickListener {
+        binding.btnIoServer.setOnClickListener {
             startMain(SERVER_IO)
         }
-        buttonLeah.setOnClickListener {
+        binding.btnJitoServer.setOnClickListener {
             startMain(SERVER_JITO)
         }
     }
