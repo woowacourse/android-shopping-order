@@ -3,13 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="price"
+            type="int" />
+
+        <variable
+            name="listener"
+            type="woowacourse.shopping.ui.order.OrderListener" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.order.OrderActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/tb_order"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/toolbar_color"
@@ -20,11 +31,11 @@
             android:id="@+id/tv_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/tv_order"
+            android:layout_marginTop="20dp"
+            android:text="@string/order"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="@+id/rv_order"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
@@ -36,9 +47,9 @@
             android:layout_marginEnd="20dp"
             app:layout_constraintDimensionRatio="h, 1:1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_order"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/order_item" />
 
         <LinearLayout
@@ -56,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="35dp"
-            android:text="@string/tv_coupon"
+            android:text="@string/coupon"
             android:textColor="@color/color_04C09E"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -67,10 +78,9 @@
             android:id="@+id/spinner_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            app:layout_constraintTop_toTopOf="@+id/tv_coupon"
             tools:listitem="@layout/coupon_item" />
 
         <TextView
@@ -80,9 +90,11 @@
             android:background="@drawable/layout_border_radius_10dp"
             android:gravity="center"
             android:padding="15dp"
+            android:text="@{@string/product_price(price)}"
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"
+            android:onClick="@{() -> listener.onOrderClick()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
