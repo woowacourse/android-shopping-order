@@ -11,6 +11,7 @@ import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.OrderHistoryModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
+import woowacourse.shopping.ui.orderdetail.OrderDetailPurpose
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private lateinit var binding: ActivityOrderHistoryBinding
@@ -67,7 +68,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun showDetail(id: Int) {
-        val intent = OrderDetailActivity.createIntent(this, id)
+        val intent = OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_DETAIL.name)
         startActivity(intent)
     }
 

@@ -19,6 +19,7 @@ import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
+import woowacourse.shopping.ui.orderdetail.OrderDetailPurpose
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -118,7 +119,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showOrderDetail(id: Int) {
-        val intent = OrderDetailActivity.createIntent(this, id)
+        val intent = OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_COMPLETE.name)
         startActivity(intent)
     }
 

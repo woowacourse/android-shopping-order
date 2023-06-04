@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.orderdetail
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.common.utils.Toaster
@@ -10,8 +11,10 @@ import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.ui.model.OrderModel
 import woowacourse.shopping.ui.order.OrderProductAdapter
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
+    private val extraPurpose: String by lazy { intent?.getStringExtra(EXTRA_KEY_PURPOSE) ?: "" }
     private lateinit var binding: ActivityOrderDetailBinding
     private lateinit var presenter: OrderDetailContract.Presenter
 
@@ -50,12 +53,28 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         }
     }
 
-    companion object {
+    override fun finish() {
+        when(OrderDetailPurpose.getPurpose(extraPurpose)) {
+            OrderDetailPurpose.SHOW_ORDER_COMPLETE -> startShoppingActivity()
+            OrderDetailPurpose.SHOW_ORDER_DETAIL -> {}
+        }
+        super.finish()
+    }
 
+    private fun startShoppingActivity() {
+        val intent = ShoppingActivity.createIntent(this)
+        intent.flags = FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+    }
+
+    companion object {
         private const val EXTRA_KEY_ID = "id"
-        fun createIntent(context: Context, id: Int) : Intent {
+        private const val EXTRA_KEY_PURPOSE = "purpose"
+
+        fun createIntent(context: Context, id: Int, purpose: String) : Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
             intent.putExtra(EXTRA_KEY_ID, id)
+            intent.putExtra(EXTRA_KEY_PURPOSE, purpose)
             return intent
         }
     }

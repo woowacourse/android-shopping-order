@@ -15,12 +15,24 @@
         android:layout_height="match_parent"
         tools:context=".ui.orderdetail.OrderDetailActivity">
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/order_detail_toolbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:background="@color/toolbar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Order Detail"
+            app:titleTextColor="@color/white" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/order_detail_toolbar">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
