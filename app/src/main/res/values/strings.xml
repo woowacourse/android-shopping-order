@@ -64,4 +64,7 @@
     <string name="tv_order_item_on_image_count">%s 외 %d개</string>
     <string name="tv_order_on_image_count">+%d</string>
 
+    <!-- activity_order_history -->
+    <string name="tb_order_history">주문 내역</string>
+
 </resources>
