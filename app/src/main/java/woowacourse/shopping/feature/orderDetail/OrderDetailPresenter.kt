@@ -1,32 +1,37 @@
 package woowacourse.shopping.feature.orderDetail
 
-import woowacourse.shopping.model.OrderDetailProductUiModel
-import woowacourse.shopping.model.OrderInfoUiModel
-import woowacourse.shopping.model.OrderStateUiModel
-import woowacourse.shopping.model.ProductUiModel
+import com.example.domain.repository.OrderRepository
+import woowacourse.shopping.mapper.toPresentation
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
-    private val id: Int
+    private val id: Int,
+    private val orderRepository: OrderRepository
 ) : OrderDetailContract.Presenter {
 
-    private val orderInfo: OrderInfoUiModel = OrderInfoUiModel(
-        0, "2023-03-04", OrderStateUiModel.DELIVERED, 6000, 1000, 100,
-        List(5) {
-            OrderDetailProductUiModel(
-                2,
-                ProductUiModel(
-                    0,
-                    "이름",
-                    "https://img.danawa.com/prod_img/500000/711/196/img/5196711_1.jpg?_v=20200724173034",
-                    2000, 0
-                )
-            )
-        }
-    )
-
     override fun loadProducts() {
-        view.initAdapter(orderInfo.products)
-        view.setUpView(orderInfo)
+        orderRepository.getOrderDetail(
+            id,
+            callback = {
+                it.onSuccess { orderInfo ->
+                    view.initAdapter(orderInfo.products.map { it.toPresentation() })
+                    view.setUpView(orderInfo.toPresentation())
+                }.onFailure { throwable ->
+                    view.showErrorMessage(throwable)
+                }
+            }
+        )
+    }
+
+    override fun cancelOrder(id: Int) {
+        orderRepository.cancelOrder(
+            id,
+            callback = {
+                it.onSuccess {
+                }.onFailure { throwable ->
+                    view.showErrorMessage(throwable)
+                }
+            }
+        )
     }
 }

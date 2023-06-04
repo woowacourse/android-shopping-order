@@ -2,9 +2,13 @@ package woowacourse.shopping.feature.orderHistory
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
+import woowacourse.shopping.data.OrderRemoteRepositoryImpl
+import woowacourse.shopping.data.TokenSharedPreference
+import woowacourse.shopping.data.service.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.feature.main.load.LoadAdapter
 import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
@@ -21,8 +25,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        presenter = OrderHistoryPresenter(this)
-
+        initPresenter()
         supportActionBar?.title = getString(R.string.order_history)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -30,12 +33,18 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         presenter.loadOrderHistory()
     }
 
+    private fun initPresenter() {
+        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
+        presenter =
+            OrderHistoryPresenter(this, OrderRemoteRepositoryImpl(OrderRemoteService(token)))
+    }
+
     private fun initAdapter() {
         orderHistoryAdapter = OrderHistoryAdapter(
             products = listOf(),
             clickListener = ::navigateToDetail
         )
-        loadAdapter = LoadAdapter { presenter.loadProducts() }
+        loadAdapter = LoadAdapter { presenter.loadOrderHistory() }
         binding.recyclerviewOrderHistory.adapter =
             ConcatAdapter(orderHistoryAdapter, loadAdapter)
     }
@@ -46,6 +55,10 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     override fun addOrderHistory(orderHistory: List<OrderHistoryProductUiModel>) {
         orderHistoryAdapter.addItems(orderHistory)
+    }
+
+    override fun showErrorMessage(t: Throwable) {
+        Toast.makeText(this, "${t.message}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

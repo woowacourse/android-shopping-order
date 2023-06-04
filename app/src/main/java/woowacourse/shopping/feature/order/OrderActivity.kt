@@ -9,9 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.CartCache
 import woowacourse.shopping.data.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.OrderRemoteRepositoryImpl
 import woowacourse.shopping.data.PointRemoteRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.service.OrderRemoteService
 import woowacourse.shopping.data.service.PointRemoteService
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.CartProductUiModel
@@ -42,6 +44,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             OrderPresenter(
                 this, CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
                 PointRemoteRepositoryImpl(PointRemoteService(token)),
+                OrderRemoteRepositoryImpl(OrderRemoteService(token))
             )
     }
 
@@ -61,7 +64,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             btnOrder.text = getString(R.string.order_btn, productsPrice)
 
             btnOrder.setOnClickListener {
-//            presenter.orderProducts(productsPrice)
+                presenter.orderProducts(productsPrice)
                 finish()
             }
         }
@@ -91,6 +94,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun afterTextChanged(p0: Editable?) {
             }
         })
+    }
+
+    override fun showErrorMessage(t: Throwable) {
+        Toast.makeText(this, "${t.message}", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

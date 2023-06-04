@@ -1,10 +1,10 @@
 package com.example.domain.repository
 
-import com.example.domain.model.Point
+import com.example.domain.model.PointInfo
 
 interface PointRepository {
     fun getPoint(
-        onSuccess: (Point) -> Unit,
+        onSuccess: (PointInfo) -> Unit,
         onFailure: () -> Unit
     )
 }

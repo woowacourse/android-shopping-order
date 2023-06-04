@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.model
 
 import com.example.domain.model.CartProduct
-import com.example.domain.model.Point
+import com.example.domain.model.PointInfo
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 
@@ -27,5 +27,4 @@ data class PointDto(
     val toBeExpiredPoint: Int
 )
 
-fun PointDto.getCurrentPoint() = Point(currentPoint)
-fun PointDto.getExpiredPoint() = Point(toBeExpiredPoint)
+fun PointDto.toDomain() = PointInfo(currentPoint, toBeExpiredPoint)

@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.service
 
-import com.example.domain.model.Point
+import com.example.domain.model.PointInfo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.PointDto
-import woowacourse.shopping.data.model.getCurrentPoint
+import woowacourse.shopping.data.model.toDomain
 
 class PointRemoteService(private val credential: String) {
 
@@ -15,7 +15,7 @@ class PointRemoteService(private val credential: String) {
         .create(RetrofitService::class.java)
 
     fun loadPoint(
-        onSuccess: (Point) -> Unit,
+        onSuccess: (PointInfo) -> Unit,
         onFailure: () -> Unit
     ) {
         retrofitService.requestPoints("Basic $credential")
@@ -27,7 +27,7 @@ class PointRemoteService(private val credential: String) {
                     if (response.code() >= 400) return onFailure()
                     val value = response.body()
                     if (value != null) {
-                        onSuccess(value.getCurrentPoint())
+                        onSuccess(value.toDomain())
                     }
                 }
 

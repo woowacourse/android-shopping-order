@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.main
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.PointRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.mapper.toDomain
@@ -15,7 +16,8 @@ class MainPresenter(
     private val view: MainContract.View,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val pointRepository: PointRepository
 ) : MainContract.Presenter {
 
     private var totalCount: Int = 0
@@ -110,6 +112,11 @@ class MainPresenter(
     }
 
     override fun loadPointInfo() {
-        view.createCheckPointDialog(100, 20)
+        pointRepository.getPoint(
+            onSuccess = {
+                view.createCheckPointDialog(it.currentPoint, it.toBeExpiredPoint)
+            },
+            onFailure = {}
+        )
     }
 }

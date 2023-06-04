@@ -6,10 +6,10 @@ interface OrderHistoryContract {
 
     interface View {
         fun addOrderHistory(orderHistory: List<OrderHistoryProductUiModel>)
+        fun showErrorMessage(t: Throwable)
     }
 
     interface Presenter {
         fun loadOrderHistory()
-        fun loadProducts()
     }
 }

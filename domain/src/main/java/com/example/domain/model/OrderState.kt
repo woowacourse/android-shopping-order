@@ -1,5 +1,9 @@
 package com.example.domain.model
 
-enum class OrderState {
-    PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+enum class OrderState(val value: String) {
+    PENDING("Pending"),
+    PROCESSING("Processing"),
+    SHIPPED("Shipped"),
+    DELIVERED("Delivered"),
+    CANCELLED("Cancelled")
 }

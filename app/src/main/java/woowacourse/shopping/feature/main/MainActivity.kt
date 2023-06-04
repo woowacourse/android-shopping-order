@@ -15,11 +15,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.CartCache
 import woowacourse.shopping.data.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.PointRemoteRepositoryImpl
 import woowacourse.shopping.data.ProductCacheImpl
 import woowacourse.shopping.data.ProductRemoteRepositoryImpl
 import woowacourse.shopping.data.RecentProductRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
 import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.service.PointRemoteService
 import woowacourse.shopping.data.service.ProductRemoteService
 import woowacourse.shopping.data.service.ServerInfo
 import woowacourse.shopping.data.sql.recent.RecentDao
@@ -110,7 +112,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             this,
             ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
+            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
+            PointRemoteRepositoryImpl(PointRemoteService(token))
         )
     }
 

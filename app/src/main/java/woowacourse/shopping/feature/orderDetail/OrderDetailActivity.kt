@@ -5,9 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.OrderRemoteRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
+import woowacourse.shopping.data.service.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.feature.order.OrderProductAdapter
 import woowacourse.shopping.model.OrderDetailProductUiModel
@@ -36,7 +39,8 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter =
             OrderDetailPresenter(
-                this, orderId
+                this, orderId,
+                OrderRemoteRepositoryImpl(OrderRemoteService(token))
             )
     }
 
@@ -53,9 +57,13 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
                 tvCancelOrder.visibility = View.GONE
             }
             tvCancelOrder.setOnClickListener {
-                // cancel
+                presenter.cancelOrder(orderInfo.orderId)
             }
         }
+    }
+
+    override fun showErrorMessage(t: Throwable) {
+        Toast.makeText(this, "${t.message}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
