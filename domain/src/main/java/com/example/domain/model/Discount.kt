@@ -14,6 +14,6 @@ class Discount(private val originalPrice: Int) : MerchandiseItem {
 
     enum class Condition(val standardPrice: Int, val amount: Int) {
         CONDITION_50000(50000, 5000),
-        CONDITION_30000(30000, 3000),
+        CONDITION_30000(30000, 2000),
     }
 }
