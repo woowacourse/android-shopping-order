@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
@@ -17,6 +18,7 @@ import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.orderdetail.OrderDetailActivity
 import woowacourse.shopping.util.executeExceptionHandler
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -113,7 +115,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         return true
     }
 
-    override fun showOrderDetail() {
+    override fun showOrderDetail(orderId: Long) {
+        Toast.makeText(this, getString(R.string.complete_order), Toast.LENGTH_SHORT).show()
+        startActivity(OrderDetailActivity.getIntent(this, orderId))
         finish()
     }
 

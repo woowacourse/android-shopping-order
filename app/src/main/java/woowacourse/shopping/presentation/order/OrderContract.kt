@@ -14,6 +14,6 @@ interface OrderContract {
         fun showOrderCartProducts(cartProductModels: List<CartProductModel>)
         fun showCash(cash: Int)
         fun showTotalPrice(totalPrice: Int)
-        fun showOrderDetail()
+        fun showOrderDetail(orderId: Long)
     }
 }

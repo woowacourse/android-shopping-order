@@ -7,5 +7,5 @@ import woowacourse.shopping.data.order.dto.Orders
 interface OrderDataSource {
     fun loadOrders(callback: (Orders?) -> Unit)
     fun loadOrder(orderId: Long, callback: (Order?) -> Unit)
-    fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: () -> Unit)
+    fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: (Long) -> Unit)
 }

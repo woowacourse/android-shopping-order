@@ -6,5 +6,5 @@ import woowacourse.shopping.model.Order
 interface OrderRepository {
     fun loadOrders(callback: (List<Order>) -> Unit)
     fun loadOrder(orderId: Long, callback: (Order) -> Unit)
-    fun orderCartProducts(cartProducts: List<CartProduct>, callback: () -> Unit)
+    fun orderCartProducts(cartProducts: List<CartProduct>, callback: (Long) -> Unit)
 }

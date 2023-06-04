@@ -52,7 +52,7 @@ class OrderRemoteDataSource(
             )
     }
 
-    override fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: () -> Unit) {
+    override fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: (Long) -> Unit) {
         retrofitService.orderCartItems(userId, orderCartItems)
             .enqueue(
                 object : retrofit2.Callback<Unit> {
@@ -60,11 +60,16 @@ class OrderRemoteDataSource(
                         call: Call<Unit>,
                         response: Response<Unit>,
                     ) {
-                        callback()
+                        val location = response.headers()[LOCATION]?.split("/")?.last()
+                        callback(location?.toLong() ?: 0)
                     }
 
                     override fun onFailure(call: Call<Unit>, t: Throwable) {}
                 },
             )
+    }
+
+    companion object {
+        private const val LOCATION = "Location"
     }
 }

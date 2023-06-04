@@ -22,11 +22,12 @@ class OrderRepositoryDefault(private val orderDataSource: OrderDataSource) : Ord
         }
     }
 
-    override fun orderCartProducts(cartProducts: List<CartProduct>, callback: () -> Unit) {
+    override fun orderCartProducts(cartProducts: List<CartProduct>, callback: (Long) -> Unit) {
         orderDataSource.orderCartProducts(cartProducts.toOrderCartItems(), callback)
     }
 
-    private fun List<CartProduct>.toOrderCartItems() = OrderCartItemDtos(map { it.toOrderCartItem() })
+    private fun List<CartProduct>.toOrderCartItems() =
+        OrderCartItemDtos(map { it.toOrderCartItem() })
 
     private fun CartProduct.toOrderCartItem() = OrderCartItemDto(
         cartItemId = cartId,
