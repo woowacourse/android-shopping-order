@@ -4,7 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -42,7 +47,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var presenter: ShoppingContract.Presenter
     private var shoppingCartAmount: TextView? = null
-    private var tvPoints: TextView? = null
+    private var memberPoints: MenuItem? = null
 
     private val productAdapter: ProductAdapter by lazy {
         ProductAdapter(
@@ -134,9 +139,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         shoppingCartAction?.actionView?.setOnClickListener {
             onOptionsItemSelected(shoppingCartAction)
         }
-
         shoppingCartAmount = shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
-        tvPoints = shoppingCartAction?.actionView?.findViewById(R.id.member_points)
+
+        memberPoints = menu?.findItem(R.id.member_points)
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -222,7 +227,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun showPoints(points: Int) {
-        tvPoints?.text = getString(R.string.points, points)
+        val spannableString = SpannableString(getString(R.string.points, points))
+        spannableString.setSpan(ForegroundColorSpan(getColor(R.color.primary)), 0, spannableString.length, 0)
+        spannableString.setSpan(AbsoluteSizeSpan(50), 0, spannableString.length, 0)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, spannableString.length, 0)
+        memberPoints?.title = spannableString
     }
 
     override fun showOrderHistory() {
