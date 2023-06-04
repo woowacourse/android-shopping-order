@@ -5,5 +5,6 @@ data class PageModel(
     val hasPrevious: Boolean,
     val hasNext: Boolean,
 ) {
-    fun toText(): String = value.toString()
+    override fun toString(): String =
+        value.toString()
 }

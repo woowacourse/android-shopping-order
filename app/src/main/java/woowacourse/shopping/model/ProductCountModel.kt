@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ProductCountModel(val value: Int) : Parcelable {
-    fun toText(): String =
+    override fun toString(): String =
         if (value > 99) "99" else value.toString()
 
     fun getVisibility(): Int =

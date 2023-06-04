@@ -114,7 +114,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         val productCountTextView = cartBadgeView.findTextView(R.id.cart_count_badge) ?: return
 
         productCountTextView.visibility = count.getVisibility()
-        productCountTextView.text = count.toText()
+        productCountTextView.text = count.toString()
     }
 
     override fun onClickCartProduct(cartProduct: CartProductModel) {

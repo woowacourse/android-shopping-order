@@ -45,7 +45,7 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
     }
 
     private fun updatePageNumber(page: PageModel) {
-        binding.pageNumberTextView.text = page.toText()
+        binding.pageNumberTextView.text = page.toString()
     }
 
     override fun updateTotalPrice(totalPrice: Int) {
