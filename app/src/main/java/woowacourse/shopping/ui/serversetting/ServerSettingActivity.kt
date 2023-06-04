@@ -18,8 +18,18 @@ class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
         binding = ActivityServerSettingBinding.inflate(layoutInflater).setContentView(this)
         binding.presenter = presenter
 
-        val token = "Basic aGoyNzcyMEBnbWFpbC5jb206MTIzNA=="
+        val token = "Basic dG1kZ2gxNTkyQG5hdmVyLmNvbToxMjM0"
+        // val token = "Basic aGoyNzcyMEBnbWFpbC5jb206MTIzNA=="
         ShoppingPreference(this).setToken(token)
+
+//        OrderProductRepositoryImpl().orderProduct(
+//            OrderRequest(
+//                listOf(OrderItems(10), OrderItems(11)),
+//                Payment(10000, 8000, 2000),
+//            ),
+//            onSuccess = { },
+//            onFailure = { },
+//        )
     }
 
     override fun navigateToShopping(serverUrl: String) {

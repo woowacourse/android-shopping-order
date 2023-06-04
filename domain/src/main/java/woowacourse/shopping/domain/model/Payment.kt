@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-class Payment(
+data class Payment(
     val originalPayment: Int,
     val finalPayment: Int,
     val point: Int,

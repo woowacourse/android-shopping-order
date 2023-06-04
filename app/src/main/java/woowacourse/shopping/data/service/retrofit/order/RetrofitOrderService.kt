@@ -14,7 +14,7 @@ interface RetrofitOrderService {
     fun orderProducts(
         @Header("Authorization") token: String,
         @Body orderRequest: OrderRequest,
-    ): Call<OrderRequest>
+    ): Call<Unit>
 
     @GET("/orders")
     fun requestOrders(

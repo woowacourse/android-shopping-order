@@ -1,5 +1,5 @@
 package woowacourse.shopping.domain.model
 
-class OrderItems(
+data class OrderItems(
     val cartItemId: Int,
 )

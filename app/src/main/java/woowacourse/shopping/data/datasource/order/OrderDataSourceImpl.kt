@@ -4,7 +4,6 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.ShoppingApplication.Companion.pref
-import woowacourse.shopping.data.dto.OrderRequestDto
 import woowacourse.shopping.data.dto.OrderResponseDto
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toDto
@@ -23,16 +22,17 @@ class OrderDataSourceImpl : OrderDataSource {
         onFailure: () -> Unit,
     ) {
         val call = retrofitService.orderProducts(token, orderRequest.toDto())
-        call.enqueue(object : retrofit2.Callback<OrderRequestDto> {
-            override fun onResponse(call: Call<OrderRequestDto>, response: Response<OrderRequestDto>) {
+        call.enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) {
                     onSuccess()
                 } else {
-                    Log.d("test", "retrofit 실패")
+                    Log.d("test", "retrofit 실패 ${response.code()}, token: $token")
+                    Log.d("test", "orderRequest 값 : ${orderRequest.toDto().orderItems}, $orderRequest")
                 }
             }
 
-            override fun onFailure(call: Call<OrderRequestDto>, t: Throwable) {
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
                 Log.d("test", "onFailure retrofit 실패 ${t.message}")
                 onFailure()
             }

@@ -46,7 +46,7 @@ class OrderPresenter(
 
     override fun order() {
         val orderItems = mutableListOf<OrderItems>()
-        cartProducts.forEach { orderItems.add(OrderItems(it.id)) }
+        cartProducts.forEach { orderItems.add(OrderItems(cartItemId = it.id)) }
         val payment = Payment(originalPayment, finalPayment, discountPayment)
         orderProductRepository.orderProduct(
             orderRequest = OrderRequest(orderItems.toList(), payment),
