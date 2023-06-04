@@ -18,6 +18,7 @@ import woowacourse.shopping.data.respository.product.source.remote.ProductRemote
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
@@ -63,9 +64,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_close -> exitProductDetailView()
-            R.id.action_order -> {
-                // TODO : 주문 목록 화면으로 이동하는 기능 필요
-            }
+            R.id.action_order -> moveToOrderListView()
         }
 
         return super.onOptionsItemSelected(item)
@@ -127,6 +126,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding.root.post {
             showToast(getString(R.string.toast_message_system_error))
         }
+    }
+
+    private fun moveToOrderListView() {
+        val intent = OrderListActivity.createIntent(this, server)
+        startActivity(intent)
     }
 
     override fun exitProductDetailView() {

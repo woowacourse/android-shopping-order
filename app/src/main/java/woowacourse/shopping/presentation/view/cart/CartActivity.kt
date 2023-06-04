@@ -18,6 +18,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.OrderActivity
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -87,12 +88,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-            }
-            R.id.action_order -> {
-                // TODO : 주문 목록 화면으로 이동하는 기능 필요
-            }
+            android.R.id.home -> finish()
+            R.id.action_order -> moveToOrderListView()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -193,6 +190,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun moveToOrderView(cartItems: List<CartModel>) {
         val intent = OrderActivity.createIntent(this, cartItems, server)
+        startActivity(intent)
+    }
+
+    private fun moveToOrderListView() {
+        val intent = OrderListActivity.createIntent(this, server)
         startActivity(intent)
     }
 
