@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
 import com.example.domain.model.CartProduct
-import woowacourse.shopping.data.remote.request.CartProductDTO
+import woowacourse.shopping.data.remote.request.CartProductDto
 import woowacourse.shopping.model.CartProductUIModel
 
 fun CartProduct.toUIModel(): CartProductUIModel {
@@ -20,7 +20,7 @@ fun CartProductUIModel.toDomain(): CartProduct {
     )
 }
 
-fun CartProductDTO.toDomain(): CartProduct {
+fun CartProductDto.toDomain(): CartProduct {
     return CartProduct(
         id = this.id,
         quantity = this.quantity,

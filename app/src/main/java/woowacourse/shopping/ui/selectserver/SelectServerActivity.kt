@@ -18,15 +18,25 @@ class SelectServerActivity : AppCompatActivity() {
     }
 
     private fun setClickEventOnHongsil() {
+//        binding.btnSelectServerHongsil.setOnClickListener {
+//            NetworkModule.setBaseUrl(HONGSIL_SERVER)
+//            navigateToShopping()
+//        } origin
+
         binding.btnSelectServerHongsil.setOnClickListener {
-            NetworkModule.setBaseUrl(HONGSIL_SERVER)
+            NetworkModule.setBaseUrlNew(HONGSIL_SERVER)
             navigateToShopping()
         }
     }
 
     private fun setClickEventOnMatthew() {
+//        binding.btnSelectServerMatthew.setOnClickListener {
+//            NetworkModule.setBaseUrl(MATTHEW_SERVER)
+//            navigateToShopping()
+//        } origin
+
         binding.btnSelectServerMatthew.setOnClickListener {
-            NetworkModule.setBaseUrl(MATTHEW_SERVER)
+            NetworkModule.setBaseUrlNew(MATTHEW_SERVER)
             navigateToShopping()
         }
     }

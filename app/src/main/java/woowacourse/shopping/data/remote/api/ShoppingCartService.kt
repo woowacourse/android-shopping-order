@@ -9,13 +9,13 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.remote.request.CartItemRequest
-import woowacourse.shopping.data.remote.request.CartProductDTO
+import woowacourse.shopping.data.remote.request.CartProductDto
 
 interface ShoppingCartService {
     @GET("/cart-items")
     fun getAllProductInCart(
         @Header("Authorization") token: String,
-    ): Call<List<CartProductDTO>>
+    ): Call<List<CartProductDto>>
 
     @POST("/cart-items")
     fun postProductToCart(
