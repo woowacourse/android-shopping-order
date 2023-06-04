@@ -24,16 +24,6 @@ class CartRepositoryImpl(
         }
     }
 
-//    override fun getCartProduct(productId: Long): CartProduct {
-//        val cartProduct = cartDataSource.getCartProduct(productId)
-//        return CartProduct(
-//            cartProduct.id,
-//            cartProduct.product.toDomainProduct(),
-//            cartProduct.quantity,
-//            true,
-//        )
-//    }
-
     override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
         cartDataSource.deleteCartProduct(cartId, callback)
     }

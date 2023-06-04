@@ -89,24 +89,6 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
                 },
             )
     }
-//
-//    override fun getCartProduct(productId: Long, callback: (CartProduct) -> Unit) {
-//        retrofitService.(userId)
-//            .enqueue(
-//                object : retrofit2.Callback<CartProduct> {
-//                    override fun onResponse(
-//                        call: Call<CartProduct>,
-//                        response: Response<CartProduct>,
-//                    ) {
-//                        val cartProducts = response.body() ?: listOf()
-//                        callback(cartProducts)
-//                    }
-//
-//                    override fun onFailure(call: Call<CartProduct>, t: Throwable) {
-//                    }
-//                },
-//            )
-//    }
 
     companion object {
         private const val LOCATION = "Location"

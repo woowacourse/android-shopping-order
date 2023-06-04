@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
@@ -164,6 +165,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun showOrderPage(cartIds: List<Long>) {
         startActivity(OrderActivity.getIntent(this, cartIds))
+    }
+
+    override fun showNotOrderAble() {
+        Toast.makeText(this, getString(R.string.cart_is_empty), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.order.dto.Order
-import woowacourse.shopping.data.order.dto.OrderCartItems
+import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.data.order.dto.Orders
 
 class OrderRemoteDataSource(
@@ -52,7 +52,7 @@ class OrderRemoteDataSource(
             )
     }
 
-    override fun orderCartProducts(orderCartItems: OrderCartItems, callback: () -> Unit) {
+    override fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: () -> Unit) {
         retrofitService.orderCartItems(userId, orderCartItems)
             .enqueue(
                 object : retrofit2.Callback<Unit> {

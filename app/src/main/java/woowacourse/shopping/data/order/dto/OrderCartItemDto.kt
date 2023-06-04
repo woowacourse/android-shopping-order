@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.order.dto
 
-data class OrderCartItem(
+data class OrderCartItemDto(
     val cartItemId: Long,
-    val orderCartItemImageUrl: String,
     val orderCartItemName: String,
     val orderCartItemPrice: Int,
+    val orderCartItemImageUrl: String,
 )

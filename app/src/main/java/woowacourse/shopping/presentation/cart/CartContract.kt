@@ -27,5 +27,6 @@ interface CartContract {
         fun showAllCheckBoxIsChecked(isChecked: Boolean)
         fun stopLoading()
         fun showOrderPage(cartIds: List<Long>)
+        fun showNotOrderAble()
     }
 }

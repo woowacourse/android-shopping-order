@@ -6,7 +6,5 @@ interface CartDataSource {
     fun insertCartProduct(productId: Long, quantity: Int, callback: (cartId: Long) -> Unit)
     fun deleteCartProduct(cartId: Long, callback: () -> Unit)
     fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit)
-
-    //    fun getCartProduct(productId: Long, callback: (CartProduct) -> Unit)
     fun getAllCartProducts(callback: (List<CartProduct>) -> Unit)
 }

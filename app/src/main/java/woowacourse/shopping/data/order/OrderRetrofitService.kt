@@ -7,7 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.order.dto.Order
-import woowacourse.shopping.data.order.dto.OrderCartItems
+import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.data.order.dto.Orders
 
 interface OrderRetrofitService {
@@ -25,6 +25,6 @@ interface OrderRetrofitService {
     @POST("/orders")
     fun orderCartItems(
         @Header("Authorization") authorization: String,
-        @Body orderCartItems: OrderCartItems,
+        @Body orderCartItemDtos: OrderCartItemDtos,
     ): Call<Unit>
 }

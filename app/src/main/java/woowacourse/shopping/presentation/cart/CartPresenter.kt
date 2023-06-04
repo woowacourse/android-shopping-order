@@ -101,7 +101,9 @@ class CartPresenter(
 
     override fun loadCartOrder() {
         val selectedCartIds = cartPages.getSelectedCartIds()
-        view.showOrderPage(selectedCartIds)
+        if (selectedCartIds.isNotEmpty()) {
+            view.showOrderPage(selectedCartIds)
+        }
     }
 
     private fun updateCart(cartProducts: CartProducts) {
