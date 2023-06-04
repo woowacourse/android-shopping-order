@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.feature.CartFixture
+import woowacourse.shopping.feature.Product
 import woowacourse.shopping.feature.getOrAwaitValue
 import woowacourse.shopping.mapper.toPresentation
 
@@ -41,7 +42,12 @@ internal class OrderConfirmPresenterTest {
         presenter =
             OrderConfirmPresenter(view, MoneySalePolicy(), cartRepository, orderRepository, cartIds)
 
-        val mockCartProducts = CartFixture.getMockCarts()
+        val mockCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 2000), 3),
+            Triple(2L, Product(2L, 13000), 2),
+            Triple(3L, Product(3L, 9000), 1),
+            Triple(4L, Product(4L, 4000), 2),
+        )
         val successSlot = slot<(List<CartProduct>) -> Unit>()
         every { cartRepository.fetchAll(capture(successSlot), any()) } answers {
             successSlot.captured(mockCartProducts)
@@ -56,7 +62,11 @@ internal class OrderConfirmPresenterTest {
 
         // then
         val actual = presenter.cartProducts.getOrAwaitValue()
-        val expected = CartFixture.getMockCartItems(cartIds).map { it.toPresentation() }
+        val expected = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 2000), 3),
+            Triple(2L, Product(2L, 13000), 2),
+            Triple(4L, Product(4L, 4000), 2),
+        ).map { it.toPresentation() }
         assert(actual == expected)
 
         // and
