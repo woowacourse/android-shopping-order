@@ -20,7 +20,7 @@ fun OrderDto.toDomain(): Order = Order(
     orderId,
     Price(payAmount),
     orderAt,
-    OrderStatus.PENDING,
+    OrderStatus.of(orderStatus),
     productName,
     productImageUrl,
     totalProductCount
