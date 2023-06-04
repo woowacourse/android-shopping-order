@@ -21,10 +21,10 @@ class MainPresenter(
 ) : MainContract.Presenter {
 
     private val loadItemCountUnit = 20
-    private var loadItemFromIndex = 0
+    private var page: Int = 1
 
     override fun loadMoreProducts() {
-        productRepository.requestFetchAllProducts(
+        productRepository.requestFetchProductsUnit(
             onFailure = {
                 view.showEmptyProducts()
                 view.setProducts(listOf())
@@ -32,9 +32,9 @@ class MainPresenter(
             onSuccess = {
                 view.addProductItems(it.map(Product::toUi))
                 view.showProducts()
-            }
+            }, unitSize = loadItemCountUnit, page = page
         )
-        loadItemFromIndex += loadItemCountUnit
+        page++
     }
 
     override fun loadRecentProducts() {
