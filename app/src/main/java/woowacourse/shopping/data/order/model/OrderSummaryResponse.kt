@@ -1,4 +1,4 @@
-package woowacourse.shopping.model.order
+package woowacourse.shopping.data.order.model
 
 data class OrderSummaryResponse(
     val id: Long,

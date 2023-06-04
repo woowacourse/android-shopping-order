@@ -10,10 +10,11 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.order.model.FixedDiscountPoliciesResponse
+import woowacourse.shopping.data.order.model.OrderRequest
+import woowacourse.shopping.data.order.model.OrderSummaryResponse
+import woowacourse.shopping.data.order.model.toDomain
 import woowacourse.shopping.model.mapper.toDomain
-import woowacourse.shopping.model.order.FixedDiscountPoliciesResponse
-import woowacourse.shopping.model.order.OrderRequest
-import woowacourse.shopping.model.order.OrderSummaryResponse
 import woowacourse.shopping.util.BANDAL
 
 class OrderRemoteRepository(
@@ -55,7 +56,7 @@ class OrderRemoteRepository(
                 ) {
                     val result = response.body() ?: emptyList()
                     if (400 <= response.code()) return onFailure()
-                    onSuccess(result.map { it.toDomain() })
+                    onSuccess(result.map(OrderSummaryResponse::toDomain))
                 }
 
                 override fun onFailure(call: Call<List<OrderSummaryResponse>>, t: Throwable) {

@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.model.CartProductResponse
+import woowacourse.shopping.data.cart.model.CartProductResponse
 
 interface RetrofitCartService {
     @GET("cart-items")

@@ -1,7 +1,6 @@
 package woowacourse.shopping.model.mapper
 
 import com.example.domain.FixedDiscountPolicy
-import woowacourse.shopping.model.order.FixedDiscountPolicyResponse
 import woowacourse.shopping.model.order.FixedDiscountPolicyState
 
 fun FixedDiscountPolicy.toUi(): FixedDiscountPolicyState {
@@ -12,13 +11,6 @@ fun FixedDiscountPolicy.toUi(): FixedDiscountPolicyState {
 }
 
 fun FixedDiscountPolicyState.toDomain(): FixedDiscountPolicy {
-    return FixedDiscountPolicy(
-        minimumPrice = minimumPrice,
-        discountPrice = discountPrice
-    )
-}
-
-fun FixedDiscountPolicyResponse.toDomain(): FixedDiscountPolicy {
     return FixedDiscountPolicy(
         minimumPrice = minimumPrice,
         discountPrice = discountPrice
