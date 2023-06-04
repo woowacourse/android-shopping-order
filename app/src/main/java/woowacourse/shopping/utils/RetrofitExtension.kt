@@ -1,6 +1,5 @@
 package woowacourse.shopping.utils
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -8,6 +7,7 @@ import retrofit2.Response
 fun <ResponseType> Call<ResponseType>.enqueueUtil(
     onSuccess: (ResponseType) -> Unit,
     onFailure: ((stateMessage: String) -> Unit)? = null,
+    onError: ((throwMessage: Throwable) -> Unit)? = null,
 ) {
     this.enqueue(object : Callback<ResponseType> {
         override fun onResponse(call: Call<ResponseType>, response: Response<ResponseType>) {
@@ -19,7 +19,7 @@ fun <ResponseType> Call<ResponseType>.enqueueUtil(
         }
 
         override fun onFailure(call: Call<ResponseType>, t: Throwable) {
-            Log.d("NetworkTest", "error:$t")
+            onError?.invoke(t)
         }
     })
 }

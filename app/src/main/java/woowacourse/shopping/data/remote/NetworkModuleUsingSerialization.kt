@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 
 object NetworkModuleUsingSerialization {
 
-    private var BASE_URL = "http://3.36.66.250:8080/"
+    private var BASE_URL = "http://3.38.132.180:8080/"
 
     @OptIn(ExperimentalSerializationApi::class)
     val retrofitNew: Retrofit = Retrofit.Builder()

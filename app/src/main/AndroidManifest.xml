@@ -19,7 +19,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.order.OrderActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ui.orderdetail.OrderDetailActivity"
             android:exported="false" />

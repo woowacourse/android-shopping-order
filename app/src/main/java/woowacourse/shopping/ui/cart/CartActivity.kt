@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
@@ -108,7 +107,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, CartClickListener {
     }
 
     override fun navigateToOrder(cartItems: CartItemsUIModel) {
-       // startActivity(OrderActivity.from(this, cartItems))
+        startActivity(OrderActivity.from(this, cartItems))
     }
 
     override fun setAllOrderCount(count: Int) {

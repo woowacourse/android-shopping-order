@@ -20,11 +20,11 @@
             android:id="@+id/tv_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:text="@string/tv_order"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="@+id/rv_order"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
@@ -67,9 +67,12 @@
             android:id="@+id/spinner_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
+            android:spinnerMode="dialog"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_coupon"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             tools:listitem="@layout/coupon_item" />
 
