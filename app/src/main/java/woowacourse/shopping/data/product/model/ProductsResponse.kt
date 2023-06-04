@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model.product
+package woowacourse.shopping.data.product.model
 
 data class ProductsResponse(
     val products: ProductsDto,

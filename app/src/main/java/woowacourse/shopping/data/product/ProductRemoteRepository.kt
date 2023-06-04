@@ -5,9 +5,9 @@ import com.example.domain.repository.ProductRepository
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.model.product.ProductDto
-import woowacourse.shopping.data.model.product.ProductsResponse
-import woowacourse.shopping.data.model.product.toDomain
+import woowacourse.shopping.data.product.model.ProductDto
+import woowacourse.shopping.data.product.model.ProductsResponse
+import woowacourse.shopping.data.product.model.toDomain
 
 class ProductRemoteRepository(
     url: String,

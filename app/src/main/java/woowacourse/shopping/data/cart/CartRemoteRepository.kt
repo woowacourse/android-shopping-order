@@ -8,7 +8,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.model.CartProductResponse
+import woowacourse.shopping.data.cart.model.CartProductResponse
+import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.util.BANDAL
 
@@ -43,7 +44,7 @@ class CartRemoteRepository(
                 ) {
                     val result = response.body() ?: emptyList()
                     if (400 <= response.code()) return onFailure()
-                    onSuccess(result.map { it.toDomain() })
+                    onSuccess(result.map(CartProductResponse::toDomain))
                 }
 
                 override fun onFailure(

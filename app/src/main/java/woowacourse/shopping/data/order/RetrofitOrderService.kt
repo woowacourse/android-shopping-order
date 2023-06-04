@@ -6,9 +6,9 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.model.order.FixedDiscountPoliciesResponse
-import woowacourse.shopping.model.order.OrderRequest
-import woowacourse.shopping.model.order.OrderSummaryResponse
+import woowacourse.shopping.data.order.model.FixedDiscountPoliciesResponse
+import woowacourse.shopping.data.order.model.OrderRequest
+import woowacourse.shopping.data.order.model.OrderSummaryResponse
 
 interface RetrofitOrderService {
 

@@ -1,4 +1,6 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.data.cart.model
+
+import woowacourse.shopping.data.product.model.ProductResponse
 
 data class CartProductResponse(
     val id: Long,
