@@ -31,6 +31,7 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.model.ProductModel
 import woowacourse.shopping.ui.model.RecentProductModel
 import woowacourse.shopping.ui.model.ShoppingProductModel
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.recyclerview.LoadMoreAdapter
 import woowacourse.shopping.ui.shopping.recyclerview.ProductAdapter
@@ -152,6 +153,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.shopping_cart_action -> presenter.openCart()
+            R.id.order_history_action -> presenter.openOrderHistory()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -191,8 +193,18 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         startProductDetailActivity(productModel, recentProductModel)
     }
 
+    private fun startProductDetailActivity(productModel: ProductModel, recentProductModel: ProductModel?) {
+        val intent = ProductDetailActivity.createIntent(this, productModel, recentProductModel)
+        activityResultLauncher.launch(intent)
+    }
+
     override fun showCart() {
         startCartActivity()
+    }
+
+    private fun startCartActivity() {
+        val intent = CartActivity.createIntent(this)
+        activityResultLauncher.launch(intent)
     }
 
     override fun updateCartQuantity(amount: Int) {
@@ -213,10 +225,11 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         tvPoints?.text = getString(R.string.points, points)
     }
 
-    private fun startCartActivity() {
-        val intent = CartActivity.createIntent(this)
-        activityResultLauncher.launch(intent)
+    override fun showOrderHistory() {
+        val intent = OrderHistoryActivity.createIntent(this)
+        startActivity(intent)
     }
+
 
     private fun initProductList() {
         binding.shoppingProductList.layoutManager = makeLayoutManager()
@@ -258,11 +271,6 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
                 }
             }
         }
-    }
-
-    private fun startProductDetailActivity(productModel: ProductModel, recentProductModel: ProductModel?) {
-        val intent = ProductDetailActivity.createIntent(this, productModel, recentProductModel)
-        activityResultLauncher.launch(intent)
     }
 
     companion object {

@@ -43,4 +43,21 @@ class ShoppingPresenterTest {
         // then
         verify { view.showPoints(points) }
     }
+
+    @Test
+    fun `주문 내역을 열어서 보여준다`() {
+        // given
+        every { productRepository.getProducts(any(), any()) } just runs
+        presenter = ShoppingPresenter(
+            view, productRepository, recentProductRepository, cartRepository, memberRepository, 0, 0
+        )
+
+        every { view.showOrderHistory() } just runs
+
+        // when
+        presenter.openOrderHistory()
+
+        // then
+        verify { view.showOrderHistory() }
+    }
 }

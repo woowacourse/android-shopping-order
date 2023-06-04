@@ -177,6 +177,10 @@ class ShoppingPresenter(
         )
     }
 
+    override fun openOrderHistory() {
+        view.showOrderHistory()
+    }
+
     private fun updateCartProductQuantity(cartProduct: CartProduct) {
         if (cartProduct.quantity > 0) {
             cartRepository.updateCartProductQuantity(

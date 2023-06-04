@@ -23,6 +23,8 @@ interface ShoppingContract {
         fun increaseCartProductAmount(shoppingProductModel: ShoppingProductModel)
 
         fun loadPoints()
+
+        fun openOrderHistory()
     }
 
     interface View {
@@ -45,5 +47,7 @@ interface ShoppingContract {
         fun notifyLoadFailed()
 
         fun showPoints(points: Int)
+
+        fun showOrderHistory()
     }
 }
