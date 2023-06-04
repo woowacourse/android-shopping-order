@@ -12,6 +12,7 @@ import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.view.order.adapter.CardAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
@@ -31,6 +32,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
 
         setPresenter()
+        setCardView()
         presenter.initReservedPoint()
         presenter.initSavingPoint()
         presenter.initCartProducts()
@@ -76,6 +78,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val orderProductAdapter = OrderProductAdapter()
         orderProductAdapter.setItems(products)
         binding.rvOrderProductList.adapter = orderProductAdapter
+    }
+
+    private fun setCardView() {
+        val cardAdapter = CardAdapter()
+        binding.rvOrderCardList.adapter = cardAdapter
     }
 
     override fun setTotalPriceView(totalPrice: Int) {
