@@ -159,7 +159,7 @@ class ShoppingCartPresenter(
         }
     }
 
-    private fun fetchChange() {
+    override fun fetchChange() {
         chargeRepository.fetchCharge { result ->
             when (result) {
                 is WoowaResult.SUCCESS -> change = result.data

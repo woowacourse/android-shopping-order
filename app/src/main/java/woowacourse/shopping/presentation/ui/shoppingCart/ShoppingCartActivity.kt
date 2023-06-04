@@ -36,6 +36,12 @@ class ShoppingCartActivity :
         binding.listShoppingCart.adapter = shoppingCartAdapter
     }
 
+    override fun onStart() {
+        super.onStart()
+        presenter.fetchChange()
+        // registerForActivityResult를 사용했다면 더 좋았겠지만,, 시간상의 문제로 이렇게 진행했습니다,,
+    }
+
     private fun initPresenter(): ShoppingCartPresenter {
         return ShoppingCartPresenter(
             this,

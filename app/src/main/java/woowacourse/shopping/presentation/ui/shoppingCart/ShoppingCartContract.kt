@@ -37,5 +37,6 @@ interface ShoppingCartContract {
         fun setPayment()
         fun setAllCheck()
         fun requestOrder()
+        fun fetchChange()
     }
 }
