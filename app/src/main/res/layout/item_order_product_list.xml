@@ -60,7 +60,8 @@
                 tools:src="@drawable/ic_launcher_foreground" />
 
             <TextView
-                android:id="@+id/tv_"
+                android:id="@+id/tv_count"
+                setCount="@{cart.count}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"

@@ -10,6 +10,7 @@ import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -26,15 +27,20 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         setContentView(R.layout.activity_order)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
-        server = intent.getSerializableCompat<Server>(KEY_SERVER_SERVER) ?: return finish()
+
+        setPresenter()
+        presenter.initReservedPoint()
+        presenter.initSavingPoint()
+        presenter.initCartProducts()
+    }
+
+    private fun setPresenter() {
+        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         cartItems = intent.getParcelableArrayListExtra<CartModel>(KEY_CART_ITEMS)?.toList() ?: return finish()
 
         val pointRepository = PointRepositoryImpl(server)
 
         presenter = OrderPresenter(this, cartItems, pointRepository)
-
-        presenter.initReservedPoint()
-        presenter.initSavingPoint()
     }
 
     override fun setAvailablePointView(point: Int) {
@@ -43,6 +49,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun setSavingPoint(point: Int) {
         binding.tvOrderPointSave.text = getString(R.string.point_text, point)
+    }
+
+    override fun setCartProductsView(products: List<CartModel>) {
+        val orderProductAdapter = OrderProductAdapter()
+        orderProductAdapter.setItems(products)
+        binding.rvOrderProductList.adapter = orderProductAdapter
     }
 
     override fun handleErrorView() {

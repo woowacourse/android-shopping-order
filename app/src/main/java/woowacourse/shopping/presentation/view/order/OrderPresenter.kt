@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.order
 
 import com.example.domain.cart.CartProducts
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.respository.point.PointRepository
 import woowacourse.shopping.presentation.model.CartModel
 
@@ -25,6 +26,10 @@ class OrderPresenter(
         ) { savingPointEntity ->
             view.setSavingPoint(savingPointEntity.savingPoint)
         }
+    }
+
+    override fun initCartProducts() {
+        view.setCartProductsView(cartItemsDomain.all.map { it.toUiModel() })
     }
 
     fun onFailure() {
