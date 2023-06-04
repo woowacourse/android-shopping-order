@@ -14,30 +14,30 @@ import org.junit.Test
 class OrderPresenterTest {
 
     private lateinit var view: OrderContract.View
-    private lateinit var orderProducts: Cart
+    private lateinit var orderPendingCart: Cart
     private lateinit var orderRepository: OrderRepository
     private lateinit var presenter: OrderContract.Presenter
 
     @Before
     fun setup() {
         view = mockk()
-        orderProducts = mockk(relaxed = true)
+        orderPendingCart = mockk(relaxed = true)
         orderRepository = mockk()
         presenter = OrderPresenter(
-            view = view, orderProducts = orderProducts, orderRepository = orderRepository
+            view = view, orderPendingCart = orderPendingCart, orderRepository = orderRepository
         )
     }
 
     @Test
     fun `주문할 상품들을 화면에 표시한다`() {
         // given
-        justRun { view.setOrderProducts(any()) }
+        justRun { view.setOrderPedningCart(any()) }
 
         // when
-        presenter.loadOrderProducts()
+        presenter.loadOrderPendingCart()
 
         // then
-        verify { view.setOrderProducts(any()) }
+        verify { view.setOrderPedningCart(any()) }
     }
 
     @Test
@@ -53,7 +53,7 @@ class OrderPresenterTest {
             onSuccess.invoke(fixedDiscountPolicies)
         }
 
-        every { orderProducts.getPickedProductsTotalPrice() } returns productsSum
+        every { orderPendingCart.getPickedProductsTotalPrice() } returns productsSum
         every { fixedDiscountPolicies.getDiscountPrice(productsSum) } returns 5000
         every { fixedDiscountPolicies.getFinalPrice(productsSum) } returns 95000
 
@@ -74,7 +74,7 @@ class OrderPresenterTest {
     fun `주문상세내역 화면으로 이동한다`() {
         // given
         val orderId = 1L
-        every { orderProducts.products } returns listOf(
+        every { orderPendingCart.products } returns listOf(
             CartProduct(
                 id = 1L,
                 productId = 1L,

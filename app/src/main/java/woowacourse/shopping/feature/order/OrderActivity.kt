@@ -20,23 +20,23 @@ import woowacourse.shopping.model.mapper.toDomain
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY)!! }
     private val presenter: OrderContract.Presenter by lazy {
-        val orderProducts: CartState by lazy { intent.getParcelableExtra(ORDER_PRODUCTS_KEY)!! }
+        val orderPendingCart: CartState by lazy { intent.getParcelableExtra(ORDER_PRODUCTS_KEY)!! }
         val orderRepository: OrderRepository = OrderRemoteRepository(url = url)
         OrderPresenter(
             view = this,
-            orderProducts = orderProducts.toDomain(),
+            orderPendingCart = orderPendingCart.toDomain(),
             orderRepository = orderRepository,
         )
     }
     private lateinit var binding: ActivityOrderBinding
-    private lateinit var adapter: OrderProductListAdapter
+    private lateinit var adapter: OrderPendingCartListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
         setToolBarBackButton()
         setPayButtonClickListener()
-        presenter.loadOrderProducts()
+        presenter.loadOrderPendingCart()
         addOrderProductListDivider()
         presenter.calculatePrice()
     }
@@ -58,7 +58,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun addOrderProductListDivider() {
-        binding.orderProductsRv.addItemDecoration(
+        binding.orderPendingCartRv.addItemDecoration(
             DividerItemDecoration(
                 this,
                 LinearLayout.VERTICAL
@@ -66,9 +66,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         )
     }
 
-    override fun setOrderProducts(orderProducts: CartState) {
-        adapter = OrderProductListAdapter(orderProducts)
-        binding.orderProductsRv.adapter = adapter
+    override fun setOrderPedningCart(orderPendingCart: CartState) {
+        adapter = OrderPendingCartListAdapter(orderPendingCart)
+        binding.orderPendingCartRv.adapter = adapter
     }
 
     override fun setProductsSum(productsSum: Int) {
@@ -99,9 +99,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     companion object {
         private const val ORDER_PRODUCTS_KEY = "order_products_key"
 
-        fun startActivity(context: Context, orderProducts: CartState, serverUrl: String) {
+        fun startActivity(context: Context, orderPendingCart: CartState, serverUrl: String) {
             val intent = Intent(context, OrderActivity::class.java)
-            intent.putExtra(ORDER_PRODUCTS_KEY, orderProducts)
+            intent.putExtra(ORDER_PRODUCTS_KEY, orderPendingCart)
             intent.putExtra(ServerType.INTENT_KEY, serverUrl)
             context.startActivity(intent)
         }

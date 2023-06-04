@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="orderProduct"
+            name="orderPendingCart"
             type="woowacourse.shopping.model.CartProductState" />
     </data>
 
@@ -19,7 +19,7 @@
             android:id="@+id/order_product_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{orderProduct.productName}"
+            android:text="@{orderPendingCart.productName}"
             android:textColor="@color/black"
             android:textSize="@dimen/order_product_item_medium_text_size"
             android:textStyle="bold"
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
-            android:text="@{@string/order_summary_format(orderProduct.productName, orderProduct.quantity, orderProduct.productPrice)}"
+            android:text="@{@string/order_summary_format(orderPendingCart.productName, orderPendingCart.quantity, orderPendingCart.productPrice)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/order_product_name_tv"
             tools:text="- 피자 3개 (10,000원)" />
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
-            android:text="@{@string/order_price_format(orderProduct.productPrice * orderProduct.quantity)}"
+            android:text="@{@string/order_price_format(orderPendingCart.productPrice * orderPendingCart.quantity)}"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/order_product_summary_tv"
@@ -52,7 +52,7 @@
             android:id="@+id/order_product_image_iv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:loadUrl="@{orderProduct.productImageUrl}"
+            app:loadUrl="@{orderPendingCart.productImageUrl}"
             app:layout_constraintDimensionRatio="W, 1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
