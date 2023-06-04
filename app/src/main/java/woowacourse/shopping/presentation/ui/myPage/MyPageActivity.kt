@@ -1,11 +1,13 @@
 package woowacourse.shopping.presentation.ui.myPage
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.defaultRepository.DefaultChargeRepository
 import woowacourse.shopping.databinding.ActivityMyPageBinding
+import woowacourse.shopping.presentation.ui.order.OrderActivity
 
 class MyPageActivity : AppCompatActivity(), MyPageContract.View {
     private lateinit var binding: ActivityMyPageBinding
@@ -20,6 +22,7 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
         setContentView(binding.root)
         presenter.fetchCharge()
         binding.buttonMyPageRecharge.setOnClickListener { requestRecharge() }
+        binding.buttonMyPageOrders.setOnClickListener { showOrders() }
     }
 
     override fun showCharge(amount: Int) {
@@ -33,5 +36,9 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
 
     override fun showError() {
         Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showOrders() {
+        startActivity(Intent(this, OrderActivity::class.java))
     }
 }
