@@ -26,6 +26,8 @@
 
     <string name="toast_message_success_add_cart">장바구니에 담았습니다.</string>
     <string name="toast_message_system_error">시스템 오류가 발생했습니다. 다시 시도 해주세요.</string>
+    <string name="toast_message_point_error">사용가능한 포인트를 초과했습니다.</string>
+
     <string name="product_detail_price_info">금액</string>
     <string name="item_product_list_more_text">더보기</string>
     <string name="toolbar_item_order">주문목록</string>
@@ -43,5 +45,5 @@
     <string name="order_pay_button_text">주문하기</string>
     <string name="order_payment_detail_use_point_title_info_text">사용 포인트</string>
 
-    <string name="point_text">%,d포인트</string>
+    <string name="point_format">%,d포인트</string>
 </resources>

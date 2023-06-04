@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.view.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -32,24 +34,42 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter.initReservedPoint()
         presenter.initSavingPoint()
         presenter.initCartProducts()
-        presenter.initView()
+        presenter.initOrderDetail()
+        setListener()
     }
 
     private fun setPresenter() {
         server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        cartItems = intent.getParcelableArrayListExtra<CartModel>(KEY_CART_ITEMS)?.toList() ?: return finish()
+        cartItems = intent.getParcelableArrayListExtra<CartModel>(KEY_CART_ITEMS)?.toList()
+            ?: return finish()
 
         val pointRepository = PointRepositoryImpl(server)
 
         presenter = OrderPresenter(this, cartItems, pointRepository)
     }
 
+    private fun setListener() {
+        binding.etOrderUsePoint.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                val availablePoint =
+                    binding.tvOrderAvailablePoint.text.toString().substringBeforeLast("포").toInt()
+
+                presenter.setPoint(s, availablePoint)
+            }
+        })
+    }
+
     override fun setAvailablePointView(point: Int) {
-        binding.tvOrderAvailablePoint.text = getString(R.string.point_text, point)
+        binding.tvOrderAvailablePoint.text = getString(R.string.point_format, point)
     }
 
     override fun setSavingPoint(point: Int) {
-        binding.tvOrderPointSave.text = getString(R.string.point_text, point)
+        binding.tvOrderPointSave.text = getString(R.string.point_format, point)
     }
 
     override fun setCartProductsView(products: List<CartModel>) {
@@ -59,12 +79,27 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun setTotalPriceView(totalPrice: Int) {
-        binding.tvOrderPaymentDetailOrderPrice.text = getString(R.string.product_price_format, totalPrice)
+        binding.tvOrderPaymentDetailOrderPrice.text =
+            getString(R.string.product_price_format, totalPrice)
     }
 
-    override fun handleErrorView() {
+    override fun setOrderPriceView(point: Int, totalPrice: Int) {
+        binding.tvOrderPaymentDetailUsePoint.text = getString(R.string.point_format, point)
+        binding.tvOrderPaymentDetailTotalPrice.text =
+            getString(R.string.product_price_format, totalPrice - point)
+    }
+
+    override fun clearUsedPointView() {
+        binding.etOrderUsePoint.text.clear()
+    }
+
+    override fun getMessage(resourceId: Int): String {
+        return getString(resourceId)
+    }
+
+    override fun handleErrorView(message: String) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(message)
         }
     }
 

@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.view.order
 
+import android.text.Editable
 import com.example.domain.cart.CartProducts
+import woowacourse.shopping.R
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.respository.point.PointRepository
@@ -32,11 +34,30 @@ class OrderPresenter(
         view.setCartProductsView(cartItemsDomain.all.map { it.toUiModel() })
     }
 
-    override fun initView() {
+    override fun initOrderDetail() {
         view.setTotalPriceView(cartItemsDomain.totalCheckedPrice)
     }
 
+    override fun setPoint(s: Editable?, availablePoint: Int) {
+        if (s == null || s.isEmpty()) {
+            return
+        }
+
+        val usedPoint = s.toString().toIntOrNull() ?: return
+
+        if (usedPoint > availablePoint) {
+            val message = view.getMessage(R.string.toast_message_point_error)
+            view.handleErrorView(message)
+            view.clearUsedPointView()
+            return
+        }
+
+        val totalPrice = cartItemsDomain.totalCheckedPrice
+        view.setOrderPriceView(usedPoint, totalPrice)
+    }
+
     fun onFailure() {
-        view.handleErrorView()
+        val message = view.getMessage(R.string.toast_message_system_error)
+        view.handleErrorView(message)
     }
 }
