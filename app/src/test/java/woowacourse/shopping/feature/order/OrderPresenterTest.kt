@@ -14,6 +14,7 @@ class OrderPresenterTest {
     lateinit var presenter: OrderContract.Presenter
     lateinit var view: OrderContract.View
     lateinit var cartRepository: CartRepository
+    private val cartIds = listOf<Long>(1, 2, 3)
 
     @Before
     fun setUp() {
@@ -25,9 +26,7 @@ class OrderPresenterTest {
     @Test
     fun `화면에 주문할 상품 목록이 나타난다`() {
         // Given: cartId 를 이용해 상품을 er4받아올 수 있는 상태이다.
-        val cartIds = listOf<Long>(1, 2, 3)
-        val fakeCartProducts =
-            ProductFixture.makeCartProducts(ProductFixture.makeProduct(1000), 10)
+        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 1000, 5)
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(
@@ -45,16 +44,14 @@ class OrderPresenterTest {
     @Test
     fun `주문 금액이 할인 정책에 해당하지 않는다면 할인 정보를 띄우지 않는다`() {
         // Given: 주문할 상품 불러오기가 완료되어 주문 금액을 계산할 수 있는 상태이다.
-        val cartIds = listOf<Long>(1, 2, 3)
-        val fakeCartProducts =
-            ProductFixture.makeCartProducts(ProductFixture.makeProduct(1000), 10)
+        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 1000, 5)
+
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
         }
-        presenter.requestProducts(cartIds)
 
         // When: 주문할 상품의 가격을 합산하고 그에 따른 할인 금액을 계산한다.
-        presenter.calculatePrice()
+        presenter.requestProducts(cartIds)
 
         // Then: 할인 가능 여부를 알 수 있다.
         verify { view.showNonDiscount() }
@@ -63,16 +60,14 @@ class OrderPresenterTest {
     @Test
     fun `주문 금액이 할인 정책에 해당한다면 할인 정보를 띄운다`() {
         // Given: 주문할 상품 불러오기가 완료되어 주문 금액을 계산할 수 있는 상태이다.
-        val cartIds = listOf<Long>(1, 2, 3)
-        val fakeCartProducts =
-            ProductFixture.makeCartProducts(ProductFixture.makeProduct(5000), 10)
+        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 5000, 5)
+
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
         }
-        presenter.requestProducts(cartIds)
 
         // When: 주문할 상품의 가격을 합산하고 그에 따른 할인 금액을 계산한다.
-        presenter.calculatePrice()
+        presenter.requestProducts(cartIds)
 
         // Then: 할인 가능 여부를 알 수 있다.
         verify { view.showDiscount(any(), any()) }
