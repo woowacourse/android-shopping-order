@@ -32,6 +32,10 @@ class OrderPresenter(
         view.setCartProductsView(cartItemsDomain.all.map { it.toUiModel() })
     }
 
+    override fun initView() {
+        view.setTotalPriceView(cartItemsDomain.totalCheckedPrice)
+    }
+
     fun onFailure() {
         view.handleErrorView()
     }

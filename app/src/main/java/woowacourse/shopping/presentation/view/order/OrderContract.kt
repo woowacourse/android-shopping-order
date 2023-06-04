@@ -9,6 +9,7 @@ interface OrderContract {
         fun setAvailablePointView(point: Int)
         fun setSavingPoint(point: Int)
         fun setCartProductsView(products: List<CartModel>)
+        fun setTotalPriceView(totalPrice: Int)
         fun handleErrorView()
     }
 
@@ -16,5 +17,6 @@ interface OrderContract {
         fun initReservedPoint()
         fun initSavingPoint()
         fun initCartProducts()
+        fun initView()
     }
 }

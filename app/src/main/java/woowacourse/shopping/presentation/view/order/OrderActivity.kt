@@ -32,6 +32,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter.initReservedPoint()
         presenter.initSavingPoint()
         presenter.initCartProducts()
+        presenter.initView()
     }
 
     private fun setPresenter() {
@@ -55,6 +56,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val orderProductAdapter = OrderProductAdapter()
         orderProductAdapter.setItems(products)
         binding.rvOrderProductList.adapter = orderProductAdapter
+    }
+
+    override fun setTotalPriceView(totalPrice: Int) {
+        binding.tvOrderPaymentDetailOrderPrice.text = getString(R.string.product_price_format, totalPrice)
     }
 
     override fun handleErrorView() {
