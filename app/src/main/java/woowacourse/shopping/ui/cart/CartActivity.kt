@@ -108,7 +108,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, CartClickListener {
     }
 
     override fun navigateToOrder(cartItems: CartItemsUIModel) {
-        startActivity(OrderActivity.from(this, cartItems))
+       // startActivity(OrderActivity.from(this, cartItems))
     }
 
     override fun setAllOrderCount(count: Int) {

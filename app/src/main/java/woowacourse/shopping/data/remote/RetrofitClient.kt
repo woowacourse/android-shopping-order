@@ -1,7 +1,10 @@
-package woowacourse.shopping.data.datasource.retrofit
+package woowacourse.shopping.data.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.remote.api.ProductService
+import woowacourse.shopping.data.remote.api.ProductDetailService
+import woowacourse.shopping.data.remote.api.ShoppingCartService
 
 object RetrofitClient {
 
@@ -24,11 +27,7 @@ object RetrofitClient {
 }
 
 object ServicePool {
-    val productDataService = RetrofitClient.create<ProductDataService>()
+    val productService = RetrofitClient.create<ProductService>()
     val productDetailService = RetrofitClient.create<ProductDetailService>()
     val shoppingCartService = RetrofitClient.create<ShoppingCartService>()
-    val orderDataService = RetrofitClient.create<OrderDataService>()
-    val orderDetailService = RetrofitClient.create<OrderDetailService>()
-    val couponDataService = RetrofitClient.create<CouponDataService>()
-    val orderHistoryService = RetrofitClient.create<OrderHistoryService>()
 }

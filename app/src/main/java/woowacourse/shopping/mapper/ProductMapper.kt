@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
 import com.example.domain.model.Product
-import woowacourse.shopping.data.remote.request.ProductDTO
+import woowacourse.shopping.data.remote.response.ProductResponseDTO
 import woowacourse.shopping.model.ProductUIModel
 
 fun Product.toUIModel(): ProductUIModel {
@@ -22,7 +22,7 @@ fun ProductUIModel.toDomain(): Product {
     )
 }
 
-fun ProductDTO.toDomain(): Product {
+fun ProductResponseDTO.toDomain(): Product {
     return Product(
         id = this.id,
         name = this.name,

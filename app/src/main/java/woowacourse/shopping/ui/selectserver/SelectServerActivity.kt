@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.selectserver
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.datasource.retrofit.RetrofitClient
+import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 

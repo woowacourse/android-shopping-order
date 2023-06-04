@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.datasource.remote.producdetail
 
-import woowacourse.shopping.data.datasource.retrofit.ServicePool
-import woowacourse.shopping.data.remote.request.ProductDTO
+import woowacourse.shopping.data.remote.ServicePool
+import woowacourse.shopping.data.remote.response.ProductResponseDTO
 import java.util.concurrent.Executors
 
 class ProductDetailSourceImpl : ProductDetailSource {
-    override fun getById(id: Long): Result<ProductDTO> {
+    override fun getById(id: Long): Result<ProductResponseDTO> {
         val executor = Executors.newSingleThreadExecutor()
-        val result = executor.submit<Result<ProductDTO>> {
+        val result = executor.submit<Result<ProductResponseDTO>> {
             val response = ServicePool.productDetailService.getProductById(id).execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
