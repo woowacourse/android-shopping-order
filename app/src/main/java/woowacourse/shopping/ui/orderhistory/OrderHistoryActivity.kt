@@ -12,6 +12,7 @@ import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialogFragmentFactory
+import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
@@ -24,6 +25,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_history)
         initOrderHistoryAdapter()
         initPresenter()
+        initCloseButton()
     }
 
     private fun initOrderHistoryAdapter() {
@@ -38,6 +40,10 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     private fun initPresenter() {
         presenter = OrderHistoryPresenter(this, OrderRepositoryImpl(RemoteOrderDataSource()))
+    }
+
+    private fun initCloseButton() {
+        binding.ivOrderHistoryClose.setThrottleFirstOnClickListener { finish() }
     }
 
     override fun updateOrdersInfo(ordersInfo: List<UiOrder>) {
