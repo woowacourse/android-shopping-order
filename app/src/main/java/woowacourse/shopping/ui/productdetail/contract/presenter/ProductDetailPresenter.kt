@@ -36,6 +36,8 @@ class ProductDetailPresenter(
         cartRepository.findById(id).getOrNull().let {
             if (it != null) {
                 cartRepository.updateCount(it.id, count)
+            } else {
+                cartRepository.insert(id, count)
             }
         }
     }

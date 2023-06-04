@@ -23,28 +23,6 @@ class ShoppingPresenter(
     private var productOffset = ProductsOffset(offset, productRepository)
     private val cachedCartProducts = mutableListOf<CartProduct>()
 
-    private fun initProducts2() {
-        /*cartRepository.getAllProductInCart(onSuccess = { cartProducts ->
-            cachedCartProducts.clear()
-            cachedCartProducts.addAll(cartProducts)
-            productRepository.getMoreProducts(
-                productOffset.getOffset(),
-                PRODUCT_COUNT,
-                onSuccess = { products ->
-                    productSize += products.size
-                    productsData.removeIf { it is ProductItem }
-                    productsData += products.map { product ->
-                        ProductItem(
-                            product.toUIModel(),
-                            cachedCartProducts.find { it.product.id == product.id }?.quantity ?: 0,
-                        )
-                    }
-                    view.setProducts(productsData.plus(ProductReadMore))
-                },
-            )
-        }, {})*/
-    }
-
     override fun initProducts() {
         cartRepository.getAllProductInCart().getOrNull()?.let { cartProducts ->
             cachedCartProducts.clear()
@@ -110,7 +88,7 @@ class ShoppingPresenter(
     }
 
     override fun insertItem(id: Long, count: Int) {
-        cartRepository.insert(id).getOrNull().let {
+        cartRepository.insert(id, count).getOrNull().let {
             view.updateItem(id, count)
         }
         updateCountSize()

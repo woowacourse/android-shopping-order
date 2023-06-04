@@ -7,6 +7,7 @@ interface CartRepository {
 
     fun insert(
         id: Long,
+        quantity: Int,
     ): Result<Unit>
 
     fun updateCount(

@@ -7,7 +7,7 @@ import woowacourse.shopping.model.CartProductUIModel
 
 class CartViewHolder private constructor(
     val binding: CartItemBinding,
-    private val onCartClickListener: OnCartClickListener,
+    private val onCartClickListener: CartClickListener,
 ) : ItemViewHolder(binding.root) {
     fun bind(cart: CartProductUIModel) {
         binding.product = cart
@@ -21,7 +21,7 @@ class CartViewHolder private constructor(
     companion object {
         fun from(
             parent: ViewGroup,
-            onCartClickListener: OnCartClickListener,
+            onCartClickListener: CartClickListener,
         ): CartViewHolder {
             val binding = CartItemBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false)
