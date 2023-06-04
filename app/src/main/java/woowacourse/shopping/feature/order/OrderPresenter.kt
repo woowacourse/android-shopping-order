@@ -6,19 +6,19 @@ import woowacourse.shopping.model.mapper.toUi
 
 class OrderPresenter(
     private val view: OrderContract.View,
-    private val orderProducts: Cart,
+    private val orderPendingCart: Cart,
     private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
     private var finalPrice = 0
 
-    override fun loadOrderProducts() {
-        view.setOrderProducts(orderProducts.toUi())
+    override fun loadOrderPendingCart() {
+        view.setOrderPedningCart(orderPendingCart.toUi())
     }
 
     override fun calculatePrice() {
         orderRepository.requestFetchDiscountPolicy(
             onSuccess = { fixedDiscountPolicies ->
-                val productsSum = orderProducts.getPickedProductsTotalPrice()
+                val productsSum = orderPendingCart.getPickedProductsTotalPrice()
                 val discountPrice = fixedDiscountPolicies.getDiscountPrice(productsSum)
                 finalPrice = fixedDiscountPolicies.getFinalPrice(productsSum)
 
@@ -32,7 +32,7 @@ class OrderPresenter(
 
     override fun navigateToOrderDetail() {
         orderRepository.requestAddOrder(
-            cartIds = orderProducts.products.map { it.id },
+            cartIds = orderPendingCart.products.map { it.id },
             finalPrice = finalPrice,
             onSuccess = { orderId: Long ->
                 view.showOrderDetailPage(orderId)

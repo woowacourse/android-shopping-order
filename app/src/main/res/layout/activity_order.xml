@@ -34,7 +34,7 @@
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/order_products_rv"
+            android:id="@+id/order_pending_cart_rv"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:padding="@dimen/margin_small"
@@ -43,7 +43,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/order_products_title_tv"
-            tools:listitem="@layout/item_order_product" />
+            tools:listitem="@layout/item_order_pending_cart" />
 
         <View
             android:id="@+id/line_separator1"
