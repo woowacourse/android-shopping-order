@@ -19,7 +19,6 @@ class ProductRepositoryImpl(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        kotlin.runCatching { }
         if (cache?.productList?.isEmpty() != false) {
             service.getAllProducts().enqueue(object : Callback<List<ProductDto>> {
                 override fun onResponse(

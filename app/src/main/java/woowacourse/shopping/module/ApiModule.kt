@@ -2,6 +2,7 @@ package woowacourse.shopping.module
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.dataSource.remote.CartProductService
@@ -20,6 +21,13 @@ object ApiModule {
 
     lateinit var userStore: UserStore
 
+    private fun httpLoggingInterceptor(): HttpLoggingInterceptor {
+        val interceptor = HttpLoggingInterceptor { message ->
+            android.util.Log.e("OkHttpLog:", message)
+        }
+        return interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    }
+
     private fun createInterceptor(): Interceptor = Interceptor { chain ->
         with(chain) {
             val modifiedRequest = request().newBuilder()
@@ -35,6 +43,7 @@ object ApiModule {
             connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
             readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+            addInterceptor(httpLoggingInterceptor())
             addInterceptor(createInterceptor())
         }.build()
     }

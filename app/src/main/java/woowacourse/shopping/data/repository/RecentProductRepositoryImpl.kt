@@ -8,8 +8,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dataSource.local.RecentDao
 import woowacourse.shopping.data.dataSource.remote.ProductService
-import woowacourse.shopping.data.model.RecentProductEntity
 import woowacourse.shopping.data.model.dto.response.ProductDto
+import woowacourse.shopping.data.model.entity.RecentProductEntity
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

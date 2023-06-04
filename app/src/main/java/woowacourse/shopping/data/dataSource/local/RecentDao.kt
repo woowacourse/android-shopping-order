@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.domain.model.Product
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.model.entity.RecentProductEntity
 import woowacourse.shopping.module.server.ServerInfo
 import java.time.LocalDateTime
 import java.time.ZoneOffset
