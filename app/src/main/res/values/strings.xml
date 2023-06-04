@@ -50,6 +50,7 @@
     <string name="order_btn_order">주문하기</string>
     <string name="order_invalid_point">올바른 금액을 입력해주세요</string>
     <string name="order_unavailable_point">사용 가능한 포인트를 초과했어요</string>
+    <string name="order_success">주문이 완료되었습니다!</string>
     <string name="order_initial_point">0</string>
 
     <!-- Strings related to order detailed -->

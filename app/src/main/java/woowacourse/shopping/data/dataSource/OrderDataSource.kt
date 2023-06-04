@@ -1,8 +1,9 @@
 package woowacourse.shopping.data.dataSource
 
+import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.model.OrderInfo
 
 interface OrderDataSource {
     fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit)
-    fun postOrderItem(ids: List<Int>, usedPoints: Int, callback: () -> Unit)
+    fun postOrderItem(orderRequest: OrderRequest, callback: () -> Unit)
 }

@@ -51,4 +51,12 @@ class OrderPresenter(
             }
         }
     }
+
+    override fun order(point: Int) {
+        val orderItemIds: List<Int> = orderInfo.cartItems.map { it.id }
+        orderRepository.postOrder(orderItemIds, point) {
+            view.showOrderSuccessMessage()
+            view.navigateToShopping()
+        }
+    }
 }

@@ -16,6 +16,8 @@ import woowacourse.shopping.data.dataSource.RemoteOrderDataSource
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
+import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.uimodel.OrderInfoUIModel
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -28,6 +30,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         initToolBar()
         initPresenter()
         initOrderInfo()
+        setOrderButtonListener()
         setPointInput()
     }
 
@@ -64,19 +67,35 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.btnOrder.isEnabled = isEnabled
     }
 
-    override fun showPointErrorMessage(errorCode: Int) {
-        Toast.makeText(this@OrderActivity, errorCode, Toast.LENGTH_SHORT).show()
-    }
-
     override fun updatePurchasePrice(discountPrice: Int, totalPrice: Int) {
         binding.tvPurchaseDiscountPrice.text = getString(R.string.product_price, discountPrice)
         binding.tvPurchaseTotalPrice.text = getString(R.string.product_price, totalPrice)
     }
 
+    override fun showPointErrorMessage(errorCode: Int) {
+        Toast.makeText(this@OrderActivity, errorCode, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showOrderSuccessMessage() {
+        Toast.makeText(this@OrderActivity, getString(R.string.order_success), Toast.LENGTH_SHORT).show()
+    }
+
+    override fun navigateToShopping() {
+        val intent = ShoppingActivity.getIntent(this, ServerSettingActivity.SERVER_IO)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun setOrderButtonListener() {
+        val point = binding.etDiscountPoint.text.toString().toIntOrNull() ?: 0
+        binding.btnOrder.setOnClickListener {
+            presenter.order(point)
+        }
+    }
+
     private fun setPointInput() {
         binding.etDiscountPoint.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
-                Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 presenter.checkPointAvailable(s.toString().toIntOrNull())

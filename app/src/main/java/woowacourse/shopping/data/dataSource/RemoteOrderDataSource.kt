@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.dataSource
 
+import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.service.RetrofitOrderService
 import woowacourse.shopping.data.service.RetrofitUtil
 import woowacourse.shopping.model.OrderInfo
@@ -26,7 +27,20 @@ class RemoteOrderDataSource(
         )
     }
 
-    override fun postOrderItem(ids: List<Int>, usedPoints: Int, callback: () -> Unit) {
-        //
+    override fun postOrderItem(orderRequest: OrderRequest, callback: () -> Unit) {
+        service.postOrderItem(orderRequest, credentials).enqueue(
+            object : retrofit2.Callback<Unit> {
+                override fun onResponse(
+                    call: retrofit2.Call<Unit>,
+                    response: retrofit2.Response<Unit>,
+                ) {
+                    callback()
+                }
+
+                override fun onFailure(call: retrofit2.Call<Unit>, t: Throwable) {
+                    callback()
+                }
+            },
+        )
     }
 }
