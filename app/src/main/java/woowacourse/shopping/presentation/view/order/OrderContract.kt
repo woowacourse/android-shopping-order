@@ -5,10 +5,12 @@ interface OrderContract {
         val presenter: Presenter
 
         fun setAvailablePointView(point: Int)
+        fun setSavingPoint(point: Int)
         fun handleErrorView()
     }
 
     interface Presenter {
-        fun initPoint()
+        fun initReservedPoint()
+        fun initSavingPoint()
     }
 }

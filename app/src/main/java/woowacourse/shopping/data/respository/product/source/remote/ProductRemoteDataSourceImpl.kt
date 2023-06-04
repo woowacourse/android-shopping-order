@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
-import android.util.Log
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.mapper.toEntity
@@ -44,7 +43,7 @@ class ProductRemoteDataSourceImpl(
                 }
 
                 override fun onFailure(call: retrofit2.Call<List<ProductModel>>, t: Throwable) {
-                    Log.d("krrong", "Fail")
+                    onFailure()
                 }
             })
     }
@@ -69,7 +68,7 @@ class ProductRemoteDataSourceImpl(
                 }
 
                 override fun onFailure(call: retrofit2.Call<ProductModel>, t: Throwable) {
-                    Log.d("krrong", "Fail")
+                    onFailure()
                 }
             })
     }

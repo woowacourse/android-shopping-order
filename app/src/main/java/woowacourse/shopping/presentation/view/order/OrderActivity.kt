@@ -33,11 +33,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         presenter = OrderPresenter(this, cartItems, pointRepository)
 
-        presenter.initPoint()
+        presenter.initReservedPoint()
+        presenter.initSavingPoint()
     }
 
     override fun setAvailablePointView(point: Int) {
         binding.tvOrderAvailablePoint.text = getString(R.string.point_text, point)
+    }
+
+    override fun setSavingPoint(point: Int) {
+        binding.tvOrderPointSave.text = getString(R.string.point_text, point)
     }
 
     override fun handleErrorView() {

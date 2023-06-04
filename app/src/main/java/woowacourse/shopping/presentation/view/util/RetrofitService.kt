@@ -9,8 +9,10 @@ import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.model.PointEntity
+import woowacourse.shopping.data.model.SavingPointEntity
 import woowacourse.shopping.presentation.model.ProductModel
 
 interface RetrofitService {
@@ -46,9 +48,15 @@ interface RetrofitService {
 
     @Headers(HEADER_JSON)
     @GET(PATH_POINT)
-    fun requestPoint(
+    fun requestReservedPoint(
         @Header(AUTHORIZATION) token: String,
     ): Call<PointEntity>
+
+    @Headers(HEADER_JSON)
+    @GET(PATH_SAVING_POINT)
+    fun requestSavingPoint(
+        @Query(PATH_TOTAL_PRICE) totalPrice: String,
+    ): Call<SavingPointEntity>
 
     companion object {
         private const val HEADER_JSON = "Content-Type: application/json"
@@ -57,7 +65,9 @@ interface RetrofitService {
         private const val PATH_CART = "/cart-items"
         private const val PATH_ID = "id"
         private const val PATH_CART_ID = "cartItemId"
+        private const val PATH_TOTAL_PRICE = "totalPrice"
         private const val PATH_POINT = "/points"
+        private const val PATH_SAVING_POINT = "/saving-point"
 
         private const val AUTHORIZATION = "Authorization"
     }
