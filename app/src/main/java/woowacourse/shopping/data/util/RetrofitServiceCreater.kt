@@ -30,10 +30,8 @@ private fun provideOkHttpClient(interceptor: Interceptor): OkHttpClient {
 }
 
 private val json = Json {
-    ignoreUnknownKeys = true
     coerceInputValues = true
     encodeDefaults = true
-    isLenient = true
 }
 
 private val jsonConverter = json.asConverterFactory(CONTENT_TYPE_JSON)
