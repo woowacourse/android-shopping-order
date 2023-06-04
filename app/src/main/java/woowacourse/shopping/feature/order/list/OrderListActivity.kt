@@ -40,7 +40,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     override fun showOrders(orderPreviews: List<OrderPreviewUiModel>) {
         binding.recyclerviewOrder.adapter =
-            OrderListAdapter(orderPreviews, presenter::requestOrderDetail)
+            OrderListAdapter(orderPreviews.reversed(), presenter::requestOrderDetail)
     }
 
     override fun showOrderDetail(orderId: Long) {
