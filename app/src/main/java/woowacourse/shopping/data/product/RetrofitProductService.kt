@@ -5,7 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.product.model.ProductsResponse
+import woowacourse.shopping.data.product.model.dto.response.ProductsResponse
 
 interface RetrofitProductService {
 

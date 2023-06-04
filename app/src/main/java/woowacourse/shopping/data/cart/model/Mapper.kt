@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.cart.model
 
 import com.example.domain.CartProduct
+import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 
 fun CartProductResponse.toDomain(): CartProduct {
     return CartProduct(

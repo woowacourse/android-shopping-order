@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.order.model
+package woowacourse.shopping.data.order.model.dto.response
 
 data class FixedDiscountPolicyResponse(
     val minimumPrice: Int,
