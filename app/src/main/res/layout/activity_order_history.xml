@@ -16,11 +16,11 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/tv_order_history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:text="@string/tv_order_history"
+            android:text="@string/order_history"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -28,14 +28,16 @@
             app:layout_constraintTop_toBottomOf="@+id/tb_order_history" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_order_history"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="20dp"
             tools:listitem="@layout/order_history_item"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_order_history" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

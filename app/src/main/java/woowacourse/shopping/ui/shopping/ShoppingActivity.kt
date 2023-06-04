@@ -21,6 +21,7 @@ import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.contract.ShoppingContract
 import woowacourse.shopping.ui.shopping.contract.presenter.ShoppingPresenter
@@ -61,7 +62,13 @@ class ShoppingActivity :
         actionView?.findViewById<ImageView>(R.id.cartBtn)?.setOnClickListener { navigateToCart() }
         actionView?.findViewById<TextView>(R.id.cartSize)?.let { cartSize = it }
         presenter.updateCountSize()
+        actionView?.findViewById<ImageView>(R.id.historyBtn)
+            ?.setOnClickListener { navigateToHistory() }
         return true
+    }
+
+    private fun navigateToHistory() {
+        startActivity(OrderHistoryActivity.from(this))
     }
 
     override fun onResume() {

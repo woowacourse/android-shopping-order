@@ -1,9 +1,11 @@
 package woowacourse.shopping
 
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import woowacourse.shopping.model.OrderProductUIModel
 
 object CustomBindingAdapter {
 
@@ -16,5 +18,12 @@ object CustomBindingAdapter {
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(view)
+    }
+
+    @BindingAdapter("orderProductsName")
+    @JvmStatic
+    fun setOrderProductsName(view: TextView, orderProducts: List<OrderProductUIModel>?) {
+        val orderProductsName = orderProducts?.joinToString(", ") { it.product.name }
+        view.text = orderProductsName
     }
 }
