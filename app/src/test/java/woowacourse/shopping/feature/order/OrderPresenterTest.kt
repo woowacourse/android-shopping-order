@@ -1,8 +1,8 @@
 package woowacourse.shopping.feature.order
 
 import com.example.domain.Cart
+import com.example.domain.CartProduct
 import com.example.domain.FixedDiscountPolicies
-import com.example.domain.FixedDiscountPolicy
 import com.example.domain.repository.OrderRepository
 import io.mockk.every
 import io.mockk.justRun
@@ -21,7 +21,7 @@ class OrderPresenterTest {
     @Before
     fun setup() {
         view = mockk()
-        orderProducts = mockk()
+        orderProducts = mockk(relaxed = true)
         orderRepository = mockk()
         presenter = OrderPresenter(
             view = view, orderProducts = orderProducts, orderRepository = orderRepository
@@ -31,26 +31,28 @@ class OrderPresenterTest {
     @Test
     fun `주문할 상품들을 화면에 표시한다`() {
         // given
-        justRun { view.setOrderProducts(orderProducts) }
+        justRun { view.setOrderProducts(any()) }
 
         // when
         presenter.loadOrderProducts()
 
         // then
-        verify { view.setOrderProducts(orderProducts) }
+        verify { view.setOrderProducts(any()) }
     }
 
     @Test
     fun `주문할 상품들의 가격 총합을 계산하고 화면을 표시한다`() {
         // given
         val productsSum = 100000
-        val fixedDiscountPolicies = FixedDiscountPolicies(
-            listOf(
-                FixedDiscountPolicy(50000, 2000),
-                FixedDiscountPolicy(100000, 5000),
-                FixedDiscountPolicy(200000, 12000)
-            )
-        )
+        val discountPrice = 5000
+        val finalPrice = 95000
+
+        val fixedDiscountPolicies = mockk<FixedDiscountPolicies>()
+        every { orderRepository.requestFetchDiscountPolicy(captureLambda(), any()) } answers {
+            val onSuccess = lambda<(FixedDiscountPolicies) -> Unit>().captured
+            onSuccess.invoke(fixedDiscountPolicies)
+        }
+
         every { orderProducts.getPickedProductsTotalPrice() } returns productsSum
         every { fixedDiscountPolicies.getDiscountPrice(productsSum) } returns 5000
         every { fixedDiscountPolicies.getFinalPrice(productsSum) } returns 95000
@@ -58,25 +60,47 @@ class OrderPresenterTest {
         justRun { view.setProductsSum(productsSum) }
         justRun { view.setDiscountPrice(discountPrice) }
         justRun { view.setFinalPrice(finalPrice) }
+
         // when
         presenter.calculatePrice()
 
         // then
-        verify { view.setProductsSum(productsSum) }
-        verify { view.setDiscountPrice(discountPrice) }
-        verify { view.setFinalPrice(finalPrice) }
+        verify(exactly = 1) { view.setProductsSum(productsSum) }
+        verify(exactly = 1) { view.setDiscountPrice(discountPrice) }
+        verify(exactly = 1) { view.setFinalPrice(finalPrice) }
     }
 
     @Test
     fun `주문상세내역 화면으로 이동한다`() {
         // given
-        val orderId = 1
-        every { orderRepository.createOrder(orderProducts) }
+        val orderId = 1L
+        every { orderProducts.products } returns listOf(
+            CartProduct(
+                id = 1L,
+                productId = 1L,
+                productImageUrl = "",
+                productName = "",
+                productPrice = 0,
+                quantity = 1,
+                isPicked = false
+            )
+        )
+        every {
+            orderRepository.requestAddOrder(
+                cartIds = listOf(1L),
+                finalPrice = 0,
+                captureLambda(),
+                any()
+            )
+        } answers {
+            val onSuccess = lambda<(orderId: Long) -> Unit>().captured
+            onSuccess.invoke(orderId)
+        }
 
         justRun { view.showOrderDetailPage(orderId) }
 
         // when
-        presenter.navigateToOrderDetail() // 주문생성하고 success로 온 orderId를 상세페이지로 전달
+        presenter.navigateToOrderDetail()
 
         // then
         verify { view.showOrderDetailPage(orderId) }

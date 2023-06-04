@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.order
 
+import com.example.domain.FixedDiscountPolicies
 import com.example.domain.order.Order
 import com.example.domain.order.OrderSummary
 import com.example.domain.repository.OrderRepository
@@ -10,6 +11,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.order.FixedDiscountPoliciesResponse
 import woowacourse.shopping.model.order.OrderRequest
 import woowacourse.shopping.model.order.OrderSummaryResponse
 import woowacourse.shopping.util.BANDAL
@@ -63,7 +65,7 @@ class OrderRemoteRepository(
     }
 
     override fun requestAddOrder(
-        cartIds: List<Int>,
+        cartIds: List<Long>,
         finalPrice: Int,
         onSuccess: (orderId: Long) -> Unit,
         onFailure: () -> Unit
@@ -104,5 +106,28 @@ class OrderRemoteRepository(
                 onFailure()
             }
         })
+    }
+
+    override fun requestFetchDiscountPolicy(
+        onSuccess: (fixedDiscountPolicies: FixedDiscountPolicies) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        retrofitOrderService.requestFetchDiscountPolicy()
+            .enqueue(object : Callback<FixedDiscountPoliciesResponse> {
+                override fun onResponse(
+                    call: Call<FixedDiscountPoliciesResponse>,
+                    response: Response<FixedDiscountPoliciesResponse>
+                ) {
+                    val result: FixedDiscountPoliciesResponse? = response.body()
+                    if (400 <= response.code()) return onFailure()
+                    if (result == null) return onFailure()
+                    onSuccess(result.toDomain())
+                }
+
+                override fun onFailure(call: Call<FixedDiscountPoliciesResponse>, t: Throwable) {
+                    onFailure()
+                }
+            }
+            )
     }
 }
