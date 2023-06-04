@@ -117,6 +117,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     override fun moveToOrderDetail(orderId: Long) {
         val intent = OrderDetailActivity.createIntent(this, server, orderId)
         startActivity(intent)
+        finish()
     }
 
     override fun handleErrorView(message: String) {

@@ -8,6 +8,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
+import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -39,6 +41,12 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     override fun setOrderDateView(date: String) {
         binding.tvOrderDetailDate.text = date
+    }
+
+    override fun setOrderProductsView(products: List<CartModel>) {
+        val orderProductAdapter = OrderProductAdapter()
+        orderProductAdapter.setItems(products)
+        binding.rvOrderDetailProductList.adapter = orderProductAdapter
     }
 
     override fun handleErrorView() {
