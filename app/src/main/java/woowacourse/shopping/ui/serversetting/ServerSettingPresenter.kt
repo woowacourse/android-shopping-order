@@ -11,6 +11,7 @@ class ServerSettingPresenter(
 ) : Presenter {
 
     override fun selectServer(server: Server) {
+        shoppingPreference.setToken("dG1kZ2gxNTkyQG5hdmVyLmNvbToxMjM0")
         shoppingPreference.setBaseUrl(server.url)
         view.navigateToShopping(server.url)
     }
