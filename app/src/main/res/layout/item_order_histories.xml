@@ -8,6 +8,10 @@
         <variable
             name="orderHistory"
             type="woowacourse.shopping.uimodel.OrderHistoryUIModel" />
+
+        <variable
+            name="onOrderDetailClick"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,9 +41,10 @@
             android:layout_marginTop="13dp"
             android:background="@drawable/layout_border_radius"
             android:gravity="center"
+            android:onClick="@{() -> onOrderDetailClick.invoke(orderHistory.id)}"
             android:paddingHorizontal="5dp"
             android:paddingVertical="3dp"
-            android:text="주문 상세"
+            android:text="@string/order_btn_detail"
             android:textColor="@color/gray_333333"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"

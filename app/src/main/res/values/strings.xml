@@ -58,5 +58,6 @@
     <string name="order_detail_title_history">주문 내역</string>
     <string name="order_detail_title_detail">주문 상세</string>
     <string name="order_title_date">주문일자</string>
+    <string name="order_btn_detail">주문 상세</string>
 
 </resources>

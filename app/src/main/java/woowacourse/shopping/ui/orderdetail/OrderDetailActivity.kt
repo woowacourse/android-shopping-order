@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.orderdetail
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -16,5 +18,11 @@ class OrderDetailActivity : AppCompatActivity() {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_detail)
+    }
+
+    companion object {
+        fun getIntent(context: Context): Intent {
+            return Intent(context, OrderDetailActivity::class.java)
+        }
     }
 }

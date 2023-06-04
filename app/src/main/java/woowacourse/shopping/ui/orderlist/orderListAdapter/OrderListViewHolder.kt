@@ -9,10 +9,15 @@ import woowacourse.shopping.uimodel.OrderHistoryUIModel
 
 class OrderListViewHolder(
     parent: ViewGroup,
+    onClick: (Int) -> Unit,
 ) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.item_order_histories, parent, false),
 ) {
     private val binding = ItemOrderHistoriesBinding.bind(itemView)
+
+    init {
+        binding.onOrderDetailClick = onClick
+    }
 
     fun bind(orderHistory: OrderHistoryUIModel) {
         binding.orderHistory = orderHistory

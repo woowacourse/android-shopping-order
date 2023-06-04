@@ -15,4 +15,8 @@ class OrderListPresenter(
             )
         }
     }
+
+    override fun showOrderDetail(orderId: Int) {
+        view.navigateToOrderDetail(orderId)
+    }
 }
