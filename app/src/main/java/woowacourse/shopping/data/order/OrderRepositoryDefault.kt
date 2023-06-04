@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.order
 
-import woowacourse.shopping.data.order.dto.OrderCartItem
-import woowacourse.shopping.data.order.dto.OrderCartItems
+import woowacourse.shopping.data.order.dto.OrderCartItemDto
+import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.Order
 
@@ -26,9 +26,9 @@ class OrderRepositoryDefault(private val orderDataSource: OrderDataSource) : Ord
         orderDataSource.orderCartProducts(cartProducts.toOrderCartItems(), callback)
     }
 
-    private fun List<CartProduct>.toOrderCartItems() = OrderCartItems(map { it.toOrderCartItem() })
+    private fun List<CartProduct>.toOrderCartItems() = OrderCartItemDtos(map { it.toOrderCartItem() })
 
-    private fun CartProduct.toOrderCartItem() = OrderCartItem(
+    private fun CartProduct.toOrderCartItem() = OrderCartItemDto(
         cartItemId = cartId,
         orderCartItemImageUrl = product.imageUrl,
         orderCartItemName = product.name,

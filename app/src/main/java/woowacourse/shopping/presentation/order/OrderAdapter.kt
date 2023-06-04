@@ -7,13 +7,13 @@ import woowacourse.shopping.presentation.model.CartProductModel
 
 class OrderAdapter(
     private val orderCartProducts: List<CartProductModel>,
-) : RecyclerView.Adapter<OrderItemViewHolder>() {
+) : RecyclerView.Adapter<OrderCartItemViewHolder>() {
 
     private lateinit var inflater: LayoutInflater
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderCartItemViewHolder {
         initLayoutInflater(parent)
-        return OrderItemViewHolder(parent, inflater)
+        return OrderCartItemViewHolder(parent, inflater)
     }
 
     private fun initLayoutInflater(parent: ViewGroup) {
@@ -24,7 +24,7 @@ class OrderAdapter(
 
     override fun getItemCount() = orderCartProducts.size
 
-    override fun onBindViewHolder(holder: OrderItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: OrderCartItemViewHolder, position: Int) {
         holder.bind(orderCartProducts[position])
     }
 }

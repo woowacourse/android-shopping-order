@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
@@ -10,6 +11,8 @@ import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cash.CashRemoteDataSource
 import woowacourse.shopping.data.cash.CashRepositoryDefault
+import woowacourse.shopping.data.order.OrderRemoteDataSource
+import woowacourse.shopping.data.order.OrderRepositoryDefault
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -30,7 +33,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             )
         val cashRepository =
             CashRepositoryDefault(CashRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo))
-        OrderPresenter(this, cartRepository, cashRepository)
+        val orderRepository =
+            OrderRepositoryDefault(OrderRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo))
+        OrderPresenter(this, cartRepository, cashRepository, orderRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +43,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding = ActivityOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
         loadOrderCarts()
+        loadRecentCash()
         initView()
-        initChargeCash()
+    }
+
+    private fun loadRecentCash() {
+        presenter.loadCash()
     }
 
     private fun loadOrderCarts() {
@@ -53,21 +62,60 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showCash(cash: Int) {
-        binding.textRecentCash.text = cash.toString()
+        binding.textRecentCash.text = getString(R.string.price_format, cash)
         binding.editOrderAddCash.text = null
     }
 
+    override fun showTotalPrice(totalPrice: Int) {
+        binding.textTotalProductPrice.text = getString(R.string.price_format, totalPrice)
+    }
+
     private fun initView() {
-        presenter.loadCash()
+        setToolBar()
+        initChargeCash()
+        initOrder()
+    }
+
+    private fun initOrder() {
+        binding.buttonPayment.setOnClickListener {
+            presenter.orderCartProducts()
+        }
     }
 
     private fun initChargeCash() {
         binding.textOrderAddCash.setOnClickListener {
-            presenter.chargeCash(getChargeCash())
+            val cash = getChargeCash()
+            if (cash > 0) {
+                presenter.chargeCash(getChargeCash())
+            }
         }
     }
 
-    private fun getChargeCash() = binding.editOrderAddCash.text.toString().toInt()
+    private fun getChargeCash(): Int {
+        val cash = binding.editOrderAddCash.text.toString()
+        if (cash == "") return 0
+        return cash.toInt()
+    }
+
+    private fun setToolBar() {
+        setSupportActionBar(binding.toolbarOrder.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_back_24)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
+    override fun showOrderDetail() {
+        finish()
+    }
 
     companion object {
         private const val ORDER_CART_ID_LIST = "ORDER_CART_LIST"

@@ -7,7 +7,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderCartBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 
-class OrderItemViewHolder(
+class OrderCartItemViewHolder(
     parent: ViewGroup,
     inflater: LayoutInflater,
 ) : RecyclerView.ViewHolder(

@@ -1,9 +1,13 @@
 package woowacourse.shopping.presentation.mapper
 
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderProduct
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.presentation.model.CheckableCartProductModel
+import woowacourse.shopping.presentation.model.OrderModel
+import woowacourse.shopping.presentation.model.OrderProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 
 fun CartProduct.toPresentation(): CheckableCartProductModel {
@@ -32,3 +36,15 @@ fun ProductModel.toDomain(): Product {
         price = Price(price),
     )
 }
+
+fun Order.toPresentation() = OrderModel(
+    orderId = orderId,
+    orderDateTime = orderDateTime,
+    orderProductModels = orderProducts.map { it.toPresentation() },
+    totalPrice = totalPrice.value,
+)
+
+fun OrderProduct.toPresentation() = OrderProductModel(
+    product.toPresentation(),
+    quantity,
+)
