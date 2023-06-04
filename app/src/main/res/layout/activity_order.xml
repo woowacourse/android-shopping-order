@@ -69,7 +69,7 @@
                     app:layout_constraintTop_toBottomOf="@id/view_line_order1" />
 
                 <TextView
-                    android:id="@+id/tv_order_available_point_title_info"
+                    android:id="@+id/tv_order_available_point_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -88,8 +88,8 @@
                     android:maxLines="1"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tv_order_available_point_title_info"
-                    app:layout_constraintTop_toTopOf="@id/tv_order_available_point_title_info"
+                    app:layout_constraintStart_toEndOf="@id/tv_order_available_point_info"
+                    app:layout_constraintTop_toTopOf="@id/tv_order_available_point_info"
                     tools:text="1,000포인트" />
 
                 <TextView
@@ -102,7 +102,7 @@
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_order_available_point_title_info" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_available_point_info" />
 
                 <EditText
                     android:id="@+id/et_order_use_point"
@@ -241,7 +241,7 @@
                     android:padding="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_order_payment_detail_use_point_title_info">
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_payment_detail_use_point_title_info">
 
                     <TextView
                         android:id="@+id/tv_order_payment_detail_total_price_title_info"

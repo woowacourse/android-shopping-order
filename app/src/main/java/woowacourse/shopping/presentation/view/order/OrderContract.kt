@@ -14,6 +14,7 @@ interface OrderContract {
         fun setTotalPriceView(totalPrice: Int)
         fun setOrderPriceView(point: Int, totalPrice: Int)
         fun clearUsedPointView()
+        fun moveToOrderDetail(orderId: Long)
         fun handleErrorView(message: String)
     }
 

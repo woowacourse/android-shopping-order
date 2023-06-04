@@ -15,6 +15,7 @@ import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.order.adapter.CardAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
+import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -111,6 +112,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun getMessage(resourceId: Int): String {
         return getString(resourceId)
+    }
+
+    override fun moveToOrderDetail(orderId: Long) {
+        val intent = OrderDetailActivity.createIntent(this, orderId)
+        startActivity(intent)
     }
 
     override fun handleErrorView(message: String) {

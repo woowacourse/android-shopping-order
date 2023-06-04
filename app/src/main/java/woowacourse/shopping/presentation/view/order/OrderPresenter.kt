@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.view.order
 
 import android.text.Editable
-import android.util.Log
 import com.example.domain.cart.CartProducts
 import woowacourse.shopping.R
 import woowacourse.shopping.data.mapper.toDomain
@@ -63,8 +62,8 @@ class OrderPresenter(
     override fun order(usedPoint: Int) {
         val cartIds = cartItemsDomain.getCheckedCartProductsId()
         val orderPostEntity = OrderPostEntity(cartIds, DUMMY_CARD_NUMBER, DUMMY_CARD_CVC, usedPoint)
-        orderRepository.requestOrder(orderPostEntity, ::onFailure) {
-            Log.d("krrong", "$it")
+        orderRepository.requestOrder(orderPostEntity, ::onFailure) { orderId ->
+            view.moveToOrderDetail(orderId)
         }
     }
 
