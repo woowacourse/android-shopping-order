@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.orderHistories
 
-import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.OrderHistoryUIModel
@@ -12,15 +12,12 @@ class OrderHistoriesPresenter(
 ) : OrderHistoriesContract.Presenter {
     val orderHistories = mutableListOf<OrderHistoryUIModel>()
 
-    private val lock = ReentrantLock()
-
     override fun getOrderHistories() {
-        if (lock.isLocked) return
-        lock.lock()
-        orderRepository.getOrderHistoriesNext { result ->
+        CompletableFuture.supplyAsync {
+            orderRepository.getOrderHistoriesNext()
+        }.thenAccept { result ->
             result.onSuccess { histories -> view.showOrderHistories(histories.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
-                .also { lock.unlock() }
         }
     }
 

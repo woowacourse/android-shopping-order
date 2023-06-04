@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -30,17 +29,10 @@ class OrderHistoryPresenterTest {
         // given
         val mockOrderHistory: OrderHistory = mockk()
         val mockOrderHistoryUIModel: OrderHistoryUIModel = mockk()
-
-        val successSlot = slot<(Result<OrderHistory>) -> Unit>()
-        every {
-            orderRepository.getOrderHistory(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(mockOrderHistory))
-        }
-
         mockkStatic("woowacourse.shopping.mapper.OrderHistoryMapperKt")
         every { mockOrderHistory.toUIModel() } answers { mockOrderHistoryUIModel }
-
+        every { orderRepository.getOrderHistory(any()) }
+            .answers { Result.success(mockOrderHistory) }
         justRun { view.setOrderHistory(any()) }
 
         // when

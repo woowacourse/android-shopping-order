@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.orderHistory
 
+import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.utils.LogUtil
@@ -11,7 +12,9 @@ class OrderHistoryPresenter(
 ) : OrderHistoryContract.Presenter {
 
     override fun getOrderDetail() {
-        orderRepository.getOrderHistory(orderId) { result ->
+        CompletableFuture.supplyAsync {
+            orderRepository.getOrderHistory(orderId)
+        }.thenAccept { result ->
             result.onSuccess { order -> view.setOrderHistory(order.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
         }

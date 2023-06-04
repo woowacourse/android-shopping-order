@@ -2,12 +2,9 @@ package woowacourse.shopping.ui.orderHistories
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.slot
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
-import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderHistoryUIModel
 
@@ -29,15 +26,8 @@ class OrderHistoriesPresenterTest {
         val mockOrderHistory = mockk<OrderHistory>()
         val mockOrderHistoryUIModel = mockk<OrderHistoryUIModel>()
 
-        mockkStatic("woowacourse.shopping.mapper.OrderHistoryMapperKt")
-        every { mockOrderHistory.toUIModel() } answers { mockOrderHistoryUIModel }
-
-        val successSlot = slot<(Result<List<OrderHistory>>) -> Unit>()
-        every {
-            orderRepository.getOrderHistoriesNext(capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(listOf(mockOrderHistory)))
-        }
+        every { orderRepository.getOrderHistoriesNext() }
+            .answers { Result.success(listOf(mockOrderHistory)) }
 
         every { view.showOrderHistories(any()) } answers { }
 

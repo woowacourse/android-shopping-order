@@ -4,8 +4,8 @@ import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.OrderHistory
 
 interface OrderRepository {
-    fun getOrder(cartIds: List<Int>, callback: (Result<Order>) -> Unit)
-    fun getOrderHistoriesNext(callback: (Result<List<OrderHistory>>) -> Unit)
-    fun getOrderHistory(id: Long, callback: (Result<OrderHistory>) -> Unit)
-    fun postOrder(point: Int, cartIds: List<Int>, callback: (Result<Long>) -> Unit)
+    fun getOrder(cartIds: List<Int>): Result<Order>
+    fun getOrderHistoriesNext(): Result<List<OrderHistory>>
+    fun getOrderHistory(id: Long): Result<OrderHistory>
+    fun postOrder(point: Int, cartIds: List<Int>): Result<Long>
 }

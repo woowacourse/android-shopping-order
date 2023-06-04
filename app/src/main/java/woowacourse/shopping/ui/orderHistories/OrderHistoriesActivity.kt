@@ -95,7 +95,9 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
     }
 
     override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
-        adapter.submitList(adapter.currentList + orderHistories)
+        runOnUiThread {
+            adapter.submitList(adapter.currentList + orderHistories)
+        }
     }
 
     override fun navigateToOrderHistory(orderId: Long) {

@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order
 
+import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.utils.LogUtil
@@ -10,14 +11,18 @@ class OrderPresenter(
     private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
     override fun getOrder() {
-        orderRepository.getOrder(cartIds) { result ->
-            result.onSuccess { orderList -> view.showOrder(orderList.toUIModel()) }
-                .onFailure { throwable -> LogUtil.logError(throwable) }
+        CompletableFuture.supplyAsync {
+            orderRepository.getOrder(cartIds)
+        }.thenAccept { result ->
+            result.onSuccess { order -> view.showOrder(order.toUIModel()) }
+                .onFailure { e -> LogUtil.logError(e) }
         }
     }
 
     override fun confirmOrder(point: Int) {
-        orderRepository.postOrder(point, cartIds) { result ->
+        CompletableFuture.supplyAsync {
+            orderRepository.postOrder(point, cartIds)
+        }.thenAccept { result ->
             result.onSuccess { view.navigateOrder() }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }

@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -34,14 +33,7 @@ class OrderPresenterTest {
 
         mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
         every { mockOrder.toUIModel() } answers { mockOrderUIModel }
-
-        val successSlot = slot<(Result<Order>) -> Unit>()
-        every {
-            orderRepository.getOrder(any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(mockOrder))
-        }
-
+        every { orderRepository.getOrder(any()) } answers { Result.success(mockOrder) }
         every { mockOrder.cartItems } returns listOf()
         justRun { view.showOrder(any()) }
 
@@ -53,16 +45,9 @@ class OrderPresenterTest {
     }
 
     @Test
-    fun `주문을 하면 `() {
+    fun `주문을 하면 메인 화면으로 간다`() {
         // given
-        mockkStatic("woowacourse.shopping.mapper.OrderMapperKt")
-
-        val successSlot = slot<(Result<Long>) -> Unit>()
-        every {
-            orderRepository.postOrder(any(), any(), capture(successSlot))
-        } answers {
-            successSlot.captured.invoke(Result.success(1))
-        }
+        every { orderRepository.postOrder(any(), any()) } answers { Result.success(1) }
         justRun { view.navigateOrder() }
 
         // when
