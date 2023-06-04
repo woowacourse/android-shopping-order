@@ -18,6 +18,9 @@
             android:name=".feature.order.OrderActivity"
             android:exported="false" />
         <activity
+            android:name=".feature.orderdetail.OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".feature.serversetting.ServerSettingActivity"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -42,7 +45,7 @@
             android:name=".feature.main.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"></activity>
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>

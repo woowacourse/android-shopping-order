@@ -9,9 +9,12 @@ interface OrderContract {
         fun showNonDiscount()
         fun showPayAmountInfo(totalPrice: Int, discountAmount: Int = 0)
         fun showPayAmount(payAmount: Int)
+        fun succeedInOrder(orderId: Long)
+        fun failToOrder()
     }
 
     interface Presenter {
-        fun requestProducts(cartIds: List<Long>)
+        fun requestProducts()
+        fun order()
     }
 }

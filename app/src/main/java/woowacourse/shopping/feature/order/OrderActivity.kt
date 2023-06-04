@@ -5,12 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.local.CartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.OrderRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
+import woowacourse.shopping.data.service.order.OrderRemoteService
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.feature.orderdetail.OrderDetailActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.util.toMoneyFormat
 
@@ -25,10 +29,20 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         supportActionBar?.title = getString(R.string.order)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        presenter = OrderPresenter(this, CartRepositoryImpl(CartRemoteService()))
         val cartIds: List<Long> =
             intent.getLongArrayExtra(PRODUCTS_ID_KEY)?.toList() ?: listOf()
-        presenter.requestProducts(cartIds)
+        presenter = OrderPresenter(
+            cartIds,
+            this,
+            CartRepositoryImpl(CartRemoteService()),
+            OrderRepositoryImpl(
+                OrderRemoteService(),
+            ),
+        )
+        presenter.requestProducts()
+        binding.btnOrder.setOnClickListener {
+            presenter.order()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,6 +83,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun showPayAmount(payAmount: Int) {
         binding.textFinalPrice.text = getString(R.string.price_format, payAmount.toMoneyFormat())
+    }
+
+    override fun succeedInOrder(orderId: Long) {
+        Toast.makeText(this, "주문이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+        val orderDetailIntent = OrderDetailActivity.getIntent(this, orderId)
+        startActivity(orderDetailIntent)
+    }
+
+    override fun failToOrder() {
+        println("주문 실패")
     }
 
     companion object {

@@ -1,12 +1,15 @@
 package woowacourse.shopping.feature.order
 
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.OrderRepository
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartProductUiModel
 
 class OrderPresenter(
+    private val cartIds: List<Long>,
     private val view: OrderContract.View,
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) :
     OrderContract.Presenter {
     private var orderProducts: List<CartProductUiModel> = listOf()
@@ -14,7 +17,7 @@ class OrderPresenter(
     private var totalPrice = 0
     private var payAmount = 0
 
-    override fun requestProducts(cartIds: List<Long>) {
+    override fun requestProducts() {
         cartRepository.getAll(
             onSuccess = { it ->
                 val products = mutableListOf<CartProductUiModel>()
@@ -29,6 +32,26 @@ class OrderPresenter(
             },
             onFailure = {},
         )
+    }
+
+    override fun order() {
+        val productCount = orderProducts.sumOf { it.productUiModel.count }
+        if (productCount <= MAXIMUM_ORDERABLE_COUNT) {
+            // 서버에 주문 요청을 한다.
+            orderRepository.addOrder(
+                cartIds,
+                payAmount,
+                onSuccess = { orderId ->
+                    view.succeedInOrder(orderId)
+                },
+                onFailure = {
+                    view.failToOrder()
+                },
+            )
+        } else {
+            // view를 이용해 주문이 불가함을 알려준다.
+            view.failToOrder()
+        }
     }
 
     private fun calculatePrice() {
@@ -66,5 +89,9 @@ class OrderPresenter(
     private fun showDiscount(discountCondition: Discount.Condition) {
         view.showDiscount(discountCondition.standardPrice, discountCondition.amount)
         view.showPayAmountInfo(totalPrice, discountCondition.amount)
+    }
+
+    companion object {
+        private const val MAXIMUM_ORDERABLE_COUNT = 99
     }
 }
