@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo
 import woowacourse.shopping.ui.paymentconfirm.ApplyPointMessageCode
 
@@ -33,12 +34,24 @@ inline fun View.setBindingThrottleFirstOnClickListener(
 }
 
 @BindingAdapter("app:productNameCount")
-fun TextView.setProductNameCount(preOrderInfo: PreOrderInfo) {
+fun TextView.setPreOrderProductNameCount(preOrderInfo: PreOrderInfo) {
     text = if (preOrderInfo.representativeExceptCount > 0) {
         this.context.getString(R.string.tv_payment_product_name_count)
             .format(preOrderInfo.representativeTitle, preOrderInfo.representativeExceptCount)
     } else {
         preOrderInfo.representativeTitle
+    }
+}
+
+@BindingAdapter("app:productNameCount")
+fun TextView.setOrderProductNameCount(orderInfo: UiOrder) {
+    val representativeExceptCount = (orderInfo.orderItems.size - 1)
+    val representativeTitle = orderInfo.orderItems.first().product.name
+    text = if (representativeExceptCount > 0) {
+        this.context.getString(R.string.tv_order_item_on_image_count)
+            .format(representativeTitle, representativeExceptCount)
+    } else {
+        representativeTitle
     }
 }
 
