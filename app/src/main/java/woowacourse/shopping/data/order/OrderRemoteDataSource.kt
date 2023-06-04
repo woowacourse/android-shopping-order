@@ -1,9 +1,12 @@
 package woowacourse.shopping.data.order
 
+import android.util.Log
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.order.dto.Order
 import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.data.order.dto.Orders
@@ -14,7 +17,7 @@ class OrderRemoteDataSource(
 ) : OrderDataSource {
     private val retrofitService: OrderRetrofitService = Retrofit.Builder()
         .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(OrderRetrofitService::class.java)
 
@@ -30,7 +33,9 @@ class OrderRemoteDataSource(
                         callback(orders)
                     }
 
-                    override fun onFailure(call: Call<Orders>, t: Throwable) {}
+                    override fun onFailure(call: Call<Orders>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
+                    }
                 },
             )
     }
@@ -47,7 +52,9 @@ class OrderRemoteDataSource(
                         callback(order)
                     }
 
-                    override fun onFailure(call: Call<Order>, t: Throwable) {}
+                    override fun onFailure(call: Call<Order>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
+                    }
                 },
             )
     }
@@ -64,7 +71,9 @@ class OrderRemoteDataSource(
                         callback(location?.toLong() ?: 0)
                     }
 
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {}
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
+                    }
                 },
             )
     }

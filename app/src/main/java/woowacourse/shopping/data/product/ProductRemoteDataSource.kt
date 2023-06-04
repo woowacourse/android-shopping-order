@@ -1,9 +1,12 @@
 package woowacourse.shopping.data.product
 
+import android.util.Log
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.product.dto.ProductDetail
 import woowacourse.shopping.data.product.dto.ProductListInfo
 
@@ -12,9 +15,10 @@ class ProductRemoteDataSource(
     private val userId: String,
 ) : ProductDataSource {
 
+    private val contentType = "application/json".toMediaType()
     private val retrofitService: ProductsRetrofitService = Retrofit.Builder()
         .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory(contentType))
         .build()
         .create(ProductsRetrofitService::class.java)
 
@@ -32,7 +36,9 @@ class ProductRemoteDataSource(
                         }
                     }
 
-                    override fun onFailure(call: Call<ProductDetail>, t: Throwable) {}
+                    override fun onFailure(call: Call<ProductDetail>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
+                    }
                 },
             )
     }
@@ -54,7 +60,9 @@ class ProductRemoteDataSource(
                         callback(productDetails, isLast)
                     }
 
-                    override fun onFailure(call: Call<ProductListInfo>, t: Throwable) {}
+                    override fun onFailure(call: Call<ProductListInfo>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
+                    }
                 },
             )
     }

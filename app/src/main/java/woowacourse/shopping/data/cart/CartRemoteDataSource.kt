@@ -1,18 +1,20 @@
 package woowacourse.shopping.data.cart
 
+import android.util.Log
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.cart.dto.CartProduct
-import woowacourse.shopping.data.cart.dto.CartProducts
 import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
 
 class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDataSource {
 
     private val retrofitService: CartRetrofitService = Retrofit.Builder()
         .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(CartRetrofitService::class.java)
 
@@ -33,6 +35,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
                     }
 
                     override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -50,6 +53,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
                     }
 
                     override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -67,6 +71,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
                     }
 
                     override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -75,16 +80,17 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     override fun getAllCartProducts(callback: (List<CartProduct>) -> Unit) {
         retrofitService.requestCartProducts(userId)
             .enqueue(
-                object : retrofit2.Callback<CartProducts> {
+                object : retrofit2.Callback<List<CartProduct>> {
                     override fun onResponse(
-                        call: Call<CartProducts>,
-                        response: Response<CartProducts>,
+                        call: Call<List<CartProduct>>,
+                        response: Response<List<CartProduct>>,
                     ) {
                         val cartProducts = response.body() ?: listOf()
                         callback(cartProducts)
                     }
 
-                    override fun onFailure(call: Call<CartProducts>, t: Throwable) {
+                    override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
+                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
