@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.dataSource
 
+import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitProductService
-import woowacourse.shopping.data.service.RetrofitUtil
 import woowacourse.shopping.model.Product
 
 class RemoteProductDataSource(
-    private val service: RetrofitProductService = RetrofitUtil.retrofitProductService,
+    private val service: RetrofitProductService = RetrofitClient.getInstance().retrofitProductService,
 ) : ProductDataSource {
 
     override fun getAll(callback: (List<Product>?) -> Unit) {

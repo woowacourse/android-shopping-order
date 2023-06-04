@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
@@ -17,21 +18,24 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
+        val token = "YUBhLmNvbToxMjM0"
         binding.btnIoServer.setOnClickListener {
-            startMain(SERVER_IO)
+            RetrofitClient.getInstance(SERVER_IO, "BASIC $token")
+            startMain()
         }
         binding.btnJitoServer.setOnClickListener {
-            startMain(SERVER_JITO)
+            RetrofitClient.getInstance(SERVER_JITO, "BASIC $token")
+            startMain()
         }
     }
 
-    private fun startMain(server: String) {
-        startActivity(ShoppingActivity.getIntent(this, server))
+    private fun startMain() {
+        startActivity(ShoppingActivity.getIntent(this))
         finish()
     }
 
     companion object {
-        const val SERVER_IO = "http://43.200.169.154:8080"
-        const val SERVER_JITO = "http://13.125.207.155:8080"
+        private const val SERVER_IO = "http://43.200.169.154:8080"
+        private const val SERVER_JITO = "http://13.125.207.155:8080"
     }
 }

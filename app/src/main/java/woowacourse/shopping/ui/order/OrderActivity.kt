@@ -16,7 +16,6 @@ import woowacourse.shopping.data.dataSource.RemoteOrderDataSource
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.order.orderAdapter.OrderAdapter
-import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.uimodel.OrderInfoUIModel
 
@@ -81,7 +80,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun navigateToShopping() {
-        val intent = ShoppingActivity.getIntent(this, ServerSettingActivity.SERVER_IO)
+        val intent = ShoppingActivity.getIntent(this)
         startActivity(intent)
         finish()
     }

@@ -24,7 +24,6 @@ import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
 import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.uimodel.RecentProductUIModel
-import woowacourse.shopping.utils.ServerURL
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
@@ -131,8 +130,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context, server: String): Intent {
-            ServerURL.url = server
+        fun getIntent(context: Context): Intent {
             return Intent(context, ShoppingActivity::class.java)
         }
     }

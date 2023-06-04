@@ -1,16 +1,14 @@
 package woowacourse.shopping.data.dataSource
 
 import woowacourse.shopping.data.service.RetrofitCartService
-import woowacourse.shopping.data.service.RetrofitUtil
+import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.model.CartProduct
 
 class RemoteCartDataSource(
-    private val service: RetrofitCartService = RetrofitUtil.retrofitCartService,
+    private val service: RetrofitCartService = RetrofitClient.getInstance().retrofitCartService,
 ) : CartDataSource {
-    private var credentials = "BASIC YUBhLmNvbToxMjM0"
-
     override fun getAll(callback: (List<CartProduct>?) -> Unit) {
-        service.getCarts(credentials).enqueue(
+        service.getCarts().enqueue(
             object : retrofit2.Callback<List<CartProduct>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<CartProduct>>,
@@ -27,10 +25,7 @@ class RemoteCartDataSource(
     }
 
     override fun postItem(itemId: Int, callback: (Int?) -> Unit) {
-        service.postCart(
-            credentials,
-            itemId,
-        ).enqueue(
+        service.postCart(itemId).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
@@ -49,11 +44,7 @@ class RemoteCartDataSource(
     }
 
     override fun patchItemQuantity(itemId: Int, quantity: Int, callback: (Int?) -> Unit) {
-        service.patchCart(
-            itemId,
-            credentials,
-            quantity,
-        ).enqueue(
+        service.patchCart(itemId, quantity).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
@@ -70,7 +61,7 @@ class RemoteCartDataSource(
     }
 
     override fun deleteItem(itemId: Int, callback: (Int?) -> Unit) {
-        service.deleteCart(itemId, credentials).enqueue(
+        service.deleteCart(itemId).enqueue(
             object : retrofit2.Callback<Int> {
                 override fun onResponse(
                     call: retrofit2.Call<Int>,
