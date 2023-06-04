@@ -14,6 +14,8 @@ import woowacourse.shopping.ui.cart.CartContract
 import woowacourse.shopping.ui.cart.CartPresenter
 import woowacourse.shopping.ui.detail.ProductDetailContract
 import woowacourse.shopping.ui.detail.ProductDetailPresenter
+import woowacourse.shopping.ui.order.detail.OrderDetailContract
+import woowacourse.shopping.ui.order.detail.OrderDetailPresenter
 import woowacourse.shopping.ui.order.history.OrderHistoryContract
 import woowacourse.shopping.ui.order.history.OrderHistoryPresenter
 import woowacourse.shopping.ui.order.main.OrderContract
@@ -83,5 +85,14 @@ fun injectOrderHistoryPresenter(
     view: OrderHistoryContract.View,
 ): OrderHistoryContract.Presenter = OrderHistoryPresenter(
     view = view,
+    orderProductRepository = OrderProductRepositoryImpl(),
+)
+
+fun injectOrderDetailPresenter(
+    view: OrderDetailContract.View,
+    orderId: Int,
+): OrderDetailContract.Presenter = OrderDetailPresenter(
+    view = view,
+    orderId = orderId,
     orderProductRepository = OrderProductRepositoryImpl(),
 )

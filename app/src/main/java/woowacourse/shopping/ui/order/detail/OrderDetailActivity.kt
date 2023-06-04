@@ -3,13 +3,42 @@ package woowacourse.shopping.ui.order.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
+import woowacourse.shopping.databinding.ActivityOrderDetailBinding
+import woowacourse.shopping.ui.order.detail.OrderDetailContract.View
+import woowacourse.shopping.util.extension.setContentView
+import woowacourse.shopping.util.inject.injectOrderDetailPresenter
 
-class OrderDetailActivity : AppCompatActivity() {
+class OrderDetailActivity : AppCompatActivity(), View {
+    private lateinit var binding: ActivityOrderDetailBinding
+
+    // private lateinit var adapter: OrderAdapter
+    private val presenter: OrderDetailContract.Presenter by lazy {
+        injectOrderDetailPresenter(
+            view = this,
+            orderId = intent.getIntExtra(ORDER_DETAIL_KEY, 0),
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order_detail)
+        binding = ActivityOrderDetailBinding.inflate(layoutInflater).setContentView(this)
+        setActionBar()
+    }
+
+    private fun setActionBar() {
+        setSupportActionBar(binding.orderDetailToolBar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        presenter.navigateToHome(item.itemId)
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun navigateToHome() {
+        finish()
     }
 
     companion object {
