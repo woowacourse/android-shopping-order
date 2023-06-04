@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderedProductBinding
 import woowacourse.shopping.domain.model.Order
@@ -17,6 +18,8 @@ class OrderDetailAdapter :
     class OrderDetailViewHolder(val binding: ItemOrderedProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(data: Order.OrderedProduct) {
+            Glide.with(binding.imageOrderItem.context).load(data.product.imageUrl)
+                .into(binding.imageOrderItem)
             binding.textOrderItemName.text = data.product.name
             binding.textOrderItemQuantity.text = data.quantity.toString()
             binding.textOrderItemPrice.text =
