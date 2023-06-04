@@ -20,11 +20,6 @@ class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
 
         val token = "Basic aGoyNzcyMEBnbWFpbC5jb206MTIzNA=="
         ShoppingPreference(this).setToken(token)
-
-//        OrderProductRepositoryImpl().requestOrders(
-//            onSuccess = { },
-//            onFailure = { },
-//        )
     }
 
     override fun navigateToShopping(serverUrl: String) {
