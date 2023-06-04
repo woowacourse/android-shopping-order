@@ -191,8 +191,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun moveToOrderView(cartIds: List<Long>) {
-        val intent = OrderActivity.createIntent(this, cartIds, server)
+    override fun moveToOrderView(cartItems: List<CartModel>) {
+        val intent = OrderActivity.createIntent(this, cartItems, server)
         startActivity(intent)
     }
 

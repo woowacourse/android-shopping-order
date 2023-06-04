@@ -41,4 +41,6 @@
     <string name="order_point_save_title_info_text">예상 적립 포인트</string>
     <string name="order_pay_button_text">주문하기</string>
     <string name="order_payment_detail_use_point_title_info_text">사용 포인트</string>
+
+    <string name="point_text">%,d포인트</string>
 </resources>

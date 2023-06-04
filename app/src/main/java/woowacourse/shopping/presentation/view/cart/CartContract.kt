@@ -13,7 +13,7 @@ interface CartContract {
         fun setTotalPriceView(totalPrice: Int)
         fun updateAllChecking(startPosition: Int, count: Int)
         fun setLayoutVisibility()
-        fun moveToOrderView(cartIds: List<Long>)
+        fun moveToOrderView(cartItems: List<CartModel>)
         fun handleErrorView()
     }
 

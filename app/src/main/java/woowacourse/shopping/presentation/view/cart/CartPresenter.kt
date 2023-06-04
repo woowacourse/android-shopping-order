@@ -139,8 +139,8 @@ class CartPresenter(
     }
 
     override fun order() {
-        val ids = pageNation.getCheckedProductIds()
-        view.moveToOrderView(ids)
+        val cartItems = pageNation.getCheckedProducts().map { it.toUiModel() }
+        view.moveToOrderView(cartItems)
     }
 
     companion object {

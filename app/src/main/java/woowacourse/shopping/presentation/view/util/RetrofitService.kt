@@ -10,6 +10,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.model.PointEntity
 import woowacourse.shopping.presentation.model.ProductModel
 
 interface RetrofitService {
@@ -43,6 +44,12 @@ interface RetrofitService {
         @Path(PATH_CART_ID) id: Long,
     ): Call<Unit>
 
+    @Headers(HEADER_JSON)
+    @GET(PATH_POINT)
+    fun requestPoint(
+        @Header(AUTHORIZATION) token: String,
+    ): Call<PointEntity>
+
     companion object {
         private const val HEADER_JSON = "Content-Type: application/json"
 
@@ -50,6 +57,7 @@ interface RetrofitService {
         private const val PATH_CART = "/cart-items"
         private const val PATH_ID = "id"
         private const val PATH_CART_ID = "cartItemId"
+        private const val PATH_POINT = "/points"
 
         private const val AUTHORIZATION = "Authorization"
     }

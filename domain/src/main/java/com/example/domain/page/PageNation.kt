@@ -66,8 +66,8 @@ data class PageNation(
         return copy(cartProducts = newCartProducts)
     }
 
-    fun getCheckedProductIds(): List<Long> {
-        return cartProducts.all.filter { it.checked }.map { it.id }
+    fun getCheckedProducts(): List<CartProduct> {
+        return cartProducts.all.filter { it.checked }
     }
 
     fun updateCurrentPageCheckedAll(isChecked: Boolean): PageNation {
