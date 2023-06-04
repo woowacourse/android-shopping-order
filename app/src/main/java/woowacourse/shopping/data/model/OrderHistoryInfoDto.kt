@@ -27,7 +27,7 @@ private fun Content.toDomain() = OrderHistoryProduct(
     orderId,
     Price(payAmount),
     orderAt,
-    OrderState.valueOf(orderStatus),
+    orderStatus.toDomain(),
     productName,
     productImageUrl,
     totalProductCount
@@ -35,3 +35,5 @@ private fun Content.toDomain() = OrderHistoryProduct(
 
 fun OrderHistoryInfoDto.toDomain() =
     OrderHistoryInfo(totalPages, currentPage, pageSize, contents.map { it.toDomain() })
+
+fun String.toDomain() = OrderState.values().first { it.value == this }

@@ -5,5 +5,5 @@ enum class OrderState(val value: String) {
     PROCESSING("Processing"),
     SHIPPED("Shipped"),
     DELIVERED("Delivered"),
-    CANCELLED("Cancelled")
+    CANCELED("Canceled")
 }

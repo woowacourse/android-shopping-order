@@ -64,7 +64,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             btnOrder.text = getString(R.string.order_btn, productsPrice)
 
             btnOrder.setOnClickListener {
-                presenter.orderProducts(productsPrice)
+                val inputValue = binding.etUsePoint.text
+                val usedPoint =
+                    if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
+                presenter.orderProducts(usedPoint)
                 finish()
             }
         }

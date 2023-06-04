@@ -2,7 +2,6 @@ package woowacourse.shopping.data.model
 
 import com.example.domain.model.OrderDetailProduct
 import com.example.domain.model.OrderInfo
-import com.example.domain.model.OrderState
 import com.example.domain.model.Point
 import com.example.domain.model.Price
 
@@ -25,7 +24,7 @@ fun OrderDetailDto.toDomain() =
     OrderInfo(
         orderId,
         orderAt,
-        OrderState.valueOf(orderStatus),
+        orderStatus.toDomain(),
         Price(payAmount),
         Point(usedPoint),
         Point(savedPoint),

@@ -9,6 +9,7 @@ interface OrderDetailContract {
         fun initAdapter(orderProducts: List<OrderDetailProductUiModel>)
         fun setUpView(orderInfo: OrderInfoUiModel)
         fun showErrorMessage(t: Throwable)
+        fun successCancel()
     }
 
     interface Presenter {

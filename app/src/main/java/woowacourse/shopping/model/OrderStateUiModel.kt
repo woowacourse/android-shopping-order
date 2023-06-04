@@ -5,5 +5,5 @@ enum class OrderStateUiModel(val value: String) {
     PROCESSING("배송준비중"),
     SHIPPED("배송중"),
     DELIVERED("배송완료"),
-    CANCELLED("주문취소")
+    CANCELED("주문취소")
 }

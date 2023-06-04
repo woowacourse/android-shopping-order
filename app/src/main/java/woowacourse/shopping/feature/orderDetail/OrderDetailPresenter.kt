@@ -28,6 +28,7 @@ class OrderDetailPresenter(
             id,
             callback = {
                 it.onSuccess {
+                    view.successCancel()
                 }.onFailure { throwable ->
                     view.showErrorMessage(throwable)
                 }

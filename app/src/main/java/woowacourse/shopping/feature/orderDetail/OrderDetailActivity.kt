@@ -62,6 +62,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         }
     }
 
+    override fun successCancel() {
+        finish()
+    }
+
     override fun showErrorMessage(t: Throwable) {
         Toast.makeText(this, "${t.message}", Toast.LENGTH_SHORT).show()
     }
