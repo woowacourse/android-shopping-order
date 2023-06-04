@@ -22,13 +22,13 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
         binding.buttonMyPageRecharge.setOnClickListener { requestRecharge() }
     }
 
-    override fun showCharge(amount: Long) {
+    override fun showCharge(amount: Int) {
         binding.textMyPageChangeValue.text = getString(R.string.detailPriceFormat, amount)
     }
 
     override fun requestRecharge() {
         if (binding.editMyPageRechargeValue.text.isNullOrEmpty()) return
-        presenter.recharge(binding.editMyPageRechargeValue.text.toString().toLong())
+        presenter.recharge(binding.editMyPageRechargeValue.text.toString().toInt())
     }
 
     override fun showError() {

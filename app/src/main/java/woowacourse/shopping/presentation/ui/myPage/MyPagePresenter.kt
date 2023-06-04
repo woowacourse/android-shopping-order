@@ -17,7 +17,7 @@ class MyPagePresenter(
         }
     }
 
-    override fun recharge(amount: Long) {
+    override fun recharge(amount: Int) {
         chargeRepository.recharge(amount) { result ->
             when (result) {
                 is WoowaResult.SUCCESS -> view.showCharge(result.data)
