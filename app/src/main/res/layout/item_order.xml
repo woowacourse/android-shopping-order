@@ -10,6 +10,10 @@
         <variable
             name="order"
             type="woowacourse.shopping.ui.model.Order" />
+
+        <variable
+            name="onRootClickListener"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,7 +21,8 @@
         android:layout_height="153dp"
         android:layout_marginHorizontal="18dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/shape_woowa_light_gray_line_1_rect">
+        android:background="@drawable/shape_woowa_light_gray_line_1_rect"
+        android:onClick="@{()-> onRootClickListener.invoke(order)}">
 
         <TextView
             android:id="@+id/tv_order_item_name"
