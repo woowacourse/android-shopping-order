@@ -58,18 +58,18 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun findById(id: Long): Result<CartProduct> {
+    override fun findById(id: Long): Result<CartProduct?> {
         return if (!isCartDataCached) {
             val result = getAllProductInCart()
             if (result.isSuccess) {
                 val cartProduct = _productInCart.find { it.product.id == id }
-                Result.success(cartProduct ?: throw IllegalArgumentException())
+                Result.success(cartProduct)
             } else {
                 Result.failure(Throwable(result.exceptionOrNull()?.message))
             }
         } else {
             val cartProduct = _productInCart.find { it.product.id == id }
-            Result.success(cartProduct ?: throw IllegalArgumentException())
+            Result.success(cartProduct)
         }
     }
 

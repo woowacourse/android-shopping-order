@@ -19,6 +19,6 @@ interface CartRepository {
         id: Long,
     ): Result<Unit>
 
-    fun findById(id: Long): Result<CartProduct>
+    fun findById(id: Long): Result<CartProduct?>
     fun getSubList(offset: Int, step: Int): Result<List<CartProduct>>
 }
