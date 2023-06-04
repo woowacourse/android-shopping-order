@@ -13,12 +13,17 @@ import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.CartItemsUIModel
+import woowacourse.shopping.ui.order.adapter.OrderAdapter
 import woowacourse.shopping.ui.order.presenter.OrderContract
 import woowacourse.shopping.ui.order.presenter.OrderPresenter
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
     private val presenter: OrderContract.Presenter by lazy { initPresenter() }
+    private val orderAdapter: OrderAdapter by lazy {
+        val cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
+        OrderAdapter(cartItems.cartProducts)
+    }
 
     private fun initPresenter() =
         OrderPresenter(
@@ -37,6 +42,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         setContentView(binding.root)
 
         presenter.fetchCoupons()
+        initAdapter()
+    }
+
+    private fun initAdapter() {
+        binding.rvOrder.adapter = orderAdapter
     }
 
     override fun setCoupons(coupons: List<Coupon>) {

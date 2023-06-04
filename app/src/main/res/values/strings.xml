@@ -25,4 +25,6 @@
     <string name="tv_total_price">최종 결제 금액</string>
     <string name="tv_order_history">주문 목록</string>
     <string name="tv_order_detail_view"><![CDATA[상세 보기 >]]></string>
+
+    <string name="quantity_format">수량: %d개</string>
 </resources>
