@@ -11,40 +11,22 @@ class CartRepositoryImpl(
 ) : CartRepository {
 
     override fun getAll(): CartProducts {
-        var cartProducts = emptyList<CartProduct>()
-
-        val thread = Thread { cartProducts = remoteDataSource.loadAll() }
-        thread.start()
-        thread.join()
-
-        return CartProducts(cartProducts)
+        return CartProducts(remoteDataSource.loadAll())
     }
 
     override fun addProduct(product: Product): Int {
-        var cartItemId = -1
-        val thread = Thread { cartItemId = remoteDataSource.addCartProduct(product.id.toInt()) }
-        thread.start()
-        thread.join()
-        return cartItemId
+        return remoteDataSource.addCartProduct(product.id.toInt())
     }
 
     override fun updateProduct(cartItemId: Int, count: Int) {
-        val thread = Thread { remoteDataSource.updateCartProductCount(cartItemId, count) }
-        thread.start()
-        thread.join()
+        remoteDataSource.updateCartProductCount(cartItemId, count)
     }
 
     override fun deleteProduct(cartItemId: Int) {
-        val thread = Thread { remoteDataSource.deleteCartProduct(cartItemId) }
-        thread.start()
-        thread.join()
+        remoteDataSource.deleteCartProduct(cartItemId)
     }
 
     override fun getCartProductByProduct(product: Product): CartProduct? {
-        var cartProducts = emptyList<CartProduct>()
-        val thread = Thread { cartProducts = remoteDataSource.loadAll() }
-        thread.start()
-        thread.join()
-        return cartProducts.find { it.product.id == product.id }
+        return remoteDataSource.loadAll().find { it.product.id == product.id }
     }
 }

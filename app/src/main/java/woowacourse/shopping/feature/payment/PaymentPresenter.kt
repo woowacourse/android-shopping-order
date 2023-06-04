@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.payment
 
+import android.os.Handler
+import android.os.Looper
 import com.example.domain.model.OrderProduct
 import com.example.domain.model.Point
 import com.example.domain.repository.CartRepository
@@ -18,18 +20,22 @@ class PaymentPresenter(
     private lateinit var orderProducts: List<OrderProduct>
     private lateinit var point: Point
 
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun loadCartProducts(cartProductIds: List<Int>) {
-        val cartProducts = mutableListOf<CartProductUiModel>()
-        val orders = mutableListOf<OrderProduct>()
-        val all = cartRepository.getAll()
-        cartProductIds.forEach { id ->
-            all.findById(id)?.let {
-                cartProducts.add(it.toPresentation())
-                orders.add(OrderProduct(it.count, it.product))
+        Thread {
+            val cartProducts = mutableListOf<CartProductUiModel>()
+            val orders = mutableListOf<OrderProduct>()
+            val all = cartRepository.getAll()
+            cartProductIds.forEach { id ->
+                all.findById(id)?.let {
+                    cartProducts.add(it.toPresentation())
+                    orders.add(OrderProduct(it.count, it.product))
+                }
             }
-        }
-        orderProducts = orders
-        view.showCartProducts(cartProducts.toList())
+            orderProducts = orders
+            handler.post { view.showCartProducts(cartProducts.toList()) }
+        }.start()
     }
 
     override fun loadPoint() {

@@ -137,12 +137,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun addProducts(products: List<ProductUiModel>) {
-        runOnUiThread {
-            binding.mainSkeleton.visibility = View.GONE
-            binding.productRv.visibility = View.VISIBLE
-            mainProductAdapter.addItems(products)
-            presenter.loadRecent()
-        }
+        binding.mainSkeleton.visibility = View.GONE
+        binding.productRv.visibility = View.VISIBLE
+        mainProductAdapter.addItems(products)
+        presenter.loadRecent()
     }
 
     override fun updateRecent(recent: List<RecentProductUiModel>) {
