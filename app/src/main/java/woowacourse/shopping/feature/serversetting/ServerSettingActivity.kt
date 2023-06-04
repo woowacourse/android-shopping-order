@@ -5,35 +5,24 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.feature.main.MainActivity
-import woowacourse.shopping.user.Server
-import woowacourse.shopping.user.ServerInfo
 
-class ServerSettingActivity : AppCompatActivity() {
-    lateinit var binding: ActivityServerSettingBinding
+class ServerSettingActivity : AppCompatActivity(), ServerContract.View {
+    private lateinit var binding: ActivityServerSettingBinding
+    private lateinit var presenter: ServerContract.Presenter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_server_setting)
-        setUpView()
+        presenter = ServerSettingPresenter(this, UserPreference)
+        binding.presenter = presenter
     }
 
-    private fun setUpView() {
-        binding.btnDeetooServer.setOnClickListener { startMain(DEETOO) }
-        binding.btnRoiseServer.setOnClickListener { startMain(ROISE) }
-        binding.btnEmilServer.setOnClickListener { startMain(EMIL) }
-    }
-
-    private fun startMain(server: Server) {
-        ServerInfo.changeServer(server)
-        Toast.makeText(this, getString(R.string.enter_server_text, server.name), Toast.LENGTH_SHORT)
+    override fun showMainScreen(serverName: String) {
+        Toast.makeText(this, getString(R.string.enter_server_text, serverName), Toast.LENGTH_SHORT)
             .show()
         startActivity(MainActivity.getIntent(this))
-    }
-
-    companion object {
-        private val DEETOO = Server.Deetoo
-        private val EMIL = Server.Emil
-        private val ROISE = Server.Roise
     }
 }

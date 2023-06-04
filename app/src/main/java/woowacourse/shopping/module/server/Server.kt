@@ -1,4 +1,4 @@
-package woowacourse.shopping.user
+package woowacourse.shopping.module.server
 
 enum class Server(val url: String, val token: String) {
     Deetoo(

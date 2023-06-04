@@ -1,4 +1,4 @@
-package woowacourse.shopping.user
+package woowacourse.shopping.module.server
 
 object ServerInfo {
     private lateinit var server: Server
@@ -9,10 +9,7 @@ object ServerInfo {
     val url: String
         get() = server.url
 
-    val token: String
-        get() = server.token
-
     fun changeServer(server: Server) {
-        this.server = server
+        ServerInfo.server = server
     }
 }

@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <data>
+
+        <variable
+            name="presenter"
+            type="woowacourse.shopping.feature.serversetting.ServerContract.Presenter" />
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -13,19 +20,22 @@
             android:id="@+id/btn_deetoo_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="디투 서버" />
+            android:onClick="@{()->presenter.selectDeeTooServer()}"
+            android:text="@string/deetoo_server" />
 
         <Button
             android:id="@+id/btn_roise_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="로이스 서버" />
+            android:onClick="@{()->presenter.selectRoiseServer()}"
+            android:text="@string/roise_server" />
 
         <Button
             android:id="@+id/btn_emil_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="에밀 서버" />
+            android:onClick="@{()->presenter.selectEmilServer()}"
+            android:text="@string/emil_server" />
 
     </LinearLayout>
 </layout>
