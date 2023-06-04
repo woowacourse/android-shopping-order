@@ -121,7 +121,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showOrderPage(cart: CartState) {
-        OrderActivity.startActivity(this, cart)
+        OrderActivity.startActivity(this, cart, url)
     }
 
     private fun setOrderButtonClickListener() {

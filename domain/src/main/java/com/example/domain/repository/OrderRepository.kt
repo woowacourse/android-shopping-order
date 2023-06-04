@@ -1,5 +1,6 @@
 package com.example.domain.repository
 
+import com.example.domain.FixedDiscountPolicies
 import com.example.domain.order.Order
 import com.example.domain.order.OrderSummary
 
@@ -11,8 +12,7 @@ interface OrderRepository {
     )
 
     fun requestAddOrder(
-        cartIds: List<Int>,
-//        cartIds: List<Long>,
+        cartIds: List<Long>,
         finalPrice: Int,
         onSuccess: (orderId: Long) -> Unit,
         onFailure: () -> Unit
@@ -21,6 +21,11 @@ interface OrderRepository {
     fun requestFetchOrderById(
         id: Long,
         onSuccess: (order: Order?) -> Unit,
+        onFailure: () -> Unit
+    )
+
+    fun requestFetchDiscountPolicy(
+        onSuccess: (fixedDiscountPolicies: FixedDiscountPolicies) -> Unit,
         onFailure: () -> Unit
     )
 }

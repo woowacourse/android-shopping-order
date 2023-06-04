@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import woowacourse.shopping.model.order.FixedDiscountPoliciesResponse
 import woowacourse.shopping.model.order.OrderRequest
 import woowacourse.shopping.model.order.OrderSummaryResponse
 
@@ -25,4 +26,7 @@ interface RetrofitOrderService {
     fun requestAddOrder(
         @Body request: OrderRequest
     ): Call<Unit>
+
+    @POST("/orders/discount-policies")
+    fun requestFetchDiscountPolicy(): Call<FixedDiscountPoliciesResponse>
 }
