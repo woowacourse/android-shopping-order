@@ -4,7 +4,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductGetResponse(
+data class ProductsResponse(
+    @SerialName("pageInfo")
+    val pageInfo: PageInfoResponse,
+    @SerialName("products")
+    val products: List<ProductItemResponse> = listOf(),
+)
+
+@Serializable
+data class ProductItemResponse(
     @SerialName("id")
     val id: Int,
     @SerialName("imageUrl")

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.repository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.ProductGetResponse
+import woowacourse.shopping.data.dto.ProductItemResponse
 import woowacourse.shopping.data.dto.mapper.toDomain
 import woowacourse.shopping.data.dto.mapper.toProductDeleteRequest
 import woowacourse.shopping.data.dto.mapper.toProductPostRequest
@@ -21,10 +21,10 @@ class ProductRepositoryImpl(
         onSuccess: (List<Product>) -> Unit,
         onFailed: (Throwable) -> Unit,
     ) {
-        productService.getAllProduct().enqueue(object : Callback<List<ProductGetResponse>> {
+        productService.getAllProduct().enqueue(object : Callback<List<ProductItemResponse>> {
             override fun onResponse(
-                call: Call<List<ProductGetResponse>>,
-                response: Response<List<ProductGetResponse>>,
+                call: Call<List<ProductItemResponse>>,
+                response: Response<List<ProductItemResponse>>,
             ) {
                 if (response.body() != null && response.isSuccessful) {
                     onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
@@ -33,7 +33,7 @@ class ProductRepositoryImpl(
                 onFailed(Throwable(response.message()))
             }
 
-            override fun onFailure(call: Call<List<ProductGetResponse>>, throwable: Throwable) {
+            override fun onFailure(call: Call<List<ProductItemResponse>>, throwable: Throwable) {
                 onFailed(throwable)
             }
         })
@@ -44,10 +44,10 @@ class ProductRepositoryImpl(
         onSuccess: (Product?) -> Unit,
         onFailed: (Throwable) -> Unit,
     ) {
-        productService.findProductById(id).enqueue(object : Callback<ProductGetResponse?> {
+        productService.findProductById(id).enqueue(object : Callback<ProductItemResponse?> {
             override fun onResponse(
-                call: Call<ProductGetResponse?>,
-                response: Response<ProductGetResponse?>,
+                call: Call<ProductItemResponse?>,
+                response: Response<ProductItemResponse?>,
             ) {
                 if (response.body() != null && response.isSuccessful) {
                     onSuccess(response.body()?.toDomain())
@@ -56,7 +56,7 @@ class ProductRepositoryImpl(
                 onFailed(Throwable(response.message()))
             }
 
-            override fun onFailure(call: Call<ProductGetResponse?>, throwable: Throwable) {
+            override fun onFailure(call: Call<ProductItemResponse?>, throwable: Throwable) {
                 onFailed(throwable)
             }
         })

@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.dto.mapper
 
 import woowacourse.shopping.data.dto.ProductDeleteRequest
-import woowacourse.shopping.data.dto.ProductGetResponse
+import woowacourse.shopping.data.dto.ProductItemResponse
 import woowacourse.shopping.data.dto.ProductPostRequest
 import woowacourse.shopping.data.dto.ProductPutRequest
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 
-fun ProductGetResponse.toDomain(): Product =
+fun ProductItemResponse.toDomain(): Product =
     Product(
         id = id,
         name = name,

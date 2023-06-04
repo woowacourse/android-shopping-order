@@ -1,9 +1,10 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.OrderResponse
+import woowacourse.shopping.data.dto.OrdersResponse
 import woowacourse.shopping.data.dto.mapper.toOrderRequest
 import woowacourse.shopping.data.dto.mapper.toOrders
 import woowacourse.shopping.data.service.order.OrderService
@@ -41,19 +42,21 @@ class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
         service.getOrders(
             page = page.value,
             size = page.sizePerPage
-        ).enqueue(object : Callback<List<OrderResponse>> {
+        ).enqueue(object : Callback<OrdersResponse> {
             override fun onResponse(
-                call: Call<List<OrderResponse>>,
-                response: Response<List<OrderResponse>>,
+                call: Call<OrdersResponse>,
+                response: Response<OrdersResponse>,
             ) {
                 if (response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()?.toOrders() ?: emptyList())
+                    onSuccess(response.body()?.orders?.toOrders() ?: emptyList())
                     return
                 }
+                Log.d("buna", "onResponse: ${response.code()}")
                 onFailed(Throwable(response.message()))
             }
 
-            override fun onFailure(call: Call<List<OrderResponse>>, throwable: Throwable) {
+            override fun onFailure(call: Call<OrdersResponse>, throwable: Throwable) {
+                Log.d("buna", "onResponse")
                 onFailed(throwable)
             }
         })

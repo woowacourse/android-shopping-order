@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 import woowacourse.shopping.data.dto.OrderPostRequest
-import woowacourse.shopping.data.dto.OrderResponse
+import woowacourse.shopping.data.dto.OrdersResponse
 
 interface OrderService {
     @POST("/orders")
@@ -16,5 +16,5 @@ interface OrderService {
     fun getOrders(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<List<OrderResponse>>
+    ): Call<OrdersResponse>
 }

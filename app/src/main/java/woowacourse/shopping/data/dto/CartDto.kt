@@ -10,7 +10,7 @@ data class CartGetResponse(
     @SerialName("quantity")
     val quantity: Int,
     @SerialName("product")
-    val product: ProductGetResponse,
+    val product: ProductItemResponse,
 )
 
 @Serializable

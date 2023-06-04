@@ -8,17 +8,17 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import woowacourse.shopping.data.dto.ProductDeleteRequest
-import woowacourse.shopping.data.dto.ProductGetResponse
+import woowacourse.shopping.data.dto.ProductItemResponse
 import woowacourse.shopping.data.dto.ProductPostRequest
 import woowacourse.shopping.data.dto.ProductPutRequest
 import woowacourse.shopping.data.service.cart.ProductId
 
 interface ProductService {
     @GET("/products")
-    fun getAllProduct(): Call<List<ProductGetResponse>>
+    fun getAllProduct(): Call<List<ProductItemResponse>>
 
     @GET("/products/{productId}")
-    fun findProductById(@Path("productId") id: ProductId): Call<ProductGetResponse?>
+    fun findProductById(@Path("productId") id: ProductId): Call<ProductItemResponse?>
 
     @POST("/products")
     fun saveProduct(@Body product: ProductPostRequest): Call<Unit>
