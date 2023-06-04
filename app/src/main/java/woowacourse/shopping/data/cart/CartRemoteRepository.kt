@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.cart
 
 import com.example.domain.CartProduct
+import com.example.domain.Pagination
 import com.example.domain.repository.CartRepository
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -9,6 +10,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
+import woowacourse.shopping.data.cart.model.dto.response.CartResponse
 import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.util.BANDAL
 
@@ -39,7 +41,7 @@ class CartRemoteRepository(
             .enqueue(object : Callback<List<CartProductResponse>> {
                 override fun onResponse(
                     call: Call<List<CartProductResponse>>,
-                    response: retrofit2.Response<List<CartProductResponse>>
+                    response: Response<List<CartProductResponse>>
                 ) {
                     val result = response.body() ?: emptyList()
                     if (400 <= response.code()) return onFailure()
@@ -50,6 +52,29 @@ class CartRemoteRepository(
                     call: Call<List<CartProductResponse>>,
                     t: Throwable
                 ) {
+                    onFailure()
+                }
+            })
+    }
+
+    override fun requestFetchCartProductsUnit(
+        unitSize: Int,
+        page: Int,
+        onSuccess: (List<CartProduct>, Pagination) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        retrofitCartService.requestFetchCartProductsUnit(unitSize, page)
+            .enqueue(object : Callback<CartResponse> {
+                override fun onResponse(
+                    call: Call<CartResponse>,
+                    response: Response<CartResponse>
+                ) {
+                    val result = response.body()!!
+                    if (response.code() >= 400) return onFailure()
+                    onSuccess(result.cartItems.map(CartProductResponse::toDomain), result.pagination.toDomain())
+                }
+
+                override fun onFailure(call: Call<CartResponse>, t: Throwable) {
                     onFailure()
                 }
             })

@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.cart
 
 import com.example.domain.Cart
 import com.example.domain.CartProduct
+import com.example.domain.Pagination
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
@@ -15,9 +16,8 @@ class CartPresenter(
     private val cart: Cart = Cart()
     private val maxProductsPerPage: Int = 5
     private val minPageNumber: Int = 1
-    // todo 추가 필요
-//    private val maxPageNumber: Int
-//        get() = getMaxPageNumber(cartRepository.getAll().size)
+
+    private var maxPageNumber: Int = Integer.MAX_VALUE
 
     private var pageNumber: Int = 1
 
@@ -28,21 +28,26 @@ class CartPresenter(
         val startIndex = pageNumber * maxProductsPerPage - maxProductsPerPage
         val endIndex = pageNumber * maxProductsPerPage - 1
 
-        cartRepository.getAll(onFailure = {}, onSuccess = {
-            val items: List<CartProductState> = it.map(CartProduct::toUi)
-            cart.updateAll(it)
-            pickAll()
-            view.setCartPageNumber(pageNumber)
-            view.setCartProducts(items)
-            view.showCartProducts()
-        })
-        view.hidePageSelectorView()
+        cartRepository.requestFetchCartProductsUnit(
+            maxProductsPerPage,
+            pageNumber,
+            onFailure = {},
+            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+                val cartProductStates: List<CartProductState> = cartProducts.map(CartProduct::toUi)
+                cart.updateAll(cartProducts)
+                pickAll()
+                maxPageNumber = pagination.lastPage
+                view.setCartPageNumber(pageNumber)
+                view.setCartProducts(cartProductStates)
+                view.showCartProducts()
+            }
+        )
 
 //        val items: List<CartProductState> =
 //            cartProducts.filterIndexed { index, _ -> index in startIndex..endIndex }
-//
-//        view.setCartPageNumber(pageNumber)
-//        if (minPageNumber < maxPageNumber) view.showPageSelectorView()
+
+        view.setCartPageNumber(pageNumber)
+        if (minPageNumber < maxPageNumber) view.showPageSelectorView()
     }
 
     override fun updatePickedCartProductCount() {
@@ -51,23 +56,23 @@ class CartPresenter(
     }
 
     override fun plusPageNumber() {
-//        pageNumber = (++pageNumber).coerceAtMost(maxPageNumber)
-//
-//        view.setCartPageNumberMinusEnable(true)
-//        if (pageNumber > maxPageNumber) return
-//        if (pageNumber < maxPageNumber) view.setCartPageNumberPlusEnable(true)
-//        if (pageNumber == maxPageNumber) view.setCartPageNumberPlusEnable(false)
-//        loadCart()
+        pageNumber = (++pageNumber).coerceAtMost(maxPageNumber)
+
+        view.setCartPageNumberMinusEnable(true)
+        if (pageNumber > maxPageNumber) return
+        if (pageNumber < maxPageNumber) view.setCartPageNumberPlusEnable(true)
+        if (pageNumber == maxPageNumber) view.setCartPageNumberPlusEnable(false)
+        loadCart()
     }
 
     override fun minusPageNumber() {
-//        pageNumber = (--pageNumber).coerceAtLeast(minPageNumber)
-//
-//        view.setCartPageNumberPlusEnable(true)
-//        if (pageNumber < minPageNumber) return
-//        if (pageNumber > minPageNumber) view.setCartPageNumberMinusEnable(true)
-//        if (pageNumber == minPageNumber) view.setCartPageNumberMinusEnable(false)
-//        loadCart()
+        pageNumber = (--pageNumber).coerceAtLeast(minPageNumber)
+
+        view.setCartPageNumberPlusEnable(true)
+        if (pageNumber < minPageNumber) return
+        if (pageNumber > minPageNumber) view.setCartPageNumberMinusEnable(true)
+        if (pageNumber == minPageNumber) view.setCartPageNumberMinusEnable(false)
+        loadCart()
     }
 
     override fun plusQuantity(cartProductState: CartProductState) {

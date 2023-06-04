@@ -4,6 +4,6 @@ import woowacourse.shopping.data.product.model.dto.response.ProductResponse
 
 data class CartProductResponse(
     val id: Long,
-    val product: ProductResponse,
     val quantity: Int,
+    val product: ProductResponse,
 )
