@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
+import woowacourse.shopping.model.UiOrderedProduct
+import woowacourse.shopping.model.UiPayment
 import woowacourse.shopping.ui.order.detail.OrderDetailContract.View
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.injectOrderDetailPresenter
@@ -25,11 +27,19 @@ class OrderDetailActivity : AppCompatActivity(), View {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderDetailBinding.inflate(layoutInflater).setContentView(this)
         setActionBar()
+        presenter.loadOrderDetailInfo()
     }
 
     private fun setActionBar() {
         setSupportActionBar(binding.orderDetailToolBar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun showOrderDetailPaymentInfo(payment: UiPayment) {
+        binding.paymentInfo = payment
+    }
+
+    override fun showOrderDetailProducts(orderedProducts: List<UiOrderedProduct>) {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
