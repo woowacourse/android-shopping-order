@@ -35,5 +35,9 @@ interface RetrofitCartProductService {
         @Path("cartItemId") cartItemId: String,
     ): Call<CartProductDto>
 
-    // fun requestCartProductById(productId: Int): CartProduct?
+    @GET("/cart-items/products/{productId}")
+    fun requestCartProductByProductId(
+        @Header("Authorization") token: String,
+        @Path("productId") productId: String,
+    ): Call<CartProductDto>
 }

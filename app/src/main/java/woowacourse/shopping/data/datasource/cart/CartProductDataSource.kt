@@ -31,5 +31,10 @@ interface CartProductDataSource {
         onFailure: () -> Unit,
     )
 
-    // fun requestCartProductById(productId: Int): CartProduct?
+    fun requestCartProductByProductId(
+        token: String,
+        productId: Int,
+        onSuccess: (CartProduct) -> Unit,
+        onFailure: () -> Unit,
+    )
 }

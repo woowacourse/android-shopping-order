@@ -2,6 +2,7 @@ package woowacourse.shopping.data.datasource.cart
 
 import android.util.Log
 import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.CartProductDto
 import woowacourse.shopping.data.mapper.toDomain
@@ -21,7 +22,7 @@ class CartProductDataSourceImpl : CartProductDataSource {
         call.enqueue(object : retrofit2.Callback<List<CartProductDto>> {
             override fun onResponse(
                 call: Call<List<CartProductDto>>,
-                response: retrofit2.Response<List<CartProductDto>>,
+                response: Response<List<CartProductDto>>,
             ) {
                 if (response.isSuccessful) {
                     val result = response.body()
@@ -51,7 +52,7 @@ class CartProductDataSourceImpl : CartProductDataSource {
         call.enqueue(object : retrofit2.Callback<Int> {
             override fun onResponse(
                 call: Call<Int>,
-                response: retrofit2.Response<Int>,
+                response: Response<Int>,
             ) {
                 println("${response.code()}")
                 if (response.isSuccessful) {
@@ -80,7 +81,7 @@ class CartProductDataSourceImpl : CartProductDataSource {
         call.enqueue(object : retrofit2.Callback<Void> {
             override fun onResponse(
                 call: Call<Void>,
-                response: retrofit2.Response<Void>,
+                response: Response<Void>,
             ) {
                 println("${response.code()}")
                 if (response.isSuccessful) {
@@ -108,7 +109,7 @@ class CartProductDataSourceImpl : CartProductDataSource {
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
             override fun onResponse(
                 call: Call<CartProductDto>,
-                response: retrofit2.Response<CartProductDto>,
+                response: Response<CartProductDto>,
             ) {
                 println("${response.code()}")
                 if (response.isSuccessful) {
@@ -116,6 +117,36 @@ class CartProductDataSourceImpl : CartProductDataSource {
                     onSuccess()
                 } else {
                     Log.d("test", "NotSuccess retrofit 실패 ")
+                }
+            }
+
+            override fun onFailure(call: Call<CartProductDto>, t: Throwable) {
+                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
+                onFailure()
+            }
+        })
+    }
+
+    override fun requestCartProductByProductId(
+        token: String,
+        productId: Int,
+        onSuccess: (CartProduct) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        val call = retrofitService.requestCartProductByProductId(token, productId.toString())
+        call.enqueue(object : retrofit2.Callback<CartProductDto> {
+            override fun onResponse(
+                call: Call<CartProductDto>,
+                response: Response<CartProductDto>,
+            ) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    Log.d("test", "retrofit result: $result")
+                    if (result != null) {
+                        onSuccess(result.toDomain())
+                    }
+                } else {
+                    Log.d("test", "requestCartProductByProductId NotSuccess retrofit 실패 $response")
                 }
             }
 

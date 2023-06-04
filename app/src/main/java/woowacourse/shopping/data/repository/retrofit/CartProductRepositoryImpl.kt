@@ -70,11 +70,10 @@ class CartProductRepositoryImpl : CartRepository {
         onSuccess: (CartProduct) -> Unit,
         onFailure: () -> Unit,
     ) {
-        getAllCartProducts(
-            onSuccess = { cartProducts ->
-                val cartProduct = cartProducts.find { it.product.id == productId } ?: run {
-                    return@getAllCartProducts
-                }
+        cartProductDataSource.requestCartProductByProductId(
+            token = token!!,
+            productId = productId,
+            onSuccess = { cartProduct ->
                 onSuccess(cartProduct)
             },
             onFailure = { },
