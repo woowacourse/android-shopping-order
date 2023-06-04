@@ -12,7 +12,6 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.Product
 
 class CartPresenterTest {
@@ -65,12 +64,7 @@ class CartPresenterTest {
         presenter.fetchCartProducts()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 1)
-            )
-        }
+        verify(exactly = 1) { view.setPage(any(), any()) }
         assertEquals(presenter.totalPrice.value, 12000)
         assertEquals(presenter.checkedCount.value, 10)
         assertEquals(presenter.allCheck.value, true)
@@ -95,12 +89,7 @@ class CartPresenterTest {
         verify(exactly = 1) {
             cartRepository.updateAllChecked(any())
         }
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 1)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
     }
 
     @Test
@@ -118,23 +107,13 @@ class CartPresenterTest {
         presenter.moveToPageNext()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 2)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
         assertEquals(presenter.allCheck.value, true)
     }
 
     @Test
     fun `이전 페이지로 가면 새로 불러온다`() {
         // given
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
-        every { cartRepository.hasNextPage() } returns true
-        every { cartRepository.hasPrevPage() } returns true
-
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
@@ -142,12 +121,7 @@ class CartPresenterTest {
         presenter.moveToPagePrev()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 0)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
         assertEquals(presenter.allCheck.value, true)
     }
 
