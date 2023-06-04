@@ -6,7 +6,7 @@ import com.example.domain.repository.OrderRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dataSource.remote.order.OrderService
+import woowacourse.shopping.data.dataSource.remote.OrderService
 import woowacourse.shopping.data.model.dto.request.OrderRequestDto
 import woowacourse.shopping.data.model.dto.response.OrderDetailDto
 import woowacourse.shopping.data.model.dto.response.OrderMinInfoItemDto

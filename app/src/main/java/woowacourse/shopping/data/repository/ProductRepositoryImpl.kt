@@ -7,7 +7,7 @@ import com.example.domain.repository.ProductRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dataSource.remote.product.ProductService
+import woowacourse.shopping.data.dataSource.remote.ProductService
 import woowacourse.shopping.data.model.dto.response.ProductDto
 
 class ProductRepositoryImpl(
@@ -19,6 +19,7 @@ class ProductRepositoryImpl(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
+        kotlin.runCatching { }
         if (cache?.productList?.isEmpty() != false) {
             service.getAllProducts().enqueue(object : Callback<List<ProductDto>> {
                 override fun onResponse(

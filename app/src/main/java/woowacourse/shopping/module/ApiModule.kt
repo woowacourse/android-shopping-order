@@ -4,9 +4,9 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.dataSource.remote.cart.CartProductService
-import woowacourse.shopping.data.dataSource.remote.order.OrderService
-import woowacourse.shopping.data.dataSource.remote.product.ProductService
+import woowacourse.shopping.data.dataSource.remote.CartProductService
+import woowacourse.shopping.data.dataSource.remote.OrderService
+import woowacourse.shopping.data.dataSource.remote.ProductService
 import woowacourse.shopping.user.ServerInfo
 import java.util.concurrent.TimeUnit
 

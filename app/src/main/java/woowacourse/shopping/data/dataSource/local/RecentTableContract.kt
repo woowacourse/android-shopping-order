@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.dataSource.recent
+package woowacourse.shopping.data.dataSource.local
 
 object RecentTableContract {
     const val TABLE_NAME = "recent_table"

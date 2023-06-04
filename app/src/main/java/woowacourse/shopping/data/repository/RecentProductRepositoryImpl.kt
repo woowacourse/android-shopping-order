@@ -6,8 +6,8 @@ import com.example.domain.repository.RecentProductRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dataSource.recent.RecentDao
-import woowacourse.shopping.data.dataSource.remote.product.ProductService
+import woowacourse.shopping.data.dataSource.local.RecentDao
+import woowacourse.shopping.data.dataSource.remote.ProductService
 import woowacourse.shopping.data.model.RecentProductEntity
 import woowacourse.shopping.data.model.dto.response.ProductDto
 import java.time.LocalDateTime

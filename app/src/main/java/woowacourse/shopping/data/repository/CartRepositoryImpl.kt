@@ -5,7 +5,7 @@ import com.example.domain.repository.CartRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dataSource.remote.cart.CartProductService
+import woowacourse.shopping.data.dataSource.remote.CartProductService
 import woowacourse.shopping.data.model.dto.request.AddCartProductDto
 import woowacourse.shopping.data.model.dto.request.ChangeCartProductCountDto
 import woowacourse.shopping.data.model.dto.response.CartProductDto
