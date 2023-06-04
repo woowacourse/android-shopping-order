@@ -14,9 +14,7 @@ import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
 import woowacourse.shopping.ui.orderHistories.historiesAdapter.HistoriesAdapter
 import woowacourse.shopping.ui.orderHistories.historiesAdapter.HistoriesListener
 import woowacourse.shopping.ui.orderHistory.OrderHistoryActivity
-import woowacourse.shopping.ui.serverSetting.ServerSettingActivity
 import woowacourse.shopping.utils.PhDividerItemDecoration
-import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View {
     private lateinit var binding: ActivityOrderHistoriesBinding
@@ -57,7 +55,6 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
     }
 
     private fun initPresenter() {
-        RetrofitUtil.url = ServerSettingActivity.SERVER_IO
         presenter = OrderHistoriesPresenter(
             this,
             OrderRepositoryImpl(OrderRemoteDataSourceImpl())

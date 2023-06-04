@@ -7,12 +7,11 @@ import woowacourse.shopping.model.PostOrderRequest
 import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-    private var credentials = "Basic YUBhLmNvbToxMjM0"
-
     private var lastOrderId: Long = 0
 
     override fun getOrder(cartIds: List<Int>): Result<Order> = runCatching {
-        RetrofitUtil.retrofitOrderService.getOrderList(credentials, cartIds.joinToString(","))
+        RetrofitUtil.getInstance().retrofitOrderService
+            .getOrderList(cartIds.joinToString(","))
             .execute().body()!!
     }
 
@@ -24,7 +23,8 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     private fun getOrderHistoriesFirst(): Result<List<OrderHistory>> = runCatching {
-        RetrofitUtil.retrofitOrderService.getOrders(credentials).execute().body()!!
+        RetrofitUtil.getInstance().retrofitOrderService
+            .getOrders().execute().body()!!
             .let {
                 lastOrderId = it.lastOrderId
                 return Result.success(it.orderHistories)
@@ -32,7 +32,8 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     private fun getOrderHistories(): Result<List<OrderHistory>> = runCatching {
-        RetrofitUtil.retrofitOrderService.getOrdersNext(credentials, lastOrderId).execute().body()!!
+        RetrofitUtil.getInstance().retrofitOrderService
+            .getOrdersNext(lastOrderId).execute().body()!!
             .let {
                 lastOrderId = it.lastOrderId
                 return Result.success(it.orderHistories)
@@ -40,11 +41,13 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     override fun getOrderHistory(id: Long): Result<OrderHistory> = runCatching {
-        RetrofitUtil.retrofitOrderService.getOrder(credentials, id).execute().body()!!
+        RetrofitUtil.getInstance().retrofitOrderService
+            .getOrder(id).execute().body()!!
     }
 
     override fun postOrder(point: Int, cartIds: List<Int>): Result<Long> = runCatching {
-        RetrofitUtil.retrofitOrderService.postOrder(credentials, PostOrderRequest(point, cartIds))
-            .execute().headers().get("Location")!!.split("/").last().toLong()
+        RetrofitUtil.getInstance().retrofitOrderService
+            .postOrder(PostOrderRequest(point, cartIds))
+            .execute().headers()["Location"]!!.split("/").last().toLong()
     }
 }

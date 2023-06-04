@@ -6,6 +6,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.shopping.ShoppingActivity
+import woowacourse.shopping.utils.RetrofitUtil
 
 class ServerSettingActivity : AppCompatActivity() {
 
@@ -20,16 +21,18 @@ class ServerSettingActivity : AppCompatActivity() {
         val buttonIo = findViewById<Button>(R.id.btn_io_server)
         val buttonJito = findViewById<Button>(R.id.btn_jito_server)
         buttonIo.setOnClickListener {
-            startMain(SERVER_IO)
+            RetrofitUtil.getInstance(SERVER_IO, "Basic YUBhLmNvbToxMjM0")
+            startMain()
         }
         buttonJito.setOnClickListener {
-            startMain(SERVER_JITO)
+            RetrofitUtil.getInstance(SERVER_JITO, "Basic YUBhLmNvbToxMjM0")
+            startMain()
         }
     }
 
-    private fun startMain(server: String) {
+    private fun startMain() {
         startActivity(
-            ShoppingActivity.getIntent(this, server).apply {
+            ShoppingActivity.getIntent(this).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
         )

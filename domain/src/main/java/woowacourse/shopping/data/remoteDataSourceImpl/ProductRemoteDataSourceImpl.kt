@@ -6,8 +6,10 @@ import woowacourse.shopping.utils.RetrofitUtil
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
-    override fun getAll(): Result<List<Product>> =
-        runCatching { RetrofitUtil.retrofitProductService.getProducts().execute().body()!! }
+    override fun getAll(): Result<List<Product>> = runCatching {
+        RetrofitUtil.getInstance().retrofitProductService
+            .getProducts().execute().body()!!
+    }
 
     override fun getNext(count: Int): Result<List<Product>> {
         TODO("Not yet implemented")
@@ -17,6 +19,8 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override fun findById(id: Int): Result<Product> =
-        runCatching { RetrofitUtil.retrofitProductService.getProduct(id).execute().body()!![0] }
+    override fun findById(id: Int): Result<Product> = runCatching {
+        RetrofitUtil.getInstance().retrofitProductService
+            .getProduct(id).execute().body()!![0]
+    }
 }

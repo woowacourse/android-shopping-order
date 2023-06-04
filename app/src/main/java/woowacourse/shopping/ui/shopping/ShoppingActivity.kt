@@ -27,7 +27,6 @@ import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
-import woowacourse.shopping.utils.RetrofitUtil
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
@@ -147,10 +146,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context, server: String = ""): Intent {
-            if (server.isNotEmpty()) {
-                RetrofitUtil.url = server
-            }
+        fun getIntent(context: Context): Intent {
             return Intent(context, ShoppingActivity::class.java)
         }
     }

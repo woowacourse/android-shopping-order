@@ -1,5 +1,6 @@
 package woowacourse.shopping.utils
 
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,24 +9,37 @@ import woowacourse.shopping.data.service.RetrofitCartService
 import woowacourse.shopping.data.service.RetrofitOrderService
 import woowacourse.shopping.data.service.RetrofitProductService
 
-object RetrofitUtil {
-    var url: String = ""
-        set(value) {
-            field = value.removeSuffix("/")
-        }
+class RetrofitUtil private constructor(
+    private val baseUrl: String,
+    private val credentials: String
+) {
 
-    private var instance: Retrofit? = null
+    private val normalRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    private val authRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpAuthClient)
+            .build()
+    }
 
     val retrofitProductService: RetrofitProductService by lazy {
-        getRetrofit().create(RetrofitProductService::class.java)
+        normalRetrofit.create(RetrofitProductService::class.java)
     }
 
     val retrofitCartService: RetrofitCartService by lazy {
-        getRetrofit().create(RetrofitCartService::class.java)
+        authRetrofit.create(RetrofitCartService::class.java)
     }
 
     val retrofitOrderService: RetrofitOrderService by lazy {
-        getRetrofit().create(RetrofitOrderService::class.java)
+        authRetrofit.create(RetrofitOrderService::class.java)
     }
 
     private val okHttpClient: OkHttpClient by lazy {
@@ -34,18 +48,36 @@ object RetrofitUtil {
                 HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 }
-            )
+            ).build()
+    }
+
+    private val okHttpAuthClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+            ).addInterceptor(createdAuthInterceptor())
             .build()
     }
 
-    private fun getRetrofit(): Retrofit {
-        if (instance == null) {
-            instance = Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpClient)
+    private fun createdAuthInterceptor(): Interceptor = Interceptor { chain ->
+        with(chain) {
+            val modifiedRequest = request().newBuilder()
+                .header("Authorization", credentials)
                 .build()
+            proceed(modifiedRequest)
         }
-        return instance!!
+    }
+
+    companion object {
+        private var instance: RetrofitUtil? = null
+
+        fun getInstance(baseUrl: String = "", credentials: String = ""): RetrofitUtil {
+            if (instance == null) {
+                instance = RetrofitUtil(baseUrl.removeSuffix("/"), credentials)
+            }
+            return instance as RetrofitUtil
+        }
     }
 }
