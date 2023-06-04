@@ -8,7 +8,7 @@ import woowacourse.shopping.data.discount.DiscountRemoteService
 import woowacourse.shopping.data.order.OrderRemoteService
 import woowacourse.shopping.data.order.OrderRequestBody
 import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.OrderPriceCalculator
+import woowacourse.shopping.domain.TotalPriceCalculator
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
@@ -156,7 +156,7 @@ class CartPresenter(
 
     override fun onLoadOrderPriceInfo() {
         val orderPrice =
-            OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+            TotalPriceCalculator.calculate(selectedCartItems)
         discountRemoteService.requestDiscountInfo(orderPrice, UserData.grade)
             .enqueue(object : Callback<DiscountInfoDto> {
                 override fun onResponse(
@@ -167,7 +167,7 @@ class CartPresenter(
                     val orderPriceInfo = response.body()?.toDomain() ?: return
                     val orderPriceInfoUIState = OrderPriceInfoUIState.create(
                         orderPriceInfo,
-                        OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+                        TotalPriceCalculator.calculate(selectedCartItems)
                     )
                     view.showOrderPriceInfo(orderPriceInfoUIState)
                 }
@@ -198,7 +198,7 @@ class CartPresenter(
 
     private fun showOrderUI(selectedCartItems: Set<CartItem>) {
         val totalPrice =
-            OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems)
+            TotalPriceCalculator.calculate(selectedCartItems)
         discountRemoteService.requestDiscountInfo(totalPrice, UserData.grade)
             .enqueue(object : Callback<DiscountInfoDto> {
                 override fun onResponse(
@@ -218,7 +218,7 @@ class CartPresenter(
                 override fun onFailure(call: Call<DiscountInfoDto>, t: Throwable) {
                 }
             })
-        view.setOrderPrice(OrderPriceCalculator.calculateTotalOrderPrice(selectedCartItems))
+        view.setOrderPrice(TotalPriceCalculator.calculate(selectedCartItems))
         view.setOrderCount(selectedCartItems.size)
         view.setCanOrder(selectedCartItems.isNotEmpty())
     }

@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain
 
-object OrderPriceCalculator {
+object TotalPriceCalculator {
 
-    fun calculateTotalOrderPrice(cartItems: Set<CartItem>): Int {
+    fun calculate(cartItems: Set<CartItem>): Int {
         return cartItems.sumOf { it.getOrderPrice() }
     }
 }
