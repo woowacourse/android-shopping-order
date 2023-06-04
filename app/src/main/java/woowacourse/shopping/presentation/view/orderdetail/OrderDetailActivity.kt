@@ -48,6 +48,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding.rvOrderDetailProductList.adapter = orderProductAdapter
     }
 
+    override fun setTotalPriceView(totalPrice: Int) {
+        binding.tvOrderDetailTotalPrice.text = getString(R.string.product_price_format, totalPrice)
+    }
+
     override fun handleErrorView() {
         binding.root.post {
             showToast(getString(R.string.toast_message_system_error))

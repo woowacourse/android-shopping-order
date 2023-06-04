@@ -8,6 +8,7 @@ interface OrderDetailContract {
         val presenter: Presenter
 
         fun setView(orderDetail: OrderDetailEntity, products: List<CartModel>)
+        fun setTotalPriceView(totalPrice: Int)
         fun handleErrorView()
     }
 
