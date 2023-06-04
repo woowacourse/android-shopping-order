@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.model
+package woowacourse.shopping.data.product.model.dto
 
 import com.google.gson.annotations.SerializedName
 

@@ -8,9 +8,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.cart.model.CartProductResponse
+import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 import woowacourse.shopping.data.cart.model.toDomain
-import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.util.BANDAL
 
 class CartRemoteRepository(

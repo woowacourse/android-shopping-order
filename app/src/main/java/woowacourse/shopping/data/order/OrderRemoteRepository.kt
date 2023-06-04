@@ -10,11 +10,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.order.model.FixedDiscountPoliciesResponse
-import woowacourse.shopping.data.order.model.OrderRequest
-import woowacourse.shopping.data.order.model.OrderSummaryResponse
+import woowacourse.shopping.data.order.model.dto.request.OrderRequest
+import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPoliciesResponse
+import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse
 import woowacourse.shopping.data.order.model.toDomain
-import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.util.BANDAL
 
 class OrderRemoteRepository(
