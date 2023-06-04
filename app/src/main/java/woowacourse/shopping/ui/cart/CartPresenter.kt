@@ -72,6 +72,7 @@ class CartPresenter(
             showOrderUI(selectedCartItems)
             view.setCanOrder(selectedCartItems.isNotEmpty())
             view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
+            showCartItems(currentPage, selectedCartItems, false)
         }
     }
 
