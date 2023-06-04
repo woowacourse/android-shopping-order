@@ -32,7 +32,7 @@
     <string name="order_title">Order</string>
     <string name="point_format">%dP</string>
     <string name="saved_point">적립 포인트 : %dP</string>
-    <string name="cancel_order"><![CDATA[취소하기 >]]></string>
+    <string name="cancel_order">주문 취소하기</string>
     <string name="order_detail">Order Detail</string>
     <string name="order_history_detail_products">주문 내역</string>
     <string name="discount_minus">-</string>
@@ -40,4 +40,6 @@
     <string name="point">Point</string>
     <string name="have_point_description">보유 포인트</string>
     <string name="expire_point_description">한 달 내에 소멸될 포인트</string>
+    <string name="order_date_description">주문 날짜</string>
+    <string name="order_state_description">주문 상태</string>
 </resources>
