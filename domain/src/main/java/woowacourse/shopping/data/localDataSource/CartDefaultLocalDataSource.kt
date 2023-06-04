@@ -8,10 +8,14 @@ class CartDefaultLocalDataSource : CartLocalDataSource {
     private var offset = 0
     private var size = 5
 
+    private fun subList(offset: Int, size: Int): List<CartProduct> {
+        return cartProducts.subList(offset, min(offset + size, cartProducts.size))
+    }
+
     override fun getPage(offset: Int, size: Int): Result<List<CartProduct>> {
         this.offset = offset
         this.size = size
-        return Result.success(cartProducts.subList(offset, min(offset + size, cartProducts.size)))
+        return Result.success(subList(offset, size))
     }
 
     override fun hasNextPage(): Boolean {
@@ -35,16 +39,13 @@ class CartDefaultLocalDataSource : CartLocalDataSource {
     }
 
     override fun setCurrentPageChecked(checked: Boolean) {
-        cartProducts.subList(offset, min(offset + size, cartProducts.size))
-            .forEachIndexed { index, cartProduct ->
-                cartProducts[offset + index] = cartProduct.copy(checked = checked)
-            }
+        subList(offset, size).forEachIndexed { index, cartProduct ->
+            cartProducts[offset + index] = cartProduct.copy(checked = checked)
+        }
     }
 
     override fun getCurrentPageChecked(): Int {
-        return cartProducts.subList(offset, min(offset + size, cartProducts.size)).count {
-            it.checked
-        }
+        return subList(offset, size).count { it.checked }
     }
 
     override fun replaceAll(cartProducts: List<CartProduct>) {
@@ -58,17 +59,14 @@ class CartDefaultLocalDataSource : CartLocalDataSource {
     }
 
     override fun updateChecked(id: Int, checked: Boolean) {
-        cartProducts.indexOfFirst { it.id == id }.let {
-            if (it == -1) { return }
-            cartProducts[it] = cartProducts[it].copy(checked = checked)
-        }
+        val idx = cartProducts.indexOfFirst { it.id == id }
+        if (idx == -1) { return }
+        cartProducts[idx] = cartProducts[idx].copy(checked = checked)
     }
 
     override fun getByProductId(productId: Int): Result<CartProduct> {
         val index = cartProducts.indexOfFirst { it.product.id == productId }
-        if (index == -1) {
-            return Result.failure(Throwable("Failed to get by product id"))
-        }
+        if (index == -1) { return Result.failure(Throwable("Failed to get by product id")) }
         return Result.success(cartProducts[index])
     }
 
