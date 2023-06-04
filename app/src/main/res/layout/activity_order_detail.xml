@@ -3,10 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="orderDetail"
+            type="woowacourse.shopping.data.model.OrderDetailEntity" />
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <ScrollView
             android:id="@+id/layout_order_detail"
@@ -35,10 +42,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    tools:text="2023-06-03T05:47:36"
+                    android:text="@{orderDetail.orderedAt}"
                     android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date_title_info" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date_title_info"
+                    tools:text="2023-06-03T05:47:36" />
 
                 <View
                     android:id="@+id/view_line_order_detail1"
@@ -142,6 +150,7 @@
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
+                    android:text="@{@string/point_format(orderDetail.usedPoint)}"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_order_detail_order_used_point_info"
@@ -166,6 +175,7 @@
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
+                    android:text="@{@string/point_format(orderDetail.savedPoint)}"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_order_detail_order_saved_point_info"

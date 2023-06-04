@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.orderdetail
 
 import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.respository.order.OrderRepository
+import woowacourse.shopping.presentation.model.CartModel
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
@@ -9,11 +10,12 @@ class OrderDetailPresenter(
     private val orderRepository: OrderRepository,
 ) : OrderDetailContract.Presenter {
 
+    private lateinit var orderProducts: List<CartModel>
+
     override fun initView() {
         orderRepository.requestOrder(orderId, ::onFailure) { orderDetailEntity ->
-            val orderProducts = orderDetailEntity.products.map { it.toUIModel() }
-            view.setOrderDateView(orderDetailEntity.orderedAt)
-            view.setOrderProductsView(orderProducts)
+            orderProducts = orderDetailEntity.products.map { it.toUIModel() }
+            view.setView(orderDetailEntity, orderProducts)
         }
     }
 

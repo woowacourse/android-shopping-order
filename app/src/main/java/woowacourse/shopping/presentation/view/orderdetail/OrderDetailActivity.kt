@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
@@ -39,11 +40,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         presenter = OrderDetailPresenter(this, orderId, orderRepository)
     }
 
-    override fun setOrderDateView(date: String) {
-        binding.tvOrderDetailDate.text = date
-    }
+    override fun setView(orderDetail: OrderDetailEntity, products: List<CartModel>) {
+        binding.orderDetail = orderDetail
 
-    override fun setOrderProductsView(products: List<CartModel>) {
         val orderProductAdapter = OrderProductAdapter()
         orderProductAdapter.setItems(products)
         binding.rvOrderDetailProductList.adapter = orderProductAdapter
