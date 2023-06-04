@@ -69,7 +69,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         startActivity(intent)
     }
 
-    override fun showCartScreen() = startActivity(CartActivity.getIntent(this))
+    override fun showCartScreen() = runOnUiThread { startActivity(CartActivity.getIntent(this)) }
 
     override fun showSelectCountScreen(product: ProductUiModel) {
         val binding = DialogSelectCountBinding.inflate(LayoutInflater.from(this))
@@ -87,6 +87,9 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             }
             binding.countView.minusClickListener = {
                 presenter.decreaseCount()
+            }
+            binding.putBtn.setOnClickListener {
+                Thread { presenter.addCart() }.start()
             }
         }.create()
 
