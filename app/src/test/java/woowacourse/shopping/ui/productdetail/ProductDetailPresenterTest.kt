@@ -29,7 +29,7 @@ class ProductDetailPresenterTest() {
             UiPrice(1000),
             "https://pbs.twimg.com/media/FpFzjV-aAAAIE-v?format=jpg&name=large"
         )
-        presenter = ProductDetailPresenter(view, basketRepository, product, null)
+        presenter = ProductDetailPresenter(view, basketRepository, product, null, null, null)
     }
 
     @Test
@@ -73,7 +73,8 @@ class ProductDetailPresenterTest() {
             UiPrice(1000),
             "https://pbs.twimg.com/media/FpFzjV-aAAAIE-v?format=jpg&name=large"
         )
-        presenter = ProductDetailPresenter(view, basketRepository, product, previousProduct)
+        presenter =
+            ProductDetailPresenter(view, basketRepository, product, 1, previousProduct, 2)
         // when
         presenter.selectPreviousProduct()
 
