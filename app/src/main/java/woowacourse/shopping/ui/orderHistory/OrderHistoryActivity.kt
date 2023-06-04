@@ -62,8 +62,10 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setOrderHistory(orderHistory: OrderHistoryUIModel) {
-        binding.orderHistory = modifyFormat(orderHistory)
-        adapter.submitList(orderHistory.orderItems)
+        runOnUiThread {
+            binding.orderHistory = modifyFormat(orderHistory)
+            adapter.submitList(orderHistory.orderItems)
+        }
     }
 
     private fun modifyFormat(order: OrderHistoryUIModel): OrderHistoryUIModel {

@@ -67,11 +67,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showOrder(order: OrderUIModel) {
-        binding.order = order
-        binding.etUsedPoint.addTextChangedListener(
-            textWatcher(order.availablePoints)
-        )
-        adapter.submitList(order.cartProducts)
+        runOnUiThread {
+            binding.order = order
+            binding.etUsedPoint.addTextChangedListener(
+                textWatcher(order.availablePoints)
+            )
+            adapter.submitList(order.cartProducts)
+        }
     }
 
     private fun textWatcher(maxPoint: Int) = object : TextWatcher {
