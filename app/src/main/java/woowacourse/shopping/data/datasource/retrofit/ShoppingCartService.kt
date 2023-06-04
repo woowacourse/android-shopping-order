@@ -8,6 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 
 interface ShoppingCartService {
@@ -19,7 +20,7 @@ interface ShoppingCartService {
     @POST("/cart-items")
     fun postProductToCart(
         @Header("Authorization") token: String,
-        @Body productId: Long,
+        @Body cartItemRequest: CartItemRequest,
     ): Call<Void>
 
     @PATCH("/cart-items/{cartItemId}")

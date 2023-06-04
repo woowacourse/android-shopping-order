@@ -31,4 +31,8 @@ class CartItems(
     fun getSize(): Int {
         return _cartProducts.size
     }
+
+    fun getToList(): List<CartProduct> {
+        return _cartProducts.toList()
+    }
 }

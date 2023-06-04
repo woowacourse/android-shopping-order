@@ -33,6 +33,7 @@ class CartPresenter(
                 cartOffset.getOffset() / STEP + 1,
             ),
         )
+        updateCartItems()
     }
 
     override fun pageUp() {
@@ -135,6 +136,10 @@ class CartPresenter(
                 updateCartItems()
             }
         }
+    }
+
+    override fun navigateToOrder() {
+        view.navigateToOrder(cartItems.toUIModel())
     }
 
     private fun getCount(id: Long): Int {

@@ -27,8 +27,9 @@ class CartRepositoryImpl(
 
     override fun insert(
         id: Long,
+        quantity: Int,
     ): Result<Unit> {
-        val result = shoppingCartDataSource.postProductToCart(id)
+        val result = shoppingCartDataSource.postProductToCart(id, quantity)
         return if (result.isSuccess) {
             Result.success(Unit)
         } else {

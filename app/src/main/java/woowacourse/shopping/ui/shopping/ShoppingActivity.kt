@@ -1,7 +1,8 @@
 package woowacourse.shopping.ui.shopping
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -93,12 +94,9 @@ class ShoppingActivity :
                 val position = parent.getChildAdapterPosition(view)
                 val column = position % spanCount + 1
                 val space = 20
-
-                /** 마지막 열(column-N)에 있는 아이템인 경우 우측에 [space] 만큼의 여백을 추가한다 */
                 if (column == spanCount) {
                     outRect.right = space
                 }
-                /** 모든 아이템의 좌측과 하단에 [space] 만큼의 여백을 추가한다. */
                 outRect.top = space
                 outRect.left = space
                 outRect.bottom = space
@@ -131,7 +129,6 @@ class ShoppingActivity :
     }
 
     override fun showCountSize(size: Int) {
-        Log.d("ShoppingActivity", "showCountSize: $size")
         cartSize?.text = size.toString()
     }
 
@@ -161,5 +158,11 @@ class ShoppingActivity :
 
     override fun decreaseCount(id: Long) {
         presenter.decreaseCount(id)
+    }
+
+    companion object {
+        fun from(context: Context): Intent {
+            return Intent(context, ShoppingActivity::class.java)
+        }
     }
 }

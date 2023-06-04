@@ -2,6 +2,7 @@ package woowacourse.shopping.data.datasource.remote.shoppingcart
 
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
 import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 import java.util.concurrent.Executors
 
@@ -24,11 +25,11 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
         return result
     }
 
-    override fun postProductToCart(productId: Long): Result<Unit> {
+    override fun postProductToCart(productId: Long, quantity: Int): Result<Unit> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.postProductToCart(token, productId).execute()
+                ServicePool.shoppingCartService.postProductToCart(token, CartItemRequest(productId, quantity)).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
