@@ -8,7 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.cart.dto.CartProducts
+import woowacourse.shopping.data.cart.dto.CartProduct
 import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
 
 interface CartRetrofitService {
@@ -16,7 +16,7 @@ interface CartRetrofitService {
     @GET("/cart-items")
     fun requestCartProducts(
         @Header("Authorization") authorization: String,
-    ): Call<CartProducts>
+    ): Call<List<CartProduct>>
 
     @POST("/cart-items")
     fun insertCartProduct(

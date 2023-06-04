@@ -1,8 +1,10 @@
 package woowacourse.shopping.data.product.dto
 
+import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 
+@Serializable
 data class Product(
     val id: Long,
     val imageUrl: String,

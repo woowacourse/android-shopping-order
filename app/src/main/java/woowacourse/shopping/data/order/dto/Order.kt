@@ -1,10 +1,12 @@
 package woowacourse.shopping.data.order.dto
 
+import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.Price
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Serializable
 data class Order(
     val orderId: Long,
     val orderedDateTime: String,
