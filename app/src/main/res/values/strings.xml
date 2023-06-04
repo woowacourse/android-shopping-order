@@ -23,7 +23,7 @@
     <string name="shopping_read_more_text">더보기</string>
     <string name="shopping_item_product_image_description">상품</string>
 
-    <!-- Strings related to recent recent product -->
+    <!-- Strings related to recent product -->
     <string name="recent_product_text">최근 본 상품</string>
     <string name="recent_product_item_product_image_description">최근 본 상품</string>
     <string name="detailed_product_last_item">마지막으로 본 상품</string>
@@ -51,5 +51,10 @@
     <string name="order_invalid_point">올바른 금액을 입력해주세요</string>
     <string name="order_unavailable_point">사용 가능한 포인트를 초과했어요</string>
     <string name="order_initial_point">0</string>
+
+    <!-- Strings related to order detailed -->
+    <string name="order_detail_title_history">주문 내역</string>
+    <string name="order_detail_title_detail">주문 상세</string>
+    <string name="order_title_date">주문일자</string>
 
 </resources>
