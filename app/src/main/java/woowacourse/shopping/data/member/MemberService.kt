@@ -3,6 +3,8 @@ package woowacourse.shopping.data.member
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Path
+import woowacourse.shopping.data.entity.OrderEntity
 import woowacourse.shopping.data.entity.OrderHistoryEntity
 import woowacourse.shopping.data.entity.PointEntity
 
@@ -13,7 +15,13 @@ interface MemberService {
     ) : Call<PointEntity>
 
     @GET("members/orders")
-    fun requestHistories(
+    fun requestOrderHistories(
         @Header("Authorization") authorization: String
     ) : Call<List<OrderHistoryEntity>>
+
+    @GET("members/orders/{orderId}")
+    fun requestOrder(
+        @Path("orderId") orderId: Int,
+        @Header("Authorization") authorization: String
+    ) : Call<OrderEntity>
 }

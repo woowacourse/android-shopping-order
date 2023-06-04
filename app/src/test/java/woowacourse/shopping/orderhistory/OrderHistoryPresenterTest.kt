@@ -27,7 +27,7 @@ class OrderHistoryPresenterTest {
 
         val histories: List<OrderHistory> = listOf(createOrderHistory(id = 1), createOrderHistory(id = 2))
         val successSlot = slot<(List<OrderHistory>) -> Unit>()
-        every { memberRepository.getHistories(capture(successSlot), any()) } answers {
+        every { memberRepository.getOrderHistories(capture(successSlot), any()) } answers {
             successSlot.captured(histories)
         }
 

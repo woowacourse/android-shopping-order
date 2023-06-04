@@ -8,8 +8,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.Storage
-import woowacourse.shopping.data.entity.OrderRequest
-import woowacourse.shopping.data.entity.OrderResponse
+import woowacourse.shopping.data.entity.PayRequest
+import woowacourse.shopping.data.entity.PayResponse
 import woowacourse.shopping.data.server.OrderRemoteDataSource
 import woowacourse.shopping.data.server.Server
 
@@ -20,9 +20,9 @@ class OrderRemoteDataSourceRetrofit : OrderRemoteDataSource {
         .build()
         .create(OrderService::class.java)
 
-    override fun addOrder(order: OrderRequest, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
-        orderService.requestOrder(Storage.credential, order).enqueue(object : Callback<OrderResponse> {
-            override fun onResponse(call: Call<OrderResponse>, response: Response<OrderResponse>) {
+    override fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        orderService.requestOrder(Storage.credential, order).enqueue(object : Callback<PayResponse> {
+            override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.orderId)
                 }
@@ -31,7 +31,7 @@ class OrderRemoteDataSourceRetrofit : OrderRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PayResponse>, t: Throwable) {
                 onFailure()
             }
         })

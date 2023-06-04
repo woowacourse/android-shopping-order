@@ -8,7 +8,7 @@ class OrderHistoryPresenter(
     private val memberRepository: MemberRepository
 ) : OrderHistoryContract.Presenter {
     override fun loadHistories() {
-        memberRepository.getHistories(
+        memberRepository.getOrderHistories(
             onSuccess = {histories ->
                 view.showHistories(histories.map { it.toView() })
             },

@@ -3,8 +3,9 @@ package woowacourse.shopping.data.entity
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrderRequest(
-    val cartItemIds: List<CartIdEntity>,
+data class OrderEntity(
+    val orderItems: List<OrderProductEntity>,
     val originalPrice: Int,
-    val points: Int
+    val usedPoints: Int,
+    val orderPrice: Int
 )

@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="order"
+            type="woowacourse.shopping.ui.model.OrderModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,14 +18,14 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingVertical="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingVertical="20dp">
 
                 <TextView
                     android:id="@+id/tv_order_detail"
@@ -36,6 +43,8 @@
                     android:id="@+id/rv_order_product"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_order_detail" />
@@ -89,6 +98,7 @@
                     android:id="@+id/original_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{@string/product_price(order.originalPrice)}"
                     android:textColor="#333333"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="@id/line_payment_price"
@@ -110,6 +120,7 @@
                     android:id="@+id/discount_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{@string/discount_price(order.usedPoints)}"
                     android:textColor="#333333"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="@id/line_payment_price"
@@ -132,6 +143,7 @@
                     android:id="@+id/final_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{@string/product_price(order.finalPrice)}"
                     android:textColor="#333333"
                     android:textSize="16sp"
                     android:textStyle="bold"
