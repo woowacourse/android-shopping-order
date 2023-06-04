@@ -1,7 +1,7 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class ProductIdBody(
+data class ProductIdDto(
     @SerializedName("productId") val productId: Int = 0
 )

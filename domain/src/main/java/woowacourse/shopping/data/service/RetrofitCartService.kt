@@ -8,8 +8,8 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.dto.CartProductDto
-import woowacourse.shopping.model.ProductIdBody
-import woowacourse.shopping.model.QuantityBody
+import woowacourse.shopping.dto.ProductIdDto
+import woowacourse.shopping.dto.QuantityDto
 
 interface RetrofitCartService {
     @GET("cart-items")
@@ -17,13 +17,13 @@ interface RetrofitCartService {
 
     @POST("cart-items")
     fun postCart(
-        @Body productId: ProductIdBody
+        @Body productId: ProductIdDto
     ): Call<Void>
 
     @PATCH("cart-items/{cartId}")
     fun patchCart(
         @Path("cartId") cartId: Int,
-        @Body quantity: QuantityBody
+        @Body quantity: QuantityDto
     ): Call<Void>
 
     @DELETE("cart-items/{cartId}")

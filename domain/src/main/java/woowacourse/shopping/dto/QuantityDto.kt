@@ -1,7 +1,7 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class QuantityBody(
+data class QuantityDto(
     @SerializedName("quantity") val quantity: Int = 0
 )

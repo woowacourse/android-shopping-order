@@ -2,8 +2,8 @@ package woowacourse.shopping.data.remoteDataSourceImpl
 
 import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
 import woowacourse.shopping.dto.CartProductDto
-import woowacourse.shopping.model.ProductIdBody
-import woowacourse.shopping.model.QuantityBody
+import woowacourse.shopping.dto.ProductIdDto
+import woowacourse.shopping.dto.QuantityDto
 import woowacourse.shopping.utils.RetrofitUtil
 
 class CartRemoteDataSourceImpl : CartRemoteDataSource {
@@ -14,13 +14,13 @@ class CartRemoteDataSourceImpl : CartRemoteDataSource {
 
     override fun postItem(itemId: Int): Result<Int> = runCatching {
         RetrofitUtil.getInstance().retrofitCartService
-            .postCart(ProductIdBody(itemId)).execute().headers()["location"]!!
+            .postCart(ProductIdDto(itemId)).execute().headers()["location"]!!
             .split("/").last().toInt()
     }
 
     override fun patchItemQuantity(itemId: Int, quantity: Int): Result<Int> = runCatching {
         RetrofitUtil.getInstance().retrofitCartService
-            .patchCart(itemId, QuantityBody(quantity)).execute()
+            .patchCart(itemId, QuantityDto(quantity)).execute()
         quantity
     }
 
