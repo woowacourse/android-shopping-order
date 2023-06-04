@@ -1,12 +1,33 @@
 package woowacourse.shopping.data.datasource.remote.product
 
-import android.util.Log
 import com.example.domain.util.CustomResult
+import com.example.domain.util.Error.Disconnect
 import woowacourse.shopping.data.remote.ServiceFactory
+import woowacourse.shopping.data.remote.api.ShoppingService
 import woowacourse.shopping.data.remote.response.ProductResponseDto
+import woowacourse.shopping.utils.enqueueUtil
 import java.util.concurrent.Executors
 
-class ProductDataSourceImpl : ProductDataSource {
+class NewShoppingDataSourceImpl(
+    private val shoppingService: ShoppingService,
+) : ProductDataSource {
+
+    override fun getProducts(
+        limit: Int,
+        scrollCount: Int,
+        onSuccess: (CustomResult<List<ProductResponseDto>>) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    ) {
+        val response = shoppingService.getProducts(limit, scrollCount)
+        response.enqueueUtil(
+            onSuccess = { products ->
+                onSuccess.invoke(CustomResult.SUCCESS(products))
+            },
+            onFailure = {
+                onFailure.invoke(CustomResult.FAIL(Disconnect))
+            },
+        )
+    }
 
     override fun getSubListProducts(
         limit: Int,
@@ -23,14 +44,5 @@ class ProductDataSourceImpl : ProductDataSource {
         }.get()
         executor.shutdown()
         return result
-    }
-
-    override fun getProducts(
-        limit: Int,
-        scrollCount: Int,
-        onSuccess: (CustomResult<List<ProductResponseDto>>) -> Unit,
-        onFailure: (CustomResult<Error>) -> Unit,
-    ) {
-        Log.d("!23", "123")
     }
 }
