@@ -6,20 +6,20 @@ import java.util.concurrent.CompletableFuture
 class FutureTest {
     @Test
     internal fun name() {
-        println("\n\n\n\n")
         printThreadId(" 메인 스레드")
-        val completableFuture: CompletableFuture<String> = CompletableFuture.supplyAsync {
-            printThreadId("작업 결과 만드는 중")
-            "작업 결과"
-        }
-
-        completableFuture.thenAccept {
-            printThreadId("다른 스레드로 작업 결과 만드는 중")
+        CompletableFuture.supplyAsync {
+            repositoryGet()
+        }.thenAccept {
+            printThreadId("만들어진 작업 결과 받아서 처리하는 중")
         }
 
         CompletableFuture.completedFuture("test").thenAccept {
             printThreadId("thenAccept 가짜 작업 결과 받고 콜백 실행중")
         }
+    }
+
+    fun repositoryGet(): String {
+        return "가짜 데이터"
     }
 
     private fun printThreadId(message: String) {
