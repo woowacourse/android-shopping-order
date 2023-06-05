@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderRepository
 
-class OrderRepositoryImpl(private val service: OrderService) : OrderRepository {
+class DefaultOrderRepository(private val service: OrderService) : OrderRepository {
 
     override fun saveOrder(
         order: Order,

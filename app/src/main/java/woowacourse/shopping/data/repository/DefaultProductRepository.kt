@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class ProductRepositoryImpl(
+class DefaultProductRepository(
     private val productService: ProductService,
 ) : ProductRepository {
 

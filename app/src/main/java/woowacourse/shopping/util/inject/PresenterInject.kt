@@ -2,11 +2,11 @@ package woowacourse.shopping.util.inject
 
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
-import woowacourse.shopping.data.repository.PointRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultOrderRepository
+import woowacourse.shopping.data.repository.DefaultPointRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
+import woowacourse.shopping.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.data.util.cartService
 import woowacourse.shopping.data.util.orderService
 import woowacourse.shopping.data.util.pointService
@@ -35,11 +35,11 @@ fun injectShoppingPresenter(
 ): ShoppingContract.Presenter {
     return ShoppingPresenter(
         view = view,
-        productRepository = ProductRepositoryImpl(productService),
-        recentProductRepository = RecentProductRepositoryImpl(
+        productRepository = DefaultProductRepository(productService),
+        recentProductRepository = DefaultRecentProductRepository(
             dao = RecentProductDaoImpl(injectShoppingDatabase(context))
         ),
-        cartRepository = CartRepositoryImpl(cartService),
+        cartRepository = DefaultCartRepository(cartService),
     )
 }
 
@@ -51,7 +51,7 @@ fun injectProductDetailPresenter(
 ): ProductDetailContract.Presenter = ProductDetailPresenter(
     view = view,
     product = detailProduct,
-    recentProductRepository = RecentProductRepositoryImpl(
+    recentProductRepository = DefaultRecentProductRepository(
         dao = RecentProductDaoImpl(injectShoppingDatabase(context))
     ),
     showLastViewedProduct = showLastViewedProduct,
@@ -62,7 +62,7 @@ fun injectCartPresenter(
 ): CartPresenter {
     return CartPresenter(
         view = view,
-        cartRepository = CartRepositoryImpl(cartService),
+        cartRepository = DefaultCartRepository(cartService),
     )
 }
 
@@ -80,15 +80,15 @@ fun injectOrderPresenter(
 ): OrderContract.Presenter = OrderPresenter(
     view = view,
     order = order,
-    orderRepository = OrderRepositoryImpl(orderService),
-    pointRepository = PointRepositoryImpl(pointService),
+    orderRepository = DefaultOrderRepository(orderService),
+    pointRepository = DefaultPointRepository(pointService),
 )
 
 fun injectOrderListPresenter(
     view: OrderHistoryContract.View,
 ): OrderHistoryContract.Presenter = OrderHistoryPresenter(
     view = view,
-    orderRepository = OrderRepositoryImpl(orderService),
+    orderRepository = DefaultOrderRepository(orderService),
 )
 
 fun injectOrderDetailPresenter(

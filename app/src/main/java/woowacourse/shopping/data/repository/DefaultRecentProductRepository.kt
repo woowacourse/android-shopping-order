@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentProductRepository {
+class DefaultRecentProductRepository(private val dao: RecentProductDao) : RecentProductRepository {
 
     override fun getRecentProducts(size: Int): RecentProducts =
         RecentProducts(items = dao.getRecentProducts(size).toDomain())

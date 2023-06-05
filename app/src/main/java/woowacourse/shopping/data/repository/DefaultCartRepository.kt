@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.repository.CartProductId
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductId
 
-class CartRepositoryImpl(private val service: CartService) : CartRepository {
+class DefaultCartRepository(private val service: CartService) : CartRepository {
 
     override fun getAllCartProducts(
         onSuccess: (List<CartProduct>) -> Unit,
