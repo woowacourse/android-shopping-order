@@ -4,26 +4,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.OrderProduct
+import woowacourse.shopping.domain.model.Payment
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.model.page.Pagination
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
-import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.model.UiProduct
+import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.PageModel
+import woowacourse.shopping.model.PriceModel
+import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.cart.CartContract.Presenter
 import woowacourse.shopping.ui.cart.CartContract.View
 
 class CartPresenter(
-    view: View,
+    private val view: View,
     private val cartRepository: CartRepository,
     cartSize: Int = 5,
-) : Presenter(view) {
+) : Presenter {
     private var cart: Cart = Cart(minProductSize = 1)
     private var currentPage: Page = Pagination(sizePerPage = cartSize)
 
-    private val _totalCheckSize = MutableLiveData(cartRepository.getAllCartProducts().size)
+    private val _totalCheckSize = MutableLiveData(0)
     val totalCheckSize: LiveData<Int> get() = _totalCheckSize
 
     private val _pageCheckSize = MutableLiveData(currentPage.getCheckedProductSize(cart))
@@ -32,62 +36,87 @@ class CartPresenter(
     }
 
     init {
-        updateCart(cart.update(loadCartProducts()))
+        fetchCartProducts()
     }
 
     override fun fetchCart(page: Int) {
         currentPage = currentPage.update(page)
-
-        view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
-        view.updatePageNumber(currentPage.toUi())
+        view.updatePageState(mapToPageModel(currentPage))
         fetchView()
     }
 
-    override fun changeProductCount(cartProduct: UiCartProduct, count: Int) {
-        val domainCartProduct = cartProduct.toDomain()
-        val newCart = cart.changeProductCount(domainCartProduct, count)
-        newCart.findCartProductById(domainCartProduct.productId)?.let { _cartProduct ->
-            cartRepository.updateProductCountById(_cartProduct.id, _cartProduct.selectedCount)
+    override fun order() {
+        val checkedCartItemsPrice = PriceModel(cart.checkedProductTotalPrice).toDomain()
+        val order = OrderModel(
+            orderProducts = cart.getCheckedCartItems().map(OrderProduct::of).toUi(),
+            payment = Payment.of(checkedCartItemsPrice).toUi()
+        )
+
+        view.navigateToOrder(order)
+    }
+
+    override fun deleteProduct(cartProductModel: CartProductModel) {
+        cartRepository.deleteCartProductById(
+            cartProductId = cartProductModel.id,
+            onSuccess = {
+                updateCart(cart.delete(cartProductModel.toDomain()))
+            },
+            onFailed = {
+                view.showCartProductDeleteFailed()
+            })
+    }
+
+    override fun updateProductCount(cartProductModel: CartProductModel, count: Int) {
+        val cartProduct = cartProductModel.toDomain()
+        val newCart = cart.updateProductCount(cartProduct, count)
+
+        newCart.findCartProductByProductId(cartProduct.productId)?.let { cartItem ->
+            cartRepository.updateProductCountById(
+                cartProductId = cartItem.id,
+                count = cartItem.selectedCount,
+                onSuccess = {
+                    updateCart(newCart)
+                },
+                onFailed = {
+                    view.showCartCountChangedFailed()
+                })
         }
         updateCart(newCart)
     }
 
-    override fun changeProductSelectState(cartProduct: UiCartProduct, isSelect: Boolean) {
-        updateCart(changeSelectState(cartProduct.product, isSelect))
-    }
-
-    private fun changeSelectState(product: UiProduct, isSelect: Boolean): Cart =
-        if (isSelect) cart.select(product.toDomain()) else cart.unselect(product.toDomain())
-
     override fun toggleAllCheckState() {
-        updateCart(
-            if (isAllChecked.value == true) {
-                cart.unselectAll(currentPage)
-            } else {
-                cart.selectAll(currentPage)
-            }
-        )
-    }
-
-    override fun removeProduct(cartProduct: UiCartProduct) {
-        cartRepository.deleteCartProductById(cartProduct.id)
-        updateCart(cart.delete(cartProduct.toDomain()))
-    }
-
-    override fun order() {
-        if (_totalCheckSize.value == 0) {
-            view.showOrderFailed(); return
+        val toggledCart = if (isAllChecked.value == true) {
+            cart.unselectAll(currentPage)
+        } else {
+            cart.selectAll(currentPage)
         }
-        cart.items.forEach { cartRepository.deleteCartProductById(it.id) }
-        view.showOrderComplete(_totalCheckSize.value ?: 0)
+        updateCart(toggledCart)
+    }
+
+    override fun updateProductSelectState(cartProductModel: CartProductModel, isSelect: Boolean) {
+        updateCart(changeSelectState(cartProductModel.product, isSelect))
+    }
+
+    private fun changeSelectState(productModel: ProductModel, isSelect: Boolean): Cart {
+        val product = productModel.toDomain()
+        return if (isSelect) cart.select(product) else cart.unselect(product)
     }
 
     override fun navigateToHome() {
         view.navigateToHome()
     }
 
-    private fun loadCartProducts(): List<CartProduct> {
-        return cartRepository.getAllCartProducts()
+    private fun fetchCartProducts() {
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts ->
+                updateCart(cart.update(cartProducts))
+                _totalCheckSize.postValue(cartProducts.size)
+            },
+            onFailed = {
+                view.showErrorMessage(it.message ?: "")
+                _totalCheckSize.postValue(DEFAULT_TOTAL_CHECK_COUNT)
+            },
+        )
     }
 
     private fun updateCart(newCart: Cart) {
@@ -98,8 +127,18 @@ class CartPresenter(
     private fun fetchView() {
         _totalCheckSize.value = cart.checkedCount
         _pageCheckSize.value = currentPage.getCheckedProductSize(cart)
-        view.updateNavigatorEnabled(currentPage.hasPrevious(), currentPage.hasNext(cart))
+
+        view.updatePageState(mapToPageModel(currentPage))
         view.updateTotalPrice(cart.checkedProductTotalPrice)
         view.updateCart(currentPage.takeItems(cart).toUi())
+    }
+
+    private fun mapToPageModel(page: Page): PageModel = page.toUi(
+        hasPrevious = currentPage.hasPrevious(),
+        hasNext = currentPage.hasNext(cart)
+    )
+
+    companion object {
+        private const val DEFAULT_TOTAL_CHECK_COUNT = 0
     }
 }

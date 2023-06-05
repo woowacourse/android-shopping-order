@@ -3,8 +3,8 @@ package woowacourse.shopping.ui.shopping.recyclerview.adapter.recentproduct
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.model.UiRecentProduct
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.model.RecentProductModel
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 
 class RecentProductWrapperAdapter(
     private val recentProductAdapter: RecentProductAdapter,
@@ -22,13 +22,13 @@ class RecentProductWrapperAdapter(
 
     override fun getItemViewType(position: Int): Int = ShoppingViewType.RECENT_PRODUCTS.value
 
-    fun submitList(recentProductList: List<UiRecentProduct>) {
+    fun submitList(recentProductList: List<RecentProductModel>) {
         recentProductAdapter.submitList(recentProductList)
         updateRecentProductWrapperVisible(recentProductList)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun updateRecentProductWrapperVisible(recentProductList: List<UiRecentProduct>) {
+    private fun updateRecentProductWrapperVisible(recentProductList: List<RecentProductModel>) {
         container.clear()
         if (recentProductList.isNotEmpty()) container.add(Any())
         notifyDataSetChanged()

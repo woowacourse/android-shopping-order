@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="payment"
+            type="woowacourse.shopping.model.PaymentModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/total_product_payment_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/total_product_payment_title"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/total_product_payment_amount_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/total_product_payment_title_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/total_product_payment_title_text_view"
+            bind:price="@{payment.originalPayment}"
+            tools:text="300,000원" />
+
+        <TextView
+            android:id="@+id/point_usage_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/order_point_usage_title"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/total_product_payment_title_text_view"
+            app:layout_constraintTop_toBottomOf="@+id/total_product_payment_title_text_view" />
+
+        <TextView
+            android:id="@+id/point_usage_amount_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/point_usage_title_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/point_usage_title_text_view"
+            bind:point="@{payment.usedPoint}"
+            tools:text="2,000P" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="18dp"
+            android:background="@color/order_payment_divider_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/point_usage_title_text_view" />
+
+        <TextView
+            android:id="@+id/final_payment_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/final_payment_title"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/divider"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+        <TextView
+            android:id="@+id/final_payment_amount_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/final_payment_title_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/final_payment_title_text_view"
+            bind:price="@{payment.finalPayment}"
+            tools:text="298,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

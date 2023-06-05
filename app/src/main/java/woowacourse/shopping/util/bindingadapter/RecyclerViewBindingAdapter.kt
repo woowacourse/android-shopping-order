@@ -1,12 +1,17 @@
 package woowacourse.shopping.util.bindingadapter
 
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-@BindingAdapter("bind:adapter", "bind:onAdapted", requireAll = false)
-fun RecyclerView.setAdapter(adapter: ConcatAdapter, onAdapted: () -> Unit) {
+@BindingAdapter(
+    "bind:adapter",
+    "bind:onAdapted",
+    requireAll = false
+)
+fun RecyclerView.setAdapter(adapter: Adapter<ViewHolder>, onAdapted: () -> Unit) {
     this.adapter = adapter
     onAdapted.invoke()
 }
@@ -24,4 +29,19 @@ fun RecyclerView.setLayoutManager(layoutManager: LayoutManager) {
 @BindingAdapter("bind:animator")
 fun RecyclerView.setAnimator(itemAnimator: RecyclerView.ItemAnimator?) {
     this.itemAnimator = itemAnimator
+}
+
+@BindingAdapter("bind:onEndScroll")
+fun RecyclerView.setAnimator(onEndScrollListener: OnEndScrollListener) {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (!recyclerView.canScrollVertically(1)) {
+                onEndScrollListener.onEndScroll()
+            }
+        }
+    })
+}
+
+interface OnEndScrollListener {
+    fun onEndScroll()
 }

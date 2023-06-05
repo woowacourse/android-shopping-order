@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -37,14 +37,14 @@
             android:id="@+id/shopping_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/shopping_tool_bar"
+            app:spanCount="2"
             bind:adapter="@{adapter}"
             bind:animator="@{null}"
             bind:fixedSize="@{true}"
             bind:layoutManager="@{ShoppingGridLayoutManager.create(context, adapter)}"
-            bind:onAdapted="@{() -> presenter.fetchAll()}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/shopping_tool_bar"
-            app:spanCount="2"
+            bind:onAdapted="@{presenter::fetchAll}"
             tools:itemCount="10"
             tools:listitem="@layout/item_product" />
 

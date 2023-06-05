@@ -1,26 +1,28 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.Page
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.PageModel
 
 interface CartContract {
     interface View {
-        fun updateCart(cartProducts: List<UiCartProduct>)
-        fun updateNavigatorEnabled(previousEnabled: Boolean, nextEnabled: Boolean)
-        fun updatePageNumber(page: Page)
+        fun updateCart(cartProducts: List<CartProductModel>)
+        fun updatePageState(page: PageModel)
         fun updateTotalPrice(totalPrice: Int)
-        fun showOrderComplete(productCount: Int)
-        fun showOrderFailed()
+        fun navigateToOrder(order: OrderModel)
         fun navigateToHome()
+        fun showErrorMessage(message: String)
+        fun showCartProductDeleteFailed()
+        fun showCartCountChangedFailed()
     }
 
-    abstract class Presenter(protected val view: View) {
-        abstract fun fetchCart(page: Int)
-        abstract fun changeProductCount(cartProduct: UiCartProduct, count: Int)
-        abstract fun changeProductSelectState(cartProduct: UiCartProduct, isSelect: Boolean)
-        abstract fun toggleAllCheckState()
-        abstract fun removeProduct(cartProduct: UiCartProduct)
-        abstract fun order()
-        abstract fun navigateToHome()
+    interface Presenter {
+        fun fetchCart(page: Int)
+        fun order()
+        fun deleteProduct(cartProductModel: CartProductModel)
+        fun updateProductCount(cartProductModel: CartProductModel, count: Int)
+        fun toggleAllCheckState()
+        fun updateProductSelectState(cartProductModel: CartProductModel, isSelect: Boolean)
+        fun navigateToHome()
     }
 }

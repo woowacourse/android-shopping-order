@@ -3,8 +3,6 @@ package woowacourse.shopping.domain.model.page
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
 
-typealias DomainPage = Page
-
 abstract class Page(
     val value: Int = DEFAULT_PAGE,
     val sizePerPage: Int = DEFAULT_SIZE_PER_PAGE,
@@ -15,17 +13,20 @@ abstract class Page(
 
     abstract fun getStartPage(): Page
 
-    abstract fun hasPrevious(): Boolean
-
-    abstract fun hasNext(cart: Cart): Boolean
-
     abstract fun next(): Page
 
     abstract fun update(value: Int): Page
 
     abstract fun takeItems(cart: Cart): List<CartProduct>
 
-    abstract fun getCheckedProductSize(cart: Cart): Int
+    abstract fun getPageForCheckHasNext(): Page
+
+    fun hasPrevious(): Boolean = value > MIN_PAGE
+
+    fun hasNext(cart: Cart): Boolean = cart.items.size > sizePerPage * value
+
+    fun getCheckedProductSize(cart: Cart): Int =
+        takeItems(cart).count { item -> item.isChecked }
 
     companion object {
         private const val DEFAULT_PAGE = 1

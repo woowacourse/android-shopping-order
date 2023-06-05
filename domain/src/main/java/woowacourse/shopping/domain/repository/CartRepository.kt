@@ -7,10 +7,32 @@ typealias ProductId = Int
 typealias CartProductId = Int
 
 interface CartRepository {
-    fun getAllCartProducts(): List<CartProduct>
-    fun addCartProductByProductId(productId: ProductId)
-    fun updateProductCountById(cartProductId: CartProductId, count: ProductCount)
-    fun deleteCartProductById(cartProductId: CartProductId)
-    fun findCartProductByProductId(productId: ProductId): CartProduct?
-    fun increaseProductCountByProductId(productId: ProductId, addCount: ProductCount)
+    fun getAllCartProducts(
+        onSuccess: (List<CartProduct>) -> Unit, onFailed: (Throwable) -> Unit,
+    )
+
+    fun findCartProductByProductId(
+        productId: ProductId,
+        onSuccess: (CartProduct) -> Unit, onFailed: () -> Unit,
+    )
+
+    fun saveCartProductByProductId(
+        productId: ProductId,
+        onSuccess: (cartItemId: Int) -> Unit, onFailed: (Throwable) -> Unit,
+    )
+
+    fun updateProductCountById(
+        cartProductId: CartProductId, count: ProductCount,
+        onSuccess: () -> Unit, onFailed: (Throwable) -> Unit,
+    )
+
+    fun deleteCartProductById(
+        cartProductId: CartProductId,
+        onSuccess: () -> Unit, onFailed: (Throwable) -> Unit,
+    )
+
+    fun increaseProductCountByProductId(
+        productId: ProductId, addCount: ProductCount,
+        onSuccess: () -> Unit, onFailed: (Throwable) -> Unit,
+    )
 }

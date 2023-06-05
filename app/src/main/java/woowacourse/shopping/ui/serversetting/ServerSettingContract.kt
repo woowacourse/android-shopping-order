@@ -7,7 +7,7 @@ interface ServerSettingContract {
         fun navigateToShopping(serverUrl: String)
     }
 
-    abstract class Presenter(protected val view: View) {
-        abstract fun selectServer(server: Server)
+    interface Presenter {
+        fun selectServer(server: Server)
     }
 }

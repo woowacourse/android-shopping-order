@@ -2,8 +2,8 @@ package woowacourse.shopping.ui.shopping.recyclerview.adapter.product
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 import woowacourse.shopping.util.diffutil.ProductDiffUtil
 import woowacourse.shopping.util.listener.CartProductClickListener
 import woowacourse.shopping.widget.SkeletonCounterView
@@ -11,7 +11,7 @@ import woowacourse.shopping.widget.SkeletonCounterView
 class ProductAdapter(
     private val cartProductClickListener: CartProductClickListener,
     private val counterListener: SkeletonCounterView.OnCountChangedListener,
-) : ListAdapter<UiCartProduct, ProductViewHolder>(ProductDiffUtil) {
+) : ListAdapter<CartProductModel, ProductViewHolder>(ProductDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder =
         ProductViewHolder(

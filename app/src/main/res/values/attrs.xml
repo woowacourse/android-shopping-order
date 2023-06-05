@@ -15,4 +15,9 @@
     <declare-styleable name="SkeletonTextView">
         <attr name="skeletonTextBackground" format="reference|color" />
     </declare-styleable>
+
+    <attr name="PointEditTextStyle" format="reference" />
+    <declare-styleable name="PointEditText">
+        <attr name="maxPoint" format="integer" />
+    </declare-styleable>
 </resources>

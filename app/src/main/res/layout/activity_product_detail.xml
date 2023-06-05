@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -10,15 +10,15 @@
 
         <variable
             name="presenter"
-            type="woowacourse.shopping.ui.detail.ProductDetailContract.Presenter" />
+            type="woowacourse.shopping.ui.productdetail.ProductDetailContract.Presenter" />
 
         <variable
             name="detailProduct"
-            type="woowacourse.shopping.model.Product" />
+            type="woowacourse.shopping.model.ProductModel" />
 
         <variable
             name="lastViewedProduct"
-            type="woowacourse.shopping.model.Product" />
+            type="woowacourse.shopping.model.ProductModel" />
     </data>
 
     <ScrollView
@@ -29,7 +29,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".ui.detail.ProductDetailActivity">
+            tools:context=".ui.productdetail.ProductDetailActivity">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/product_detail_tool_bar"
@@ -45,12 +45,12 @@
                 android:id="@+id/product_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                bind:imageUrl="@{detailProduct.imageUrl}"
                 android:scaleType="centerCrop"
                 app:layout_constraintDimensionRatio="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/product_detail_tool_bar"
+                bind:imageUrl="@{detailProduct.imageUrl}"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
@@ -95,11 +95,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
                 android:includeFontPadding="false"
-                bind:price="@{detailProduct.price}"
                 android:textColor="@color/woowa_text_black"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_title_text_view"
+                bind:price="@{detailProduct.price}"
                 tools:text="99,800원" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -147,12 +147,12 @@
                     android:id="@+id/recent_product_price_text_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    bind:price="@{lastViewedProduct.price}"
                     android:textColor="@color/woowa_text_black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="@+id/recent_product_name_text_view"
                     app:layout_constraintEnd_toEndOf="@+id/recent_product_btn"
                     app:layout_constraintTop_toTopOf="@+id/recent_product_name_text_view"
+                    bind:price="@{lastViewedProduct.price}"
                     tools:text="19,800원" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

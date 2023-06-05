@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.ui.shopping.ShoppingViewType
+import woowacourse.shopping.ui.shopping.recyclerview.ShoppingViewType
 
 class LoadMoreAdapter(
     private val onItemClick: () -> Unit,

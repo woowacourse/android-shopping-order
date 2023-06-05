@@ -2,8 +2,6 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.page.Page
 
-typealias DomainCart = Cart
-
 data class Cart(
     val items: List<CartProduct> = emptyList(),
     val minProductSize: Int = 0,
@@ -42,17 +40,29 @@ data class Cart(
     fun update(cartProducts: List<CartProduct>): Cart =
         copy(items = cartProducts.distinctBy { it.productId })
 
+    fun addAll(cartProducts: List<CartProduct>): Cart =
+        copy(items = (items + cartProducts).distinctBy { it.product.id })
+
     fun delete(cartProduct: CartProduct): Cart =
         copy(items = items.filter { it.productId != cartProduct.productId })
 
-    fun findCartProductById(productId: Int): CartProduct? =
+    fun findCartProductByProductId(productId: Int): CartProduct? =
         items.find { it.productId == productId }
 
-    fun changeProductCount(cartProduct: DomainCartProduct, count: Int): Cart {
+    fun updateProductCount(cartProduct: CartProduct, count: Int): Cart {
         return copy(items = items.map { item ->
             if (item.productId == cartProduct.productId) item.changeCount(count) else item
         })
     }
+
+    fun addProductCount(product: Product, count: Int): Cart {
+        return copy(items = items.map { item ->
+            if (item.productId == product.id) item.plusCount(count) else item
+        })
+    }
+
+    fun getCheckedCartItems(): List<CartProduct> =
+        items.filter { it.isChecked }
 
     operator fun plus(cart: Cart): Cart =
         copy(items = (this.items + cart.items).distinctBy { it.product.id })

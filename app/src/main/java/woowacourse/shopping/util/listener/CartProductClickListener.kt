@@ -1,8 +1,8 @@
 package woowacourse.shopping.util.listener
 
-import woowacourse.shopping.model.UiCartProduct
+import woowacourse.shopping.model.CartProductModel
 
 interface CartProductClickListener {
-    fun onClickCartProduct(cartProduct: UiCartProduct)
-    fun onAddCartProduct(cartProduct: UiCartProduct)
+    fun onClickCartProduct(cartProduct: CartProductModel)
+    fun onAddCartProduct(cartProduct: CartProductModel)
 }

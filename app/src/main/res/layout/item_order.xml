@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="orderProduct"
+            type="woowacourse.shopping.model.OrderProductModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/shape_order_item">
+
+        <woowacourse.shopping.widget.SkeletonTextView
+            android:id="@+id/product_name_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{orderProduct.name}"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <woowacourse.shopping.widget.SkeletonImageView
+            android:id="@+id/product_image_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/product_name_text_view"
+            app:layout_constraintWidth_percent="0.3"
+            bind:imageUrl="@{orderProduct.imageUrl}" />
+
+        <woowacourse.shopping.widget.SkeletonTextView
+            android:id="@+id/product_count_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:ellipsize="end"
+            android:gravity="end|center_vertical"
+            android:maxLines="1"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/product_price_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/product_image_view"
+            bind:quantity="@{orderProduct.quantity}" />
+
+        <woowacourse.shopping.widget.SkeletonTextView
+            android:id="@+id/product_price_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:gravity="end|center_vertical"
+            android:maxLines="1"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/product_image_view"
+            app:layout_constraintEnd_toEndOf="@+id/product_count_text_view"
+            app:layout_constraintStart_toEndOf="@id/product_image_view"
+            app:layout_constraintStart_toStartOf="@+id/product_count_text_view"
+            bind:price="@{orderProduct.totalPrice}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -29,11 +29,13 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/cart_image_view"
         app:layout_constraintDimensionRatio="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cart_image_view"
         app:layout_constraintTop_toTopOf="@+id/cart_image_view"
-        tools:text="99" />
+        tools:text="99"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,8 @@
 
     <!-- 공통 -->
     <string name="price_format">%,d원</string>
+    <string name="quantity_format">%,d개</string>
+    <string name="point_format">%,dP</string>
     <string name="tb_shopping">Shopping</string>
 
     <!-- ShoppingActivity -->
@@ -31,4 +33,23 @@
     <string name="order_failed_message">주문에 실패하였습니다!</string>
     <string name="black_pepper_server">후추 서버</string>
     <string name="hamad_server">하마드 서버</string>
+    <string name="purchase">구매하기</string>
+    <string name="use_point">포인트 사용</string>
+    <string name="apply_point">적용하기</string>
+    <string name="use_point_icon_desc">use point icon</string>
+    <string name="order_load_failed_message">주문 정보 로딩에 실패하였습니다!</string>
+    <string name="order_list">주문 목록</string>
+    <string name="inquiry_order_detail">상세보기  ></string>
+    <string name="load_order_failed_message">주문 목록을 불러오는데 실패했습니다.</string>
+    <string name="order_number_format">주문번호 : %d</string>
+    <string name="order_product_name_format_with_quantity">%s 외 %,d개</string>
+    <string name="product_total_payment_and_count_format">%,d원 / 수량 : %,d개</string>
+    <string name="total_product_payment_title">총 상품 금액</string>
+    <string name="order_point_usage_title">포인트 사용</string>
+    <string name="final_payment_title">최종 결제 금액</string>
+    <string name="detail_order_product_list_title">상세 주문 내역</string>
+    <string name="cart_product_count_change_failed">장바구니 제품 개수 변경에 실패하였습니다.</string>
+    <string name="cart_product_delete_failed">상품 제거에 실패하였습니다.</string>
+    <string name="cart_product_save_failed">장바구니 상품 추가에 실패하였습니다.</string>
+    <string name="product_load_failed">상품 목록을 불러오는 데에 실패하였습니다.</string>
 </resources>

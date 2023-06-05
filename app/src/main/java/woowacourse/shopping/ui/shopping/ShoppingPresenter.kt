@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.DomainCartProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
@@ -11,82 +11,118 @@ import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toUi
-import woowacourse.shopping.model.UiCartProduct
-import woowacourse.shopping.model.UiProduct
-import woowacourse.shopping.model.UiProductCount
-import woowacourse.shopping.model.UiRecentProduct
+import woowacourse.shopping.model.CartProductModel
+import woowacourse.shopping.model.ProductCountModel
+import woowacourse.shopping.model.ProductModel
+import woowacourse.shopping.model.RecentProductModel
+import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
+import woowacourse.shopping.util.collection.DistinctList
 
 class ShoppingPresenter(
-    view: View,
+    private val view: View,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductSize: Int = 10,
     private var recentProducts: RecentProducts = RecentProducts(),
     sizePerPage: Int = 20,
-) : Presenter(view) {
+) : Presenter {
     private var cart = Cart()
+    private val products: DistinctList<Product> = DistinctList()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
-    private val cartProductCount: UiProductCount
-        get() = UiProductCount(cart.productCountInCart)
+    private val cartProductCount: ProductCountModel
+        get() = ProductCountModel(cart.productCountInCart)
 
     override fun fetchAll() {
-        updateCart(newCartProducts = loadAllCartProducts())
+        loadProducts(currentPage)
         fetchRecentProducts()
     }
 
     override fun fetchRecentProducts() {
-        updateRecentProducts(recentProductRepository.getPartially(recentProductSize))
+        updateRecentProducts(recentProductRepository.getRecentProducts(recentProductSize))
     }
 
     override fun loadMoreProducts() {
         currentPage = currentPage.next()
+        loadProducts(currentPage)
         updateCartView()
     }
 
-    override fun inquiryProductDetail(cartProduct: UiCartProduct) {
+    override fun inquiryProductDetail(cartProduct: CartProductModel) {
         val recentProduct = RecentProduct(product = cartProduct.product.toDomain())
         view.navigateToProductDetail(cartProduct.product)
         updateRecentProducts(recentProducts + recentProduct)
     }
 
-    override fun inquiryRecentProductDetail(recentProduct: UiRecentProduct) {
+    override fun inquiryRecentProductDetail(recentProduct: RecentProductModel) {
         view.navigateToProductDetail(recentProduct.product)
     }
 
-    override fun navigateToCart() {
+    override fun inquiryCart() {
         view.navigateToCart()
     }
 
-    override fun addCartProduct(product: UiProduct, addCount: Int) {
-        cartRepository.addCartProductByProductId(product.toDomain().id)
-        updateCart(newCartProducts = loadAllCartProducts())
+    override fun inquiryOrders() {
+        view.navigateToOrderList()
     }
 
-    override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
-        cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+    override fun addCartProduct(product: ProductModel, addCount: Int) {
+        cartRepository.saveCartProductByProductId(
+            product.toDomain().id,
+            onSuccess = { loadProducts(currentPage) },
+            onFailed = { view.showCartProductSaveFailed() },
+        )
     }
 
-    override fun increaseCartCount(product: UiProduct, addCount: Int) {
-        cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+    override fun updateCartCount(cartProduct: CartProductModel, changedCount: Int) {
+        cartRepository.updateProductCountById(
+            cartProduct.toDomain().id,
+            ProductCount(changedCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailed = { view.showCartCountChangedFailed() },
+        )
     }
 
-    private fun loadAllCartProducts(): List<CartProduct> {
-        val products = productRepository.getAllProducts()
-        val cartProducts = cartRepository.getAllCartProducts()
+    override fun increaseCartCount(product: ProductModel, addCount: Int) {
+        cartRepository.increaseProductCountByProductId(
+            product.id,
+            ProductCount(addCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailed = { view.showCartCountChangedFailed() },
+        )
+    }
 
-        return products.map { product ->
-            cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
-                product = product,
-                selectedCount = ProductCount(0)
-            )
-        }
+    private fun loadProducts(page: Page) {
+        productRepository.getProductsByPage(
+            page = page.getPageForCheckHasNext(),
+            onSuccess = { fetchedProducts ->
+                products.addAll(fetchedProducts)
+                loadCartProducts { fetchedCartProducts ->
+                    updateCart(transformCartProducts(products, fetchedCartProducts))
+                }
+            },
+            onFailed = { view.showProductLoadFailed() },
+        )
+    }
+
+    private fun transformCartProducts(
+        products: List<Product>,
+        cartProducts: List<CartProduct>,
+    ): List<CartProduct> = products.map { product ->
+        cartProducts.find { it.productId == product.id } ?: CartProduct(
+            product = product,
+            selectedCount = ProductCount(0),
+        )
+    }
+
+    private fun loadCartProducts(onLoaded: (List<CartProduct>) -> Unit) {
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts -> onLoaded(cartProducts) },
+            onFailed = {},
+        )
     }
 
     private fun updateCart(newCartProducts: List<CartProduct>) {

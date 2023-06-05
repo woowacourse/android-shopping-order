@@ -6,6 +6,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import woowacourse.shopping.R
 
 class SkeletonTextView : AppCompatTextView {
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         initStyledAttributes(attrs)
