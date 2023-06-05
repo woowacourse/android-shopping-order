@@ -76,7 +76,7 @@ class ApiModule private constructor(
         fun getInstance(userStore: UserStore): ApiModule {
             synchronized(this) {
                 apiModule?.let { return it }
-                return ApiModule(userStore)
+                return ApiModule(userStore).apply { apiModule = this }
             }
         }
     }
