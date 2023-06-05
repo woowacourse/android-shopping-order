@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.OrderProduct
 import woowacourse.shopping.domain.Price
 
-fun OrderProductEntity.toOrderProductDomainModel() = OrderProduct(
+fun OrderProductEntity.toDomainModel() = OrderProduct(
     id = productId.toInt(),
     name = productName,
     count = Count(quantity.toInt()),

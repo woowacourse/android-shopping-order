@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
-import woowacourse.shopping.data.mapper.toProductDomainModel
+import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -14,7 +14,7 @@ class ProductRepositoryImpl(
         onReceived: (products: List<Product>) -> Unit
     ) {
         remoteProductRemoteDataSource.getPartially(size, lastId) { products ->
-            onReceived(products.map { it.toProductDomainModel() })
+            onReceived(products.map { it.toDomainModel() })
         }
     }
 }

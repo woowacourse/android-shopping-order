@@ -3,12 +3,12 @@ package woowacourse.shopping.data.mapper
 import woowacourse.shopping.data.datasource.response.RecentProductEntity
 import woowacourse.shopping.domain.RecentProduct
 
-fun RecentProductEntity.toRecentProductDomainModel() = RecentProduct(
+fun RecentProductEntity.toDomainModel() = RecentProduct(
     id = id,
-    product = product.toProductDomainModel()
+    product = product.toDomainModel()
 )
 
-fun RecentProduct.toRecentProductEntity() = RecentProductEntity(
+fun RecentProduct.toEntity() = RecentProductEntity(
     id = id,
-    product = product.toProductEntity()
+    product = product.toEntity()
 )

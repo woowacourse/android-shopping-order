@@ -1,9 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSource
-import woowacourse.shopping.data.mapper.toBasketProductDomainModel
-import woowacourse.shopping.data.mapper.toBasketProductEntity
-import woowacourse.shopping.data.mapper.toProductEntity
+import woowacourse.shopping.data.mapper.toDomainModel
+import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
@@ -18,7 +17,7 @@ class BasketRepositoryImpl(
     ) {
         basketRemoteDataSource.getAll(
             onReceived = { dataBasketProduct ->
-                onReceived(dataBasketProduct.map { it.toBasketProductDomainModel() })
+                onReceived(dataBasketProduct.map { it.toDomainModel() })
             },
             onFailed = { errorMessage ->
                 onFailed(errorMessage)
@@ -32,7 +31,7 @@ class BasketRepositoryImpl(
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketRemoteDataSource.add(
-            product = product.toProductEntity(),
+            product = product.toEntity(),
             onAdded = onAdded,
             onFailed = onFailed
         )
@@ -44,7 +43,7 @@ class BasketRepositoryImpl(
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketRemoteDataSource.update(
-            basketProduct = basketProduct.toBasketProductEntity(),
+            basketProduct = basketProduct.toEntity(),
             onUpdated = onUpdated,
             onFailed = onFailed
         )
@@ -56,7 +55,7 @@ class BasketRepositoryImpl(
         onFailed: (errorMessage: String) -> Unit,
     ) {
         basketRemoteDataSource.remove(
-            basketProduct = basketProduct.toBasketProductEntity(),
+            basketProduct = basketProduct.toEntity(),
             onRemoved = onRemoved,
             onFailed = { errorMessage ->
                 onFailed(errorMessage)

@@ -4,14 +4,14 @@ import woowacourse.shopping.data.datasource.response.BasketProductEntity
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 
-fun BasketProductEntity.toBasketProductDomainModel() = BasketProduct(
+fun BasketProductEntity.toDomainModel() = BasketProduct(
     id = id,
     count = Count(count),
-    product = product.toProductDomainModel()
+    product = product.toDomainModel()
 )
 
-fun BasketProduct.toBasketProductEntity() = BasketProductEntity(
+fun BasketProduct.toEntity() = BasketProductEntity(
     id = id,
     count = count.value,
-    product = product.toProductEntity()
+    product = product.toEntity()
 )

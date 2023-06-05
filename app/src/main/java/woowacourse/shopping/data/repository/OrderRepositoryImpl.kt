@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.mapper.toOrderDomainModel
+import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.repository.OrderRepository
 
@@ -42,7 +42,7 @@ class OrderRepositoryImpl(
         orderRemoteDataSource.getOrder(
             orderId = orderId,
             onReceived = { order ->
-                onReceived(order.toOrderDomainModel())
+                onReceived(order.toDomainModel())
             },
             onFailed = { errorMessage ->
                 onFailed(errorMessage)
@@ -56,7 +56,7 @@ class OrderRepositoryImpl(
     ) {
         orderRemoteDataSource.getOrders(
             onReceived = { order ->
-                onReceived(order.map { it.toOrderDomainModel() })
+                onReceived(order.map { it.toDomainModel() })
             },
             onFailed = { errorMessage ->
                 onFailed(errorMessage)
