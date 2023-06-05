@@ -35,15 +35,21 @@ class OrderPresenter(
     override fun getCoupons() {
         val list = mutableListOf("사용 안함")
         couponRepository.getCoupons().getOrNull()?.let {
-            Log.d("getCoupons", it.toString())
             view.setCoupons(list.plus(it.map { coupon -> coupon.name }))
         }
     }
 
     override fun getTotalPrice(couponName: String) {
-        order = applyCoupon(couponName)
-
-        view.setPrice(order.totalPrice)
+        val coupon =
+            couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
+        val totalPrice = if (coupon != null) {
+             val response = couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.id).getOrNull()
+                ?: throw IllegalArgumentException("쿠폰 적용 실패")
+            response.totalPrice
+        } else {
+            cartItems.totalPrice
+        }
+        view.setPrice(totalPrice)
     }
 
     override fun navigateToOrderDetail() {
@@ -55,9 +61,7 @@ class OrderPresenter(
     private fun applyCoupon(couponName: String): OrderUIModel {
         val coupon =
             couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
-        Log.d("applyCoupon", coupon.toString())
         val cartItemsIds = cartItems.cartProducts.map { cartProduct -> cartProduct.id }
-        Log.d("applyCoupon", cartItemsIds.toString())
         return if (coupon != null) {
             orderRepository.insertOrderWithCoupon(cartItemsIds, coupon.id).getOrNull()?.toUIModel()
                 ?: throw IllegalArgumentException("쿠폰 적용 실패")
