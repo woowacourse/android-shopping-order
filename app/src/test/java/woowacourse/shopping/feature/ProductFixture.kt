@@ -8,11 +8,6 @@ object ProductFixture {
     fun getProducts(vararg idToPrice: Pair<Long, Int>): List<Product> {
         return idToPrice.map { Product(it.first, "", "", it.second) }
     }
-
-//    fun makeCartProducts(cartProductsIds: List<Long>, price: Int, count: Int): List<CartProduct> {
-//        return cartProductsIds.map { id ->
-//            makeCartProduct(id, price, count)
-//        }
 }
 
 private fun Product(id: Long, name: String, imgUrl: String, price: Int): Product {
