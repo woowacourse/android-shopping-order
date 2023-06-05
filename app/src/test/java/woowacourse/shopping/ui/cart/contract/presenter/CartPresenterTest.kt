@@ -71,7 +71,13 @@ internal class CartPresenterTest {
         // given
         val slot = slot<CartUIModel>()
         every { cartRepository.getSubList(any(), any()) } returns emptyList()
-        every { cartRepository.getAllProductInCart() } returns listOf(CartProduct(fakeProduct, 1, true))
+        every { cartRepository.getAllProductInCart() } returns listOf(
+            CartProduct(
+                fakeProduct,
+                1,
+                true,
+            ),
+        )
         every { view.setCarts(any(), capture(slot)) } answers { nothing }
         // when
         presenter.pageUp()
@@ -85,7 +91,13 @@ internal class CartPresenterTest {
         // given
         val slot = slot<CartUIModel>()
         every { cartRepository.getSubList(any(), any()) } returns emptyList()
-        every { cartRepository.getAllProductInCart() } returns listOf(CartProduct(fakeProduct, 1, true))
+        every { cartRepository.getAllProductInCart() } returns listOf(
+            CartProduct(
+                fakeProduct,
+                1,
+                true,
+            ),
+        )
         every { view.setCarts(any(), capture(slot)) } answers { nothing }
         // when
         presenter.pageDown()

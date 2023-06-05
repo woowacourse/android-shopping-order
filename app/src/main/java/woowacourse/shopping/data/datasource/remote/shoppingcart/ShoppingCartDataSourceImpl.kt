@@ -29,7 +29,10 @@ class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSou
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServiceFactory.shoppingCartService.postProductToCart(token, CartItemRequest(productId, quantity)).execute()
+                ServiceFactory.shoppingCartService.postProductToCart(
+                    token,
+                    CartItemRequest(productId, quantity),
+                ).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {

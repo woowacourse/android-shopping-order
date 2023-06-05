@@ -1,52 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.selectserver.SelectServerActivity">
 
-    <TextView
-        android:id="@+id/tv_select_server_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="170dp"
-        android:gravity="center"
-        android:text="@string/tv_select_server_title"
-        android:textColor="@color/black"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.selectserver.SelectServerActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_select_server_hongsil"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="100dp"
-        android:background="@drawable/layout_border_radius_10dp"
-        android:padding="10dp"
-        android:text="@string/btn_select_server_hongsil"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_select_server_matthew"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/tv_select_server_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="170dp"
+            android:gravity="center"
+            android:text="@string/tv_select_server_title"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_select_server_matthew"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginEnd="30dp"
-        android:background="@drawable/layout_border_radius_10dp"
-        android:padding="10dp"
-        android:text="@string/btn_select_server_matthew"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_select_server_hongsil"
-        app:layout_constraintTop_toTopOf="@+id/btn_select_server_hongsil" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_select_server_hongsil"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/layout_border_radius_10dp"
+            android:padding="10dp"
+            android:text="@string/btn_select_server_hongsil"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_select_server_matthew"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_select_server_matthew"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="30dp"
+            android:background="@drawable/layout_border_radius_10dp"
+            android:padding="10dp"
+            android:text="@string/btn_select_server_matthew"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_select_server_hongsil"
+            app:layout_constraintTop_toTopOf="@+id/btn_select_server_hongsil" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

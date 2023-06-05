@@ -30,4 +30,3 @@ fun ProductResponseDto.toDomain(): Product {
         imageUrl = this.imageUrl,
     )
 }
-

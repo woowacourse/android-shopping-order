@@ -78,17 +78,17 @@
         <include
             android:id="@+id/order_count_layout"
             layout="@layout/order_count"
-            app:count="@{count}"
-            app:listener ="@{listener}"
-            app:product = "@{product}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="14dp"
             android:layout_marginBottom="11dp"
             android:visibility="@{count >= 1? View.VISIBLE : View.GONE }"
+            app:count="@{count}"
             app:layout_constraintBottom_toBottomOf="@+id/productImg"
             app:layout_constraintEnd_toEndOf="@+id/productImg"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:listener="@{listener}"
+            app:product="@{product}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

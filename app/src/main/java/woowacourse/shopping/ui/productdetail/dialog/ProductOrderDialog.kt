@@ -26,6 +26,7 @@ class ProductOrderDialog(
         binding.count = count
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
+
     fun setOrderCount(count: Int) {
         binding.count = count
         binding.executePendingBindings()

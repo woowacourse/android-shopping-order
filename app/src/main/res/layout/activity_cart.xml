@@ -42,7 +42,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            tools:listitem="@layout/cart_item"/>
+            tools:listitem="@layout/cart_item" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -96,11 +96,11 @@
             android:layout_height="78dp"
             android:background="#04C09E"
             android:gravity="center"
+            android:onClick="@{() -> listener.onOrderClick()}"
             android:text="@{@string/order_button_message(count)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:onClick="@{() -> listener.onOrderClick()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="주문하기(2)" />

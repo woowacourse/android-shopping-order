@@ -1,11 +1,8 @@
 package woowacourse.shopping.ui.shopping.viewHolder
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import com.example.domain.repository.CartRepository
 import woowacourse.shopping.databinding.ProductItemBinding
-import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.ui.shopping.ProductItem
 import woowacourse.shopping.ui.shopping.ProductsItemType
 

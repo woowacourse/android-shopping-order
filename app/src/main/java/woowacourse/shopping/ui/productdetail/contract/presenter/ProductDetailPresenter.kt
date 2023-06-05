@@ -41,6 +41,7 @@ class ProductDetailPresenter(
             }
         }
     }
+
     override fun addProductToRecent() {
         recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)
