@@ -4,14 +4,13 @@ import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.RecentProducts
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.mapper.toDomainModel
 import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
-import woowacourse.shopping.ui.model.RecentProductUiModel
-import woowacourse.shopping.util.secondOrNull
 import kotlin.concurrent.thread
 
 class ShoppingPresenter(
@@ -22,7 +21,7 @@ class ShoppingPresenter(
     private var hasNext: Boolean = false,
     private var lastId: Int = -1,
     private var totalProducts: List<ProductUiModel> = listOf(),
-    private var recentProducts: List<RecentProductUiModel> = listOf(),
+    private var recentProducts: RecentProducts = RecentProducts(listOf()),
 ) : ShoppingContract.Presenter {
     private lateinit var basket: Basket
     private var isLoaded: Boolean = false
@@ -143,27 +142,35 @@ class ShoppingPresenter(
         products.size == TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE
 
     override fun fetchRecentProducts() {
-        recentProducts = recentProductRepository.getPartially(RECENT_PRODUCT_SIZE)
-            .map { it.toUiModel() }
-        view.updateRecentProducts(recentProducts)
+        recentProducts = RecentProducts(
+            values = recentProductRepository.getPartially(RECENT_PRODUCT_SIZE)
+        )
+
+        view.updateRecentProducts(
+            recentProducts = recentProducts.values.map {
+                it.toUiModel()
+            }
+        )
     }
 
     override fun inquiryProductDetail(product: ProductUiModel) {
-        val previousProduct = if (recentProducts.firstOrNull()?.product == product) {
-            recentProducts.secondOrNull()?.product
-        } else {
-            recentProducts.firstOrNull()?.product
+        val previousProduct = recentProducts.getLatestProduct(
+            product = product.toDomainModel()
+        )?.toUiModel()
+
+        val previousBasketId = previousProduct?.run {
+            basket.getProductByProductId(id).id
         }
+
+        val currentProductBasketId = runCatching {
+            basket.getProductByProductId(product.id).id
+        }.getOrNull()
 
         view.showProductDetail(
             currentProduct = product,
-            currentProductBasketId = basket.getProductByProductId(product.id).id,
+            currentProductBasketId = currentProductBasketId,
             previousProduct = previousProduct,
-            previousProductBasketId = if (previousProduct != null) {
-                basket.getProductByProductId(previousProduct.id).id
-            } else {
-                null
-            }
+            previousProductBasketId = previousBasketId
         )
         thread { recentProductRepository.add(product.toDomainModel()) }
     }
