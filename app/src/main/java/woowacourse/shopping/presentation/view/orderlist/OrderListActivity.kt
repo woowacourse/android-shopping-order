@@ -9,6 +9,7 @@ import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderDetailModel
+import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.orderlist.adapter.OrderListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
@@ -37,7 +38,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun setOrderView(orders: List<OrderDetailModel>) {
-        val orderListAdapter = OrderListAdapter {}
+        val orderListAdapter = OrderListAdapter { order ->
+            val intent = OrderDetailActivity.createIntent(this, server, order.id)
+            startActivity(intent)
+        }
         orderListAdapter.setItems(orders)
         binding.rvOrderList.adapter = orderListAdapter
     }

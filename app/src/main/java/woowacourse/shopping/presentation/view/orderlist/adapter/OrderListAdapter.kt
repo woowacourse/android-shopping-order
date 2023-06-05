@@ -7,7 +7,7 @@ import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.view.orderlist.viewholder.OrderListViewHolder
 
 class OrderListAdapter(
-    private val onClick: () -> Unit,
+    private val onClick: (orderDetail: OrderDetailModel) -> Unit,
 ) : ListAdapter<OrderDetailModel, OrderListViewHolder>(orderDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderListViewHolder {

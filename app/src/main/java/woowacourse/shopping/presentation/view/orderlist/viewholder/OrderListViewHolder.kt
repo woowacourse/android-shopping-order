@@ -9,14 +9,16 @@ import woowacourse.shopping.presentation.model.OrderDetailModel
 
 class OrderListViewHolder(
     parent: ViewGroup,
-    onClick: () -> Unit,
+    onClick: (orderDetail: OrderDetailModel) -> Unit,
 ) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.item_order_list, parent, false),
 ) {
     private val binding = ItemOrderListBinding.bind(itemView)
 
     init {
-        binding.tvOrderDetail.setOnClickListener { onClick() }
+        binding.tvOrderDetail.setOnClickListener {
+            binding.orderDetail?.let(onClick)
+        }
     }
 
     fun bind(orderDetail: OrderDetailModel) {
