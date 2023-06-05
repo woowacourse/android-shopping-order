@@ -4,8 +4,10 @@ import com.example.domain.model.OrderDetailProduct
 import com.example.domain.model.OrderHistoryInfo
 import com.example.domain.model.OrderInfo
 import com.example.domain.model.Point
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.OrderDetailDto
 import woowacourse.shopping.data.model.OrderDetailProductDto
 import woowacourse.shopping.data.model.OrderHistoryInfoDto
@@ -16,7 +18,7 @@ class OrderRemoteService(private val credential: String) {
 
     private val retrofitService = Retrofit.Builder()
         .baseUrl(ServerInfo.currentBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(RetrofitService::class.java)
 

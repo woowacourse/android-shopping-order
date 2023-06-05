@@ -4,7 +4,9 @@ import com.example.domain.model.OrderDetailProduct
 import com.example.domain.model.OrderInfo
 import com.example.domain.model.Point
 import com.example.domain.model.Price
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class OrderDetailDto(
     val orderAt: String,
     val orderId: Int,
@@ -15,6 +17,7 @@ data class OrderDetailDto(
     val usedPoint: Int
 )
 
+@Serializable
 data class OrderDetailInfoDto(
     val product: ProductDto,
     val quantity: Int

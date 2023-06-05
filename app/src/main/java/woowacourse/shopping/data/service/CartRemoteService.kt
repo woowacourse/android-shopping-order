@@ -1,8 +1,10 @@
 package woowacourse.shopping.data.service
 
 import com.example.domain.model.CartProduct
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.CartProductDto
 import woowacourse.shopping.data.model.toDomain
 
@@ -10,7 +12,7 @@ class CartRemoteService(private val credential: String) {
 
     private val retrofitService = Retrofit.Builder()
         .baseUrl(ServerInfo.currentBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(RetrofitService::class.java)
 

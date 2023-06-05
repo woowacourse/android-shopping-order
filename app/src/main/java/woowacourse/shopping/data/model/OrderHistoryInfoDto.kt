@@ -4,7 +4,9 @@ import com.example.domain.model.OrderHistoryInfo
 import com.example.domain.model.OrderHistoryProduct
 import com.example.domain.model.OrderState
 import com.example.domain.model.Price
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class OrderHistoryInfoDto(
     val contents: List<Content>,
     val currentPage: Int,
@@ -12,14 +14,14 @@ data class OrderHistoryInfoDto(
     val totalPages: Int
 )
 
+@Serializable
 data class Content(
-    val orderAt: String,
     val orderId: Int,
-    val orderStatus: String,
     val payAmount: Int,
-    val productImageUrl: String,
+    val orderAt: String,
+    val orderStatus: String,
     val productName: String,
-    val totalPrice: Int,
+    val productImageUrl: String,
     val totalProductCount: Int
 )
 
