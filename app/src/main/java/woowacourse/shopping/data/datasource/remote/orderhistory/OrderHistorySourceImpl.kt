@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.remote.orderhistory
 
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
-import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.OrderDTO
 import java.util.concurrent.Executors
 

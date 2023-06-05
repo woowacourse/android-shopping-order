@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote.producdetail
 
-import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.ProductDTO
 import java.util.concurrent.Executors
 

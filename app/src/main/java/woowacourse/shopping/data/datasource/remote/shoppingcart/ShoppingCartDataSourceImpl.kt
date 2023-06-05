@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
-import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 import java.util.concurrent.Executors

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.retrofit
+package woowacourse.shopping.data.datasource.remote.retrofit
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json

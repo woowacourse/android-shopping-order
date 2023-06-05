@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.remote.coupon
 
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
-import woowacourse.shopping.data.datasource.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.CouponDTO
 import woowacourse.shopping.data.remote.request.CouponDiscountPriceDTO
 import java.util.concurrent.Executors
