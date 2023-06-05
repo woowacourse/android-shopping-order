@@ -11,15 +11,15 @@
             android:id="@+id/recent_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/recent_product"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
             android:layout_marginStart="14dp"
             android:layout_marginBottom="4dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/recent_product"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/recyclerview"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/recyclerview" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"
@@ -29,10 +29,10 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"

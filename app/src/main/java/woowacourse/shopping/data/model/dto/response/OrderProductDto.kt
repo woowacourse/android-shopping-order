@@ -10,7 +10,7 @@ data class OrderProductDto(
     val productId: Long,
     @SerializedName("name")
     val name: String,
-    @SerializedName("price")
+    @SerializedName("singleProductPrice")
     val price: Int,
     @SerializedName("count")
     val count: Int,

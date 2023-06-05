@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        tools:context=".feature.serversetting.ServerSettingActivity"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".feature.serversetting.ServerSettingActivity">
 
         <Button
             android:id="@+id/btn_deetoo_server"

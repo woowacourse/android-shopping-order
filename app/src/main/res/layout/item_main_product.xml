@@ -24,8 +24,8 @@
             android:id="@+id/main_product_img"
             imgUrl="@{product.imgUrl}"
             android:layout_width="0dp"
-            android:contentDescription="@string/product_image_description"
             android:layout_height="0dp"
+            android:contentDescription="@string/product_image_description"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -40,10 +40,10 @@
             android:layout_marginTop="10dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="@{product.name}"
             app:layout_constraintTop_toBottomOf="@id/main_product_img"
             tools:text="상품이름" />
 
@@ -63,8 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            app:layout_constraintBottom_toBottomOf="@id/main_product_img"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/main_product_img" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

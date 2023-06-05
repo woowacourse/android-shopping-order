@@ -16,9 +16,9 @@
             android:clipToPadding="false"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
-            tools:listitem="@layout/item_main_product"
+            tools:layout_editor_absoluteX="6dp"
             tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="6dp" />
+            tools:listitem="@layout/item_main_product" />
 
         <FrameLayout
             android:id="@+id/skeleton_main_loading_layout"
