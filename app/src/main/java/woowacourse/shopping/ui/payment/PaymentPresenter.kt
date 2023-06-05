@@ -14,18 +14,16 @@ class PaymentPresenter(
 ) : PaymentContract.Presenter {
 
     override fun getUser() {
-        userRepository.getUser(
-            onReceived = { user ->
-                view.initView(
-                    user = user.toUiModel(),
-                    basketProducts = basketProducts,
-                    totalPrice = totalPrice
-                )
-            },
-            onFailure = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+        userRepository.getUser().thenAccept {
+            view.initView(
+                user = it.getOrThrow().toUiModel(),
+                basketProducts = basketProducts,
+                totalPrice = totalPrice
+            )
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun addOrder(usingPoint: Int) {

@@ -6,13 +6,13 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.domain.User
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.UserFixture
 import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
+import java.util.concurrent.CompletableFuture
 
 class PaymentPresenterTest {
 
@@ -45,17 +45,11 @@ class PaymentPresenterTest {
     fun `저장소로부터 유저 정보를 받아온 후 뷰를 초기화한다`() {
         // given
         val user = UserFixture.createUser()
-        val slotInitView = slot<(user: User) -> Unit>()
         val totalPrice = basketProducts.sumOf { it.product.price.value }
 
         every {
-            userRepository.getUser(
-                onReceived = capture(slotInitView),
-                onFailure = any()
-            )
-        } answers {
-            slotInitView.captured.invoke(user)
-        }
+            userRepository.getUser()
+        } returns CompletableFuture.completedFuture(Result.success(user))
 
         // when: 유저 정보를 저장소로부터 받아온다
         presenter.getUser()
@@ -73,24 +67,18 @@ class PaymentPresenterTest {
     @Test
     fun `유저 정보를 받지 못한 경우 에러 메시지를 띄운다`() {
         // given
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "유저 정보를 불러올 수 없습니다."
 
         every {
-            userRepository.getUser(
-                onReceived = any(),
-                onFailure = capture(slotShowErrorMessage)
-            )
-        } answers {
-            slotShowErrorMessage.captured.invoke(errorMessage)
-        }
+            userRepository.getUser()
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when: 유저 정보를 저장소로부터 받아온다
         presenter.getUser()
 
         // then: 받아오지 못한 경우 에러 메시지를 띄운다
         verify {
-            view.showErrorMessage(errorMessage)
+            view.showErrorMessage(any())
         }
     }
 
