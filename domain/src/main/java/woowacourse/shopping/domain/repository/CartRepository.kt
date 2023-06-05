@@ -18,7 +18,7 @@ interface CartRepository {
 
     fun saveCartProductByProductId(
         productId: ProductId,
-        onSuccess: () -> Unit, onFailed: (Throwable) -> Unit,
+        onSuccess: (cartItemId: Int) -> Unit, onFailed: (Throwable) -> Unit,
     )
 
     fun updateProductCountById(

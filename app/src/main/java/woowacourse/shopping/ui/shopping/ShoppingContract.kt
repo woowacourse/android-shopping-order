@@ -27,7 +27,7 @@ interface ShoppingContract {
         fun addCartProduct(product: ProductModel, addCount: Int = 1)
         fun updateCartCount(cartProduct: CartProductModel, changedCount: Int)
         fun increaseCartCount(product: ProductModel, addCount: Int)
-        fun navigateToCart()
+        fun inquiryCart()
         fun inquiryProductDetail(cartProduct: CartProductModel)
         fun inquiryRecentProductDetail(recentProduct: RecentProductModel)
         fun inquiryOrders()

@@ -19,6 +19,7 @@ import woowacourse.shopping.model.mapper.toDomain
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
+import woowacourse.shopping.util.collection.DistinctList
 
 class ShoppingPresenter(
     private val view: View,
@@ -30,10 +31,13 @@ class ShoppingPresenter(
     sizePerPage: Int = 20,
 ) : Presenter {
     private var cart = Cart()
+    private val products: DistinctList<Product> = DistinctList()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
+    private val cartProductCount: ProductCountModel
+        get() = ProductCountModel(cart.productCountInCart)
 
     override fun fetchAll() {
-        fetchAllCartProducts()
+        loadProducts(currentPage)
         fetchRecentProducts()
     }
 
@@ -43,34 +47,8 @@ class ShoppingPresenter(
 
     override fun loadMoreProducts() {
         currentPage = currentPage.next()
+        loadProducts(currentPage)
         updateCartView()
-    }
-
-    override fun addCartProduct(product: ProductModel, addCount: Int) {
-        cartRepository.saveCartProductByProductId(
-            productId = product.toDomain().id,
-            onSuccess = ::fetchAllCartProducts,
-            onFailed = { view.showCartProductSaveFailed() })
-    }
-
-    override fun updateCartCount(cartProduct: CartProductModel, changedCount: Int) {
-        cartRepository.updateProductCountById(
-            cartProductId = cartProduct.toDomain().id,
-            count = ProductCount(changedCount),
-            onSuccess = ::fetchAllCartProducts,
-            onFailed = { view.showCartCountChangedFailed() })
-    }
-
-    override fun increaseCartCount(product: ProductModel, addCount: Int) {
-        cartRepository.increaseProductCountByProductId(
-            productId = product.id,
-            addCount = ProductCount(addCount),
-            onSuccess = ::fetchAllCartProducts,
-            onFailed = { view.showCartCountChangedFailed() })
-    }
-
-    override fun navigateToCart() {
-        view.navigateToCart()
     }
 
     override fun inquiryProductDetail(cartProduct: CartProductModel) {
@@ -83,33 +61,68 @@ class ShoppingPresenter(
         view.navigateToProductDetail(recentProduct.product)
     }
 
+    override fun inquiryCart() {
+        view.navigateToCart()
+    }
+
     override fun inquiryOrders() {
         view.navigateToOrderList()
     }
 
-    private fun fetchAllCartProducts() {
-        productRepository.getProductsByPage(
-            page = currentPage.getPageForCheckHasNext(),
-            onSuccess = { products -> transformCountedCartProduct(products, ::updateCart) },
-            onFailed = { view.showProductLoadFailed() }
+    override fun addCartProduct(product: ProductModel, addCount: Int) {
+        cartRepository.saveCartProductByProductId(
+            product.toDomain().id,
+            onSuccess = { loadProducts(currentPage) },
+            onFailed = { view.showCartProductSaveFailed() },
         )
     }
 
-    private fun transformCountedCartProduct(
-        products: List<Product>,
-        onSuccess: (List<CartProduct>) -> Unit,
-    ) {
-        cartRepository.getAllCartProducts(
-            onSuccess = { fetchedCartProducts ->
-                val countedCartProduct = products.map { product ->
-                    fetchedCartProducts.find { it.productId == product.id } ?: CartProduct(
-                        product = product,
-                        selectedCount = ProductCount(0)
-                    )
+    override fun updateCartCount(cartProduct: CartProductModel, changedCount: Int) {
+        cartRepository.updateProductCountById(
+            cartProduct.toDomain().id,
+            ProductCount(changedCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailed = { view.showCartCountChangedFailed() },
+        )
+    }
+
+    override fun increaseCartCount(product: ProductModel, addCount: Int) {
+        cartRepository.increaseProductCountByProductId(
+            product.id,
+            ProductCount(addCount),
+            onSuccess = {},
+            onFailed = { view.showCartCountChangedFailed() },
+        )
+        loadProducts(currentPage)
+    }
+
+    private fun loadProducts(page: Page) {
+        productRepository.getProductsByPage(
+            page = page.getPageForCheckHasNext(),
+            onSuccess = { fetchedProducts ->
+                products.addAll(fetchedProducts)
+                loadCartProducts { fetchedCartProducts ->
+                    updateCart(transformCartProducts(products, fetchedCartProducts))
                 }
-                onSuccess(countedCartProduct)
             },
             onFailed = { view.showProductLoadFailed() },
+        )
+    }
+
+    private fun transformCartProducts(
+        products: List<Product>,
+        cartProducts: List<CartProduct>,
+    ): List<CartProduct> = products.map { product ->
+        cartProducts.find { it.productId == product.id } ?: CartProduct(
+            product = product,
+            selectedCount = ProductCount(0),
+        )
+    }
+
+    private fun loadCartProducts(onLoaded: (List<CartProduct>) -> Unit) {
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts -> onLoaded(cartProducts) },
+            onFailed = {},
         )
     }
 
@@ -119,19 +132,9 @@ class ShoppingPresenter(
     }
 
     private fun updateCartView() {
-        updateCartProductCount()
         view.updateProducts(currentPage.takeItems(cart).toUi())
+        view.updateCartBadge(cartProductCount)
         view.updateLoadMoreVisible()
-    }
-
-    private fun updateCartProductCount() {
-        cartRepository.getAllCartProducts(
-            onSuccess = {
-                view.updateCartBadge(ProductCountModel(Cart(it).productCountInCart))
-            },
-            onFailed = {
-                view.updateCartBadge(ProductCountModel(0))
-            })
     }
 
     private fun View.updateLoadMoreVisible() {

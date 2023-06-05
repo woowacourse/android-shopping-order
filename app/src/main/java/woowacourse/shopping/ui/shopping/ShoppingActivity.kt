@@ -56,7 +56,7 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     private fun initShoppingToolbar() {
         val cart = binding.shoppingToolBar.findItemActionView(R.id.cart)
-        cart?.setOnClickListener { presenter.navigateToCart() }
+        cart?.setOnClickListener { presenter.inquiryCart() }
 
         binding.shoppingToolBar.setOnMenuItemClickListener { item ->
             if (item?.itemId == R.id.order_list) presenter.inquiryOrders()

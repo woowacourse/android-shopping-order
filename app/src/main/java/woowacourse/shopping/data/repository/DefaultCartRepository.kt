@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,28 +40,41 @@ class DefaultCartRepository(private val service: CartService) : CartRepository {
         onSuccess: (CartProduct) -> Unit,
         onFailed: () -> Unit,
     ) {
-        getAllCartProducts(
-            onSuccess = { cartProducts ->
-                val cartProduct = cartProducts.find { it.product.id == productId } ?: run {
-                    onFailed()
-                    return@getAllCartProducts
+        service.findCartProductByProductId(productId).enqueue(object : Callback<CartGetResponse> {
+            override fun onResponse(
+                call: Call<CartGetResponse>,
+                response: Response<CartGetResponse>,
+            ) {
+                Log.d("buna", response.code().toString())
+                if (response.isSuccessful && response.body() != null) {
+                    onSuccess(response.body()!!.toDomain())
+                    return
                 }
-                onSuccess(cartProduct)
-            },
-            onFailed = { onFailed() }
-        )
+                onFailed()
+            }
+
+            override fun onFailure(call: Call<CartGetResponse>, throwable: Throwable) {
+                onFailed()
+            }
+        })
     }
 
     override fun saveCartProductByProductId(
         productId: ProductId,
-        onSuccess: () -> Unit,
+        onSuccess: (cartItemId: Int) -> Unit,
         onFailed: (Throwable) -> Unit,
     ) {
         service.saveCartProduct(requestBody = CartAddRequest(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    Log.d("buna", response.code().toString())
                     if (response.isSuccessful && response.body() != null) {
-                        onSuccess()
+                        val header = response.headers()["location"]
+                        val cartItemId = header?.substringAfterLast("/")?.toIntOrNull() ?: run {
+                            onFailed(Throwable(response.message()))
+                            return
+                        }
+                        onSuccess(cartItemId)
                         return
                     }
                     onFailed(Throwable(response.message()))
@@ -129,13 +143,12 @@ class DefaultCartRepository(private val service: CartService) : CartRepository {
                 updateProductCountById(cartProduct.id, updatedCount, onSuccess, onFailed)
             },
             onFailed = {
-                saveCartProductByProductId(productId, onSuccess, onFailed)
-                findCartProductByProductId(
+                saveCartProductByProductId(
                     productId = productId,
-                    onSuccess = { newCartProduct ->
-                        updateProductCountById(newCartProduct.id, addCount, onSuccess, onFailed)
+                    onSuccess = { cartItemId ->
+                        updateProductCountById(cartItemId, addCount, onSuccess, onFailed)
                     },
-                    onFailed = {}
+                    onFailed = onFailed
                 )
             })
     }

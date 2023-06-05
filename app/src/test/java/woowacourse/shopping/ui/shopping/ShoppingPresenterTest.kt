@@ -110,7 +110,7 @@ internal class ShoppingPresenterTest {
         /* ... */
 
         // when
-        presenter.navigateToCart()
+        presenter.inquiryCart()
 
         // then
         verify(exactly = 1) { view.navigateToCart() }
@@ -122,7 +122,7 @@ internal class ShoppingPresenterTest {
         /* ... */
 
         // when
-        presenter.navigateToCart()
+        presenter.inquiryCart()
 
         // then
         verify(exactly = 1) { view.navigateToCart() }
