@@ -44,7 +44,7 @@ class CartPresenter(
         view.setEnableRightButton(pageNation.hasNextPage())
 
         val newCarts = pageNation.currentItems.map { it.toUIModel() }
-        view.setCartItemsView(newCarts)
+        view.showCartItemsView(newCarts)
         view.setAllCartChecked(pageNation.isAllChecked)
     }
 
@@ -66,21 +66,21 @@ class CartPresenter(
         view.setEnableLeftButton(pageNation.hasPreviousPage())
         view.setEnableRightButton(pageNation.hasNextPage())
 
-        view.setChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
+        view.showChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 
     override fun setPreviousPage() {
         pageNation = pageNation.previousPage()
-        view.setPageCountView(pageNation.currentPage)
+        view.showPageCountView(pageNation.currentPage)
     }
 
     override fun setNextPage() {
         pageNation = pageNation.nextPage()
-        view.setPageCountView(pageNation.currentPage)
+        view.showPageCountView(pageNation.currentPage)
     }
 
     override fun calculateTotalPrice() {
-        view.setTotalPriceView(pageNation.totalPrice)
+        view.showTotalPriceView(pageNation.totalPrice)
     }
 
     override fun updateProductCount(cartId: Long, count: Int) {
@@ -107,7 +107,7 @@ class CartPresenter(
     override fun updateCurrentPageAllProductChecked(isChecked: Boolean) {
         pageNation = pageNation.updateAllCartsChecked(isChecked)
         calculateTotalPrice()
-        view.setChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
+        view.showChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 
     override fun showOrder() {

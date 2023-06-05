@@ -99,14 +99,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setCartItemsView(carts: List<CartProductModel>) {
+    override fun showCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter = CartAdapter(carts, cartProductListener)
             binding.rvCart.adapter = cartAdapter
         }
     }
 
-    override fun setChangedCartItemsView(carts: List<CartProductModel>) {
+    override fun showChangedCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter.updateList(carts)
         }
@@ -169,11 +169,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setPageCountView(page: Int) {
+    override fun showPageCountView(page: Int) {
         binding.tvCartListPageCount.text = page.toString()
     }
 
-    override fun setTotalPriceView(totalPrice: Int) {
+    override fun showTotalPriceView(totalPrice: Int) {
         binding.totalPrice = totalPrice
     }
 

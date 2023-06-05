@@ -44,12 +44,12 @@ class OrderListPresenterTest {
             orderListOnSuccess.captured(orders)
         }
 
-        justRun { view.setOrderListItemView(orders.map { it.toUIModel() }) }
+        justRun { view.showOrderListItemView(orders.map { it.toUIModel() }) }
 
         // when
         presenter.loadOrderList()
 
         // then
-        verify { view.setOrderListItemView(orders.map { it.toUIModel() }) }
+        verify { view.showOrderListItemView(orders.map { it.toUIModel() }) }
     }
 }

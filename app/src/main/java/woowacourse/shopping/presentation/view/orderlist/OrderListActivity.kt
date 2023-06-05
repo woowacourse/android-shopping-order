@@ -73,7 +73,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         val decoration = DividerItemDecoration(binding.rvOrderList.context, LinearLayoutManager(this).orientation)
         binding.rvOrderList.addItemDecoration(decoration)
     }
-    override fun setOrderListItemView(orders: List<OrderDetailModel>) {
+    override fun showOrderListItemView(orders: List<OrderDetailModel>) {
         binding.rvOrderList.post {
             binding.rvOrderList.adapter = OrderListAdapter(orders, ::onOrderItemClick)
         }

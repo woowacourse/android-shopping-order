@@ -32,7 +32,7 @@ class CountView @JvmOverloads constructor(
         }
     }
 
-    override fun setCountTextView(count: Int) {
+    override fun showCountTextView(count: Int) {
         binding.tvCount.text = count.toString()
     }
 

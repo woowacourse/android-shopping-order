@@ -27,7 +27,7 @@ class OrderPresenter(
 
     override fun setUsePoint(usePoint: Int) {
         this.usePoint = this.usePoint.toModel().updatePoint(usePoint).toUIModel()
-        view.setUsePointView(this.usePoint)
+        view.showUsePointView(this.usePoint)
     }
 
     override fun loadOrderProducts(cartIds: ArrayList<Long>) {
@@ -40,8 +40,8 @@ class OrderPresenter(
             loadUserPoint()
             loadSavePredictionPoint(orderPrice)
 
-            view.setOrderPriceView(CartProductsModel(orderProducts).toModel().totalPrice)
-            view.setProductItemsView(orderProducts)
+            view.showOrderPriceView(CartProductsModel(orderProducts).toModel().totalPrice)
+            view.showProductItemsView(orderProducts)
             view.setLayoutVisibility()
         }
     }
@@ -49,20 +49,20 @@ class OrderPresenter(
     private fun loadCards() {
         cards = cardRepository.loadCards().map { it.toUIModel() }
 
-        view.setCardItemsView(cards)
+        view.showCardItemsView(cards)
     }
 
     private fun loadUserPoint() {
         pointRepository.loadPoint(::onFailure) {
             point = it.toUIModel()
-            view.setUserPointView(it.toUIModel())
+            view.showUserPointView(it.toUIModel())
             view.setPointTextChangeListener(orderPrice, point)
         }
     }
 
     private fun loadSavePredictionPoint(orderPrice: Int) {
         pointRepository.loadPredictionSavePoint(orderPrice, ::onFailure) {
-            view.setSavePredictionPointView(it.toUIModel())
+            view.showSavePredictionPointView(it.toUIModel())
         }
     }
 

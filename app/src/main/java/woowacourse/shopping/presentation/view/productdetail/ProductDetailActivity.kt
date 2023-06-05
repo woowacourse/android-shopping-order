@@ -86,17 +86,17 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         )
     }
 
-    override fun setVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel) {
+    override fun showVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel) {
         binding.recentProduct = recentProduct
 
         binding.clLastProductInfo.visibility = View.VISIBLE
     }
 
-    override fun setGoneOfLastRecentProductInfoView() {
+    override fun hideLastRecentProductInfoView() {
         binding.clLastProductInfo.visibility = View.GONE
     }
 
-    override fun setProductInfoView(productModel: ProductModel) {
+    override fun showProductInfoView(productModel: ProductModel) {
         binding.product = productModel
     }
 

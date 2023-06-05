@@ -9,7 +9,7 @@ class OrderListPresenter(
 ) : OrderListContract.Presenter {
     override fun loadOrderList() {
         orderRepository.loadOrderList(::onFailure) { orders ->
-            view.setOrderListItemView(orders.map { it.toUIModel() })
+            view.showOrderListItemView(orders.map { it.toUIModel() })
         }
     }
 

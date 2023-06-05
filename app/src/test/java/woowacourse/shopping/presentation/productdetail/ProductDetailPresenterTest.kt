@@ -41,33 +41,33 @@ class ProductDetailPresenterTest {
         // given
         val recentProduct = RecentProductFixture.getData()
         val slot = slot<RecentProductModel>()
-        justRun { view.setVisibleOfLastRecentProductInfoView(capture(slot)) }
+        justRun { view.showVisibleOfLastRecentProductInfoView(capture(slot)) }
 
         // when
         presenter.loadLastRecentProductInfo(recentProduct)
 
         // then
-        verify { view.setVisibleOfLastRecentProductInfoView(slot.captured) }
+        verify { view.showVisibleOfLastRecentProductInfoView(slot.captured) }
     }
 
     @Test
     fun `마지막으로 본 상품이 존재하지 않다면 마지막으로 본 상품 정보를 안 보여준다`() {
         // given
         val recentProduct = null
-        justRun { view.setGoneOfLastRecentProductInfoView() }
+        justRun { view.hideLastRecentProductInfoView() }
 
         // when
         presenter.loadLastRecentProductInfo(recentProduct)
 
         // then
-        verify { view.setGoneOfLastRecentProductInfoView() }
+        verify { view.hideLastRecentProductInfoView() }
     }
 
     @Test
     fun `id를 통해 데이터를 받아와 상품 정보를 보여준다`() {
         // given
         val slot = slot<ProductModel>()
-        justRun { view.setProductInfoView(capture(slot)) }
+        justRun { view.showProductInfoView(capture(slot)) }
         val slotOnSuccess = slot<(Product) -> Unit>()
         every {
             productRepository.loadDataById(
@@ -81,7 +81,7 @@ class ProductDetailPresenterTest {
         presenter.setProduct(1L)
 
         // then
-        verify { view.setProductInfoView(ProductFixture.getData()) }
+        verify { view.showProductInfoView(ProductFixture.getData()) }
     }
 
     @Test
@@ -104,7 +104,7 @@ class ProductDetailPresenterTest {
         presenter.showCount()
 
         // then
-        verify { view.setProductInfoView(product) }
+        verify { view.showProductInfoView(product) }
         verify { view.showCountView(product) }
     }
 
@@ -114,7 +114,7 @@ class ProductDetailPresenterTest {
         val product = ProductFixture.getData()
         val lastRecentProduct = RecentProductModel(1L, product)
         val slot = slot<RecentProductModel>()
-        justRun { view.setVisibleOfLastRecentProductInfoView(capture(slot)) }
+        justRun { view.showVisibleOfLastRecentProductInfoView(capture(slot)) }
 
         // when
         presenter.loadLastRecentProductInfo(lastRecentProduct)
@@ -122,7 +122,7 @@ class ProductDetailPresenterTest {
         // then
         val actual = slot.captured
         assertEquals(lastRecentProduct, actual)
-        verify { view.setVisibleOfLastRecentProductInfoView(actual) }
+        verify { view.showVisibleOfLastRecentProductInfoView(actual) }
     }
 
     @Test
@@ -130,13 +130,13 @@ class ProductDetailPresenterTest {
         // given
         val product = ProductModel(-1L, "", 0, "")
         val lastRecentProduct = RecentProductModel(-1L, product)
-        justRun { view.setGoneOfLastRecentProductInfoView() }
+        justRun { view.hideLastRecentProductInfoView() }
 
         // when
         presenter.loadLastRecentProductInfo(lastRecentProduct)
 
         // then
-        verify { view.setGoneOfLastRecentProductInfoView() }
+        verify { view.hideLastRecentProductInfoView() }
     }
 
     @Test

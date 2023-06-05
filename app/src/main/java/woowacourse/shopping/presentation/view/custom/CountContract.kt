@@ -4,7 +4,7 @@ interface CountContract {
     interface View {
         fun setMinusButton()
         fun setPlusButton()
-        fun setCountTextView(count: Int)
+        fun showCountTextView(count: Int)
         fun updateCount(count: Int)
         fun getCount(): Int
     }

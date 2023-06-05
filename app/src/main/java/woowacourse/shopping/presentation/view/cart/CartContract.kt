@@ -4,15 +4,15 @@ import woowacourse.shopping.presentation.model.CartProductModel
 
 interface CartContract {
     interface View {
-        fun setCartItemsView(carts: List<CartProductModel>)
-        fun setChangedCartItemsView(carts: List<CartProductModel>)
         fun setEnableLeftButton(isEnabled: Boolean)
         fun setEnableRightButton(isEnabled: Boolean)
         fun setEnableOrderButton(isEnabled: Boolean)
         fun setAllCartChecked(isChecked: Boolean)
-        fun setPageCountView(page: Int)
-        fun setTotalPriceView(totalPrice: Int)
         fun setLayoutVisibility()
+        fun showCartItemsView(carts: List<CartProductModel>)
+        fun showChangedCartItemsView(carts: List<CartProductModel>)
+        fun showPageCountView(page: Int)
+        fun showTotalPriceView(totalPrice: Int)
         fun showOrderView(cartIds: ArrayList<Long>)
         fun handleErrorView(message: String)
     }

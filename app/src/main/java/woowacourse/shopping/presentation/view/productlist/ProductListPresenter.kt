@@ -46,7 +46,7 @@ class ProductListPresenter(
                     cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
                         .map { it.toUIModel() }
 
-                view.setProductItemsView(displayProducts)
+                view.showProductItemsView(displayProducts)
                 loadRecentProductItems()
                 view.setLayoutVisibility()
                 updateCartCount(allCount)
@@ -90,7 +90,7 @@ class ProductListPresenter(
                 cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
                     .map { it.toUIModel() }
 
-            view.setProductItemsView(displayProducts)
+            view.showProductItemsView(displayProducts)
             updateCartCount(allCount)
         }
     }
@@ -105,14 +105,14 @@ class ProductListPresenter(
         val displayProducts =
             cartProducts.toModel().getDisplayList(productsStartIndex, DISPLAY_PRODUCT_COUNT)
                 .map { it.toUIModel() }
-        view.setProductItemsView(displayProducts)
+        view.showProductItemsView(displayProducts)
     }
 
     override fun loadRecentProductItems() {
         recentProductRepository.getRecentProducts(LOAD_RECENT_PRODUCT_COUNT, ::onFailure) {
             recentProducts.clear()
             recentProducts.addAll(it.toUIModel().recentProducts)
-            view.setRecentProductItemsView(recentProducts.toList())
+            view.showRecentProductItemsView(recentProducts.toList())
         }
     }
 
@@ -191,7 +191,7 @@ class ProductListPresenter(
 
     private fun updateVisibilityCartCount(count: Int) {
         if (count == 0) {
-            view.setGoneToolbarCartCountView()
+            view.hideGoneToolbarCartCountView()
             return
         }
         view.setVisibleToolbarCartCountView()

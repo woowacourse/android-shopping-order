@@ -110,31 +110,31 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun setProductItemsView(products: List<CartProductModel>) {
+    override fun showProductItemsView(products: List<CartProductModel>) {
         binding.rvOrderProductList.post {
             binding.rvOrderProductList.adapter = OrderProductListAdapter(products)
         }
     }
 
-    override fun setCardItemsView(cards: List<CardModel>) {
+    override fun showCardItemsView(cards: List<CardModel>) {
         binding.rvOrderCardList.post {
             binding.rvOrderCardList.adapter = CardListAdapter(cards)
         }
     }
 
-    override fun setUserPointView(userPoint: PointModel) {
+    override fun showUserPointView(userPoint: PointModel) {
         binding.availablePoint = userPoint
     }
 
-    override fun setUsePointView(usePoint: PointModel) {
+    override fun showUsePointView(usePoint: PointModel) {
         binding.usePoint = usePoint
     }
 
-    override fun setSavePredictionPointView(savePredictionPoint: PointModel) {
+    override fun showSavePredictionPointView(savePredictionPoint: PointModel) {
         binding.savingPoint = savePredictionPoint
     }
 
-    override fun setOrderPriceView(orderPrice: Int) {
+    override fun showOrderPriceView(orderPrice: Int) {
         binding.orderPrice = orderPrice
     }
 

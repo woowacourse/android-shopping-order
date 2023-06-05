@@ -166,7 +166,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         }
     }
 
-    override fun setGoneToolbarCartCountView() {
+    override fun hideGoneToolbarCartCountView() {
         toolbarCartBinding.tvToolbarCartCount.post {
             toolbarCartBinding.tvToolbarCartCount.visibility = View.GONE
         }
@@ -200,13 +200,13 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding.rvProductList.layoutManager = layoutManager
     }
 
-    override fun setProductItemsView(cartProducts: List<CartProductModel>) {
+    override fun showProductItemsView(cartProducts: List<CartProductModel>) {
         binding.rvProductList.post {
             productListAdapter.setItems(cartProducts)
         }
     }
 
-    override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
+    override fun showRecentProductItemsView(recentProducts: List<RecentProductModel>) {
         binding.rvProductList.post {
             recentProductListAdapter.setItems(recentProducts)
         }

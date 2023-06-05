@@ -30,15 +30,15 @@ class ProductDetailPresenter(
             view.exitProductDetailView()
             return
         }
-        view.setProductInfoView(product)
+        view.showProductInfoView(product)
     }
 
     override fun loadLastRecentProductInfo(recentProduct: RecentProductModel?) {
         if (recentProduct == null || recentProduct.id == UNABLE_ID) {
-            view.setGoneOfLastRecentProductInfoView()
+            view.hideLastRecentProductInfoView()
             return
         }
-        view.setVisibleOfLastRecentProductInfoView(recentProduct)
+        view.showVisibleOfLastRecentProductInfoView(recentProduct)
     }
 
     override fun addCart(productId: Long, count: Int) {

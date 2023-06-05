@@ -72,25 +72,29 @@ class ProductListPresenterTest {
         // 최근 본 상품 데이터를 가져온다
         val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
-            recentProductRepository.getRecentProducts(10, capture(slotGetRecentProductsOnSuccess))
+            recentProductRepository.getRecentProducts(
+                10,
+                onFailure = any(),
+                capture(slotGetRecentProductsOnSuccess)
+            )
         } answers {
             slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
         }
 
-        justRun { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
         justRun { view.updateToolbarCartCountView(2) }
         justRun { view.setVisibleToolbarCartCountView() }
-        justRun { view.setProductItemsView(CartFixture.getFixture()) }
+        justRun { view.showProductItemsView(CartFixture.getFixture()) }
         justRun { view.setLayoutVisibility() }
 
         // when
         presenter.initProductItems()
 
         // then
-        verify { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        verify { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
         verify { view.updateToolbarCartCountView(2) }
         verify { view.setVisibleToolbarCartCountView() }
-        verify { view.setProductItemsView(CartFixture.getFixture()) }
+        verify { view.showProductItemsView(CartFixture.getFixture()) }
         verify { view.setLayoutVisibility() }
     }
 
@@ -112,18 +116,22 @@ class ProductListPresenterTest {
         // 최근 본 상품 데이터를 가져온다
         val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
-            recentProductRepository.getRecentProducts(10, capture(slotGetRecentProductsOnSuccess))
+            recentProductRepository.getRecentProducts(
+                10,
+                onFailure = any(),
+                capture(slotGetRecentProductsOnSuccess)
+            )
         } answers {
             slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
         }
 
-        justRun { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
 
         // when
         presenter.loadRecentProductItems()
 
         // then
-        verify { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        verify { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
     }
 
     @Test
@@ -131,14 +139,14 @@ class ProductListPresenterTest {
         // given
         val slotDisplayProducts = slot<List<CartProductModel>>()
         justRun {
-            view.setProductItemsView(capture(slotDisplayProducts))
+            view.showProductItemsView(capture(slotDisplayProducts))
         }
 
         // when
         presenter.updateProductItems(startIndex = 0)
 
         // then
-        verify { view.setProductItemsView(slotDisplayProducts.captured) }
+        verify { view.showProductItemsView(slotDisplayProducts.captured) }
     }
 
     @Test
@@ -166,12 +174,16 @@ class ProductListPresenterTest {
         // given
         val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
-            recentProductRepository.getRecentProducts(10, capture(slotGetRecentProductsOnSuccess))
+            recentProductRepository.getRecentProducts(
+                10,
+                onFailure = any(),
+                capture(slotGetRecentProductsOnSuccess)
+            )
         } answers {
             slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
         }
 
-        justRun { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
 
         presenter.loadRecentProductItems()
 
@@ -190,7 +202,7 @@ class ProductListPresenterTest {
                 )
             )
         assertEquals(expected, actual)
-        verify { view.setRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
+        verify { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
     }
 
     @Test

@@ -52,8 +52,8 @@ class CartPresenterTest {
         every { cartRepository.getAllLocalCart() } returns CartFixture.getFixture()
             .map { it.toModel() }
         justRun { view.setEnableOrderButton(true) }
-        justRun { view.setCartItemsView(capture(slotItems)) }
-        justRun { view.setTotalPriceView(capture(slotTotalPrice)) }
+        justRun { view.showCartItemsView(capture(slotItems)) }
+        justRun { view.showTotalPriceView(capture(slotTotalPrice)) }
         justRun { view.setEnableLeftButton(false) }
         justRun { view.setEnableRightButton(false) }
         justRun { view.setAllCartChecked(true) }
@@ -73,8 +73,8 @@ class CartPresenterTest {
 
         verify { cartRepository.getAllLocalCart() }
         verify { view.setEnableOrderButton(true) }
-        verify { view.setCartItemsView(slotItems.captured) }
-        verify { view.setTotalPriceView(slotTotalPrice.captured) }
+        verify { view.showCartItemsView(slotItems.captured) }
+        verify { view.showTotalPriceView(slotTotalPrice.captured) }
         verify { view.setEnableLeftButton(false) }
         verify { view.setEnableRightButton(false) }
         verify { view.setAllCartChecked(true) }
@@ -95,7 +95,7 @@ class CartPresenterTest {
         justRun { view.setEnableRightButton(false) }
 
         val slotItems = slot<List<CartProductModel>>()
-        justRun { view.setChangedCartItemsView(capture(slotItems)) }
+        justRun { view.showChangedCartItemsView(capture(slotItems)) }
 
         // when
         presenter.deleteCartItem(targetCartId)
@@ -132,7 +132,7 @@ class CartPresenterTest {
         verify { view.setEnableOrderButton(true) }
         verify { view.setEnableLeftButton(false) }
         verify { view.setEnableRightButton(false) }
-        verify { view.setChangedCartItemsView(actual) }
+        verify { view.showChangedCartItemsView(actual) }
     }
 
     @Test
@@ -141,13 +141,13 @@ class CartPresenterTest {
         presenter.setPageNation(CartFixture.getFixture(), 1)
 
         val slot = slot<Int>()
-        justRun { view.setPageCountView(capture(slot)) }
+        justRun { view.showPageCountView(capture(slot)) }
 
         // when
         presenter.setPreviousPage()
 
         // then
-        verify { view.setPageCountView(slot.captured) }
+        verify { view.showPageCountView(slot.captured) }
     }
 
     @Test
@@ -156,13 +156,13 @@ class CartPresenterTest {
         presenter.setPageNation(CartFixture.getFixture(), 1)
 
         val slot = slot<Int>()
-        justRun { view.setPageCountView(capture(slot)) }
+        justRun { view.showPageCountView(capture(slot)) }
 
         // when
         presenter.setNextPage()
 
         // then
-        verify { view.setPageCountView(slot.captured) }
+        verify { view.showPageCountView(slot.captured) }
     }
 
     @Test
@@ -229,7 +229,7 @@ class CartPresenterTest {
         presenter.setPageNation(CartFixture.getFixture(), 1)
 
         val slot = slot<Int>()
-        justRun { view.setTotalPriceView(capture(slot)) }
+        justRun { view.showTotalPriceView(capture(slot)) }
 
         // when
         presenter.calculateTotalPrice()
@@ -238,7 +238,7 @@ class CartPresenterTest {
         val actual = slot.captured
         val expected = 24_900 + 15_000
         assertEquals(expected, actual)
-        verify { view.setTotalPriceView(actual) }
+        verify { view.showTotalPriceView(actual) }
     }
 
     @Test

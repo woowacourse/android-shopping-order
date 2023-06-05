@@ -5,11 +5,11 @@ import woowacourse.shopping.presentation.model.RecentProductModel
 
 interface ProductContract {
     interface View {
-        fun setProductItemsView(cartProducts: List<CartProductModel>)
-        fun setRecentProductItemsView(recentProducts: List<RecentProductModel>)
         fun setVisibleToolbarCartCountView()
-        fun setGoneToolbarCartCountView()
         fun setLayoutVisibility()
+        fun showProductItemsView(cartProducts: List<CartProductModel>)
+        fun showRecentProductItemsView(recentProducts: List<RecentProductModel>)
+        fun hideGoneToolbarCartCountView()
         fun updateToolbarCartCountView(count: Int)
         fun moveToCartView()
         fun handleErrorView(message: String)

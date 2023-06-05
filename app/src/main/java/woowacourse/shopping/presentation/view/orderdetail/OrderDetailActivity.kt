@@ -70,29 +70,29 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         )
     }
 
-    override fun setOrderProductItemView(orderProducts: List<CartProductModel>) {
+    override fun showOrderProductItemView(orderProducts: List<CartProductModel>) {
         binding.rvOrderDetailProductList.post {
             binding.rvOrderDetailProductList.adapter = OrderProductListAdapter(orderProducts)
         }
     }
 
-    override fun setOrderDateView(oderDate: String) {
+    override fun showOrderDateView(oderDate: String) {
         binding.orderDate = oderDate
     }
 
-    override fun setOrderPriceView(orderPrice: Int) {
+    override fun showOrderPriceView(orderPrice: Int) {
         binding.orderPrice = orderPrice
     }
 
-    override fun setTotalPriceView(totalPrice: Int) {
+    override fun showTotalPriceView(totalPrice: Int) {
         binding.totalPrice = totalPrice
     }
 
-    override fun setUsedPointView(usedPoint: Int) {
+    override fun showUsedPointView(usedPoint: Int) {
         binding.usedPoint = usedPoint
     }
 
-    override fun setSavedPointView(savedPoint: Int) {
+    override fun showSavedPointView(savedPoint: Int) {
         binding.savedPoint = savedPoint
     }
 

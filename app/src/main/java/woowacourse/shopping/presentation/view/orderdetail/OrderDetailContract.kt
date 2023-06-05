@@ -4,12 +4,12 @@ import woowacourse.shopping.presentation.model.CartProductModel
 
 interface OrderDetailContract {
     interface View {
-        fun setOrderDateView(oderDate: String)
-        fun setOrderProductItemView(orderProducts: List<CartProductModel>)
-        fun setOrderPriceView(orderPrice: Int)
-        fun setTotalPriceView(totalPrice: Int)
-        fun setUsedPointView(usedPoint: Int)
-        fun setSavedPointView(savedPoint: Int)
+        fun showOrderDateView(oderDate: String)
+        fun showOrderProductItemView(orderProducts: List<CartProductModel>)
+        fun showOrderPriceView(orderPrice: Int)
+        fun showTotalPriceView(totalPrice: Int)
+        fun showUsedPointView(usedPoint: Int)
+        fun showSavedPointView(savedPoint: Int)
         fun handleErrorView(message: String)
     }
 

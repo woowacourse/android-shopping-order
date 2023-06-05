@@ -51,22 +51,22 @@ class OrderDetailPresenterTest {
             loadOnSuccess.captured(orderDetail)
         }
 
-        justRun { view.setOrderProductItemView(orderDetail.products.map { it.toUIModel() }) }
-        justRun { view.setOrderDateView(orderDetail.orderDateTime) }
-        justRun { view.setOrderPriceView(totalPrice) }
-        justRun { view.setUsedPointView(orderDetail.usedPoint) }
-        justRun { view.setSavedPointView(orderDetail.savedPoint) }
-        justRun { view.setTotalPriceView(totalPrice - orderDetail.usedPoint) }
+        justRun { view.showOrderProductItemView(orderDetail.products.map { it.toUIModel() }) }
+        justRun { view.showOrderDateView(orderDetail.orderDateTime) }
+        justRun { view.showOrderPriceView(totalPrice) }
+        justRun { view.showUsedPointView(orderDetail.usedPoint) }
+        justRun { view.showSavedPointView(orderDetail.savedPoint) }
+        justRun { view.showTotalPriceView(totalPrice - orderDetail.usedPoint) }
 
         // when
         presenter.loadOrderDetail(1L)
 
         // then
-        verify { view.setOrderProductItemView(orderDetail.products.map { it.toUIModel() }) }
-        verify { view.setOrderDateView(orderDetail.orderDateTime) }
-        verify { view.setOrderPriceView(totalPrice) }
-        verify { view.setUsedPointView(orderDetail.usedPoint) }
-        verify { view.setSavedPointView(orderDetail.savedPoint) }
-        verify { view.setTotalPriceView(totalPrice - orderDetail.usedPoint) }
+        verify { view.showOrderProductItemView(orderDetail.products.map { it.toUIModel() }) }
+        verify { view.showOrderDateView(orderDetail.orderDateTime) }
+        verify { view.showOrderPriceView(totalPrice) }
+        verify { view.showUsedPointView(orderDetail.usedPoint) }
+        verify { view.showSavedPointView(orderDetail.savedPoint) }
+        verify { view.showTotalPriceView(totalPrice - orderDetail.usedPoint) }
     }
 }

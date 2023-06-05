@@ -12,12 +12,12 @@ class OrderDetailPresenter(
         orderRepository.loadOrder(orderId, ::onFailure) { orderDetail ->
             val orderProducts = CartProducts(orderDetail.products)
 
-            view.setOrderProductItemView(orderProducts.getAll().map { it.toUIModel() })
-            view.setOrderDateView(orderDetail.orderDateTime)
-            view.setOrderPriceView(orderProducts.totalPrice)
-            view.setUsedPointView(orderDetail.usedPoint)
-            view.setSavedPointView(orderDetail.savedPoint)
-            view.setTotalPriceView(orderProducts.totalPrice - orderDetail.usedPoint)
+            view.showOrderProductItemView(orderProducts.getAll().map { it.toUIModel() })
+            view.showOrderDateView(orderDetail.orderDateTime)
+            view.showOrderPriceView(orderProducts.totalPrice)
+            view.showUsedPointView(orderDetail.usedPoint)
+            view.showSavedPointView(orderDetail.savedPoint)
+            view.showTotalPriceView(orderProducts.totalPrice - orderDetail.usedPoint)
         }
     }
 

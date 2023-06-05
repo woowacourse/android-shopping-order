@@ -7,13 +7,13 @@ import woowacourse.shopping.presentation.model.PointModel
 interface OrderContract {
     interface View {
         fun setLayoutVisibility()
-        fun setProductItemsView(products: List<CartProductModel>)
-        fun setCardItemsView(cards: List<CardModel>)
-        fun setUserPointView(userPoint: PointModel)
-        fun setUsePointView(usePoint: PointModel)
         fun setPointTextChangeListener(orderPrice: Int, userPoint: PointModel)
-        fun setOrderPriceView(orderPrice: Int)
-        fun setSavePredictionPointView(savePredictionPoint: PointModel)
+        fun showProductItemsView(products: List<CartProductModel>)
+        fun showCardItemsView(cards: List<CardModel>)
+        fun showUserPointView(userPoint: PointModel)
+        fun showUsePointView(usePoint: PointModel)
+        fun showOrderPriceView(orderPrice: Int)
+        fun showSavePredictionPointView(savePredictionPoint: PointModel)
         fun showOrderDetailView(orderId: Long)
         fun handleErrorView(message: String)
     }
