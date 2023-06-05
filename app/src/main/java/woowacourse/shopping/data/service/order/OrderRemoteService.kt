@@ -78,12 +78,13 @@ class OrderRemoteService {
                     call: Call<List<OrderPreviewDto>>,
                     response: Response<List<OrderPreviewDto>>,
                 ) {
-                    println("dsfsdfsdfsdfsdfsd $response")
                     if (response.isSuccessful) {
                         val result: List<OrderPreviewDto>? = response.body()
                         val orderPreviews: List<OrderPreview> =
                             result?.map { it.toDomain() } ?: return onFailure()
                         onSuccess(orderPreviews)
+                    } else {
+                        response.errorBody()
                     }
                 }
 
