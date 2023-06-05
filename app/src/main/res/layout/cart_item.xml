@@ -28,7 +28,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginStart="16dp"
-            android:checked="true"
+            android:checked="@{product.isChecked}"
             app:layout_constraintBottom_toBottomOf="@+id/product_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/product_title" />
