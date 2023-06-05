@@ -1,23 +1,23 @@
 package woowacourse.shopping.data.dataSource
 
+import woowacourse.shopping.data.dto.CartProductDto
 import woowacourse.shopping.data.service.RetrofitCartService
 import woowacourse.shopping.data.service.RetrofitClient
-import woowacourse.shopping.model.CartProduct
 
 class RemoteCartDataSource(
     private val service: RetrofitCartService = RetrofitClient.getInstance().retrofitCartService,
 ) : CartDataSource {
-    override fun getAll(callback: (List<CartProduct>?) -> Unit) {
+    override fun getAll(callback: (List<CartProductDto>?) -> Unit) {
         service.getCarts().enqueue(
-            object : retrofit2.Callback<List<CartProduct>> {
+            object : retrofit2.Callback<List<CartProductDto>> {
                 override fun onResponse(
-                    call: retrofit2.Call<List<CartProduct>>,
-                    response: retrofit2.Response<List<CartProduct>>,
+                    call: retrofit2.Call<List<CartProductDto>>,
+                    response: retrofit2.Response<List<CartProductDto>>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: retrofit2.Call<List<CartProduct>>, t: Throwable) {
+                override fun onFailure(call: retrofit2.Call<List<CartProductDto>>, t: Throwable) {
                     callback(null)
                 }
             },

@@ -1,5 +1,6 @@
 package woowacourse.shopping.mapper
 
+import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.uimodel.ProductUIModel
 
@@ -20,3 +21,10 @@ fun ProductUIModel.toDomain(): Product {
         imageUrl = this.imageUrl,
     )
 }
+
+fun ProductDto.toDomain() = Product(
+    id = this.id,
+    name = this.name,
+    price = this.price,
+    imageUrl = this.imageUrl,
+)

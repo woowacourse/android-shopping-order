@@ -6,16 +6,16 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.model.OrderListResponse
-import woowacourse.shopping.data.model.OrderRequest
-import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.model.OrderInfo
+import woowacourse.shopping.data.dto.OrderHistoryDto
+import woowacourse.shopping.data.dto.OrderInfoDto
+import woowacourse.shopping.data.dto.OrderListResponse
+import woowacourse.shopping.data.dto.OrderRequest
 
 interface RetrofitOrderService {
     @GET("cart-items/checkout")
     fun orderCart(
         @Query("ids") itemIds: List<Int>,
-    ): Call<OrderInfo>
+    ): Call<OrderInfoDto>
 
     @POST("orders")
     fun postOrderItem(
@@ -28,5 +28,5 @@ interface RetrofitOrderService {
     @GET("orders/{id}")
     fun getOrder(
         @Path("id") id: Int,
-    ): Call<OrderHistory>
+    ): Call<OrderHistoryDto>
 }

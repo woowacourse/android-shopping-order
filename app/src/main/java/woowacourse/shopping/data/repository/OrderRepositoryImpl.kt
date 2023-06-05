@@ -1,7 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.dataSource.OrderDataSource
-import woowacourse.shopping.data.model.OrderRequest
+import woowacourse.shopping.data.dto.OrderRequest
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderInfo
 import woowacourse.shopping.repository.OrderRepository
@@ -12,7 +13,7 @@ class OrderRepositoryImpl(
 
     override fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
         remoteDatabase.getOrderItemsInfo(ids) {
-            callback(it)
+            callback(it?.toDomain())
         }
     }
 
@@ -23,14 +24,14 @@ class OrderRepositoryImpl(
     }
 
     override fun getOrderHistoryList(callback: (List<OrderHistory>?) -> Unit) {
-        remoteDatabase.getOrderHistories {
-            callback(it?.orders)
+        remoteDatabase.getOrderHistories { response ->
+            callback(response?.orders?.map { it.toDomain() })
         }
     }
 
     override fun getOrderHistory(id: Int, callback: (OrderHistory?) -> Unit) {
         remoteDatabase.getOrderHistory(id) {
-            callback(it)
+            callback(it?.toDomain())
         }
     }
 }

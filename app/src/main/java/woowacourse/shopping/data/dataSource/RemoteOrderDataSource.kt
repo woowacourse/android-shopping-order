@@ -2,27 +2,27 @@ package woowacourse.shopping.data.dataSource
 
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.data.model.OrderListResponse
-import woowacourse.shopping.data.model.OrderRequest
+import woowacourse.shopping.data.dto.OrderHistoryDto
+import woowacourse.shopping.data.dto.OrderInfoDto
+import woowacourse.shopping.data.dto.OrderListResponse
+import woowacourse.shopping.data.dto.OrderRequest
 import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitOrderService
-import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.model.OrderInfo
 
 class RemoteOrderDataSource(
     private val service: RetrofitOrderService = RetrofitClient.getInstance().retrofitOrderService,
 ) : OrderDataSource {
-    override fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
+    override fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfoDto?) -> Unit) {
         service.orderCart(ids).enqueue(
-            object : retrofit2.Callback<OrderInfo> {
+            object : retrofit2.Callback<OrderInfoDto> {
                 override fun onResponse(
-                    call: Call<OrderInfo>,
-                    response: Response<OrderInfo>,
+                    call: Call<OrderInfoDto>,
+                    response: Response<OrderInfoDto>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: Call<OrderInfo>, t: Throwable) {
+                override fun onFailure(call: Call<OrderInfoDto>, t: Throwable) {
                     callback(null)
                 }
             },
@@ -63,17 +63,17 @@ class RemoteOrderDataSource(
         )
     }
 
-    override fun getOrderHistory(id: Int, callback: (OrderHistory?) -> Unit) {
+    override fun getOrderHistory(id: Int, callback: (OrderHistoryDto?) -> Unit) {
         service.getOrder(id).enqueue(
-            object : retrofit2.Callback<OrderHistory> {
+            object : retrofit2.Callback<OrderHistoryDto> {
                 override fun onResponse(
-                    call: Call<OrderHistory>,
-                    response: Response<OrderHistory>,
+                    call: Call<OrderHistoryDto>,
+                    response: Response<OrderHistoryDto>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: Call<OrderHistory>, t: Throwable) {
+                override fun onFailure(call: Call<OrderHistoryDto>, t: Throwable) {
                     callback(null)
                 }
             },

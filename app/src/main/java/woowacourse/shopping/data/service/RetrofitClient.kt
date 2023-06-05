@@ -1,9 +1,11 @@
 package woowacourse.shopping.data.service
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitClient(
     private val baseUrl: String,
@@ -21,10 +23,12 @@ class RetrofitClient(
         authRetrofit.create(RetrofitOrderService::class.java)
     }
 
+    private val contentType = "application/json".toMediaType()
+
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(Json.asConverterFactory(contentType))
             .client(okHttpClient)
             .build()
     }
@@ -32,7 +36,7 @@ class RetrofitClient(
     private val authRetrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(Json.asConverterFactory(contentType))
             .client(okHttpAuthClient)
             .build()
     }

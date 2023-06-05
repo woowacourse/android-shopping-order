@@ -7,16 +7,11 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.data.dto.CartProductDto
 
 interface RetrofitCartService {
     @GET("cart-items")
-    fun getCarts(): Call<List<CartProduct>>
-
-    @GET("cart-items/{cartId}")
-    fun getCart(
-        @Path("cartId") cartId: Int,
-    ): Call<CartProduct>
+    fun getCarts(): Call<List<CartProductDto>>
 
     @POST("cart-items")
     fun postCart(

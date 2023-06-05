@@ -1,41 +1,41 @@
 package woowacourse.shopping.data.dataSource
 
+import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitProductService
-import woowacourse.shopping.model.Product
 
 class RemoteProductDataSource(
     private val service: RetrofitProductService = RetrofitClient.getInstance().retrofitProductService,
 ) : ProductDataSource {
 
-    override fun getAll(callback: (List<Product>?) -> Unit) {
+    override fun getAll(callback: (List<ProductDto>?) -> Unit) {
         service.getProducts().enqueue(
-            object : retrofit2.Callback<List<Product>> {
+            object : retrofit2.Callback<List<ProductDto>> {
                 override fun onResponse(
-                    call: retrofit2.Call<List<Product>>,
-                    response: retrofit2.Response<List<Product>>,
+                    call: retrofit2.Call<List<ProductDto>>,
+                    response: retrofit2.Response<List<ProductDto>>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: retrofit2.Call<List<Product>>, t: Throwable) {
+                override fun onFailure(call: retrofit2.Call<List<ProductDto>>, t: Throwable) {
                     callback(null)
                 }
             },
         )
     }
 
-    override fun findById(id: Int, callback: (Product?) -> Unit) {
+    override fun findById(id: Int, callback: (ProductDto?) -> Unit) {
         service.getProduct(id).enqueue(
-            object : retrofit2.Callback<Product> {
+            object : retrofit2.Callback<ProductDto> {
                 override fun onResponse(
-                    call: retrofit2.Call<Product>,
-                    response: retrofit2.Response<Product>,
+                    call: retrofit2.Call<ProductDto>,
+                    response: retrofit2.Response<ProductDto>,
                 ) {
                     callback(response.body())
                 }
 
-                override fun onFailure(call: retrofit2.Call<Product>, t: Throwable) {
+                override fun onFailure(call: retrofit2.Call<ProductDto>, t: Throwable) {
                     callback(null)
                 }
             },

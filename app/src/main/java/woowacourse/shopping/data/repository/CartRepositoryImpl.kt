@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.dataSource.CartDataSource
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.repository.CartRepository
 
@@ -10,8 +11,8 @@ class CartRepositoryImpl(
     private val cartItems = CartProducts(emptyList())
 
     override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll {
-            cartItems.replaceAll(it ?: emptyList())
+        remoteDatabase.getAll { cartDtos ->
+            cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
             callback(cartItems)
         }
     }
@@ -57,8 +58,8 @@ class CartRepositoryImpl(
 
     override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
         if (cartItems.isEmpty()) {
-            remoteDatabase.getAll {
-                cartItems.replaceAll(it ?: emptyList())
+            remoteDatabase.getAll { cartDtos ->
+                cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
             }
         }
 
@@ -91,9 +92,9 @@ class CartRepositoryImpl(
     }
 
     override fun getAll(callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll {
-            cartItems.replaceAll(it ?: emptyList())
-            callback(CartProducts(it ?: emptyList()))
+        remoteDatabase.getAll { cartDtos ->
+            cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
+            callback(CartProducts(cartDtos?.map { it.toDomain() } ?: emptyList()))
         }
     }
 }
