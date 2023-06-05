@@ -6,23 +6,26 @@ import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
+import java.util.concurrent.CompletableFuture
 
 class BasketRepositoryImpl(
     private val basketRemoteDataSource: BasketRemoteDataSource,
 ) : BasketRepository {
 
-    override fun getAll(
-        onReceived: (List<BasketProduct>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketRemoteDataSource.getAll(
-            onReceived = { dataBasketProduct ->
-                onReceived(dataBasketProduct.map { it.toDomainModel() })
-            },
-            onFailed = { errorMessage ->
-                onFailed(errorMessage)
+    override fun getAll(): CompletableFuture<Result<List<BasketProduct>>> {
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.getAll().mapCatching { basketProducts ->
+                basketProducts.map { it.toDomainModel() }
             }
-        )
+        }
+//        basketRemoteDataSource.getAll(
+//            onReceived = { dataBasketProduct ->
+//                onReceived(dataBasketProduct.map { it.toDomainModel() })
+//            },
+//            onFailed = { errorMessage ->
+//                onFailed(errorMessage)
+//            }
+//        )
     }
 
     override fun add(

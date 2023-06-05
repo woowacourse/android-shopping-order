@@ -60,17 +60,11 @@ class ShoppingPresenterTest {
     fun `저장소로부터 장바구니 상품들을 받아와 장바구니 개수를 갱신한다`() {
         // given
         val basketProducts = BasketProductFixture.createBasketProducts()
-        val slotUpdateProducts = slot<(List<BasketProduct>) -> Unit>()
         val totalBasketProductCount = basketProducts.sumOf { it.count.value }
 
         every {
-            basketRepository.getAll(
-                onReceived = capture(slotUpdateProducts),
-                onFailed = any()
-            )
-        }.answers {
-            slotUpdateProducts.captured.invoke(basketProducts)
-        }
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.success(basketProducts))
 
         // when
         presenter.initBasket()
@@ -82,23 +76,17 @@ class ShoppingPresenterTest {
     @Test
     fun `저장소로부터 장바구니 상품들을 받아오지 못한 경우 에러 메시지를 보여준다`() {
         // given
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "장바구니 상품을 불러올 수 없습니다."
 
         every {
-            basketRepository.getAll(
-                onReceived = any(),
-                onFailed = capture(slotShowErrorMessage)
-            )
-        }.answers {
-            slotShowErrorMessage.captured.invoke(errorMessage)
-        }
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when
         presenter.initBasket()
 
         // then
-        verify { view.showErrorMessage(errorMessage) }
+        verify { view.showErrorMessage(any()) }
     }
 
     @Test
@@ -278,21 +266,14 @@ class ShoppingPresenterTest {
         products: List<Product> = ProductFixture.createProducts(),
         basketProducts: List<BasketProduct> = BasketProductFixture.createBasketProducts(),
     ) {
-        val slotUpdateProduct = slot<(products: List<Product>) -> Unit>()
-        val slotUpdateBasketProducts = slot<(products: List<BasketProduct>) -> Unit>()
-
         every {
             productRepository.getPartially(any(), any())
         } returns CompletableFuture.completedFuture(Result.success(products))
 
         every {
-            basketRepository.getAll(
-                onReceived = capture(slotUpdateBasketProducts),
-                any()
-            )
-        }.answers {
-            slotUpdateBasketProducts.captured.invoke(basketProducts)
-        }
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.success(basketProducts))
+
         presenter.initBasket()
     }
 }

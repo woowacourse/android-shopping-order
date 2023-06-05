@@ -11,11 +11,16 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
         lastId: Int,
     ): Result<List<ProductEntity>> {
         val response = productService.requestProducts().execute()
-        val result = response.body()?.run {
-            Result.success(this)
-        } ?: Result.failure(Throwable("상품을 불러올 수 없습니다."))
 
-        return result
+        return response.body()?.run {
+            Result.success(
+                getDataProductsFromCache(
+                    size = size,
+                    lastId = lastId,
+                    allProducts = this
+                )
+            )
+        } ?: Result.failure(Throwable(PRODUCT_ERROR))
     }
 
     private fun getDataProductsFromCache(
@@ -26,5 +31,9 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
         if (lastId == -1) return allProducts.subList(0, min(allProducts.size, size))
         val startIndex = allProducts.indexOfFirst { it.id == lastId } + 1
         return allProducts.subList(startIndex, min(allProducts.size, startIndex + size))
+    }
+
+    companion object {
+        private const val PRODUCT_ERROR = "상품 정보를 받아올 수 없습니다."
     }
 }

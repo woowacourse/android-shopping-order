@@ -16,26 +16,32 @@ class ProductDetailPresenter(
 ) : ProductDetailContract.Presenter {
 
     init {
-        basketRepository.getAll(
-            onReceived = { basketProducts ->
-                currentProduct.basketCount =
-                    basketProducts.find { it.product.id == currentProduct.id }?.count?.value ?: 0
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
+        basketRepository.getAll().thenAccept { basketProducts ->
+            currentProduct.basketCount = basketProducts.getOrThrow()
+                .find { it.product.id == currentProduct.id }
+                ?.count
+                ?.value
+                ?: 0
+        }.exceptionally { error ->
+            error.message?.let {
+                view.showErrorMessage(it)
             }
-        )
+            null
+        }
+
         if (previousProduct != null) {
-            basketRepository.getAll(
-                onReceived = { basketProducts ->
-                    previousProduct?.basketCount =
-                        basketProducts.find { it.product.id == requireNotNull(previousProduct).id }?.count?.value
-                            ?: 0
-                },
-                onFailed = { errorMessage ->
-                    view.showErrorMessage(errorMessage)
+            basketRepository.getAll().thenAccept { basketProducts ->
+                previousProduct?.basketCount = basketProducts.getOrThrow()
+                    .find { it.product.id == requireNotNull(previousProduct).id }
+                    ?.count
+                    ?.value
+                    ?: 0
+            }.exceptionally { error ->
+                error.message?.let {
+                    view.showErrorMessage(it)
                 }
-            )
+                null
+            }
         }
     }
 
@@ -101,7 +107,8 @@ class ProductDetailPresenter(
     )
 
     override fun selectPreviousProduct() {
-        currentProduct = previousProduct ?: throw IllegalStateException(NO_PREVIOUS_PRODUCT_ERROR)
+        currentProduct =
+            previousProduct ?: throw IllegalStateException(NO_PREVIOUS_PRODUCT_ERROR)
         currentProductBasketId = previousProductBasketId
         previousProduct = null
         previousProductBasketId = null

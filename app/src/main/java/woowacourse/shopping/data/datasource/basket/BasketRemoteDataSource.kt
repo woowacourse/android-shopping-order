@@ -5,10 +5,7 @@ import woowacourse.shopping.data.datasource.response.ProductEntity
 
 interface BasketRemoteDataSource {
 
-    fun getAll(
-        onReceived: (List<BasketProductEntity>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun getAll(): Result<List<BasketProductEntity>>
 
     fun add(
         product: ProductEntity,

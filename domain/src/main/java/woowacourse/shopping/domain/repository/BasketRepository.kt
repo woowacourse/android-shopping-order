@@ -2,14 +2,11 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
+import java.util.concurrent.CompletableFuture
 
 interface BasketRepository {
 
-    fun getAll(
-        onReceived: (List<BasketProduct>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
-
+    fun getAll(): CompletableFuture<Result<List<BasketProduct>>>
     fun add(
         product: Product,
         onAdded: (Int) -> Unit,

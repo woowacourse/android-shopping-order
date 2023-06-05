@@ -3,32 +3,39 @@ package woowacourse.shopping.data.datasource.basket
 import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.basketProductService
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
+import woowacourse.shopping.data.datasource.getResult
 import woowacourse.shopping.data.datasource.response.BasketProductEntity
 import woowacourse.shopping.data.datasource.response.ProductEntity
 
 class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
-    override fun getAll(
-        onReceived: (List<BasketProductEntity>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketProductService.requestBasketProducts(
+    override fun getAll(): Result<List<BasketProductEntity>> {
+        val response = basketProductService.requestBasketProducts(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
-        ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
+        ).execute()
 
-            override fun onResponse(
-                call: retrofit2.Call<List<BasketProductEntity>>,
-                response: retrofit2.Response<List<BasketProductEntity>>,
-            ) {
-                response.body()?.let {
-                    onReceived(it)
-                } ?: onFailed(BASKET_PRODUCTS_ERROR)
-            }
+        return response.getResult(BASKET_PRODUCTS_ERROR)
+//        val result = response.body()?.run {
+//            Result.success(this)
+//        } ?: Result.failure(Throwable(BASKET_PRODUCTS_ERROR))
 
-            override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
-                onFailed(BASKET_PRODUCTS_ERROR)
-            }
-        })
+//        basketProductService.requestBasketProducts(
+//            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
+//        ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
+//
+//            override fun onResponse(
+//                call: retrofit2.Call<List<BasketProductEntity>>,
+//                response: retrofit2.Response<List<BasketProductEntity>>,
+//            ) {
+//                response.body()?.let {
+//                    onReceived(it)
+//                } ?: onFailed(BASKET_PRODUCTS_ERROR)
+//            }
+//
+//            override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
+//                onFailed(BASKET_PRODUCTS_ERROR)
+//            }
+//        })
     }
 
     override fun add(
