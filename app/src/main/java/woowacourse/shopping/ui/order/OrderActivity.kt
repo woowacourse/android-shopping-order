@@ -76,7 +76,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showOrderSuccessMessage() {
-        Toast.makeText(this@OrderActivity, getString(R.string.order_success), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@OrderActivity, getString(R.string.order_success), Toast.LENGTH_SHORT)
+            .show()
     }
 
     override fun navigateToShopping() {
@@ -86,15 +87,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun setOrderButtonListener() {
-        val point = binding.etDiscountPoint.text.toString().toIntOrNull() ?: 0
         binding.btnOrder.setOnClickListener {
+            val point = binding.etDiscountPoint.text.toString().toIntOrNull() ?: 0
             presenter.order(point)
         }
     }
 
     private fun setPointInput() {
         binding.etDiscountPoint.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 presenter.checkPointAvailable(s.toString().toIntOrNull())
