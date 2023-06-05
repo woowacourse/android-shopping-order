@@ -9,8 +9,8 @@ import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(
     context: Context,
-    private val url: String,
-    private val user: String = BANDAL
+    url: String,
+    user: String = BANDAL
 ) : RecentProductRepository {
 
     private val recentProductDao = RecentProductDao(context.applicationContext, url, user)

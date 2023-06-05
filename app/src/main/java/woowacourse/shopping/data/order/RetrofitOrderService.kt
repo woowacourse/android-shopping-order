@@ -15,13 +15,11 @@ interface RetrofitOrderService {
     @GET("/orders")
     fun requestAllOrders(): Call<List<OrderSummaryResponse>>
 
-    // todo 서버 배포 완료 후 검증 필요
     @GET("/orders/{id}")
     fun requestFetchOrderById(
         @Path("id") id: Long
     ): Call<Order>
 
-    // todo 서버 배포 완료 후 검증 필요
     @POST("/orders")
     fun requestAddOrder(
         @Body request: OrderRequest
