@@ -109,7 +109,7 @@ class ProductListPresenter(
     }
 
     override fun loadRecentProductItems() {
-        recentProductRepository.getRecentProducts(LOAD_RECENT_PRODUCT_COUNT) {
+        recentProductRepository.getRecentProducts(LOAD_RECENT_PRODUCT_COUNT, ::onFailure) {
             recentProducts.clear()
             recentProducts.addAll(it.toUIModel().recentProducts)
             view.setRecentProductItemsView(recentProducts.toList())

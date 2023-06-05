@@ -11,8 +11,12 @@ class RecentProductRepositoryImpl(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
 ) : RecentProductRepository {
 
-    override fun getRecentProducts(limit: Int, onSuccess: (RecentProducts) -> Unit) {
-        productRemoteDataSource.requestDatas({}) { products ->
+    override fun getRecentProducts(
+        limit: Int,
+        onFailure: (message: String) -> Unit,
+        onSuccess: (RecentProducts) -> Unit
+    ) {
+        productRemoteDataSource.requestDatas(onFailure) { products ->
             val recentProductEntities = recentProductLocalDataSource.getAllRecentProducts(limit)
             val recentProducts = recentProductEntities.mapNotNull { recentProductEntity ->
                 products.find { it.id == recentProductEntity.productId }?.let { product ->
