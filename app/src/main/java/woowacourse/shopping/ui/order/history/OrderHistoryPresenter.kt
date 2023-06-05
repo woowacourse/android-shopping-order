@@ -1,19 +1,28 @@
 package woowacourse.shopping.ui.order.history
 
 import woowacourse.shopping.data.mapper.toUiModel
+import woowacourse.shopping.domain.model.OrderResponse
+import woowacourse.shopping.domain.model.page.LoadMore
+import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderProductRepository
 import woowacourse.shopping.ui.order.history.OrderHistoryContract.Presenter
 import woowacourse.shopping.ui.order.history.OrderHistoryContract.View
+import woowacourse.shopping.util.collection.DistinctList
 
 class OrderHistoryPresenter(
     view: View,
     private val orderProductRepository: OrderProductRepository,
+    private var page: Page = LoadMore(INITIAL_PAGE, SIZE_PER_PAGE),
 ) : Presenter(view) {
+    private val orders: DistinctList<OrderResponse> = DistinctList()
 
     override fun loadOrderedProducts() {
         orderProductRepository.requestOrders(
-            onSuccess = { products ->
-                view.showOrderedProducts(products.map { it.toUiModel() })
+            page = page,
+            onSuccess = { fetchedOrders ->
+                orders.addAll(fetchedOrders)
+                view.showOrderedProducts(orders.map { it.toUiModel() })
+                page = page.next()
             },
             onFailure = { },
         )
@@ -25,5 +34,10 @@ class OrderHistoryPresenter(
                 view.navigateToHome()
             }
         }
+    }
+
+    companion object {
+        private const val INITIAL_PAGE = 1
+        private const val SIZE_PER_PAGE = 10
     }
 }

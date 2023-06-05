@@ -2,8 +2,10 @@ package woowacourse.shopping.data.repository.retrofit
 
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
+import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderProductRepository
 
 class OrderProductRemoteRepository : OrderProductRepository {
@@ -25,11 +27,13 @@ class OrderProductRemoteRepository : OrderProductRepository {
     }
 
     override fun requestOrders(
+        page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     ) {
         orderProductDataSource.requestOrders(
             token = token!!,
+            page = page.toData(),
             onSuccess = onSuccess,
             onFailure = onFailure,
         )

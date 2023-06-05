@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.UiOrderResponse
 import woowacourse.shopping.ui.order.detail.OrderDetailActivity
@@ -26,6 +28,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderHistoryBinding.inflate(layoutInflater).setContentView(this)
         setActionBar()
+        initRecyclerView()
         presenter.loadOrderedProducts()
     }
 
@@ -35,10 +38,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
     }
 
     override fun showOrderedProducts(orderedProducts: List<UiOrderResponse>) {
-        binding.orderHistoryRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        adapter = HistoryAdapter(orderedProducts, ::navigateToOrderDetail)
-        binding.orderHistoryRecyclerView.adapter = adapter
+        adapter.submitList(orderedProducts)
     }
 
     private fun navigateToOrderDetail(orderId: Int) {
@@ -53,6 +53,22 @@ class OrderHistoryActivity : AppCompatActivity(), View {
 
     override fun navigateToHome() {
         finish()
+    }
+
+    private fun initRecyclerView() {
+        binding.orderHistoryRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        adapter = HistoryAdapter(::navigateToOrderDetail)
+        binding.orderHistoryRecyclerView.adapter = adapter
+        binding.orderHistoryRecyclerView.itemAnimator = null
+
+        binding.orderHistoryRecyclerView.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (!binding.orderHistoryRecyclerView.canScrollVertically(1)) {
+                    presenter.loadOrderedProducts()
+                }
+            }
+        })
     }
 
     companion object {

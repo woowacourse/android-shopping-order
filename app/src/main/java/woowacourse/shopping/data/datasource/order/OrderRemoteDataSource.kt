@@ -8,6 +8,7 @@ import woowacourse.shopping.data.dto.OrderResponseDto
 import woowacourse.shopping.data.dto.OrderResponsesDto
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toDto
+import woowacourse.shopping.data.model.Page
 import woowacourse.shopping.data.util.retrofit.RetrofitUtil
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
@@ -42,10 +43,11 @@ class OrderRemoteDataSource : OrderDataSource {
 
     override fun requestOrders(
         token: String,
+        page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.requestOrders(token, 1, 10)
+        val call = retrofitService.requestOrders(token, page.value, page.sizePerPage)
         call.enqueue(object : retrofit2.Callback<OrderResponsesDto> {
             override fun onResponse(
                 call: Call<OrderResponsesDto>,

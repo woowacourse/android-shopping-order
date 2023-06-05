@@ -6,7 +6,7 @@ import woowacourse.shopping.model.UiOrderResponse
 
 class HistoryViewHolder(
     private val binding: ItemOrderHistoryBinding,
-    private val onDetailListener: (Int) -> Unit,
+    private val onDetailListener: (orderId: Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(orderedProduct: UiOrderResponse) {
         binding.orderedProduct = orderedProduct

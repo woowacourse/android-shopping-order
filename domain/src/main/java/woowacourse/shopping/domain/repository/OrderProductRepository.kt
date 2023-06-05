@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
+import woowacourse.shopping.domain.model.page.Page
 
 interface OrderProductRepository {
     fun orderProduct(
@@ -11,6 +12,7 @@ interface OrderProductRepository {
     )
 
     fun requestOrders(
+        page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     )

@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.datasource.order
 
+import woowacourse.shopping.data.model.Page
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
@@ -13,6 +14,7 @@ interface OrderDataSource {
 
     fun requestOrders(
         token: String,
+        page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: () -> Unit,
     )
