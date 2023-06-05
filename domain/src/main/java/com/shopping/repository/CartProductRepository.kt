@@ -9,7 +9,7 @@ interface CartProductRepository {
     fun remove(cartProduct: CartProduct)
     fun loadCartProducts(index: Pair<Int, Int>): List<CartProduct>
     fun update(cartProduct: CartProduct)
-    fun add(product: Product)
+    fun add(product: Product, quantity: Int)
     fun findCountById(id: Long): Int
     fun updateCount(product: Product, count: Int, updateCartBadge: () -> Unit)
     fun getTotalPrice(): Int

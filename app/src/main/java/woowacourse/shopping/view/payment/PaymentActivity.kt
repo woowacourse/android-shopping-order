@@ -57,13 +57,17 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     private fun setButtonOnClick() {
         binding.tvPaymentButtom.setOnClickListener {
             presenter.payOrderProducts(
-                binding.tvOrderTotalPrice.text.toString().toInt(),
+                binding.tvOrderTotalPrice.text.toString().replace("원", "").toInt(),
                 binding.etUsingPoint.text.toString().toInt()
             )
         }
         binding.etUsingPoint.addTextChangedListener(
             afterTextChanged = {
-                binding.point = PointUIModel(it.toString().toInt())
+                if (it == null) {
+                    binding.point = PointUIModel(0)
+                } else {
+                    binding.point = PointUIModel(it.toString().toInt())
+                }
             }
         )
     }

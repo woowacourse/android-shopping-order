@@ -58,7 +58,7 @@ class ShoppingMainPresenter(
     }
 
     override fun addToCart(productUIModel: ProductUIModel) {
-        cartProductRepository.add(productUIModel.toDomain())
+        cartProductRepository.add(productUIModel.toDomain(), 1)
         updateCartBadge()
     }
 

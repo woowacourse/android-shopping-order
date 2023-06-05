@@ -6,6 +6,7 @@ import com.shopping.domain.Product
 import com.shopping.repository.CartProductRepository
 import woowacourse.shopping.model.data.dto.CartProductDTO
 import woowacourse.shopping.model.data.dto.ProductDTO
+import woowacourse.shopping.model.data.dto.RequestCartDTO
 import woowacourse.shopping.server.retrofit.CartItemsService
 import woowacourse.shopping.server.retrofit.createResponseCallback
 
@@ -44,12 +45,21 @@ class CartProductRepositoryImpl(
     }
 
     override fun update(cartProduct: CartProduct) {
-        service.patchCartItem(cartProduct.id, cartProduct.count.value)
-        fetchCartProducts()
+        service.patchCartItem(cartProduct.id, cartProduct.count.value).enqueue(
+            createResponseCallback(
+                onSuccess = {
+                    fetchCartProducts()
+                },
+                onFailure = {
+                    throw IllegalStateException("상품 갯수 업데이트에 실패했습니다.")
+                }
+            )
+        )
     }
 
     override fun updateCount(product: Product, count: Int, updateCartBadge: () -> Unit) {
-        service.patchCartItem(product.id, count).enqueue(
+        val cartProduct = cartProducts.find { it.product.id == product.id } ?: throw IllegalStateException("상품을 찾을 수 없습니다.")
+        service.patchCartItem(cartProduct.id, count).enqueue(
             createResponseCallback(
                 onSuccess = {
                     updateCartBadge()
@@ -60,8 +70,8 @@ class CartProductRepositoryImpl(
         fetchCartProducts()
     }
 
-    override fun add(product: Product) {
-        service.addCartItem(product.id).enqueue(
+    override fun add(product: Product, quantity: Int) {
+        service.addCartItem(RequestCartDTO(product.id, quantity)).enqueue(
             createResponseCallback(
                 onSuccess = {
                     println("성공")
@@ -86,8 +96,16 @@ class CartProductRepositoryImpl(
         cartProducts.filter { it.isSelected }.sumOf { it.count.value }
 
     override fun remove(cartProduct: CartProduct) {
-        service.deleteCartItem(cartProduct.id)
-        fetchCartProducts()
+        service.deleteCartItem(cartProduct.id).enqueue(
+            createResponseCallback(
+                onSuccess = {
+                    fetchCartProducts()
+                },
+                onFailure = {
+                    throw IllegalStateException("상품 삭제를 실패하였습니다. : ${it.message}")
+                }
+            )
+        )
     }
 
     override fun getCheckedCartItems(): Array<Long> {

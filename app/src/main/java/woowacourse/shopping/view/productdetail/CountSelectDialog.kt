@@ -61,7 +61,7 @@ class CountSelectDialog(
     }
 
     private fun saveCartProduct(product: ProductUIModel) {
-        cartProductRepository.add(product.toDomain())
+        cartProductRepository.add(product.toDomain(), binding.counterView.getCount())
     }
 
     private fun showCartPage() {

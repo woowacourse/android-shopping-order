@@ -45,6 +45,10 @@ class CounterView @JvmOverloads constructor(
         binding.tvCount.text = count.toString()
     }
 
+    fun getCount(): Int {
+        return binding.tvCount.text.toString().toInt()
+    }
+
     companion object {
         private const val INIT_COUNT = 1
         private const val ZERO_COUNT = 0

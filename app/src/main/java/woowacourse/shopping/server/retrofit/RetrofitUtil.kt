@@ -10,9 +10,8 @@ fun <T> createResponseCallback(
 ): Callback<T> {
     return object : Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
-            val responseBody = response.body()
-            if (responseBody != null) {
-                onSuccess(responseBody)
+            if (response.isSuccessful) {
+                response.body()?.let(onSuccess)
             } else {
                 onFailure(Exception("Response unsuccessful"))
             }
