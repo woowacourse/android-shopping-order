@@ -60,9 +60,7 @@ class ShoppingPresenter(
     override fun updateBasket() {
         basketRepository.getAll().thenAccept { basketProducts ->
             basket = Basket(basketProducts.getOrThrow())
-            fetchTotalBasketCount()
-            fetchBasketCount()
-            view.updateProducts(totalProducts)
+            updateBothProducts()
         }.exceptionally { error ->
             error.message?.let {
                 view.showErrorMessage(it)
@@ -81,9 +79,7 @@ class ShoppingPresenter(
         ).thenAccept {
             it.getOrThrow()
             basket = basket.plus(BasketProduct(count = Count(1), product = product))
-            fetchBasketCount()
-            fetchTotalBasketCount()
-            view.updateProducts(totalProducts)
+            updateBothProducts()
         }.exceptionally { error ->
             error.message?.let { view.showErrorMessage(it) }
             null
@@ -96,9 +92,7 @@ class ShoppingPresenter(
         ).thenAccept {
             it.getOrThrow()
             basket = basket.minus(BasketProduct(count = Count(1), product = product))
-            fetchBasketCount()
-            fetchTotalBasketCount()
-            view.updateProducts(totalProducts)
+            updateBothProducts()
         }.exceptionally { error ->
             error.message?.let { view.showErrorMessage(it) }
             null
@@ -137,6 +131,12 @@ class ShoppingPresenter(
                 isLoaded = true
                 view.updateSkeletonState(isLoaded)
             }
+    }
+
+    private fun updateBothProducts() {
+        fetchBasketCount()
+        fetchTotalBasketCount()
+        view.updateProducts(totalProducts)
     }
 
     private fun checkHasNext(products: List<ProductUiModel>): Boolean =
