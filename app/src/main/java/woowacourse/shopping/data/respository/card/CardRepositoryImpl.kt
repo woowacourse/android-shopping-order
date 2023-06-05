@@ -4,8 +4,10 @@ import woowacourse.shopping.data.mapper.toModel
 import woowacouse.shopping.data.repository.card.CardRepository
 import woowacouse.shopping.model.card.Card
 
-class CardRepositoryImpl : CardRepository {
+class CardRepositoryImpl(
+    private val cardDAO: CardDAO,
+) : CardRepository {
     override fun loadCards(): List<Card> {
-        return CardDAO.getCards().map { it.toModel() }
+        return cardDAO.getCards().map { it.toModel() }
     }
 }

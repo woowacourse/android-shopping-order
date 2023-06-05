@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.card.CardDAO
 import woowacourse.shopping.data.respository.card.CardRepositoryImpl
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
@@ -77,7 +78,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         presenter = OrderPresenter(
             this,
-            cardRepository = CardRepositoryImpl(),
+            cardRepository = CardRepositoryImpl(CardDAO),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
             pointRepository = PointRepositoryImpl(pointRemoteDataSource),
             orderRepository = OrderRepositoryImpl(orderRemoteDataSource),
