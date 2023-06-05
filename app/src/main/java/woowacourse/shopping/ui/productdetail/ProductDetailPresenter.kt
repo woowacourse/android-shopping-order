@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
+import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
@@ -17,31 +18,19 @@ class ProductDetailPresenter(
 
     init {
         basketRepository.getAll().thenAccept { basketProducts ->
-            currentProduct.basketCount = basketProducts.getOrThrow()
-                .find { it.product.id == currentProduct.id }
-                ?.count
-                ?.value
-                ?: 0
+            val basket = Basket(basketProducts.getOrThrow())
+            val currentProductCount = basket.getCountByProductId(currentProduct.id)
+            val previousProductCount = previousProduct?.run {
+                basket.getCountByProductId(id)
+            } ?: 0
+
+            currentProduct.basketCount = currentProductCount
+            previousProduct?.basketCount = previousProductCount
         }.exceptionally { error ->
             error.message?.let {
                 view.showErrorMessage(it)
             }
             null
-        }
-
-        if (previousProduct != null) {
-            basketRepository.getAll().thenAccept { basketProducts ->
-                previousProduct?.basketCount = basketProducts.getOrThrow()
-                    .find { it.product.id == requireNotNull(previousProduct).id }
-                    ?.count
-                    ?.value
-                    ?: 0
-            }.exceptionally { error ->
-                error.message?.let {
-                    view.showErrorMessage(it)
-                }
-                null
-            }
         }
     }
 
@@ -104,8 +93,7 @@ class ProductDetailPresenter(
     )
 
     override fun selectPreviousProduct() {
-        currentProduct =
-            previousProduct ?: throw IllegalStateException(NO_PREVIOUS_PRODUCT_ERROR)
+        currentProduct = previousProduct ?: throw IllegalStateException(NO_PREVIOUS_PRODUCT_ERROR)
         currentProductBasketId = previousProductBasketId
         previousProduct = null
         previousProductBasketId = null

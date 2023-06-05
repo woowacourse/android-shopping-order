@@ -159,7 +159,9 @@ class ShoppingPresenter(
         )?.toUiModel()
 
         val previousBasketId = previousProduct?.run {
-            basket.getProductByProductId(id).id
+            runCatching {
+                basket.getProductByProductId(id).id
+            }.getOrNull()
         }
 
         val currentProductBasketId = runCatching {
