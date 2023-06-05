@@ -16,10 +16,11 @@ class OrderCompleteDataSourceImpl(
     private val token = authInfoDataSource.getAuthInfo() ?: "throw IllegalArgumentException()"
 
     override fun getReceipt(
+        orderId: Int,
         onSuccess: (OrderCompleteResponseDto) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     ) {
-        orderCompleteService.getReceipt(token).enqueueUtil(
+        orderCompleteService.getReceipt(token, orderId).enqueueUtil(
             onSuccess = { onSuccess.invoke(it) },
             onFailure = { onFailure.invoke(FAIL(Disconnect(it))) },
             onError = { Log.d("NETWORK_ERROR", it.toString()) },

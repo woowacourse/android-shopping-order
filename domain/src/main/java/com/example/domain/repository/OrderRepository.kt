@@ -2,6 +2,7 @@ package com.example.domain.repository
 
 import com.example.domain.model.Coupon
 import com.example.domain.model.OrderNumber
+import com.example.domain.model.Receipt
 import com.example.domain.model.TotalPrice
 import com.example.domain.util.CustomResult
 
@@ -32,7 +33,8 @@ interface OrderRepository {
     )
 
     fun getReceipt(
-        onSuccess: (OrderNumber) -> Unit,
+        orderId: Int,
+        onSuccess: (Receipt) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     )
 }

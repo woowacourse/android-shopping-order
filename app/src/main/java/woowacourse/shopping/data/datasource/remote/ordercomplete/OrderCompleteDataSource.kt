@@ -6,6 +6,7 @@ import woowacourse.shopping.data.remote.response.OrderCompleteResponseDto
 interface OrderCompleteDataSource {
 
     fun getReceipt(
+        orderId: Int,
         onSuccess: (OrderCompleteResponseDto) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     )

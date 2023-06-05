@@ -16,3 +16,9 @@ fun AppliedTotalResponseDto.toDomain(): TotalPrice =
         discountPrice = this.discountPrice,
         finalPrice = this.totalPrice,
     )
+
+// fun OrderCompleteResponseDto.toDomain(): Receipt =
+//    Receipt(
+//        orderProducts = this.orderProducts.map { it.toDomain }
+//    )
+//

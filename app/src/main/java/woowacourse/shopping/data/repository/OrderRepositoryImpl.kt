@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import com.example.domain.model.Coupon
 import com.example.domain.model.OrderNumber
+import com.example.domain.model.Receipt
 import com.example.domain.model.TotalPrice
 import com.example.domain.repository.OrderRepository
 import com.example.domain.util.CustomResult
@@ -68,10 +69,12 @@ class OrderRepositoryImpl(
     }
 
     override fun getReceipt(
-        onSuccess: (OrderNumber) -> Unit,
+        orderId: Int,
+        onSuccess: (Receipt) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     ) {
         orderCompleteDataSource.getReceipt(
+            orderId,
             onSuccess = { orderCompleteResponseDto ->
                 // onSuccess.invoke(orderCompleteResponseDto.toDomain())
             },

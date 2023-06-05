@@ -7,8 +7,9 @@ class OrderCompletePresenter(
     private val view: OrderCompleteContract.View,
     private val orderRepository: OrderRepository,
 ) : OrderCompleteContract.Presenter {
-    override fun getReceipt() {
+    override fun getReceipt(orderId: Int) {
         orderRepository.getReceipt(
+            orderId,
             onSuccess = { view.setReceipt(it) },
             onFailure = { Log.d("ERROR_OrderCompletePresenter", it.toString()) },
         )

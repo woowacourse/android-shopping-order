@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.model.OrderNumber
+import com.example.domain.model.Receipt
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
@@ -39,6 +39,8 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderCompleteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        presenter.getReceipt(intent.getIntExtra(ORDER_ID, 0))
     }
 
     companion object {
@@ -50,7 +52,7 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
         }
     }
 
-    override fun setReceipt(orderNumber: OrderNumber) {
+    override fun setReceipt(receipt: Receipt) {
         TODO("Not yet implemented")
     }
 }
