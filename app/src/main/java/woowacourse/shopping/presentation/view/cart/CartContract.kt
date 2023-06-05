@@ -14,7 +14,7 @@ interface CartContract {
         fun setTotalPriceView(totalPrice: Int)
         fun setLayoutVisibility()
         fun showOrderView(cartIds: ArrayList<Long>)
-        fun handleErrorView()
+        fun handleErrorView(message: String)
     }
 
     interface Presenter {

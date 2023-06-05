@@ -12,7 +12,7 @@ interface ProductContract {
         fun setLayoutVisibility()
         fun updateToolbarCartCountView(count: Int)
         fun moveToCartView()
-        fun handleErrorView()
+        fun handleErrorView(message: String)
     }
 
     interface Presenter {

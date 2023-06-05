@@ -4,13 +4,13 @@ import woowacouse.shopping.model.point.Point
 
 interface PointRepository {
     fun loadPoint(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit,
     )
 
     fun loadPredictionSavePoint(
         orderPrice: Int,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit,
     )
 }

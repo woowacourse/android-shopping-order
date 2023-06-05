@@ -12,14 +12,14 @@ class CartRepositoryImpl(
 
     override fun addCartProduct(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     ) {
         cartRemoteDataSource.requestPostCartItem(productId, onFailure, onSuccess)
     }
 
     override fun loadAllCarts(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit
     ) {
         cartRemoteDataSource.requestDatas(onFailure, onSuccess)
@@ -27,7 +27,7 @@ class CartRepositoryImpl(
 
     override fun loadCartsByCartIds(
         cartIds: ArrayList<Long>,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit
     ) {
         cartRemoteDataSource.requestDatas(onFailure) { allCarts ->
@@ -37,7 +37,7 @@ class CartRepositoryImpl(
 
     override fun updateCartCount(
         cartProduct: CartProduct,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: () -> Unit
     ) {
         cartRemoteDataSource.requestPatchCartItem(cartProduct, onFailure, onSuccess)

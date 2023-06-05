@@ -5,7 +5,7 @@ import woowacourse.shopping.presentation.model.OrderDetailModel
 interface OrderListContract {
     interface View {
         fun setOrderListItemView(orders: List<OrderDetailModel>)
-        fun handleErrorView()
+        fun handleErrorView(message: String)
     }
 
     interface Presenter {

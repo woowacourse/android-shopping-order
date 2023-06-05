@@ -11,21 +11,21 @@ interface CartRepository {
 
     fun addCartProduct(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     )
     fun loadAllCarts(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     )
     fun loadCartsByCartIds(
         cartIds: ArrayList<Long>,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     )
     fun updateCartCount(
         cartProduct: CartProduct,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: () -> Unit,
     )
     fun deleteCart(cartId: Long)

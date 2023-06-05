@@ -9,7 +9,7 @@ interface ProductDetailContract {
         fun setGoneOfLastRecentProductInfoView()
         fun setProductInfoView(productModel: ProductModel)
         fun showCountView(productModel: ProductModel)
-        fun handleErrorView()
+        fun handleErrorView(message: String)
         fun addCartSuccessView()
         fun exitProductDetailView()
     }

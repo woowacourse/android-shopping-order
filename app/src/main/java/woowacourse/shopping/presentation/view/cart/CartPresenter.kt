@@ -13,8 +13,8 @@ class CartPresenter(
 ) : CartContract.Presenter {
     private lateinit var pageNation: PageNation
 
-    private fun onFailure() {
-        view.handleErrorView()
+    private fun onFailure(message: String) {
+        view.handleErrorView(message)
     }
 
     override fun initCartItems() {

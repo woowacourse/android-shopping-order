@@ -4,13 +4,13 @@ import woowacouse.shopping.model.product.Product
 
 interface ProductRemoteDataSource {
     fun requestDatas(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     )
 
     fun requestData(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: Product) -> Unit,
     )
 }

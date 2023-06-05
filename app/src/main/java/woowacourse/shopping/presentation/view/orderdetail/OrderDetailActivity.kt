@@ -92,9 +92,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding.savedPoint = savedPoint
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(message: String) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(message)
             finish()
         }
     }

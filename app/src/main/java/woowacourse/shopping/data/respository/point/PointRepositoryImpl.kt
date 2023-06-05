@@ -7,13 +7,16 @@ import woowacouse.shopping.model.point.Point
 class PointRepositoryImpl(
     private val pointRemoteDataSource: PointRemoteDataSource
 ) : PointRepository {
-    override fun loadPoint(onFailure: () -> Unit, onSuccess: (Point) -> Unit) {
+    override fun loadPoint(
+        onFailure: (message: String) -> Unit,
+        onSuccess: (Point) -> Unit
+    ) {
         pointRemoteDataSource.requestPoint(onFailure, onSuccess)
     }
 
     override fun loadPredictionSavePoint(
         orderPrice: Int,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit
     ) {
         pointRemoteDataSource.requestPredictionSavePoint(orderPrice, onFailure, onSuccess)

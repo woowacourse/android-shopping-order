@@ -79,7 +79,7 @@ class OrderPresenter(
         }
     }
 
-    private fun onFailure() {
-        view.handleErrorView()
+    private fun onFailure(message: String) {
+        view.handleErrorView(message)
     }
 }

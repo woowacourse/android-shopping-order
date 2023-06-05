@@ -20,13 +20,13 @@ class ProductDetailPresenter(
         }
     }
 
-    private fun onFailure() {
-        view.handleErrorView()
+    private fun onFailure(message: String) {
+        view.handleErrorView(message)
     }
 
     private fun loadProductInfo() {
         if (product.id == UNABLE_ID) {
-            view.handleErrorView()
+            view.handleErrorView("")
             view.exitProductDetailView()
             return
         }

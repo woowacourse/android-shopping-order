@@ -192,9 +192,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(message: String) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(message)
         }
     }
 

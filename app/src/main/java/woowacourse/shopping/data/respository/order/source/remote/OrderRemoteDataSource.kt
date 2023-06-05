@@ -6,18 +6,18 @@ import woowacouse.shopping.model.order.OrderDetail
 interface OrderRemoteDataSource {
     fun requestPostData(
         order: Order,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     )
 
     fun requestOrderItem(
         orderId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (OrderDetail) -> Unit,
     )
 
     fun requestOrderList(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (List<OrderDetail>) -> Unit
     )
 }

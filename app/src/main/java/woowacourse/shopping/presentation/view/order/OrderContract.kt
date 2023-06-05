@@ -15,7 +15,7 @@ interface OrderContract {
         fun setOrderPriceView(orderPrice: Int)
         fun setSavePredictionPointView(savePredictionPoint: PointModel)
         fun showOrderDetailView(orderId: Long)
-        fun handleErrorView()
+        fun handleErrorView(message: String)
     }
 
     interface Presenter {

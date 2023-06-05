@@ -4,19 +4,19 @@ import woowacouse.shopping.model.cart.CartProduct
 
 interface CartRemoteDataSource {
     fun requestDatas(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     )
 
     fun requestPatchCartItem(
         cartProduct: CartProduct,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: () -> Unit,
     )
 
     fun requestPostCartItem(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     )
 

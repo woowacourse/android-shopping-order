@@ -6,18 +6,18 @@ import woowacouse.shopping.model.order.OrderDetail
 interface OrderRepository {
     fun addOrder(
         orderInfo: Order,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     )
 
     fun loadOrder(
         orderId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (OrderDetail) -> Unit,
     )
 
     fun loadOrderList(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (List<OrderDetail>) -> Unit,
     )
 }

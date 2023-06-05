@@ -122,9 +122,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(message: String) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            if (message.isEmpty()) return@post showToast(getString(R.string.toast_message_system_error))
+            showToast(message)
         }
     }
 

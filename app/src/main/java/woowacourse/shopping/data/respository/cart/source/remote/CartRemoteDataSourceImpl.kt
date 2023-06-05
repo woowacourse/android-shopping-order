@@ -26,7 +26,7 @@ class CartRemoteDataSourceImpl(
     private val token = "Basic ${token.value}"
 
     override fun requestDatas(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     ) {
         retrofit.requestDatas(token).enqueue(object : retrofit2.Callback<List<CartRemoteEntity>> {
@@ -37,10 +37,10 @@ class CartRemoteDataSourceImpl(
                 if (response.isSuccessful) {
                     response.body()?.let { carts ->
                         onSuccess(carts.map { it.toModel() })
-                    } ?: onFailure()
+                    } ?: response.errorBody()?.let { onFailure(it.string()) }
                     return
                 }
-                onFailure()
+                response.errorBody()?.let { onFailure(it.string()) }
             }
 
             override fun onFailure(call: Call<List<CartRemoteEntity>>, t: Throwable) {
@@ -51,7 +51,7 @@ class CartRemoteDataSourceImpl(
 
     override fun requestPatchCartItem(
         cartProduct: CartProduct,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: () -> Unit,
     ) {
         retrofit.requestPatchCartItem(token, cartProduct.id, cartProduct.count)
@@ -61,7 +61,7 @@ class CartRemoteDataSourceImpl(
                         onSuccess()
                         return
                     }
-                    onFailure()
+                    response.errorBody()?.let { onFailure(it.string()) }
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
@@ -72,7 +72,7 @@ class CartRemoteDataSourceImpl(
 
     override fun requestPostCartItem(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     ) {
         retrofit.requestPostCartItem(token, productId)
@@ -82,12 +82,14 @@ class CartRemoteDataSourceImpl(
                     response: Response<Unit>
                 ) {
                     if (response.isSuccessful) {
-                        val location = response.headers()["Location"] ?: return onFailure()
+                        val location = response.headers()["Location"]
+                            ?: return response.errorBody()?.let { onFailure(it.string()) } ?: Unit
+
                         val cartId = location.substringAfterLast("cart-items/").toLong()
                         onSuccess(cartId)
                         return
                     }
-                    onFailure()
+                    response.errorBody()?.let { onFailure(it.string()) }
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {

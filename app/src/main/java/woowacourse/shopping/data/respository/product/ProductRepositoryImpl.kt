@@ -8,7 +8,7 @@ class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override fun loadDatas(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     ) {
         productRemoteDataSource.requestDatas(onFailure, onSuccess)
@@ -16,7 +16,7 @@ class ProductRepositoryImpl(
 
     override fun loadDataById(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: Product) -> Unit,
     ) {
         productRemoteDataSource.requestData(productId, onFailure, onSuccess)

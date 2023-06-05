@@ -21,7 +21,7 @@ class ProductRemoteDataSourceImpl(
         .create(ProductService::class.java)
 
     override fun requestDatas(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     ) {
         retrofit.requestDatas().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
@@ -32,9 +32,9 @@ class ProductRemoteDataSourceImpl(
                 if (response.isSuccessful) {
                     response.body()?.let { products ->
                         onSuccess(products.map { it.toModel() })
-                    } ?: onFailure()
+                    } ?: response.errorBody()?.let { onFailure(it.string()) }
                 } else {
-                    onFailure()
+                    response.errorBody()?.let { onFailure(it.string()) }
                 }
             }
 
@@ -46,7 +46,7 @@ class ProductRemoteDataSourceImpl(
 
     override fun requestData(
         productId: Long,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (products: Product) -> Unit,
     ) {
         retrofit.requestData(productId).enqueue(object : retrofit2.Callback<ProductEntity> {
@@ -57,9 +57,9 @@ class ProductRemoteDataSourceImpl(
                 if (response.isSuccessful) {
                     response.body()?.let { product ->
                         onSuccess(product.toModel())
-                    } ?: onFailure()
+                    } ?: response.errorBody()?.let { onFailure(it.string()) }
                 } else {
-                    onFailure()
+                    response.errorBody()?.let { onFailure(it.string()) }
                 }
             }
 

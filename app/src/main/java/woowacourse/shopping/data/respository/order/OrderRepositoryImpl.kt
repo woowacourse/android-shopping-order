@@ -10,17 +10,24 @@ class OrderRepositoryImpl(
 ) : OrderRepository {
     override fun addOrder(
         orderInfo: Order,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit
     ) {
         orderRemoteDataSource.requestPostData(orderInfo, onFailure, onSuccess)
     }
 
-    override fun loadOrder(orderId: Long, onFailure: () -> Unit, onSuccess: (OrderDetail) -> Unit) {
+    override fun loadOrder(
+        orderId: Long,
+        onFailure: (message: String) -> Unit,
+        onSuccess: (OrderDetail) -> Unit
+    ) {
         orderRemoteDataSource.requestOrderItem(orderId, onFailure, onSuccess)
     }
 
-    override fun loadOrderList(onFailure: () -> Unit, onSuccess: (List<OrderDetail>) -> Unit) {
+    override fun loadOrderList(
+        onFailure: (message: String) -> Unit,
+        onSuccess: (List<OrderDetail>) -> Unit
+    ) {
         orderRemoteDataSource.requestOrderList(onFailure, onSuccess)
     }
 }

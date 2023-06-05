@@ -4,13 +4,13 @@ import woowacouse.shopping.model.point.Point
 
 interface PointRemoteDataSource {
     fun requestPoint(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit,
     )
 
     fun requestPredictionSavePoint(
         orderPrice: Int,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit,
     )
 }

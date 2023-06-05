@@ -27,16 +27,16 @@ class PointRemoteDataSourceImpl(
     private val token = "Basic ${token.value}"
 
     override fun requestPoint(
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit
     ) {
         retrofit.requestPoint(token).enqueue(object : retrofit2.Callback<PointEntity> {
             override fun onResponse(call: Call<PointEntity>, response: Response<PointEntity>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { onSuccess(it.toModel()) } ?: return onFailure()
+                    response.body()?.let { onSuccess(it.toModel()) } ?: response.errorBody()?.let { onFailure(it.string()) }
                     return
                 }
-                onFailure()
+                response.errorBody()?.let { onFailure(it.string()) }
             }
 
             override fun onFailure(call: Call<PointEntity>, t: Throwable) {
@@ -47,7 +47,7 @@ class PointRemoteDataSourceImpl(
 
     override fun requestPredictionSavePoint(
         orderPrice: Int,
-        onFailure: () -> Unit,
+        onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit
     ) {
         retrofit.requestPredictionSavePoint(orderPrice)
@@ -59,10 +59,10 @@ class PointRemoteDataSourceImpl(
                     if (response.isSuccessful) {
                         response.body()?.let {
                             onSuccess(it.toModel())
-                        } ?: return onFailure()
+                        } ?: response.errorBody()?.let { onFailure(it.string()) }
                         return
                     }
-                    onFailure()
+                    response.errorBody()?.let { onFailure(it.string()) }
                 }
 
                 override fun onFailure(call: Call<SavingPointEntity>, t: Throwable) {
