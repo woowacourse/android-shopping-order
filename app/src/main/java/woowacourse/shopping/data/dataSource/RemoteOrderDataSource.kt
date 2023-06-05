@@ -6,6 +6,7 @@ import woowacourse.shopping.data.model.OrderListResponse
 import woowacourse.shopping.data.model.OrderRequest
 import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitOrderService
+import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderInfo
 
 class RemoteOrderDataSource(
@@ -56,6 +57,23 @@ class RemoteOrderDataSource(
                 }
 
                 override fun onFailure(call: Call<OrderListResponse>, t: Throwable) {
+                    callback(null)
+                }
+            },
+        )
+    }
+
+    override fun getOrderHistory(id: Int, callback: (OrderHistory?) -> Unit) {
+        service.getOrder(id).enqueue(
+            object : retrofit2.Callback<OrderHistory> {
+                override fun onResponse(
+                    call: Call<OrderHistory>,
+                    response: Response<OrderHistory>,
+                ) {
+                    callback(response.body())
+                }
+
+                override fun onFailure(call: Call<OrderHistory>, t: Throwable) {
                     callback(null)
                 }
             },

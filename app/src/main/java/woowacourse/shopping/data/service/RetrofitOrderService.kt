@@ -4,9 +4,11 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.OrderListResponse
 import woowacourse.shopping.data.model.OrderRequest
+import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderInfo
 
 interface RetrofitOrderService {
@@ -22,4 +24,9 @@ interface RetrofitOrderService {
 
     @GET("orders")
     fun getOrders(): Call<OrderListResponse>
+
+    @GET("orders/{id}")
+    fun getOrder(
+        @Path("id") id: Int,
+    ): Call<OrderHistory>
 }

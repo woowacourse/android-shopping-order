@@ -9,6 +9,7 @@ import woowacourse.shopping.repository.OrderRepository
 class OrderRepositoryImpl(
     private val remoteDatabase: OrderDataSource,
 ) : OrderRepository {
+
     override fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit) {
         remoteDatabase.getOrderItemsInfo(ids) {
             callback(it)
@@ -21,9 +22,15 @@ class OrderRepositoryImpl(
         }
     }
 
-    override fun getOrderList(callback: (List<OrderHistory>?) -> Unit) {
+    override fun getOrderHistoryList(callback: (List<OrderHistory>?) -> Unit) {
         remoteDatabase.getOrderHistories {
             callback(it?.orders)
+        }
+    }
+
+    override fun getOrderHistory(id: Int, callback: (OrderHistory?) -> Unit) {
+        remoteDatabase.getOrderHistory(id) {
+            callback(it)
         }
     }
 }

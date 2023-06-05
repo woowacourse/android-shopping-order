@@ -61,7 +61,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun navigateToOrderDetail(orderId: Int) {
-        val intent = OrderDetailActivity.getIntent(this)
+        val intent = OrderDetailActivity.getIntent(this, orderId)
         startActivity(intent)
     }
 
