@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.dataSource.local.RecentDao
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -51,12 +52,13 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     }
 
     private fun initPresenter(productId: Long, recentProductUiModel: RecentProductUiModel?) {
-        val productService = ApiModule.createProductService()
+        val apiModule = ApiModule.getInstance(UserPreference)
+        val productService = apiModule.createProductService()
         presenter = DetailPresenter(
             this,
-            ProductRepositoryImpl(ApiModule.createProductService(), null),
+            ProductRepositoryImpl(apiModule.createProductService(), null),
             RecentProductRepositoryImpl(RecentDao(this), productService),
-            CartRepositoryImpl(ApiModule.createCartService()),
+            CartRepositoryImpl(apiModule.createCartService()),
             productId,
             recentProductUiModel,
         )

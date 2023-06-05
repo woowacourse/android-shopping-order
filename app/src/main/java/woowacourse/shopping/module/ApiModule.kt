@@ -12,18 +12,12 @@ import woowacourse.shopping.data.preferences.UserStore
 import woowacourse.shopping.module.server.ServerInfo
 import java.util.concurrent.TimeUnit
 
-object ApiModule {
-    private const val AUTHORIZATION = "Authorization"
-    private const val BASIC_USER_TOKEN = "Basic %s"
-    private const val CONNECT_TIMEOUT = 15L
-    private const val WRITE_TIMEOUT = 15L
-    private const val READ_TIMEOUT = 15L
-
-    lateinit var userStore: UserStore
-
+class ApiModule private constructor(
+    private val userStore: UserStore
+) {
     private fun httpLoggingInterceptor(): HttpLoggingInterceptor {
         val interceptor = HttpLoggingInterceptor { message ->
-            android.util.Log.e("OkHttpLog:", message)
+            android.util.Log.e(HTTP_LOG_TAG, message)
         }
         return interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
     }
@@ -66,5 +60,24 @@ object ApiModule {
 
     fun createOrderService(): OrderService {
         return createRetrofit().create(OrderService::class.java)
+    }
+
+    companion object {
+        private const val AUTHORIZATION = "Authorization"
+        private const val BASIC_USER_TOKEN = "Basic %s"
+        private const val CONNECT_TIMEOUT = 15L
+        private const val WRITE_TIMEOUT = 15L
+        private const val READ_TIMEOUT = 15L
+
+        private const val HTTP_LOG_TAG = "OkHttpLog:"
+
+        private var apiModule: ApiModule? = null
+
+        fun getInstance(userStore: UserStore): ApiModule {
+            synchronized(this) {
+                apiModule?.let { return it }
+                return ApiModule(userStore)
+            }
+        }
     }
 }

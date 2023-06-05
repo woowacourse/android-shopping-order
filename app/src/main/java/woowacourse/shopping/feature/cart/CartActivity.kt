@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.order.confirm.OrderConfirmActivity
@@ -70,7 +71,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val cartProductRemoteService = ApiModule.createCartService()
+        val cartProductRemoteService = ApiModule.getInstance(UserPreference).createCartService()
         presenter = CartPresenter(this, CartRepositoryImpl(cartProductRemoteService))
     }
 

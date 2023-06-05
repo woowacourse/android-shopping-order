@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.feature.order.detail.OrderDetailActivity
@@ -39,7 +40,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private fun initPresenter() {
-        presenter = OrderListPresenter(this, OrderRepositoryImpl(ApiModule.createOrderService()))
+        presenter = OrderListPresenter(
+            this,
+            OrderRepositoryImpl(ApiModule.getInstance(UserPreference).createOrderService())
+        )
     }
 
     private fun initAdapter() {

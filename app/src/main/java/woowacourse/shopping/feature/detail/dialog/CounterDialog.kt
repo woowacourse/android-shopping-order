@@ -9,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
 import woowacourse.shopping.commonUi.CounterView
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
@@ -52,7 +53,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
     private fun setInitPresenter(product: ProductUiModel, cartId: Long?) {
         presenter = CounterDialogPresenter(
             this,
-            CartRepositoryImpl(ApiModule.createCartService()),
+            CartRepositoryImpl(ApiModule.getInstance(UserPreference).createCartService()),
             product,
             cartId,
         )

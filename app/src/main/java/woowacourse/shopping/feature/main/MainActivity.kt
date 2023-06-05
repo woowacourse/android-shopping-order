@@ -15,6 +15,7 @@ import com.example.domain.cache.ProductLocalCache
 import woowacourse.shopping.R
 import woowacourse.shopping.commonUi.CartCounterBadge
 import woowacourse.shopping.data.dataSource.local.RecentDao
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -98,8 +99,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val productService = ApiModule.createProductService()
-        val cartProductRemoteService = ApiModule.createCartService()
+        val apiModule = ApiModule.getInstance(UserPreference)
+        val productService = apiModule.createProductService()
+        val cartProductRemoteService = apiModule.createCartService()
         presenter = MainPresenter(
             ProductRepositoryImpl(productService, ProductLocalCache()),
             CartRepositoryImpl(cartProductRemoteService),

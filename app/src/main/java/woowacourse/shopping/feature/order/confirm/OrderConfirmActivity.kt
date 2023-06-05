@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.domain.model.MoneySalePolicy
 import woowacourse.shopping.R
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderConfirmBinding
@@ -38,12 +39,13 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     }
 
     private fun initPresenter(cartIds: List<Long>) {
+        val apiModule = ApiModule.getInstance(UserPreference)
         presenter =
             OrderConfirmPresenter(
                 this,
                 MoneySalePolicy(),
-                CartRepositoryImpl(ApiModule.createCartService()),
-                OrderRepositoryImpl(ApiModule.createOrderService()),
+                CartRepositoryImpl(apiModule.createCartService()),
+                OrderRepositoryImpl(apiModule.createOrderService()),
                 cartIds
             )
         binding.presenter = presenter

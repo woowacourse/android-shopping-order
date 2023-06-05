@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.OrderProductUiModel
@@ -21,7 +22,11 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_detail)
         val orderId: Long = intent.getLongExtra(ORDER_ID_KEY, -1L)
         presenter =
-            OrderDetailPresenter(this, OrderRepositoryImpl(ApiModule.createOrderService()), orderId)
+            OrderDetailPresenter(
+                this,
+                OrderRepositoryImpl(ApiModule.getInstance(UserPreference).createOrderService()),
+                orderId
+            )
 
         adapter = OrderDetailProductAdapter()
         binding.orderDetailProductRecyclerView.adapter = adapter
