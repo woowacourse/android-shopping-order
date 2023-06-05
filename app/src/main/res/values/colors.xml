@@ -13,4 +13,5 @@
     <color name="gray_dark">#333333</color>
     <color name="order_confirm_enabled_false">#D6D6D6</color>
     <color name="skeleton_background">#E2E2E2</color>
+    <color name="divider_color">#EBEBEB</color>
 </resources>

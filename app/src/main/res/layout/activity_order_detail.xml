@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="18dp"
                 android:layout_marginTop="15dp"
-                android:textColor="#04C09E"
+                android:textColor="@color/mint"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/order_price"
-                    android:textColor="#AAAAAA"
+                    android:textColor="@color/gray_light"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_payment_info_phrases" />
 
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/discount_price"
-                    android:textColor="#AAAAAA"
+                    android:textColor="@color/gray_light"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_order_price_phrases" />
 
@@ -115,7 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="27dp"
-                    app:dividerColor="#AAAAAA"
+                    app:dividerColor="@color/gray_light"
                     app:layout_constraintTop_toBottomOf="@id/text_discount_price_phrases" />
 
                 <TextView
@@ -146,7 +146,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="7dp"
                 android:layout_marginTop="24dp"
-                app:dividerColor="#EBEBEB"
+                app:dividerColor="@color/divider_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layout_payment_info" />
