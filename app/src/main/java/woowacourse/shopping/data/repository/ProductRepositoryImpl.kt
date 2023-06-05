@@ -15,10 +15,6 @@ class ProductRepositoryImpl(
 //        remoteDatabase.getNext(count, callback)
     }
 
-    override fun insert(product: Product, callback: (Int) -> Unit) {
-//        remoteDatabase.insert(product, callback)
-    }
-
     override fun findById(id: Int, callback: (Product?) -> Unit) {
         remoteDatabase.findById(id, callback)
     }

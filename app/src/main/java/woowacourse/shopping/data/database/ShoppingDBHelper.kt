@@ -4,8 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import woowacourse.shopping.data.database.cart.CartConstant
+import woowacourse.shopping.data.database.product.ProductConstant
 import woowacourse.shopping.data.database.recentProduct.RecentProductConstant
-import woowacourse.shopping.database.cart.ProductConstant
 
 class ShoppingDBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {

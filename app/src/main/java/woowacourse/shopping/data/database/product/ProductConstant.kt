@@ -1,4 +1,4 @@
-package woowacourse.shopping.database.cart
+package woowacourse.shopping.data.database.product
 
 import android.database.Cursor
 import android.provider.BaseColumns
@@ -35,20 +35,6 @@ object ProductConstant : BaseColumns {
 
     fun getGetNextQuery(limit: Int, offset: Int): String {
         return "SELECT * FROM $TABLE_NAME DESC LIMIT $limit OFFSET $offset"
-    }
-
-    fun getInsertQuery(product: Product): String {
-        return """
-            INSERT OR IGNORE INTO $TABLE_NAME (
-                $TABLE_COLUMN_ID,
-                $TABLE_COLUMN_NAME,
-                $TABLE_COLUMN_PRICE,
-                $TABLE_COLUMN_IMAGE_URL) VALUES (
-                ${product.id},
-                '${product.name}',
-                ${product.price},
-                '${product.imageUrl}')
-        """.trimIndent()
     }
 
     fun fromCursor(cursor: Cursor): Product {

@@ -72,7 +72,6 @@ class CartDatabase(context: Context) : CartRepository {
         getAll { cartProducts = it }
     }
 
-    // TODO: ??? 이게 맞나,, 같은 인터페이스 쓰는 게 맞나,,?
     override fun getCheckedIds(): List<Int> {
         return cartProducts.checkedIds
     }

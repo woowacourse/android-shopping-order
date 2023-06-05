@@ -2,7 +2,6 @@ package woowacourse.shopping.data.database.product
 
 import android.content.Context
 import woowacourse.shopping.data.database.ShoppingDBHelper
-import woowacourse.shopping.database.cart.ProductConstant
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.ProductRepository
 
@@ -36,10 +35,5 @@ class ProductDatabase(context: Context) : ProductRepository {
             it.moveToNext()
             callback(ProductConstant.fromCursor(it))
         }
-    }
-
-    override fun insert(product: Product, callback: (Int) -> Unit) {
-        db.execSQL(ProductConstant.getInsertQuery(product))
-        callback(product.id)
     }
 }
