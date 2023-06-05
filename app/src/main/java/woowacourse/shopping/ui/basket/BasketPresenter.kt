@@ -77,7 +77,8 @@ class BasketPresenter(
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basketProduct = basket.getProductByProductId(product.id)?.minusCount()
+            basketProduct = basket.getProductByProductId(product.id)
+                ?.minusCount()
                 ?: throw IllegalStateException(
                     NOT_EXIST_PRODUCT_ERROR
                 ),
@@ -125,17 +126,17 @@ class BasketPresenter(
     override fun deleteBasketProduct(
         product: BasketProductUiModel,
     ) {
-        basketRepository.remove(
-            basketProduct = product.toDomainModel(),
-            onRemoved = {
+        basketRepository.remove(product.toDomainModel())
+            .thenAccept {
+                it.getOrThrow()
                 basket = basket.remove(product.toDomainModel())
                 amendStartId()
                 updateBasketProductViewData()
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
             }
-        )
+            .exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
+            }
     }
 
     private fun updateStateToOrder() {

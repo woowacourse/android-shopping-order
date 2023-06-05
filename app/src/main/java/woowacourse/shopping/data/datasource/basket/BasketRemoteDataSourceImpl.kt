@@ -41,60 +41,18 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             return Result.success(Unit)
         }
         return Result.failure(Throwable(FAILED_TO_UPDATE_COUNT))
-//        basketProductService.updateBasketProduct(
-//            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
-//            cartItemId = basketProduct.id.toString(),
-//            quantity = basketProduct.count
-//        ).enqueue(object : retrofit2.Callback<Unit> {
-//
-//            override fun onResponse(
-//                call: retrofit2.Call<Unit>,
-//                response: retrofit2.Response<Unit>,
-//            ) {
-//                if (response.isSuccessful) {
-//                    onUpdated()
-//                } else {
-//                    onFailed(FAILED_TO_UPDATE_COUNT)
-//                }
-//            }
-//
-//            override fun onFailure(
-//                call: retrofit2.Call<Unit>,
-//                t: Throwable,
-//            ) {
-//                onFailed(FAILED_TO_UPDATE_COUNT)
-//            }
-//        })
     }
 
-    override fun remove(
-        basketProduct: BasketProductEntity,
-        onRemoved: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketProductService.removeBasketProduct(
+    override fun remove(basketProduct: BasketProductEntity): Result<Unit> {
+        val response = basketProductService.removeBasketProduct(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
-        ).enqueue(object : retrofit2.Callback<Unit> {
+        ).execute()
 
-            override fun onResponse(
-                call: retrofit2.Call<Unit>,
-                response: retrofit2.Response<Unit>,
-            ) {
-                if (response.isSuccessful) {
-                    onRemoved()
-                } else {
-                    onFailed(FAILED_TO_REMOVE_PRODUCT)
-                }
-            }
-
-            override fun onFailure(
-                call: retrofit2.Call<Unit>,
-                t: Throwable,
-            ) {
-                onFailed(FAILED_TO_REMOVE_PRODUCT)
-            }
-        })
+        if (response.isSuccessful) {
+            return Result.success(Unit)
+        }
+        return Result.failure(Throwable(FAILED_TO_REMOVE_PRODUCT))
     }
 
     companion object {

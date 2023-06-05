@@ -194,7 +194,7 @@ class BasketPresenterTest {
             .products
             .map { it.toUiModel() }
 
-        verify { basketRepository.remove(basketProduct, any(), any()) }
+        verify { basketRepository.remove(basketProduct) }
         verify { view.updateNavigatorEnabled(any(), any()) }
         verify { view.updateBasketProducts(expected) }
     }

@@ -34,17 +34,10 @@ class BasketRepositoryImpl(
         }
     }
 
-    override fun remove(
-        basketProduct: BasketProduct,
-        onRemoved: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketRemoteDataSource.remove(
-            basketProduct = basketProduct.toEntity(),
-            onRemoved = onRemoved,
-            onFailed = { errorMessage ->
-                onFailed(errorMessage)
-            }
-        )
+    override fun remove(basketProduct: BasketProduct): CompletableFuture<Result<Unit>> {
+
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.remove(basketProduct.toEntity())
+        }
     }
 }

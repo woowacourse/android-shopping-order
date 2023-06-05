@@ -12,9 +12,5 @@ interface BasketRepository {
 
     fun update(basketProduct: BasketProduct): CompletableFuture<Result<Unit>>
 
-    fun remove(
-        basketProduct: BasketProduct,
-        onRemoved: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun remove(basketProduct: BasketProduct): CompletableFuture<Result<Unit>>
 }

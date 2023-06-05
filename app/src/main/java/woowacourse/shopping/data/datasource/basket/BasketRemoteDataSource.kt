@@ -11,9 +11,5 @@ interface BasketRemoteDataSource {
 
     fun update(basketProduct: BasketProductEntity): Result<Unit>
 
-    fun remove(
-        basketProduct: BasketProductEntity,
-        onRemoved: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun remove(basketProduct: BasketProductEntity): Result<Unit>
 }
