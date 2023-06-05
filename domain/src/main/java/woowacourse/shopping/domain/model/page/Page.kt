@@ -19,6 +19,8 @@ abstract class Page(
 
     abstract fun hasNext(cart: Cart): Boolean
 
+    abstract fun getPageForCheckHasNext(): Page
+
     abstract fun next(): Page
 
     abstract fun update(value: Int): Page

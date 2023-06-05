@@ -21,6 +21,7 @@ import woowacourse.shopping.model.UiProductCount
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
+import woowacourse.shopping.util.collection.DistinctList
 
 class ShoppingPresenter(
     view: View,
@@ -33,11 +34,13 @@ class ShoppingPresenter(
 ) : Presenter(view) {
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
+    private val products: DistinctList<Product> = DistinctList()
+
     private val cartProductCount: UiProductCount
         get() = UiProductCount(cart.productCountInCart)
 
     override fun fetchAll() {
-        loadAllProducts()
+        loadProducts(currentPage)
         fetchRecentProducts()
     }
 
@@ -47,6 +50,7 @@ class ShoppingPresenter(
 
     override fun loadMoreProducts() {
         currentPage = currentPage.next()
+        loadProducts(currentPage)
         updateCartView()
     }
 
@@ -72,7 +76,7 @@ class ShoppingPresenter(
         cartRepository.addCartProductByProductId(
             product.toDomain().id,
             onSuccess = {
-                loadAllProducts()
+                loadProducts(currentPage)
             },
             onFailure = {},
         )
@@ -82,47 +86,44 @@ class ShoppingPresenter(
         cartRepository.updateProductCountById(
             cartProduct.toDomain().id,
             ProductCount(changedCount),
-            onSuccess = { loadAllProducts() },
+            onSuccess = { loadProducts(currentPage) },
             onFailure = { },
         )
     }
 
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
         cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        loadAllProducts()
+        loadProducts(currentPage)
     }
 
-    private lateinit var products: MutableList<Product>
-
-    private fun loadAllProducts() {
+    private fun loadProducts(page: Page) {
         productRepository.getAllProducts(
-            page = currentPage.value,
-            size = currentPage.sizePerPage,
+            page = page.getPageForCheckHasNext(),
             onSuccess = {
-                if (currentPage.value == 1) {
-                    products = it.toMutableList()
-                } else {
-                    products.addAll(it)
-                    Log.d("botto", "${products.size}")
+                products.addAll(it)
+                Log.d("botto", "${products.size}")
+                loadCartProducts { fetchedCartProducts ->
+                    updateCart(transformCartProducts(products, fetchedCartProducts))
                 }
-                loadCartProducts(products)
-                Log.d("test", "page value: ${currentPage.value}")
+                Log.d("test", "page value: ${page.value}")
             },
             onFailure = { println("[ERROR] 값을 불러오지 못했습니다.") },
         )
     }
 
-    private fun loadCartProducts(products: List<Product>) {
+    private fun transformCartProducts(
+        products: List<Product>,
+        cartProducts: List<CartProduct>,
+    ): List<CartProduct> = products.map { product ->
+        cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
+            product = product,
+            selectedCount = ProductCount(0),
+        )
+    }
+
+    private fun loadCartProducts(onLoaded: (List<CartProduct>) -> Unit) {
         cartRepository.getAllCartProducts(
-            onSuccess = { cartProducts ->
-                val allCartProducts = products.map { product ->
-                    cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
-                        product = product,
-                        selectedCount = ProductCount(0),
-                    )
-                }
-                updateCart(allCartProducts)
-            },
+            onSuccess = { cartProducts -> onLoaded(cartProducts) },
             onFailure = {},
         )
     }
@@ -141,10 +142,8 @@ class ShoppingPresenter(
     private fun View.updateLoadMoreVisible() {
         if (currentPage.hasNext(cart)) {
             showLoadMoreButton()
-//            loadAllProducts()
         } else {
             hideLoadMoreButton()
-//            loadAllProducts()
         }
     }
 

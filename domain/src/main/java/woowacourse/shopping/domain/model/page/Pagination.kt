@@ -16,6 +16,10 @@ class Pagination(
 
     override fun hasNext(cart: Cart): Boolean = cart.items.size > sizePerPage * value
 
+    override fun getPageForCheckHasNext(): Page {
+        return Pagination(value, sizePerPage + 1)
+    }
+
     override fun next(): Page = Pagination(value + 1, sizePerPage)
 
     override fun update(value: Int): Page = Pagination(value, sizePerPage)

@@ -4,6 +4,7 @@ import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.service.okhttp.product.ProductService
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
@@ -11,8 +12,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
 
     override fun getAllProducts(
-        page: Int,
-        size: Int,
+        page: Page,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {

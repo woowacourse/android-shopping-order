@@ -1,11 +1,11 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.page.Page
 
 interface ProductRepository {
     fun getAllProducts(
-        page: Int,
-        size: Int,
+        page: Page,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     )

@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository.retrofit
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.mapper.toDto
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRemoteRepository(
@@ -10,14 +11,13 @@ class ProductRemoteRepository(
 ) : ProductRepository {
 
     override fun getAllProducts(
-        page: Int,
-        size: Int,
+        page: Page,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
         productDataSource.requestProducts(
-            page = page,
-            size = size,
+            page = page.value,
+            size = page.sizePerPage,
             onSuccess = onSuccess,
             onFailure = onFailure,
         )
