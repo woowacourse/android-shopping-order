@@ -1,7 +1,8 @@
-package woowacourse.shopping.data.user
+package woowacourse.shopping.data.remote
 
+import woowacourse.shopping.data.datasource.UserDataSource
 import woowacourse.shopping.data.entity.UserEntity
-import woowacourse.shopping.network.retrofit.UserRetrofitService
+import woowacourse.shopping.data.remote.retrofit.UserRetrofitService
 
 class UserRemoteSource(private val userService: UserRetrofitService) : UserDataSource {
     override fun save(user: UserEntity) {

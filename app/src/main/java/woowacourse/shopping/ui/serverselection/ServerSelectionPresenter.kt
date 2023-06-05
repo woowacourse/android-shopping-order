@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.serverselection
 
-import woowacourse.shopping.network.RemoteHost
-import woowacourse.shopping.network.ServerConfiguration
+import woowacourse.shopping.data.remote.RemoteHost
+import woowacourse.shopping.data.remote.ServerConfiguration
 
 class ServerSelectionPresenter(
     val view: ServerSelectionContract.View

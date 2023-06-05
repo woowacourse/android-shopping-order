@@ -1,5 +1,6 @@
-package woowacourse.shopping.data.user
+package woowacourse.shopping.data.local
 
+import woowacourse.shopping.data.datasource.UserDataSource
 import woowacourse.shopping.data.entity.UserEntity
 
 class UserMemorySource : UserDataSource {

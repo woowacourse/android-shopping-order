@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.user
+package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.entity.UserEntity
 

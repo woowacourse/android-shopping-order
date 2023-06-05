@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.recentlyviewedproduct
+package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.domain.product.Product

@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.remote
 
-import woowacourse.shopping.data.Authorization
+import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.entity.CartItemEntity
 import woowacourse.shopping.data.entity.ProductIdEntity
 import woowacourse.shopping.data.entity.QuantityEntity
-import woowacourse.shopping.network.retrofit.CartItemRetrofitService
+import woowacourse.shopping.data.remote.retrofit.CartItemRetrofitService
 
 class CartItemRemoteSource(private val cartItemService: CartItemRetrofitService) :
     CartItemDataSource {

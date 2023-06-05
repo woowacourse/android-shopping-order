@@ -1,7 +1,8 @@
-package woowacourse.shopping.data.product
+package woowacourse.shopping.data.remote
 
+import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.entity.ProductEntity
-import woowacourse.shopping.network.retrofit.ProductRetrofitService
+import woowacourse.shopping.data.remote.retrofit.ProductRetrofitService
 
 class ProductRemoteSource(private val productService: ProductRetrofitService) : ProductDataSource {
     override fun findAll(): Result<List<ProductEntity>> {

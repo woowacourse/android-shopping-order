@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.order
+package woowacourse.shopping.data.remote
 
-import woowacourse.shopping.data.Authorization
+import woowacourse.shopping.data.datasource.OrderDataSource
 import woowacourse.shopping.data.entity.CartItemIdsEntity
 import woowacourse.shopping.data.entity.DiscountsEntity
 import woowacourse.shopping.data.entity.OrderEntity
-import woowacourse.shopping.network.retrofit.OrderRetrofitService
+import woowacourse.shopping.data.remote.retrofit.OrderRetrofitService
 
 class OrderRemoteSource(private val orderService: OrderRetrofitService) : OrderDataSource {
     override fun save(cartItemIds: List<Long>, userToken: String): Result<Long> {

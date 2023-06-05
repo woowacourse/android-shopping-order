@@ -1,5 +1,6 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.entity.CartItemEntity.Companion.toDomain
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User

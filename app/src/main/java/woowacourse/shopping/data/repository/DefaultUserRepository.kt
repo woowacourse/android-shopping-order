@@ -1,6 +1,7 @@
-package woowacourse.shopping.data.user
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
+import woowacourse.shopping.data.datasource.UserDataSource
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.UserRepository
 import java.util.concurrent.CompletableFuture

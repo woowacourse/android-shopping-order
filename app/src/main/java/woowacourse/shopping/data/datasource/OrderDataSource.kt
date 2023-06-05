@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.order
+package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.entity.DiscountsEntity
 import woowacourse.shopping.data.entity.OrderEntity

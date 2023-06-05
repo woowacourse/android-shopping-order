@@ -1,9 +1,10 @@
-package woowacourse.shopping.data.recentlyviewedproduct
+package woowacourse.shopping.data.local
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import woowacourse.shopping.data.database.ProductContract
+import woowacourse.shopping.data.datasource.RecentlyViewedProductDataSource
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct

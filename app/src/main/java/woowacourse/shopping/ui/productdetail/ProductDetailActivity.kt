@@ -53,12 +53,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun setProduct(product: ProductDetailUIState) {
-        runOnUiThread {
-            binding.btnProductDetailAdd.isVisible = !product.isInCart
-            binding.product = product
-            binding.btnProductDetailAdd.setOnClickListener {
-                presenter.showCartCounter(product.id)
-            }
+        binding.btnProductDetailAdd.isVisible = !product.isInCart
+        binding.product = product
+        binding.btnProductDetailAdd.setOnClickListener {
+            presenter.showCartCounter(product.id)
         }
     }
 

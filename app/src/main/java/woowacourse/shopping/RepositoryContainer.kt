@@ -5,23 +5,23 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import woowacourse.shopping.data.cart.CartItemRemoteSource
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.order.DefaultOrderRepository
-import woowacourse.shopping.data.order.OrderRemoteSource
-import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductRemoteSource
-import woowacourse.shopping.data.recentlyviewedproduct.DefaultRecentlyViewedProductRepository
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemorySource
-import woowacourse.shopping.data.user.DefaultUserRepository
-import woowacourse.shopping.data.user.UserMemorySource
-import woowacourse.shopping.data.user.UserRemoteSource
-import woowacourse.shopping.network.ServerConfiguration
-import woowacourse.shopping.network.retrofit.CartItemRetrofitService
-import woowacourse.shopping.network.retrofit.OrderRetrofitService
-import woowacourse.shopping.network.retrofit.ProductRetrofitService
-import woowacourse.shopping.network.retrofit.UserRetrofitService
+import woowacourse.shopping.data.local.RecentlyViewedProductMemorySource
+import woowacourse.shopping.data.local.UserMemorySource
+import woowacourse.shopping.data.remote.CartItemRemoteSource
+import woowacourse.shopping.data.remote.OrderRemoteSource
+import woowacourse.shopping.data.remote.ProductRemoteSource
+import woowacourse.shopping.data.remote.ServerConfiguration
+import woowacourse.shopping.data.remote.UserRemoteSource
+import woowacourse.shopping.data.remote.retrofit.CartItemRetrofitService
+import woowacourse.shopping.data.remote.retrofit.OrderRetrofitService
+import woowacourse.shopping.data.remote.retrofit.ProductRetrofitService
+import woowacourse.shopping.data.remote.retrofit.UserRetrofitService
+import woowacourse.shopping.data.repository.DefaultCartItemRepository
+import woowacourse.shopping.data.repository.DefaultOrderRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
+import woowacourse.shopping.data.repository.DefaultRecentlyViewedProductRepository
+import woowacourse.shopping.data.repository.DefaultUserRepository
 
 class RepositoryContainer(context: Context) {
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
