@@ -35,4 +35,8 @@ class Cart(products: List<CartProduct> = emptyList()) {
     fun setAllPicked(picked: Boolean) = _products.map { it.isPicked = picked }
 
     private fun getIndexById(id: Long): Int = _products.indexOfFirst { it.id == id }
+
+    companion object {
+        const val MAX_SIZE = 1_000
+    }
 }
