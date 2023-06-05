@@ -1,10 +1,12 @@
 package woowacourse.shopping.data.product
 
+import com.example.domain.Pagination
 import com.example.domain.Product
 import com.example.domain.repository.ProductRepository
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.data.product.model.dto.ProductDto
 import woowacourse.shopping.data.product.model.dto.response.ProductsResponse
 import woowacourse.shopping.data.product.model.toDomain
@@ -24,7 +26,7 @@ class ProductRemoteRepository(
     override fun requestFetchProductsUnit(
         unitSize: Int,
         page: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (List<Product>, Pagination) -> Unit,
         onFailure: () -> Unit
     ) {
         retrofitProductService.requestFetchProductsUnit(
@@ -35,10 +37,12 @@ class ProductRemoteRepository(
                 call: Call<ProductsResponse>,
                 response: retrofit2.Response<ProductsResponse>
             ) {
+                if (400 <= response.code()) return onFailure()
+
                 val result: ProductsResponse = response.body() ?: return
                 val products: List<Product> = result.products.map(ProductDto::toDomain)
-                if (400 <= response.code()) return onFailure()
-                onSuccess(products)
+                val pagination: Pagination = result.pagination.toDomain()
+                onSuccess(products, pagination)
             }
 
             override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
