@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import woowacourse.shopping.data.database.contract.RecentProductContract
 
 const val DATABASE_NAME = "ShoppingDatabase.db"
-const val DATABASE_VERSION = 12
+const val DATABASE_VERSION = 13
 
 class ShoppingDatabase private constructor(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {

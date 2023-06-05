@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,7 +44,6 @@ class DefaultCartRepository(private val service: CartService) : CartRepository {
                 call: Call<CartGetResponse>,
                 response: Response<CartGetResponse>,
             ) {
-                Log.d("buna", response.code().toString())
                 if (response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.toDomain())
                     return
@@ -67,7 +65,6 @@ class DefaultCartRepository(private val service: CartService) : CartRepository {
         service.saveCartProduct(requestBody = CartAddRequest(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    Log.d("buna", response.code().toString())
                     if (response.isSuccessful && response.body() != null) {
                         val header = response.headers()["location"]
                         val cartItemId = header?.substringAfterLast("/")?.toIntOrNull() ?: run {

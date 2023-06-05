@@ -55,7 +55,6 @@ class DefaultOrderRepository(private val service: OrderService) : OrderRepositor
             }
 
             override fun onFailure(call: Call<OrdersResponse>, throwable: Throwable) {
-                Log.d("buna", "$throwable ")
                 onFailed(throwable)
             }
         })
