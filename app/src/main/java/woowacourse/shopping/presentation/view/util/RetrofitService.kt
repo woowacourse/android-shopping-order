@@ -68,10 +68,15 @@ interface RetrofitService {
     ): Call<Unit>
 
     @GET("$PATH_ORDER/{$PATH_ORDER_ID}")
-    fun requestOrder(
+    fun requestOrderById(
         @Header(AUTHORIZATION) token: String,
         @Path(PATH_ORDER_ID) orderId: Long,
     ): Call<OrderDetailEntity>
+
+    @GET(PATH_ORDER)
+    fun requestOrders(
+        @Header(AUTHORIZATION) token: String,
+    ): Call<List<OrderDetailEntity>>
 
     companion object {
         private const val HEADER_JSON = "Content-Type: application/json"

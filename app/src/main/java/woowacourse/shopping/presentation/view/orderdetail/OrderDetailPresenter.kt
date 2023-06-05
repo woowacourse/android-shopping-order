@@ -14,7 +14,7 @@ class OrderDetailPresenter(
     private lateinit var orderProductsDomain: CartProducts
 
     override fun initView() {
-        orderRepository.requestOrder(orderId, ::onFailure) { orderDetailEntity ->
+        orderRepository.requestOrderById(orderId, ::onFailure) { orderDetailEntity ->
             val orderProductsUi = orderDetailEntity.products.map { it.toUIModel() }
             view.setView(orderDetailEntity, orderProductsUi)
 

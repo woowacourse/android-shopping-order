@@ -10,9 +10,14 @@ interface OrderRepository {
         onSuccess: (orderId: Long) -> Unit,
     )
 
-    fun requestOrder(
+    fun requestOrderById(
         orderId: Long,
         onFailure: () -> Unit,
         onSuccess: (orderDetailEntity: OrderDetailEntity) -> Unit,
+    )
+
+    fun requestOrders(
+        onFailure: () -> Unit,
+        onSuccess: (orderDetailEntities: List<OrderDetailEntity>) -> Unit,
     )
 }

@@ -40,12 +40,12 @@ class OrderRepositoryImpl(
             })
     }
 
-    override fun requestOrder(
+    override fun requestOrderById(
         orderId: Long,
         onFailure: () -> Unit,
         onSuccess: (orderDetailEntity: OrderDetailEntity) -> Unit,
     ) {
-        orderService.requestOrder("Basic ${Server.TOKEN}", orderId)
+        orderService.requestOrderById("Basic ${Server.TOKEN}", orderId)
             .enqueue(object : Callback<OrderDetailEntity> {
                 override fun onResponse(
                     call: Call<OrderDetailEntity>,
@@ -58,6 +58,28 @@ class OrderRepositoryImpl(
                 }
 
                 override fun onFailure(call: Call<OrderDetailEntity>, t: Throwable) {
+                    onFailure()
+                }
+            })
+    }
+
+    override fun requestOrders(
+        onFailure: () -> Unit,
+        onSuccess: (orderDetailEntities: List<OrderDetailEntity>) -> Unit,
+    ) {
+        orderService.requestOrders("Basic ${Server.TOKEN}")
+            .enqueue(object : Callback<List<OrderDetailEntity>> {
+                override fun onResponse(
+                    call: Call<List<OrderDetailEntity>>,
+                    response: Response<List<OrderDetailEntity>>,
+                ) {
+                    if (response.isSuccessful) {
+                        val orderDetailEntities = response.body() ?: return onFailure()
+                        onSuccess(orderDetailEntities)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<OrderDetailEntity>>, t: Throwable) {
                     onFailure()
                 }
             })
