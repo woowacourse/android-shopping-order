@@ -17,6 +17,7 @@ import woowacourse.shopping.ui.ProductFixture
 import woowacourse.shopping.ui.RecentProductFixture
 import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
+import java.util.concurrent.CompletableFuture
 
 class ShoppingPresenterTest {
     private lateinit var view: ShoppingContract.View
@@ -104,7 +105,6 @@ class ShoppingPresenterTest {
     fun `저장소로부터 상품을 받아와 상품 뷰를 갱신한다`() {
         // given
         val products = ProductFixture.createProducts()
-        val slotUpdateProducts = slot<(products: List<Product>) -> Unit>()
 
         setUpBasket(
             products = products,
@@ -112,14 +112,8 @@ class ShoppingPresenterTest {
         )
 
         every {
-            productRepository.getPartially(
-                any(),
-                any(),
-                onReceived = capture(slotUpdateProducts)
-            )
-        }.answers {
-            slotUpdateProducts.captured.invoke(products)
-        }
+            productRepository.getPartially(any(), any())
+        } returns CompletableFuture.completedFuture(Result.success(products))
 
         // when
         presenter.updateProducts()
@@ -288,14 +282,8 @@ class ShoppingPresenterTest {
         val slotUpdateBasketProducts = slot<(products: List<BasketProduct>) -> Unit>()
 
         every {
-            productRepository.getPartially(
-                any(),
-                any(),
-                onReceived = capture(slotUpdateProduct)
-            )
-        }.answers {
-            slotUpdateProduct.captured.invoke(products)
-        }
+            productRepository.getPartially(any(), any())
+        } returns CompletableFuture.completedFuture(Result.success(products))
 
         every {
             basketRepository.getAll(

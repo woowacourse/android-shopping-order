@@ -9,28 +9,13 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     override fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<ProductEntity>) -> Unit,
-    ) {
-        productService.requestProducts().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
+    ): Result<List<ProductEntity>> {
+        val response = productService.requestProducts().execute()
+        val result = response.body()?.run {
+            Result.success(this)
+        } ?: Result.failure(Throwable("상품을 불러올 수 없습니다."))
 
-            override fun onResponse(
-                call: retrofit2.Call<List<ProductEntity>>,
-                response: retrofit2.Response<List<ProductEntity>>,
-            ) {
-                response.body()?.let {
-                    onReceived(
-                        getDataProductsFromCache(
-                            size = size,
-                            lastId = lastId,
-                            allProducts = it
-                        )
-                    )
-                }
-            }
-
-            override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
-            }
-        })
+        return result
     }
 
     private fun getDataProductsFromCache(

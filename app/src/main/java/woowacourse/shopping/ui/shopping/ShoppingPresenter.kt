@@ -133,9 +133,9 @@ class ShoppingPresenter(
     }
 
     override fun updateProducts() {
-        productRepository
-            .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId) { products ->
-                var uiProducts = products.map { it.toUiModel() }
+        productRepository.getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId)
+            .thenAccept { products ->
+                var uiProducts = products.getOrThrow().map { it.toUiModel() }
                 lastId = uiProducts.maxOfOrNull { it.id } ?: -1
                 hasNext = checkHasNext(uiProducts)
                 lastId -= if (hasNext) 1 else 0

@@ -1,11 +1,11 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.Product
+import java.util.concurrent.CompletableFuture
 
 interface ProductRepository {
     fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<Product>) -> Unit
-    )
+    ): CompletableFuture<Result<List<Product>>>
 }

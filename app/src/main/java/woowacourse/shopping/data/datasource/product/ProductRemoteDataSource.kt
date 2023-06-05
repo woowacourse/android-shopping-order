@@ -7,6 +7,5 @@ interface ProductRemoteDataSource {
     fun getPartially(
         size: Int,
         lastId: Int,
-        onReceived: (products: List<ProductEntity>) -> Unit,
-    )
+    ): Result<List<ProductEntity>>
 }
