@@ -22,7 +22,7 @@ class OrderHistoryPresenter(
             page = page.getPageForCheckHasNext(),
             onSuccess = { fetchedOrders ->
                 orders.addAll(fetchedOrders)
-                view.showOrders(orders.take(page.value * page.sizePerPage).toUi())
+                view.showOrders(orders.toUi())
                 view.hideLoading()
                 page = page.next()
             },
