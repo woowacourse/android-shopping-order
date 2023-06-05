@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.database.dao.recentproduct
 
-import woowacourse.shopping.data.model.ProductEntity
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 
 interface RecentProductDao {
     fun getSize(): Int

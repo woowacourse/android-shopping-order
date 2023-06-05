@@ -7,7 +7,7 @@ import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.NetworkModule.orderService
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.datasource.response.OrderResponse
+import woowacourse.shopping.data.datasource.response.OrderEntity
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
@@ -19,11 +19,11 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         orderService.addOrder(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             orderRequest = orderRequest
-        ).enqueue(object : retrofit2.Callback<OrderResponse> {
+        ).enqueue(object : retrofit2.Callback<OrderEntity> {
 
             override fun onResponse(
-                call: Call<OrderResponse>,
-                response: Response<OrderResponse>,
+                call: Call<OrderEntity>,
+                response: Response<OrderEntity>,
             ) {
                 Log.d("woogi", "onResponse: $orderRequest")
                 Log.d(
@@ -43,7 +43,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 }
             }
 
-            override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
+            override fun onFailure(call: Call<OrderEntity>, t: Throwable) {
                 onFailed(RESPONSE_ERROR)
             }
         })
@@ -51,47 +51,47 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
     override fun getOrder(
         orderId: Int,
-        onReceived: (OrderResponse) -> Unit,
+        onReceived: (OrderEntity) -> Unit,
         onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.getOrder(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             orderId = orderId
-        ).enqueue(object : retrofit2.Callback<OrderResponse> {
+        ).enqueue(object : retrofit2.Callback<OrderEntity> {
 
             override fun onResponse(
-                call: Call<OrderResponse>,
-                response: Response<OrderResponse>,
+                call: Call<OrderEntity>,
+                response: Response<OrderEntity>,
             ) {
                 response.body()?.let {
                     onReceived(it)
                 } ?: onFailed(ORDER_INFO_ERROR)
             }
 
-            override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
+            override fun onFailure(call: Call<OrderEntity>, t: Throwable) {
                 onFailed(ORDER_INFO_ERROR)
             }
         })
     }
 
     override fun getOrders(
-        onReceived: (List<OrderResponse>) -> Unit,
+        onReceived: (List<OrderEntity>) -> Unit,
         onFailed: (errorMessage: String) -> Unit,
     ) {
         orderService.getOrders(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
-        ).enqueue(object : retrofit2.Callback<List<OrderResponse>> {
+        ).enqueue(object : retrofit2.Callback<List<OrderEntity>> {
 
             override fun onResponse(
-                call: Call<List<OrderResponse>>,
-                response: Response<List<OrderResponse>>,
+                call: Call<List<OrderEntity>>,
+                response: Response<List<OrderEntity>>,
             ) {
                 response.body()?.let {
                     onReceived(it)
                 } ?: onFailed(ORDERS_INFO_ERROR)
             }
 
-            override fun onFailure(call: Call<List<OrderResponse>>, t: Throwable) {
+            override fun onFailure(call: Call<List<OrderEntity>>, t: Throwable) {
                 onFailed(ORDERS_INFO_ERROR)
             }
         })

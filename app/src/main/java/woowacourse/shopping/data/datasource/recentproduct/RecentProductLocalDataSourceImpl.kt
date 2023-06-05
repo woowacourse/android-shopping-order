@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.datasource.recentproduct
 
 import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDao
-import woowacourse.shopping.data.model.ProductEntity
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 
 class RecentProductLocalDataSourceImpl(private val dao: RecentProductDao) :
     RecentProductLocalDataSource.Local {

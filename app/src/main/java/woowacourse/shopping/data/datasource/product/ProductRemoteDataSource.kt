@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.product
 
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
 
 interface ProductRemoteDataSource {
 

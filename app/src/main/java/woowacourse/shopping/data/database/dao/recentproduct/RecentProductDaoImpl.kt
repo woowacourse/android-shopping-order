@@ -5,8 +5,8 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import woowacourse.shopping.data.database.contract.RecentProductContract
-import woowacourse.shopping.data.model.ProductEntity
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 
 class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProductDao {
 

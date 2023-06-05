@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.basket
 
-import woowacourse.shopping.data.model.BasketProductEntity
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.datasource.response.BasketProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
 
 interface BasketRemoteDataSource {
 

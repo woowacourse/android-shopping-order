@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.order
 
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.datasource.response.OrderResponse
+import woowacourse.shopping.data.datasource.response.OrderEntity
 
 interface OrderRemoteDataSource {
 
@@ -13,12 +13,12 @@ interface OrderRemoteDataSource {
 
     fun getOrder(
         orderId: Int,
-        onReceived: (order: OrderResponse) -> Unit,
+        onReceived: (order: OrderEntity) -> Unit,
         onFailed: (errorMessage: String) -> Unit,
     )
 
     fun getOrders(
-        onReceived: (List<OrderResponse>) -> Unit,
+        onReceived: (List<OrderEntity>) -> Unit,
         onFailed: (errorMessage: String) -> Unit,
     )
 }

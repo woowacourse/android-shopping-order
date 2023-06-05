@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 import woowacourse.shopping.domain.RecentProduct
 
 fun RecentProductEntity.toRecentProductDomainModel() = RecentProduct(

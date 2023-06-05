@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.OrderProductEntity
+import woowacourse.shopping.data.datasource.response.OrderProductEntity
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.OrderProduct
 import woowacourse.shopping.domain.Price

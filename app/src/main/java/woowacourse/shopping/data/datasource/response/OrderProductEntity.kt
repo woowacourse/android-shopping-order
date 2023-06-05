@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.datasource.response
 
 data class OrderProductEntity(
     val productId: Long,

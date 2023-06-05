@@ -7,7 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import woowacourse.shopping.data.datasource.request.OrderRequest
-import woowacourse.shopping.data.datasource.response.OrderResponse
+import woowacourse.shopping.data.datasource.response.OrderEntity
 
 interface OrderService {
 
@@ -17,7 +17,7 @@ interface OrderService {
         authorization: String,
         @Path("id")
         orderId: Int,
-    ): Call<OrderResponse>
+    ): Call<OrderEntity>
 
     @POST("orders")
     fun addOrder(
@@ -25,11 +25,11 @@ interface OrderService {
         authorization: String,
         @Body
         orderRequest: OrderRequest,
-    ): Call<OrderResponse>
+    ): Call<OrderEntity>
 
     @GET("orders")
     fun getOrders(
         @Header("Authorization")
         authorization: String,
-    ): Call<List<OrderResponse>>
+    ): Call<List<OrderEntity>>
 }

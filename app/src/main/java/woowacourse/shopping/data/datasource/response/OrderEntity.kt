@@ -1,9 +1,8 @@
 package woowacourse.shopping.data.datasource.response
 
 import com.google.gson.annotations.SerializedName
-import woowacourse.shopping.data.model.OrderProductEntity
 
-data class OrderResponse(
+data class OrderEntity(
     @SerializedName("orderId")
     val orderId: Long,
     @SerializedName("createdAt")

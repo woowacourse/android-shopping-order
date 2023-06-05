@@ -11,7 +11,7 @@ import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.model.BasketProductEntity
+import woowacourse.shopping.data.datasource.response.BasketProductEntity
 
 interface BasketProductService {
 

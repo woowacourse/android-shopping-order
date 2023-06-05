@@ -4,8 +4,8 @@ import okhttp3.ResponseBody
 import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.basketProductService
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
-import woowacourse.shopping.data.model.BasketProductEntity
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.datasource.response.BasketProductEntity
+import woowacourse.shopping.data.datasource.response.ProductEntity
 
 class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
 
