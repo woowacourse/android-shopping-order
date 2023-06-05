@@ -61,10 +61,10 @@ class ShoppingActivity :
 
     private fun initMenuClickListener() {
         val cartItemView = binding.shoppingToolBar.findItemActionView(R.id.cart)
-        cartItemView?.setOnClickListener { presenter.navigateToCart() }
+        cartItemView?.setOnClickListener { presenter.inquiryCart() }
 
         binding.shoppingToolBar.setOnMenuItemClickListener { item ->
-            if (item?.itemId == R.id.order_history) presenter.navigateToOrderHistory()
+            if (item?.itemId == R.id.order_history) presenter.inquiryOrderHistory()
             true
         }
     }

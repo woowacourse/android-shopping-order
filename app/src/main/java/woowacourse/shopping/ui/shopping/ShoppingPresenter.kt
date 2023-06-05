@@ -60,11 +60,11 @@ class ShoppingPresenter(
         view.navigateToProductDetail(recentProduct.product)
     }
 
-    override fun navigateToCart() {
+    override fun inquiryCart() {
         view.navigateToCart()
     }
 
-    override fun navigateToOrderHistory() {
+    override fun inquiryOrderHistory() {
         view.navigateToOrderHistory()
     }
 
@@ -102,7 +102,8 @@ class ShoppingPresenter(
                 if (currentPage.value == 1) {
                     products = it.toMutableList()
                 } else {
-                    it.forEach { product -> products.add(product) }
+                    products.addAll(it)
+                    Log.d("botto", "${products.size}")
                 }
                 loadCartProducts(products)
                 Log.d("test", "page value: ${currentPage.value}")
@@ -140,10 +141,10 @@ class ShoppingPresenter(
     private fun View.updateLoadMoreVisible() {
         if (currentPage.hasNext(cart)) {
             showLoadMoreButton()
-            loadAllProducts()
+//            loadAllProducts()
         } else {
             hideLoadMoreButton()
-            loadAllProducts()
+//            loadAllProducts()
         }
     }
 
