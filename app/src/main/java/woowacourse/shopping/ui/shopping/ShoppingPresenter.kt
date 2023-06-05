@@ -11,6 +11,7 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository,
 ) : ShoppingContract.Presenter {
+
     override fun setUpProducts() {
         setUpCartCounts()
         setUpNextProducts()

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <item
-        android:id="@+id/exit"
+        android:id="@+id/cart"
         android:enabled="true"
-        android:icon="@drawable/ic_exit"
-        android:title="@string/exit"
-        app:showAsAction="always"
-        app:theme="@style/DetailMenuIconStyle" />
+        android:title="@string/menu_cart_title"
+        app:actionLayout="@layout/toolbar_main_item_to_cart"
+        app:showAsAction="always" />
 </menu>
