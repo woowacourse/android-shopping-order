@@ -13,13 +13,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.members.MemberDto
 import woowacourse.shopping.data.members.MemberRemoteService
 import woowacourse.shopping.databinding.ActivityMyPageBinding
 import woowacourse.shopping.ui.orders.OrdersActivity
-import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.UserData
 
 class MyPageActivity : AppCompatActivity() {
@@ -27,13 +24,7 @@ class MyPageActivity : AppCompatActivity() {
         ActivityMyPageBinding.inflate(layoutInflater)
     }
 
-    private val memberRemoteService: MemberRemoteService by lazy {
-        Retrofit.Builder()
-            .baseUrl(ServerConfiguration.host.url)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(MemberRemoteService::class.java)
-    }
+    private val memberRemoteService = MemberRemoteService.getInstance()
 
     private var spinnerInitializationFlag = false
 

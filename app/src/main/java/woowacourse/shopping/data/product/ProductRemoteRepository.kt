@@ -2,19 +2,12 @@ package woowacourse.shopping.data.product
 
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.utils.ServerConfiguration
 
 class ProductRemoteRepository : ProductRepository {
 
-    private val productRemoteService: ProductRemoteService = Retrofit.Builder()
-        .baseUrl(ServerConfiguration.host.url)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ProductRemoteService::class.java)
+    private val productRemoteService: ProductRemoteService = ProductRemoteService.getInstance()
 
     override fun findAll(limit: Int, offset: Int, onFinish: (List<Product>) -> Unit) {
         productRemoteService.requestProducts()

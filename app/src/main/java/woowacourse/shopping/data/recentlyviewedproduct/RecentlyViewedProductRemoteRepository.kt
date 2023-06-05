@@ -5,25 +5,18 @@ import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.database.ProductContract
 import woowacourse.shopping.data.product.ProductDto
 import woowacourse.shopping.data.product.ProductRemoteService
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.RecentlyViewedProduct
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.utils.ServerConfiguration
 import java.time.LocalDateTime
 
 class RecentlyViewedProductRemoteRepository(private val db: SQLiteDatabase) :
     RecentlyViewedProductRepository {
 
-    private val productRemoteService: ProductRemoteService = Retrofit.Builder()
-        .baseUrl(ServerConfiguration.host.url)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ProductRemoteService::class.java)
+    private val productRemoteService = ProductRemoteService.getInstance()
 
     override fun save(
         product: Product,

@@ -9,8 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartItemMemoryCache
 import woowacourse.shopping.data.cart.CartItemRemoteRepository
@@ -22,7 +20,6 @@ import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
 import woowacourse.shopping.ui.order.OrderResultActivity
 import woowacourse.shopping.utils.PRICE_FORMAT
-import woowacourse.shopping.utils.ServerConfiguration
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private val binding: ActivityCartBinding by lazy {
@@ -44,16 +41,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         CartPresenter(
             this,
             CartItemRemoteRepository(),
-            Retrofit.Builder()
-                .baseUrl(ServerConfiguration.host.url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(OrderRemoteService::class.java),
-            Retrofit.Builder()
-                .baseUrl(ServerConfiguration.host.url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(DiscountRemoteService::class.java)
+            OrderRemoteService.getInstance(),
+            DiscountRemoteService.getInstance()
         )
     }
 
