@@ -66,7 +66,7 @@ class ProductDetailPresenter(
             }
 
             cartProduct?.let { cart ->
-                val newCartProduct = cart.copy(count = cart.count + count)
+                val newCartProduct = cart.updateCount(cart.count + count)
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()

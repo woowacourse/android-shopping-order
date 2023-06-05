@@ -13,7 +13,7 @@ data class CartProduct(
     fun decreaseCount(): CartProduct = copy(count = (count - 1).coerceAtLeast(MIN_COUNT))
 
     fun updateCount(count: Int): CartProduct {
-        if (count < 0)
+        if (count < MIN_COUNT || count > MAX_COUNT)
             return this
         return copy(count = count)
     }
