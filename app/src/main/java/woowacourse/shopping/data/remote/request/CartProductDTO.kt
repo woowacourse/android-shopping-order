@@ -1,10 +1,12 @@
 package woowacourse.shopping.data.remote.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CartProductDTO(
     val id: Long,
     val quantity: Int,
-    @SerializedName("product")
+    @SerialName("product")
     val productDto: ProductDTO,
 )

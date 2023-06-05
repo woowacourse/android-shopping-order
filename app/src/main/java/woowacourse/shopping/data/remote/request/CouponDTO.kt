@@ -1,9 +1,11 @@
 package woowacourse.shopping.data.remote.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CouponDTO(
-    @SerializedName("memberCouponId")
+    @SerialName("memberCouponId")
     val id: Long,
     val name: String,
 )
