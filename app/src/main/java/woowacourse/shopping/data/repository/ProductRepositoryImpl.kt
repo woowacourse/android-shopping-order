@@ -13,6 +13,7 @@ class ProductRepositoryImpl(
         size: Int,
         lastId: Int,
     ): CompletableFuture<Result<List<Product>>> {
+
         return CompletableFuture.supplyAsync {
             remoteProductRemoteDataSource.getPartially(size, lastId).mapCatching { products ->
                 products.map { it.toDomainModel() }

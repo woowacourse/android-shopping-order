@@ -13,6 +13,7 @@ class BasketRepositoryImpl(
 ) : BasketRepository {
 
     override fun getAll(): CompletableFuture<Result<List<BasketProduct>>> {
+
         return CompletableFuture.supplyAsync {
             basketRemoteDataSource.getAll().mapCatching { basketProducts ->
                 basketProducts.map { it.toDomainModel() }
@@ -23,12 +24,14 @@ class BasketRepositoryImpl(
     override fun add(
         product: Product,
     ): CompletableFuture<Result<Int>> {
+
         return CompletableFuture.supplyAsync {
             basketRemoteDataSource.add(product.toEntity())
         }
     }
 
     override fun update(basketProduct: BasketProduct): CompletableFuture<Result<Unit>> {
+
         return CompletableFuture.supplyAsync {
             basketRemoteDataSource.update(basketProduct.toEntity())
         }
