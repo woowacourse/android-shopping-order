@@ -5,7 +5,7 @@ import com.example.domain.model.OrderPreview
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.request.OrderRequestDTO
+import woowacourse.shopping.data.dto.request.OrderRequestDto
 import woowacourse.shopping.data.dto.response.OrderDetailDto
 import woowacourse.shopping.data.dto.response.OrderPreviewDto
 import woowacourse.shopping.data.service.RetrofitApiGenerator
@@ -21,7 +21,7 @@ class OrderRemoteService {
         onSuccess: (Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val orderRequest = OrderRequestDTO(cartIds, totalPrice)
+        val orderRequest = OrderRequestDto(cartIds, totalPrice)
 
         RetrofitApiGenerator.orderService.requestAddOrder(
             authorization,

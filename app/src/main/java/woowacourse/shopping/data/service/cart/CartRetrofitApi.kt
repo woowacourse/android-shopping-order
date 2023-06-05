@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.service.cart
 
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -9,6 +8,8 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import woowacourse.shopping.data.dto.request.AddCartRequestDto
+import woowacourse.shopping.data.dto.request.ChangeCartCountRequestDto
 import woowacourse.shopping.data.dto.response.CartProductDto
 
 interface CartRetrofitApi {
@@ -18,14 +19,14 @@ interface CartRetrofitApi {
     @POST("cart-items")
     fun requestAddCartProduct(
         @Header("Authorization") authorization: String,
-        @Body body: RequestBody,
+        @Body addCartRequestDto: AddCartRequestDto,
     ): Call<Unit>
 
     @PATCH("cart-items/{cartId}")
     fun requestChangeCartProductCount(
         @Header("Authorization") authorization: String,
         @Path("cartId") cartId: Long,
-        @Body body: RequestBody,
+        @Body changeCartCountRequestDto: ChangeCartCountRequestDto,
     ): Call<Unit>
 
     @DELETE("cart-items/{cartId}")

@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.dto.request.OrderRequestDTO
+import woowacourse.shopping.data.dto.request.OrderRequestDto
 import woowacourse.shopping.data.dto.response.OrderDetailDto
 import woowacourse.shopping.data.dto.response.OrderPreviewDto
 
@@ -14,7 +14,7 @@ interface OrderRetrofitApi {
     @POST("orders")
     fun requestAddOrder(
         @Header("Authorization") authorization: String,
-        @Body orderRequestDTO: OrderRequestDTO,
+        @Body orderRequestDTO: OrderRequestDto,
     ): Call<Unit>
 
     @GET("orders/{id}")

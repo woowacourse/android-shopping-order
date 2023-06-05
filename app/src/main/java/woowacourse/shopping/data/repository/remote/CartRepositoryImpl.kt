@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.local
+package woowacourse.shopping.data.repository.remote
 
 import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository

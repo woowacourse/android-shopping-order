@@ -1,12 +1,11 @@
 package woowacourse.shopping.data.service.cart
 
 import com.example.domain.model.CartProduct
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.dto.request.AddCartRequestDto
+import woowacourse.shopping.data.dto.request.ChangeCartCountRequestDto
 import woowacourse.shopping.data.dto.response.CartProductDto
 import woowacourse.shopping.data.service.RetrofitApiGenerator
 import woowacourse.shopping.user.ServerInfo
@@ -41,14 +40,8 @@ class CartRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val bodyString = """ 
-            { 
-                "productId": $productId 
-            } 
-        """.trimIndent()
-
         RetrofitApiGenerator.cartService
-            .requestAddCartProduct(authorization, createRequestBody(bodyString))
+            .requestAddCartProduct(authorization, AddCartRequestDto(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.isSuccessful) {
@@ -71,16 +64,10 @@ class CartRemoteService {
         onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val bodyString = """ 
-            { 
-            "quantity": $count 
-            } 
-        """.trimIndent()
-
         RetrofitApiGenerator.cartService.requestChangeCartProductCount(
             authorization,
             cartId,
-            createRequestBody(bodyString),
+            ChangeCartCountRequestDto(count),
         ).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) return onSuccess(cartId)
@@ -133,9 +120,5 @@ class CartRemoteService {
                     onFailure()
                 }
             })
-    }
-
-    private fun createRequestBody(bodyString: String): RequestBody {
-        return bodyString.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     }
 }

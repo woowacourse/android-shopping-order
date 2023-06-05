@@ -12,8 +12,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.data.service.product.ProductRemoteService

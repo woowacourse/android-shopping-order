@@ -2,7 +2,7 @@ package woowacourse.shopping.data.dto.request
 
 import com.google.gson.annotations.SerializedName
 
-class OrderRequestDTO(
+data class OrderRequestDto(
     @SerializedName("cartItems")
     val cartItems: List<Long>,
 

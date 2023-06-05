@@ -9,7 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
 import woowacourse.shopping.common_ui.CounterView
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.data.service.cart.CartRemoteService
 import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
