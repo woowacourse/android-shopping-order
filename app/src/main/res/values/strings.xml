@@ -24,4 +24,8 @@
     <string name="move_to_order_detail"><![CDATA[상세보기 >]]></string>
     <string name="order_history">주문 목록</string>
     <string name="order_summary">%s 외 %d</string>
+    <string name="order_total_price">결제 금액</string>
+    <string name="order_price_description">주문 금액</string>
+    <string name="discount_point_description">할인 금액</string>
+    <string name="total_amount_format">%s개</string>
 </resources>
