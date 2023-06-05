@@ -40,14 +40,15 @@ class SkeletonCounterView : ConstraintLayout {
     }
 
     private fun initTypedArrayValue(attrs: AttributeSet) {
-        context.obtainStyledAttributes(attrs, R.styleable.SkeletonCounterView).use {
-            count = it.getInt(R.styleable.SkeletonCounterView_count, INITIAL_COUNT)
-            minCount = it.getInt(R.styleable.SkeletonCounterView_min_count, DEFAULT_MIN_COUNT)
-            maxCount = it.getInt(R.styleable.SkeletonCounterView_max_count, DEFAULT_MAX_COUNT)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SkeletonCounterView)
+        count = typedArray.getInt(R.styleable.SkeletonCounterView_count, INITIAL_COUNT)
+        minCount = typedArray.getInt(R.styleable.SkeletonCounterView_min_count, DEFAULT_MIN_COUNT)
+        maxCount = typedArray.getInt(R.styleable.SkeletonCounterView_max_count, DEFAULT_MAX_COUNT)
 
-            val isUseSkeleton = it.getBoolean(R.styleable.SkeletonCounterView_useSkeleton, false)
-            binding.skeletonLayout.visibility = if (isUseSkeleton) VISIBLE else GONE
-        }
+        val isUseSkeleton =
+            typedArray.getBoolean(R.styleable.SkeletonCounterView_useSkeleton, false)
+        binding.skeletonLayout.visibility = if (isUseSkeleton) VISIBLE else GONE
+        typedArray.recycle()
     }
 
     fun setOnPlusClickListener(onPlusClick: (view: SkeletonCounterView, newCount: Int) -> Unit) {

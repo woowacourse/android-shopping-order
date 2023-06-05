@@ -24,9 +24,9 @@ class PointEditText : AppCompatEditText {
     }
 
     private fun initMaxPoint(attrs: AttributeSet) {
-        context.obtainStyledAttributes(attrs, R.styleable.PointEditText).use {
-            maxPoint = it.getInt(R.styleable.PointEditText_maxPoint, DEFAULT_MAX_POINT)
-        }
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PointEditText)
+        maxPoint = typedArray.getInt(R.styleable.PointEditText_maxPoint, DEFAULT_MAX_POINT)
+        typedArray.recycle()
     }
 
     private fun initEditTextConfig() {
