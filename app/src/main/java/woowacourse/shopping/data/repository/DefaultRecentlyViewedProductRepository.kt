@@ -17,7 +17,8 @@ class DefaultRecentlyViewedProductRepository(
 ) : RecentlyViewedProductRepository {
 
     override fun save(
-        product: Product, viewedTime: LocalDateTime
+        product: Product,
+        viewedTime: LocalDateTime
     ): CompletableFuture<Result<RecentlyViewedProduct>> {
         return CompletableFuture.supplyAsync {
             recentlyViewedProductDataSource.save(product, viewedTime)
@@ -33,7 +34,8 @@ class DefaultRecentlyViewedProductRepository(
     }
 
     private fun findLimitedRecentlyViewedProduct(
-        products: List<ProductEntity>, limit: Int
+        products: List<ProductEntity>,
+        limit: Int
     ): Result<List<RecentlyViewedProduct>> {
         return recentlyViewedProductDataSource.findLimitedOrderByViewedTimeDesc(limit)
             .mapCatching { recentlyViewedProductEntities ->

@@ -12,7 +12,7 @@ import woowacourse.shopping.data.remote.CartItemRemoteSource
 import woowacourse.shopping.data.remote.OrderRemoteSource
 import woowacourse.shopping.data.remote.ProductRemoteSource
 import woowacourse.shopping.data.remote.ServerConfiguration
-import woowacourse.shopping.data.remote.UserRemoteSource
+import woowacourse.shopping.data.remote.UserRemoteRemoteSource
 import woowacourse.shopping.data.remote.retrofit.CartItemRetrofitService
 import woowacourse.shopping.data.remote.retrofit.OrderRetrofitService
 import woowacourse.shopping.data.remote.retrofit.ProductRetrofitService
@@ -45,7 +45,7 @@ class RepositoryContainer(context: Context) {
 
     private val userCacheDataSource = UserMemorySource()
     private val userRemoteSource by lazy {
-        UserRemoteSource(retrofit.create(UserRetrofitService::class.java))
+        UserRemoteRemoteSource(retrofit.create(UserRetrofitService::class.java))
     }
 
     private val orderDataSource by lazy {

@@ -22,5 +22,11 @@ data class UserEntity(
                 Rank.valueOf(grade)
             )
         }
+
+        fun User.toEntity(): UserEntity {
+            return UserEntity(
+                id, email, password, rank.toString()
+            )
+        }
     }
 }

@@ -1,47 +1,37 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.datasource.UserCacheDataSource
+import woowacourse.shopping.data.datasource.UserRemoteDataSource
 import woowacourse.shopping.data.entity.UserEntity.Companion.toDomain
-import woowacourse.shopping.data.datasource.UserDataSource
+import woowacourse.shopping.data.entity.UserEntity.Companion.toEntity
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.UserRepository
 import java.util.concurrent.CompletableFuture
 
 class DefaultUserRepository(
-    private val cacheDataSource: UserDataSource,
-    private val remoteDataSource: UserDataSource
+    private val cacheDataSource: UserCacheDataSource,
+    private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
     override fun saveCurrent(user: User) {
-        currentUser = user
+        cacheDataSource.save(user.toEntity())
     }
 
     override fun findAll(): CompletableFuture<Result<List<User>>> {
         return CompletableFuture.supplyAsync {
-            cacheDataSource.findAll().mapCatching { users ->
-                users.map { it.toDomain() }
-            }.recoverCatching {
-                findAllRemote().getOrThrow()
+            remoteDataSource.findAll().mapCatching { remoteUsers ->
+                remoteUsers.forEach {
+                    cacheDataSource.save(it)
+                }
+                remoteUsers.map { it.toDomain() }
             }
         }
     }
 
     override fun findCurrent(): CompletableFuture<Result<User>> {
         return CompletableFuture.supplyAsync {
-            runCatching {
-                currentUser ?: throw IllegalStateException("User Not Exist!")
+            cacheDataSource.find().mapCatching {
+                it.toDomain()
             }
         }
-    }
-
-    private fun findAllRemote(): Result<List<User>> {
-        return remoteDataSource.findAll().mapCatching { remoteUsers ->
-            remoteUsers.forEach {
-                cacheDataSource.save(it)
-            }
-            remoteUsers.map { it.toDomain() }
-        }
-    }
-
-    companion object {
-        private var currentUser: User? = null
     }
 }

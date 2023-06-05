@@ -1,19 +1,19 @@
 package woowacourse.shopping.data.local
 
-import woowacourse.shopping.data.datasource.UserDataSource
+import woowacourse.shopping.data.datasource.UserCacheDataSource
 import woowacourse.shopping.data.entity.UserEntity
 
-class UserMemorySource : UserDataSource {
-    private val users: MutableSet<UserEntity> = mutableSetOf()
+class UserMemorySource : UserCacheDataSource {
+    private lateinit var user: UserEntity
 
     override fun save(user: UserEntity) {
-        users.add(user)
+        this.user = user
     }
 
-    override fun findAll(): Result<List<UserEntity>> {
+    override fun find(): Result<UserEntity> {
         return runCatching {
-            if (users.isEmpty()) throw IllegalStateException("Empty Cached User")
-            users.toList()
+            if (!::user.isInitialized) throw IllegalStateException("Empty Cached User")
+            user
         }
     }
 }

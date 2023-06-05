@@ -2,8 +2,9 @@ package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.entity.UserEntity
 
-interface UserDataSource {
+interface UserCacheDataSource {
+
     fun save(user: UserEntity)
 
-    fun findAll(): Result<List<UserEntity>>
+    fun find(): Result<UserEntity>
 }

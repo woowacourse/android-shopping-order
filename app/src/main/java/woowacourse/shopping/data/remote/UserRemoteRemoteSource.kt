@@ -1,13 +1,10 @@
 package woowacourse.shopping.data.remote
 
-import woowacourse.shopping.data.datasource.UserDataSource
+import woowacourse.shopping.data.datasource.UserRemoteDataSource
 import woowacourse.shopping.data.entity.UserEntity
 import woowacourse.shopping.data.remote.retrofit.UserRetrofitService
 
-class UserRemoteSource(private val userService: UserRetrofitService) : UserDataSource {
-    override fun save(user: UserEntity) {
-    }
-
+class UserRemoteRemoteSource(private val userService: UserRetrofitService) : UserRemoteDataSource {
     override fun findAll(): Result<List<UserEntity>> {
         return runCatching {
             val response = userService.selectUsers().execute()
