@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.orderhistory
 
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.page.LoadMore
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -13,15 +14,19 @@ class OrderHistoryPresenter(
     private val orderRepository: OrderRepository,
     private var page: Page = LoadMore(INITIAL_PAGE, SIZE_PER_PAGE),
 ) : Presenter {
+    private val orders: MutableList<Order> = mutableListOf()
 
     override fun loadMoreOrders() {
+        view.showLoading()
         orderRepository.getOrders(
             page = page.getPageForCheckHasNext(),
-            onSuccess = { orders ->
-                view.showMoreOrders(orders.toUi())
+            onSuccess = { fetchedOrders ->
+                orders.addAll(fetchedOrders)
+                view.showOrders(orders.take(page.value * page.sizePerPage).toUi())
+                view.hideLoading()
                 page = page.next()
             },
-            onFailed = { view.showLoadOrderFailed() }
+            onFailed = { view.hideLoading() }
         )
     }
 

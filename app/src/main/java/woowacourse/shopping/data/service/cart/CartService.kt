@@ -18,6 +18,11 @@ interface CartService {
     @GET("/cart-items")
     fun getAllCartProduct(): Call<List<CartGetResponse>>
 
+    @GET("/cart-items/products/{productId}")
+    fun findCartProductByProductId(
+        @Path("productId") productId: ProductId,
+    ): Call<CartGetResponse>
+
     @POST("/cart-items")
     fun saveCartProduct(@Body requestBody: CartAddRequest): Call<Unit>
 

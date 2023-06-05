@@ -4,10 +4,11 @@ import woowacourse.shopping.model.OrderModel
 
 interface OrderHistoryContract {
     interface View {
-        fun showMoreOrders(orders: List<OrderModel>)
-        fun showLoadOrderFailed()
+        fun showOrders(orders: List<OrderModel>)
         fun navigateToOrderDetail(order: OrderModel)
         fun navigateToHome()
+        fun showLoading()
+        fun hideLoading()
     }
 
     interface Presenter {

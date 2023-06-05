@@ -45,7 +45,21 @@
             app:layout_constraintTop_toBottomOf="@+id/order_list_toolbar"
             bind:adapter="@{adapter}"
             bind:fixedSize="@{true}"
+            bind:onEndScroll="@{() -> presenter.loadMoreOrders()}"
             tools:listitem="@layout/item_order_history" />
+
+        <ProgressBar
+            android:id="@+id/loading_progress_bar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/woowa_emerald"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

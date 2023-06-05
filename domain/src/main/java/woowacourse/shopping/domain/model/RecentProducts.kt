@@ -4,7 +4,6 @@ data class RecentProducts(
     private val items: List<RecentProduct> = emptyList(),
     private val maxCount: Int = 10,
 ) {
-
     fun getItems(): List<RecentProduct> = items.take(maxCount).map { it.copy() }
 
     fun getLatest(): RecentProduct? = items.firstOrNull()

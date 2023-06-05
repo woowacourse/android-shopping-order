@@ -55,6 +55,12 @@ data class Cart(
         })
     }
 
+    fun addProductCount(product: Product, count: Int): Cart {
+        return copy(items = items.map { item ->
+            if (item.productId == product.id) item.plusCount(count) else item
+        })
+    }
+
     fun getCheckedCartItems(): List<CartProduct> =
         items.filter { it.isChecked }
 

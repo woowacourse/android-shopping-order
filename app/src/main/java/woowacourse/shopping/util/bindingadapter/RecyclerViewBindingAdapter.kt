@@ -30,3 +30,18 @@ fun RecyclerView.setLayoutManager(layoutManager: LayoutManager) {
 fun RecyclerView.setAnimator(itemAnimator: RecyclerView.ItemAnimator?) {
     this.itemAnimator = itemAnimator
 }
+
+@BindingAdapter("bind:onEndScroll")
+fun RecyclerView.setAnimator(onEndScrollListener: OnEndScrollListener) {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (!recyclerView.canScrollVertically(1)) {
+                onEndScrollListener.onEndScroll()
+            }
+        }
+    })
+}
+
+interface OnEndScrollListener {
+    fun onEndScroll()
+}
