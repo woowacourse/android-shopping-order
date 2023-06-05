@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
@@ -60,7 +59,6 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
     }
 
     override fun setCoupons(coupon: List<String>) {
-        Log.d("OrderActivity", coupon.toString())
         val couponAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
@@ -71,6 +69,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
 
     override fun navigateToOrderDetail(id: Long) {
         startActivity(OrderDetailActivity.from(this, id))
+        finish()
     }
 
     override fun setUpOrder(cartProducts: List<CartProductUIModel>) {
