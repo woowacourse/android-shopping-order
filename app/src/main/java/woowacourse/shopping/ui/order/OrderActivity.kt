@@ -13,6 +13,7 @@ import com.example.domain.model.Coupon
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
 import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -20,6 +21,7 @@ import woowacourse.shopping.model.CartItemsUIModel
 import woowacourse.shopping.ui.order.adapter.OrderAdapter
 import woowacourse.shopping.ui.order.presenter.OrderContract
 import woowacourse.shopping.ui.order.presenter.OrderPresenter
+import woowacourse.shopping.ui.ordercomplete.OrderCompleteActivity
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -35,6 +37,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                     ServiceFactory.orderService,
                     AuthInfoDataSourceImpl.getInstance(this),
                 ),
+                OrderCompleteDataSourceImpl(
+                    ServiceFactory.orderCompleteService,
+                    AuthInfoDataSourceImpl.getInstance(this),
+                ),
             ),
         )
 
@@ -45,6 +51,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
         initView(cartItems)
+        binding.tvOrderTotalBtn.setOnClickListener { startActivity(OrderCompleteActivity.from(this)) }
     }
 
     private fun initView(cartItems: CartItemsUIModel) {

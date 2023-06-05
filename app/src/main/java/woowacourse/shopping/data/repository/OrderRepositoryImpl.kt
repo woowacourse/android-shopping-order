@@ -1,14 +1,17 @@
 package woowacourse.shopping.data.repository
 
 import com.example.domain.model.Coupon
+import com.example.domain.model.Receipt
 import com.example.domain.model.TotalPrice
 import com.example.domain.repository.OrderRepository
 import com.example.domain.util.CustomResult
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSource
+import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSource
 import woowacourse.shopping.mapper.toDomain
 
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource,
+    private val orderCompleteDataSource: OrderCompleteDataSource,
 ) : OrderRepository {
     override fun getCoupons(
         onSuccess: (List<Coupon>) -> Unit,
@@ -34,6 +37,18 @@ class OrderRepositoryImpl(
             couponId,
             onSuccess = { appliedTotalResponseDto ->
                 onSuccess.invoke(appliedTotalResponseDto.toDomain())
+            },
+            onFailure = { onFailure.invoke(it) },
+        )
+    }
+
+    override fun getReceipt(
+        onSuccess: (Receipt) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    ) {
+        orderCompleteDataSource.getReceipt(
+            onSuccess = { orderCompleteResponseDto ->
+                onSuccess.invoke(orderCompleteResponseDto.toDomain())
             },
             onFailure = { onFailure.invoke(it) },
         )

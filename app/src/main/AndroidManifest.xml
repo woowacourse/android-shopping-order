@@ -21,7 +21,7 @@
             android:name=".ui.order.OrderActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.orderdetail.OrderDetailActivity"
+            android:name=".ui.ordercomplete.OrderCompleteActivity"
             android:exported="false" />
         <activity
             android:name=".ui.selectserver.SelectServerActivity"

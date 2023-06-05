@@ -18,6 +18,6 @@ interface OrderService {
     fun getAppliedPrice(
         @Header("Authorization") token: String,
         @Query("origin-price") originPrice: Int,
-        @Query("coupon-id") couponId: Int,
+        @Query("member-coupon-id") couponId: Int,
     ): Call<AppliedTotalResponseDto>
 }
