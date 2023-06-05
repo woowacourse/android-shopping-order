@@ -29,18 +29,15 @@ class DetailedProductPresenter(
 
     override fun setUpLastProduct() {
         val lastId = sharedPreferenceUtils.getLastProductId()
-        if (lastId == product.id || lastId == -1) {
-            lastProduct = null
+        if (lastId in listOf(product.id, -1)) {
+            sharedPreferenceUtils.setLastProductId(product.id)
             return
         }
 
-        CompletableFuture.supplyAsync {
-            productRepository.findById(lastId)
-        }.thenAccept { result ->
-            result.onSuccess { product -> this.lastProduct = product.toUIModel() }
-                .onFailure { exception -> LogUtil.logError(exception) }
-        }
-        sharedPreferenceUtils.setLastProductId(product.id)
+        CompletableFuture.supplyAsync { productRepository.findById(lastId) }.get()
+            .onSuccess { product -> this.lastProduct = product.toUIModel() }
+            .onFailure { exception -> LogUtil.logError(exception) }
+            .also { sharedPreferenceUtils.setLastProductId(product.id) }
     }
 
     override fun setUpProductDetail() {

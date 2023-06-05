@@ -90,7 +90,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun navigateToOrder() {
+    override fun navigatetoOrder() {
         startActivity(
             ShoppingActivity.getIntent(this).apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP

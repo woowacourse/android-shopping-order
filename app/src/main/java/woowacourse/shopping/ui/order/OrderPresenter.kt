@@ -23,7 +23,7 @@ class OrderPresenter(
         CompletableFuture.supplyAsync {
             orderRepository.postOrder(point, cartIds)
         }.thenAccept { result ->
-            result.onSuccess { view.navigateToOrder() }
+            result.onSuccess { view.navigatetoOrder() }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
