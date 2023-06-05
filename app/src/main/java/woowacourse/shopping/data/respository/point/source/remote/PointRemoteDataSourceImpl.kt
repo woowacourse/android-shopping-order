@@ -27,6 +27,7 @@ class PointRemoteDataSourceImpl(
 
             override fun onFailure(call: Call<PointEntity>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
+                onFailure(ERROR_CONNECT)
             }
         })
     }
@@ -53,7 +54,12 @@ class PointRemoteDataSourceImpl(
 
                 override fun onFailure(call: Call<SavingPointEntity>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
+                    onFailure(ERROR_CONNECT)
                 }
             })
+    }
+
+    companion object {
+        private const val ERROR_CONNECT = "연결에 실패하였습니다. 다시 시도해주세요"
     }
 }

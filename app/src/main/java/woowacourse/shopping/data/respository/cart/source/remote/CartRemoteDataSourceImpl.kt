@@ -31,6 +31,7 @@ class CartRemoteDataSourceImpl(
 
             override fun onFailure(call: Call<List<CartRemoteEntity>>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
+                onFailure(ERROR_CONNECT)
             }
         })
     }
@@ -52,6 +53,7 @@ class CartRemoteDataSourceImpl(
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
+                    onFailure(ERROR_CONNECT)
                 }
             })
     }
@@ -80,6 +82,7 @@ class CartRemoteDataSourceImpl(
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
+                    onFailure(ERROR_CONNECT)
                 }
             })
     }
@@ -90,5 +93,9 @@ class CartRemoteDataSourceImpl(
         }
         thread.start()
         thread.join()
+    }
+
+    companion object {
+        private const val ERROR_CONNECT = "연결에 실패하였습니다. 다시 시도해주세요"
     }
 }

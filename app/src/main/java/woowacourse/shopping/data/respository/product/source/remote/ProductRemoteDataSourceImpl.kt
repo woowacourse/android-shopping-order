@@ -30,6 +30,7 @@ class ProductRemoteDataSourceImpl(
 
             override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
+                onFailure(ERROR_CONNECT)
             }
         })
     }
@@ -55,7 +56,12 @@ class ProductRemoteDataSourceImpl(
 
             override fun onFailure(call: retrofit2.Call<ProductEntity>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
+                onFailure(ERROR_CONNECT)
             }
         })
+    }
+
+    companion object {
+        private const val ERROR_CONNECT = "연결에 실패하였습니다. 다시 시도해주세요"
     }
 }

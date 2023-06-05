@@ -40,6 +40,7 @@ class OrderRemoteDataSourceImpl(
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
+                onFailure(ERROR_CONNECT)
             }
         })
     }
@@ -66,6 +67,7 @@ class OrderRemoteDataSourceImpl(
 
                 override fun onFailure(call: Call<OrderDetailEntity>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
+                    onFailure(ERROR_CONNECT)
                 }
             })
     }
@@ -91,7 +93,12 @@ class OrderRemoteDataSourceImpl(
 
                 override fun onFailure(call: Call<List<OrderDetailEntity>>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
+                    onFailure(ERROR_CONNECT)
                 }
             })
+    }
+
+    companion object {
+        private const val ERROR_CONNECT = "연결에 실패하였습니다. 다시 시도해주세요"
     }
 }
