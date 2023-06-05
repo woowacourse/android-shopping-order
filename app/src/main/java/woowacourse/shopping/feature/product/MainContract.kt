@@ -25,12 +25,12 @@ interface MainContract {
     interface Presenter {
         fun loadRecentProducts()
         fun loadMoreProducts()
-        fun loadCartProductCountBadge()
-        fun loadCartProductCounts()
+        fun loadCartSizeBadge()
+        fun loadCartProductsQuantity()
         fun addRecentProduct(product: Product)
         fun showProductDetail(productState: ProductState)
         fun storeCartProduct(productState: ProductState)
-        fun minusCartProductCount(cartProductState: CartProductState)
-        fun plusCartProductCount(cartProductState: CartProductState)
+        fun minusCartProductQuantity(cartProductState: CartProductState)
+        fun plusCartProductQuantity(cartProductState: CartProductState)
     }
 }

@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.product
 
+import com.example.domain.Cart
 import com.example.domain.CartProduct
 import com.example.domain.Pagination
 import com.example.domain.Product
@@ -32,8 +33,8 @@ class MainPresenter(
                 view.setProducts(listOf())
             },
             onSuccess = { products, pagination ->
-                loadCartProductCounts()
                 view.addProductItems(products.map(Product::toUi))
+                loadCartProductsQuantity()
                 view.showProducts()
                 currentPage = pagination.currentPage + 1
             }, unitSize = loadItemCountUnit, page = currentPage
@@ -44,7 +45,7 @@ class MainPresenter(
         view.setRecentProducts(recentProductRepository.getAll())
     }
 
-    override fun loadCartProductCountBadge() {
+    override fun loadCartSizeBadge() {
         view.showCartProductCountBadge()
         cartRepository.requestFetchCartProductsUnit(
             unitSize = 0, page = 0, onFailure = {},
@@ -54,9 +55,9 @@ class MainPresenter(
         )
     }
 
-    override fun loadCartProductCounts() {
+    override fun loadCartProductsQuantity() {
         cartRepository.requestFetchCartProductsUnit(
-            unitSize = loadItemCountUnit, page = currentPage, onFailure = {},
+            unitSize = Cart.MAX_SIZE, page = 1, onFailure = {},
             onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
                 view.setCartProductCounts(cartProducts)
                 currentPage = pagination.currentPage + 1
@@ -81,26 +82,24 @@ class MainPresenter(
 
     override fun storeCartProduct(productState: ProductState) {
         cartRepository.addCartProduct(productState.id, { }, { })
-        loadCartProductCounts()
-        loadCartProductCountBadge()
+        loadCartProductsQuantity()
+        loadCartSizeBadge()
     }
 
-    override fun minusCartProductCount(cartProductState: CartProductState) {
+    override fun minusCartProductQuantity(cartProductState: CartProductState) {
         cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
         if (cartProductState.quantity - 1 == 0) {
             cartRepository.deleteCartProduct(
-                id = cartProductState.id,
-                onSuccess = {},
-                onFailure = {}
+                id = cartProductState.id, onSuccess = {}, onFailure = {}
             )
         }
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = { loadCartProductCountBadge() }
+            onFailure = {}, onSuccess = { loadCartSizeBadge() }
         )
     }
 
-    override fun plusCartProductCount(cartProductState: CartProductState) {
+    override fun plusCartProductQuantity(cartProductState: CartProductState) {
         cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,

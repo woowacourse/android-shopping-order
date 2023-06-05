@@ -52,8 +52,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             cartProductStates = listOf(),
             onProductClick = presenter::showProductDetail,
             cartProductAddFab = { Thread { presenter.storeCartProduct(it) }.start() },
-            cartProductCountMinus = { Thread { presenter.minusCartProductCount(it) }.start() },
-            cartProductCountPlus = { Thread { presenter.plusCartProductCount(it) }.start() }
+            cartProductCountMinus = { Thread { presenter.minusCartProductQuantity(it) }.start() },
+            cartProductCountPlus = { Thread { presenter.plusCartProductQuantity(it) }.start() }
         )
     }
     private val recentProductListAdapter by lazy {
@@ -86,8 +86,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onResume() {
         super.onResume()
         runOnUiThread {
+            presenter.loadCartProductsQuantity()
             presenter.loadRecentProducts()
-            presenter.loadCartProductCountBadge()
+            presenter.loadCartSizeBadge()
         }
     }
 
