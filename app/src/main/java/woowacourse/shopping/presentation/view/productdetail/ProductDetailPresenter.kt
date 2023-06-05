@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.view.productdetail
 
-import woowacourse.shopping.data.mapper.toUIModel
+import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
 import woowacourse.shopping.presentation.model.CartModel
@@ -15,8 +15,8 @@ class ProductDetailPresenter(
     private lateinit var product: CartModel
 
     init {
-        productRepository.loadDataById(productId, ::onFailure) { cartRemoteEntity ->
-            product = cartRemoteEntity.toUIModel()
+        productRepository.loadDataById(productId, ::onFailure) { remoteProduct ->
+            product = remoteProduct.toUiModel()
             loadProductInfo()
         }
     }

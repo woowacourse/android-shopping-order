@@ -29,8 +29,8 @@ class ProductListPresenter(
     }
 
     override fun initProductItems() {
-        productRepository.loadDatas(::onFailure) { remoteEntities ->
-            val allProducts = remoteEntities.map { productEntity -> productEntity.toUIModel() }
+        productRepository.loadDatas(::onFailure) { productList ->
+            val allProducts = productList.map { product -> product.toUiModel() }
             products.addAll(allProducts)
 
             loadCartItems()

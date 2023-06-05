@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.respository.product
 
-import woowacourse.shopping.data.model.CartRemoteEntity
+import com.example.domain.cart.CartProduct
+import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSource
 
 class ProductRepositoryImpl(
@@ -8,16 +9,20 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override fun loadDatas(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onSuccess: (products: List<CartProduct>) -> Unit,
     ) {
-        productRemoteDataSource.requestDatas(onFailure, onSuccess)
+        productRemoteDataSource.requestDatas(onFailure) { cartRemoteEntities ->
+            onSuccess(cartRemoteEntities.map { it.toDomain() })
+        }
     }
 
     override fun loadDataById(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (products: CartRemoteEntity) -> Unit,
+        onSuccess: (product: CartProduct) -> Unit,
     ) {
-        productRemoteDataSource.requestData(productId, onFailure, onSuccess)
+        productRemoteDataSource.requestData(productId, onFailure) { cartRemoteEntity ->
+            onSuccess(cartRemoteEntity.toDomain())
+        }
     }
 }

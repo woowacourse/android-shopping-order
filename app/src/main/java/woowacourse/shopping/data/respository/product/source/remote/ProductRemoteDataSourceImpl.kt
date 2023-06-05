@@ -51,7 +51,7 @@ class ProductRemoteDataSourceImpl(
     override fun requestData(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (products: CartRemoteEntity) -> Unit,
+        onSuccess: (product: CartRemoteEntity) -> Unit,
     ) {
         productService.requestProductById(productId)
             .enqueue(object : retrofit2.Callback<ProductModel> {
