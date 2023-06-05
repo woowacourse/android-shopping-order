@@ -8,7 +8,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.feature.ProductFixture
+import woowacourse.shopping.feature.CartFixture
+import woowacourse.shopping.feature.Product
 import woowacourse.shopping.mapper.toPresentation
 
 class OrderPresenterTest {
@@ -29,7 +30,11 @@ class OrderPresenterTest {
     @Test
     fun `화면에 주문할 상품 목록이 나타난다`() {
         // Given: cartId 를 이용해 상품을 er4받아올 수 있는 상태이다.
-        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 1000, 5)
+        val fakeCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 3000), 3),
+            Triple(2L, Product(2L, 3000), 3),
+            Triple(3L, Product(3L, 3000), 3),
+        )
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(
@@ -47,7 +52,11 @@ class OrderPresenterTest {
     @Test
     fun `주문 금액이 할인 정책에 해당하지 않는다면 할인 정보를 띄우지 않는다`() {
         // Given: cartId 를 이용해 상품을 받아올 수 있는 상태이다. 주문 가격이 할인 정책에 해당하지 않는다.
-        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 1000, 5)
+        val fakeCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 3000), 3),
+            Triple(2L, Product(2L, 3000), 3),
+            Triple(3L, Product(3L, 3000), 3),
+        )
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
@@ -63,7 +72,11 @@ class OrderPresenterTest {
     @Test
     fun `주문 금액이 할인 정책에 해당한다면 할인 정보를 띄운다`() {
         // Given: cartId 를 이용해 상품을 받아올 수 있는 상태이다. 주문 가격이 할인 정책에 해당한다.
-        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 5000, 5)
+        val fakeCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 10000), 3),
+            Triple(2L, Product(2L, 10000), 3),
+            Triple(3L, Product(3L, 10000), 3),
+        )
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
@@ -79,7 +92,11 @@ class OrderPresenterTest {
     @Test
     fun `상품의 총 개수가 99개를 넘는다면 주문이 불가하다`() {
         // Given: 주문할 상품 불러오기가 완료되었고, 상품의 총 개수가 99개를 넘는다.
-        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 5000, 50)
+        val fakeCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 10000), 50),
+            Triple(2L, Product(2L, 10000), 50),
+            Triple(3L, Product(3L, 10000), 50),
+        )
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
@@ -97,7 +114,11 @@ class OrderPresenterTest {
     @Test
     fun `상품의 총 개수가 99개를 넘지 않는다면 주문이 완료된다`() {
         // Given: 주문할 상품 불러오기가 완료되었고, 상품의 총 개수가 99개를 넘지 않는다.
-        val fakeCartProducts = ProductFixture.makeCartProducts(cartIds, 5000, 10)
+        val fakeCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 10000), 10),
+            Triple(2L, Product(2L, 10000), 10),
+            Triple(3L, Product(3L, 10000), 10),
+        )
 
         every { cartRepository.getAll(onSuccess = any(), onFailure = any()) } answers {
             firstArg<(List<CartProduct>) -> Unit>().invoke(fakeCartProducts)
@@ -122,4 +143,19 @@ class OrderPresenterTest {
         // Then: 주문 완료 화면을 띄운다.
         verify { view.succeedInOrder(1) }
     }
+//    private val mockCartProducts = CartFixture.getMockCarts(List(10){Triple(it.toLong(), Product(it.toLong(), 3000),3)})
+//        CartFixture.getMockCarts(
+//
+//            Triple(4L, Product(4L, 3000), 3),
+//            Triple(5L, Product(5L, 3000), 3),
+//            Triple(6L, Product(6L, 3000), 3),
+//            Triple(7L, Product(7L, 3000), 3),
+//            Triple(8L, Product(8L, 3000), 3),
+//            Triple(9L, Product(9L, 3000), 3),
+//            Triple(10L, Product(10L, 3000), 3),
+//            Triple(11L, Product(11L, 3000), 3),
+//            Triple(12L, Product(12L, 3000), 3),
+//            Triple(13L, Product(13L, 3000), 3),
+//            Triple(14L, Product(14L, 3000), 3),
+//        )
 }
