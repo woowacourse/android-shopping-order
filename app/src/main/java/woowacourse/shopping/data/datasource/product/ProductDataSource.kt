@@ -5,6 +5,8 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductDataSource {
     fun requestProducts(
+        page: Int,
+        size: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     )

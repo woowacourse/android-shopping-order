@@ -4,6 +4,8 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun getAllProducts(
+        page: Int,
+        size: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     )

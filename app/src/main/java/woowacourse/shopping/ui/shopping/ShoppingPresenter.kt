@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import android.util.Log
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.DomainCartProduct
@@ -91,13 +92,20 @@ class ShoppingPresenter(
         loadAllProducts()
     }
 
-    private lateinit var products: List<Product>
+    private lateinit var products: MutableList<Product>
 
     private fun loadAllProducts() {
         productRepository.getAllProducts(
+            page = currentPage.value,
+            size = currentPage.sizePerPage,
             onSuccess = {
-                products = it
+                if (currentPage.value == 1) {
+                    products = it.toMutableList()
+                } else {
+                    it.forEach { product -> products.add(product) }
+                }
                 loadCartProducts(products)
+                Log.d("test", "page value: ${currentPage.value}")
             },
             onFailure = { println("[ERROR] 값을 불러오지 못했습니다.") },
         )
@@ -130,7 +138,13 @@ class ShoppingPresenter(
     }
 
     private fun View.updateLoadMoreVisible() {
-        if (currentPage.hasNext(cart)) showLoadMoreButton() else hideLoadMoreButton()
+        if (currentPage.hasNext(cart)) {
+            showLoadMoreButton()
+            loadAllProducts()
+        } else {
+            hideLoadMoreButton()
+            loadAllProducts()
+        }
     }
 
     private fun updateRecentProducts(newRecentProducts: RecentProducts) {

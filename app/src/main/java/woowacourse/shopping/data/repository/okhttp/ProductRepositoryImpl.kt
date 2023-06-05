@@ -11,6 +11,8 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
 
     override fun getAllProducts(
+        page: Int,
+        size: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {

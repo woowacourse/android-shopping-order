@@ -15,10 +15,12 @@ class ProductRemoteDataSource : ProductDataSource {
     private val retrofitService = getProductByRetrofit(baseUrl)
 
     override fun requestProducts(
+        page: Int,
+        size: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        val call = retrofitService.requestProducts(1, 20)
+        val call = retrofitService.requestProducts(page, size)
         call.enqueue(object : retrofit2.Callback<ProductsDto> {
             override fun onResponse(
                 call: Call<ProductsDto>,

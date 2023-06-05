@@ -10,10 +10,14 @@ class ProductRemoteRepository(
 ) : ProductRepository {
 
     override fun getAllProducts(
+        page: Int,
+        size: Int,
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
         productDataSource.requestProducts(
+            page = page,
+            size = size,
             onSuccess = onSuccess,
             onFailure = onFailure,
         )
