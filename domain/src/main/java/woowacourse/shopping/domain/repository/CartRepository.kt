@@ -13,7 +13,7 @@ interface CartRepository {
 
     fun findCartProductByProductId(
         productId: ProductId,
-        onSuccess: (CartProduct) -> Unit, onFailed: (Throwable) -> Unit,
+        onSuccess: (CartProduct) -> Unit, onFailed: () -> Unit,
     )
 
     fun saveCartProductByProductId(

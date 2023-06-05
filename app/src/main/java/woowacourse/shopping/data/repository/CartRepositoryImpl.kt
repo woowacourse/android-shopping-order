@@ -37,17 +37,17 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
     override fun findCartProductByProductId(
         productId: ProductId,
         onSuccess: (CartProduct) -> Unit,
-        onFailed: (Throwable) -> Unit,
+        onFailed: () -> Unit,
     ) {
         getAllCartProducts(
             onSuccess = { cartProducts ->
                 val cartProduct = cartProducts.find { it.product.id == productId } ?: run {
-                    onFailed(IllegalStateException("해당 상품이 존재하지 않습니다."))
+                    onFailed()
                     return@getAllCartProducts
                 }
                 onSuccess(cartProduct)
             },
-            onFailed = { onFailed(it) }
+            onFailed = { onFailed() }
         )
     }
 
