@@ -41,10 +41,12 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun initView(orders: List<OrderUiModel>) {
-        binding.rvOrders.adapter = OrderHistoryAdapter(
-            orders = orders,
-            onClicked = ::showOrderDetail
-        )
+        runOnUiThread {
+            binding.rvOrders.adapter = OrderHistoryAdapter(
+                orders = orders,
+                onClicked = ::showOrderDetail
+            )
+        }
     }
 
     override fun showErrorMessage(errorMessage: String) {

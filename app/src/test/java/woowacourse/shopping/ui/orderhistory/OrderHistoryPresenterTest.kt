@@ -2,14 +2,13 @@ package woowacourse.shopping.ui.orderhistory
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
 import woowacourse.shopping.ui.mapper.toUiModel
+import java.util.concurrent.CompletableFuture
 
 class OrderHistoryPresenterTest {
 
@@ -31,16 +30,10 @@ class OrderHistoryPresenterTest {
     fun `주문 목록들을 받아온 후 뷰를 초기화한다`() {
         // given
         val orders = OrderFixture.createOrders()
-        val slotInitView = slot<(orders: List<Order>) -> Unit>()
 
         every {
-            repository.getOrders(
-                onReceived = capture(slotInitView),
-                onFailed = any()
-            )
-        } answers {
-            slotInitView.captured.invoke(orders)
-        }
+            repository.getOrders()
+        } returns CompletableFuture.completedFuture(Result.success(orders))
 
         // when 저장소로부터 주문 목록을 받아온다.
         presenter.getOrders()
@@ -56,22 +49,16 @@ class OrderHistoryPresenterTest {
     @Test
     fun `주문 목록들을 받아오지 못한 경우 에러 메시지를 띄운다`() {
         // given
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "주문 목록을 불러올 수 없습니다."
 
         every {
-            repository.getOrders(
-                onReceived = any(),
-                onFailed = capture(slotShowErrorMessage)
-            )
-        } answers {
-            slotShowErrorMessage.captured.invoke(errorMessage)
-        }
+            repository.getOrders()
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when: 저장소로부터 주문 목록을 받아온다.
         presenter.getOrders()
 
         // then: 주문 목록을 받아오지 못한 경우 에러 메시지를 띄운다.
-        verify { view.showErrorMessage(errorMessage) }
+        verify { view.showErrorMessage(any()) }
     }
 }

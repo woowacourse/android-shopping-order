@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.datasource.order
 
-import retrofit2.Call
-import retrofit2.Response
 import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.NetworkModule.orderService
@@ -38,27 +36,12 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         return response.getResult(ORDER_INFO_ERROR)
     }
 
-    override fun getOrders(
-        onReceived: (List<OrderEntity>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        orderService.getOrders(
+    override fun getOrders(): Result<List<OrderEntity>> {
+        val response = orderService.getOrders(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
-        ).enqueue(object : retrofit2.Callback<List<OrderEntity>> {
+        ).execute()
 
-            override fun onResponse(
-                call: Call<List<OrderEntity>>,
-                response: Response<List<OrderEntity>>,
-            ) {
-                response.body()?.let {
-                    onReceived(it)
-                } ?: onFailed(ORDERS_INFO_ERROR)
-            }
-
-            override fun onFailure(call: Call<List<OrderEntity>>, t: Throwable) {
-                onFailed(ORDERS_INFO_ERROR)
-            }
-        })
+        return response.getResult(ORDERS_INFO_ERROR)
     }
 
     companion object {

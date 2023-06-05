@@ -9,13 +9,17 @@ class OrderHistoryPresenter(
 ) : OrderHistoryContract.Presenter {
 
     override fun getOrders() {
-        repository.getOrders(
-            onReceived = { orders ->
-                view.initView(orders.map { it.toUiModel() })
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
+        repository.getOrders()
+            .thenAccept {
+                val orders = it.getOrThrow().map { order ->
+                    order.toUiModel()
+                }
+
+                view.initView(orders)
             }
-        )
+            .exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
+            }
     }
 }

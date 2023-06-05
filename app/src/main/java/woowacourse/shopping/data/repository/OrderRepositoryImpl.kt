@@ -38,17 +38,12 @@ class OrderRepositoryImpl(
         }
     }
 
-    override fun getOrders(
-        onReceived: (orders: List<Order>) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        orderRemoteDataSource.getOrders(
-            onReceived = { order ->
-                onReceived(order.map { it.toDomainModel() })
-            },
-            onFailed = { errorMessage ->
-                onFailed(errorMessage)
+    override fun getOrders(): CompletableFuture<Result<List<Order>>> {
+
+        return CompletableFuture.supplyAsync {
+            orderRemoteDataSource.getOrders().mapCatching { orders ->
+                orders.map { it.toDomainModel() }
             }
-        )
+        }
     }
 }
