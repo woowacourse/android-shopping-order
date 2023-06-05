@@ -1,5 +1,8 @@
 package woowacourse.shopping.feature.product
 
+import android.util.Log
+import com.example.domain.CartProduct
+import com.example.domain.Pagination
 import com.example.domain.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
@@ -30,11 +33,11 @@ class MainPresenter(
                 view.setProducts(listOf())
             },
             onSuccess = {
+                loadCartProductCounts()
                 view.addProductItems(it.map(Product::toUi))
                 view.showProducts()
-            }, unitSize = loadItemCountUnit, page = page
+            }, unitSize = loadItemCountUnit, page = page++
         )
-        page++
     }
 
     override fun loadRecentProducts() {
@@ -43,16 +46,25 @@ class MainPresenter(
 
     override fun loadCartProductCountBadge() {
         view.showCartProductCountBadge()
-        cartRepository.getAll(onFailure = {}, onSuccess = {
-            if (it.size >= MIN_COUNT_VALUE) view.setCartProductCountBadge(it.size)
-            else view.hideCartProductCount()
-        })
+        cartRepository.requestFetchCartProductsUnit(
+            unitSize = 0, page = 0, onFailure = {},
+            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+                if (MIN_COUNT_VALUE <= pagination.total) view.setCartProductCountBadge(pagination.total)
+            }
+        )
     }
 
     override fun loadCartProductCounts() {
-        cartRepository.getAll(onFailure = {}, onSuccess = {
-            view.setCartProductCounts(it)
-        })
+        cartRepository.requestFetchCartProductsUnit(
+            // todo UNIT SIZE, page는 ProductRepo로부터 pagination 받아와 적용하기
+            unitSize = 100, page = 1, onFailure = {},
+            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+                Log.d("otter66", "page: $page")
+                Log.d("otter66", "cart: $cartProducts")
+                Log.d("otter66", "pagination: $pagination")
+                view.setCartProductCounts(cartProducts)
+            }
+        )
     }
 
     override fun addRecentProduct(product: Product) {
@@ -71,7 +83,7 @@ class MainPresenter(
     }
 
     override fun storeCartProduct(productState: ProductState) {
-        cartRepository.addCartProduct(productState.id.toLong(), { }, { })
+        cartRepository.addCartProduct(productState.id, { }, { })
         loadCartProductCounts()
         loadCartProductCountBadge()
     }

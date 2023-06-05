@@ -37,15 +37,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         get() = _binding!!
 
     private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
-    private val cartRepository: CartRepository by lazy {
-        CartRemoteRepository(url = serverUrl)
-    }
     private val presenter: MainContract.Presenter by lazy {
-        val productRepository: ProductRepository =
-            ProductRemoteRepository(serverUrl)
+        val cartRepository: CartRepository = CartRemoteRepository(url = serverUrl)
+        val productRepository: ProductRepository = ProductRemoteRepository(serverUrl)
         val recentProductRepository: RecentProductRepository =
             RecentProductRepositoryImpl(this, serverUrl)
-        MainPresenter(this, productRepository, recentProductRepository, cartRepository)
+        MainPresenter(
+            view = this, productRepository = productRepository,
+            recentProductRepository = recentProductRepository, cartRepository = cartRepository
+        )
     }
     private val productListAdapter: ProductListAdapter by lazy {
         ProductListAdapter(
@@ -80,10 +80,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         initList()
 
         presenter.loadMoreProducts()
-        cartRepository.getAll(
-            onFailure = {}, onSuccess = { presenter.loadCartProductCounts() }
-        )
-
         initToolBar()
     }
 
