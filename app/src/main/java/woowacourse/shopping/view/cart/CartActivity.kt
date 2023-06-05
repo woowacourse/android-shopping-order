@@ -28,6 +28,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             CartRemoteRepository(ServerPreferencesRepository(this)),
         )
     }
+    private lateinit var adapter: CartAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +70,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showProducts(items: List<CartViewItem>) {
-        binding.recyclerCart.adapter = CartAdapter(
-            items,
+        adapter = CartAdapter(
+            items.toMutableList(),
             object : CartAdapter.OnItemClick {
                 override fun onRemoveClick(id: Int) {
                     presenter.removeProduct(id)
@@ -93,6 +94,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
             },
         )
+        binding.recyclerCart.adapter = adapter
     }
 
     private fun showErrorMessageToast(message: String?) {
@@ -103,12 +105,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showChangedItems() {
-        binding.recyclerCart.adapter?.notifyDataSetChanged()
-    }
+//    override fun showChangedItems() {
+//        binding.recyclerCart.adapter?.notifyDataSetChanged()
+//    }
+//
+//    override fun showChangedItem(position: Int) {
+//        binding.recyclerCart.adapter?.notifyItemChanged(position)
+//    }
 
-    override fun showChangedItem(position: Int) {
-        binding.recyclerCart.adapter?.notifyItemChanged(position)
+    override fun changeItems(newItems: List<CartViewItem>) {
+        adapter.updateItems(newItems.toList())
     }
 
     override fun showOrderActivity(selectedCartProducts: List<CartProduct>) {

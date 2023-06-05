@@ -1,11 +1,12 @@
 package woowacourse.shopping.view.cart
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.CartProductModel
 
 class CartAdapter(
-    private val items: List<CartViewItem>,
+    private val items: MutableList<CartViewItem>,
     private val onItemClick: OnItemClick,
 ) : RecyclerView.Adapter<CartItemViewHolder>() {
 
@@ -32,5 +33,12 @@ class CartAdapter(
             is CartItemViewHolder.CartProductViewHolder -> holder.bind(items[position] as CartViewItem.CartProductItem)
             is CartItemViewHolder.CartPaginationViewHolder -> holder.bind(items[position] as CartViewItem.PaginationItem)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateItems(newItems: List<CartViewItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 }

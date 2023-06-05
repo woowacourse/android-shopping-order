@@ -85,7 +85,7 @@ class CartPresenter(
         cartItems.addAll(items)
         addBottomPagination()
         _isCheckedAll.postValue(getIsCheckedAll())
-        view.showChangedItems()
+        view.changeItems(cartItems)
     }
 
     override fun removeProduct(cartId: Int) {
@@ -106,7 +106,7 @@ class CartPresenter(
                 return@remove
             }
             addBottomPagination()
-            view.showChangedItems()
+            view.changeItems(cartItems)
         }
     }
 
@@ -124,8 +124,8 @@ class CartPresenter(
         cartItems.filterIsInstance<CartViewItem.CartProductItem>().forEachIndexed { index, item ->
             val newItem = item.product.copy(isChecked = isChecked)
             cartItems[index] = CartViewItem.CartProductItem(newItem)
-            view.showChangedItem(index)
         }
+        view.changeItems(cartItems)
 
         val products = if (isChecked) { // 전체 선택
             convertItemsToCartProducts(cartItems) - cartSystem.selectedProducts.toSet()
@@ -162,7 +162,7 @@ class CartPresenter(
             cartPagination.updateItem(cartId, quantity)
             cartSystem.updateProduct(cartId, quantity)
             _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
-            view.showChangedItem(index)
+            view.changeItems(cartItems)
         }
     }
 

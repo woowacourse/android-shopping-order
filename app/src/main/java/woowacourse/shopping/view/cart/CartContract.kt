@@ -8,8 +8,7 @@ import woowacourse.shopping.model.CartProductModel
 interface CartContract {
     interface View {
         fun showProducts(items: List<CartViewItem>)
-        fun showChangedItems()
-        fun showChangedItem(position: Int)
+        fun changeItems(newItems: List<CartViewItem>)
         fun stopLoading()
         fun showOrderActivity(selectedCartProducts: List<CartProduct>)
         fun showProductsNothingToast()
