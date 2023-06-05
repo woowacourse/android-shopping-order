@@ -8,6 +8,7 @@ interface OrderContract {
         fun initAdapter(orderProducts: List<CartProductUiModel>)
         fun setUpView(point: Int, productsPrice: Int)
         fun showErrorMessage(t: Throwable)
+        fun successOrder()
     }
 
     interface Presenter {

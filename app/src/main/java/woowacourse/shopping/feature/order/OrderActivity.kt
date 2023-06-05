@@ -68,11 +68,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                 val usedPoint =
                     if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
                 presenter.orderProducts(usedPoint)
-                finish()
             }
         }
 
         setEditTextState(point, productsPrice)
+    }
+
+    override fun successOrder() {
+        finish()
     }
 
     private fun setEditTextState(point: Int, productsPrice: Int) {

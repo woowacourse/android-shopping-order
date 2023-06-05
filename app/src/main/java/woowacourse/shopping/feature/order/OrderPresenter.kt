@@ -41,6 +41,7 @@ class OrderPresenter(
             Point(usedPoint), orders,
             callback = {
                 it.onSuccess {
+                    view.successOrder()
                 }.onFailure { throwable ->
                     view.showErrorMessage(throwable)
                 }
