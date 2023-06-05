@@ -8,12 +8,9 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 import woowacourse.shopping.data.cart.model.dto.response.CartResponse
 
 interface RetrofitCartService {
-    @GET("cart-items")
-    fun requestAllCartProducts(): Call<List<CartProductResponse>>
 
     @GET("cart-items")
     fun requestFetchCartProductsUnit(

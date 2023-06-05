@@ -26,7 +26,6 @@ class ProductViewHolder(
     ) {
         binding.product = productState
         hideCounterView()
-
         if (cartProductState != null) {
             showCounterView()
             binding.counterView.count = cartProductState.quantity

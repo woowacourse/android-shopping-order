@@ -5,11 +5,6 @@ import com.example.domain.Pagination
 
 interface CartRepository {
 
-    fun getAll(
-        onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit
-    )
-
     fun requestFetchCartProductsUnit(
         unitSize: Int,
         page: Int,

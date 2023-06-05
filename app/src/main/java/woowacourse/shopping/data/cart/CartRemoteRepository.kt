@@ -36,27 +36,6 @@ class CartRemoteRepository(
         .build()
         .create(RetrofitCartService::class.java)
 
-    override fun getAll(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
-        retrofitCartService.requestAllCartProducts()
-            .enqueue(object : Callback<List<CartProductResponse>> {
-                override fun onResponse(
-                    call: Call<List<CartProductResponse>>,
-                    response: Response<List<CartProductResponse>>
-                ) {
-                    val result = response.body() ?: emptyList()
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result.map(CartProductResponse::toDomain))
-                }
-
-                override fun onFailure(
-                    call: Call<List<CartProductResponse>>,
-                    t: Throwable
-                ) {
-                    onFailure()
-                }
-            })
-    }
-
     override fun requestFetchCartProductsUnit(
         unitSize: Int,
         page: Int,
