@@ -13,12 +13,6 @@ class OrderDetailPresenter(
                 view.setOrderHistory(it.toUIModel())
                 view.setOrderList(it.orderItems.map { orderItem -> orderItem.toUIModel() })
             } ?: throw IllegalArgumentException("주문 내역을 가져오는데 실패했습니다.")
-
-/*            view.setOrderHistory(history?.toUIModel() ?: throw IllegalArgumentException("주문 내역을 가져오는데 실패했습니다."))
-            view.setOrderList(
-                history?.orderItems?.map { orderItem -> orderItem.toUIModel() }
-                    ?: throw IllegalArgumentException("주문 내역을 가져오는데 실패했습니다."),
-            )*/
         }
     }
 }
