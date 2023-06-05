@@ -13,14 +13,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
         tools:context=".view.orderdetail.OrderDetailActivity">
 
         <TextView
             android:id="@+id/tv_order_products_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/order_total_price"
+            android:padding="20dp"
+            android:text="@string/order_product_title"
             android:textColor="@color/black"
             android:textSize="25sp"
             android:textStyle="bold"
@@ -31,14 +31,26 @@
             android:id="@+id/rv_order_products"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_order_products_title" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/boarder_color"
+            app:layout_constraintBottom_toTopOf="@id/lo_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lo_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
+            android:padding="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -47,7 +59,6 @@
                 android:id="@+id/tv_order_total_price_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:text="@string/order_total_price"
                 android:textColor="@color/black"
                 android:textSize="25sp"
@@ -116,9 +127,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/discount_point_description"
+                android:text="@string/order_total_price_with_discount"
                 android:textColor="@color/black"
                 android:textSize="20sp"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_discount_point_description" />
 
@@ -129,6 +141,7 @@
                 android:text="@{@string/price_format(orderDetail.orderPrice)}"
                 android:textColor="@color/black"
                 android:textSize="20sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/tv_order_price_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_order_price_description"

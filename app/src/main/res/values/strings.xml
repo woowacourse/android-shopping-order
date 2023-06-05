@@ -28,4 +28,6 @@
     <string name="order_price_description">주문 금액</string>
     <string name="discount_point_description">할인 금액</string>
     <string name="total_amount_format">%s개</string>
+    <string name="order_product_title">주문 내역</string>
+    <string name="order_total_price_with_discount">최종 결제 금액</string>
 </resources>
