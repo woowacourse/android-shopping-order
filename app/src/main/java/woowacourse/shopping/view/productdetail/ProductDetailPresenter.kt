@@ -2,9 +2,10 @@ package woowacourse.shopping.view.productdetail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentViewedRepository
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentViewedRepository
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.toDomain
 import woowacourse.shopping.model.toUiModel
@@ -30,11 +31,18 @@ class ProductDetailPresenter(
     }
 
     override fun fetchProductDetail() {
-        productRepository.getProductById(productId) {
-            updateRecentViewedProducts(it.toUiModel())
-            view.showProductDetail(it.toUiModel(), lastViewedProduct)
-            _quantity.value = it.toUiModel().quantity
-            product = it.toUiModel()
+        productRepository.getProductById(productId) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    updateRecentViewedProducts(result.response.toUiModel())
+                    view.showProductDetail(result.response.toUiModel(), lastViewedProduct)
+                    _quantity.value = result.response.toUiModel().quantity
+                    product = result.response.toUiModel()
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 
@@ -42,13 +50,27 @@ class ProductDetailPresenter(
         val quantityValue = _quantity.value
         if (quantityValue != null && quantityValue > 0) {
             if (product.cartId == null || product.cartId <= 0) {
-                cartRepository.insert(product.id, quantityValue) {
-                    view.finishActivity(it > 0)
+                cartRepository.insert(product.id, quantityValue) { result ->
+                    when (result) {
+                        is DataResult.Success -> {
+                            view.finishActivity(result.response > 0)
+                        }
+                        is DataResult.Failure -> {
+                            view.showErrorMessageToast(result.message)
+                        }
+                    }
                 }
                 return
             }
-            cartRepository.update(product.cartId, quantityValue) {
-                view.finishActivity(it)
+            cartRepository.update(product.cartId, quantityValue) { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        view.finishActivity(result.response)
+                    }
+                    is DataResult.Failure -> {
+                        view.showErrorMessageToast(result.message)
+                    }
+                }
             }
         }
     }

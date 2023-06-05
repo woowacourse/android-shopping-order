@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import woowacourse.shopping.domain.repository.MypageRepository
+import woowacourse.shopping.data.repository.MypageRepository
 import woowacourse.shopping.view.mypage.MypageContract
 import woowacourse.shopping.view.mypage.MypagePresenter
 

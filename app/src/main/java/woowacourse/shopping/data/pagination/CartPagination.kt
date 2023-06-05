@@ -1,17 +1,16 @@
-package woowacourse.shopping.domain.pagination
+package woowacourse.shopping.data.pagination
 
 import woowacourse.shopping.domain.cartsystem.CartPageStatus
 import woowacourse.shopping.domain.model.CartProduct
 
-class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
-    NextPagination<CartProduct>, PrevPagination<CartProduct> {
+class CartPagination(private val rangeSize: Int, items: List<CartProduct>) {
     private var lastIndex = 0
     private var page: Int = 0
     val status: CartPageStatus
         get() = CartPageStatus(lastIndex > rangeSize, lastIndex < allItems.size, page)
     private val allItems: MutableList<CartProduct> = items.toMutableList()
 
-    override fun fetchNextItems(callback: (List<CartProduct>) -> Unit) {
+    fun fetchNextItems(callback: (List<CartProduct>) -> Unit) {
         if (allItems.size <= lastIndex) return
         val items: List<CartProduct> = if (allItems.size < lastIndex + rangeSize) { // 범위 초과
             allItems.subList(lastIndex, allItems.size)
@@ -32,7 +31,7 @@ class CartPagination(private val rangeSize: Int, items: List<CartProduct>) :
         callback(items)
     }
 
-    override fun fetchPrevItems(callback: (List<CartProduct>) -> Unit) {
+    fun fetchPrevItems(callback: (List<CartProduct>) -> Unit) {
         if (lastIndex < rangeSize) return
         val items: List<CartProduct>
         if (lastIndex % rangeSize == 0) {

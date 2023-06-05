@@ -1,7 +1,8 @@
 package woowacourse.shopping.view.orderdetail
 
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.model.OrderDetailModel
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.model.toUiModel
 
 class OrderDetailPresenter(
     private val orderId: Int,
@@ -9,9 +10,16 @@ class OrderDetailPresenter(
     private val orderRepository: OrderRepository,
 ) : OrderDetailContract.Presenter {
     override fun fetchOrder() {
-        orderRepository.getOrder(orderId) {
-            val model = OrderDetailModel.from(it)
-            view.showOrderDetail(model)
+        orderRepository.getOrder(orderId) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val model = result.response.toUiModel()
+                    view.showOrderDetail(model)
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 }

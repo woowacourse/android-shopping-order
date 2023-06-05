@@ -12,8 +12,8 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRemoteRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.CartRemoteRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.CartProductModel
@@ -97,21 +97,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.recyclerCart.adapter = adapter
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
-
-//    override fun showChangedItems() {
-//        binding.recyclerCart.adapter?.notifyDataSetChanged()
-//    }
-//
-//    override fun showChangedItem(position: Int) {
-//        binding.recyclerCart.adapter?.notifyItemChanged(position)
-//    }
 
     override fun changeItems(newItems: List<CartViewItem>) {
         adapter.updateItems(newItems.toList())

@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.retrofit
+package woowacourse.shopping.data.remote
 
 import retrofit2.Call
 import retrofit2.http.*
-import woowacourse.shopping.domain.model.TotalCashDTO
+import woowacourse.shopping.data.remote.dto.TotalCashDTO
 
 interface MypageApi {
     @GET("/members/cash")

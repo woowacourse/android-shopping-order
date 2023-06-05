@@ -2,7 +2,8 @@ package woowacourse.shopping.view.mypage
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import woowacourse.shopping.domain.repository.MypageRepository
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.MypageRepository
 
 class MypagePresenter(private val view: MypageContract.View, private val mypageRepository: MypageRepository) : MypageContract.Presenter {
     private val _cash = MutableLiveData(0)
@@ -10,8 +11,15 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
         get() = _cash
 
     override fun fetchCash() {
-        mypageRepository.getCash {
-            _cash.value = it
+        mypageRepository.getCash { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    _cash.value = result.response
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 
@@ -20,8 +28,15 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
             view.showNegativeIntErrorToast()
             return
         }
-        mypageRepository.chargeCash(cash) {
-            _cash.value = it
+        mypageRepository.chargeCash(cash) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    _cash.value = result.response
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 }

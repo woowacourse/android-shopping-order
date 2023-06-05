@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.retrofit
+package woowacourse.shopping.data.remote
 
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.remote.dto.ProductsWithCartItemDTO
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithCartInfo
-import woowacourse.shopping.domain.model.ProductsWithCartItemDTO
 
 interface ProductApi {
     @GET("products")

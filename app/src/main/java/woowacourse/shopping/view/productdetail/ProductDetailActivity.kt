@@ -11,10 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRemoteRepository
-import woowacourse.shopping.data.repository.ProductRemoteRepository
-import woowacourse.shopping.data.repository.RecentViewedDbRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.CartRemoteRepository
+import woowacourse.shopping.data.repository.impl.ProductRemoteRepository
+import woowacourse.shopping.data.repository.impl.RecentViewedDbRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogQuantityBinding
 import woowacourse.shopping.model.ProductModel
@@ -68,7 +68,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return

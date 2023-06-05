@@ -4,9 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import woowacourse.shopping.data.repository.ServerStoreRespository
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.ServerStoreRespository
 
 class RecentViewedDBHelper(context: Context, serverRepository: ServerStoreRespository) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
     private val server = serverRepository.getServerUrl()

@@ -1,15 +1,14 @@
 package woowacourse.shopping
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import io.mockk.Called
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.model.toUiModel
 import woowacourse.shopping.view.cart.CartContract
 import woowacourse.shopping.view.cart.CartPresenter

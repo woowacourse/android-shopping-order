@@ -17,10 +17,10 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRemoteRepository
-import woowacourse.shopping.data.repository.ProductRemoteRepository
-import woowacourse.shopping.data.repository.RecentViewedDbRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.CartRemoteRepository
+import woowacourse.shopping.data.repository.impl.ProductRemoteRepository
+import woowacourse.shopping.data.repository.impl.RecentViewedDbRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.view.cart.CartActivity

@@ -1,16 +1,24 @@
 package woowacourse.shopping.view.orderhistory
 
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.model.OrderDetailModel
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.model.toUiModel
 
 class OrderHistoryPresenter(
     private val view: OrderHistoryContract.View,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
 ) : OrderHistoryContract.Presenter {
     override fun fetchOrders() {
-        orderRepository.getAll { ordersDto ->
-            val orders = ordersDto.orders.map { OrderDetailModel.from(it) }
-            view.showOrders(orders)
+        orderRepository.getAll { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val orders = result.response.map { it.toUiModel() }
+                    view.showOrders(orders)
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 }

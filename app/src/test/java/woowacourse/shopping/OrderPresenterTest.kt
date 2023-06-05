@@ -1,15 +1,14 @@
 package woowacourse.shopping
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.domain.model.OrderCartItemsDTO
-import woowacourse.shopping.domain.model.OrderDTO
-import woowacourse.shopping.domain.model.OrdersDTO
-import woowacourse.shopping.domain.repository.MypageRepository
-import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
+import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrdersDTO
+import woowacourse.shopping.data.repository.MypageRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.view.order.OrderContract
 import woowacourse.shopping.view.order.OrderPresenter
 

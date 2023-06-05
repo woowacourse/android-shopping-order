@@ -2,12 +2,13 @@ package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import woowacourse.shopping.data.pagination.CartPagination
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.domain.cartsystem.CartPageStatus
 import woowacourse.shopping.domain.cartsystem.CartSystem
 import woowacourse.shopping.domain.cartsystem.CartSystemResult
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.pagination.CartPagination
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductModel
 import woowacourse.shopping.model.toDomain
 import woowacourse.shopping.model.toUiModel
@@ -31,19 +32,27 @@ class CartPresenter(
         CartPageStatus(isPrevEnabled = false, isNextEnabled = false, 1)
 
     override fun fetchProducts() {
-        cartRepository.getAll {
-            cartPagination = CartPagination(PAGINATION_SIZE, it)
-            cartPagination.fetchNextItems { cartProducts ->
-                val items = cartProducts.map {
-                    CartViewItem.CartProductItem(
-                        it.toUiModel(cartSystem.isSelectedProduct(it)),
-                    )
+        cartRepository.getAll { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val cartProducts = result.response
+                    cartPagination = CartPagination(PAGINATION_SIZE, cartProducts)
+                    cartPagination.fetchNextItems { newItems ->
+                        val items = newItems.map {
+                            CartViewItem.CartProductItem(
+                                it.toUiModel(cartSystem.isSelectedProduct(it)),
+                            )
+                        }
+                        cartItems.addAll(items)
+                        _isCheckedAll.value = getIsCheckedAll()
+                        addBottomPagination()
+                        view.showProducts(cartItems)
+                        view.stopLoading()
+                    }
                 }
-                cartItems.addAll(items)
-                _isCheckedAll.value = getIsCheckedAll()
-                addBottomPagination()
-                view.showProducts(cartItems)
-                view.stopLoading()
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
             }
         }
     }
@@ -63,7 +72,7 @@ class CartPresenter(
     override fun fetchPrevPage() {
         cartItems.clear()
         cartPagination.fetchPrevItems { cartProducts ->
-            fetchNewItems(cartProducts)
+//            fetchNewItems(cartProducts)
         }
     }
 
@@ -89,24 +98,31 @@ class CartPresenter(
     }
 
     override fun removeProduct(cartId: Int) {
-        cartRepository.remove(cartId) { isSuccess ->
-            if (!isSuccess) return@remove
-            val item =
-                cartItems.first { it is CartViewItem.CartProductItem && it.product.cartId == cartId } as CartViewItem.CartProductItem
-            val nextItem = cartPagination.removeItem(item.product.toDomain())
-            cartItems.remove(item)
+        cartRepository.remove(cartId) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    if (!result.response) return@remove
+                    val item =
+                        cartItems.first { it is CartViewItem.CartProductItem && it.product.cartId == cartId } as CartViewItem.CartProductItem
+                    val nextItem = cartPagination.removeItem(item.product.toDomain())
+                    cartItems.remove(item)
 
-            _cartSystemResult.postValue(cartSystem.removeProduct(cartId))
-            _isCheckedAll.postValue(getIsCheckedAll())
+                    _cartSystemResult.postValue(cartSystem.removeProduct(cartId))
+                    _isCheckedAll.postValue(getIsCheckedAll())
 
-            cartItems.removeLast()
-            if (nextItem != null) addNextProduct(nextItem)
-            if (cartItems.isEmpty()) {
-                fetchCurrentPage()
-                return@remove
+                    cartItems.removeLast()
+                    if (nextItem != null) addNextProduct(nextItem)
+                    if (cartItems.isEmpty()) {
+                        fetchCurrentPage()
+                        return@remove
+                    }
+                    addBottomPagination()
+                    view.changeItems(cartItems)
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
             }
-            addBottomPagination()
-            view.changeItems(cartItems)
         }
     }
 
@@ -152,17 +168,24 @@ class CartPresenter(
 
     override fun updateCartProductCount(cartId: Int, quantity: Int) {
         if (quantity < COUNT_MIN) return
-        cartRepository.update(cartId, quantity) { isSuccess ->
-            if (!isSuccess) return@update
-            val cartProducts = convertItemsToCartProducts(cartItems)
-            val index = cartProducts.indexOfFirst { it.id == cartId }
-            val newProduct =
-                (cartItems[index] as CartViewItem.CartProductItem).product.copy(quantity = quantity)
-            cartItems[index] = CartViewItem.CartProductItem(newProduct)
-            cartPagination.updateItem(cartId, quantity)
-            cartSystem.updateProduct(cartId, quantity)
-            _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
-            view.changeItems(cartItems)
+        cartRepository.update(cartId, quantity) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    if (!result.response) return@update
+                    val cartProducts = convertItemsToCartProducts(cartItems)
+                    val index = cartProducts.indexOfFirst { it.id == cartId }
+                    val newProduct =
+                        (cartItems[index] as CartViewItem.CartProductItem).product.copy(quantity = quantity)
+                    cartItems[index] = CartViewItem.CartProductItem(newProduct)
+                    cartPagination.updateItem(cartId, quantity)
+                    cartSystem.updateProduct(cartId, quantity)
+                    _cartSystemResult.postValue(cartSystem.updateProduct(cartId, quantity))
+                    view.changeItems(cartItems)
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 

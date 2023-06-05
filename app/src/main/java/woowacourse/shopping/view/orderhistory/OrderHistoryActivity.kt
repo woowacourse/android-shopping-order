@@ -7,8 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.OrderRemoteRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.OrderDetailModel
 import woowacourse.shopping.view.orderdetail.OrderDetailActivity
@@ -42,7 +42,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return

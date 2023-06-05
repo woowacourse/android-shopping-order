@@ -1,10 +1,11 @@
 package woowacourse.shopping.view.order
 
-import woowacourse.shopping.domain.model.OrderCartItemsDTO
-import woowacourse.shopping.domain.repository.MypageRepository
-import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.MypageRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.model.OrderCartProductsModel
-import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.OrderUserInfoModel
 
 class OrderPresenter(
     private val view: OrderContract.View,
@@ -16,9 +17,16 @@ class OrderPresenter(
     private var ownCash = 0
 
     override fun fetchOrder() {
-        mypageRepository.getCash {
-            ownCash = it
-            view.showOrder(OrderModel(products, it, it - totalPrice, totalPrice))
+        mypageRepository.getCash { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    ownCash = result.response
+                    view.showOrder(OrderUserInfoModel(products, ownCash, ownCash - totalPrice, totalPrice))
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
+            }
         }
     }
 
@@ -28,9 +36,16 @@ class OrderPresenter(
             return
         }
         val orderCartItemsDTO = products.toDTO()
-        orderRepository.order(orderCartItemsDTO) {
-            if (it != null) {
-                view.showOrderComplete(it)
+        orderRepository.order(orderCartItemsDTO) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    if (result.response != null) {
+                        view.showOrderComplete(result.response)
+                    }
+                }
+                is DataResult.Failure -> {
+                    view.showErrorMessageToast(result.message)
+                }
             }
         }
     }

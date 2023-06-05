@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.impl
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import woowacourse.shopping.domain.repository.ServerStoreRespository
+import woowacourse.shopping.data.repository.ServerStoreRespository
 
 class ServerPreferencesRepository(context: Context) : ServerStoreRespository {
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)

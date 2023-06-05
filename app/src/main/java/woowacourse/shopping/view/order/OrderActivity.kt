@@ -7,13 +7,13 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.MypageRemoteRepository
-import woowacourse.shopping.data.repository.OrderRemoteRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.MypageRemoteRepository
+import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.OrderCartProductsModel
-import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.OrderUserInfoModel
 import woowacourse.shopping.util.getParcelableCompat
 import woowacourse.shopping.view.orderdetail.OrderDetailActivity
 
@@ -44,7 +44,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         )
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return
@@ -56,12 +56,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.presenter = presenter
     }
 
-    override fun showOrder(orderModel: OrderModel) {
+    override fun showOrder(orderUserInfoModel: OrderUserInfoModel) {
         binding.recyclerOrderCartProducts.adapter =
-            OrderCartProductsAdapter(orderModel.orderProducts.orderProducts)
-        binding.textUsableCash.text = getString(R.string.cash_contain_price, orderModel.usableCash)
-        binding.textUseCash.text = getString(R.string.cash_contain_price, orderModel.afterUseCash)
-        binding.textOrderPrice.text = getString(R.string.korean_won, orderModel.paymentPrice)
+            OrderCartProductsAdapter(orderUserInfoModel.orderProducts.orderProducts)
+        binding.textUsableCash.text = getString(R.string.cash_contain_price, orderUserInfoModel.usableCash)
+        binding.textUseCash.text = getString(R.string.cash_contain_price, orderUserInfoModel.afterUseCash)
+        binding.textOrderPrice.text = getString(R.string.korean_won, orderUserInfoModel.paymentPrice)
     }
 
     override fun showUnableToast() {

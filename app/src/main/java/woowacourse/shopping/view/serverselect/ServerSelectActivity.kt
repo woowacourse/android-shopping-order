@@ -2,7 +2,7 @@ package woowacourse.shopping.view.serverselect
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityServerSelectBinding
 import woowacourse.shopping.view.productlist.ProductListActivity
 

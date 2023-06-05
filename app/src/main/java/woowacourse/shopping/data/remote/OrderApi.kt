@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.retrofit
+package woowacourse.shopping.data.remote
 
 import retrofit2.Call
 import retrofit2.http.*
-import woowacourse.shopping.domain.model.OrderCartItemsDTO
-import woowacourse.shopping.domain.model.OrderDTO
-import woowacourse.shopping.domain.model.OrdersDTO
+import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
+import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrdersDTO
 
 interface OrderApi {
     @GET("/orders")

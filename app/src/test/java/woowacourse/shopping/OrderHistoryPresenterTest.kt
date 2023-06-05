@@ -4,13 +4,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.domain.model.OrderCartItemsDTO
-import woowacourse.shopping.domain.model.OrderDTO
-import woowacourse.shopping.domain.model.OrdersDTO
+import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
+import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrdersDTO
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.orderhistory.OrderHistoryContract
 import woowacourse.shopping.view.orderhistory.OrderHistoryPresenter
 

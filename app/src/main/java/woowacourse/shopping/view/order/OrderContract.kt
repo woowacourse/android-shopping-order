@@ -1,12 +1,14 @@
 package woowacourse.shopping.view.order
 
-import woowacourse.shopping.model.OrderModel
+import woowacourse.shopping.model.OrderUserInfoModel
 
 interface OrderContract {
     interface View {
-        fun showOrder(orderModel: OrderModel)
+        fun showOrder(orderUserInfoModel: OrderUserInfoModel)
         fun showUnableToast()
         fun showOrderComplete(orderId: Int)
+
+        fun showErrorMessageToast(message: String?)
     }
     interface Presenter {
         fun fetchOrder()

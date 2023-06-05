@@ -7,8 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.OrderRemoteRepository
-import woowacourse.shopping.data.repository.ServerPreferencesRepository
+import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
+import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.OrderDetailModel
 
@@ -43,10 +43,15 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             showDataNothingToast()
             finish()
         }
-        presenter = OrderDetailPresenter(orderId, this, OrderRemoteRepository(ServerPreferencesRepository(this)))
+        presenter = OrderDetailPresenter(
+            orderId, this,
+            OrderRemoteRepository(
+                ServerPreferencesRepository(this)
+            )
+        )
     }
 
-    private fun showErrorMessageToast(message: String?) {
+    override fun showErrorMessageToast(message: String?) {
         if (message == null) {
             Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
             return

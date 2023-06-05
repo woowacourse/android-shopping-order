@@ -6,6 +6,7 @@ interface OrderHistoryContract {
     interface View {
         fun showOrders(orders: List<OrderDetailModel>)
         fun setUpPresenter()
+        fun showErrorMessageToast(message: String?)
     }
     interface Presenter {
         fun fetchOrders()

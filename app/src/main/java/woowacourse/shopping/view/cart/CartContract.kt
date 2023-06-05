@@ -12,6 +12,8 @@ interface CartContract {
         fun stopLoading()
         fun showOrderActivity(selectedCartProducts: List<CartProduct>)
         fun showProductsNothingToast()
+
+        fun showErrorMessageToast(message: String?)
     }
 
     interface Presenter {
