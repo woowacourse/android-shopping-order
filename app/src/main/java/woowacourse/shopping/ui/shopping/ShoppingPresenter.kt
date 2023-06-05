@@ -90,10 +90,9 @@ class ShoppingPresenter(
         cartRepository.increaseProductCountByProductId(
             product.id,
             ProductCount(addCount),
-            onSuccess = {},
+            onSuccess = { loadProducts(currentPage) },
             onFailed = { view.showCartCountChangedFailed() },
         )
-        loadProducts(currentPage)
     }
 
     private fun loadProducts(page: Page) {
