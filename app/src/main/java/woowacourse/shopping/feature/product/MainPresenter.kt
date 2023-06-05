@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.product
 
-import android.util.Log
 import com.example.domain.CartProduct
 import com.example.domain.Pagination
 import com.example.domain.Product
@@ -24,7 +23,7 @@ class MainPresenter(
 ) : MainContract.Presenter {
 
     private val loadItemCountUnit = 20
-    private var page: Int = 1
+    private var currentPage: Int = 1
 
     override fun loadMoreProducts() {
         productRepository.requestFetchProductsUnit(
@@ -32,11 +31,12 @@ class MainPresenter(
                 view.showEmptyProducts()
                 view.setProducts(listOf())
             },
-            onSuccess = {
+            onSuccess = { products, pagination ->
                 loadCartProductCounts()
-                view.addProductItems(it.map(Product::toUi))
+                view.addProductItems(products.map(Product::toUi))
                 view.showProducts()
-            }, unitSize = loadItemCountUnit, page = page++
+                currentPage = pagination.currentPage + 1
+            }, unitSize = loadItemCountUnit, page = currentPage
         )
     }
 
@@ -56,13 +56,10 @@ class MainPresenter(
 
     override fun loadCartProductCounts() {
         cartRepository.requestFetchCartProductsUnit(
-            // todo UNIT SIZE, page는 ProductRepo로부터 pagination 받아와 적용하기
-            unitSize = 100, page = 1, onFailure = {},
+            unitSize = loadItemCountUnit, page = currentPage, onFailure = {},
             onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
-                Log.d("otter66", "page: $page")
-                Log.d("otter66", "cart: $cartProducts")
-                Log.d("otter66", "pagination: $pagination")
                 view.setCartProductCounts(cartProducts)
+                currentPage = pagination.currentPage + 1
             }
         )
     }
