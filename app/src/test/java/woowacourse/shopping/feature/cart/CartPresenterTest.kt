@@ -3,8 +3,6 @@ package woowacourse.shopping.feature.cart
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.CartProduct
-import com.example.domain.model.Price
-import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import io.mockk.Runs
 import io.mockk.every
@@ -16,7 +14,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.mapper.toDomain
-import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
 
@@ -46,7 +43,7 @@ internal class CartPresenterTest {
 
         val expected = mockCartProducts.take(5)
         val actual = cartProductSlot.captured.map {
-            CartProduct(it.productUiModel.toDomain(), 1, true)
+            it.toDomain()
         }
 
         assert(expected == actual)
@@ -98,18 +95,10 @@ internal class CartPresenterTest {
 
     private val mockCartProducts = List(41) {
         CartProduct(
-            productsDatasource[it], 1, true
+            cartProductId = 1L,
+            product = productsDatasource[it],
+            count = 1,
+            isSelected = true
         )
     }
-
-    private val mockProduct = Product(
-        5,
-        "유명산지 고당도사과 1.5kg",
-        "https://product-image.kurly.com/cdn-cgi/image/quality=85,width=676/product/image/b573ba85-9bfa-433b-bafc-3356b081440b.jpg",
-        Price(13000)
-    )
-
-    private val mockCartProductUiModel = CartProductUiModel(
-        mockProduct.toPresentation(1), 1, true
-    )
 }

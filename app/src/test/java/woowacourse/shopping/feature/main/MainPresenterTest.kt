@@ -5,6 +5,7 @@ import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.PointRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import io.mockk.Runs
@@ -28,6 +29,7 @@ internal class MainPresenterTest {
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var productCache: ProductCache
     private lateinit var cartRepository: CartRepository
+    private lateinit var pointRepository: PointRepository
 
     @Before
     fun init() {
@@ -36,8 +38,15 @@ internal class MainPresenterTest {
         recentProductRepository = mockk()
         productCache = ProductCacheImpl
         cartRepository = mockk()
+        pointRepository = mockk(relaxed = true)
 
-        presenter = MainPresenter(view, productRepository, recentProductRepository, cartRepository)
+        presenter = MainPresenter(
+            view,
+            productRepository,
+            recentProductRepository,
+            cartRepository,
+            pointRepository
+        )
     }
 
     @Test
@@ -72,14 +81,17 @@ internal class MainPresenterTest {
 
     @Test
     fun `최근 본 상품 목록을 가져와서 화면에 띄운다`() {
-        every { recentProductRepository.getAll() } returns mockRecentProducts
+        every { recentProductRepository.getAll() } returns mockRecentProducts.map { it.product.id }
+        every { productRepository.getProductById(any()) } returns mockProducts[0]
         val slot = slot<List<RecentProductUiModel>>()
         every { view.updateRecent(capture(slot)) } just Runs
 
         presenter.loadRecent()
 
-        val actual = slot.captured.map { it.productUiModel.toDomain() }
-        val expected = mockRecentProducts.map { it.product }
+        val actual = slot.captured[0].productUiModel.toDomain()
+        val expected = mockRecentProducts[0].product
+        println(actual.toString())
+        println(expected.toString())
         assert(actual == expected)
         verify { view.updateRecent(any()) }
     }

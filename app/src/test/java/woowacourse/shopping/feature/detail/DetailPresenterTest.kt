@@ -22,7 +22,7 @@ internal class DetailPresenterTest {
     @Before
     fun init() {
         view = mockk(relaxed = true)
-        cartRepository = mockk()
+        cartRepository = mockk(relaxed = true)
         presenter = DetailPresenter(view, cartRepository, mockProduct)
     }
 
