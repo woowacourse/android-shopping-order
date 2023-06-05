@@ -4,6 +4,7 @@ import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
 import woowacourse.shopping.data.NetworkModule.orderService
 import woowacourse.shopping.data.datasource.getResult
+import woowacourse.shopping.data.datasource.getResultOnHeaders
 import woowacourse.shopping.data.datasource.request.OrderRequest
 import woowacourse.shopping.data.datasource.response.OrderEntity
 
@@ -18,13 +19,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         if (response.code() == 409) {
             return Result.failure(Throwable(STOCK_ERROR))
         }
-        return response.headers()[LOCATION]?.run {
-            Result.success(
-                this.split("/")
-                    .last()
-                    .toLong()
-            )
-        } ?: Result.failure(Throwable(FAILED_TO_ADD_ORDER))
+        return response.getResultOnHeaders(FAILED_TO_ADD_ORDER)
     }
 
     override fun getOrder(orderId: Int): Result<OrderEntity> {
@@ -49,6 +44,5 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
         private const val ORDER_INFO_ERROR = "주문에 대한 정보를 받아오지 못했습니다."
         private const val ORDERS_INFO_ERROR = "주문 목록에 대한 정보를 받아오지 못했습니다."
         private const val STOCK_ERROR = "상품 재고가 부족해 주문에 실패했습니다."
-        private const val LOCATION = "Location"
     }
 }

@@ -26,7 +26,9 @@ class BasketRepositoryImpl(
     ): CompletableFuture<Result<Int>> {
 
         return CompletableFuture.supplyAsync {
-            basketRemoteDataSource.add(product.toEntity())
+            basketRemoteDataSource.add(product.toEntity()).map { productId ->
+                productId.toInt()
+            }
         }
     }
 

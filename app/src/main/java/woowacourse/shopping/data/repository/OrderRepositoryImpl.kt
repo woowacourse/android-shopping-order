@@ -23,8 +23,8 @@ class OrderRepositoryImpl(
         )
 
         return CompletableFuture.supplyAsync {
-            orderRemoteDataSource.addOrder(orderRequest).mapCatching {
-                it.toInt()
+            orderRemoteDataSource.addOrder(orderRequest).mapCatching { orderId ->
+                orderId.toInt()
             }
         }
     }

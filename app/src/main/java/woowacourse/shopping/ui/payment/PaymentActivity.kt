@@ -109,10 +109,12 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun showErrorMessage(message: String) {
-        val intent = ShoppingActivity.getIntent(this)
+        runOnUiThread {
+            val intent = ShoppingActivity.getIntent(this)
 
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        startActivity(intent)
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            startActivity(intent)
+        }
     }
 
     private fun successToApplyPoint(price: Int) {
