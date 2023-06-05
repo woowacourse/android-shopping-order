@@ -21,13 +21,6 @@ class RecentProductListAdapter(
 
     override fun getItemViewType(position: Int): Int = ViewType.RECENT_PRODUCT.ordinal
 
-    fun addItems(newItems: List<RecentProductState>) {
-        val items = this.recentProductStates.toMutableList()
-        newItems.forEach { items.add(0, it) }
-        this.recentProductStates = items.toList()
-        notifyItemRangeInserted(recentProductStates.size, newItems.size)
-    }
-
     fun setItems(items: List<RecentProductState>) {
         this.recentProductStates = items.toList()
         notifyDataSetChanged()
