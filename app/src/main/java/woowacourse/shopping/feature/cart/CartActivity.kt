@@ -49,7 +49,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.pageNumberPlusTv.setOnClickListener { presenter.plusPageNumber() }
         binding.pageNumberMinusTv.setOnClickListener { presenter.minusPageNumber() }
         binding.allCheckBox.setOnCheckedChangeListener { _, _ -> presenter.pickAll() }
-        presenter.loadCart()
+        presenter.initContents()
         presenter.updatePickedCartProductCount()
         setOrderButtonClickListener()
     }

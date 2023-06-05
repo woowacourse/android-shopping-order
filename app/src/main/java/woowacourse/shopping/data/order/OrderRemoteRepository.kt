@@ -70,21 +70,19 @@ class OrderRemoteRepository(
         onSuccess: (orderId: Long) -> Unit,
         onFailure: () -> Unit
     ) {
-        retrofitOrderService.requestAddOrder(
-            request = OrderRequest(cartIds, finalPrice)
-        ).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                val resultOrderId: Long? =
-                    response.headers()["Location"]?.split("/")?.last()?.toLong()
-                if (400 <= response.code()) return onFailure()
-                if (resultOrderId == null) return onFailure()
-                onSuccess(resultOrderId)
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
-            }
-        })
+        retrofitOrderService.requestAddOrder(request = OrderRequest(cartIds, finalPrice))
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    val resultOrderId: Long? =
+                        response.headers()["Location"]?.split("/")?.last()?.toLong()
+                    if (400 <= response.code()) return onFailure()
+                    if (resultOrderId == null) return onFailure()
+                    onSuccess(resultOrderId)
+                }
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    onFailure()
+                }
+            })
     }
 
     override fun requestFetchOrderById(
