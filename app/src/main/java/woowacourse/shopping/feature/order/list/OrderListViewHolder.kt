@@ -23,17 +23,6 @@ class OrderListViewHolder(
     fun bind(orderPreview: OrderPreviewUiModel) {
         val context = this.itemView.context
         binding.orderPreview = orderPreview
-        binding.textOrderDate.text = orderPreview.toDateFormat()
-        if (orderPreview.extraProductCount == 0) {
-            binding.textProductName.text = orderPreview.mainName
-        } else {
-            binding.textProductName.text = context.getString(
-                R.string.order_main_product_name_more_than_one,
-                orderPreview.mainName,
-                orderPreview.extraProductCount,
-            )
-        }
-        binding.textOrderId.text = context.getString(R.string.order_id, orderPreview.orderId)
         binding.textPayPrice.text =
             context.getString(R.string.price_format, orderPreview.paymentAmount.toMoneyFormat())
     }
