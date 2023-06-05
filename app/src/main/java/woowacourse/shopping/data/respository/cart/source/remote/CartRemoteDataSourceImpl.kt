@@ -1,35 +1,21 @@
 package woowacourse.shopping.data.respository.cart.source.remote
 
 import android.util.Log
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.mapper.toModel
 import woowacourse.shopping.data.model.CartRemoteEntity
-import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.source.service.CartService
 import woowacouse.shopping.model.cart.CartProduct
 
 class CartRemoteDataSourceImpl(
-    url: Server.Url,
-    token: Server.Token,
+    private val cartService: CartService,
 ) : CartRemoteDataSource {
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(url.value)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
-        .create(CartService::class.java)
-
-    private val token = "Basic ${token.value}"
-
     override fun requestDatas(
         onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     ) {
-        retrofit.requestDatas(token).enqueue(object : retrofit2.Callback<List<CartRemoteEntity>> {
+        cartService.requestDatas().enqueue(object : retrofit2.Callback<List<CartRemoteEntity>> {
             override fun onResponse(
                 call: Call<List<CartRemoteEntity>>,
                 response: Response<List<CartRemoteEntity>>
@@ -54,7 +40,7 @@ class CartRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: () -> Unit,
     ) {
-        retrofit.requestPatchCartItem(token, cartProduct.id, cartProduct.count)
+        cartService.requestPatchCartItem(cartProduct.id, cartProduct.count)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.code() == 200) {
@@ -75,7 +61,7 @@ class CartRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit,
     ) {
-        retrofit.requestPostCartItem(token, productId)
+        cartService.requestPostCartItem(productId)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -100,7 +86,7 @@ class CartRemoteDataSourceImpl(
 
     override fun requestDeleteCartItem(cartId: Long) {
         val thread = Thread {
-            retrofit.requestDeleteCartItem(token, cartId).execute()
+            cartService.requestDeleteCartItem(cartId).execute()
         }
         thread.start()
         thread.join()

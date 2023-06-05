@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.RetrofitBuilder
 import woowacourse.shopping.data.respository.card.CardDAO
 import woowacourse.shopping.data.respository.card.CardRepositoryImpl
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
@@ -38,6 +39,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
 
+    private lateinit var retrofitBuilder: RetrofitBuilder
+
     private lateinit var presenter: OrderContract.Presenter
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -48,6 +51,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val cartIds = intent.getSerializableCompat<ArrayList<Long>>(KEY_CART_IDS) ?: return finish()
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setToolbar()
         setPresenter()
@@ -72,9 +76,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
-        val pointRemoteDataSource = PointRemoteDataSourceImpl(url, token)
-        val orderRemoteDataSource = OrderRemoteDataSourceImpl(url, token)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
+        val pointRemoteDataSource = PointRemoteDataSourceImpl(retrofitBuilder.createPointService())
+        val orderRemoteDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
 
         presenter = OrderPresenter(
             this,

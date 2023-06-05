@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.RetrofitBuilder
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
@@ -27,6 +28,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
+
+    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var cartAdapter: CartAdapter
 
@@ -57,6 +60,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setPresenter()
         setSupportActionBar()
@@ -70,7 +74,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(url, token)
+        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
         presenter = CartPresenter(
             this,
             CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSourceImpl),

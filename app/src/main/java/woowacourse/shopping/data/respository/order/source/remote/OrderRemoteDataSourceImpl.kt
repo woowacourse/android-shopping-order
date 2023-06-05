@@ -1,32 +1,18 @@
 package woowacourse.shopping.data.respository.order.source.remote
 
 import android.util.Log
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.mapper.toModel
 import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
-import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.service.OrderService
 import woowacouse.shopping.model.order.Order
 import woowacouse.shopping.model.order.OrderDetail
 
 class OrderRemoteDataSourceImpl(
-    url: Server.Url,
-    token: Server.Token
+    private val orderService: OrderService,
 ) : OrderRemoteDataSource {
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(url.value)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
-        .create(OrderService::class.java)
-
-    private val token = "Basic ${token.value}"
-
     override fun requestPostData(
         order: Order,
         onFailure: (message: String) -> Unit,
@@ -38,7 +24,7 @@ class OrderRemoteDataSourceImpl(
             order.card.cvc,
             order.usePoint.getPoint()
         )
-        retrofit.requestPostData(token, orderPostEntity).enqueue(object : retrofit2.Callback<Unit> {
+        orderService.requestPostData(orderPostEntity).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.code() == 201) {
                     val location = response.headers()["Location"] ?: return response.errorBody()
@@ -63,7 +49,7 @@ class OrderRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (OrderDetail) -> Unit
     ) {
-        retrofit.requestOrderItem(token, orderId)
+        orderService.requestOrderItem(orderId)
             .enqueue(object : retrofit2.Callback<OrderDetailEntity> {
                 override fun onResponse(
                     call: Call<OrderDetailEntity>,
@@ -88,7 +74,7 @@ class OrderRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (List<OrderDetail>) -> Unit
     ) {
-        retrofit.requestOrderList(token)
+        orderService.requestOrderList()
             .enqueue(object : retrofit2.Callback<List<OrderDetailEntity>> {
                 override fun onResponse(
                     call: Call<List<OrderDetailEntity>>,

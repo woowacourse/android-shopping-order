@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.RetrofitBuilder
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
@@ -38,6 +39,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
 
+    private lateinit var retrofitBuilder: RetrofitBuilder
+
     private lateinit var presenter: ProductDetailContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +52,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setPresenter()
         presenter.setProduct(productId)
@@ -72,9 +76,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(url)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofitBuilder.createProductService())
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
         presenter = ProductDetailPresenter(
             this,
             productRepository = ProductRepositoryImpl(productRemoteDataSource),

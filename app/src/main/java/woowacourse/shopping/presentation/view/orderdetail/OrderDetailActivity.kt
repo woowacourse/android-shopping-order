@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.RetrofitBuilder
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
@@ -24,6 +25,8 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
 
+    private lateinit var retrofitBuilder: RetrofitBuilder
+
     private lateinit var presenter: OrderDetailContract.Presenter
 
     private val orderId: Long by lazy {
@@ -37,6 +40,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         if (orderId == -1L) return finish()
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setToolbar()
         setPresenter()
@@ -59,7 +63,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun setPresenter() {
-        val orderDataSource = OrderRemoteDataSourceImpl(url, token)
+        val orderDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
         presenter = OrderDetailPresenter(
             this,
             orderRepository = OrderRepositoryImpl(orderDataSource)

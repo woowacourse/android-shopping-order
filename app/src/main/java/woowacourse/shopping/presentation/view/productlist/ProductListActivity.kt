@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.respository.RetrofitBuilder
 import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
@@ -41,6 +42,8 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
     private lateinit var url: Server.Url
     private lateinit var token: Server.Token
+
+    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var presenter: ProductContract.Presenter
 
@@ -105,6 +108,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
         token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
+        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         binding.rvProductList.itemAnimator = null
 
@@ -135,9 +139,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(url)
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofitBuilder.createProductService())
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(url, token)
         val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, url)
         presenter = ProductListPresenter(
             this,
