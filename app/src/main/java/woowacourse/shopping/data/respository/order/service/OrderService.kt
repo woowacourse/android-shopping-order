@@ -5,22 +5,22 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.model.OrderDetailEntity
-import woowacourse.shopping.data.model.OrderPostEntity
+import woowacourse.shopping.data.model.dto.request.OrderRequest
+import woowacourse.shopping.data.model.dto.response.OrderDetailResponse
 
 interface OrderService {
     @POST("/orders")
     fun requestPostData(
         @Body
-        order: OrderPostEntity,
+        order: OrderRequest,
     ): Call<Unit>
 
     @GET("/orders/{orderId}")
     fun requestOrderItem(
         @Path("orderId")
         orderId: Long,
-    ): Call<OrderDetailEntity>
+    ): Call<OrderDetailResponse>
 
     @GET("/orders")
-    fun requestOrderList(): Call<List<OrderDetailEntity>>
+    fun requestOrderList(): Call<List<OrderDetailResponse>>
 }

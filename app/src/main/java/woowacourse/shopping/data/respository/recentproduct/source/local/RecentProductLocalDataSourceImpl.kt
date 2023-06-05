@@ -7,8 +7,8 @@ import android.provider.BaseColumns
 import woowacourse.shopping.data.database.RecentProductContract
 import woowacourse.shopping.data.database.RecentProductHelper
 import woowacourse.shopping.data.database.getTableName
-import woowacourse.shopping.data.model.RecentProductEntity
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.model.entity.RecentProductEntity
 import java.time.LocalDateTime
 
 class RecentProductLocalDataSourceImpl(

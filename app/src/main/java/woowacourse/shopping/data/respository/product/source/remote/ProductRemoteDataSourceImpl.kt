@@ -2,7 +2,7 @@ package woowacourse.shopping.data.respository.product.source.remote
 
 import android.util.Log
 import woowacourse.shopping.data.mapper.toModel
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.dto.response.ProductResponse
 import woowacourse.shopping.data.respository.product.service.ProductService
 import woowacouse.shopping.model.product.Product
 
@@ -14,10 +14,10 @@ class ProductRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     ) {
-        productService.requestDatas().enqueue(object : retrofit2.Callback<List<ProductEntity>> {
+        productService.requestDatas().enqueue(object : retrofit2.Callback<List<ProductResponse>> {
             override fun onResponse(
-                call: retrofit2.Call<List<ProductEntity>>,
-                response: retrofit2.Response<List<ProductEntity>>
+                call: retrofit2.Call<List<ProductResponse>>,
+                response: retrofit2.Response<List<ProductResponse>>
             ) {
                 if (response.isSuccessful) {
                     response.body()?.let { products ->
@@ -28,7 +28,7 @@ class ProductRemoteDataSourceImpl(
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<List<ProductResponse>>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
                 onFailure(ERROR_CONNECT)
             }
@@ -40,10 +40,10 @@ class ProductRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (products: Product) -> Unit,
     ) {
-        productService.requestData(productId).enqueue(object : retrofit2.Callback<ProductEntity> {
+        productService.requestData(productId).enqueue(object : retrofit2.Callback<ProductResponse> {
             override fun onResponse(
-                call: retrofit2.Call<ProductEntity>,
-                response: retrofit2.Response<ProductEntity>
+                call: retrofit2.Call<ProductResponse>,
+                response: retrofit2.Response<ProductResponse>
             ) {
                 if (response.isSuccessful) {
                     response.body()?.let { product ->
@@ -54,7 +54,7 @@ class ProductRemoteDataSourceImpl(
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<ProductEntity>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<ProductResponse>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
                 onFailure(ERROR_CONNECT)
             }

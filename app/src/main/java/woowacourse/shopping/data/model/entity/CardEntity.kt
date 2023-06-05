@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.entity
 
 data class CardEntity(
     val id: Long,

@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.OrderDetailEntity
+import woowacourse.shopping.data.model.dto.response.OrderDetailResponse
 import woowacouse.shopping.model.order.OrderDetail
 
-fun OrderDetailEntity.toModel(): OrderDetail = OrderDetail(
+fun OrderDetailResponse.toModel(): OrderDetail = OrderDetail(
     id,
     usedPoint,
     savedPoint,

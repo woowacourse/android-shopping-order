@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.dto.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrderDetailEntity(
+data class OrderDetailResponse(
     val id: Long,
     val usedPoint: Int,
     val savedPoint: Int,
     val orderedAt: String,
-    val products: List<CartRemoteEntity>,
+    val products: List<CartResponse>,
 )

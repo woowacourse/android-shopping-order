@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.respository.card
 
-import woowacourse.shopping.data.model.CardEntity
+import woowacourse.shopping.data.model.entity.CardEntity
 
 object CardDAO {
     private val cards = listOf(

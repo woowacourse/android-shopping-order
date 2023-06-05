@@ -7,8 +7,8 @@ import woowacourse.shopping.data.database.CartContract
 import woowacourse.shopping.data.database.CartHelper
 import woowacourse.shopping.data.database.getTableName
 import woowacourse.shopping.data.mapper.toModel
-import woowacourse.shopping.data.model.CartLocalEntity
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.model.entity.CartLocalEntity
 import woowacouse.shopping.model.cart.CartProduct
 
 class CartLocalDataSourceImpl(

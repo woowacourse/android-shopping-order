@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.PointEntity
-import woowacourse.shopping.data.model.SavingPointEntity
+import woowacourse.shopping.data.model.dto.response.PointResponse
+import woowacourse.shopping.data.model.dto.response.SavingPointResponse
 import woowacouse.shopping.model.point.Point
 
-fun PointEntity.toModel(): Point = Point(point)
+fun PointResponse.toModel(): Point = Point(point)
 
-fun SavingPointEntity.toModel(): Point = Point(savingPoint)
+fun SavingPointResponse.toModel(): Point = Point(savingPoint)

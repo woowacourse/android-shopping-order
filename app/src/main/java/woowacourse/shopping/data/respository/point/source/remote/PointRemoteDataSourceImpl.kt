@@ -4,8 +4,8 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.data.mapper.toModel
-import woowacourse.shopping.data.model.PointEntity
-import woowacourse.shopping.data.model.SavingPointEntity
+import woowacourse.shopping.data.model.dto.response.PointResponse
+import woowacourse.shopping.data.model.dto.response.SavingPointResponse
 import woowacourse.shopping.data.respository.point.service.PointService
 import woowacouse.shopping.model.point.Point
 
@@ -16,8 +16,8 @@ class PointRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (Point) -> Unit
     ) {
-        pointService.requestPoint().enqueue(object : retrofit2.Callback<PointEntity> {
-            override fun onResponse(call: Call<PointEntity>, response: Response<PointEntity>) {
+        pointService.requestPoint().enqueue(object : retrofit2.Callback<PointResponse> {
+            override fun onResponse(call: Call<PointResponse>, response: Response<PointResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.let { onSuccess(it.toModel()) } ?: response.errorBody()?.let { onFailure(it.string()) }
                     return
@@ -25,7 +25,7 @@ class PointRemoteDataSourceImpl(
                 response.errorBody()?.let { onFailure(it.string()) }
             }
 
-            override fun onFailure(call: Call<PointEntity>, t: Throwable) {
+            override fun onFailure(call: Call<PointResponse>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
                 onFailure(ERROR_CONNECT)
             }
@@ -38,10 +38,10 @@ class PointRemoteDataSourceImpl(
         onSuccess: (Point) -> Unit
     ) {
         pointService.requestPredictionSavePoint(orderPrice)
-            .enqueue(object : retrofit2.Callback<SavingPointEntity> {
+            .enqueue(object : retrofit2.Callback<SavingPointResponse> {
                 override fun onResponse(
-                    call: Call<SavingPointEntity>,
-                    response: Response<SavingPointEntity>
+                    call: Call<SavingPointResponse>,
+                    response: Response<SavingPointResponse>
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let {
@@ -52,7 +52,7 @@ class PointRemoteDataSourceImpl(
                     response.errorBody()?.let { onFailure(it.string()) }
                 }
 
-                override fun onFailure(call: Call<SavingPointEntity>, t: Throwable) {
+                override fun onFailure(call: Call<SavingPointResponse>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
                     onFailure(ERROR_CONNECT)
                 }

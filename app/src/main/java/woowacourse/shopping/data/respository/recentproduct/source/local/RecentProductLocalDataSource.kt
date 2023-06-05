@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.respository.recentproduct.source.local
 
-import woowacourse.shopping.data.model.RecentProductEntity
+import woowacourse.shopping.data.model.entity.RecentProductEntity
 
 interface RecentProductLocalDataSource {
     fun insertRecentProduct(productId: Long)

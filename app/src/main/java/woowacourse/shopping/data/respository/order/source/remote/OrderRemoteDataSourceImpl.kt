@@ -4,8 +4,8 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.data.mapper.toModel
-import woowacourse.shopping.data.model.OrderDetailEntity
-import woowacourse.shopping.data.model.OrderPostEntity
+import woowacourse.shopping.data.model.dto.request.OrderRequest
+import woowacourse.shopping.data.model.dto.response.OrderDetailResponse
 import woowacourse.shopping.data.respository.order.service.OrderService
 import woowacouse.shopping.model.order.Order
 import woowacouse.shopping.model.order.OrderDetail
@@ -18,13 +18,13 @@ class OrderRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (Long) -> Unit
     ) {
-        val orderPostEntity = OrderPostEntity(
+        val orderRequest = OrderRequest(
             order.cartIds,
             order.getCardNumber(),
             order.card.cvc,
             order.usePoint.getPoint()
         )
-        orderService.requestPostData(orderPostEntity).enqueue(object : retrofit2.Callback<Unit> {
+        orderService.requestPostData(orderRequest).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.code() == 201) {
                     val location = response.headers()["Location"] ?: return response.errorBody()
@@ -51,10 +51,10 @@ class OrderRemoteDataSourceImpl(
         onSuccess: (OrderDetail) -> Unit
     ) {
         orderService.requestOrderItem(orderId)
-            .enqueue(object : retrofit2.Callback<OrderDetailEntity> {
+            .enqueue(object : retrofit2.Callback<OrderDetailResponse> {
                 override fun onResponse(
-                    call: Call<OrderDetailEntity>,
-                    response: Response<OrderDetailEntity>
+                    call: Call<OrderDetailResponse>,
+                    response: Response<OrderDetailResponse>
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let {
@@ -65,7 +65,7 @@ class OrderRemoteDataSourceImpl(
                     response.errorBody()?.let { onFailure(it.string()) }
                 }
 
-                override fun onFailure(call: Call<OrderDetailEntity>, t: Throwable) {
+                override fun onFailure(call: Call<OrderDetailResponse>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
                     onFailure(ERROR_CONNECT)
                 }
@@ -77,10 +77,10 @@ class OrderRemoteDataSourceImpl(
         onSuccess: (List<OrderDetail>) -> Unit
     ) {
         orderService.requestOrderList()
-            .enqueue(object : retrofit2.Callback<List<OrderDetailEntity>> {
+            .enqueue(object : retrofit2.Callback<List<OrderDetailResponse>> {
                 override fun onResponse(
-                    call: Call<List<OrderDetailEntity>>,
-                    response: Response<List<OrderDetailEntity>>
+                    call: Call<List<OrderDetailResponse>>,
+                    response: Response<List<OrderDetailResponse>>
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { orders ->
@@ -91,7 +91,7 @@ class OrderRemoteDataSourceImpl(
                     response.errorBody()?.let { onFailure(it.string()) }
                 }
 
-                override fun onFailure(call: Call<List<OrderDetailEntity>>, t: Throwable) {
+                override fun onFailure(call: Call<List<OrderDetailResponse>>, t: Throwable) {
                     Log.e("Request Failed", t.toString())
                     onFailure(ERROR_CONNECT)
                 }

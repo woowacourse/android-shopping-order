@@ -4,7 +4,7 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.data.mapper.toModel
-import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.model.dto.response.CartResponse
 import woowacourse.shopping.data.respository.cart.source.service.CartService
 import woowacouse.shopping.model.cart.CartProduct
 
@@ -15,10 +15,10 @@ class CartRemoteDataSourceImpl(
         onFailure: (message: String) -> Unit,
         onSuccess: (products: List<CartProduct>) -> Unit,
     ) {
-        cartService.requestDatas().enqueue(object : retrofit2.Callback<List<CartRemoteEntity>> {
+        cartService.requestDatas().enqueue(object : retrofit2.Callback<List<CartResponse>> {
             override fun onResponse(
-                call: Call<List<CartRemoteEntity>>,
-                response: Response<List<CartRemoteEntity>>
+                call: Call<List<CartResponse>>,
+                response: Response<List<CartResponse>>
             ) {
                 if (response.isSuccessful) {
                     response.body()?.let { carts ->
@@ -29,7 +29,7 @@ class CartRemoteDataSourceImpl(
                 response.errorBody()?.let { onFailure(it.string()) }
             }
 
-            override fun onFailure(call: Call<List<CartRemoteEntity>>, t: Throwable) {
+            override fun onFailure(call: Call<List<CartResponse>>, t: Throwable) {
                 Log.e("Request Failed", t.toString())
                 onFailure(ERROR_CONNECT)
             }

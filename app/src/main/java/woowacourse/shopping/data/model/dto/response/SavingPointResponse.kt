@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.dto.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SavingPointEntity(
+data class SavingPointResponse(
     val savingPoint: Int,
 )

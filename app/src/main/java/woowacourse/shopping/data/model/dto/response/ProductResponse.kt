@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.dto.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductEntity(
+data class ProductResponse(
     val id: Long,
     val name: String,
     val price: Int,
