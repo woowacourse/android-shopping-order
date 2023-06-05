@@ -11,11 +11,7 @@ interface OrderRepository {
         totalPrice: Int,
     ): CompletableFuture<Result<Int>>
 
-    fun getOrder(
-        orderId: Int,
-        onReceived: (order: Order) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun getOrder(orderId: Int): CompletableFuture<Result<Order>>
 
     fun getOrders(
         onReceived: (orders: List<Order>) -> Unit,

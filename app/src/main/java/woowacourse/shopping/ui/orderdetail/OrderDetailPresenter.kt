@@ -13,15 +13,14 @@ class OrderDetailPresenter(
 
     override fun getOrder() {
         if (orderId != -1) {
-            orderRepository.getOrder(
-                orderId = orderId,
-                onReceived = { order ->
-                    view.initView(order.toUiModel())
-                },
-                onFailed = { errorMessage ->
-                    view.showErrorMessage(errorMessage)
+            orderRepository.getOrder(orderId)
+                .thenAccept { order ->
+                    view.initView(order.getOrThrow().toUiModel())
                 }
-            )
+                .exceptionally { error ->
+                    error.message?.let { view.showErrorMessage(it) }
+                    null
+                }
         }
         order?.let {
             view.initView(it)
