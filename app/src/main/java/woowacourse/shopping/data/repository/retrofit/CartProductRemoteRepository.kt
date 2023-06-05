@@ -83,12 +83,14 @@ class CartProductRemoteRepository : CartRepository {
     override fun increaseProductCountByProductId(
         productId: ProductId,
         addCount: ProductCount,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
     ) {
         findCartProductByProductId(
             productId = productId,
             onSuccess = { cartProduct ->
                 val updatedCount = cartProduct.selectedCount + addCount
-                updateProductCountById(cartProduct.id, updatedCount, {}, {})
+                updateProductCountById(cartProduct.id, updatedCount, onSuccess, onFailure)
             },
             onFailure = {
                 addCartProductByProductId(
@@ -100,11 +102,11 @@ class CartProductRemoteRepository : CartRepository {
                                 updateProductCountById(
                                     newCartProduct.id,
                                     addCount,
-                                    onSuccess = {},
-                                    onFailure = {},
+                                    onSuccess = onSuccess,
+                                    onFailure = onFailure,
                                 )
                             },
-                            onFailure = {},
+                            onFailure = onFailure,
                         )
                     },
                     onFailure = {},

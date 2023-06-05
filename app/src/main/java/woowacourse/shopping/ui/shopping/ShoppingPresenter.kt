@@ -92,8 +92,12 @@ class ShoppingPresenter(
     }
 
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
-        cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        loadProducts(currentPage)
+        cartRepository.increaseProductCountByProductId(
+            product.id,
+            ProductCount(addCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailure = {},
+        )
     }
 
     private fun loadProducts(page: Page) {

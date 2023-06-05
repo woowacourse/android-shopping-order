@@ -47,7 +47,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         service.findCartProductByProductId(productId)?.toDomain()
     }
 
-    override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount) {
+    override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount, onSuccess: () -> Unit, onFailure: () -> Unit) {
 //        val cartProduct = findCartProductByProductId(productId) ?: run {
 //            addCartProductByProductId(productId)
 //            val newCartProduct = findCartProductByProductId(productId) ?: return

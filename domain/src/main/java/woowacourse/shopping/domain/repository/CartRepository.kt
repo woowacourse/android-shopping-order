@@ -37,5 +37,7 @@ interface CartRepository {
     fun increaseProductCountByProductId(
         productId: ProductId,
         addCount: ProductCount,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
     )
 }
