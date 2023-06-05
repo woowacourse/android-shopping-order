@@ -11,12 +11,8 @@ class OrderPresenter(
 ) : OrderContract.Presenter {
     override fun fetchCoupons() {
         orderRepository.getCoupons(
-            onSuccess = {
-                view.setCoupons(it)
-            },
-            onFailure = {
-                Log.d("ERROR_OrderPresenter", it.toString())
-            },
+            onSuccess = { view.setCoupons(it) },
+            onFailure = { Log.d("ERROR_OrderPresenter", it.toString()) },
         )
     }
 
@@ -34,7 +30,11 @@ class OrderPresenter(
             return
         }
 
-        val isSelected = selectedCoupon - 1
-        view.setTotal()
+        orderRepository.getAppliedPrice(
+            totalPrice = cartItems.totalPrice,
+            couponId = selectedCoupon,
+            onSuccess = { view.setTotal(it.finalPrice) },
+            onFailure = { Log.d("ERROR_OrderPresenter", it.toString()) },
+        )
     }
 }

@@ -1,10 +1,18 @@
 package woowacourse.shopping.mapper
 
 import com.example.domain.model.Coupon
-import woowacourse.shopping.data.remote.response.OrderResponseDto
+import com.example.domain.model.TotalPrice
+import woowacourse.shopping.data.remote.response.AppliedTotalResponseDto
+import woowacourse.shopping.data.remote.response.CouponsResponseDto
 
-fun OrderResponseDto.toDomain(): Coupon =
+fun CouponsResponseDto.toDomain(): Coupon =
     Coupon(
         id = this.id,
         name = this.name,
+    )
+
+fun AppliedTotalResponseDto.toDomain(): TotalPrice =
+    TotalPrice(
+        discountPrice = this.discountPrice,
+        finalPrice = this.totalPrice,
     )

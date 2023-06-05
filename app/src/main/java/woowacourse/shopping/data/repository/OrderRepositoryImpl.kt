@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import com.example.domain.model.Coupon
+import com.example.domain.model.TotalPrice
 import com.example.domain.repository.OrderRepository
 import com.example.domain.util.CustomResult
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSource
@@ -22,4 +23,19 @@ class OrderRepositoryImpl(
     }
 
     override fun postOrder() {}
+    override fun getAppliedPrice(
+        totalPrice: Int,
+        couponId: Int,
+        onSuccess: (TotalPrice) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    ) {
+        orderDataSource.getAppliedPrice(
+            totalPrice,
+            couponId,
+            onSuccess = { appliedTotalResponseDto ->
+                onSuccess.invoke(appliedTotalResponseDto.toDomain())
+            },
+            onFailure = { onFailure.invoke(it) },
+        )
+    }
 }

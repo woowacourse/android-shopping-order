@@ -25,7 +25,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
     private val presenter: OrderContract.Presenter by lazy { initPresenter() }
     private lateinit var orderAdapter: OrderAdapter
-    private val cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
+    private lateinit var cartItems: CartItemsUIModel
 
     private fun initPresenter() =
         OrderPresenter(
@@ -43,6 +43,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding = ActivityOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
         initView(cartItems)
     }
 
@@ -77,7 +78,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.d("123123", "456456")
+                Log.d("onNothingSelected", "onNothingSelected")
             }
         }
 
