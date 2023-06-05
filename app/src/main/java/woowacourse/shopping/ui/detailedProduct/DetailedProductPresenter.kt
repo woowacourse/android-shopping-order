@@ -22,12 +22,9 @@ class DetailedProductPresenter(
     private var lastProduct: ProductUIModel? = null
 
     init {
-        CompletableFuture.supplyAsync {
-            productRepository.findById(productId)
-        }.thenAccept { result ->
-            result.onSuccess { product -> this.product = product.toUIModel() }
-                .onFailure { exception -> LogUtil.logError(exception) }
-        }
+        CompletableFuture.supplyAsync { productRepository.findById(productId) }.get()
+            .onSuccess { product -> this.product = product.toUIModel() }
+            .onFailure { exception -> LogUtil.logError(exception) }
     }
 
     override fun setUpLastProduct() {
@@ -60,9 +57,8 @@ class DetailedProductPresenter(
     }
 
     override fun addProductToRecent() {
-        recentRepository.findById(product.id)?.let {
-            recentRepository.delete(it.id)
-        }
+        recentRepository.findById(product.id)
+            ?.let { recentRepository.delete(it.id) }
         recentRepository.insert(product.toDomain())
     }
 
