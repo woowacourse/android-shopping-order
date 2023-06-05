@@ -51,7 +51,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
         cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
         initView(cartItems)
-        binding.tvOrderTotalBtn.setOnClickListener { startActivity(OrderCompleteActivity.from(this)) }
+        binding.tvOrderTotalBtn.setOnClickListener {
+            val orderItems = cartItems.cartProducts.map { it.id.toInt() }
+            presenter.postOrder(orderItems)
+        }
     }
 
     private fun initView(cartItems: CartItemsUIModel) {
@@ -97,6 +100,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     override fun setTotal(totalPrice: Int) {
         binding.tvOrderTotalBtn.text =
             String.format(getString(R.string.product_price), totalPrice)
+    }
+
+    override fun fetchOrderId(orderId: Int) {
+        startActivity(OrderCompleteActivity.from(this, orderId))
+        finish()
     }
 
     companion object {

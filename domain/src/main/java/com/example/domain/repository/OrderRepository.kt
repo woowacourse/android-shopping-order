@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
 import com.example.domain.model.Coupon
-import com.example.domain.model.Receipt
+import com.example.domain.model.OrderNumber
 import com.example.domain.model.TotalPrice
 import com.example.domain.util.CustomResult
 
@@ -11,7 +11,19 @@ interface OrderRepository {
         onFailure: (CustomResult<Error>) -> Unit,
     )
 
-    fun postOrder()
+    fun postOrderWithCoupon(
+        cartItemIds: List<Int>,
+        couponId: Int,
+        onSuccess: (OrderNumber) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    )
+
+    fun postOrderWithoutCoupon(
+        cartItemIds: List<Int>,
+        onSuccess: (OrderNumber) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    )
+
     fun getAppliedPrice(
         totalPrice: Int,
         couponId: Int,
@@ -20,7 +32,7 @@ interface OrderRepository {
     )
 
     fun getReceipt(
-        onSuccess: (Receipt) -> Unit,
+        onSuccess: (OrderNumber) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     )
 }

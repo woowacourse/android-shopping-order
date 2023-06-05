@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.model.Receipt
+import com.example.domain.model.OrderNumber
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
@@ -42,12 +42,15 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
     }
 
     companion object {
-        fun from(context: Context): Intent {
-            return Intent(context, OrderCompleteActivity::class.java)
+        private const val ORDER_ID = "ORDER_ID"
+        fun from(context: Context, orderId: Int): Intent {
+            return Intent(context, OrderCompleteActivity::class.java).apply {
+                putExtra(ORDER_ID, orderId)
+            }
         }
     }
 
-    override fun setReceipt(receipt: Receipt) {
+    override fun setReceipt(orderNumber: OrderNumber) {
         TODO("Not yet implemented")
     }
 }

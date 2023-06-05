@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import com.example.domain.model.Coupon
-import com.example.domain.model.Receipt
+import com.example.domain.model.OrderNumber
 import com.example.domain.model.TotalPrice
 import com.example.domain.repository.OrderRepository
 import com.example.domain.util.CustomResult
@@ -25,7 +25,32 @@ class OrderRepositoryImpl(
         )
     }
 
-    override fun postOrder() {}
+    override fun postOrderWithCoupon(
+        cartItemIds: List<Int>,
+        couponId: Int,
+        onSuccess: (OrderNumber) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    ) {
+        orderDataSource.postOrderWithCoupon(
+            cartItemIds,
+            couponId,
+            onSuccess = { onSuccess.invoke(OrderNumber(id = it.id)) },
+            onFailure = { onFailure.invoke(it) },
+        )
+    }
+
+    override fun postOrderWithoutCoupon(
+        cartItemIds: List<Int>,
+        onSuccess: (OrderNumber) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    ) {
+        orderDataSource.postOrderWithoutCoupon(
+            cartItemIds,
+            onSuccess = { onSuccess.invoke(OrderNumber(id = it.id)) },
+            onFailure = { onFailure.invoke(it) },
+        )
+    }
+
     override fun getAppliedPrice(
         totalPrice: Int,
         couponId: Int,
@@ -43,12 +68,12 @@ class OrderRepositoryImpl(
     }
 
     override fun getReceipt(
-        onSuccess: (Receipt) -> Unit,
+        onSuccess: (OrderNumber) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     ) {
         orderCompleteDataSource.getReceipt(
             onSuccess = { orderCompleteResponseDto ->
-                onSuccess.invoke(orderCompleteResponseDto.toDomain())
+                // onSuccess.invoke(orderCompleteResponseDto.toDomain())
             },
             onFailure = { onFailure.invoke(it) },
         )

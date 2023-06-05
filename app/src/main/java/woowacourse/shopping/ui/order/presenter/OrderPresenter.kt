@@ -9,6 +9,7 @@ class OrderPresenter(
     private val view: OrderContract.View,
     private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
+    private var coupon: Int = NOTHING
     override fun fetchCoupons() {
         orderRepository.getCoupons(
             onSuccess = { view.setCoupons(it) },
@@ -16,8 +17,22 @@ class OrderPresenter(
         )
     }
 
-    override fun postOrder() {
-        TODO("Not yet implemented")
+    override fun postOrder(orderItems: List<Int>) {
+        if (coupon == NOTHING) {
+            orderRepository.postOrderWithoutCoupon(
+                orderItems,
+                onSuccess = { view.fetchOrderId(it.id) },
+                onFailure = { Log.d("ERROR_OrderPresenter", it.toString()) },
+            )
+            return
+        }
+
+        orderRepository.postOrderWithCoupon(
+            orderItems,
+            coupon,
+            onSuccess = { view.fetchOrderId(it.id) },
+            onFailure = { Log.d("ERROR_OrderPresenter", it.toString()) },
+        )
     }
 
     override fun calculateTotal(
@@ -25,10 +40,12 @@ class OrderPresenter(
         coupons: List<Coupon>,
         cartItems: CartItemsUIModel,
     ) {
-        if (selectedCoupon == 0) {
+        if (selectedCoupon == NOTHING) {
             view.setTotal(cartItems.totalPrice)
             return
         }
+
+        coupon = selectedCoupon
 
         orderRepository.getAppliedPrice(
             totalPrice = cartItems.totalPrice,
@@ -36,5 +53,9 @@ class OrderPresenter(
             onSuccess = { view.setTotal(it.finalPrice) },
             onFailure = { Log.d("ERROR_OrderPresenter", it.toString()) },
         )
+    }
+
+    companion object {
+        private const val NOTHING = 0
     }
 }
