@@ -9,7 +9,7 @@ class RecentProducts(val values: List<RecentProduct> = listOf()) {
         return values.firstOrNull()?.product
     }
 
-    private fun <T> Iterable<T>.secondOrNull(predicate: ((T) -> Boolean)? = null): T? {
+    private fun List<RecentProduct>.secondOrNull(predicate: ((RecentProduct) -> Boolean)? = null): RecentProduct? {
         var count = 0
         for (element in this) {
             if (predicate == null || predicate(element)) {
