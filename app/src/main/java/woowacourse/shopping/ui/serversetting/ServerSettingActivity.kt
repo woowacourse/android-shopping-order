@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.remote.RetrofitModule
+import woowacourse.shopping.data.httpclient.RetrofitModule
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.setThrottleFirstOnClickListener
 

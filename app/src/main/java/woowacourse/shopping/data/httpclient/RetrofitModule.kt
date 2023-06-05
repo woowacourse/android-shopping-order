@@ -1,13 +1,13 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.httpclient
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.remote.service.BasketService
-import woowacourse.shopping.data.remote.service.OrderService
-import woowacourse.shopping.data.remote.service.ProductService
-import woowacourse.shopping.data.remote.service.UserPointInfoService
+import woowacourse.shopping.data.httpclient.service.BasketService
+import woowacourse.shopping.data.httpclient.service.OrderService
+import woowacourse.shopping.data.httpclient.service.ProductService
+import woowacourse.shopping.data.httpclient.service.UserPointInfoService
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 

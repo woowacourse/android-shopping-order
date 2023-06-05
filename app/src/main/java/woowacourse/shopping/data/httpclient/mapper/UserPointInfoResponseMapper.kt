@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.remote.mapper
+package woowacourse.shopping.data.httpclient.mapper
 
+import woowacourse.shopping.data.httpclient.response.UserPointInfoResponse
 import woowacourse.shopping.data.model.DataEarnRate
 import woowacourse.shopping.data.model.DataPoint
 import woowacourse.shopping.data.model.DataUserPointInfo
-import woowacourse.shopping.data.remote.response.UserPointInfoResponse
 
 fun UserPointInfoResponse.toDataModel(): DataUserPointInfo =
     DataUserPointInfo(

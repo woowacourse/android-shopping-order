@@ -5,10 +5,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.userpointdata.UserPointInfoDataSource
+import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.data.httpclient.mapper.toDataModel
+import woowacourse.shopping.data.httpclient.response.UserPointInfoResponse
 import woowacourse.shopping.data.model.DataUserPointInfo
-import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.mapper.toDataModel
-import woowacourse.shopping.data.remote.response.UserPointInfoResponse
 
 class RemoteUserPointInfoDataSource : UserPointInfoDataSource.Remote {
     override fun getUserPointInfo(onReceived: (DataUserPointInfo) -> Unit) {

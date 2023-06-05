@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.remote.response.order.addorder
+package woowacourse.shopping.data.httpclient.response.order.addorder
 
-import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorCode.LACK_OF_POINT
-import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorCode.SHORTAGE_STOCK
+import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderErrorCode.LACK_OF_POINT
+import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderErrorCode.SHORTAGE_STOCK
 import woowacourse.shopping.domain.exception.AddOrderException.LackOfPointException
 import woowacourse.shopping.domain.exception.AddOrderException.ShortageStockException
 

@@ -4,11 +4,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.basket.BasketDataSource
+import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.data.httpclient.request.BasketAddRequest
+import woowacourse.shopping.data.httpclient.request.BasketUpdateRequest
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.request.BasketAddRequest
-import woowacourse.shopping.data.remote.request.BasketUpdateRequest
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {

@@ -4,8 +4,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.product.ProductDataSource
+import woowacourse.shopping.data.httpclient.RetrofitModule
 import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.remote.RetrofitModule
 import java.lang.Integer.min
 
 class RemoteProductDataSource() : ProductDataSource.Remote {

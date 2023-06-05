@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.remote.service
+package woowacourse.shopping.data.httpclient.service
 
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.remote.request.AddOrderRequest
-import woowacourse.shopping.data.remote.response.order.Individualorder.IndividualOrderResponse
+import woowacourse.shopping.data.httpclient.request.AddOrderRequest
+import woowacourse.shopping.data.httpclient.response.order.Individualorder.IndividualOrderResponse
 
 interface OrderService {
     @POST("/orders")

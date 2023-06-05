@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.response.order.addorder
+package woowacourse.shopping.data.httpclient.response.order.addorder
 
 enum class AddOrderErrorCode(val numberCode: Int) {
     SHORTAGE_STOCK(1), LACK_OF_POINT(2);

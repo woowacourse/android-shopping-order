@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.response
+package woowacourse.shopping.data.httpclient.response
 
 import com.google.gson.annotations.SerializedName
 

@@ -4,13 +4,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.order.OrderDataSource
+import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.data.httpclient.mapper.toData
+import woowacourse.shopping.data.httpclient.request.AddOrderRequest
+import woowacourse.shopping.data.httpclient.response.order.Individualorder.IndividualOrderResponse
+import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderErrorBody
+import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderFailureException
 import woowacourse.shopping.data.model.DataOrder
-import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.mapper.toData
-import woowacourse.shopping.data.remote.request.AddOrderRequest
-import woowacourse.shopping.data.remote.response.order.Individualorder.IndividualOrderResponse
-import woowacourse.shopping.data.remote.response.order.addorder.AddOrderErrorBody
-import woowacourse.shopping.data.remote.response.order.addorder.AddOrderFailureException
 
 class RemoteOrderDataSource : OrderDataSource.Remote {
     override fun addOrder(
