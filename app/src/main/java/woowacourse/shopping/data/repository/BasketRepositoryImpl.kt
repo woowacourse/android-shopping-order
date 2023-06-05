@@ -28,16 +28,10 @@ class BasketRepositoryImpl(
         }
     }
 
-    override fun update(
-        basketProduct: BasketProduct,
-        onUpdated: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketRemoteDataSource.update(
-            basketProduct = basketProduct.toEntity(),
-            onUpdated = onUpdated,
-            onFailed = onFailed
-        )
+    override fun update(basketProduct: BasketProduct): CompletableFuture<Result<Unit>> {
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.update(basketProduct.toEntity())
+        }
     }
 
     override fun remove(

@@ -65,14 +65,14 @@ class BasketPresenter(
                 ?: throw IllegalStateException(
                     NOT_EXIST_PRODUCT_ERROR
                 ),
-            onUpdated = {
-                basket = basket.plus(BasketProduct(count = Count(1), product = product))
-                updateBasketProductViewData()
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.plus(BasketProduct(count = Count(1), product = product))
+            updateBasketProductViewData()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun minusBasketProductCount(product: Product) {
@@ -81,14 +81,14 @@ class BasketPresenter(
                 ?: throw IllegalStateException(
                     NOT_EXIST_PRODUCT_ERROR
                 ),
-            onUpdated = {
-                basket = basket.minus(BasketProduct(count = Count(1), product = product))
-                updateBasketProductViewData()
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.minus(BasketProduct(count = Count(1), product = product))
+            updateBasketProductViewData()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun updateBasketProducts() {

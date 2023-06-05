@@ -1,9 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
-import io.mockk.invoke
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -154,8 +152,6 @@ class ShoppingPresenterTest {
         verify {
             basketRepository.update(
                 basketProduct = basketProducts.find { it.product.id == products.first().id }!!,
-                any(),
-                any()
             )
         }
     }
@@ -207,9 +203,7 @@ class ShoppingPresenterTest {
         verify { view.updateTotalBasketCount(basketProducts.sumOf { it.count.value }) }
         verify {
             basketRepository.update(
-                basketProducts.find { it.product.id == products.first().id }!!,
-                any(),
-                any()
+                basketProduct = basketProducts.find { it.product.id == products.first().id }!!,
             )
         }
     }
@@ -220,7 +214,6 @@ class ShoppingPresenterTest {
         val products = ProductFixture.createProducts()
         val basketProducts = BasketProductFixture.createBasketProducts()
         val basketProduct = basketProducts.find { it.product.id == products.first().id }
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "물품의 개수 감소시키는 것을 실패했습니다"
 
         setUpBasket(
@@ -230,18 +223,14 @@ class ShoppingPresenterTest {
         every {
             basketRepository.update(
                 basketProduct = basketProduct!!,
-                onUpdated = any(),
-                onFailed = capture(slotShowErrorMessage)
             )
-        } answers {
-            slotShowErrorMessage.invoke(errorMessage)
-        }
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when
         presenter.minusBasketProductCount(products.first())
 
         // then
-        verify { view.showErrorMessage(errorMessage) }
+        verify { view.showErrorMessage(any()) }
     }
 
     @Test

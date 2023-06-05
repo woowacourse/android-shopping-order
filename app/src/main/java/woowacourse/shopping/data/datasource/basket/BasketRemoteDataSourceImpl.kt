@@ -28,60 +28,43 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         } ?: Result.failure(Throwable(FAILED_TO_ADD_BASKET))
 
         return result
-//        basketProductService.addBasketProduct(
+    }
+
+    override fun update(basketProduct: BasketProductEntity): Result<Unit> {
+        val response = basketProductService.updateBasketProduct(
+            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
+            cartItemId = basketProduct.id.toString(),
+            quantity = basketProduct.count
+        ).execute()
+
+        if (response.isSuccessful) {
+            return Result.success(Unit)
+        }
+        return Result.failure(Throwable(FAILED_TO_UPDATE_COUNT))
+//        basketProductService.updateBasketProduct(
 //            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
-//            productId = product.id
+//            cartItemId = basketProduct.id.toString(),
+//            quantity = basketProduct.count
 //        ).enqueue(object : retrofit2.Callback<Unit> {
 //
 //            override fun onResponse(
 //                call: retrofit2.Call<Unit>,
 //                response: retrofit2.Response<Unit>,
 //            ) {
-//                response.headers()[LOCATION]?.let {
-//                    val productId = it.split("/").last().toInt()
-//
-//                    onAdded(productId)
-//                } ?: onFailed(FAILED_TO_ADD_BASKET)
+//                if (response.isSuccessful) {
+//                    onUpdated()
+//                } else {
+//                    onFailed(FAILED_TO_UPDATE_COUNT)
+//                }
 //            }
 //
 //            override fun onFailure(
 //                call: retrofit2.Call<Unit>,
 //                t: Throwable,
 //            ) {
-//                onFailed(FAILED_TO_ADD_BASKET)
+//                onFailed(FAILED_TO_UPDATE_COUNT)
 //            }
 //        })
-    }
-
-    override fun update(
-        basketProduct: BasketProductEntity,
-        onUpdated: () -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketProductService.updateBasketProduct(
-            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
-            cartItemId = basketProduct.id.toString(),
-            quantity = basketProduct.count
-        ).enqueue(object : retrofit2.Callback<Unit> {
-
-            override fun onResponse(
-                call: retrofit2.Call<Unit>,
-                response: retrofit2.Response<Unit>,
-            ) {
-                if (response.isSuccessful) {
-                    onUpdated()
-                } else {
-                    onFailed(FAILED_TO_UPDATE_COUNT)
-                }
-            }
-
-            override fun onFailure(
-                call: retrofit2.Call<Unit>,
-                t: Throwable,
-            ) {
-                onFailed(FAILED_TO_UPDATE_COUNT)
-            }
-        })
     }
 
     override fun remove(

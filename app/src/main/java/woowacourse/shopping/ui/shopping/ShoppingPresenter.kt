@@ -81,34 +81,33 @@ class ShoppingPresenter(
                 ?: throw IllegalStateException(
                     NOT_EXIST_PRODUCT_ERROR
                 ),
-            onUpdated = {
-                basket = basket.plus(BasketProduct(count = Count(1), product = product))
-                fetchBasketCount()
-                fetchTotalBasketCount()
-                view.updateProducts(totalProducts)
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.plus(BasketProduct(count = Count(1), product = product))
+            fetchBasketCount()
+            fetchTotalBasketCount()
+            view.updateProducts(totalProducts)
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basketProduct = basket.getProductByProductId(product.id)?.minusCount()
-                ?: throw IllegalStateException(
-                    NOT_EXIST_PRODUCT_ERROR
-                ),
-            onUpdated = {
-                basket = basket.minus(BasketProduct(count = Count(1), product = product))
-                fetchBasketCount()
-                fetchTotalBasketCount()
-                view.updateProducts(totalProducts)
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+            basketProduct = basket.getProductByProductId(product.id)
+                ?.minusCount()
+                ?: throw IllegalStateException(NOT_EXIST_PRODUCT_ERROR),
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.minus(BasketProduct(count = Count(1), product = product))
+            fetchBasketCount()
+            fetchTotalBasketCount()
+            view.updateProducts(totalProducts)
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun addBasketProduct(product: Product) {

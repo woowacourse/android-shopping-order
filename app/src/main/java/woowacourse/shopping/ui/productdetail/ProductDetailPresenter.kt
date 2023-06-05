@@ -88,13 +88,13 @@ class ProductDetailPresenter(
     }
 
     private fun updateCurrentProduct() {
-        basketRepository.update(
-            basketProduct = getAddableCurrentProduct(),
-            onUpdated = {},
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
+        basketRepository.update(getAddableCurrentProduct())
+            .thenAccept {
+                it.getOrThrow()
+            }.exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
             }
-        )
     }
 
     private fun getAddableCurrentProduct() = BasketProduct(
