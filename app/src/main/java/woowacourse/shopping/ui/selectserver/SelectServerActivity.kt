@@ -36,7 +36,7 @@ class SelectServerActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val HONGSIL_SERVER = "http://3.38.132.180:8080/"
+        private const val HONGSIL_SERVER = "http://3.36.66.250:8080/"
         private const val MATTHEW_SERVER = "http://3.36.66.250:8080/"
     }
 }
