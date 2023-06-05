@@ -19,7 +19,7 @@ data class OrderPreviewDto(
     @SerializedName("date")
     val date: String,
 
-    @SerializedName("paymentAmount")
+    @SerializedName("price")
     val paymentAmount: Int,
 ) {
     fun toDomain() =

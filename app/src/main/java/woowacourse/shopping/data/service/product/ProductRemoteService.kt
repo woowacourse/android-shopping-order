@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.service.product
 
 import com.example.domain.model.Product
-import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.response.ProductDto
 import woowacourse.shopping.data.service.RetrofitApiGenerator
 import woowacourse.shopping.mapper.toDomain
 

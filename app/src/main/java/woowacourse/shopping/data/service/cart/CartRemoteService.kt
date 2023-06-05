@@ -7,7 +7,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.CartProductDto
+import woowacourse.shopping.data.dto.response.CartProductDto
 import woowacourse.shopping.data.service.RetrofitApiGenerator
 import woowacourse.shopping.user.ServerInfo
 import java.net.URI

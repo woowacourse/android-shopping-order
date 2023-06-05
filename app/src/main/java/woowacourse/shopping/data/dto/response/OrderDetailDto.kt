@@ -2,7 +2,6 @@ package woowacourse.shopping.data.dto.response
 
 import com.example.domain.model.OrderDetail
 import com.google.gson.annotations.SerializedName
-import woowacourse.shopping.data.dto.OrderProductDto
 
 data class OrderDetailDto(
     @SerializedName("priceBeforeDiscount")

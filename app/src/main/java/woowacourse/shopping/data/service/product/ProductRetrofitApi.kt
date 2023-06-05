@@ -3,7 +3,7 @@ package woowacourse.shopping.data.service.product
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
-import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.response.ProductDto
 
 interface ProductRetrofitApi {
     @GET("products")

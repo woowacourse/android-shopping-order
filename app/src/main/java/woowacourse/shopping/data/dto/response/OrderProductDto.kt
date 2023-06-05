@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.dto
+package woowacourse.shopping.data.dto.response
 
 import com.example.domain.model.OrderProduct
 import com.google.gson.annotations.SerializedName
@@ -10,7 +10,7 @@ data class OrderProductDto(
     @SerializedName("name")
     val name: String,
 
-    @SerializedName("price")
+    @SerializedName("singleProductPrice")
     val price: Int,
 
     @SerializedName("count")

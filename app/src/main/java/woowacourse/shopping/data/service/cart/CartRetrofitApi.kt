@@ -9,7 +9,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.dto.CartProductDto
+import woowacourse.shopping.data.dto.response.CartProductDto
 
 interface CartRetrofitApi {
     @GET("cart-items")
