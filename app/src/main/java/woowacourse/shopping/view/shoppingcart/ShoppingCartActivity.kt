@@ -12,6 +12,7 @@ import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.model.uimodel.CartProductUIModel
 import woowacourse.shopping.server.retrofit.RetrofitClient
+import woowacourse.shopping.view.payment.PaymentActivity
 
 class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
     override lateinit var presenter: ShoppingCartContract.Presenter
@@ -118,7 +119,7 @@ class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
     }
 
     override fun updateTotalCount(totalCount: Int) {
-        binding.btnOrder.text = getText(R.string.order_format).toString().format(totalCount)
+        binding.tvOrderButton.text = getText(R.string.order_format).toString().format(totalCount)
     }
 
     private fun setTotalCheckBoxClick() {
@@ -126,6 +127,15 @@ class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
             presenter.changeProductsCheckedState(binding.checkBoxAll.isChecked)
             adapter.update(presenter.loadCartProducts())
         }
+
+        binding.tvOrderButton.setOnClickListener {
+            presenter.getCheckedCartItems()
+        }
+    }
+
+    override fun showPaymentPage(cartIds: Array<Long>) {
+        startActivity(PaymentActivity.intent(this, cartIds))
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

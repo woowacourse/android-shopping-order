@@ -14,4 +14,5 @@ interface CartProductRepository {
     fun updateCount(product: Product, count: Int, updateCartBadge: () -> Unit)
     fun getTotalPrice(): Int
     fun getTotalCount(): Int
+    fun getCheckedCartItems(): Array<Long>
 }

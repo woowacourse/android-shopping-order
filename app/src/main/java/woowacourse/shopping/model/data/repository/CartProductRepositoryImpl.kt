@@ -90,6 +90,16 @@ class CartProductRepositoryImpl(
         fetchCartProducts()
     }
 
+    override fun getCheckedCartItems(): Array<Long> {
+        val cartItemIds = mutableListOf<Long>()
+        cartProducts.forEach { cartProduct ->
+            if (cartProduct.isSelected) {
+                cartItemIds.add(cartProduct.id)
+            }
+        }
+        return cartItemIds.toTypedArray()
+    }
+
     private fun fetchCartProducts() {
         getAll(onSuccess = { }, onFailure = { })
     }

@@ -30,4 +30,9 @@
     <string name="total_amount_format">%s개</string>
     <string name="order_product_title">주문 내역</string>
     <string name="order_total_price_with_discount">최종 결제 금액</string>
+    <string name="order_payment">주 문 하 기</string>
+    <string name="available_point">사용 가능한 포인트</string>
+    <string name="point_title">포인트</string>
+    <string name="using_point">사용 할 포인트</string>
+    <string name="hint_using_point">사용할 포인트 입력</string>
 </resources>

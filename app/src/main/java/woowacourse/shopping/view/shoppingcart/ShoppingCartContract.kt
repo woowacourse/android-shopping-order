@@ -17,6 +17,7 @@ interface ShoppingCartContract {
         fun updateTotalCheckbox(totalCheckBoxState: Boolean)
         fun updateTotalPrice(totalPrice: Int)
         fun updateTotalCount(totalCount: Int)
+        fun showPaymentPage(cartIds: Array<Long>)
     }
 
     interface Presenter {
@@ -31,5 +32,6 @@ interface ShoppingCartContract {
         fun getTotalCount(): Int
         fun changeProductsCheckedState(isSelected: Boolean)
         fun updateSelectedTotal()
+        fun getCheckedCartItems()
     }
 }

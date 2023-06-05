@@ -98,6 +98,11 @@ class ShoppingCartPresenter(
     override fun getTotalCount(): Int =
         cartProductRepository.getTotalCount()
 
+    override fun getCheckedCartItems() {
+        val cartIds = cartProductRepository.getCheckedCartItems()
+        view.showPaymentPage(cartIds)
+    }
+
     private fun setButtonViews() {
         if (paging.isPossiblePageUp()) {
             view.activatePageUpCounter()
