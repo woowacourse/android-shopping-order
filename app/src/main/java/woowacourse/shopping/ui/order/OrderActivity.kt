@@ -1,12 +1,16 @@
 package woowacourse.shopping.ui.order
 
-import android.R
+import android.R.layout.simple_list_item_1
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.model.Coupon
+import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.remote.ServiceFactory
@@ -20,10 +24,8 @@ import woowacourse.shopping.ui.order.presenter.OrderPresenter
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
     private val presenter: OrderContract.Presenter by lazy { initPresenter() }
-    private val orderAdapter: OrderAdapter by lazy {
-        val cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
-        OrderAdapter(cartItems.cartProducts)
-    }
+    private lateinit var orderAdapter: OrderAdapter
+    private val cartItems = intent.getSerializableExtra(CART_ITEM) as CartItemsUIModel
 
     private fun initPresenter() =
         OrderPresenter(
@@ -41,25 +43,52 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding = ActivityOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        presenter.fetchCoupons()
-        initAdapter()
+        initView(cartItems)
     }
 
-    private fun initAdapter() {
-        binding.rvOrder.adapter = orderAdapter
+    private fun initView(cartItems: CartItemsUIModel) {
+        initOrderListAdapter(cartItems)
+        presenter.fetchCoupons()
     }
 
     override fun setCoupons(coupons: List<Coupon>) {
+        initCouponsAdapter(coupons)
+    }
+
+    private fun initCouponsAdapter(coupons: List<Coupon>) {
         val couponList: MutableList<String> = mutableListOf()
         couponList.add(BLANK)
         couponList.addAll(coupons.map { it.name })
 
-        initAdapter(couponList)
+        val adapter = ArrayAdapter(this, simple_list_item_1, couponList)
+        binding.spinnerCoupon.adapter = adapter
+        binding.spinnerCoupon.onItemSelectedListener = setItemSelectedListener(coupons)
     }
 
-    private fun initAdapter(couponList: MutableList<String>) {
-        val adapter = ArrayAdapter(this, R.layout.simple_list_item_1, couponList)
-        binding.spinnerCoupon.adapter = adapter
+    private fun setItemSelectedListener(coupons: List<Coupon>) =
+        object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                presenter.calculateTotal(position, coupons, cartItems)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.d("123123", "456456")
+            }
+        }
+
+    private fun initOrderListAdapter(cartItems: CartItemsUIModel) {
+        orderAdapter = OrderAdapter(cartItems.cartProducts)
+        binding.rvOrder.adapter = orderAdapter
+    }
+
+    override fun setTotal(totalPrice: Int) {
+        binding.tvOrderTotalBtn.text =
+            String.format(getString(R.string.product_price), totalPrice)
     }
 
     companion object {

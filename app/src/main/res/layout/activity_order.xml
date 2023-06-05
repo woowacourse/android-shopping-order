@@ -79,6 +79,7 @@
             tools:listitem="@layout/coupon_item" />
 
         <TextView
+            android:id="@+id/tv_order_total_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"

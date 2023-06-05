@@ -1,7 +1,9 @@
 package woowacourse.shopping.ui.order.presenter
 
 import android.util.Log
+import com.example.domain.model.Coupon
 import com.example.domain.repository.OrderRepository
+import woowacourse.shopping.model.CartItemsUIModel
 
 class OrderPresenter(
     private val view: OrderContract.View,
@@ -20,5 +22,19 @@ class OrderPresenter(
 
     override fun postOrder() {
         TODO("Not yet implemented")
+    }
+
+    override fun calculateTotal(
+        selectedCoupon: Int,
+        coupons: List<Coupon>,
+        cartItems: CartItemsUIModel,
+    ) {
+        if (selectedCoupon == 0) {
+            view.setTotal(cartItems.totalPrice)
+            return
+        }
+
+        val isSelected = selectedCoupon - 1
+        view.setTotal()
     }
 }
