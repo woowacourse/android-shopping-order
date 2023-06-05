@@ -61,6 +61,8 @@ class CartPresenter(
         cartRepository.deleteCart(cartId)
 
         setEnabledOrder()
+        calculateTotalPrice()
+
         view.setEnableLeftButton(pageNation.hasPreviousPage())
         view.setEnableRightButton(pageNation.hasNextPage())
 
@@ -89,6 +91,7 @@ class CartPresenter(
                 if (count == 0) {
                     deleteCartItem(cartId)
                 }
+                calculateTotalPrice()
             }
         }
     }
@@ -97,11 +100,13 @@ class CartPresenter(
         pageNation = pageNation.updateCartCheckedByCartId(cartId, isChecked)
 
         cartRepository.updateLocalCartChecked(cartId, isChecked)
+        calculateTotalPrice()
         view.setAllCartChecked(pageNation.isAllChecked)
     }
 
     override fun updateCurrentPageAllProductChecked(isChecked: Boolean) {
         pageNation = pageNation.updateAllCartsChecked(isChecked)
+        calculateTotalPrice()
         view.setChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 

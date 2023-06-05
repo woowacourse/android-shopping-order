@@ -38,17 +38,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val cartProductListener = object : CartProductListener {
         override fun onCheckChanged(cartId: Long, checked: Boolean) {
             presenter.updateProductChecked(cartId, checked)
-            presenter.calculateTotalPrice()
         }
 
         override fun onCountClick(cartId: Long, count: Int) {
             presenter.updateProductCount(cartId, count)
-            presenter.calculateTotalPrice()
         }
 
         override fun onDeleteClick(cartId: Long) {
             presenter.deleteCartItem(cartId)
-            presenter.calculateTotalPrice()
         }
     }
 
@@ -163,7 +160,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cbCartAll.setOnCheckedChangeListener { view, isChecked ->
             if (view.isPressed.not()) return@setOnCheckedChangeListener
             presenter.updateCurrentPageAllProductChecked(isChecked)
-            presenter.calculateTotalPrice()
         }
     }
 
