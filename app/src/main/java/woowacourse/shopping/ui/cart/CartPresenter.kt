@@ -108,7 +108,7 @@ class CartPresenter(
         view.navigateToItemDetail(productId)
     }
 
-    override fun navigateToOrder() {
+    override fun checkOutOrder() {
         CompletableFuture.supplyAsync {
             cartRepository.getChecked()
         }.thenAccept { result ->

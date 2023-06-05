@@ -23,7 +23,7 @@ interface CartContract {
         fun updateItemCheck(productId: Int, checked: Boolean)
         fun getPageIndex(): Int
         fun navigateToItemDetail(productId: Int)
-        fun navigateToOrder()
+        fun checkOutOrder()
         fun fetchCartProducts()
     }
 }

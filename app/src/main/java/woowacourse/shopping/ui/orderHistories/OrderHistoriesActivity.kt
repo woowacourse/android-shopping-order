@@ -84,11 +84,11 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
                 }
             }
         })
-        presenter.getOrderHistories()
+        presenter.fetchOrderHistories()
     }
 
     private fun loadMoreData() {
-        presenter.getOrderHistories()
+        presenter.fetchOrderHistories()
     }
 
     override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {

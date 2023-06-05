@@ -167,21 +167,15 @@ class CartPresenterTest {
     @Test
     fun `장바구니에 담긴 상품을 삭제한다`() {
         // given
-        every {
-            cartRepository.updateCountWithProductId(any(), any())
-        } answers { Result.success(0) }
-        every { cartRepository.hasNextPage() } returns true
-        every { cartRepository.hasPrevPage() } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.updateCountWithProductId(any(), any()) }
+            .answers { Result.success(0) }
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.fetchCartProducts()
         presenter.updateItemCount(1, 0)
 
         // then
-        verify(exactly = 2) { view.setPage(any(), any()) }
+        verify(exactly = 1) { view.setPage(any(), any()) }
     }
 
     @Test

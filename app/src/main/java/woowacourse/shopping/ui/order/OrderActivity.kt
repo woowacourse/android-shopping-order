@@ -63,7 +63,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         binding.confirmOrder = {
             presenter.confirmOrder(binding.etUsedPoint.text.toString().toIntOrNull() ?: 0)
         }
-        presenter.getOrder()
+        presenter.setUpOrder()
     }
 
     override fun showOrder(order: OrderUIModel) {
@@ -90,7 +90,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun navigateOrder() {
+    override fun navigateToOrder() {
         startActivity(
             ShoppingActivity.getIntent(this).apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP

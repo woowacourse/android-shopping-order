@@ -32,7 +32,7 @@ class OrderHistoriesPresenterTest {
         every { view.showOrderHistories(any()) } answers { }
 
         // when
-        presenter.getOrderHistories()
+        presenter.fetchOrderHistories()
 
         // then
         view.showOrderHistories(listOf(mockOrderHistoryUIModel))

@@ -9,7 +9,7 @@ interface OrderHistoryContract {
     }
 
     interface Presenter {
-        fun getOrderDetail()
+        fun fetchOrderDetail()
         fun navigateToProductDetail(productId: Int)
     }
 }

@@ -10,7 +10,7 @@ class OrderPresenter(
     private val cartIds: List<Int>,
     private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
-    override fun getOrder() {
+    override fun setUpOrder() {
         CompletableFuture.supplyAsync {
             orderRepository.getOrder(cartIds)
         }.thenAccept { result ->
@@ -23,7 +23,7 @@ class OrderPresenter(
         CompletableFuture.supplyAsync {
             orderRepository.postOrder(point, cartIds)
         }.thenAccept { result ->
-            result.onSuccess { view.navigateOrder() }
+            result.onSuccess { view.navigateToOrder() }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }

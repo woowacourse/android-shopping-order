@@ -98,7 +98,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.rvProducts.itemAnimator = null
 
         binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
-        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.navigateToOrder() }
+        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.checkOutOrder() }
 
         presenter.fetchCartProducts()
     }

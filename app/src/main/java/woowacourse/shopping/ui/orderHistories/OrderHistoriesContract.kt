@@ -10,7 +10,7 @@ interface OrderHistoriesContract {
     }
 
     interface Presenter {
-        fun getOrderHistories()
+        fun fetchOrderHistories()
         fun navigateToOrderHistory(orderId: Long)
         fun navigateToProductDetail(productId: Int)
     }

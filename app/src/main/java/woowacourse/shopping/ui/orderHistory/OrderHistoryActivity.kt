@@ -58,7 +58,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     private fun initView() {
         binding.rvOrderProduct.adapter = adapter
-        presenter.getOrderDetail()
+        presenter.fetchOrderDetail()
     }
 
     override fun setOrderHistory(orderHistory: OrderHistoryUIModel) {

@@ -36,7 +36,7 @@ class OrderHistoryPresenterTest {
         justRun { view.setOrderHistory(any()) }
 
         // when
-        presenter.getOrderDetail()
+        presenter.fetchOrderDetail()
 
         // then
         verify(exactly = 1) { view.setOrderHistory(mockOrderHistoryUIModel) }

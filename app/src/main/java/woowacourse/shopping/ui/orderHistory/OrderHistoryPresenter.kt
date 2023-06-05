@@ -11,7 +11,7 @@ class OrderHistoryPresenter(
     private val orderId: Long
 ) : OrderHistoryContract.Presenter {
 
-    override fun getOrderDetail() {
+    override fun fetchOrderDetail() {
         CompletableFuture.supplyAsync {
             orderRepository.getOrderHistory(orderId)
         }.thenAccept { result ->

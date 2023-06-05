@@ -38,7 +38,7 @@ class OrderPresenterTest {
         justRun { view.showOrder(any()) }
 
         // when
-        presenter.getOrder()
+        presenter.setUpOrder()
 
         // then
         verify(exactly = 1) { view.showOrder(mockOrderUIModel) }
@@ -48,12 +48,12 @@ class OrderPresenterTest {
     fun `주문을 하면 메인 화면으로 간다`() {
         // given
         every { orderRepository.postOrder(any(), any()) } answers { Result.success(1) }
-        justRun { view.navigateOrder() }
+        justRun { view.navigateToOrder() }
 
         // when
         presenter.confirmOrder(1000)
 
         // then
-        verify(exactly = 1) { view.navigateOrder() }
+        verify(exactly = 1) { view.navigateToOrder() }
     }
 }
