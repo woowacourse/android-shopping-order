@@ -5,6 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
 import woowacourse.shopping.data.remote.request.OrderDTO
+import woowacourse.shopping.data.remote.request.OrderRequestWithCoupon
 import woowacourse.shopping.data.remote.request.OrderRequestWithoutCoupon
 
 interface OrderDataService {
@@ -12,8 +13,7 @@ interface OrderDataService {
     @POST("orders")
     fun postOrderWithCoupon(
         @Header("Authorization") token: String,
-        @Body cartItemsIds: List<Long>,
-        @Body memberCouponId: Long,
+        @Body orderRequestWithCoupon: OrderRequestWithCoupon,
     ): Call<OrderDTO>
 
     @POST("orders")

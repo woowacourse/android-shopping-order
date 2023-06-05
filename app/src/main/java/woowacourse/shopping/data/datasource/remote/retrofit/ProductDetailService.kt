@@ -6,6 +6,6 @@ import retrofit2.http.Path
 import woowacourse.shopping.data.remote.request.ProductDTO
 
 interface ProductDetailService {
-    @GET("/products/{productId}")
+    @GET("products/{productId}")
     fun getProductById(@Path("productId") id: Long): Call<ProductDTO>
 }

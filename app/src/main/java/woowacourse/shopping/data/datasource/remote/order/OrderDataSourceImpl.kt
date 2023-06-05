@@ -3,6 +3,7 @@ package woowacourse.shopping.data.datasource.remote.order
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
 import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.OrderDTO
+import woowacourse.shopping.data.remote.request.OrderRequestWithCoupon
 import woowacourse.shopping.data.remote.request.OrderRequestWithoutCoupon
 import java.util.concurrent.Executors
 
@@ -14,7 +15,10 @@ class OrderDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) : 
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<OrderDTO>> {
             val response =
-                ServicePool.orderDataService.postOrderWithCoupon(token, cartItemsIds, couponId)
+                ServicePool.orderDataService.postOrderWithCoupon(
+                    token,
+                    OrderRequestWithCoupon(cartItemsIds, couponId),
+                )
                     .execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
