@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.OrderProduct
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.ui.model.OrderProductUiModel
 
-fun OrderProductUiModel.toOrderProductDomainModel() = OrderProduct(
+fun OrderProductUiModel.toDomainModel() = OrderProduct(
     id = id,
     name = name,
     count = Count(count),
@@ -13,7 +13,7 @@ fun OrderProductUiModel.toOrderProductDomainModel() = OrderProduct(
     imageUrl = imageUrl
 )
 
-fun OrderProduct.toOrderProductUiModel() = OrderProductUiModel(
+fun OrderProduct.toUiModel() = OrderProductUiModel(
     id = id,
     name = name,
     count = count.value,

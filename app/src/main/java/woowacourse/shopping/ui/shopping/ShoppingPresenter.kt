@@ -7,9 +7,8 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.mapper.toProductDomainModel
-import woowacourse.shopping.ui.mapper.toProductUiModel
-import woowacourse.shopping.ui.mapper.toRecentProductUiModel
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.model.RecentProductUiModel
 import woowacourse.shopping.util.secondOrNull
@@ -136,7 +135,7 @@ class ShoppingPresenter(
     override fun updateProducts() {
         productRepository
             .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId) { products ->
-                var uiProducts = products.map { it.toProductUiModel() }
+                var uiProducts = products.map { it.toUiModel() }
                 lastId = uiProducts.maxOfOrNull { it.id } ?: -1
                 hasNext = checkHasNext(uiProducts)
                 lastId -= if (hasNext) 1 else 0
@@ -154,7 +153,7 @@ class ShoppingPresenter(
 
     override fun fetchRecentProducts() {
         recentProducts = recentProductRepository.getPartially(RECENT_PRODUCT_SIZE)
-            .map { it.toRecentProductUiModel() }
+            .map { it.toUiModel() }
         view.updateRecentProducts(recentProducts)
     }
 
@@ -173,7 +172,7 @@ class ShoppingPresenter(
                 previousProduct.id
             )?.id else null
         )
-        thread { recentProductRepository.add(product.toProductDomainModel()) }
+        thread { recentProductRepository.add(product.toDomainModel()) }
     }
 
     override fun fetchHasNext() {

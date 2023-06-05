@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.orderdetail
 
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.ui.mapper.toOrderUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.OrderUiModel
 
 class OrderDetailPresenter(
@@ -16,7 +16,7 @@ class OrderDetailPresenter(
             orderRepository.getOrder(
                 orderId = orderId,
                 onReceived = { order ->
-                    view.initView(order.toOrderUiModel())
+                    view.initView(order.toUiModel())
                 },
                 onFailed = { errorMessage ->
                     view.showErrorMessage(errorMessage)

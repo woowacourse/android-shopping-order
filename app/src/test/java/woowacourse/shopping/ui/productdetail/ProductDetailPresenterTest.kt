@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.ui.ProductFixture
-import woowacourse.shopping.ui.mapper.toProductUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
 
 class ProductDetailPresenterTest {
@@ -27,9 +27,9 @@ class ProductDetailPresenterTest {
         presenter = ProductDetailPresenter(
             view = view,
             basketRepository = basketRepository,
-            currentProduct = ProductFixture.createProduct().toProductUiModel(),
+            currentProduct = ProductFixture.createProduct().toUiModel(),
             currentProductBasketId = 1,
-            previousProduct = ProductFixture.createProduct2().toProductUiModel(),
+            previousProduct = ProductFixture.createProduct2().toUiModel(),
             previousProductBasketId = 2
         )
     }
@@ -37,8 +37,8 @@ class ProductDetailPresenterTest {
     @Test
     fun `현재 상품 데이터를 화면에 초기화 할수있다`() {
         // given
-        val currentProduct = ProductFixture.createProduct().toProductUiModel()
-        val previousProduct = ProductFixture.createProduct2().toProductUiModel()
+        val currentProduct = ProductFixture.createProduct().toUiModel()
+        val previousProduct = ProductFixture.createProduct2().toUiModel()
 
         // when
         presenter.initProductData()
@@ -80,7 +80,7 @@ class ProductDetailPresenterTest {
         presenter.selectPreviousProduct()
 
         // then
-        val expected = ProductFixture.createProduct2().toProductUiModel()
+        val expected = ProductFixture.createProduct2().toUiModel()
 
         assertEquals(expected, slotProduct.captured)
     }

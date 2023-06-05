@@ -15,9 +15,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.BasketProductFixture
 import woowacourse.shopping.ui.ProductFixture
 import woowacourse.shopping.ui.RecentProductFixture
-import woowacourse.shopping.ui.mapper.toPriceUiModel
-import woowacourse.shopping.ui.mapper.toProductUiModel
-import woowacourse.shopping.ui.mapper.toRecentProductUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
 
 class ShoppingPresenterTest {
@@ -127,7 +125,7 @@ class ShoppingPresenterTest {
         presenter.updateProducts()
 
         // then
-        verify { view.updateProducts(products.map { it.toProductUiModel() }) }
+        verify { view.updateProducts(products.map { it.toUiModel() }) }
     }
 
     @Test
@@ -141,7 +139,7 @@ class ShoppingPresenterTest {
         presenter.fetchRecentProducts()
 
         // then
-        verify { view.updateRecentProducts(products.map { it.toRecentProductUiModel() }) }
+        verify { view.updateRecentProducts(products.map { it.toUiModel() }) }
     }
 
     @Test
@@ -163,7 +161,7 @@ class ShoppingPresenterTest {
             ProductUiModel(
                 id = product.id,
                 name = product.name,
-                price = product.price.toPriceUiModel(),
+                price = product.price.toUiModel(),
                 imageUrl = product.imageUrl,
                 basketCount = basketProducts.first { it.product.id == product.id }.count.value
             )
@@ -224,7 +222,7 @@ class ShoppingPresenterTest {
             ProductUiModel(
                 id = product.id,
                 name = product.name,
-                price = product.price.toPriceUiModel(),
+                price = product.price.toUiModel(),
                 imageUrl = product.imageUrl,
                 basketCount = basketProducts.first { it.product.id == product.id }.count.value
             )

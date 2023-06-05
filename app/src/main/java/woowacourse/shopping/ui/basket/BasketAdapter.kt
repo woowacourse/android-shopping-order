@@ -7,8 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemBasketBinding
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.mapper.toCountDomainModel
-import woowacourse.shopping.ui.mapper.toProductDomainModel
+import woowacourse.shopping.ui.mapper.toDomainModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class BasketAdapter(
@@ -25,13 +24,13 @@ class BasketAdapter(
         return BasketViewHolder(
             binding,
             { onRemoveItemClick(it) },
-            { minusClickListener(it.toProductDomainModel()) },
-            { plusClickListener(it.toProductDomainModel()) },
+            { minusClickListener(it.toDomainModel()) },
+            { plusClickListener(it.toDomainModel()) },
             { basketProduct, isChecked ->
                 val processedBasketProduct = BasketProduct(
                     id = basketProduct.id,
-                    count = basketProduct.count.toCountDomainModel(),
-                    product = basketProduct.product.toProductDomainModel(),
+                    count = basketProduct.count.toDomainModel(),
+                    product = basketProduct.product.toDomainModel(),
                     checked = isChecked
                 )
                 onCheckedChangeListener(processedBasketProduct)

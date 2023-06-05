@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.basket.BasketContract
 import woowacourse.shopping.ui.basket.BasketPresenter
-import woowacourse.shopping.ui.mapper.toBasketProductUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 
 class BasketPresenterTest {
     private lateinit var view: BasketContract.View
@@ -87,7 +87,7 @@ class BasketPresenterTest {
                 )
             )
             .products
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         verify { basketRepository.update(basketProduct.plusCount(), any(), any()) }
         verify { view.updateBasketProducts(expected) }
@@ -112,7 +112,7 @@ class BasketPresenterTest {
                 )
             )
             .products
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         verify { basketRepository.update(basketProduct.minusCount(), any(), any()) }
         verify { view.updateBasketProducts(expected) }
@@ -164,7 +164,7 @@ class BasketPresenterTest {
         val checkedProducts = BasketFixture.createBasket()
             .products
             .filter { it.checked }
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         // when: 포인트를 사용한다
         presenter.startPayment()
@@ -186,13 +186,13 @@ class BasketPresenterTest {
             .first()
 
         // when
-        presenter.deleteBasketProduct(basketProduct.toBasketProductUiModel())
+        presenter.deleteBasketProduct(basketProduct.toUiModel())
 
         // then
         val expected = presenter.basket
             .remove(basketProduct)
             .products
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         verify { basketRepository.remove(basketProduct, any(), any()) }
         verify { view.updateNavigatorEnabled(any(), any()) }

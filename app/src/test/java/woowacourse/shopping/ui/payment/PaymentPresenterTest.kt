@@ -11,8 +11,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.UserRepository
 import woowacourse.shopping.ui.BasketFixture
 import woowacourse.shopping.ui.UserFixture
-import woowacourse.shopping.ui.mapper.toBasketProductUiModel
-import woowacourse.shopping.ui.mapper.toUserUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class PaymentPresenterTest {
@@ -29,7 +28,7 @@ class PaymentPresenterTest {
         basketProducts = BasketFixture.createBasket()
             .products
             .filter { it.checked }
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         userRepository = mockk(relaxed = true)
         orderRepository = mockk(relaxed = true)
@@ -64,7 +63,7 @@ class PaymentPresenterTest {
         // then: 받아온 유저 정보를 가지고 뷰를 초기화한다
         verify {
             view.initView(
-                user = user.toUserUiModel(),
+                user = user.toUiModel(),
                 basketProducts = basketProducts,
                 totalPrice = totalPrice
             )

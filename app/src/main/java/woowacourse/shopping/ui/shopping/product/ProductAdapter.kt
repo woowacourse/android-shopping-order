@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.mapper.toProductDomainModel
+import woowacourse.shopping.ui.mapper.toDomainModel
 import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.ShoppingViewType
 
@@ -19,9 +19,9 @@ class ProductAdapter(
         ProductViewHolder(
             parent,
             { onItemClick(currentList[it]) },
-            { minusClickListener(it.toProductDomainModel()) },
-            { plusClickListener(it.toProductDomainModel()) },
-            { addClickListener(it.toProductDomainModel()) }
+            { minusClickListener(it.toDomainModel()) },
+            { plusClickListener(it.toDomainModel()) },
+            { addClickListener(it.toDomainModel()) }
         )
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

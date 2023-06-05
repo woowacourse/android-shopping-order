@@ -10,7 +10,7 @@ import org.junit.Test
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
-import woowacourse.shopping.ui.mapper.toOrderUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract
 import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 
@@ -51,7 +51,7 @@ class OrderDetailPresenterTest {
         presenter.getOrder()
 
         // then: 받아온 주문 정보로 뷰가 초기화된다.
-        verify { view.initView(order.toOrderUiModel()) }
+        verify { view.initView(order.toUiModel()) }
     }
 
     @Test

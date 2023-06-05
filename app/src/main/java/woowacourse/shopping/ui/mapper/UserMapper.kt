@@ -3,13 +3,13 @@ package woowacourse.shopping.ui.mapper
 import woowacourse.shopping.domain.User
 import woowacourse.shopping.ui.model.UserUiModel
 
-fun UserUiModel.toUserDomainModel() = User(
+fun UserUiModel.toDomainModel() = User(
     email = email,
     point = point,
     accumulationRate = accumulationRate
 )
 
-fun User.toUserUiModel() = UserUiModel(
+fun User.toUiModel() = UserUiModel(
     email = email,
     point = point,
     accumulationRate = accumulationRate

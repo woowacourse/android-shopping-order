@@ -3,8 +3,8 @@ package woowacourse.shopping.ui.mapper
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.ui.model.PriceUiModel
 
-fun PriceUiModel.toProductDomainModel(): Price =
+fun PriceUiModel.toDomainModel(): Price =
     Price(value)
 
-fun Price.toPriceUiModel(): PriceUiModel =
+fun Price.toUiModel(): PriceUiModel =
     PriceUiModel(value)

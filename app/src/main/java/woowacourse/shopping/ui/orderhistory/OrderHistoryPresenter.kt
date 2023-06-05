@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.orderhistory
 
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.ui.mapper.toOrderUiModel
+import woowacourse.shopping.ui.mapper.toUiModel
 
 class OrderHistoryPresenter(
     private val view: OrderHistoryContract.View,
@@ -11,7 +11,7 @@ class OrderHistoryPresenter(
     override fun getOrders() {
         repository.getOrders(
             onReceived = { orders ->
-                view.initView(orders.map { it.toOrderUiModel() })
+                view.initView(orders.map { it.toUiModel() })
             },
             onFailed = { errorMessage ->
                 view.showErrorMessage(errorMessage)

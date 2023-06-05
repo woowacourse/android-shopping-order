@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
-import woowacourse.shopping.ui.mapper.toBasketProductDomainModel
-import woowacourse.shopping.ui.mapper.toBasketProductUiModel
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class BasketPresenter(
@@ -118,7 +118,7 @@ class BasketPresenter(
             basket.getSubBasketByStartId(
                 startId,
                 BASKET_PAGING_SIZE
-            ).products.map { it.toBasketProductUiModel() }
+            ).products.map { it.toUiModel() }
         )
     }
 
@@ -126,9 +126,9 @@ class BasketPresenter(
         product: BasketProductUiModel,
     ) {
         basketRepository.remove(
-            basketProduct = product.toBasketProductDomainModel(),
+            basketProduct = product.toDomainModel(),
             onRemoved = {
-                basket = basket.remove(product.toBasketProductDomainModel())
+                basket = basket.remove(product.toDomainModel())
                 amendStartId()
                 updateBasketProductViewData()
             },
@@ -162,7 +162,7 @@ class BasketPresenter(
     override fun startPayment() {
         val products = basket.products
             .filter { it.checked }
-            .map { it.toBasketProductUiModel() }
+            .map { it.toUiModel() }
 
         view.showPaymentView(
             basketProducts = products,
