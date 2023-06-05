@@ -31,8 +31,6 @@ class ShoppingPresenter(
 ) : Presenter {
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
-    private val cartProductCount: ProductCountModel
-        get() = ProductCountModel(cart.productCountInCart)
 
     override fun fetchAll() {
         fetchAllCartProducts()
@@ -121,9 +119,19 @@ class ShoppingPresenter(
     }
 
     private fun updateCartView() {
+        updateCartProductCount()
         view.updateProducts(currentPage.takeItems(cart).toUi())
-        view.updateCartBadge(cartProductCount)
         view.updateLoadMoreVisible()
+    }
+
+    private fun updateCartProductCount() {
+        cartRepository.getAllCartProducts(
+            onSuccess = {
+                view.updateCartBadge(ProductCountModel(Cart(it).productCountInCart))
+            },
+            onFailed = {
+                view.updateCartBadge(ProductCountModel(0))
+            })
     }
 
     private fun View.updateLoadMoreVisible() {
