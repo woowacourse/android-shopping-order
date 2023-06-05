@@ -17,7 +17,7 @@ import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.shopping.uistate.ProductUIState.Companion.toUIState
-import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState.Companion.toUIState
+import woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState
 
 class ShoppingPresenterTest {
     private lateinit var view: ShoppingContract.View
@@ -51,18 +51,24 @@ class ShoppingPresenterTest {
     @Test
     fun 최근에_본_상품_10개를_불러오고_표시한다() {
         // given
-        val recentlyViewedProducts = listOf(RecentlyViewedProduct())
+        val recentlyViewedProducts = List(10) { RecentlyViewedProduct() }
         every {
-            recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
+            recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(10)
         } returns async(recentlyViewedProducts)
         every { view.setRecentlyViewedProducts(any()) } just runs
 
         // when
-        presenter.loadRecentlyViewedProducts()
+        presenter.loadRecentlyViewedProducts(10)
 
         // then
-        verify { recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc() }
-        verify { view.setRecentlyViewedProducts(recentlyViewedProducts.map { it.toUIState() }) }
+        val expect = List(10) {
+            RecentlyViewedProductUIState(
+                0, "", "", 0
+            )
+        }
+
+        verify { recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(10) }
+        verify { view.setRecentlyViewedProducts(expect) }
     }
 
     @Test

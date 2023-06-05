@@ -98,7 +98,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private fun initLastViewedProduct() {
         if (!intent.getBooleanExtra(FROM_PRODUCT_DETAIL_ACTIVITY, false)) {
-            presenter.loadLastViewedProduct()
+            presenter.loadLastViewedProduct(RECENT_PRODUCT_LIMIT_COUNT)
         }
     }
 
@@ -106,6 +106,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         private const val PRODUCT_ID = "PRODUCT_ID"
         private const val FROM_PRODUCT_DETAIL_ACTIVITY = "FROM_PRODUCT_DETAIL_ACTIVITY"
         private const val TAG_ADD_TO_CART_DIALOG = "TAG_ADD_TO_CART_DIALOG"
+        private const val RECENT_PRODUCT_LIMIT_COUNT = 10
 
         fun startActivity(context: Context, productId: Long) {
             val intent = Intent(context, ProductDetailActivity::class.java).apply {

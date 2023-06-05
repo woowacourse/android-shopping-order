@@ -12,5 +12,5 @@ interface RecentlyViewedProductRepository {
         viewedTime: LocalDateTime
     ): CompletableFuture<Result<RecentlyViewedProduct>>
 
-    fun findFirst10OrderByViewedTimeDesc(): CompletableFuture<Result<List<RecentlyViewedProduct>>>
+    fun findLimitedOrderByViewedTimeDesc(limit: Int): CompletableFuture<Result<List<RecentlyViewedProduct>>>
 }

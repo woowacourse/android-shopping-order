@@ -9,5 +9,5 @@ interface RecentlyViewedProductDataSource {
 
     fun save(product: Product, viewedTime: LocalDateTime): Result<RecentlyViewedProduct>
 
-    fun findFirst10OrderByViewedTimeDesc(): Result<List<RecentlyViewedProductEntity>>
+    fun findLimitedOrderByViewedTimeDesc(limit: Int): Result<List<RecentlyViewedProductEntity>>
 }

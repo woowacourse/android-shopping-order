@@ -28,8 +28,8 @@ class ShoppingPresenter(
         currentUser = users[0]
     }
 
-    override fun loadRecentlyViewedProducts() {
-        recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
+    override fun loadRecentlyViewedProducts(limit: Int) {
+        recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(limit)
             .thenAccept { recentlyViewedProduct ->
                 val recentlyViewedProductUIStates =
                     recentlyViewedProduct.getOrThrow().map { it.toUIState() }

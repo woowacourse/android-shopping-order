@@ -35,9 +35,8 @@ class RecentlyViewedProductMemorySource(private val db: SQLiteDatabase) :
         }
     }
 
-    override fun findFirst10OrderByViewedTimeDesc(): Result<List<RecentlyViewedProductEntity>> {
+    override fun findLimitedOrderByViewedTimeDesc(limit: Int): Result<List<RecentlyViewedProductEntity>> {
         val recentlyViewedProducts = mutableListOf<RecentlyViewedProductEntity>()
-        val limit = 10
 
         return runCatching {
             val cursor = db.rawQuery(

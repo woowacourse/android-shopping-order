@@ -9,7 +9,7 @@ interface ProductDetailContract {
         fun loadProduct(productId: Long)
         fun addProductToCart(productId: Long, count: Int)
         fun showCartCounter(productId: Long)
-        fun loadLastViewedProduct()
+        fun loadLastViewedProduct(limit: Int)
     }
 
     interface View : ErrorView {

@@ -168,7 +168,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun initRecentlyViewedProducts() {
-        presenter.loadRecentlyViewedProducts()
+        presenter.loadRecentlyViewedProducts(RECENT_PRODUCT_LIMIT_COUNT)
     }
 
     private fun setUIAboutRecentlyViewedProductIsVisible(isVisible: Boolean) {
@@ -196,6 +196,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     companion object {
+        private const val RECENT_PRODUCT_LIMIT_COUNT = 10
+
         fun startActivity(context: Context) {
             val intent = Intent(context, ShoppingActivity::class.java).apply {}
             context.startActivity(intent)

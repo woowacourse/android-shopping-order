@@ -99,11 +99,11 @@ class ProductDetailPresenterTest {
         // given
         val recentlyViewedProduct = listOf(RecentlyViewedProduct())
         every {
-            recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc()
+            recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(1)
         } returns async(recentlyViewedProduct)
 
         // when
-        presenter.loadLastViewedProduct()
+        presenter.loadLastViewedProduct(1)
         // then
         val expect = LastViewedProductUIState(0, "", 0)
         verify { view.setLastViewedProduct(expect) }

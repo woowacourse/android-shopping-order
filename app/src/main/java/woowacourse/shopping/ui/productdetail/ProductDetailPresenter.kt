@@ -60,8 +60,8 @@ class ProductDetailPresenter(
         }
     }
 
-    override fun loadLastViewedProduct() {
-        recentlyViewedProductRepository.findFirst10OrderByViewedTimeDesc().thenAccept {
+    override fun loadLastViewedProduct(limit: Int) {
+        recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(limit).thenAccept {
             val recentlyViewedProducts = it.getOrThrow()
             if (recentlyViewedProducts.isEmpty()) {
                 view.setLastViewedProduct(null)
