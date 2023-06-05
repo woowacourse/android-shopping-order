@@ -46,4 +46,5 @@
     <string name="deetoo_server">디투 서버</string>
     <string name="roise_server">로이스 서버</string>
     <string name="emil_server">에밀 서버</string>
+    <string name="order_unavailable_message">주문의 최대 상품 갯수는 99개를 넘을 수 없습니다</string>
 </resources>

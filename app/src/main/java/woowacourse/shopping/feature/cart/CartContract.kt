@@ -11,6 +11,7 @@ interface CartContract {
         fun hideLoadingView()
         fun showLoadingView()
         fun showOrderConfirmScreen(cartIds: List<Long>)
+        fun showOrderUnavailableMessage()
     }
 
     interface Presenter {

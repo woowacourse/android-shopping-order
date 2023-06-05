@@ -93,8 +93,12 @@ class CartPresenter(
     }
 
     override fun requestOrderConfirmScreen() {
-        if (page.cartBottomNavigationUiModel.isAnyChecked.not()) return
-        _page?.checkedCartIds?.let { view.showOrderConfirmScreen(it) }
+        if ((_page?.selectedCount ?: 0) <= ORDER_MAXIMUM_COUNT) {
+            if (page.cartBottomNavigationUiModel.isAnyChecked.not()) return
+            _page?.checkedCartIds?.let { view.showOrderConfirmScreen(it) }
+        } else {
+            view.showOrderUnavailableMessage()
+        }
     }
 
     override fun processRemoveOrderCheckedItems() {
@@ -103,5 +107,9 @@ class CartPresenter(
 
     override fun exit() {
         view.exitCartScreen()
+    }
+
+    companion object {
+        private const val ORDER_MAXIMUM_COUNT = 99
     }
 }
