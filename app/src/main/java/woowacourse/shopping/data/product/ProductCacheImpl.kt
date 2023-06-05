@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.product
 
 import com.example.domain.ProductCache
 import com.example.domain.model.Product

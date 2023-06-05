@@ -3,6 +3,8 @@ package woowacourse.shopping.data
 import com.example.domain.datasource.productsDatasource
 import com.example.domain.model.Product
 import org.junit.Test
+import woowacourse.shopping.data.product.ProductCacheImpl
+import woowacourse.shopping.data.product.ProductRemoteMockRepositoryImpl
 import woowacourse.shopping.data.service.ProductMockWebService
 import java.util.concurrent.CountDownLatch
 

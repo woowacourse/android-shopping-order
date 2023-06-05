@@ -13,13 +13,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.CartRemoteRepositoryImpl
 import woowacourse.shopping.data.PointRemoteRepositoryImpl
-import woowacourse.shopping.data.ProductCacheImpl
-import woowacourse.shopping.data.ProductRemoteRepositoryImpl
 import woowacourse.shopping.data.RecentProductRepositoryImpl
 import woowacourse.shopping.data.TokenSharedPreference
+import woowacourse.shopping.data.cart.CartCache
+import woowacourse.shopping.data.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.product.ProductCacheImpl
+import woowacourse.shopping.data.product.ProductRemoteRepositoryImpl
 import woowacourse.shopping.data.service.CartRemoteService
 import woowacourse.shopping.data.service.PointRemoteService
 import woowacourse.shopping.data.service.ProductRemoteService
