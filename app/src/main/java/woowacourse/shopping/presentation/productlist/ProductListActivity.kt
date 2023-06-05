@@ -15,6 +15,7 @@ import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
+import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -31,15 +32,9 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var productListAdapter: ProductListAdapter
 
     private val presenter: ProductListPresenter by lazy {
-        val shoppingOrderPref = ShoppingOrderSharedPreference(applicationContext)
-        val productDataSource = ProductRemoteDataSource(
-            baseUrl = shoppingOrderPref.baseUrl,
-            userId = shoppingOrderPref.userInfo,
-        )
-        val cartDataSource = CartRemoteDataSource(
-            baseUrl = shoppingOrderPref.baseUrl,
-            userId = shoppingOrderPref.userInfo,
-        )
+        val retrofit = RetrofitUtil.getInstance().retrofit
+        val productDataSource = ProductRemoteDataSource(retrofit)
+        val cartDataSource = CartRemoteDataSource(retrofit)
 
         val shoppingOrderSharedPref = ShoppingOrderSharedPreference(applicationContext)
         val recentProductDao =

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.order.OrderRemoteDataSource
 import woowacourse.shopping.data.order.OrderRepositoryDefault
-import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
+import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderModel
 import woowacourse.shopping.presentation.orderdetail.OrderDetailActivity
@@ -18,9 +18,8 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private lateinit var binding: ActivityOrderListBinding
 
     private val presenter: OrderListContract.Presenter by lazy {
-        val sharedPref = ShoppingOrderSharedPreference(applicationContext)
-        val orderRepository =
-            OrderRepositoryDefault(OrderRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo))
+        val retrofit = RetrofitUtil.getInstance().retrofit
+        val orderRepository = OrderRepositoryDefault(OrderRemoteDataSource(retrofit))
         OrderListPresenter(this, orderRepository)
     }
 

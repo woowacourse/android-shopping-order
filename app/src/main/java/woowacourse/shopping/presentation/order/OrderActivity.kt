@@ -8,14 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
-import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cash.CashRemoteDataSource
 import woowacourse.shopping.data.cash.CashRepositoryDefault
 import woowacourse.shopping.data.order.OrderRemoteDataSource
 import woowacourse.shopping.data.order.OrderRepositoryDefault
 import woowacourse.shopping.data.product.ProductRemoteDataSource
-import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
+import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.orderdetail.OrderDetailActivity
@@ -26,17 +25,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
 
     private val presenter: OrderContract.Presenter by lazy {
-        val sharedPref = ShoppingOrderSharedPreference(applicationContext)
-        val productDataSource = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
-        val cartRepository: CartRepository =
-            CartRepositoryImpl(
-                CartRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo),
-                productDataSource,
-            )
-        val cashRepository =
-            CashRepositoryDefault(CashRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo))
-        val orderRepository =
-            OrderRepositoryDefault(OrderRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo))
+        val retrofit = RetrofitUtil.getInstance().retrofit
+        val productDataSource = ProductRemoteDataSource(retrofit)
+        val cartRepository = CartRepositoryImpl(CartRemoteDataSource(retrofit), productDataSource)
+        val cashRepository = CashRepositoryDefault(CashRemoteDataSource(retrofit))
+        val orderRepository = OrderRepositoryDefault(OrderRemoteDataSource(retrofit))
         OrderPresenter(this, cartRepository, cashRepository, orderRepository)
     }
 
@@ -119,6 +112,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         Toast.makeText(this, getString(R.string.complete_order), Toast.LENGTH_SHORT).show()
         startActivity(OrderDetailActivity.getIntent(this, orderId))
         finish()
+    }
+
+    override fun handleRequestError() {
+        Toast.makeText(this, getString(R.string.loading_error_message), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -15,5 +15,6 @@ interface OrderContract {
         fun showCash(cash: Int)
         fun showTotalPrice(totalPrice: Int)
         fun showOrderDetail(orderId: Long)
+        fun handleRequestError()
     }
 }

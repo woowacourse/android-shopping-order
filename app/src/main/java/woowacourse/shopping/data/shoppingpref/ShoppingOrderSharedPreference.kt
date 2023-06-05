@@ -23,5 +23,11 @@ class ShoppingOrderSharedPreference(context: Context) {
     companion object {
         private const val USERINFO = "USERINFO"
         private const val SERVER = "SERVER"
+        private var shoppingOrderSharedPreference: ShoppingOrderSharedPreference? = null
+        fun getInstance(context: Context): ShoppingOrderSharedPreference {
+            return shoppingOrderSharedPreference ?: ShoppingOrderSharedPreference(context).also {
+                shoppingOrderSharedPreference = it
+            }
+        }
     }
 }

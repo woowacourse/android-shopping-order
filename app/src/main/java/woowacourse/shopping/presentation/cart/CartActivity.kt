@@ -9,10 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
-import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRemoteDataSource
-import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
+import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
@@ -23,13 +22,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
     private val presenter: CartContract.Presenter by lazy {
-        val sharedPref = ShoppingOrderSharedPreference(applicationContext)
-        val productDataSource = ProductRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo)
-        val cartRepository: CartRepository =
-            CartRepositoryImpl(
-                CartRemoteDataSource(sharedPref.baseUrl, sharedPref.userInfo),
-                productDataSource,
-            )
+        val retrofit = RetrofitUtil.getInstance().retrofit
+        val productDataSource = ProductRemoteDataSource(retrofit)
+        val cartRepository = CartRepositoryImpl(CartRemoteDataSource(retrofit), productDataSource)
         CartPresenter(this, cartRepository)
     }
 

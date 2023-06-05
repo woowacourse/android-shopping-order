@@ -1,29 +1,22 @@
 package woowacourse.shopping.data.cart
 
 import android.util.Log
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.data.cart.dto.CartProduct
 import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
 
-class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDataSource {
+class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
 
-    private val retrofitService: CartRetrofitService = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
-        .create(CartRetrofitService::class.java)
+    private val retrofitService = retrofit.create(CartRetrofitService::class.java)
 
     override fun insertCartProduct(
         productId: Long,
         quantity: Int,
         callback: (cartId: Long) -> Unit,
     ) {
-        retrofitService.insertCartProduct(userId, ProductInsertCartRequest(productId, quantity))
+        retrofitService.insertCartProduct(ProductInsertCartRequest(productId, quantity))
             .enqueue(
                 object : retrofit2.Callback<Unit> {
                     override fun onResponse(
@@ -42,7 +35,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     }
 
     override fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit) {
-        retrofitService.updateCartProduct(userId, cartId, quantity)
+        retrofitService.updateCartProduct(cartId, quantity)
             .enqueue(
                 object : retrofit2.Callback<Unit> {
                     override fun onResponse(
@@ -60,7 +53,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     }
 
     override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
-        retrofitService.deleteCartProduct(userId, cartId)
+        retrofitService.deleteCartProduct(cartId)
             .enqueue(
                 object : retrofit2.Callback<Unit> {
                     override fun onResponse(
@@ -78,7 +71,7 @@ class CartRemoteDataSource(baseUrl: String, private val userId: String) : CartDa
     }
 
     override fun getAllCartProducts(callback: (List<CartProduct>) -> Unit) {
-        retrofitService.requestCartProducts(userId)
+        retrofitService.requestCartProducts()
             .enqueue(
                 object : retrofit2.Callback<List<CartProduct>> {
                     override fun onResponse(

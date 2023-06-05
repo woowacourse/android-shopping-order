@@ -1,9 +1,6 @@
 package woowacourse.shopping.data.product
 
 import android.util.Log
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -11,19 +8,13 @@ import woowacourse.shopping.data.product.dto.ProductDetail
 import woowacourse.shopping.data.product.dto.ProductListInfo
 
 class ProductRemoteDataSource(
-    baseUrl: String,
-    private val userId: String,
+    retrofit: Retrofit,
 ) : ProductDataSource {
 
-    private val contentType = "application/json".toMediaType()
-    private val retrofitService: ProductsRetrofitService = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(Json.asConverterFactory(contentType))
-        .build()
-        .create(ProductsRetrofitService::class.java)
+    private val retrofitService = retrofit.create(ProductsRetrofitService::class.java)
 
     override fun findProductById(id: Long, callback: (ProductDetail) -> Unit) {
-        retrofitService.getProductDetail(userId, id)
+        retrofitService.getProductDetail(id)
             .enqueue(
                 object : retrofit2.Callback<ProductDetail> {
                     override fun onResponse(
@@ -48,7 +39,7 @@ class ProductRemoteDataSource(
         pageItemCount: Int,
         callback: (List<ProductDetail>, Boolean) -> Unit,
     ) {
-        retrofitService.getProductDetails(userId, lastId, pageItemCount)
+        retrofitService.getProductDetails(lastId, pageItemCount)
             .enqueue(
                 object : retrofit2.Callback<ProductListInfo> {
                     override fun onResponse(

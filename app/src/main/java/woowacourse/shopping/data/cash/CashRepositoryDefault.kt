@@ -5,7 +5,14 @@ class CashRepositoryDefault(private val cashDataSource: CashDataSource) : CashRe
         cashDataSource.chargeCash(cash, callback)
     }
 
-    override fun loadCash(callback: (Int) -> Unit) {
-        cashDataSource.loadCash(callback)
+    override fun loadCash(callback: (Result<Int>) -> Unit) {
+        cashDataSource.loadCash { result ->
+            val x = result.onSuccess {
+                Result.success(it)
+            }.onFailure {
+                Result.failure<Throwable>(it)
+            }
+            callback(x)
+        }
     }
 }

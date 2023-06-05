@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.serversettings
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
+import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityServerSelectBinding
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 
@@ -25,9 +26,10 @@ class ServerSelectActivity : AppCompatActivity() {
     }
 
     private fun startMain(server: String) {
-        val shoppingOrderSharedPreference = ShoppingOrderSharedPreference(this)
-        shoppingOrderSharedPreference.baseUrl = server
-        shoppingOrderSharedPreference.userInfo = USER_ID
+        val shoppingOrderPref = ShoppingOrderSharedPreference(this)
+        shoppingOrderPref.baseUrl = server
+        shoppingOrderPref.userInfo = USER_ID
+        RetrofitUtil.getInstance(shoppingOrderPref.baseUrl, shoppingOrderPref.userInfo)
         startActivity(ProductListActivity.getIntent(this))
         finish()
     }
