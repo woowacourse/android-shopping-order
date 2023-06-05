@@ -24,4 +24,7 @@
     <string name="order_fail_message">주문에 실패했습니다 다시 시도해주세요.</string>
     <string name="order_list_title">%s 등 %d개</string>
     <string name="toolbar_order_list">주문내역</string>
+    <string name="order_detail_total_price">주문 금액</string>
+    <string name="order_detail_spend_point">사용한 포인트</string>
+    <string name="order_detail_spend_price">결제 금액</string>
 </resources>

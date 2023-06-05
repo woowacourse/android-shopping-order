@@ -7,6 +7,7 @@ import woowacourse.shopping.data.order.OrderRemoteDataSource
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderModel
+import woowacourse.shopping.presentation.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.orderlist.adapter.OrderListAdapter
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
@@ -27,6 +28,8 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun showOrderList(orders: List<OrderModel>) {
-        binding.rvOrderList.adapter = OrderListAdapter(orders)
+        binding.rvOrderList.adapter = OrderListAdapter(orders) {
+            startActivity(OrderDetailActivity.getIntent(this, it))
+        }
     }
 }

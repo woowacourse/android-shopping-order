@@ -16,6 +16,7 @@ import woowacourse.shopping.data.user.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.OrderCartInfoModel
 import woowacourse.shopping.presentation.order.adapter.OrderCartAdapter
+import woowacourse.shopping.presentation.productlist.ProductListActivity
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
 import woowacourse.shopping.util.noIntentExceptionHandler
 
@@ -54,7 +55,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     override fun showOrderSuccess() {
         Toast.makeText(this, getString(R.string.order_success_message), Toast.LENGTH_SHORT).show()
-        finish()
+        val intent = Intent(this, ProductListActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        startActivity(intent)
     }
 
     override fun showOrderFail() {

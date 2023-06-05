@@ -8,6 +8,7 @@ import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.data.order.requestbody.OrderRequestBody
 import woowacourse.shopping.data.order.response.OrderDataModel
+import woowacourse.shopping.data.order.response.OrderDetailDataModel
 import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
 class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) : OrderDataSource {
@@ -47,6 +48,32 @@ class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) 
 
                 override fun onFailure(
                     call: Call<BaseResponse<List<OrderDataModel>>>,
+                    t: Throwable
+                ) {
+                }
+            })
+    }
+
+    override fun loadOrderDetail(
+        id: Int,
+        onSuccess: (OrderDetailDataModel) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        orderClient.loadOrderDetail(credentials = getAuthToken(), id)
+            .enqueue(object : Callback<BaseResponse<OrderDetailDataModel>> {
+                override fun onResponse(
+                    call: Call<BaseResponse<OrderDetailDataModel>>,
+                    response: Response<BaseResponse<OrderDetailDataModel>>
+                ) {
+                    if (response.body()?.result == null) {
+                        onFailure()
+                        return
+                    }
+                    onSuccess(response.body()?.result!!)
+                }
+
+                override fun onFailure(
+                    call: Call<BaseResponse<OrderDetailDataModel>>,
                     t: Throwable
                 ) {
                 }

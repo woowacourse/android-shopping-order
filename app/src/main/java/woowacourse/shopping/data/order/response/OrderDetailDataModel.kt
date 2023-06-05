@@ -5,6 +5,6 @@ data class OrderDetailDataModel(
     val totalPrice: Int,
     val spendPoint: Int,
     val spendPrice: Int,
-    val orderDate: String,
-    val orderItems: List<OrderRequestProductDataModel>
+    val createdAt: String,
+    val orderItemResponses: List<OrderDetailProductDataModel>
 )
