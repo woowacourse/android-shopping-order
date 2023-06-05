@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.productlist
 
+import android.util.Log
 import woowacourse.shopping.domain.pagination.ProductListPagination
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -56,18 +57,12 @@ class ProductListPresenter(
     }
 
     override fun loadMoreProducts() {
-        val recentViewedItemSize =
-            productsListItems.filterIsInstance<ProductListViewItem.RecentViewedItem>().size
-        val productsItemSize =
-            productsListItems.filterIsInstance<ProductListViewItem.ProductItem>().size
-
-        val position = productsItemSize + recentViewedItemSize
         pagination.fetchNextItems { productsWithCartInfo ->
             if (productsWithCartInfo.isEmpty()) return@fetchNextItems
             productsListItems.removeLast()
             addProductsItem(productsWithCartInfo.map { it.toUiModel() })
             addShowMoreItem()
-            view.notifyAddProducts(position, productsWithCartInfo.size)
+            view.changeItems(productsListItems)
         }
     }
 
@@ -114,7 +109,7 @@ class ProductListPresenter(
                         quantity = cartProduct?.quantity ?: 0,
                     ),
                 )
-                view.notifyDataChanged(position)
+                view.changeItems(productsListItems)
             }
         }
     }
@@ -130,7 +125,7 @@ class ProductListPresenter(
                     quantity = productWithCartInfo.cartItem?.quantity ?: 0,
                 ),
             )
-            view.notifyDataChanged(position)
+            view.changeItems(productsListItems)
         }
     }
 
@@ -143,7 +138,7 @@ class ProductListPresenter(
                 0,
                 ProductListViewItem.RecentViewedItem(products.map { it.toUiModel(null) }),
             )
-            view.notifyRecentViewedChanged()
+            view.changeItems(productsListItems)
         }
     }
 

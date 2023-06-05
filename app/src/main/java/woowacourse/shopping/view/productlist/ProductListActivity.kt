@@ -53,6 +53,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         }
     private lateinit var presenter: ProductListContract.Presenter
     private lateinit var cartCountInAppBar: TextView
+    private lateinit var adapter: ProductListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,8 +95,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         val gridLayoutManager = GridLayoutManagerWrapper(this, 2)
         gridLayoutManager.spanSizeLookup = GridLayoutManagerSpanSizeLookup(items)
         binding.gridProducts.layoutManager = gridLayoutManager
-        binding.gridProducts.adapter = ProductListAdapter(
-            items,
+        adapter = ProductListAdapter(
+            items.toMutableList(),
             object : ProductListAdapter.OnItemClick {
                 override fun onProductClick(product: ProductModel) {
                     presenter.showProductDetail(product)
@@ -115,6 +116,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 }
             },
         )
+        binding.gridProducts.adapter = adapter
     }
 
     override fun showErrorMessageToast(message: String?) {
@@ -125,22 +127,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun notifyAddProducts(position: Int, size: Int) {
-        binding.gridProducts.adapter?.notifyItemRangeInserted(position, size)
-    }
-
-    override fun notifyRecentViewedChanged() {
-        binding.gridProducts.adapter?.notifyDataSetChanged()
-    }
-
-    override fun notifyDataChanged(position: Int) {
-        binding.gridProducts.adapter?.notifyItemChanged(position)
-    }
-
     override fun onClickProductDetail(product: ProductModel, lastViewedProduct: ProductModel?) {
         val intent =
             ProductDetailActivity.newIntent(binding.root.context, product)
         resultLauncher.launch(intent)
+    }
+
+    override fun changeItems(newItems: List<ProductListViewItem>) {
+        adapter.updateItems(newItems.toList())
     }
 
     override fun showCartCount(count: Int) {

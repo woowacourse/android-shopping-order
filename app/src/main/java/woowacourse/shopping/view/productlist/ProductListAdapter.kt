@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.ProductModel
 
 class ProductListAdapter(
-    private val items: List<ProductListViewItem>,
+    private val items: MutableList<ProductListViewItem>,
     private val onItemClick: OnItemClick,
 ) : RecyclerView.Adapter<ProductViewHolder>() {
     interface OnItemClick {
@@ -36,6 +36,21 @@ class ProductListAdapter(
             is ProductViewHolder.ShowMoreViewHolder -> {
                 return
             }
+        }
+    }
+
+    fun updateItems(newItems: List<ProductListViewItem>) {
+        val original = items.toList()
+        items.clear()
+        items.addAll(newItems)
+        if (original.size < items.size) { // 더보기 클릭한 경우
+            notifyItemRemoved(original.size - 1)
+            notifyItemRangeInserted(original.size - 1, items.size - original.size + 1)
+            return
+        }
+        val updatedItems = (newItems - original.toSet()).toList()
+        for (item in updatedItems) {
+            notifyItemChanged(items.indexOf(item))
         }
     }
 }
