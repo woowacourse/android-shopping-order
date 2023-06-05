@@ -25,10 +25,8 @@ class ProductDetailPresenter(
     }
 
     override fun setUpProductDetail() {
-        repository.getById(id).getOrNull().let {
-            if (it != null) {
-                view.setProductDetail(it.toUIModel())
-            }
+        repository.getById(id).getOrNull()?.let {
+            view.setProductDetail(it.toUIModel())
         }
     }
 
@@ -41,6 +39,7 @@ class ProductDetailPresenter(
             }
         }
     }
+
     override fun addProductToRecent() {
         recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)

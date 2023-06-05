@@ -57,12 +57,12 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(id: Long) {
-        /*val product = repository.findById(id)?.product
+        val product = repository.findById(id).getOrNull()
         product.let {
             if (it != null) {
-                view.navigateToItemDetail(it.toUIModel())
+                view.navigateToItemDetail(it.product.toUIModel())
             }
-        }*/
+        }
     }
 
     override fun saveOffsetState(outState: MutableMap<String, Int>) {

@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.orderdetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -48,7 +47,6 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     override fun setOrderDetail(order: OrderUIModel) {
-        Log.d("OrderDetailActivity", "setOrderDetail: ${order.orderProducts}")
         setOrderProducts(order.orderProducts)
         binding.order = order
     }

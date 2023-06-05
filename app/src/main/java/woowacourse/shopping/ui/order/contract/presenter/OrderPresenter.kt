@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.order.contract.presenter
 
-import android.util.Log
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
@@ -43,8 +42,9 @@ class OrderPresenter(
         val coupon =
             couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
         val totalPrice = if (coupon != null) {
-             val response = couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.id).getOrNull()
-                ?: throw IllegalArgumentException("쿠폰 적용 실패")
+            val response =
+                couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.id).getOrNull()
+                    ?: throw IllegalArgumentException("쿠폰 적용 실패")
             response.totalPrice
         } else {
             cartItems.totalPrice

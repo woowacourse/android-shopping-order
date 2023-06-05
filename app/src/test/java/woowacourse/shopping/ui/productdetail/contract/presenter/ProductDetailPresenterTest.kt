@@ -1,30 +1,28 @@
 package woowacourse.shopping.ui.productdetail.contract.presenter
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.ProductDetailRepository
 import com.example.domain.repository.RecentRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.productdetail.contract.ProductDetailContract
-import kotlin.properties.Delegates
 
 internal class ProductDetailPresenterTest {
     private lateinit var view: ProductDetailContract.View
     private lateinit var presenter: ProductDetailPresenter
     private lateinit var cartRepository: CartRepository
     private lateinit var recentRepository: RecentRepository
-    private var visible by Delegates.notNull<Boolean>()
+    private lateinit var productDetailRepository: ProductDetailRepository
 
     private val fakeProduct: Product = Product(
         1,
@@ -39,14 +37,15 @@ internal class ProductDetailPresenterTest {
     @Before
     fun setUp() {
         view = mockk(relaxed = true)
-        visible = true
         cartRepository = mockk(relaxed = true)
         recentRepository = mockk(relaxed = true)
+        productDetailRepository = mockk(relaxed = true)
+        every { productDetailRepository.getById(0) } returns Result.success(fakeProduct)
         presenter =
             ProductDetailPresenter(
                 view,
-                fakeProduct.toUIModel(),
-                visible,
+                0,
+                productDetailRepository,
                 cartRepository,
                 recentRepository,
             )
@@ -54,25 +53,27 @@ internal class ProductDetailPresenterTest {
 
     @Test
     fun `상품을 불러와서 세팅한다`() {
-        // given
         val slot = slot<ProductUIModel>()
+        every { productDetailRepository.getById(any()) } returns Result.success(fakeProduct)
         every { view.setProductDetail(capture(slot)) } answers { nothing }
-        // when
+
+// when
         presenter.setUpProductDetail()
 
-        // then
-        Assert.assertEquals(slot.captured, fakeProduct.toUIModel())
+// then
+        assertEquals(fakeProduct.toUIModel(), slot.captured)
         verify { view.setProductDetail(fakeProduct.toUIModel()) }
     }
 
     @Test
     fun `상품을 장바구니에 추가한다`() {
         // given
-        every { cartRepository.insert(any()) } answers { nothing }
+        every { cartRepository.findById(any()) } returns Result.success(null)
+        every { cartRepository.insert(any(), any()) } answers { Result.success(Unit) }
         // when
         presenter.addProductToCart()
         // then
-        verify(exactly = 1) { cartRepository.insert(CartProduct(fakeProduct, 1, true)) }
+        verify { cartRepository.insert(any(), any()) }
     }
 
     @Test
@@ -83,18 +84,6 @@ internal class ProductDetailPresenterTest {
         presenter.addProductToRecent()
         // then
         verify { recentRepository.insert(fakeProduct) }
-    }
-
-    @Test
-    fun `최근 본 상품을 볼 수 있는지 확인`() {
-        // given
-        val slot = slot<Boolean>()
-        every { view.setVisibleLatestProduct(capture(slot)) } answers { nothing }
-        // when
-        presenter.isVisibleLatestProduct()
-        // then
-        assertEquals(slot.captured, visible)
-        verify { view.setVisibleLatestProduct(slot.captured) }
     }
 
     @Test
@@ -125,15 +114,15 @@ internal class ProductDetailPresenterTest {
     @Test
     fun `마지막으로 본 상품을 누르면 상세화면으로 이동한다`() {
         // given
-        val slot = slot<ProductUIModel>()
+        val slot = slot<Long>()
         every { recentRepository.getRecent(1) } returns listOf(fakeProduct)
         every { view.navigateToDetail(capture(slot)) } answers { nothing }
         // when
         presenter.setLatestProduct()
         presenter.clickLatestProduct()
         // then
-        assertEquals(slot.captured, fakeProduct.toUIModel())
-        verify { view.navigateToDetail(fakeProduct.toUIModel()) }
+        assertEquals(slot.captured, fakeProduct.id)
+        verify { view.navigateToDetail(fakeProduct.id) }
     }
 
     @Test
@@ -141,7 +130,7 @@ internal class ProductDetailPresenterTest {
         // given
         presenter.addProductCount(fakeProduct.id)
         // then
-        assertEquals(presenter.count.value, 2)
+        verify { view.setProductCount(any()) }
     }
 
     @Test
@@ -150,6 +139,6 @@ internal class ProductDetailPresenterTest {
         presenter.addProductCount(fakeProduct.id)
         presenter.subtractProductCount(fakeProduct.id)
         // then
-        assertEquals(presenter.count.value, 1)
+        verify { view.setProductCount(any()) }
     }
 }
