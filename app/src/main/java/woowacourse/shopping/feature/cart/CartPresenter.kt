@@ -22,29 +22,33 @@ class CartPresenter(
     private var pageNumber: Int = 1
 
     override fun initContents() {
+        cartRepository.requestFetchCartProductsUnit(
+            Cart.MAX_SIZE,
+            pageNumber,
+            onFailure = {},
+            onSuccess = { cartProducts: List<CartProduct>, _: Pagination ->
+                cart.updateAll(cartProducts)
+                loadCart()
+                view.setCartPageNumber(pageNumber)
+                view.showCartProducts()
+            }
+        )
     }
 
     override fun loadCart() {
-        val startIndex = pageNumber * maxProductsPerPage - maxProductsPerPage
-        val endIndex = pageNumber * maxProductsPerPage - 1
-
         cartRepository.requestFetchCartProductsUnit(
             maxProductsPerPage,
             pageNumber,
             onFailure = {},
             onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
                 val cartProductStates: List<CartProductState> = cartProducts.map(CartProduct::toUi)
-                cart.updateAll(cartProducts)
-                pickAll()
                 maxPageNumber = pagination.lastPage
+                pickAll()
                 view.setCartPageNumber(pageNumber)
                 view.setCartProducts(cartProductStates)
                 view.showCartProducts()
             }
         )
-
-//        val items: List<CartProductState> =
-//            cartProducts.filterIndexed { index, _ -> index in startIndex..endIndex }
 
         view.setCartPageNumber(pageNumber)
         if (minPageNumber < maxPageNumber) view.showPageSelectorView()
@@ -145,10 +149,5 @@ class CartPresenter(
 
     override fun attachCartToOrder() {
         view.showOrderPage(cart.getPickedProducts().toUi())
-    }
-
-    private fun getMaxPageNumber(cartsSize: Int): Int {
-        if (cartsSize == 0) return 1
-        return (cartsSize - 1) / maxProductsPerPage + 1
     }
 }
