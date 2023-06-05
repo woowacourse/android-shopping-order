@@ -71,6 +71,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
 
     override fun navigateToOrderDetail(id: Long) {
         startActivity(OrderDetailActivity.from(this, id))
+        finish()
     }
 
     override fun setUpOrder(cartProducts: List<CartProductUIModel>) {

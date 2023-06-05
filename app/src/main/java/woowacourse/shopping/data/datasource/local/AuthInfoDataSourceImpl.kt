@@ -17,7 +17,7 @@ class AuthInfoDataSourceImpl private constructor(context: Context) : AuthInfoDat
     }
 
     override fun setAuthInfo() {
-        sharedPreference.edit().putString(USER_ACCESS_TOKEN, "basic c2FuZ3VuOjEyMzQ=").apply()
+        sharedPreference.edit().putString(USER_ACCESS_TOKEN, "basic bG9waToxMjM0").apply()
     }
 
     companion object {
