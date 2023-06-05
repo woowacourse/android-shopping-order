@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
@@ -28,6 +29,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private lateinit var presenter: ProductDetailContract.Presenter
     private lateinit var productModel: ProductModel
     private lateinit var productDetailDialog: ProductDetailDialog
+    private val httpErrorHandler = HttpErrorHandler(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initProductModel()
@@ -50,6 +52,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                 cartRemoteDataSource = CartServiceHelper(
                     PreferenceUtil(this),
                 ),
+                httpErrorHandler
             ),
             productModel = productModel,
             recentProductRepository = RecentProductRepositoryImpl(
@@ -57,6 +60,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
                     RecentProductDbHelper(this),
                 ),
                 ProductServiceHelper,
+                httpErrorHandler
             ),
         )
     }

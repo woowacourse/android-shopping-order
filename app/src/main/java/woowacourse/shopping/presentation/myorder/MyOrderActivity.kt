@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
@@ -20,7 +21,10 @@ class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
     private val presenter: MyOrderContract.Presenter by lazy {
         MyOrderPresenter(
             view = this,
-            orderRepository = OrderRepositoryImpl(OrderServiceHelper(PreferenceUtil(this)))
+            orderRepository = OrderRepositoryImpl(
+                OrderServiceHelper(PreferenceUtil(this)),
+                HttpErrorHandler(this)
+            )
         )
     }
 

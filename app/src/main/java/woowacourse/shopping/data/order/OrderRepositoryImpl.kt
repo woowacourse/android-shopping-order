@@ -16,7 +16,8 @@ import woowacourse.shopping.data.order.model.OrderProductBody
 import woowacourse.shopping.repository.OrderRepository
 
 class OrderRepositoryImpl constructor(
-    private val orderRemoteDataSource: OrderRemoteDataSource
+    private val orderRemoteDataSource: OrderRemoteDataSource,
+    private val httpErrorHandler: HttpErrorHandler,
 ) : OrderRepository {
     override fun getAllOrders(onSuccess: (List<Order>) -> Unit) {
         orderRemoteDataSource.getAllOrders()
@@ -38,7 +39,7 @@ class OrderRepositoryImpl constructor(
                     call: Call<BaseResponse<List<OrderDataModel>>>,
                     t: Throwable
                 ) {
-                    HttpErrorHandler.throwError(t)
+                    httpErrorHandler.handleHttpError(t)
                 }
             })
     }
@@ -59,7 +60,7 @@ class OrderRepositoryImpl constructor(
                     call: Call<BaseResponse<OrderDetailDataModel>>,
                     t: Throwable
                 ) {
-                    HttpErrorHandler.throwError(t)
+                    httpErrorHandler.handleHttpError(t)
                 }
             })
     }
@@ -84,7 +85,7 @@ class OrderRepositoryImpl constructor(
                 }
 
                 override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
-                    HttpErrorHandler.throwError(t)
+                    httpErrorHandler.handleHttpError(t)
                 }
             })
     }

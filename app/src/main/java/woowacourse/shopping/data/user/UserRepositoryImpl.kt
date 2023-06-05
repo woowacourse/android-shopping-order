@@ -11,7 +11,8 @@ import woowacourse.shopping.data.user.model.UserDataModel
 import woowacourse.shopping.repository.UserRepository
 
 class UserRepositoryImpl constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val httpErrorHandler: HttpErrorHandler,
 ) : UserRepository {
     override fun getUserPoint(onSuccess: (User?) -> Unit) {
         userRemoteDataSource.getUserPoint().enqueue(object : Callback<BaseResponse<UserDataModel>> {
@@ -25,7 +26,7 @@ class UserRepositoryImpl constructor(
             }
 
             override fun onFailure(call: Call<BaseResponse<UserDataModel>>, t: Throwable) {
-                HttpErrorHandler.throwError(t)
+                httpErrorHandler.handleHttpError(t)
             }
         })
     }

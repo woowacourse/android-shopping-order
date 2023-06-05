@@ -10,6 +10,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
@@ -36,17 +37,18 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var productListAdapter: ProductListAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private lateinit var cartMenuItem: MenuItem
-
+    private val httpErrorHandler = HttpErrorHandler(this)
     private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductServiceHelper }
     private val presenter: ProductListPresenter by lazy {
         ProductListPresenter(
             this,
-            ProductRepositoryImpl(productRemoteDataSource),
+            ProductRepositoryImpl(productRemoteDataSource, httpErrorHandler),
             RecentProductRepositoryImpl(
                 RecentProductDao(RecentProductDbHelper(this)),
                 ProductServiceHelper,
+                httpErrorHandler,
             ),
-            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this))),
+            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this)), httpErrorHandler),
         )
     }
 

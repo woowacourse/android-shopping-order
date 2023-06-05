@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
@@ -27,6 +28,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var presenter: OrderContract.Presenter
     private lateinit var orderAdapter: OrderItemsAdapter
     private lateinit var productPriceTextView: TextView
+    private val httpErrorHandler = HttpErrorHandler(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
@@ -50,8 +52,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                 presenter = OrderPresenter(
                     view = this,
                     orderProductsModel = receivedProduct,
-                    orderRepository = OrderRepositoryImpl(OrderServiceHelper(PreferenceUtil(this))),
-                    userRepository = UserRepositoryImpl(UserServiceHelper(PreferenceUtil(this)))
+                    orderRepository = OrderRepositoryImpl(
+                        OrderServiceHelper(PreferenceUtil(this)),
+                        httpErrorHandler
+                    ),
+                    userRepository = UserRepositoryImpl(
+                        UserServiceHelper(PreferenceUtil(this)),
+                        httpErrorHandler
+                    )
                 )
             } ?: noIntentExceptionHandler(getString(R.string.product_model_null_error_message))
     }

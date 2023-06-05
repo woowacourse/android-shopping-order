@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
@@ -36,7 +37,10 @@ class MyOrderDetailActivity : AppCompatActivity(), MyOrderDetailContract.View {
         val orderId = intent.getIntExtra(ORDER_ID_KEY, 0)
         presenter = MyOrderDetailPresenter(
             this,
-            OrderRepositoryImpl(OrderServiceHelper(PreferenceUtil(this))),
+            OrderRepositoryImpl(
+                OrderServiceHelper(PreferenceUtil(this)),
+                HttpErrorHandler(this)
+            ),
             orderId
         )
     }

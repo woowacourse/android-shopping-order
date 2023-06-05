@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.recentproduct
 
 import woowacourse.shopping.Product
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.repository.RecentProductRepository
@@ -8,8 +9,9 @@ import woowacourse.shopping.repository.RecentProductRepository
 class RecentProductRepositoryImpl constructor(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
     productRemoteDataSource: ProductRemoteDataSource,
+    httpErrorHandler: HttpErrorHandler,
 ) : RecentProductRepository {
-    private val productRepository = ProductRepositoryImpl(productRemoteDataSource)
+    private val productRepository = ProductRepositoryImpl(productRemoteDataSource, httpErrorHandler)
     override fun addRecentProductId(recentProductId: Int) {
         recentProductLocalDataSource.addRecentProduct(recentProductId)
     }

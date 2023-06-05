@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
@@ -21,12 +22,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var cartAdapter: CartAdapter
     private lateinit var cartProductPriceView: TextView
+    private val httpErrorHandler = HttpErrorHandler(this)
     private val presenter: CartContract.Presenter by lazy { initPresenter() }
 
     private fun initPresenter(): CartContract.Presenter {
         return CartPresenter(
             this,
-            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this))),
+            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this)), httpErrorHandler),
         )
     }
 

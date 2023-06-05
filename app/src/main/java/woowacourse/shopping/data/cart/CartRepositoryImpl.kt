@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.cart
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.model.CartDataModel
 import woowacourse.shopping.data.common.model.BaseResponse
 import woowacourse.shopping.data.mapper.toDomain
@@ -13,6 +13,7 @@ import woowacourse.shopping.repository.CartRepository
 
 class CartRepositoryImpl constructor(
     private val cartRemoteDataSource: CartRemoteDataSource,
+    private val httpErrorHandler: HttpErrorHandler,
 ) : CartRepository {
     override fun addCartItem(productId: Int, onSuccess: (Int?) -> Unit) {
         cartRemoteDataSource.addCartItem(productId).enqueue(object : Callback<BaseResponse<Unit>> {
@@ -23,8 +24,7 @@ class CartRepositoryImpl constructor(
             }
 
             override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
-                Log.d("HttpError", t.message.toString())
-                throw (t)
+                httpErrorHandler.handleHttpError(t)
             }
         })
     }
@@ -36,8 +36,7 @@ class CartRepositoryImpl constructor(
             }
 
             override fun onFailure(call: Call<BaseResponse<CartDataModel>>, t: Throwable) {
-                Log.d("HttpError", t.message.toString())
-                throw (t)
+                httpErrorHandler.handleHttpError(t)
             }
         })
     }
@@ -52,8 +51,7 @@ class CartRepositoryImpl constructor(
             }
 
             override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
-                Log.d("HttpError", t.message.toString())
-                throw (t)
+                httpErrorHandler.handleHttpError(t)
             }
         })
     }
@@ -81,8 +79,7 @@ class CartRepositoryImpl constructor(
                 }
 
                 override fun onFailure(call: Call<BaseResponse<List<CartDataModel>>>, t: Throwable) {
-                    Log.d("HttpError", t.message.toString())
-                    throw (t)
+                    httpErrorHandler.handleHttpError(t)
                 }
             })
     }

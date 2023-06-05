@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.serversetting
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.ApiClient
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.product.ProductServiceHelper
 import woowacourse.shopping.data.recentproduct.RecentProductDao
@@ -21,6 +22,7 @@ class ServerSettingActivity : AppCompatActivity() {
             RecentProductRepositoryImpl(
                 recentProductLocalDataSource = RecentProductDao(RecentProductDbHelper(this)),
                 productRemoteDataSource = ProductServiceHelper,
+                HttpErrorHandler(this),
             ),
         )
     }
