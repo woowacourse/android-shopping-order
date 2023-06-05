@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.Order
+import java.util.concurrent.CompletableFuture
 
 interface OrderRepository {
 
@@ -8,9 +9,7 @@ interface OrderRepository {
         basketIds: List<Int>,
         usingPoint: Int,
         totalPrice: Int,
-        onAdded: (orderId: Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    ): CompletableFuture<Result<Int>>
 
     fun getOrder(
         orderId: Int,

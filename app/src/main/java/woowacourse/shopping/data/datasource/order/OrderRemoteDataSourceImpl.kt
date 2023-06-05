@@ -10,37 +10,22 @@ import woowacourse.shopping.data.datasource.response.OrderEntity
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
-    override fun addOrder(
-        orderRequest: OrderRequest,
-        onAdded: (orderId: Long) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        orderService.addOrder(
+    override fun addOrder(orderRequest: OrderRequest): Result<Long> {
+        val response = orderService.addOrder(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             orderRequest = orderRequest
-        ).enqueue(object : retrofit2.Callback<OrderEntity> {
+        ).execute()
 
-            override fun onResponse(
-                call: Call<OrderEntity>,
-                response: Response<OrderEntity>,
-            ) {
-                if (response.code() == 409) {
-                    onFailed(STOCK_ERROR)
-                } else {
-                    response.headers()[LOCATION]?.let {
-                        val orderId = it.split("/")
-                            .last()
-                            .toLong()
-
-                        onAdded(orderId)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<OrderEntity>, t: Throwable) {
-                onFailed(RESPONSE_ERROR)
-            }
-        })
+        if (response.code() == 409) {
+            return Result.failure(Throwable(STOCK_ERROR))
+        }
+        return response.headers()[LOCATION]?.run {
+            Result.success(
+                this.split("/")
+                    .last()
+                    .toLong()
+            )
+        } ?: Result.failure(Throwable(FAILED_TO_ADD_ORDER))
     }
 
     override fun getOrder(
@@ -92,7 +77,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     companion object {
-        private const val RESPONSE_ERROR = "서버로부터 응답을 받지 못했습니다."
+        private const val FAILED_TO_ADD_ORDER = "주문을 추가하지 못했습니다"
         private const val ORDER_INFO_ERROR = "주문에 대한 정보를 받아오지 못했습니다."
         private const val ORDERS_INFO_ERROR = "주문 목록에 대한 정보를 받아오지 못했습니다."
         private const val STOCK_ERROR = "상품 재고가 부족해 주문에 실패했습니다."

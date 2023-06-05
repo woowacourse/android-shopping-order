@@ -5,11 +5,7 @@ import woowacourse.shopping.data.datasource.response.OrderEntity
 
 interface OrderRemoteDataSource {
 
-    fun addOrder(
-        orderRequest: OrderRequest,
-        onAdded: (orderId: Long) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun addOrder(orderRequest: OrderRequest): Result<Long>
 
     fun getOrder(
         orderId: Int,

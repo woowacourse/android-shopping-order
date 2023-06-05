@@ -25,7 +25,7 @@ interface OrderService {
         authorization: String,
         @Body
         orderRequest: OrderRequest,
-    ): Call<OrderEntity>
+    ): Call<Unit>
 
     @GET("orders")
     fun getOrders(

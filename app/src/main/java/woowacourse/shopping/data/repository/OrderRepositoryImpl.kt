@@ -5,6 +5,7 @@ import woowacourse.shopping.data.datasource.request.OrderRequest
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.repository.OrderRepository
+import java.util.concurrent.CompletableFuture
 
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
@@ -14,24 +15,18 @@ class OrderRepositoryImpl(
         basketIds: List<Int>,
         usingPoint: Int,
         totalPrice: Int,
-        onAdded: (orderId: Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
+    ): CompletableFuture<Result<Int>> {
         val orderRequest = OrderRequest(
             basketIds = basketIds.map(Int::toLong),
             usingPoint = usingPoint.toLong(),
             totalPrice = totalPrice.toLong()
         )
 
-        orderRemoteDataSource.addOrder(
-            orderRequest = orderRequest,
-            onAdded = { orderId ->
-                onAdded(orderId.toInt())
-            },
-            onFailed = { errorMessage ->
-                onFailed(errorMessage)
+        return CompletableFuture.supplyAsync {
+            orderRemoteDataSource.addOrder(orderRequest).mapCatching {
+                it.toInt()
             }
-        )
+        }
     }
 
     override fun getOrder(

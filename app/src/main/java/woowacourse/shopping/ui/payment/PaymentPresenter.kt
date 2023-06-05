@@ -31,8 +31,13 @@ class PaymentPresenter(
             basketIds = basketProducts.map { it.id },
             usingPoint = usingPoint,
             totalPrice = basketProducts.sumOf { it.product.price.value * it.count.value },
-            onAdded = view::showOrderDetail,
-            onFailed = view::showErrorMessage
-        )
+        ).thenAccept {
+            val orderId = it.getOrThrow()
+
+            view.showOrderDetail(orderId)
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 }

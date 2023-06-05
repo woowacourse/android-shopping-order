@@ -57,42 +57,44 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         basketProducts: List<BasketProductUiModel>,
         totalPrice: Int,
     ) {
-        with(binding) {
-            ivPaymentProduct.setImage(
-                basketProducts.first()
-                    .product
-                    .imageUrl
-            )
-            tvPaymentProductNameCount.text = getString(
-                R.string.tv_order_products,
-                basketProducts.first().product.name,
-                basketProducts.size
-            )
-            tvPaymentOnImageCount.text = getString(
-                R.string.iv_product_count,
-                basketProducts.size
-            )
-            tvPaymentPointMessage.text = getString(R.string.tv_over_using_point)
-            tvPaymentHoldingPoint.text = user.point.toString()
-            tvPaymentTotalPrice.text = totalPrice.toString()
-            tvPaymentActualAmount.text = totalPrice.toString()
-            etPaymentUsingPoint.addTextChangedListener(
-                InputPointWatcher(
-                    totalPrice = totalPrice,
-                    possessingPoint = user.point,
-                    availableCase = ::successToApplyPoint,
-                    inAvailableCase = ::failedToApplyPoint
+        runOnUiThread {
+            with(binding) {
+                ivPaymentProduct.setImage(
+                    basketProducts.first()
+                        .product
+                        .imageUrl
                 )
-            )
-            btnPaymentFinalOrder.setOnClickListener {
-                presenter.addOrder(
-                    usingPoint = etPaymentUsingPoint.text
-                        .toString()
-                        .toInt()
+                tvPaymentProductNameCount.text = getString(
+                    R.string.tv_order_products,
+                    basketProducts.first().product.name,
+                    basketProducts.size
                 )
-            }
-            ivPaymentClose.setOnClickListener {
-                finish()
+                tvPaymentOnImageCount.text = getString(
+                    R.string.iv_product_count,
+                    basketProducts.size
+                )
+                tvPaymentPointMessage.text = getString(R.string.tv_over_using_point)
+                tvPaymentHoldingPoint.text = user.point.toString()
+                tvPaymentTotalPrice.text = totalPrice.toString()
+                tvPaymentActualAmount.text = totalPrice.toString()
+                etPaymentUsingPoint.addTextChangedListener(
+                    InputPointWatcher(
+                        totalPrice = totalPrice,
+                        possessingPoint = user.point,
+                        availableCase = ::successToApplyPoint,
+                        inAvailableCase = ::failedToApplyPoint
+                    )
+                )
+                btnPaymentFinalOrder.setOnClickListener {
+                    presenter.addOrder(
+                        usingPoint = etPaymentUsingPoint.text
+                            .toString()
+                            .toInt()
+                    )
+                }
+                ivPaymentClose.setOnClickListener {
+                    finish()
+                }
             }
         }
     }

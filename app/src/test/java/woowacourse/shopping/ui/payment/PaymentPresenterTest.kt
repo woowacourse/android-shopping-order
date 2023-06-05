@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.payment
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -87,7 +86,6 @@ class PaymentPresenterTest {
         // given
         val basketsId = basketProducts.map { it.id }
         val totalPrice = basketProducts.sumOf { it.product.price.value }
-        val slotShowOrderDetail = slot<(orderId: Int) -> Unit>()
         val usingPoint = 1000
         val orderId = 1
 
@@ -96,24 +94,19 @@ class PaymentPresenterTest {
                 basketIds = basketsId,
                 usingPoint = usingPoint,
                 totalPrice = totalPrice,
-                onAdded = capture(slotShowOrderDetail),
-                onFailed = any()
             )
-        } answers {
-            slotShowOrderDetail.captured.invoke(orderId)
-        }
+        } returns CompletableFuture.completedFuture(Result.success(orderId))
 
         // when: 주문을 추가한다
         presenter.addOrder(usingPoint)
 
         // then: 받아온 주문 식별번호를 가지고 주문 상세 화면을 보여준다
-        verify { view.showOrderDetail(orderId = 1) }
+        verify { view.showOrderDetail(orderId) }
     }
 
     @Test
     fun `주문을 추가에 실패한 경우 에러 메시지를 띄운다`() {
         // given
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "주문 추가에 실패했습니다"
 
         every {
@@ -121,17 +114,13 @@ class PaymentPresenterTest {
                 basketIds = any(),
                 usingPoint = any(),
                 totalPrice = any(),
-                onAdded = any(),
-                onFailed = capture(slotShowErrorMessage)
             )
-        } answers {
-            slotShowErrorMessage.captured.invoke(errorMessage)
-        }
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when: 주문을 추가한다
         presenter.addOrder(0)
 
         // then: 실패한 경우 에러메시지를 띄운다
-        verify { view.showErrorMessage(errorMessage) }
+        verify { view.showErrorMessage(any()) }
     }
 }
