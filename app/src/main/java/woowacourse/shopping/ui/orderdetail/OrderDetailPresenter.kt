@@ -24,8 +24,19 @@ class OrderDetailPresenter(
                     null
                 }
         }
+
         order?.let {
             view.initView(it)
         }
+    }
+
+    override fun handleNavigator() {
+        order?.let {
+            return view.navigator.navigateToPreviousView(
+                onFailed = view::showErrorMessage
+            )
+        }
+
+        view.navigator.navigateToShoppingView()
     }
 }
