@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.order
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
 import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
@@ -25,11 +24,6 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
                 call: Call<OrderEntity>,
                 response: Response<OrderEntity>,
             ) {
-                Log.d("woogi", "onResponse: $orderRequest")
-                Log.d(
-                    "woogi",
-                    "onResponse: ${response.code()}, ${response.headers()}, ${response.message()}"
-                )
                 if (response.code() == 409) {
                     onFailed(STOCK_ERROR)
                 } else {
