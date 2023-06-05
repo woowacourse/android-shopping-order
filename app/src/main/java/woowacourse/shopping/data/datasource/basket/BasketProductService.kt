@@ -1,8 +1,6 @@
 package woowacourse.shopping.data.datasource.basket
 
-import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -18,7 +16,7 @@ interface BasketProductService {
     @GET("cart-items")
     fun requestBasketProducts(
         @Header("Authorization")
-        authorization: String
+        authorization: String,
     ): Call<List<BasketProductEntity>>
 
     @Headers("Content-Type: application/json")
@@ -28,7 +26,7 @@ interface BasketProductService {
         authorization: String,
         @Body
         productId: Int,
-    ): Call<Response<ResponseBody>>
+    ): Call<Unit>
 
     @Headers("Content-Type: application/json")
     @PATCH("cart-items/{cartItemId}")
@@ -39,7 +37,7 @@ interface BasketProductService {
         cartItemId: String,
         @Body
         quantity: Int,
-    ): Call<Response<ResponseBody>>
+    ): Call<Unit>
 
     @DELETE("cart-items/{cartItemId}")
     fun removeBasketProduct(
@@ -47,5 +45,5 @@ interface BasketProductService {
         authorization: String,
         @Path("cartItemId")
         cartItemId: String,
-    ): Call<Response<ResponseBody>>
+    ): Call<Unit>
 }

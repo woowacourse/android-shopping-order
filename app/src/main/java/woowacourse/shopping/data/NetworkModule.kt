@@ -17,7 +17,6 @@ object NetworkModule {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(url)
-            .addConverterFactory(NullOnEmptyConvertFactory)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

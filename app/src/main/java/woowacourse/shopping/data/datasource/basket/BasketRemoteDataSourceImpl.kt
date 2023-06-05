@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.basket
 
-import okhttp3.ResponseBody
 import woowacourse.shopping.data.NetworkModule.AUTHORIZATION_FORMAT
 import woowacourse.shopping.data.NetworkModule.basketProductService
 import woowacourse.shopping.data.NetworkModule.encodedUserInfo
@@ -40,11 +39,11 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         basketProductService.addBasketProduct(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             productId = product.id
-        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
+        ).enqueue(object : retrofit2.Callback<Unit> {
 
             override fun onResponse(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
-                response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
+                response: retrofit2.Response<Unit>,
             ) {
                 response.headers()[LOCATION]?.let {
                     val productId = it.split("/").last().toInt()
@@ -54,7 +53,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             }
 
             override fun onFailure(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
                 t: Throwable,
             ) {
                 onFailed(FAILED_TO_ADD_BASKET)
@@ -71,11 +70,11 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
             quantity = basketProduct.count
-        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
+        ).enqueue(object : retrofit2.Callback<Unit> {
 
             override fun onResponse(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
-                response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
+                response: retrofit2.Response<Unit>,
             ) {
                 if (response.isSuccessful) {
                     onUpdated()
@@ -85,7 +84,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             }
 
             override fun onFailure(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
                 t: Throwable,
             ) {
                 onFailed(FAILED_TO_UPDATE_COUNT)
@@ -101,11 +100,11 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         basketProductService.removeBasketProduct(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             cartItemId = basketProduct.id.toString(),
-        ).enqueue(object : retrofit2.Callback<retrofit2.Response<ResponseBody>> {
+        ).enqueue(object : retrofit2.Callback<Unit> {
 
             override fun onResponse(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
-                response: retrofit2.Response<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
+                response: retrofit2.Response<Unit>,
             ) {
                 if (response.isSuccessful) {
                     onRemoved()
@@ -115,7 +114,7 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
             }
 
             override fun onFailure(
-                call: retrofit2.Call<retrofit2.Response<ResponseBody>>,
+                call: retrofit2.Call<Unit>,
                 t: Throwable,
             ) {
                 onFailed(FAILED_TO_REMOVE_PRODUCT)
