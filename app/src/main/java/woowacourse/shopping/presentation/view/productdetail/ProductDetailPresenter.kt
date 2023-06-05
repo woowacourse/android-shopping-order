@@ -44,14 +44,14 @@ class ProductDetailPresenter(
 
     override fun addCart(count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartRemoteEntity = carts.find { cartRemoteEntity -> cartRemoteEntity.productEntity.id == product.product.id }
+            val cartProduct = carts.all.find { cartProduct -> cartProduct.product.id == product.product.id }
 
-            if (cartRemoteEntity == null) {
+            if (cartProduct == null) {
                 cartRepository.addCartProduct(product.product.id, ::onFailure) {
                     if (count == UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                             val reCartProduct =
-                                reLoadCarts.find { cartProduct -> cartProduct.productEntity.id == product.id }
+                                reLoadCarts.all.find { product -> product.product.id == this.product.id }
                                     ?: return@loadAllCarts
 
                             cartRepository.addLocalCart(reCartProduct.id)
@@ -64,10 +64,10 @@ class ProductDetailPresenter(
 
                     cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                         val reCartProduct =
-                            reLoadCarts.find { cartProduct -> cartProduct.productEntity.id == product.id }
+                            reLoadCarts.all.find { product -> product.product.id == this.product.id }
                                 ?: return@loadAllCarts
 
-                        val newCartProduct = reCartProduct.copy(quantity = count)
+                        val newCartProduct = reCartProduct.copy(count = count)
                         cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                             view.addCartSuccessView()
                             view.exitProductDetailView()
@@ -76,9 +76,9 @@ class ProductDetailPresenter(
                 }
             }
 
-            cartRemoteEntity?.let { cart ->
-                val newCartRemoteEntity = cartRemoteEntity.copy(quantity = cart.quantity + count)
-                cartRepository.updateCartCount(newCartRemoteEntity, ::onFailure) {
+            cartProduct?.let { cart ->
+                val newCartProduct = cartProduct.copy(count = cart.count + count)
+                cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()
                 }

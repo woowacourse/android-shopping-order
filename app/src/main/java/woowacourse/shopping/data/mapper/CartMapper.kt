@@ -12,7 +12,8 @@ fun CartRemoteEntity.toUIModel(): CartModel =
         checked = true,
     )
 
-fun CartRemoteEntity.toDomain(): CartProduct = CartProduct(id, productEntity.toDomain(), checked = false)
+fun CartRemoteEntity.toDomain(): CartProduct =
+    CartProduct(id, productEntity.toDomain(), quantity, checked = false)
 
 fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toEntity())
 

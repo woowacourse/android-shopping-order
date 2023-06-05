@@ -47,7 +47,7 @@ class ProductListPresenter(
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val newProducts = products.map { product ->
                 product.copy(
-                    count = carts.find { cart -> cart.productEntity.id == product.product.id }?.quantity
+                    count = carts.all.find { cart -> cart.product.id == product.product.id }?.count
                         ?: 0,
                 )
             }
@@ -139,9 +139,9 @@ class ProductListPresenter(
         }
 
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = carts.find { it.productEntity.id == productId } ?: return@loadAllCarts
+            val cartProduct = carts.all.find { it.product.id == productId } ?: return@loadAllCarts
             cartRepository.addLocalCart(cartProduct.id)
-            val newCartProduct = cartProduct.copy(quantity = count)
+            val newCartProduct = cartProduct.copy(count = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                 if (count == 0) {

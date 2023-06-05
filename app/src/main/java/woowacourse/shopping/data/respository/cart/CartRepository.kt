@@ -1,7 +1,8 @@
 package woowacourse.shopping.data.respository.cart
 
+import com.example.domain.cart.CartProduct
+import com.example.domain.cart.CartProducts
 import woowacourse.shopping.data.model.CartLocalEntity
-import woowacourse.shopping.data.model.CartRemoteEntity
 
 interface CartRepository {
     fun addLocalCart(cartId: Long)
@@ -16,10 +17,10 @@ interface CartRepository {
     )
     fun loadAllCarts(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onSuccess: (products: CartProducts) -> Unit,
     )
     fun updateCartCount(
-        cartEntity: CartRemoteEntity,
+        cartProduct: CartProduct,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     )

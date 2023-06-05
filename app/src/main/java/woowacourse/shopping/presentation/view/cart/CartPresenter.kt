@@ -1,10 +1,6 @@
 package woowacourse.shopping.presentation.view.cart
 
-import com.example.domain.cart.CartProducts
 import com.example.domain.page.PageNation
-import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.mapper.toEntity
-import woowacourse.shopping.data.mapper.toUIModel
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.presentation.model.CartModel
@@ -25,12 +21,9 @@ class CartPresenter(
         get() = (currentPage - 1) * DISPLAY_CART_COUNT_CONDITION
 
     override fun initCartItems() {
-        cartRepository.loadAllCarts(::onFailure) {
-            val carts = mutableListOf<CartModel>()
-            carts.addAll(it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() })
-
+        cartRepository.loadAllCarts(::onFailure) { cartProducts ->
             pageNation = PageNation(
-                CartProducts(carts.map { cartModel -> cartModel.toDomain() }),
+                cartProducts,
                 currentPage,
             )
 
@@ -102,8 +95,7 @@ class CartPresenter(
         pageNation = pageNation.updateCountState(cartId, count)
         val cartProduct = pageNation.currentPageCartProducts.find { it.id == cartId } ?: return
 
-        val cartEntity = cartProduct.toEntity()
-        cartRepository.updateCartCount(cartEntity, ::onFailure) {
+        cartRepository.updateCartCount(cartProduct, ::onFailure) {
             if (count == 0) {
                 deleteCartItem(cartId)
             }
