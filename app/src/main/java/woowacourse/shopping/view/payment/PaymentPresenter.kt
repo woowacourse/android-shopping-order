@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.payment
 
+import woowacourse.shopping.model.data.dto.CartItemIdDTO
 import woowacourse.shopping.model.data.dto.CartProductDTO
 import woowacourse.shopping.model.data.dto.OrderPayDTO
 import woowacourse.shopping.model.uimodel.OrderProductUIModel
@@ -32,7 +33,7 @@ class PaymentPresenter(
                     view.updateOrderProducts(orderProducts)
                     var price = 0
                     orderProducts.forEach {
-                        price += (it.count * it.price)
+                        price += (it.price)
                     }
                     view.updateTotalPrice(price)
                 },
@@ -44,31 +45,32 @@ class PaymentPresenter(
     }
 
     override fun payOrderProducts(originalPrice: Int, points: Int) {
-        payService.postPay(OrderPayDTO(cartItemIds, originalPrice, points)).enqueue(
+        payService.postPay(OrderPayDTO(cartItemIds.map { CartItemIdDTO(it) }, originalPrice, points)).enqueue(
             createResponseCallback(
-                onSuccess = { orderId ->
-                    view.showOrderDetail(orderId)
+                onSuccess = { received ->
+                    view.showOrderDetail(received.orderId)
                 },
                 onFailure = {
                     throw IllegalStateException("서버 통신(상품 목록)에 실패했습니다.")
                 }
             )
         )
-    }
+        }
 
-    override fun getPoints() {
-        membersService.getPoint().enqueue(
-            createResponseCallback(
-                onSuccess = { received ->
-                    view.updatePoints(received.point)
-                },
-                onFailure = {
-                    throw IllegalStateException("서버 통신(포인트)에 실패했습니다.")
-                }
+        override fun getPoints() {
+            membersService.getPoint().enqueue(
+                createResponseCallback(
+                    onSuccess = { received ->
+                        view.updatePoints(received.point)
+                    },
+                    onFailure = {
+                        throw IllegalStateException("서버 통신(포인트)에 실패했습니다.")
+                    }
+                )
             )
-        )
-    }
+        }
 
-    private fun CartProductDTO.transformToOrderProduct(): OrderProductUIModel =
-        OrderProductUIModel(product.name, product.imageUrl, quantity, product.price * quantity)
-}
+        private fun CartProductDTO.transformToOrderProduct(): OrderProductUIModel =
+            OrderProductUIModel(product.name, product.imageUrl, quantity, product.price * quantity)
+    }
+    

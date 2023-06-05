@@ -49,15 +49,15 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     private fun setView() {
-        val cartIds = intent.getLongArrayExtra(CART_IDS) ?: LongArray(0)
-        presenter.updateOrderProducts(cartIds.toTypedArray())
+        val cartIds = intent.getSerializableExtra(CART_IDS) as Array<Long>
+        presenter.updateOrderProducts(cartIds)
         presenter.getPoints()
     }
 
     private fun setButtonOnClick() {
         binding.tvPaymentButtom.setOnClickListener {
             presenter.payOrderProducts(
-                binding.tvOrderTotalPrice.text.toString().replace("원", "").toInt(),
+                binding.tvOrderTotalPrice.text.toString().replace("원", "").replace(",", "").toInt(),
                 binding.etUsingPoint.text.toString().toInt()
             )
         }
