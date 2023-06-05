@@ -74,19 +74,16 @@ class ProductDetailPresenter(
             updateCurrentProduct()
             view.showBasket()
         } else {
-            basketRepository.add(
-                product = currentProduct.toDomainModel(),
-                onAdded = { basketProductId ->
-                    currentProductBasketId = basketProductId
-                    if (currentProduct.basketCount > 1) {
-                        updateCurrentProduct()
-                    }
-                    view.showBasket()
-                },
-                onFailed = { errorMessage ->
-                    view.showErrorMessage(errorMessage)
+            basketRepository.add(currentProduct.toDomainModel()).thenAccept { basketProductId ->
+                currentProductBasketId = basketProductId.getOrThrow()
+                if (currentProduct.basketCount > 1) {
+                    updateCurrentProduct()
                 }
-            )
+                view.showBasket()
+            }.exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
+            }
         }
     }
 

@@ -7,11 +7,7 @@ import java.util.concurrent.CompletableFuture
 interface BasketRepository {
 
     fun getAll(): CompletableFuture<Result<List<BasketProduct>>>
-    fun add(
-        product: Product,
-        onAdded: (Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun add(product: Product): CompletableFuture<Result<Int>>
 
     fun update(
         basketProduct: BasketProduct,

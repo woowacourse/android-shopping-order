@@ -15,57 +15,42 @@ class BasketRemoteDataSourceImpl : BasketRemoteDataSource {
         ).execute()
 
         return response.getResult(BASKET_PRODUCTS_ERROR)
-//        val result = response.body()?.run {
-//            Result.success(this)
-//        } ?: Result.failure(Throwable(BASKET_PRODUCTS_ERROR))
-
-//        basketProductService.requestBasketProducts(
-//            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo)
-//        ).enqueue(object : retrofit2.Callback<List<BasketProductEntity>> {
-//
-//            override fun onResponse(
-//                call: retrofit2.Call<List<BasketProductEntity>>,
-//                response: retrofit2.Response<List<BasketProductEntity>>,
-//            ) {
-//                response.body()?.let {
-//                    onReceived(it)
-//                } ?: onFailed(BASKET_PRODUCTS_ERROR)
-//            }
-//
-//            override fun onFailure(call: retrofit2.Call<List<BasketProductEntity>>, t: Throwable) {
-//                onFailed(BASKET_PRODUCTS_ERROR)
-//            }
-//        })
     }
 
-    override fun add(
-        product: ProductEntity,
-        onAdded: (Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketProductService.addBasketProduct(
+    override fun add(product: ProductEntity): Result<Int> {
+        val response = basketProductService.addBasketProduct(
             authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
             productId = product.id
-        ).enqueue(object : retrofit2.Callback<Unit> {
+        ).execute()
 
-            override fun onResponse(
-                call: retrofit2.Call<Unit>,
-                response: retrofit2.Response<Unit>,
-            ) {
-                response.headers()[LOCATION]?.let {
-                    val productId = it.split("/").last().toInt()
+        val result = response.headers()[LOCATION]?.run {
+            Result.success(split("/").last().toInt())
+        } ?: Result.failure(Throwable(FAILED_TO_ADD_BASKET))
 
-                    onAdded(productId)
-                } ?: onFailed(FAILED_TO_ADD_BASKET)
-            }
-
-            override fun onFailure(
-                call: retrofit2.Call<Unit>,
-                t: Throwable,
-            ) {
-                onFailed(FAILED_TO_ADD_BASKET)
-            }
-        })
+        return result
+//        basketProductService.addBasketProduct(
+//            authorization = AUTHORIZATION_FORMAT.format(encodedUserInfo),
+//            productId = product.id
+//        ).enqueue(object : retrofit2.Callback<Unit> {
+//
+//            override fun onResponse(
+//                call: retrofit2.Call<Unit>,
+//                response: retrofit2.Response<Unit>,
+//            ) {
+//                response.headers()[LOCATION]?.let {
+//                    val productId = it.split("/").last().toInt()
+//
+//                    onAdded(productId)
+//                } ?: onFailed(FAILED_TO_ADD_BASKET)
+//            }
+//
+//            override fun onFailure(
+//                call: retrofit2.Call<Unit>,
+//                t: Throwable,
+//            ) {
+//                onFailed(FAILED_TO_ADD_BASKET)
+//            }
+//        })
     }
 
     override fun update(

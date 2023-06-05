@@ -112,24 +112,21 @@ class ShoppingPresenter(
     }
 
     override fun addBasketProduct(product: Product) {
-        basketRepository.add(
-            product = product,
-            onAdded = { basketProductId ->
-                basket = basket.plus(
-                    BasketProduct(
-                        id = basketProductId,
-                        count = Count(1),
-                        product = product
-                    )
+        basketRepository.add(product).thenAccept { basketProductId ->
+            basket = basket.plus(
+                BasketProduct(
+                    id = basketProductId.getOrThrow(),
+                    count = Count(1),
+                    product = product
                 )
-                fetchBasketCount()
-                fetchTotalBasketCount()
-                view.updateProducts(totalProducts)
-            },
-            onFailed = { errorMessage ->
-                view.showErrorMessage(errorMessage)
-            }
-        )
+            )
+            fetchBasketCount()
+            fetchTotalBasketCount()
+            view.updateProducts(totalProducts)
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun updateProducts() {

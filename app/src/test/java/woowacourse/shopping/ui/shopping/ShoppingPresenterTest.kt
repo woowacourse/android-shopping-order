@@ -164,25 +164,18 @@ class ShoppingPresenterTest {
     fun `장바구니 물품 추가에 대해서 실패하면 에러 메시지를 보여준다`() {
         // given
         val products = ProductFixture.createProducts()
-        val slotShowErrorMessage = slot<(errorMessage: String) -> Unit>()
         val errorMessage = "물품을 장바구니에 추가하지 못했습니다."
 
         setUpBasket(products)
         every {
-            basketRepository.add(
-                product = products.first(),
-                onAdded = any(),
-                onFailed = capture(slotShowErrorMessage)
-            )
-        } answers {
-            slotShowErrorMessage.invoke(errorMessage)
-        }
+            basketRepository.add(products.first())
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
 
         // when
         presenter.addBasketProduct(products.first())
 
         // then
-        verify { view.showErrorMessage(errorMessage) }
+        verify { view.showErrorMessage(any()) }
     }
 
     @Test

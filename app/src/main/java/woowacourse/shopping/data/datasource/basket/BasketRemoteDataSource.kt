@@ -7,11 +7,7 @@ interface BasketRemoteDataSource {
 
     fun getAll(): Result<List<BasketProductEntity>>
 
-    fun add(
-        product: ProductEntity,
-        onAdded: (Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    )
+    fun add(product: ProductEntity): Result<Int>
 
     fun update(
         basketProduct: BasketProductEntity,

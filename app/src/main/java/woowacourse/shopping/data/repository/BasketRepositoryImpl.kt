@@ -18,26 +18,14 @@ class BasketRepositoryImpl(
                 basketProducts.map { it.toDomainModel() }
             }
         }
-//        basketRemoteDataSource.getAll(
-//            onReceived = { dataBasketProduct ->
-//                onReceived(dataBasketProduct.map { it.toDomainModel() })
-//            },
-//            onFailed = { errorMessage ->
-//                onFailed(errorMessage)
-//            }
-//        )
     }
 
     override fun add(
         product: Product,
-        onAdded: (Int) -> Unit,
-        onFailed: (errorMessage: String) -> Unit,
-    ) {
-        basketRemoteDataSource.add(
-            product = product.toEntity(),
-            onAdded = onAdded,
-            onFailed = onFailed
-        )
+    ): CompletableFuture<Result<Int>> {
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.add(product.toEntity())
+        }
     }
 
     override fun update(
