@@ -16,6 +16,7 @@ class CartPresenter(
 ) : CartContract.Presenter {
 
     private lateinit var cartPages: CartPages
+
     override fun loadCarts() {
         initCartPages()
     }

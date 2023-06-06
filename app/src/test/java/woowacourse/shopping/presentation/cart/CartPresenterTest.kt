@@ -116,4 +116,30 @@ class CartPresenterTest {
         // then : 장바구니 아이템 상품 개수가 증가되어 화면에 노출된다.
         verify { view.showCartProductModels(expected) }
     }
+
+    @Test
+    fun `장바구니 아이템의 상품 개수를 감소시킨다`() {
+        // given : 장바구니 아이템의 상품 개수를 감소 시킬 수 있는 상태다.
+
+        val expected = CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4) +
+            CartProductFixture.getCheckableCartProductModel(5, 1)
+
+        every { view.showCartProductModels(expected) } just runs
+
+        every {
+            cartRepository.updateCartProductCount(any(), any(), any())
+        } answers {
+            val callback = args[2] as () -> Unit
+            callback()
+        }
+        presenter.loadCarts()
+
+        // when : 장바구니 아이템 상품 개수 감소 요청을 보낸다.
+        presenter.subProductCartCount(
+            cartProductModel = CartProductFixture.getCheckableCartProductModel(5, 2),
+        )
+
+        // then : 장바구니 아이템 상품 개수가 감소되어 화면에 노출된다.
+        verify { view.showCartProductModels(expected) }
+    }
 }
