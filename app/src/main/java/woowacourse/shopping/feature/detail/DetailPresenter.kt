@@ -85,13 +85,14 @@ class DetailPresenter(
 
     override fun navigateRecentProductDetail() {
         recentProductUiModel?.let { recentProductUiModel ->
-            recentProductRepository.addRecentProduct(
-                recentProductUiModel.product.toDomain(),
-                onSuccess = {
-                    view.showRecentProductDetailScreen(recentProductUiModel)
-                },
-                onFailure = {}
-            )
+            recentProductRepository.addRecentProduct(recentProductUiModel.product.toDomain()) { result ->
+                when (result) {
+                    is BaseResponse.SUCCESS -> view.showRecentProductDetailScreen(
+                        recentProductUiModel
+                    )
+                    else -> view.showRetryMessage()
+                }
+            }
         }
     }
 

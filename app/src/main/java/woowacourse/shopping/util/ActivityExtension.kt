@@ -27,3 +27,7 @@ fun Activity.showToastLong(
 fun Activity.showToastNetworkError() {
     Toaster.showShort(this, getString(R.string.network_error_message))
 }
+
+fun Activity.showToastRetryAgainLater() {
+    Toaster.showShort(this, getString(R.string.please_retry_again_later))
+}

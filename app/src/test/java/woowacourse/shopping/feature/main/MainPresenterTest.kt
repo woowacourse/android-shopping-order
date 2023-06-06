@@ -100,10 +100,10 @@ internal class MainPresenterTest {
             Product(1L, 2000) to LocalDateTime.of(2023, 1, 1, 0, 0),
         )
         every {
-            recentProductRepository.fetchAllRecentProduct(onSuccess = any(), any())
+            recentProductRepository.fetchAllRecentProduct(any())
         } answers {
-            val successBlock = arg<(List<RecentProduct>) -> Unit>(0)
-            successBlock(mockRecentProducts)
+            val successBlock = arg<(BaseResponse<List<RecentProduct>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockRecentProducts))
         }
 
         // when
@@ -136,10 +136,10 @@ internal class MainPresenterTest {
         }
 
         every {
-            recentProductRepository.addRecentProduct(mockProduct, onSuccess = any(), any())
+            recentProductRepository.addRecentProduct(mockProduct, any())
         } answers {
-            val successBlock = arg<(Product) -> Unit>(1)
-            successBlock(mockProduct)
+            val successBlock = arg<(BaseResponse<Product>) -> Unit>(1)
+            successBlock(BaseResponse.SUCCESS(mockProduct))
         }
 
         // when

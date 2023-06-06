@@ -48,4 +48,5 @@
     <string name="emil_server">에밀 서버</string>
     <string name="order_unavailable_message">주문의 최대 상품 갯수는 99개를 넘을 수 없습니다</string>
     <string name="network_error_message">네트워크 연결을 확인해주세요</string>
+    <string name="please_retry_again_later">문제가 발생했습니다\n잠시 후에 다시 시도해주세요</string>
 </resources>

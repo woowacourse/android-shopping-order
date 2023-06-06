@@ -13,6 +13,7 @@ interface DetailContract {
         fun showRecentProductDetailScreen(recentProductUiModel: RecentProductUiModel)
         fun exitDetailScreen()
         fun showSelectCartProductCountScreen(product: ProductUiModel, cartId: Long?)
+        fun showRetryMessage()
     }
 
     interface Presenter {

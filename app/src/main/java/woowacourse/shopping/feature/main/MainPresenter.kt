@@ -81,13 +81,16 @@ class MainPresenter(
     }
 
     override fun loadRecentProducts() {
-        recentProductRepository.fetchAllRecentProduct(
-            onSuccess = { recentProducts ->
-                val recentProductUiModels = recentProducts.map { it.toPresentation() }
-                _recentProducts.postValue(recentProductUiModels)
-            },
-            onFailure = {}
-        )
+        recentProductRepository.fetchAllRecentProduct { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val recentProducts = result.response
+                    val recentProductUiModels = recentProducts.map { it.toPresentation() }
+                    _recentProducts.postValue(recentProductUiModels)
+                }
+                else -> showRetryMessage()
+            }
+        }
     }
 
     override fun showCartCount() {
@@ -112,18 +115,19 @@ class MainPresenter(
         productUiModel: ProductUiModel,
         recentProductUiModel: RecentProductUiModel?
     ) {
-        recentProductRepository.addRecentProduct(
-            productUiModel.toDomain(),
-            onSuccess = {
-                _mainScreenEvent.postValue(
-                    MainScreenEvent.ShowProductDetailScreen(
-                        productUiModel,
-                        recentProductUiModel
+        recentProductRepository.addRecentProduct(productUiModel.toDomain()) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    _mainScreenEvent.postValue(
+                        MainScreenEvent.ShowProductDetailScreen(
+                            productUiModel,
+                            recentProductUiModel
+                        )
                     )
-                )
-            },
-            onFailure = {}
-        )
+                }
+                else -> showRetryMessage()
+            }
+        }
     }
 
     override fun changeProductCartCount(productId: Long, count: Int) {
@@ -197,6 +201,10 @@ class MainPresenter(
 
     private fun showNetworkError() {
         _mainScreenEvent.value = MainScreenEvent.ShowNetworkError
+    }
+
+    private fun showRetryMessage() {
+        _mainScreenEvent.value = MainScreenEvent.ShowRetryMessage
     }
 
     private fun createCartProductUiModels(

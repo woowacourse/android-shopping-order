@@ -20,6 +20,7 @@ interface MainContract {
             object ShowLoading : MainScreenEvent()
             object HideLoading : MainScreenEvent()
             object ShowNetworkError : MainScreenEvent()
+            object ShowRetryMessage : MainScreenEvent()
         }
     }
 

@@ -30,6 +30,7 @@ import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
 import woowacourse.shopping.feature.order.list.OrderListActivity
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastRetryAgainLater
 import woowacourse.shopping.util.showToastShort
 
 class MainActivity : AppCompatActivity(), MainContract.View {
@@ -144,6 +145,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             }
             MainContract.View.MainScreenEvent.ShowNetworkError -> {
                 showToastNetworkError()
+            }
+            MainContract.View.MainScreenEvent.ShowRetryMessage -> {
+                showToastRetryAgainLater()
             }
         }
     }

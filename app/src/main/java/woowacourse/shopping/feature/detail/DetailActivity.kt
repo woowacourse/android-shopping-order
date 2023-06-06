@@ -115,6 +115,10 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         counterDialog.show(supportFragmentManager, COUNTER_DIALOG_TAG)
     }
 
+    override fun showRetryMessage() {
+        showRetryMessage()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_bar_cancel_menu, menu)
         return true
