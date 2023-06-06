@@ -9,14 +9,10 @@ import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
 class CartRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) : CartDataSource {
     private val retrofitService = ApiClient.client
         .create(CartService::class.java)
-
-    private fun getAuthToken() =
-        sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
 
     override fun addCartItem(productId: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         retrofitService.addCartItem(AddCartRequestBody(productId))

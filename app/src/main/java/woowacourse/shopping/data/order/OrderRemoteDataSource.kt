@@ -9,13 +9,9 @@ import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.data.order.requestbody.OrderRequestBody
 import woowacourse.shopping.data.order.response.OrderDataModel
 import woowacourse.shopping.data.order.response.OrderDetailDataModel
-import woowacourse.shopping.presentation.serversetting.ServerSettingPresenter
 
 class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) : OrderDataSource {
     private val orderClient = ApiClient.client.create(OrderService::class.java)
-
-    private fun getAuthToken() =
-        sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
 
     override fun order(
         orderRequestBody: OrderRequestBody,
