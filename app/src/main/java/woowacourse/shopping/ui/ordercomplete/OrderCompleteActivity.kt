@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.ordercomplete
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.model.Receipt
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
@@ -53,6 +54,6 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
     }
 
     override fun setReceipt(receipt: Receipt) {
-        TODO("Not yet implemented")
+        Log.d("123OrderCompleteActivity", receipt.toString())
     }
 }
