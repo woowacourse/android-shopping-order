@@ -163,7 +163,34 @@ class CartPresenterTest {
             productModel = CartProductFixture.getProductModel(5),
         )
 
-        // then : 장바구니 아이템 선택 상태가 변경되어 노출된다.
+        // then : 장바구니 아이템 전체 선택을 해제한다.
+        verify { view.showAllCheckBoxIsChecked(false) }
+
+        // and : 선택된 상품 전체 가격을 업데이트 한다.
+        verify { view.showTotalCount(expectedCount) }
+
+        // and : 선택된 상품 전체 개수를 업데이트 한다.
+        verify { view.showTotalPrice(expectedPrice) }
+    }
+
+    @Test
+    fun `현재 장바구니 모든 아이템의 선택을 해제한다`() {
+        // given : 장바구니 목록 전체를 선택할 수 있는 상태이다.
+        val selectedExpectedProduct =
+            CartProductFixture.getCartProducts(2, 6, 7, 8, 9, 10)
+        val expectedCount = selectedExpectedProduct.sumOf { it.quantity }
+        val expectedPrice = selectedExpectedProduct.sumOf { it.getTotalPrice() }
+
+        every { view.showAllCheckBoxIsChecked(false) } just runs
+        every { view.showTotalCount(expectedCount) } just runs
+        every { view.showTotalPrice(expectedPrice) } just runs
+
+        presenter.loadCarts()
+
+        // when : 장바구니 목록 전체 선택 해제 요청을 보낸다.
+        presenter.selectAllProduct(false)
+
+        // then : 장바구니 아이템 전체 선택을 해제한다.
         verify { view.showAllCheckBoxIsChecked(false) }
 
         // and : 선택된 상품 전체 가격을 업데이트 한다.
