@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.RecentProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class RecentProductRepositoryImpl(
+class DefaultRecentProductRepository(
     private val recentProductDao: RecentProductDao,
     private val productRemoteDataSource: ProductRemoteDataSource
 ) : RecentProductRepository {

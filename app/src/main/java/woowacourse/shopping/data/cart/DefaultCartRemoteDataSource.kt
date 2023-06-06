@@ -12,7 +12,7 @@ import woowacourse.shopping.data.entity.mapper.CartProductMapper.toDomain
 import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 
-class CartRemoteDataSourceRetrofit(retrofit: Retrofit): CartRemoteDataSource {
+class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
     private val cartService: CartService = retrofit.create(CartService::class.java)
 
     override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {

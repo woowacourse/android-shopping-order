@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.OrderHistory
 import woowacourse.shopping.domain.repository.MemberRepository
 
-class MemberRepositoryImpl(private val memberRemoteDataSource: MemberRemoteDataSource) : MemberRepository {
+class DefaultMemberRepository(private val memberRemoteDataSource: MemberRemoteDataSource) : MemberRepository {
     override fun getPoints(onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         memberRemoteDataSource.getPoints(onSuccess, onFailure)
     }

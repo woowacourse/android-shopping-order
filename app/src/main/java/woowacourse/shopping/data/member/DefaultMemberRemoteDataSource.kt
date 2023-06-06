@@ -13,7 +13,7 @@ import woowacourse.shopping.data.server.MemberRemoteDataSource
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.OrderHistory
 
-class MemberRemoteDataSourceRetrofit(retrofit: Retrofit) : MemberRemoteDataSource {
+class DefaultMemberRemoteDataSource(retrofit: Retrofit) : MemberRemoteDataSource {
     private val memberService: MemberService = retrofit.create(MemberService::class.java)
 
     override fun getPoints(onSuccess: (Int) -> Unit, onFailure: () -> Unit) {

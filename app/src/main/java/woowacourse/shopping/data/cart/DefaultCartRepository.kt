@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
 
-class CartRepositoryImpl(
+class DefaultCartRepository(
     private val cartRemoteDataSource: CartRemoteDataSource
 ) : CartRepository {
 

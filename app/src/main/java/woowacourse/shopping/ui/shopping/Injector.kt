@@ -4,44 +4,43 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import retrofit2.Retrofit
 import woowacourse.shopping.Storage
-import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
-import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartRemoteDataSource
+import woowacourse.shopping.data.cart.DefaultCartRepository
 import woowacourse.shopping.data.database.ShoppingDBOpenHelper
 import woowacourse.shopping.data.database.dao.RecentProductDao
-import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
-import woowacourse.shopping.data.member.MemberRepositoryImpl
-import woowacourse.shopping.data.order.OrderRemoteDataSourceRetrofit
-import woowacourse.shopping.data.order.OrderRepositoryImpl
-import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.member.DefaultMemberRemoteDataSource
+import woowacourse.shopping.data.member.DefaultMemberRepository
+import woowacourse.shopping.data.order.DefaultOrderRemoteDataSource
+import woowacourse.shopping.data.order.DefaultOrderRepository
+import woowacourse.shopping.data.product.DefaultProductRemoteDataSource
+import woowacourse.shopping.data.product.DefaultProductRepository
+import woowacourse.shopping.data.recentproduct.DefaultRecentProductRepository
 import woowacourse.shopping.data.server.ShoppingRetrofit
 
 object RepositoryInjector {
     fun injectProductRepository(retrofit: Retrofit) =
-        ProductRepositoryImpl(
-            productRemoteDataSource = ProductRemoteDataSourceRetrofit(retrofit),
-            cartRemoteDataSource = CartRemoteDataSourceRetrofit(retrofit)
+        DefaultProductRepository(
+            productRemoteDataSource = DefaultProductRemoteDataSource(retrofit),
+            cartRemoteDataSource = DefaultCartRemoteDataSource(retrofit)
         )
 
     fun injectRecentProductRepository(
         database: SQLiteDatabase,
         server: String,
         retrofit: Retrofit
-    ) =
-        RecentProductRepositoryImpl(
-            recentProductDao = RecentProductDao(database, server),
-            productRemoteDataSource = ProductRemoteDataSourceRetrofit(retrofit)
-        )
+    ) = DefaultRecentProductRepository(
+        recentProductDao = RecentProductDao(database, server),
+        productRemoteDataSource = DefaultProductRemoteDataSource(retrofit)
+    )
 
     fun injectCartRepository(retrofit: Retrofit) =
-        CartRepositoryImpl(CartRemoteDataSourceRetrofit(retrofit))
+        DefaultCartRepository(DefaultCartRemoteDataSource(retrofit))
 
     fun injectMemberRepository(retrofit: Retrofit) =
-        MemberRepositoryImpl(MemberRemoteDataSourceRetrofit(retrofit))
+        DefaultMemberRepository(DefaultMemberRemoteDataSource(retrofit))
 
     fun injectOrderRepository(retrofit: Retrofit) =
-        OrderRepositoryImpl(OrderRemoteDataSourceRetrofit(retrofit))
+        DefaultOrderRepository(DefaultOrderRemoteDataSource(retrofit))
 }
 
 object DatabaseInjector {

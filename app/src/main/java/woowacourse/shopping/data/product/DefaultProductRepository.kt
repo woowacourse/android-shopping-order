@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.ShoppingProduct
 import woowacourse.shopping.domain.ShoppingProducts
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class ProductRepositoryImpl(
+class DefaultProductRepository(
     private val productRemoteDataSource: ProductRemoteDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource
 ) : ProductRepository {

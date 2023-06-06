@@ -9,7 +9,7 @@ import woowacourse.shopping.data.entity.mapper.ProductMapper.toDomain
 import woowacourse.shopping.data.server.ProductRemoteDataSource
 import woowacourse.shopping.domain.Product
 
-class ProductRemoteDataSourceRetrofit(retrofit: Retrofit) : ProductRemoteDataSource {
+class DefaultProductRemoteDataSource(retrofit: Retrofit) : ProductRemoteDataSource {
     private val productService: ProductService = retrofit.create(ProductService::class.java)
 
     override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
