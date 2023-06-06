@@ -77,4 +77,26 @@ class OrderPresenterTest {
         // then : 캐시 잔액이 화면에 노출된다.
         verify { view.showCash(5000) }
     }
+
+    @Test
+    fun `캐시를 충전한다`() {
+        // given : 캐시를 충전할 수 있는 상태다.
+        val chargingCash = 3000
+        val totalCash = 8000
+
+        every { view.showCash(totalCash) } just runs
+
+        every {
+            cashRepository.chargeCash(chargingCash, any())
+        } answers {
+            val callback = args[1] as (Int) -> Unit
+            callback(totalCash)
+        }
+
+        // when : 캐시 충전 요청을 보낸다.
+        presenter.chargeCash(chargingCash)
+
+        // then : 충전 후 캐시 잔액이 화면에 노출된다.
+        verify { view.showCash(totalCash) }
+    }
 }
