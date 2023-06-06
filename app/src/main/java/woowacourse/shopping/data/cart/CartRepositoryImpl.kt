@@ -5,10 +5,10 @@ import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.repository.CartRepository
 
 class CartRepositoryImpl constructor(
-    private val cartRemoteDataSource: CartRemoteDataSource,
+    private val cartDataSource: CartDataSource,
 ) : CartRepository {
     override fun addCartItem(productId: Int, onSuccess: (Int?) -> Unit) {
-        cartRemoteDataSource.addCartItem(
+        cartDataSource.addCartItem(
             productId,
             onSuccess = {
                 onSuccess(it)
@@ -19,7 +19,7 @@ class CartRepositoryImpl constructor(
     }
 
     override fun deleteCartItem(cartId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
-        cartRemoteDataSource.deleteCartItem(
+        cartDataSource.deleteCartItem(
             cartId,
             onSuccess = {
                 onSuccess()
@@ -36,7 +36,7 @@ class CartRepositoryImpl constructor(
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
-        cartRemoteDataSource.updateCartItemQuantity(cartId, count, onSuccess = {
+        cartDataSource.updateCartItemQuantity(cartId, count, onSuccess = {
             onSuccess()
         }, onFailure = {
             onFailure()
@@ -47,7 +47,7 @@ class CartRepositoryImpl constructor(
         onSuccess: (List<CartProductInfo>) -> Unit,
         onFailure: () -> Unit
     ) {
-        cartRemoteDataSource.getAllCartProductsInfo(onSuccess = {
+        cartDataSource.getAllCartProductsInfo(onSuccess = {
             onSuccess(it)
         }, onFailure = {
             onFailure()

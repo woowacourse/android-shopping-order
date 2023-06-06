@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoListModel
@@ -26,7 +26,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(): CartContract.Presenter {
         return CartPresenter(
             this,
-            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this))),
+            CartRepositoryImpl(CartRemoteDataSource(PreferenceUtil(this))),
         )
     }
 
