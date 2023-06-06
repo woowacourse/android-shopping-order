@@ -199,4 +199,25 @@ class CartPresenterTest {
         // and : 선택된 상품 전체 개수를 업데이트 한다.
         verify { view.showTotalPrice(expectedPrice) }
     }
+
+    @Test
+    fun `다음 페이지로 넘긴다`() {
+        // given : 다음 페이지로 넘길 수 있는 상태다.
+        every {
+            view.showCartProductModels(
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 6, 7, 8, 9, 10),
+            )
+        } just runs
+        presenter.loadCarts()
+
+        // when : 다음 페이지로 넘기기 요청을 보낸다.
+        presenter.plusPage()
+
+        // then : 다음 페이지 장바구니 상품들이 노출된다.
+        verify {
+            view.showCartProductModels(
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 6, 7, 8, 9, 10),
+            )
+        }
+    }
 }
