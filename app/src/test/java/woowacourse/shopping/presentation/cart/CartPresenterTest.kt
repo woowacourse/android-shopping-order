@@ -21,21 +21,21 @@ class CartPresenterTest {
     private lateinit var cartRepository: CartRepository
     private val notOrderedCartList = CartProductInfoListModel(
         listOf(
-            CartProductInfoModel(0, makeTestProductModel(0), 1, false),
-            CartProductInfoModel(1, makeTestProductModel(1), 1, false),
-            CartProductInfoModel(2, makeTestProductModel(2), 1, false),
-            CartProductInfoModel(3, makeTestProductModel(3), 1, false),
-            CartProductInfoModel(4, makeTestProductModel(4), 1, false),
+            CartProductInfoModel(0, makeTestProductModel(0), 1, false, 1000),
+            CartProductInfoModel(1, makeTestProductModel(1), 1, false, 1000),
+            CartProductInfoModel(2, makeTestProductModel(2), 1, false, 1000),
+            CartProductInfoModel(3, makeTestProductModel(3), 1, false, 1000),
+            CartProductInfoModel(4, makeTestProductModel(4), 1, false, 1000),
         )
     )
 
     private val orderedCartList = CartProductInfoListModel(
         listOf(
-            CartProductInfoModel(0, makeTestProductModel(0), 1, true),
-            CartProductInfoModel(1, makeTestProductModel(1), 1, true),
-            CartProductInfoModel(2, makeTestProductModel(2), 1, true),
-            CartProductInfoModel(3, makeTestProductModel(3), 1, true),
-            CartProductInfoModel(4, makeTestProductModel(4), 1, true),
+            CartProductInfoModel(0, makeTestProductModel(0), 1, true, 1000),
+            CartProductInfoModel(1, makeTestProductModel(1), 1, true, 1000),
+            CartProductInfoModel(2, makeTestProductModel(2), 1, true, 1000),
+            CartProductInfoModel(3, makeTestProductModel(3), 1, true, 1000),
+            CartProductInfoModel(4, makeTestProductModel(4), 1, true, 1000),
         )
     )
 
@@ -77,10 +77,10 @@ class CartPresenterTest {
         // then
         val expected = CartProductInfoListModel(
             listOf(
-                CartProductInfoModel(1, makeTestProductModel(1), 1, false),
-                CartProductInfoModel(2, makeTestProductModel(2), 1, false),
-                CartProductInfoModel(3, makeTestProductModel(3), 1, false),
-                CartProductInfoModel(4, makeTestProductModel(4), 1, false),
+                CartProductInfoModel(1, makeTestProductModel(1), 1, false, 1000),
+                CartProductInfoModel(2, makeTestProductModel(2), 1, false, 1000),
+                CartProductInfoModel(3, makeTestProductModel(3), 1, false, 1000),
+                CartProductInfoModel(4, makeTestProductModel(4), 1, false, 1000),
             )
         ).items
         verify { view.setCartItems(expected) }
@@ -101,11 +101,11 @@ class CartPresenterTest {
         // then
         val expected = CartProductInfoListModel(
             listOf(
-                CartProductInfoModel(0, makeTestProductModel(0), 3, false),
-                CartProductInfoModel(1, makeTestProductModel(1), 1, false),
-                CartProductInfoModel(2, makeTestProductModel(2), 1, false),
-                CartProductInfoModel(3, makeTestProductModel(3), 1, false),
-                CartProductInfoModel(4, makeTestProductModel(4), 1, false),
+                CartProductInfoModel(0, makeTestProductModel(0), 3, false, 3000),
+                CartProductInfoModel(1, makeTestProductModel(1), 1, false, 1000),
+                CartProductInfoModel(2, makeTestProductModel(2), 1, false, 1000),
+                CartProductInfoModel(3, makeTestProductModel(3), 1, false, 1000),
+                CartProductInfoModel(4, makeTestProductModel(4), 1, false, 1000),
             )
         ).items
         verify { view.setCartItems(expected) }
@@ -142,7 +142,7 @@ class CartPresenterTest {
             initCartProducts = notOrderedCartList,
             initPage = 1,
         )
-        val notOrderItem = CartProductInfoModel(0, makeTestProductModel(1), 1)
+        val notOrderItem = CartProductInfoModel(0, makeTestProductModel(1), 1, totalPrice = 1000)
         // when
         presenter.addProductInOrder(notOrderItem)
         // then
@@ -160,7 +160,7 @@ class CartPresenterTest {
             initCartProducts = orderedCartList,
             initPage = 1,
         )
-        val orderItem = CartProductInfoModel(0, makeTestProductModel(1), 1)
+        val orderItem = CartProductInfoModel(0, makeTestProductModel(1), 1, totalPrice = 1000)
         // when
         presenter.deleteProductInOrder(orderItem)
         // then

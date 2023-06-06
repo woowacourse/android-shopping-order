@@ -67,16 +67,9 @@ class ProductListPresenter(
     }
 
     override fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int) {
-        if (count == 0) {
-            cartRepository.deleteCartItem(cartProductModel.id) {
-                updateCartCount()
-                refreshProductItems()
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(cartProductModel.id, count) {
-                updateCartCount()
-                refreshProductItems()
-            }
+        cartRepository.updateCartItemQuantity(cartProductModel.id, count) {
+            updateCartCount()
+            refreshProductItems()
         }
     }
     companion object {

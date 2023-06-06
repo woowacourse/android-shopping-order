@@ -88,31 +88,7 @@ class ProductListPresenterTest {
     }
 
     @Test
-    fun 업데이트할_카트_상품의_개수가_0이라면_상품을_삭제한후에_장바구니_상품_개수를_최신화하고_상품들을_다시_로드한다() {
-        // given
-        val slotDeleteProduct = slot<() -> Unit>()
-        val slotCartProduct = slot<(List<CartProductInfo>) -> Unit>()
-        val slotProduct = slot<(List<Product>) -> Unit>()
-        every { cartRepository.deleteCartItem(0, onSuccess = capture(slotDeleteProduct)) } answers {
-            slotDeleteProduct.captured.invoke()
-        }
-        every { cartRepository.getAllCartItems(onSuccess = capture(slotCartProduct)) } answers {
-            slotCartProduct.captured.invoke(List(10) { makeCartProduct(it) })
-        }
-        every { productRepository.getProductsWithRange(0, 20, capture(slotProduct)) } answers {
-            slotProduct.captured.invoke(List(10) { makeProduct(it) })
-        }
-        val deleteItem = makeCartProduct(0).toPresentation()
-        // when
-        presenter.updateCartItemQuantity(deleteItem, 0)
-        // then
-        verify { cartRepository.deleteCartItem(0, slotDeleteProduct.captured) }
-        verify { view.loadProductItems(any()) }
-        verify { view.showCartCount(any()) }
-    }
-
-    @Test
-    fun 업데이트할_카트_상품의_개수가_0이_아니라면_상품개수를_업데이트한후에_장바구니_상품_개수를_최신화하고_상품들을_다시_로드한다() {
+    fun 상품개수를_업데이트한후에_장바구니_상품_개수를_최신화하고_상품들을_다시_로드한다() {
         // given
         val slotCartProduct = slot<(List<CartProductInfo>) -> Unit>()
         val slotUpdateQuantity = slot<() -> Unit>()

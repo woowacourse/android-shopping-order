@@ -6,7 +6,6 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.Price
 import woowacourse.shopping.Product
 import woowacourse.shopping.presentation.mapper.toDomain
@@ -92,7 +91,7 @@ class ProductDetailPresenterTest {
         // when
         presenter.showProductCart()
         // then
-        val expected = CartProductInfoModel(0, initProductModel, 1)
+        val expected = CartProductInfoModel(0, initProductModel, 1, totalPrice = 1000)
         view.showProductCart(expected)
     }
 
@@ -105,46 +104,28 @@ class ProductDetailPresenterTest {
     }
 
     @Test
-    fun `장바구니에 상품이 이미 있을 때, 담기를 누르면 장바구니 수량을 업데이트 하고,완료메세지를 띄운다`() {
+    fun `담기를 누르면 장바구니 수량을 업데이트 하고,완료메세지를 띄운다`() {
         // given
-        val slotCartProduct = slot<(List<CartProductInfo>) -> Unit>()
         val slotUpdateQuantity = slot<() -> Unit>()
-        every { cartRepository.getAllCartItems(capture(slotCartProduct)) } answers {
-            slotCartProduct.captured.invoke(List(10) { makeCartProduct(it) })
-        }
-        every { cartRepository.updateCartItemQuantity(1, 3, capture(slotUpdateQuantity)) } answers {
+        every {
+            cartRepository.updateCartItemQuantityByProduct(
+                product = initProductModel.toDomain(),
+                count = 3,
+                onSuccess = capture(slotUpdateQuantity)
+            )
+        } answers {
             slotUpdateQuantity.captured.invoke()
         }
         // when
         presenter.saveProductInRepository(3)
         // then
-        verify { cartRepository.updateCartItemQuantity(initProductModel.id, 3, slotUpdateQuantity.captured) }
+        verify {
+            cartRepository.updateCartItemQuantityByProduct(
+                initProductModel.toDomain(),
+                3,
+                slotUpdateQuantity.captured
+            )
+        }
         verify { view.showCompleteMessage(initProductModel.name) }
     }
-
-    @Test
-    fun `장바구니에 상품이 없을 때, 담기를 누르면 장바구니에 아이템을 추가한후, 장바구니 수량을 업데이트 하고,완료메세지를 띄운다`() {
-        // given
-        val slotCartProduct = slot<(List<CartProductInfo>) -> Unit>()
-        val slotAddCart = slot<(Int?) -> Unit>()
-        val slotUpdateQuantity = slot<() -> Unit>()
-        every { cartRepository.getAllCartItems(capture(slotCartProduct)) } answers {
-            slotCartProduct.captured.invoke(emptyList())
-        }
-        every { cartRepository.addCartItem(initProductModel.id, capture(slotAddCart)) } answers {
-            slotAddCart.captured.invoke(1)
-        }
-        every { cartRepository.updateCartItemQuantity(1, 3, capture(slotUpdateQuantity)) } answers {
-            slotUpdateQuantity.captured.invoke()
-        }
-        // when
-        presenter.saveProductInRepository(3)
-        // then
-        verify { cartRepository.addCartItem(initProductModel.id, slotAddCart.captured) }
-        verify { cartRepository.updateCartItemQuantity(initProductModel.id, 3, slotUpdateQuantity.captured) }
-        verify { view.showCompleteMessage(initProductModel.name) }
-    }
-
-    private fun makeCartProduct(id: Int): CartProductInfo = CartProductInfo(id, makeProduct(id), 1)
-    private fun makeProduct(id: Int): Product = Product(id, "", "", Price(1000))
 }

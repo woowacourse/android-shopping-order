@@ -5,6 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
+import woowacourse.shopping.Product
 import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.model.CartDataModel
 import woowacourse.shopping.data.common.model.BaseResponse
@@ -47,7 +48,8 @@ class CartRepositoryImpl constructor(
             count = count,
         ).enqueue(object : Callback<BaseResponse<Unit>> {
             override fun onResponse(call: Call<BaseResponse<Unit>>, response: Response<BaseResponse<Unit>>) {
-                onSuccess()
+                if (count == 0) deleteCartItem(cartId) { onSuccess() }
+                else onSuccess()
             }
 
             override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
@@ -89,6 +91,22 @@ class CartRepositoryImpl constructor(
             val foundItem =
                 CartProductInfoList(it).items.find { cartItem -> cartItem.product.id == productId }
             onSuccess(foundItem)
+        }
+    }
+
+    override fun updateCartItemQuantityByProduct(
+        product: Product,
+        count: Int,
+        onSuccess: () -> Unit
+    ) {
+        getAllCartItems { cartList ->
+            val cartId = cartList.find { it.product.id == product.id }?.id
+            if (cartId == null) addCartItem(product.id) { newCartId ->
+                if (newCartId == null) return@addCartItem
+                updateCartItemQuantity(newCartId, count, onSuccess)
+            } else {
+                updateCartItemQuantity(cartId, count, onSuccess)
+            }
         }
     }
 }

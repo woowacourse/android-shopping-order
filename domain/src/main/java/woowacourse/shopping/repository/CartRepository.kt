@@ -1,6 +1,7 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.CartProductInfo
+import woowacourse.shopping.Product
 
 interface CartRepository {
     fun getCartItemByProductId(
@@ -24,4 +25,5 @@ interface CartRepository {
     )
 
     fun addCartItem(productId: Int, onSuccess: (Int?) -> Unit)
+    fun updateCartItemQuantityByProduct(product: Product, count: Int, onSuccess: () -> Unit)
 }
