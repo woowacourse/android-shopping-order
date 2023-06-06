@@ -15,20 +15,30 @@ class OrderPresenter(
     private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
 
-    private lateinit var totalCartProducts: CartProducts
+    private lateinit var orderingCartProducts: CartProducts
 
     override fun loadOrderCarts(orderCartIds: List<Long>) {
-        cartRepository.getCartProducts { cartProducts ->
-            totalCartProducts = CartProducts(cartProducts)
-            val cartProductModels =
-                cartProducts.filter { it.cartId in orderCartIds }.toPresentation()
-            view.showOrderCartProducts(cartProductModels)
-            view.showTotalPrice(CartProducts(cartProducts).getSelectedProductsPrice())
+        cartRepository.getCartProducts { totalCarts ->
+            convertOrderingCarts(totalCarts, orderCartIds)
+            showOrderInfo()
         }
     }
 
+    private fun convertOrderingCarts(
+        totalCarts: List<CartProduct>,
+        orderCartIds: List<Long>,
+    ) {
+        val orderingCarts = totalCarts.filter { it.cartId in orderCartIds }
+        orderingCartProducts = CartProducts(orderingCarts)
+    }
+
+    private fun showOrderInfo() {
+        view.showOrderCartProducts(orderingCartProducts.items.toPresentation())
+        view.showTotalPrice(orderingCartProducts.getSelectedProductsPrice())
+    }
+
     override fun orderCartProducts() {
-        orderRepository.orderCartProducts(totalCartProducts.items) { orderId ->
+        orderRepository.orderCartProducts(orderingCartProducts.items) { orderId ->
             view.showOrderDetail(orderId)
         }
     }
