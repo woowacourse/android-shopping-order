@@ -19,7 +19,7 @@ class ProductRepositoryImpl(
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        if (cache?.productList?.isEmpty() != false) {
+        if (cache?.productList?.isEmpty() == true) {
             service.getAllProducts().enqueue(object : Callback<List<ProductDto>> {
                 override fun onResponse(
                     call: Call<List<ProductDto>>,
@@ -35,7 +35,7 @@ class ProductRepositoryImpl(
                         }
                     )
                     val nextProducts = allProducts.take(UNIT_SIZE)
-                    cache?.addProducts(nextProducts)
+                    cache.addProducts(nextProducts)
                     onSuccess(nextProducts)
                 }
 
@@ -44,7 +44,7 @@ class ProductRepositoryImpl(
                 }
             })
         } else {
-            onSuccess(cache.productList)
+            onSuccess(cache?.productList ?: emptyList())
         }
     }
 

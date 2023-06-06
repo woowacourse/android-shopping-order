@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
@@ -35,18 +36,7 @@ class DetailPresenter(
         productRepository.fetchProductById(
             productId,
             onSuccess = { product ->
-                cartRepository.fetchAll(
-                    onSuccess = { cartProducts ->
-                        val productUiModel =
-                            cartProducts.find { it.product.id == productId }
-                                ?.toPresentation()?.productUiModel
-
-                        productUiModel?.let {
-                            _product.postValue(it)
-                        } ?: _product.postValue(product.toPresentation())
-                    },
-                    onFailure = { }
-                )
+                findCartInfoByProduct(product)
             },
             onFailure = {
                 failedLoadDetailData()
@@ -59,6 +49,21 @@ class DetailPresenter(
             val recentProduct = recentProductUiModel.product
             view.setRecentScreen(recentProduct.name, recentProduct.toMoneyFormat())
         }
+    }
+
+    private fun findCartInfoByProduct(product: Product) {
+        cartRepository.fetchAll(
+            onSuccess = { cartProducts ->
+                val productUiModel =
+                    cartProducts.find { it.product.id == productId }
+                        ?.toPresentation()?.productUiModel
+
+                productUiModel?.let {
+                    _product.postValue(it)
+                } ?: _product.postValue(product.toPresentation())
+            },
+            onFailure = { }
+        )
     }
 
     override fun updateProductCount(count: Int) {
