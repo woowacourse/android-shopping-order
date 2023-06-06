@@ -3,9 +3,10 @@ package woowacourse.shoppoing.data.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.configure.ApplicationConfigure
 import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.utils.RetrofitUtil
+import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.utils.mockWebServer.CartMockWeb
 
 class CartRemoteDataSourceImplTest {
@@ -16,7 +17,7 @@ class CartRemoteDataSourceImplTest {
     fun setUp() {
         // given
         mockWebServer = CartMockWeb()
-        RetrofitUtil.url = mockWebServer.url
+        ApplicationConfigure.BASE_URL = mockWebServer.url
         remoteCartDataSource = CartRemoteDataSourceImpl()
     }
 

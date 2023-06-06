@@ -3,9 +3,9 @@ package woowacourse.shoppoing.data.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.configure.ApplicationConfigure
 import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.utils.RetrofitUtil
 import woowacourse.shopping.utils.mockWebServer.MockWeb
 
 class ProductRemoteDataSourceImplTest {
@@ -16,7 +16,7 @@ class ProductRemoteDataSourceImplTest {
     fun setUp() {
         // given
         mockWebServer = MockWeb()
-        RetrofitUtil.url = mockWebServer.url
+        ApplicationConfigure.BASE_URL = mockWebServer.url
         remoteProductRepository = ProductRemoteDataSourceImpl()
     }
 

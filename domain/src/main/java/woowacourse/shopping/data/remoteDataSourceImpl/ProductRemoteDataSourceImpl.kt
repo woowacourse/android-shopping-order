@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.remoteDataSourceImpl
 
+import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.data.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.utils.RetrofitUtil
 
 class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getAll(): Result<List<Product>> = runCatching {
-        RetrofitUtil.getInstance().retrofitProductService
+        RetrofitClient.getInstance().retrofitProductService
             .getProducts().execute().body()!!.map { it.toDomain() }
     }
 
@@ -20,7 +20,7 @@ class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
     }
 
     override fun findById(id: Int): Result<Product> = runCatching {
-        RetrofitUtil.getInstance().retrofitProductService
+        RetrofitClient.getInstance().retrofitProductService
             .getProduct(id).execute().body()!![0].toDomain()
     }
 }

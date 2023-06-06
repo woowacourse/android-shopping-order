@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.remoteDataSourceImpl
 
+import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.dto.PostOrderRequestDto
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.OrderHistory
-import woowacourse.shopping.utils.RetrofitUtil
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     private var lastOrderId: Long = 0
 
     override fun getOrder(cartIds: List<Int>): Result<Order> = runCatching {
-        RetrofitUtil.getInstance().retrofitOrderService
+        RetrofitClient.getInstance().retrofitOrderService
             .getOrderList(cartIds.joinToString(","))
             .execute().body()!!
     }
@@ -23,7 +23,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     private fun getOrderHistoriesFirst(): Result<List<OrderHistory>> = runCatching {
-        RetrofitUtil.getInstance().retrofitOrderService
+        RetrofitClient.getInstance().retrofitOrderService
             .getOrders().execute().body()!!
             .let { response ->
                 lastOrderId = response.lastOrderId
@@ -32,7 +32,7 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     private fun getOrderHistories(): Result<List<OrderHistory>> = runCatching {
-        RetrofitUtil.getInstance().retrofitOrderService
+        RetrofitClient.getInstance().retrofitOrderService
             .getOrdersNext(lastOrderId).execute().body()!!
             .let { response ->
                 lastOrderId = response.lastOrderId
@@ -41,12 +41,12 @@ class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
     }
 
     override fun getOrderHistory(id: Long): Result<OrderHistory> = runCatching {
-        RetrofitUtil.getInstance().retrofitOrderService
+        RetrofitClient.getInstance().retrofitOrderService
             .getOrder(id).execute().body()!!.toDomain()
     }
 
     override fun postOrder(point: Int, cartIds: List<Int>): Result<Long> = runCatching {
-        RetrofitUtil.getInstance().retrofitOrderService
+        RetrofitClient.getInstance().retrofitOrderService
             .postOrder(PostOrderRequestDto(point, cartIds))
             .execute().headers()["Location"]!!.split("/").last().toLong()
     }
