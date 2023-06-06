@@ -8,7 +8,7 @@ class ProductDetailSourceImpl : ProductDetailSource {
     override fun getById(id: Long): Result<ProductDTO> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<ProductDTO>> {
-            val response = ServicePool.productDetailService.getProductById(id).execute()
+            val response = ServicePool.productDataService.getProductById(id).execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {

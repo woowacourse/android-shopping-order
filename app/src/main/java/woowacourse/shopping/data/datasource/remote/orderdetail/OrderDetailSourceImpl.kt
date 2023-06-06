@@ -13,7 +13,7 @@ class OrderDetailSourceImpl(private val authInfoDataSource: AuthInfoDataSource) 
     override fun getById(orderId: Long): Result<OrderDTO> {
         val executors = Executors.newSingleThreadExecutor()
         val result = executors.submit<Result<OrderDTO>> {
-            val response = ServicePool.orderDetailService.getById(token, orderId).execute()
+            val response = ServicePool.orderDataService.getById(token, orderId).execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {

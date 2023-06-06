@@ -27,10 +27,7 @@ object RetrofitClient {
 
 object ServicePool {
     val productDataService = RetrofitClient.create<ProductDataService>()
-    val productDetailService = RetrofitClient.create<ProductDetailService>()
     val shoppingCartService = RetrofitClient.create<ShoppingCartService>()
-    val orderDataService = RetrofitClient.create<OrderDataService>()
-    val orderDetailService = RetrofitClient.create<OrderDetailService>()
     val couponDataService = RetrofitClient.create<CouponDataService>()
-    val orderHistoryService = RetrofitClient.create<OrderHistoryService>()
+    val orderDataService = RetrofitClient.create<OrderDataService>()
 }

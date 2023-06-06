@@ -24,10 +24,15 @@ class CouponDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) :
         return result
     }
 
-    override fun getPriceWithCoupon(originalPrice: Int, couponId: Long): Result<CouponDiscountPriceDTO> {
+    override fun getPriceWithCoupon(
+        originalPrice: Int,
+        couponId: Long,
+    ): Result<CouponDiscountPriceDTO> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<CouponDiscountPriceDTO>> {
-            val response = ServicePool.couponDataService.getCouponDiscount(token, originalPrice, couponId).execute()
+            val response =
+                ServicePool.couponDataService.getCouponDiscount(token, originalPrice, couponId)
+                    .execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {

@@ -13,7 +13,7 @@ class OrderHistorySourceImpl(private val authInfoDataSource: AuthInfoDataSource)
     override fun getOrderList(): Result<List<OrderDTO>> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<List<OrderDTO>>> {
-            val response = ServicePool.orderHistoryService.getOrderList(token).execute()
+            val response = ServicePool.orderDataService.getOrderList(token).execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {

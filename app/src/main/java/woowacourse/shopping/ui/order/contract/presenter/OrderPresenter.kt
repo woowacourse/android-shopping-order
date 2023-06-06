@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.contract.presenter
 
+import android.util.Log
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository
 import woowacourse.shopping.mapper.toUIModel
@@ -41,6 +42,7 @@ class OrderPresenter(
     override fun getTotalPrice(couponName: String) {
         val coupon =
             couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
+        Log.d("coupon", coupon.toString())
         val totalPrice = if (coupon != null) {
             val response =
                 couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.id).getOrNull()
