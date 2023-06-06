@@ -6,20 +6,30 @@ import retrofit2.Response
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.BaseResponse
 import woowacourse.shopping.data.common.SharedPreferencesDb
+import woowacourse.shopping.data.order.requestbody.OrderCartRequestBody
 import woowacourse.shopping.data.order.requestbody.OrderRequestBody
 import woowacourse.shopping.data.order.response.OrderDataModel
 import woowacourse.shopping.data.order.response.OrderDetailDataModel
+import woowacourse.shopping.data.order.response.OrderRequestDataModel
 
 class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) : OrderDataSource {
     private val orderClient = ApiClient.client.create(OrderService::class.java)
 
     override fun order(
-        orderRequestBody: OrderRequestBody,
+        orderRequest: OrderRequestDataModel,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
         orderClient.order(
-            orderRequestBody
+            OrderRequestBody(
+                orderRequest.spendPoint,
+                orderRequest.orderItems.map {
+                    OrderCartRequestBody(
+                        it.productId,
+                        it.quantity
+                    )
+                }
+            )
         ).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 onSuccess()

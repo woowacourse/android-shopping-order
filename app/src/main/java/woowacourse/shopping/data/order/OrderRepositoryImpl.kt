@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.order
 
-import woowacourse.shopping.data.order.requestbody.OrderCartRequestBody
-import woowacourse.shopping.data.order.requestbody.OrderRequestBody
 import woowacourse.shopping.data.order.response.OrderDataModel
 import woowacourse.shopping.data.order.response.OrderDetailDataModel
 import woowacourse.shopping.data.order.response.OrderRequestDataModel
@@ -13,12 +11,7 @@ class OrderRepositoryImpl(private val orderRequestDataSource: OrderDataSource) :
         onFailure: () -> Unit
     ) {
         orderRequestDataSource.order(
-            OrderRequestBody(
-                spendPoint = orderRequestDataModel.spendPoint,
-                orderItems = orderRequestDataModel.orderItems.map {
-                    OrderCartRequestBody(it.productId, it.quantity)
-                }
-            ),
+            orderRequestDataModel,
             onSuccess = {
                 onSuccess()
             }, onFailure = {
