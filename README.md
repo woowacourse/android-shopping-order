@@ -2,7 +2,7 @@
 
 1. ProductListPresenter
 
-- [ ] 상품 목록 불러오기
+- [x] 상품 목록 불러오기
 
 ```Gherkin
 GIVEN 상품을 불러올 수 있는 상태다. 

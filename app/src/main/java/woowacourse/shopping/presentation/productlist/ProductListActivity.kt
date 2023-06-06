@@ -89,20 +89,20 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         binding.recyclerProduct.adapter = productListAdapter
     }
 
-    override fun setProductModels(cartProductModels: List<CartProductModel>, isLast: Boolean) {
+    override fun showProductModels(cartProductModels: List<CartProductModel>, isLast: Boolean) {
         productListAdapter.setProductItems(
             cartProductModels.map { ProductViewType.ProductItem(it) },
             isLast,
         )
     }
 
-    override fun setRecentProductModels(productModels: List<ProductModel>) {
+    override fun showRecentProductModels(productModels: List<ProductModel>) {
         runOnUiThread {
             productListAdapter.setRecentProductsItems(productModels)
         }
     }
 
-    override fun setCartCount(count: Int) {
+    override fun showCartCount(count: Int) {
         binding.textCartCountProductList.text = count.toString()
     }
 
@@ -126,14 +126,13 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun productClick(productModel: ProductModel) {
-        presenter.saveRecentProductId(productModel)
-        showProductDetail(productModel.id)
+        presenter.navigateProductDetail(productModel)
     }
 
-    private fun showProductDetail(productId: Long) {
+    override fun showProductDetail(productModel: ProductModel) {
         val recentProductId = productListAdapter.getRecentFirstProduct()
         startActivity(
-            ProductDetailActivity.getIntent(this, productId, recentProductId),
+            ProductDetailActivity.getIntent(this, productModel.id, recentProductId),
         )
     }
 

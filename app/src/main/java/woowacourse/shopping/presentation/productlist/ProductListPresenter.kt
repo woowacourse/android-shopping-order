@@ -19,7 +19,7 @@ class ProductListPresenter(
 
     override fun loadProducts() {
         loadProductsWithSize(PRODUCTS_SIZE) { cartProductModels, isLast ->
-            view.setProductModels(cartProductModels, isLast)
+            view.showProductModels(cartProductModels, isLast)
             loadCartCount()
         }
     }
@@ -27,7 +27,7 @@ class ProductListPresenter(
     private fun loadCartCount() {
         cartRepository.getCartProducts() {
             val cartCount = it.sumOf { it.quantity }
-            view.setCartCount(cartCount)
+            view.showCartCount(cartCount)
         }
     }
 
@@ -50,13 +50,14 @@ class ProductListPresenter(
     override fun loadRecentProducts() {
         getRecentProductModels { recentProductModels ->
             if (recentProductModels.isNotEmpty()) {
-                view.setRecentProductModels(recentProductModels)
+                view.showRecentProductModels(recentProductModels)
             }
         }
     }
 
-    override fun saveRecentProductId(productModel: ProductModel) {
+    override fun navigateProductDetail(productModel: ProductModel) {
         recentProductRepository.addRecentProduct(productModel.toDomain()) {}
+        view.showProductDetail(productModel)
     }
 
     override fun addCartProductCount(cartProductModel: CartProductModel) {
