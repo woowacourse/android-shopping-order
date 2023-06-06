@@ -40,11 +40,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initView() {
+        setOrderButtonClick()
         setAdapter()
         initOrderProduct()
-        initPoint()
-        presenter.loadTotalPrice()
-        setOrderButtonClick()
     }
 
     private fun setOrderButtonClick() {
@@ -91,9 +89,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initOrderProduct() {
-        intent.getParcelableArrayListExtraCompat<OrderCartModel>(ORDER_CART_KEY_VALUE)
+        intent.getParcelableArrayListExtraCompat<OrderCartModel>("")
             ?.let { orderCarts ->
                 presenter.initOrderCarts(orderCarts)
+                initPoint()
+                presenter.loadTotalPrice()
             } ?: noIntentExceptionHandler(getString(R.string.order_cart_model_null_error_message))
     }
 
