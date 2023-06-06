@@ -14,11 +14,11 @@ import woowacourse.shopping.domain.model.Order
 
 class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRepository {
 
-    private val retrofitService =
+    private val orderService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), OrderApi::class.java)
 
     override fun getAll(callback: (DataResult<List<Order>>) -> Unit) {
-        retrofitService.requestOrders().enqueue(object : retrofit2.Callback<OrdersDTO> {
+        orderService.requestOrders().enqueue(object : retrofit2.Callback<OrdersDTO> {
             override fun onResponse(
                 call: Call<OrdersDTO>,
                 response: Response<OrdersDTO>,
@@ -39,7 +39,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
     }
 
     override fun getOrder(id: Int, callback: (DataResult<Order>) -> Unit) {
-        retrofitService.requestOrderDetail(id).enqueue(object : retrofit2.Callback<OrderDTO> {
+        orderService.requestOrderDetail(id).enqueue(object : retrofit2.Callback<OrderDTO> {
             override fun onResponse(
                 call: Call<OrderDTO>,
                 response: Response<OrderDTO>,
@@ -60,7 +60,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
     }
 
     override fun order(cartProducts: OrderCartItemsDTO, callback: (DataResult<Int?>) -> Unit) {
-        retrofitService.requestOrderCartItems(cartProducts).enqueue(object : retrofit2.Callback<Unit> {
+        orderService.requestOrderCartItems(cartProducts).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
                     callback(DataResult.NotSuccessfulError)

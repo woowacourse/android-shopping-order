@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.model.ProductWithCartInfo
 class ProductRemoteRepository(
     serverRepository: ServerStoreRespository,
 ) : ProductRepository {
-    private val retrofitService =
+    private val productService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), ProductApi::class.java)
 
     override fun getProductsByRange(
@@ -21,7 +21,7 @@ class ProductRemoteRepository(
         pageItemCount: Int,
         callback: (DataResult<ProductsWithCartItemDTO>) -> Unit
     ) {
-        retrofitService.requestProductsByRange(lastId, pageItemCount)
+        productService.requestProductsByRange(lastId, pageItemCount)
             .enqueue(object : retrofit2.Callback<ProductsWithCartItemDTO> {
                 override fun onResponse(
                     call: Call<ProductsWithCartItemDTO>,
@@ -43,7 +43,7 @@ class ProductRemoteRepository(
     }
 
     override fun getProductById(id: Int, callback: (DataResult<ProductWithCartInfo>) -> Unit) {
-        retrofitService.requestProductById(id)
+        productService.requestProductById(id)
             .enqueue(object : retrofit2.Callback<ProductWithCartInfo> {
                 override fun onResponse(
                     call: Call<ProductWithCartInfo>,

@@ -12,11 +12,11 @@ import woowacourse.shopping.data.repository.ServerStoreRespository
 class MypageRemoteRepository(
     serverRepository: ServerStoreRespository,
 ) : MypageRepository {
-    private val retrofitService =
+    private val mypageService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), MypageApi::class.java)
 
     override fun getCash(callback: (DataResult<Int>) -> Unit) {
-        retrofitService.requestCash().enqueue(object : retrofit2.Callback<TotalCashDTO> {
+        mypageService.requestCash().enqueue(object : retrofit2.Callback<TotalCashDTO> {
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
                     if (!response.isSuccessful) {
@@ -34,7 +34,7 @@ class MypageRemoteRepository(
     }
 
     override fun chargeCash(cash: Int, callback: (DataResult<Int>) -> Unit) {
-        retrofitService.requestChargeCash(cash).enqueue(object : retrofit2.Callback<TotalCashDTO> {
+        mypageService.requestChargeCash(cash).enqueue(object : retrofit2.Callback<TotalCashDTO> {
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
                     if (!response.isSuccessful) {

@@ -14,11 +14,11 @@ class CartRemoteRepository(
     serverRepository: ServerStoreRespository,
 ) : CartRepository {
 
-    private val retrofitService =
+    private val cartService =
         RetrofitGenerator.create(serverRepository.getServerUrl(), CartApi::class.java)
 
     override fun getAll(callback: (DataResult<List<CartProduct>>) -> Unit) {
-        retrofitService.requestCartItems().enqueue(object : retrofit2.Callback<List<CartProduct>> {
+        cartService.requestCartItems().enqueue(object : retrofit2.Callback<List<CartProduct>> {
             override fun onResponse(
                 call: Call<List<CartProduct>>,
                 response: Response<List<CartProduct>>,
@@ -39,7 +39,7 @@ class CartRemoteRepository(
     }
 
     override fun insert(productId: Int, quantity: Int, callback: (DataResult<Int>) -> Unit) {
-        retrofitService.requestInsertCart(RequestInsertBody(productId, quantity))
+        cartService.requestInsertCart(RequestInsertBody(productId, quantity))
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (!response.isSuccessful) {
@@ -57,7 +57,7 @@ class CartRemoteRepository(
     }
 
     override fun update(cartId: Int, quantity: Int, callback: (DataResult<Boolean>) -> Unit) {
-        retrofitService.requestUpdateCart(cartId, quantity)
+        cartService.requestUpdateCart(cartId, quantity)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (!response.isSuccessful) {
@@ -74,7 +74,7 @@ class CartRemoteRepository(
     }
 
     override fun remove(cartId: Int, callback: (DataResult<Boolean>) -> Unit) {
-        retrofitService.requestDeleteCart(cartId).enqueue(object : retrofit2.Callback<Unit> {
+        cartService.requestDeleteCart(cartId).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
                     callback(DataResult.NotSuccessfulError)
