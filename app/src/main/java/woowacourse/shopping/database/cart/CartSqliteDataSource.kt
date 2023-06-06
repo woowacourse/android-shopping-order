@@ -31,6 +31,10 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         return db.rawQuery(CartConstant.getGetAllQuery(), null)
     }
 
+    override fun getAll(): Result<List<CartProduct>> {
+        TODO("Not yet implemented")
+    }
+
     override fun getPage(offset: Int, size: Int): Result<List<CartProduct>> {
         CartConstant.getPagingQuery(offset, size).let {
             getCartCursor().use { cursor ->
@@ -55,11 +59,11 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         TODO("Not yet implemented")
     }
 
-    override fun getTotalCount(): Int {
+    override fun getTotalQuantity(): Int {
         return cartProducts.size
     }
 
-    override fun getTotalCheckedCount(): Int {
+    override fun getTotalCheckedQuantity(): Int {
         return cartProducts.count { it.checked }
     }
 
@@ -67,7 +71,7 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         TODO("Not yet implemented")
     }
 
-    override fun setCurrentPageChecked(checked: Boolean) {
+    override fun updateCurrentPageChecked(checked: Boolean) {
         TODO("Not yet implemented")
     }
 
@@ -87,7 +91,7 @@ class CartSqliteDataSource(context: Context) : CartLocalDataSource {
         TODO("Not yet implemented")
     }
 
-    override fun getTotalPrice(): Int {
+    override fun getTotalCheckedPrice(): Int {
         return cartProducts.sumOf { it.product.price * it.quantity }
     }
 }

@@ -46,7 +46,7 @@ class ShoppingPresenter(
 
     override fun setUpTotalCount() {
         view.setToolbar(
-            cartRepository.getTotalCheckedCount()
+            cartRepository.getTotalCheckedQuantity()
         )
     }
 

@@ -106,7 +106,7 @@ class ShoppingPresenterTest {
     fun `상품의 개수를 장바구니 저장한다`() {
         // given
         justRun { cartRepository.updateCountWithProductId(any(), any()) }
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { cartRepository.getAll() } returns Result.success(fakeCartProducts)
         justRun { view.setToolbar(any()) }
 

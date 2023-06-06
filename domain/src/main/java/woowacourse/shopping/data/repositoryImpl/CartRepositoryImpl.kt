@@ -11,6 +11,51 @@ class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource
 ) : CartRepository {
 
+    override fun getAll(): Result<List<CartProduct>> {
+        remoteDataSource.getAll()
+            .onSuccess {
+                localDataSource.replaceAll(it.toDomain())
+                return localDataSource.getAll()
+            }
+        return Result.failure(Throwable("Failed to get all"))
+    }
+
+    override fun getPage(offset: Int, size: Int): Result<List<CartProduct>> {
+        return localDataSource.getPage(offset, size)
+    }
+
+    override fun getCurrentPage(): Int {
+        return localDataSource.getCurrentPage()
+    }
+
+    override fun getCurrentPageChecked(): Int {
+        return localDataSource.getCurrentPageChecked()
+    }
+
+    override fun getChecked(): Result<List<CartProduct>> {
+        return localDataSource.getChecked()
+    }
+
+    override fun getTotalQuantity(): Int {
+        return localDataSource.getTotalQuantity()
+    }
+
+    override fun getTotalCheckedQuantity(): Int {
+        return localDataSource.getTotalCheckedQuantity()
+    }
+
+    override fun getTotalCheckedPrice(): Int {
+        return localDataSource.getTotalCheckedPrice()
+    }
+
+    override fun hasNextPage(): Boolean {
+        return localDataSource.hasNextPage()
+    }
+
+    override fun hasPrevPage(): Boolean {
+        return localDataSource.hasPrevPage()
+    }
+
     override fun updateCountWithProductId(productId: Int, count: Int): Result<Int> {
         localDataSource.getByProductId(productId)
             .onSuccess {
@@ -30,59 +75,11 @@ class CartRepositoryImpl(
         return Result.success(count)
     }
 
-    override fun getAll(): Result<List<CartProduct>> {
-        val result = remoteDataSource.getAll()
-        result.onSuccess {
-            localDataSource.replaceAll(it.toDomain())
-            return Result.success(it.toDomain())
-        }
-        return Result.failure(Throwable("Failed to get all"))
-    }
-
-    override fun getPage(offset: Int, size: Int): Result<List<CartProduct>> {
-        if (localDataSource.getTotalCount() == 0) {
-            getAll()
-        }
-        return localDataSource.getPage(offset, size)
-    }
-
-    override fun getTotalCount(): Int {
-        return localDataSource.getTotalCount()
-    }
-
-    override fun getTotalCheckedCount(): Int {
-        return localDataSource.getTotalCheckedCount()
-    }
-
-    override fun getTotalPrice(): Int {
-        return localDataSource.getTotalPrice()
-    }
-
-    override fun hasNextPage(): Boolean {
-        return localDataSource.hasNextPage()
-    }
-
-    override fun hasPrevPage(): Boolean {
-        return localDataSource.hasPrevPage()
-    }
-
     override fun updateChecked(id: Int, checked: Boolean) {
         localDataSource.updateChecked(id, checked)
     }
 
-    override fun setCurrentPageChecked(checked: Boolean) {
-        localDataSource.setCurrentPageChecked(checked)
-    }
-
-    override fun getCurrentPageChecked(): Int {
-        return localDataSource.getCurrentPageChecked()
-    }
-
-    override fun getCurrentPage(): Int {
-        return localDataSource.getCurrentPage()
-    }
-
-    override fun getChecked(): Result<List<CartProduct>> {
-        return localDataSource.getChecked()
+    override fun updateCurrentPageChecked(checked: Boolean) {
+        localDataSource.updateCurrentPageChecked(checked)
     }
 }

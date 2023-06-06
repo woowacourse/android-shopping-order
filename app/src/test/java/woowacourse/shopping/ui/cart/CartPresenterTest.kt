@@ -53,8 +53,8 @@ class CartPresenterTest {
     @Test
     fun `화면의 초기값들을 설정한다`() {
         // given
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
 
@@ -73,11 +73,11 @@ class CartPresenterTest {
     @Test
     fun `현재 페이지의 상품들을 모두 선택한다`() {
         // given
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
-        every { cartRepository.setCurrentPageChecked(any()) } answers { nothing }
+        every { cartRepository.updateCurrentPageChecked(any()) } answers { nothing }
 
         every { view.setPage(any(), any()) } answers { nothing }
 
@@ -87,7 +87,7 @@ class CartPresenterTest {
 
         // then
         verify(exactly = 1) {
-            cartRepository.setCurrentPageChecked(any())
+            cartRepository.updateCurrentPageChecked(any())
         }
         verify(exactly = 2) { view.setPage(any(), any()) }
     }
@@ -95,8 +95,8 @@ class CartPresenterTest {
     @Test
     fun `다음 페이지로 넘어가면 새로 불러온다`() {
         // given
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
 
@@ -133,8 +133,8 @@ class CartPresenterTest {
 
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
@@ -151,8 +151,8 @@ class CartPresenterTest {
         every { cartRepository.updateChecked(any(), any()) } returns Unit
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalCheckedCount() } returns 10
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when

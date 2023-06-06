@@ -50,11 +50,11 @@ class CartPresenter(
     }
 
     private fun setUPTotalPrice() {
-        _totalPrice.postValue(cartRepository.getTotalPrice())
+        _totalPrice.postValue(cartRepository.getTotalCheckedPrice())
     }
 
     private fun setUpCheckedCount() {
-        _checkedCount.postValue(cartRepository.getTotalCheckedCount())
+        _checkedCount.postValue(cartRepository.getTotalCheckedQuantity())
     }
 
     private fun setUpAllButton() {
@@ -64,7 +64,7 @@ class CartPresenter(
 
     override fun setUpProductsCheck(checked: Boolean) {
         if (isCheckChanging) return
-        cartRepository.setCurrentPageChecked(checked)
+        cartRepository.updateCurrentPageChecked(checked)
         fetchCartProducts()
     }
 
