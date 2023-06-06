@@ -132,7 +132,7 @@ class CartPresenter(
         val orderCarts = cartProducts.getSelectedCart().items.map {
             it.toPresentation().toOrderCartInfo()
         }
-        view.showOrderView(ArrayList(orderCarts))
+        view.showOrderView(orderCarts)
     }
 
     companion object {

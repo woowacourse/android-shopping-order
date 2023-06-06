@@ -174,7 +174,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun showOrderView(orderCarts: ArrayList<OrderCartModel>) {
+    override fun showOrderView(orderCarts: List<OrderCartModel>) {
         val intent = OrderActivity.getIntent(this, orderCarts)
         startActivity(intent)
     }

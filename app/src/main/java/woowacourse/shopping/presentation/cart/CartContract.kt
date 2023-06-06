@@ -33,6 +33,6 @@ interface CartContract {
         fun setProductPrice(price: Int)
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
-        fun showOrderView(orderCarts: ArrayList<OrderCartModel>)
+        fun showOrderView(orderCarts: List<OrderCartModel>)
     }
 }
