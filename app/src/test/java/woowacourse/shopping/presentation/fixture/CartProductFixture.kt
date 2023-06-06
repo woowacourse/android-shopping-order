@@ -17,6 +17,10 @@ object CartProductFixture {
     fun getCartProductModel(id: Long): CartProductModel =
         UnCheckableCartProductModel(id, getProductModel(id), 1)
 
+    fun getProducts(vararg ids: Long) = ids.map { getProduct(it) }
+
+    fun getProductModels(vararg ids: Long) = ids.map { getProductModel(it) }
+
     fun getProduct(id: Long) = Product(id, "text.com", "test", Price(1000))
 
     fun getProductModel(id: Long) = ProductModel(id, "text.com", "test", 1000)

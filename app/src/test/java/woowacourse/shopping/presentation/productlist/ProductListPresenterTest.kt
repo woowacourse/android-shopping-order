@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.presentation.fixture.CartProductFixture
 import woowacourse.shopping.presentation.model.CartProductModel
 
@@ -55,6 +56,33 @@ class ProductListPresenterTest {
             view.showProductModels(
                 cartProductModels = CartProductFixture.getCartProductModels(1, 2, 3),
                 isLast = false,
+            )
+        }
+    }
+
+    @Test
+    fun `최근 본 상품 목록을 불러온다`() {
+        // given : 최근 본 상품을 불러올 수 있는 상태다.
+        every {
+            view.showRecentProductModels(
+                productModels = CartProductFixture.getProductModels(1, 2, 3),
+            )
+        } just runs
+
+        every {
+            recentProductRepository.getRecentProductsBySize(size = any(), callback = any())
+        } answers {
+            val callback = args[1] as (List<Product>) -> Unit
+            callback(CartProductFixture.getProducts(1, 2, 3))
+        }
+
+        // when : 최근 본 상품 요청을 보낸다.
+        presenter.loadRecentProducts()
+
+        // then : 최근 본 상품을 노출시킨다.
+        verify {
+            view.showRecentProductModels(
+                productModels = CartProductFixture.getProductModels(1, 2, 3),
             )
         }
     }
