@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.order
 
-import android.util.Log
 import woowacourse.shopping.OrderCartInfoList
 import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.data.order.response.OrderCartDataModel
@@ -24,13 +23,13 @@ class OrderPresenter(
     }
 
     override fun loadPoint() {
-        userRepository.getPoint({
-            Log.d("test1", it.value.toString())
-            view.showPoint(it.value)
-        }, {
-            Log.d("test2", "0")
+        userRepository.getPoint(
+            onSuccess = {
+                view.showPoint(it.value)
+            }, onFailure = {
             view.showPoint(0)
-        })
+        }
+        )
     }
 
     override fun loadTotalPrice() {
