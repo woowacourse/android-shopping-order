@@ -12,7 +12,7 @@ object RetrofitGenerator {
             if (!original.url.encodedPath.equals("/products", true)) {
                 it.proceed(
                     original.newBuilder().apply {
-                        addHeader("Authorization", "Basic ${UserAuthorization.create()}")
+                        addHeader("Authorization", "Basic ${UserAuthorization.create("dooly@dooly.com", "1234")}")
                     }.build(),
                 )
             } else {
