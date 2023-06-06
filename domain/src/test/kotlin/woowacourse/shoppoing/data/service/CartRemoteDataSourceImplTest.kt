@@ -5,8 +5,8 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.configure.ApplicationConfigure
 import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
+import woowacourse.shopping.dto.toDomain
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.utils.mockWebServer.CartMockWeb
 
 class CartRemoteDataSourceImplTest {
@@ -24,14 +24,10 @@ class CartRemoteDataSourceImplTest {
     @Test
     fun `장바구니 목록을 가져온다`() {
         // when
-        var lock = true
         var cartProducts: List<CartProduct> = emptyList()
-        remoteCartDataSource.getAll { result ->
-            result.onSuccess { cartProducts = it }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+        remoteCartDataSource.getAll()
+            .onSuccess { cartProducts = it.toDomain() }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(cartProducts).hasSize(7)
@@ -49,14 +45,10 @@ class CartRemoteDataSourceImplTest {
     @Test
     fun `장바구니에 상품을 추가한다`() {
         // when
-        var lock = true
         var count: Int? = null
-        remoteCartDataSource.postItem(1) { result ->
-            result.onSuccess { count = 1 }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+        remoteCartDataSource.postItem(1)
+            .onSuccess { count = 1 }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(count).isEqualTo(1)
@@ -65,14 +57,10 @@ class CartRemoteDataSourceImplTest {
     @Test
     fun `장바구니의 상품 개수를 변경한다`() {
         // when
-        var lock = true
         var count: Int? = null
-        remoteCartDataSource.patchItemQuantity(1, 10) { result ->
-            result.onSuccess { count = 10 }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+        remoteCartDataSource.patchItemQuantity(1, 10)
+            .onSuccess { count = 10 }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(count).isEqualTo(10)
@@ -81,14 +69,10 @@ class CartRemoteDataSourceImplTest {
     @Test
     fun `장바구니에서 상품을 제거한다`() {
         // when
-        var lock = true
         var count: Int? = null
-        remoteCartDataSource.deleteItem(1) { result ->
-            result.onSuccess { count = 0 }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+        remoteCartDataSource.deleteItem(1)
+            .onSuccess { count = 0 }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(count).isEqualTo(0)

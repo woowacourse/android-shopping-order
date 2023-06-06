@@ -24,15 +24,12 @@ class ProductRemoteDataSourceImplTest {
     fun `상품 목록을 가져온다`() {
         // given
         var products: List<Product> = emptyList()
-        var lock = true
 
         // when
-        remoteProductRepository.getAll { result ->
-            result.onSuccess { products = it }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+
+        remoteProductRepository.getAll()
+            .onSuccess { products = it }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(products).hasSize(100)
@@ -50,15 +47,11 @@ class ProductRemoteDataSourceImplTest {
     fun `ID로 상품을 가져온다`() {
         // given
         var product: Product? = null
-        var lock = true
 
         // when
-        remoteProductRepository.findById(1) {
-            it.onSuccess { product = it }
-                .onFailure { e -> throw e }
-            lock = false
-        }
-        while (lock) { Thread.sleep(100) }
+        remoteProductRepository.findById(1)
+            .onSuccess { product = it }
+            .onFailure { e -> throw e }
 
         // then
         assertThat(product).isNotNull
