@@ -24,6 +24,9 @@ import woowacourse.shopping.Storage
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.ui.DatabaseInjector
+import woowacourse.shopping.ui.RepositoryInjector
+import woowacourse.shopping.ui.RetrofitInjector
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.model.ProductModel
 import woowacourse.shopping.ui.model.RecentProductModel

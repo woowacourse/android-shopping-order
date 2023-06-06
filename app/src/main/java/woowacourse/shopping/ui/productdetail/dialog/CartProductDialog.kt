@@ -9,9 +9,9 @@ import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.getSerializableByKey
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
+import woowacourse.shopping.ui.RepositoryInjector
+import woowacourse.shopping.ui.RetrofitInjector
 import woowacourse.shopping.ui.model.ProductModel
-import woowacourse.shopping.ui.shopping.RepositoryInjector
-import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     private lateinit var binding: DialogAddCartProductBinding

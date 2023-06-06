@@ -10,10 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.ui.RepositoryInjector
+import woowacourse.shopping.ui.RetrofitInjector
 import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.order.OrderActivity
-import woowacourse.shopping.ui.shopping.RepositoryInjector
-import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding

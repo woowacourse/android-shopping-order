@@ -7,11 +7,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
+import woowacourse.shopping.ui.RepositoryInjector
+import woowacourse.shopping.ui.RetrofitInjector
 import woowacourse.shopping.ui.model.OrderHistoryModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.orderdetail.OrderDetailPurpose
-import woowacourse.shopping.ui.shopping.RepositoryInjector
-import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private lateinit var binding: ActivityOrderHistoryBinding

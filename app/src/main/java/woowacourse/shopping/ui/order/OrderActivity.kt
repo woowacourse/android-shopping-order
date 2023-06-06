@@ -11,11 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.ui.RepositoryInjector
+import woowacourse.shopping.ui.RetrofitInjector
 import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.orderdetail.OrderDetailPurpose
-import woowacourse.shopping.ui.shopping.RepositoryInjector
-import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
