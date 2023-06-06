@@ -8,14 +8,14 @@ import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.model.ProductModel
+import woowacourse.shopping.Storage
 import woowacourse.shopping.common.utils.getSerializable
-import woowacourse.shopping.data.database.ShoppingDBOpenHelper
-import woowacourse.shopping.data.database.dao.RecentProductDao
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.ui.model.ProductModel
 import woowacourse.shopping.ui.productdetail.dialog.CartProductDialog
-import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
+import woowacourse.shopping.ui.shopping.DatabaseInjector
+import woowacourse.shopping.ui.shopping.RepositoryInjector
+import woowacourse.shopping.ui.shopping.RetrofitInjector
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -99,15 +99,16 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun initPresenter() {
-        val db = ShoppingDBOpenHelper(this).writableDatabase
+        val database = DatabaseInjector.inject(this)
+        val server = Storage.getInstance(this).server
+        val retrofit = RetrofitInjector.inject(this)
+        val recentProductRepository = RepositoryInjector.injectRecentProductRepository(database, server, retrofit)
+
         presenter = ProductDetailPresenter(
             this,
-            productModel = productModel,
-            recentProductModel = recentProductModel,
-            recentProductRepository = RecentProductRepositoryImpl(
-                RecentProductDao(db),
-                ProductRemoteDataSourceRetrofit()
-            )
+            productModel,
+            recentProductModel,
+            recentProductRepository
         )
     }
 

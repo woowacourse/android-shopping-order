@@ -4,10 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 
-object Storage {
-    private lateinit var sharedPreferences: SharedPreferences
-    private val KEY_SERVER = "server"
-    private val KEY_CREDENTIAL = "credential"
+class Storage private constructor() {
     var server: String
         get() = sharedPreferences.getString(KEY_SERVER, "") ?: ""
         set(value) {
@@ -25,8 +22,21 @@ object Storage {
                 .apply()
         }
 
-    fun init(context: Context) {
-        sharedPreferences = context.getSharedPreferences("shopping", Application.MODE_PRIVATE)
-        credential = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+    companion object {
+        private lateinit var sharedPreferences: SharedPreferences
+        private const val NAME = "shopping"
+        private const val KEY_SERVER = "server"
+        private const val KEY_CREDENTIAL = "credential"
+
+        @Volatile
+        private var instance: Storage? = null
+
+        fun getInstance(context: Context) = instance ?: synchronized(this) {
+            instance ?: Storage().also {
+                sharedPreferences = context.applicationContext.getSharedPreferences(NAME, Application.MODE_PRIVATE)
+                it.credential = "cmluZ2xvQGVtYWlsLmNvbTpyaW5nbG8xMDEwMjM1"
+                instance = it
+            }
+        }
     }
 }

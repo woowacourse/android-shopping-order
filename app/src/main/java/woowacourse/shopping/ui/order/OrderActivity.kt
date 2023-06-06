@@ -10,16 +10,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.common.utils.Toaster
-import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
-import woowacourse.shopping.data.member.MemberRepositoryImpl
-import woowacourse.shopping.data.order.OrderRemoteDataSourceRetrofit
-import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailActivity
 import woowacourse.shopping.ui.orderdetail.OrderDetailPurpose
+import woowacourse.shopping.ui.shopping.RepositoryInjector
+import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
     private lateinit var binding: ActivityOrderBinding
@@ -42,9 +38,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initPresenter() {
-        val cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit())
-        val memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit())
-        val orderRepository = OrderRepositoryImpl(OrderRemoteDataSourceRetrofit())
+        val retrofit = RetrofitInjector.inject(this)
+        val cartRepository = RepositoryInjector.injectCartRepository(retrofit)
+        val memberRepository = RepositoryInjector.injectMemberRepository(retrofit)
+        val orderRepository = RepositoryInjector.injectOrderRepository(retrofit)
+
         presenter = OrderPresenter(this, cartRepository, memberRepository, orderRepository)
     }
 

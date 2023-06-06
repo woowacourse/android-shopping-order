@@ -8,12 +8,12 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.common.utils.Toaster
-import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.ui.model.CartProductModel
 import woowacourse.shopping.ui.order.OrderActivity
+import woowacourse.shopping.ui.shopping.RepositoryInjector
+import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -128,9 +128,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
+        val retrofit = RetrofitInjector.inject(this)
+        val cartRepository = RepositoryInjector.injectCartRepository(retrofit)
+
         presenter = CartPresenter(
             this,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
+            cartRepository,
             sizePerPage = SIZE_PER_PAGE
         )
     }

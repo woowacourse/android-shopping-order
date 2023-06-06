@@ -20,17 +20,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
+import woowacourse.shopping.Storage
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.convertDpToPixel
-import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.database.ShoppingDBOpenHelper
-import woowacourse.shopping.data.database.dao.RecentProductDao
-import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
-import woowacourse.shopping.data.member.MemberRepositoryImpl
-import woowacourse.shopping.data.product.ProductRemoteDataSourceRetrofit
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.model.ProductModel
@@ -247,22 +239,20 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun initPresenter() {
-        val db = ShoppingDBOpenHelper(this).writableDatabase
-        val productRepository = ProductRepositoryImpl(
-            productRemoteDataSource = ProductRemoteDataSourceRetrofit(),
-            cartRemoteDataSource = CartRemoteDataSourceRetrofit()
-        )
-        val recentProductRepository = RecentProductRepositoryImpl(
-            recentProductDao = RecentProductDao(db),
-            productRemoteDataSource = ProductRemoteDataSourceRetrofit()
-        )
+        val database = DatabaseInjector.inject(this)
+        val server = Storage.getInstance(this).server
+        val retrofit = RetrofitInjector.inject(this)
+        val productRepository = RepositoryInjector.injectProductRepository(retrofit)
+        val recentProductRepository = RepositoryInjector.injectRecentProductRepository(database, server, retrofit)
+        val cartRepository = RepositoryInjector.injectCartRepository(retrofit)
+        val memberRepository = RepositoryInjector.injectMemberRepository(retrofit)
 
         presenter = ShoppingPresenter(
             this,
-            productRepository = productRepository,
-            recentProductRepository = recentProductRepository,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
-            memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit()),
+            productRepository,
+            recentProductRepository,
+            cartRepository,
+            memberRepository,
             recentProductSize = 10,
             productLoadSize = 20
         )

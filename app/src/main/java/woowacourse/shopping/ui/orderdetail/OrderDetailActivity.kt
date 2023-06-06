@@ -6,11 +6,11 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.common.utils.Toaster
-import woowacourse.shopping.data.member.MemberRemoteDataSourceRetrofit
-import woowacourse.shopping.data.member.MemberRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.ui.model.OrderModel
 import woowacourse.shopping.ui.order.OrderProductAdapter
+import woowacourse.shopping.ui.shopping.RepositoryInjector
+import woowacourse.shopping.ui.shopping.RetrofitInjector
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
@@ -33,7 +33,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun initPresenter() {
-        val memberRepository = MemberRepositoryImpl(MemberRemoteDataSourceRetrofit())
+        val retrofit = RetrofitInjector.inject(this)
+        val memberRepository = RepositoryInjector.injectMemberRepository(retrofit)
+
         presenter = OrderDetailPresenter(this, memberRepository)
     }
 

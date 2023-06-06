@@ -3,8 +3,9 @@ package woowacourse.shopping.ui.serverselect
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.Storage
-import woowacourse.shopping.databinding.ActivitySeverSelectBinding
 import woowacourse.shopping.data.server.Server
+import woowacourse.shopping.data.server.ShoppingRetrofit
+import woowacourse.shopping.databinding.ActivitySeverSelectBinding
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class SeverSelectActivity : AppCompatActivity() {
@@ -29,9 +30,16 @@ class SeverSelectActivity : AppCompatActivity() {
     }
 
     private fun startShopping(server: String) {
-        Storage.server = server
+        saveServer(server)
+
         val intent = ShoppingActivity.createIntent(this)
         startActivity(intent)
         finish()
+    }
+
+    private fun saveServer(server: String) {
+        ShoppingRetrofit.releaseInstance()
+        val storage = Storage.getInstance(this)
+        storage.server = server
     }
 }

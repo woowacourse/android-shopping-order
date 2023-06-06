@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import woowacourse.shopping.ui.model.ProductModel
 import woowacourse.shopping.common.utils.Toaster
 import woowacourse.shopping.common.utils.getSerializableByKey
-import woowacourse.shopping.data.cart.CartRemoteDataSourceRetrofit
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogAddCartProductBinding
+import woowacourse.shopping.ui.model.ProductModel
+import woowacourse.shopping.ui.shopping.RepositoryInjector
+import woowacourse.shopping.ui.shopping.RetrofitInjector
 
 class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     private lateinit var binding: DialogAddCartProductBinding
@@ -57,10 +57,13 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
     }
 
     private fun initPresenter() {
+        val retrofit = RetrofitInjector.inject(requireContext())
+        val cartRepository = RepositoryInjector.injectCartRepository(retrofit)
+
         presenter = CartProductDialogPresenter(
             this,
             product,
-            cartRepository = CartRepositoryImpl(CartRemoteDataSourceRetrofit()),
+            cartRepository,
             cartProductAmount = 1
         )
     }
