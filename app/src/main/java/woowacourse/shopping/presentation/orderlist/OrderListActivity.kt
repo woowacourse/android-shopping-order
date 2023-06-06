@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.order.DefaultOrderRepository
 import woowacourse.shopping.data.order.OrderRemoteDataSource
-import woowacourse.shopping.data.order.OrderRepositoryDefault
 import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderModel
@@ -19,7 +19,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     private val presenter: OrderListContract.Presenter by lazy {
         val retrofit = RetrofitUtil.getInstance().retrofit
-        val orderRepository = OrderRepositoryDefault(OrderRemoteDataSource(retrofit))
+        val orderRepository = DefaultOrderRepository(OrderRemoteDataSource(retrofit))
         OrderListPresenter(this, orderRepository)
     }
 

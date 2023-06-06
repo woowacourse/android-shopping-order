@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
-import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartRepository
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -24,7 +24,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         val retrofit = RetrofitUtil.getInstance().retrofit
         val productDataSource = ProductRemoteDataSource(retrofit)
-        val cartRepository = CartRepositoryImpl(CartRemoteDataSource(retrofit), productDataSource)
+        val cartRepository =
+            DefaultCartRepository(CartRemoteDataSource(retrofit), productDataSource)
         CartPresenter(this, cartRepository)
     }
 

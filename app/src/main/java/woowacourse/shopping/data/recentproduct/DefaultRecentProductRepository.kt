@@ -4,7 +4,7 @@ import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 
-class RecentProductRepositoryImpl(
+class DefaultRecentProductRepository(
     private val recentProductDao: RecentProductDao,
     shoppingOrderPref: ShoppingOrderSharedPreference,
 ) : RecentProductRepository {

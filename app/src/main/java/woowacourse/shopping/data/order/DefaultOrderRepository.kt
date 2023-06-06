@@ -5,7 +5,7 @@ import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.Order
 
-class OrderRepositoryDefault(private val orderDataSource: OrderDataSource) : OrderRepository {
+class DefaultOrderRepository(private val orderDataSource: OrderDataSource) : OrderRepository {
     override fun loadOrder(orderId: Long, callback: (Order) -> Unit) {
         orderDataSource.loadOrder(orderId) { order ->
             if (order != null) {

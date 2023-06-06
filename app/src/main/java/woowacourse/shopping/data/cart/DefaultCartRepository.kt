@@ -7,7 +7,7 @@ import woowacourse.shopping.presentation.mapper.toPresentation
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.UnCheckableCartProductModel
 
-class CartRepositoryImpl(
+class DefaultCartRepository(
     private val cartDataSource: CartDataSource,
     private val productDataSource: ProductDataSource,
 ) : CartRepository {

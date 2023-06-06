@@ -10,10 +10,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRemoteDataSource
-import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.DefaultCartRepository
 import woowacourse.shopping.data.product.ProductRemoteDataSource
+import woowacourse.shopping.data.recentproduct.DefaultRecentProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.shoppingpref.ShoppingOrderSharedPreference
 import woowacourse.shopping.data.util.RetrofitUtil
 import woowacourse.shopping.databinding.ActivityProductListBinding
@@ -40,8 +40,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         val recentProductDao =
             RecentProductDatabase.getInstance(applicationContext).recentProductDao()
         val recentProductRepository =
-            RecentProductRepositoryImpl(recentProductDao, shoppingOrderSharedPref)
-        val cartProductRepository = CartRepositoryImpl(cartDataSource, productDataSource)
+            DefaultRecentProductRepository(recentProductDao, shoppingOrderSharedPref)
+        val cartProductRepository = DefaultCartRepository(cartDataSource, productDataSource)
 
         ProductListPresenter(this, cartProductRepository, recentProductRepository)
     }
