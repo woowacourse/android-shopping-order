@@ -13,7 +13,7 @@ class OrderHistoryPresenter(
                 view.showHistories(histories.map { it.toView() })
             },
             onFailure = {
-                view.notifyLoadFailed()
+                view.notifyFailure(it)
             }
         )
 

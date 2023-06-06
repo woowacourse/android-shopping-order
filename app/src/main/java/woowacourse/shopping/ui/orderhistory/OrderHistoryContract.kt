@@ -12,7 +12,7 @@ interface OrderHistoryContract {
     interface View {
         fun showHistories(histories: List<OrderHistoryModel>)
 
-        fun notifyLoadFailed()
+        fun notifyFailure(message: String)
 
         fun showDetail(id: Int)
     }

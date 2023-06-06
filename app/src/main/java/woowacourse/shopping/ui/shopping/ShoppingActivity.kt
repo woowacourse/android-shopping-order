@@ -212,9 +212,9 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         productAdapter.updateProduct(shoppingProductModel)
     }
 
-    override fun notifyLoadFailed() {
+    override fun notifyFailure(message: String) {
         runOnUiThread {
-            Toaster.showToast(this, "상품을 불러오는데 실패했습니다!")
+            Toaster.showToast(this, message)
         }
     }
 

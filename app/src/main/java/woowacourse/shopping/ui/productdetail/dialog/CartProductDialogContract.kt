@@ -13,5 +13,7 @@ interface CartProductDialogContract {
         fun updateCartProductAmount(amount: Int)
 
         fun notifyAddToCartCompleted()
+
+        fun notifyFailure(message: String)
     }
 }

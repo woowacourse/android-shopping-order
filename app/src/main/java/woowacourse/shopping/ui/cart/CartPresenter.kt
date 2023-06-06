@@ -28,8 +28,8 @@ class CartPresenter(
 
     private fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit) {
         cartRepository.getAll(
-            onSuccess = { onSuccess(it) },
-            onFailure = { view.notifyLoadFailed() }
+            onSuccess,
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -77,7 +77,7 @@ class CartPresenter(
                 updateNavigationVisibility()
                 view.setResultForChange()
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -135,7 +135,7 @@ class CartPresenter(
                 updateTotalPrice()
                 updateTotalQuantity()
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 

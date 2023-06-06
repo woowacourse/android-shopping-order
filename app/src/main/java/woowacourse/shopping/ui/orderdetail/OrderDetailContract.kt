@@ -10,6 +10,6 @@ interface OrderDetailContract {
     interface View {
         fun showDetail(order: OrderModel)
 
-        fun notifyLoadFailed()
+        fun notifyFailure(message: String)
     }
 }

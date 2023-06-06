@@ -38,7 +38,7 @@ interface CartContract {
 
         fun updateAllChecked(isAllChecked: Boolean)
 
-        fun notifyLoadFailed()
+        fun notifyFailure(message: String)
 
         fun showOrder(ids: List<Int>)
     }

@@ -121,9 +121,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         startActivity(intent)
     }
 
-    override fun notifyOrderFailed() {
+    override fun notifyFailure(message: String) {
         runOnUiThread {
-            Toaster.showToast(this, "서버 문제로 주문을 실패했습니다!")
+            Toaster.showToast(this, message)
         }
     }
 

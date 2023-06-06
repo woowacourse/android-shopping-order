@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.CartProduct
 class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
     private val cartService: CartService = retrofit.create(CartService::class.java)
 
-    override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
+    override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: (String) -> Unit) {
         cartService.requestCartProducts().enqueue(object : Callback<List<CartProductEntity>> {
             override fun onResponse(
                 call: Call<List<CartProductEntity>>,
@@ -24,17 +24,17 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
                 if(response.isSuccessful) {
                     onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
                 }else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<List<CartProductEntity>>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_GET_PRODUCTS_FAILED)
             }
         })
     }
 
-    override fun addCartProduct(id: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addCartProduct(id: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         val json = JSONObject()
             .put("productId", id)
             .put("quantity", quantity)
@@ -47,12 +47,12 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
                     onSuccess(cartId)
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_ADD_PRODUCT_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_ADD_PRODUCT_FAILED)
             }
         })
     }
@@ -61,7 +61,7 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
         id: Int,
         quantity: Int,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         val json = JSONObject()
             .put("quantity", quantity)
@@ -72,12 +72,12 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
                     onSuccess()
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_UPDATE_QUANTITY_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_UPDATE_QUANTITY_FAILED)
             }
         })
     }
@@ -85,7 +85,7 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
     override fun deleteCartProduct(
         cartProductId: Int,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         cartService.deleteCartProduct(cartProductId).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -93,13 +93,20 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
                     onSuccess()
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_DELETE_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_DELETE_FAILED)
             }
         })
+    }
+
+    companion object {
+        private const val MESSAGE_GET_PRODUCTS_FAILED = "상품을 불러오는데 실패했습니다."
+        private const val MESSAGE_ADD_PRODUCT_FAILED = "장바구니에 상품을 추가하는데 실패했습니다."
+        private const val MESSAGE_UPDATE_QUANTITY_FAILED = "장바구니 상품 수량을 업데이트하는데 실패했습니다"
+        private const val MESSAGE_DELETE_FAILED = "장바구니 상품을 삭제하는데 실패했습니다"
     }
 }

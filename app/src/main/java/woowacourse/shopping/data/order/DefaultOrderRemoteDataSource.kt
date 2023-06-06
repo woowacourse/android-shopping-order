@@ -11,20 +11,24 @@ import woowacourse.shopping.data.server.OrderRemoteDataSource
 class DefaultOrderRemoteDataSource(retrofit: Retrofit) : OrderRemoteDataSource {
     private val orderService: OrderService = retrofit.create(OrderService::class.java)
 
-    override fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         orderService.requestOrder(order).enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.orderId)
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_ORDER_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<PayResponse>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_ORDER_FAILED)
             }
         })
+    }
+
+    companion object {
+        private const val MESSAGE_ORDER_FAILED = "상품을 주문하는데 실패했습니다."
     }
 }

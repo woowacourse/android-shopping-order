@@ -44,7 +44,7 @@ interface ShoppingContract {
 
         fun updateShoppingProduct(shoppingProductModel: ShoppingProductModel)
 
-        fun notifyLoadFailed()
+        fun notifyFailure(message: String)
 
         fun showPoints(points: Int)
 

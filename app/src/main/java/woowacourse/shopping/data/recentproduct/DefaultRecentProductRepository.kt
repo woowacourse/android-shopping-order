@@ -11,7 +11,7 @@ class DefaultRecentProductRepository(
     private val recentProductDao: RecentProductDao,
     private val productRemoteDataSource: ProductRemoteDataSource
 ) : RecentProductRepository {
-    override fun getAll(onSuccess: (RecentProducts) -> Unit, onFailure: () -> Unit) {
+    override fun getAll(onSuccess: (RecentProducts) -> Unit, onFailure: (String) -> Unit) {
         val recentProducts = mutableListOf<RecentProduct>()
         val entities = recentProductDao.selectAll()
         entities.forEach { entity ->
@@ -24,7 +24,7 @@ class DefaultRecentProductRepository(
                         onSuccess(RecentProducts(recentProducts))
                     }
                 },
-                onFailure = { onFailure() }
+                onFailure = { onFailure(MESSAGE_GET_RECENT_PRODUCTS_FAILED) }
             )
         }
     }
@@ -42,7 +42,7 @@ class DefaultRecentProductRepository(
         recentProductDao.updateRecentProduct(entity)
     }
 
-    override fun getLatestRecentProduct(onSuccess: (RecentProduct?) -> Unit, onFailure: () -> Unit) {
+    override fun getLatestRecentProduct(onSuccess: (RecentProduct?) -> Unit, onFailure: (String) -> Unit) {
         val entity = recentProductDao.selectLatestRecentProduct()
         if (entity == null) {
             onSuccess(null)
@@ -50,12 +50,17 @@ class DefaultRecentProductRepository(
             productRemoteDataSource.getProduct(
                 entity.id,
                 onSuccess = { onSuccess(RecentProduct(entity.time, it)) },
-                onFailure = { onFailure() }
+                onFailure = { onFailure(MESSAGE_GET_LATEST_RECENT_PRODUCT_FAILED) }
             )
         }
     }
 
     override fun isExist(id: Int): Boolean {
         return recentProductDao.selectProduct(id) != null
+    }
+
+    companion object {
+        private const val MESSAGE_GET_RECENT_PRODUCTS_FAILED = "최근 본 상품을 불러오는데 실패했습니다."
+        private const val MESSAGE_GET_LATEST_RECENT_PRODUCT_FAILED = "마지막으로 본 상품을 불러오는데 실패했습니다."
     }
 }

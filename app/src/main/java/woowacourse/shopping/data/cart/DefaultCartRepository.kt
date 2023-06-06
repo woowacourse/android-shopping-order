@@ -11,27 +11,24 @@ class DefaultCartRepository(
 
     override fun getAll(
         onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
-        cartRemoteDataSource.getCartProducts(
-            onSuccess = { onSuccess(it) },
-            onFailure = { onFailure() }
-        )
+        cartRemoteDataSource.getCartProducts(onSuccess, onFailure)
     }
 
-    override fun addCartProduct(productId: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun addCartProduct(productId: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         cartRemoteDataSource.addCartProduct(
             productId,
             quantity,
-            onSuccess = { onSuccess(it) },
-            onFailure = { onFailure() }
+            onSuccess,
+            onFailure
         )
     }
 
     override fun deleteCartProduct(
         cartProduct: CartProduct,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         cartRemoteDataSource.deleteCartProduct(
             cartProductId = cartProduct.id,
@@ -43,7 +40,7 @@ class DefaultCartRepository(
     override fun deleteCartProduct(
         shoppingProduct: ShoppingProduct,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         findByProductId(
             productId = shoppingProduct.product.id,
@@ -52,29 +49,33 @@ class DefaultCartRepository(
                     deleteCartProduct(it, onSuccess, onFailure)
                 }
                 else {
-                    onFailure()
+                    onFailure(FAILURE_MESSAGE_NOT_EXIST)
                 }
             },
             onFailure = onFailure
         )
     }
 
-    override fun updateCartProductQuantity(cartProduct: CartProduct, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun updateCartProductQuantity(cartProduct: CartProduct, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         cartRemoteDataSource.updateCartProductQuantity(
             id = cartProduct.id,
             quantity = cartProduct.quantity,
-            onSuccess = { onSuccess() },
-            onFailure = { onFailure() }
+            onSuccess,
+            onFailure
         )
     }
 
-    override fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: () -> Unit) {
+    override fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: (String) -> Unit) {
         getAll(
             onSuccess = { products ->
                 val cartProduct = products.find { it.product.id == productId }
                 onSuccess(cartProduct)
             },
-            onFailure = { onFailure() }
+            onFailure
         )
+    }
+
+    companion object {
+        private const val FAILURE_MESSAGE_NOT_EXIST = "장바구니에 존재하지 않는 상품입니다."
     }
 }

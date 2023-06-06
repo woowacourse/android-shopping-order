@@ -51,6 +51,12 @@ class CartProductDialog : DialogFragment(), CartProductDialogContract.View {
         dismiss()
     }
 
+    override fun notifyFailure(message: String) {
+        activity?.runOnUiThread {
+            Toaster.showToast(requireContext(), message)
+        }
+    }
+
     private fun initBinding(inflater: LayoutInflater, container: ViewGroup?) {
         binding = DialogAddCartProductBinding.inflate(inflater, container, false)
         binding.product = product

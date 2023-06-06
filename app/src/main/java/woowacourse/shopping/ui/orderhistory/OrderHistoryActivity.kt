@@ -63,9 +63,9 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
         )
     }
 
-    override fun notifyLoadFailed() {
+    override fun notifyFailure(message: String) {
         runOnUiThread {
-            Toaster.showToast(this, "주문 목록을 불러오는데 실패했습니다!")
+            Toaster.showToast(this, message)
         }
     }
 

@@ -24,7 +24,7 @@ class OrderPresenter(
                 view.showOriginalPrice(cart.totalPrice)
                 view.updateFinalPrice(cart.totalPrice)
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -34,7 +34,7 @@ class OrderPresenter(
                 points = it
                 view.showPoints(it)
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -71,7 +71,7 @@ class OrderPresenter(
                     view.showOrderDetail(it)
                 },
                 onFailure = {
-                    view.notifyOrderFailed()
+                    view.notifyFailure(it)
                 }
             )
         }

@@ -42,7 +42,7 @@ class ShoppingPresenter(
                 setCartQuantity()
                 view.afterLoad()
             },
-            onFailure = { view.notifyLoadFailed() }
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -61,7 +61,7 @@ class ShoppingPresenter(
                 setCartQuantity()
                 view.afterLoad()
             },
-            onFailure = { view.notifyLoadFailed() }
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -77,7 +77,7 @@ class ShoppingPresenter(
                 val recentProductsInSize = recentProducts.getRecentProducts(recentProductSize)
                 view.updateRecentProducts(recentProductsInSize.value.map { it.toView() })
             },
-            onFailure = { view.notifyLoadFailed() }
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -96,7 +96,7 @@ class ShoppingPresenter(
                     view.showProductDetail(productModel, it?.product?.toView())
                 }
             },
-            onFailure = { view.notifyLoadFailed() }
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -144,7 +144,7 @@ class ShoppingPresenter(
                     updateCartProductQuantity(cartProduct)
                 }
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -164,7 +164,7 @@ class ShoppingPresenter(
                     updateCartProductQuantity(cartProduct)
                 }
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -173,7 +173,7 @@ class ShoppingPresenter(
             onSuccess = {
                 view.showPoints(it)
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -189,7 +189,7 @@ class ShoppingPresenter(
                     val shoppingProduct = ShoppingProduct(cartProduct.product, cartProduct.quantity)
                     updateShoppingProductQuantity(shoppingProduct)
                 },
-                onFailure = {}
+                onFailure = { view.notifyFailure(it) }
             )
         } else {
             removeFromCart(cartProduct)
@@ -203,7 +203,7 @@ class ShoppingPresenter(
                 val shoppingProduct = ShoppingProduct(cartProduct.product, cartProduct.quantity)
                 updateShoppingProductQuantity(shoppingProduct)
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -223,7 +223,7 @@ class ShoppingPresenter(
                 view.updateShoppingProduct(shoppingProduct.toView())
                 updateCartQuantity()
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 }

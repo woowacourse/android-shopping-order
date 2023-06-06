@@ -14,9 +14,8 @@ class OrderDetailPresenter(
                 view.showDetail(it.toView())
             },
             onFailure = {
-                view.notifyLoadFailed()
+                view.notifyFailure(it)
             }
         )
-
     }
 }

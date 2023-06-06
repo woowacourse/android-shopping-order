@@ -49,9 +49,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding.order = order
     }
 
-    override fun notifyLoadFailed() {
+    override fun notifyFailure(message: String) {
         runOnUiThread {
-            Toaster.showToast(this, "주문을 불러오는데 실패했습니다!")
+            Toaster.showToast(this, message)
         }
     }
 

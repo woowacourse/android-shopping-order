@@ -32,6 +32,6 @@ interface OrderContract {
 
         fun showOrderDetail(id: Int)
 
-        fun notifyOrderFailed()
+        fun notifyFailure(message: String)
     }
 }

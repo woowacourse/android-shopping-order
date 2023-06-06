@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class DefaultOrderRepository(private val orderRemoteDataSource: OrderRemoteDataSource) : OrderRepository {
-    override fun order(cart: Cart, points: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    override fun order(cart: Cart, points: Int, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         val order = PayRequest(
             cartItemIds = cart.cartProducts.map { CartIdEntity(it.id) },
             originalPrice = cart.totalPrice,

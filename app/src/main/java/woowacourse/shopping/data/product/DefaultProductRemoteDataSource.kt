@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.Product
 class DefaultProductRemoteDataSource(retrofit: Retrofit) : ProductRemoteDataSource {
     private val productService: ProductService = retrofit.create(ProductService::class.java)
 
-    override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: () -> Unit) {
+    override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: (String) -> Unit) {
         productService.requestProducts().enqueue(object : Callback<List<ProductEntity>> {
             override fun onResponse(
                 call: Call<List<ProductEntity>>,
@@ -22,30 +22,35 @@ class DefaultProductRemoteDataSource(retrofit: Retrofit) : ProductRemoteDataSour
                     onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<List<ProductEntity>>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_GET_PRODUCTS_FAILED)
             }
         })
     }
 
-    override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: () -> Unit) {
+    override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: (String) -> Unit) {
         productService.requestProduct(id).enqueue(object : Callback<ProductEntity> {
             override fun onResponse(call: Call<ProductEntity>, response: Response<ProductEntity>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.toDomain())
                 }
                 else {
-                    onFailure()
+                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCT_FAILED })
                 }
             }
 
             override fun onFailure(call: Call<ProductEntity>, t: Throwable) {
-                onFailure()
+                onFailure(MESSAGE_GET_PRODUCT_FAILED)
             }
         })
+    }
+
+    companion object {
+        private const val MESSAGE_GET_PRODUCTS_FAILED = "상품을 불러오는데 실패했습니다."
+        private const val MESSAGE_GET_PRODUCT_FAILED = "상품 정보를 불러오는데 실패했습니다."
     }
 }

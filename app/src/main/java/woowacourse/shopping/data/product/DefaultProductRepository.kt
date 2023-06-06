@@ -14,20 +14,20 @@ class DefaultProductRepository(
 ) : ProductRepository {
     override fun getProducts(
         onSuccess: (ShoppingProducts) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         productRemoteDataSource.getProducts(
             onSuccess = {
                 joinProductAmount(it, onSuccess, onFailure)
             },
-            onFailure = { onFailure() }
+            onFailure
         )
     }
 
     private fun joinProductAmount(
         products: List<Product>,
         onSuccess: (ShoppingProducts) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (String) -> Unit
     ) {
         cartRemoteDataSource.getCartProducts(
             onSuccess = { cartProducts ->
@@ -37,7 +37,7 @@ class DefaultProductRepository(
                 )
                 onSuccess(shoppingProducts)
             },
-            onFailure = { onFailure() }
+            onFailure
         )
     }
 

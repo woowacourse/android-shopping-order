@@ -81,9 +81,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.cartProductAllCheckbox.isChecked = isAllChecked
     }
 
-    override fun notifyLoadFailed() {
+    override fun notifyFailure(message: String) {
+
         runOnUiThread {
-            Toaster.showToast(this, "장바구니 상품을 불러오는데 실패했습니다!")
+            Toaster.showToast(this, message)
         }
     }
 

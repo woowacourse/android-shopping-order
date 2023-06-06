@@ -45,7 +45,7 @@ class CartProductDialogPresenter(
                     updateCartProduct(cartProduct)
                 }
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -56,7 +56,7 @@ class CartProductDialogPresenter(
             onSuccess = {
                 view.notifyAddToCartCompleted()
             },
-            onFailure = {}
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
@@ -64,7 +64,7 @@ class CartProductDialogPresenter(
         cartRepository.updateCartProductQuantity(
             cartProduct,
             onSuccess = { view.notifyAddToCartCompleted() },
-            onFailure = { }
+            onFailure = { view.notifyFailure(it) }
         )
     }
 
