@@ -93,7 +93,7 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
 
     override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
         runOnUiThread {
-            adapter.submitList(adapter.currentList + orderHistories)
+            adapter.submitList(orderHistories)
         }
     }
 
