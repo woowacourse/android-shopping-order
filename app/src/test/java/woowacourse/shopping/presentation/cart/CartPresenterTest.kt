@@ -10,6 +10,7 @@ import org.junit.Test
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.Counter
 import woowacourse.shopping.presentation.fixture.CartProductFixture
 
 class CartPresenterTest {
@@ -223,6 +224,7 @@ class CartPresenterTest {
 
     @Test
     fun `이전 페이지로 넘긴다`() {
+        presenter = CartPresenter(view, cartRepository, Counter(2))
         // given : 이전 페이지로 돌아갈 수 있는 상태다.
         every {
             view.showCartProductModels(
@@ -232,13 +234,30 @@ class CartPresenterTest {
         presenter.loadCarts()
 
         // when : 이전 페이지로 돌아가기 요청을 보낸다.
-        presenter.plusPage()
+        presenter.minusPage()
 
         // then : 이전 페이지 장바구니 상품들이 노출된다.
         verify {
             view.showCartProductModels(
                 CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4, 5),
             )
+        }
+    }
+
+    @Test
+    fun `장바구니 상품을 주문하기 위해 주문 화면으로 이동한다`() {
+        // given : 주문하기로 이동할 수 있는 상태이다.
+        presenter.loadCarts()
+        every {
+            view.showOrderPage(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        } just runs
+
+        // when : 주문하기 이동 요청을 보낸다.
+        presenter.navigateCartOrder()
+
+        // then : 주문하기 화면이 노출된다.
+        verify {
+            view.showOrderPage(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
         }
     }
 }
