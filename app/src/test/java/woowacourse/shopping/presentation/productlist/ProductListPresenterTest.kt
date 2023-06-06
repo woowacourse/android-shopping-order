@@ -120,4 +120,58 @@ class ProductListPresenterTest {
             )
         }
     }
+
+    @Test
+    fun `장바구니에 담긴 상품 개수가 증가한다`() {
+        // given : 장바구니의 상품 개수를 증가시킬 수 있는 상태다.
+        every {
+            view.replaceProductModel(
+                cartProductModel = CartProductFixture.getCartProductModel(1, 2),
+            )
+        } just runs
+
+        every {
+            cartRepository.updateCartProductCount(any(), any(), any())
+        } answers {
+            val callback = args[2] as () -> Unit
+            callback()
+        }
+
+        // when : 장바구니 상품 개수 증가 요청을 보낸다.
+        presenter.addCartProductCount(CartProductFixture.getCartProductModel(1))
+
+        // then : 증가된 상품 개수가 노출된다.
+        verify {
+            view.replaceProductModel(
+                cartProductModel = CartProductFixture.getCartProductModel(1, 2),
+            )
+        }
+    }
+
+    @Test
+    fun `장바구니에 담긴 상품 개수가 감소한다`() {
+        // given : 장바구니의 상품 개수를 감소시킬 수 있는 상태다.
+        every {
+            view.replaceProductModel(
+                cartProductModel = CartProductFixture.getCartProductModel(1, 1),
+            )
+        } just runs
+
+        every {
+            cartRepository.updateCartProductCount(any(), any(), any())
+        } answers {
+            val callback = args[2] as () -> Unit
+            callback()
+        }
+
+        // when : 장바구니 상품 개수 감소 요청을 보낸다.
+        presenter.subCartProductCount(CartProductFixture.getCartProductModel(1, 2))
+
+        // then : 감소된 상품 개수가 노출된다.
+        verify {
+            view.replaceProductModel(
+                cartProductModel = CartProductFixture.getCartProductModel(1, 1),
+            )
+        }
+    }
 }
