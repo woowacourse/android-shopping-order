@@ -4,10 +4,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.product.ProductRemoteDataSource
-import woowacourse.shopping.data.recentproduct.RecentProductDao
-import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.local.recentproduct.RecentProductDao
+import woowacourse.shopping.data.local.recentproduct.RecentProductDbHelper
+import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 

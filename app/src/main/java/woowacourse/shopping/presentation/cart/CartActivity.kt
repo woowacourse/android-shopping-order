@@ -8,9 +8,9 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRemoteDataSource
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.common.PreferenceUtil
+import woowacourse.shopping.data.remote.cart.CartRemoteDataSource
+import woowacourse.shopping.data.remote.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductListModel
 import woowacourse.shopping.presentation.model.CartProductModel

@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.order
 
 import woowacourse.shopping.OrderCartInfoList
-import woowacourse.shopping.data.order.OrderRepository
-import woowacourse.shopping.data.order.response.OrderCartDataModel
-import woowacourse.shopping.data.order.response.OrderRequestDataModel
-import woowacourse.shopping.data.user.UserRepository
+import woowacourse.shopping.data.remote.order.response.OrderCartDataModel
+import woowacourse.shopping.data.remote.order.response.OrderRequestDataModel
+import woowacourse.shopping.data.remote.user.UserRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.model.OrderCartModel
 

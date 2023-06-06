@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.orderlist
 
 import woowacourse.shopping.data.mapper.toPresentation
-import woowacourse.shopping.data.order.OrderRepository
+import woowacourse.shopping.data.repository.OrderRepository
 
 class OrderListPresenter(
     private val view: OrderListContract.View,

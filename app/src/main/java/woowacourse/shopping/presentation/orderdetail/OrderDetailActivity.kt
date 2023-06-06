@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.order.OrderRemoteDataSource
-import woowacourse.shopping.data.order.OrderRepositoryImpl
+import woowacourse.shopping.data.remote.order.OrderRemoteDataSource
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.orderdetail.adapter.OrderDetailProductAdapter

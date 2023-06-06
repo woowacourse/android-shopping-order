@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.order.response.OrderDetailDataModel
+import woowacourse.shopping.data.remote.order.response.OrderDetailDataModel
 import woowacourse.shopping.presentation.model.OrderDetailModel
 
 fun OrderDetailDataModel.toPresentation(): OrderDetailModel {

@@ -9,10 +9,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.order.OrderRemoteDataSource
-import woowacourse.shopping.data.order.OrderRepositoryImpl
-import woowacourse.shopping.data.user.UserRemoteDataSource
-import woowacourse.shopping.data.user.UserRepositoryImpl
+import woowacourse.shopping.data.remote.order.OrderRemoteDataSource
+import woowacourse.shopping.data.remote.user.UserRemoteDataSource
+import woowacourse.shopping.data.remote.user.UserRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.OrderCartModel
 import woowacourse.shopping.presentation.order.adapter.OrderCartAdapter

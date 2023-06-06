@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.orderdetail
 
 import android.util.Log
 import woowacourse.shopping.data.mapper.toPresentation
-import woowacourse.shopping.data.order.OrderRepository
+import woowacourse.shopping.data.repository.OrderRepository
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
