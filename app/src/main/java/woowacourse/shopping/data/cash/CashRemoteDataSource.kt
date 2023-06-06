@@ -11,7 +11,7 @@ class CashRemoteDataSource(
     private val retrofitService: CashRetrofitService =
         retrofit.create(CashRetrofitService::class.java)
 
-    override fun loadCash(callback: (Result<Int>) -> Unit) {
+    override fun loadCash(callback: (Int) -> Unit) {
         retrofitService.getCash()
             .enqueue(
                 object : retrofit2.Callback<TotalCash> {
@@ -19,16 +19,11 @@ class CashRemoteDataSource(
                         call: Call<TotalCash>,
                         response: Response<TotalCash>,
                     ) {
-                        if (response.isSuccessful) {
-                            val totalCash = response.body()?.totalCash ?: 0
-                            callback(Result.success(totalCash))
-                        } else {
-                            callback(Result.failure(Throwable("Response Error")))
-                        }
+                        val totalCash = response.body()?.totalCash ?: 0
+                        callback(totalCash)
                     }
 
                     override fun onFailure(call: Call<TotalCash>, t: Throwable) {
-                        callback(Result.failure(t))
                         Log.e("Request Failed", t.toString())
                     }
                 },

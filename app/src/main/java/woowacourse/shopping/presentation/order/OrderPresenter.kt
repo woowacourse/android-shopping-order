@@ -38,9 +38,8 @@ class OrderPresenter(
     }
 
     override fun loadCash() {
-        cashRepository.loadCash { result ->
-            result.onSuccess { cash -> view.showCash(cash) }
-                .onFailure { view.handleRequestError() }
+        cashRepository.loadCash { cash ->
+            view.showCash(cash)
         }
     }
 
