@@ -86,4 +86,38 @@ class ProductListPresenterTest {
             )
         }
     }
+
+    @Test
+    fun `상품 상세를 보여준다`() {
+        // given : 상품 상세를 보여줄 수 있는 상태다.
+        every {
+            view.showProductDetail(
+                productModel = CartProductFixture.getProductModel(1),
+            )
+        } just runs
+
+        every {
+            recentProductRepository.addRecentProduct(any(), any())
+        }
+
+        every { recentProductRepository.addRecentProduct(any(), any()) } just runs
+
+        // when : 상품 상세를 보여달라는 요청을 보낸다.
+        presenter.navigateProductDetail(CartProductFixture.getProductModel(1))
+
+        // then : 상품 상세 화면이 노출된다.
+        verify {
+            view.showProductDetail(
+                productModel = CartProductFixture.getProductModel(1),
+            )
+        }
+
+        // and : 최근 본 상품이 저장된다.
+        verify {
+            recentProductRepository.addRecentProduct(
+                product = CartProductFixture.getProduct(1),
+                any(),
+            )
+        }
+    }
 }
