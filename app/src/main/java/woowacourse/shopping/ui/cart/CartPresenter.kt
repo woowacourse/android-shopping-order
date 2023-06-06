@@ -74,6 +74,8 @@ class CartPresenter(
             onSuccess = {
                 cart = cart.removeCartProduct(cartProduct)
                 updateCartPage()
+                updateTotalPrice()
+                updateTotalQuantity()
                 updateNavigationVisibility()
                 view.setResultForChange()
             },
