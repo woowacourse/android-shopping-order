@@ -10,8 +10,8 @@ class OrderDetailPresenter(
 ) :
     OrderDetailContract.Presenter {
     override fun getOrderDetail(id: Long) {
-        orderDetailRepository.getById(id).getOrNull()?.let { order ->
-            view.setOrderDetail(order.toUIModel())
+        orderDetailRepository.getById(id) {
+            view.setOrderDetail(it.toUIModel())
         }
     }
 }

@@ -3,22 +3,27 @@ package com.example.domain.repository
 import com.example.domain.model.CartProduct
 
 interface CartRepository {
-    fun getAllProductInCart(): Result<List<CartProduct>>
+    fun getAllProductInCart(callback: (List<CartProduct>) -> Unit)
 
     fun insert(
         id: Long,
         quantity: Int,
-    ): Result<Unit>
+        callback: (Unit) -> Unit,
+    )
 
     fun updateCount(
         id: Long,
         count: Int,
-    ): Result<Unit>
+        callback: (Unit) -> Unit,
+    )
 
     fun remove(
         id: Long,
-    ): Result<Unit>
+        callback: (Unit) -> Unit,
+    )
 
-    fun findById(id: Long): Result<CartProduct?>
-    fun getSubList(offset: Int, step: Int): Result<List<CartProduct>>
+    fun findById(id: Long, callback: (CartProduct?) -> Unit)
+
+    fun findByProductId(productId: Long, callback: (CartProduct?) -> Unit)
+    fun getSubList(offset: Int, step: Int, callback: (List<CartProduct>) -> Unit)
 }

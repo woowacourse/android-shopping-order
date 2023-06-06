@@ -7,14 +7,14 @@ import woowacourse.shopping.mapper.toDomain
 
 class OrderHistoryRepositoryImpl(private val orderHistoryRemoteSource: OrderHistoryRemoteSource) :
     OrderHistoryRepository {
-
-    override fun getOrderHistory(): Result<List<Order>> {
-        val result = orderHistoryRemoteSource.getOrderList()
-        return if (result.isSuccess) {
-            val orderList = result.getOrNull()?.map { it.toDomain() }
-            Result.success(orderList ?: throw IllegalArgumentException())
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+    override fun getOrderHistory(callback: (List<Order>) -> Unit) {
+        orderHistoryRemoteSource.getOrderList {
+            if (it.isSuccess) {
+                val orderList = it.getOrNull()?.map { it.toDomain() }
+                callback(orderList ?: throw IllegalArgumentException())
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 }

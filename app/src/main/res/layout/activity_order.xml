@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:onItemSelected="@{() -> listener.onItemSelected(spinnerCoupon.getSelectedItem().toString())}"
+            android:onItemSelected="@{() -> listener.onItemSelected(spinnerCoupon.getSelectedItemPosition())}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_coupon"
             tools:listitem="@layout/coupon_item" />
@@ -95,7 +95,7 @@
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"
-            android:onClick="@{() -> listener.onOrderClick()}"
+            android:onClick="@{() -> listener.onOrderClick(spinnerCoupon.getSelectedItemPosition())}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

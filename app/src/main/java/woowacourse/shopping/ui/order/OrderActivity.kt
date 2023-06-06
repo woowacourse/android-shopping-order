@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.coupon.CouponRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
@@ -77,12 +76,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
         binding.rvOrder.adapter = rvAdapter
     }
 
-    override fun onOrderClick() {
-        presenter.navigateToOrderDetail()
+    override fun onOrderClick(id: Int) {
+        presenter.navigateToOrderDetail(id)
     }
 
-    override fun onItemSelected(couponName: String) {
-        presenter.getTotalPrice(couponName)
+    override fun onItemSelected(id: Int) {
+        presenter.getTotalPrice(id)
     }
 
     companion object {

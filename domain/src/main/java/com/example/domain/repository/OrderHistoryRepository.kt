@@ -4,5 +4,5 @@ import com.example.domain.model.Order
 
 interface OrderHistoryRepository {
 
-    fun getOrderHistory(): Result<List<Order>>
+    fun getOrderHistory(callback: (List<Order>) -> Unit)
 }

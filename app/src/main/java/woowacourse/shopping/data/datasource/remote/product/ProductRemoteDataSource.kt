@@ -4,5 +4,5 @@ import woowacourse.shopping.data.remote.request.ProductDTO
 
 interface ProductRemoteDataSource {
 
-    fun getSubListProducts(limit: Int, scrollCount: Int): Result<List<ProductDTO>>
+    fun getSubListProducts(limit: Int, scrollCount: Int, callback: (Result<List<ProductDTO>>) -> Unit)
 }

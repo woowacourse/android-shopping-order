@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
+import com.example.domain.model.ProductItem
+import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
 
 sealed interface ProductsItemType {
@@ -11,5 +13,9 @@ sealed interface ProductsItemType {
 }
 
 data class RecentProductsItem(val product: List<ProductUIModel>) : ProductsItemType
-data class ProductItem(val product: ProductUIModel, val count: Int) : ProductsItemType
+data class ProductItemModel(val product: ProductUIModel, val count: Int) : ProductsItemType
 object ProductReadMore : ProductsItemType
+
+fun ProductItem.toUIModel(): ProductItemModel {
+    return ProductItemModel(product.toUIModel(), count)
+}

@@ -9,7 +9,7 @@ class OrderHistoryPresenter(
     val repository: OrderHistoryRepository,
 ) : OrderHistoryContract.Presenter {
     override fun getOrderHistory() {
-        repository.getOrderHistory().getOrNull()?.let {
+        repository.getOrderHistory() {
             view.setOrderHistory(it.map { order -> order.toUIModel() })
         }
     }

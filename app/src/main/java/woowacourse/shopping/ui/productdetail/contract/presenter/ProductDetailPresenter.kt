@@ -25,32 +25,36 @@ class ProductDetailPresenter(
     }
 
     override fun setUpProductDetail() {
-        repository.getById(id).getOrNull()?.let {
+        repository.getById(id) {
             view.setProductDetail(it.toUIModel())
         }
     }
 
     override fun addProductToCart() {
-        cartRepository.findById(id).getOrNull().let {
-            if (it != null) {
-                cartRepository.updateCount(it.id, count)
-            } else {
-                cartRepository.insert(id, count)
+        cartRepository.findByProductId(id) {
+            if (it == null) {
+                cartRepository.insert(id, count, {})
+                return@findByProductId
             }
+            updateProdouctQuantity(it.id, count)
         }
+    }
+
+    private fun updateProdouctQuantity(id: Long, count: Int) {
+        cartRepository.updateCount(id, count, {})
     }
 
     override fun addProductToRecent() {
         recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)
         }
-        repository.getById(id).getOrNull()?.let {
+        repository.getById(id) {
             recentRepository.insert(it)
         }
     }
 
     override fun setProductCountDialog() {
-        repository.getById(id).getOrNull()?.let {
+        repository.getById(id) {
             view.showProductCountDialog(it.toUIModel())
         }
     }

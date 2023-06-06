@@ -7,13 +7,14 @@ import woowacourse.shopping.mapper.toDomain
 
 class OrderDetailRepositoryImpl(private val orderRemoteDetailSource: OrderRemoteDetailSource) :
     OrderDetailRepository {
-    override fun getById(id: Long): Result<Order> {
-        val result = orderRemoteDetailSource.getById(id)
-        return if (result.isSuccess) {
-            val orderDomain = result.getOrNull()?.toDomain()
-            Result.success(orderDomain ?: throw IllegalArgumentException())
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+    override fun getById(id: Long, callback: (Order) -> Unit) {
+        orderRemoteDetailSource.getById(id) {
+            if (it.isSuccess) {
+                val orderDomain = it.getOrNull()?.toDomain()
+                callback(orderDomain ?: throw IllegalArgumentException())
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 }

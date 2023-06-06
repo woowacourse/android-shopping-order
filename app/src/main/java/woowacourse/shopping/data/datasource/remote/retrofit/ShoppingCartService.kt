@@ -17,7 +17,7 @@ interface ShoppingCartService {
     @POST("/cart-items")
     fun postProductToCart(
         @Body cartItemRequest: CartItemRequest,
-    ): Call<Void>
+    ): Call<Unit>
 
     @PATCH("/cart-items/{cartItemId}")
     fun patchProductCount(

@@ -1,11 +1,8 @@
 package woowacourse.shopping.ui.order.contract.presenter
 
-import android.util.Log
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository
-import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartItemsUIModel
-import woowacourse.shopping.model.OrderUIModel
 import woowacourse.shopping.ui.order.contract.OrderContract
 
 class OrderPresenter(
@@ -16,13 +13,13 @@ class OrderPresenter(
 ) :
     OrderContract.Presenter {
 
+    private var coupon: Int = NOTHING
+
     init {
         getOrder()
         getOriginalPrice()
         getCoupons()
     }
-
-    private lateinit var order: OrderUIModel
 
     override fun getOrder() {
         view.setUpOrder(cartItems.cartProducts)
@@ -34,42 +31,37 @@ class OrderPresenter(
 
     override fun getCoupons() {
         val list = mutableListOf("사용 안함")
-        couponRepository.getCoupons().getOrNull()?.let {
+        couponRepository.getCoupons {
             view.setCoupons(list.plus(it.map { coupon -> coupon.name }))
         }
     }
 
-    override fun getTotalPrice(couponName: String) {
-        val coupon =
-            couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
-        Log.d("coupon", coupon.toString())
-        val totalPrice = if (coupon != null) {
-            val response =
-                couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.id).getOrNull()
-                    ?: throw IllegalArgumentException("쿠폰 적용 실패")
-            response.totalPrice
-        } else {
-            cartItems.totalPrice
+    override fun getTotalPrice(couponId: Int) {
+        if (coupon == NOTHING) {
+            view.setPrice(cartItems.totalPrice)
+            return
         }
-        view.setPrice(totalPrice)
+        coupon = couponId
+
+        couponRepository.getPriceWithCoupon(cartItems.totalPrice, coupon.toLong()) {
+            view.setPrice(it.totalPrice)
+        }
     }
 
-    override fun navigateToOrderDetail() {
-        order = applyCoupon("")
-
-        view.navigateToOrderDetail(order.id)
-    }
-
-    private fun applyCoupon(couponName: String): OrderUIModel {
-        val coupon =
-            couponRepository.getCoupons().getOrNull()?.find { coupon -> coupon.name == couponName }
+    override fun navigateToOrderDetail(couponId: Int) {
         val cartItemsIds = cartItems.cartProducts.map { cartProduct -> cartProduct.id }
-        return if (coupon != null) {
-            orderRepository.insertOrderWithCoupon(cartItemsIds, coupon.id).getOrNull()?.toUIModel()
-                ?: throw IllegalArgumentException("쿠폰 적용 실패")
-        } else {
-            orderRepository.insertOrderWithoutCoupon(cartItemsIds).getOrNull()?.toUIModel()
-                ?: throw IllegalArgumentException("쿠폰 적용 실패")
+        if (coupon == NOTHING) {
+            orderRepository.insertOrderWithoutCoupon(cartItemsIds) { order ->
+                view.navigateToOrderDetail(order.id)
+            }
+            return
         }
+        orderRepository.insertOrderWithCoupon(cartItemsIds, coupon.toLong()) {
+            view.navigateToOrderDetail(it.id)
+        }
+    }
+
+    companion object {
+        private const val NOTHING = 0
     }
 }

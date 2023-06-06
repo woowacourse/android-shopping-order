@@ -4,75 +4,81 @@ import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSource
 import woowacourse.shopping.mapper.toDomain
-import java.io.IOException
 
 class CartRepositoryImpl(
     private val shoppingCartDataSource: ShoppingCartDataSource,
 ) : CartRepository {
 
-    override fun getAllProductInCart(): Result<List<CartProduct>> {
-        val result = shoppingCartDataSource.getAllProductInCart()
-        return if (result.isSuccess) {
-            val productsDomain = result.getOrNull()?.map { productDto -> productDto.toDomain() }
-            Result.success(productsDomain ?: emptyList())
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+    override fun getAllProductInCart(callback: (List<CartProduct>) -> Unit) {
+        shoppingCartDataSource.getAllProductInCart {
+            if (it.isSuccess) {
+                val cartProducts = it.getOrNull()?.map { cartProduct -> cartProduct.toDomain() }
+                callback(cartProducts ?: throw IllegalArgumentException())
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 
     override fun insert(
         id: Long,
         quantity: Int,
-    ): Result<Unit> {
-        val result = shoppingCartDataSource.postProductToCart(id, quantity)
-        return if (result.isSuccess) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+        callback: (Unit) -> Unit,
+    ) {
+        shoppingCartDataSource.postProductToCart(id, quantity) {
+            if (it.isSuccess) {
+                callback(Unit)
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 
     override fun updateCount(
         id: Long,
         count: Int,
-    ): Result<Unit> {
-        val result = shoppingCartDataSource.patchProductCount(id, count)
-        return if (result.isSuccess) {
-            Result.success(Unit)
-        } else {
-            Result.failure(IOException("Response unsuccessful"))
+        callback: (Unit) -> Unit,
+    ) {
+        shoppingCartDataSource.patchProductCount(id, count) {
+            if (it.isSuccess) {
+                callback(Unit)
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 
-    override fun remove(id: Long): Result<Unit> {
-        val result = shoppingCartDataSource.deleteProductInCart(id)
-        return if (result.isSuccess) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+    override fun remove(id: Long, callback: (Unit) -> Unit) {
+        shoppingCartDataSource.deleteProductInCart(id) {
+            if (it.isSuccess) {
+                callback(Unit)
+            } else {
+                throw IllegalArgumentException()
+            }
         }
     }
 
-    override fun findById(id: Long): Result<CartProduct?> {
-        val result = getAllProductInCart()
-        return if (result.isSuccess) {
-            val cartProduct = result.getOrNull()?.find { it.product.id == id }
-            Result.success(cartProduct)
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+    override fun findById(id: Long, callback: (CartProduct?) -> Unit) {
+        getAllProductInCart { cartProducts ->
+            val cartProduct = cartProducts.find { it.id == id }
+            callback(cartProduct)
         }
     }
 
-    override fun getSubList(offset: Int, step: Int): Result<List<CartProduct>> {
-        val result = getAllProductInCart()
-        return if (result.isSuccess) {
-            val limitedProducts = result.getOrThrow().subList(
-                offset.coerceAtMost(result.getOrThrow().size),
-                (offset + step).coerceAtMost(result.getOrThrow().size),
+    override fun findByProductId(productId: Long, callback: (CartProduct?) -> Unit) {
+        getAllProductInCart { cartProducts ->
+            val cartProduct = cartProducts.find { it.product.id == productId }
+            callback(cartProduct)
+        }
+    }
+
+    override fun getSubList(offset: Int, step: Int, callback: (List<CartProduct>) -> Unit) {
+        getAllProductInCart { cartProducts ->
+            val subList = cartProducts.subList(
+                offset.coerceAtMost(cartProducts.size),
+                (offset + step).coerceAtMost(cartProducts.size),
             )
-            Result.success(limitedProducts)
-        } else {
-            Result.failure(Throwable(result.exceptionOrNull()?.message))
+            callback(subList)
         }
     }
 }

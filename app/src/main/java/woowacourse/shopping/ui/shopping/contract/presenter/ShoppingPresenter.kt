@@ -5,11 +5,12 @@ import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.ui.shopping.ProductItem
+import woowacourse.shopping.ui.shopping.ProductItemModel
 import woowacourse.shopping.ui.shopping.ProductReadMore
 import woowacourse.shopping.ui.shopping.ProductsItemType
 import woowacourse.shopping.ui.shopping.RecentProductsItem
 import woowacourse.shopping.ui.shopping.contract.ShoppingContract
+import woowacourse.shopping.ui.shopping.toUIModel
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -21,25 +22,14 @@ class ShoppingPresenter(
     private var productsData: MutableList<ProductsItemType> = mutableListOf()
     private var productSize: Int = 0
     private var productOffset = ProductsOffset(offset, productRepository)
-    private val cachedCartProducts = mutableListOf<CartProduct>()
 
     override fun initProducts() {
-        cartRepository.getAllProductInCart().getOrNull()?.let { cartProducts ->
-            cachedCartProducts.clear()
-            cachedCartProducts.addAll(cartProducts)
+        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()) { products ->
+            productSize += products.size
+            productsData.removeIf { it is ProductItemModel }
+            productsData += products.map { it.toUIModel() }
+            view.setProducts(productsData.plus(ProductReadMore))
         }
-        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()).getOrNull()
-            ?.let { products ->
-                productSize += products.size
-                productsData.removeIf { it is ProductItem }
-                productsData += products.map { product ->
-                    ProductItem(
-                        product.toUIModel(),
-                        cachedCartProducts.find { it.product.id == product.id }?.quantity ?: 0,
-                    )
-                }
-                view.setProducts(productsData.plus(ProductReadMore))
-            }
     }
 
     override fun updateProducts() {
@@ -68,18 +58,12 @@ class ShoppingPresenter(
 
     override fun fetchMoreProducts() {
         productOffset = productOffset.plus(1)
-        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()).getOrNull()
-            .let { products ->
-                productSize += products?.size ?: 0
-                productsData.removeIf { it is ProductItem }
-                productsData += products?.map { product ->
-                    ProductItem(
-                        product.toUIModel(),
-                        cachedCartProducts.find { it.product.id == product.id }?.quantity ?: 0,
-                    )
-                } ?: emptyList()
-                view.addProducts(productsData.plus(ProductReadMore))
-            }
+        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()) { products ->
+            productSize += products.size
+            productsData.removeIf { it is ProductItemModel }
+            productsData += products.map { it.toUIModel() }
+            view.addProducts(productsData.plus(ProductReadMore))
+        }
     }
 
     override fun navigateToItemDetail(id: Long) {
@@ -88,36 +72,40 @@ class ShoppingPresenter(
     }
 
     override fun insertItem(id: Long, count: Int) {
-        cartRepository.insert(id, count).getOrNull().let {
+        cartRepository.insert(id, count) {
             view.updateItem(id, count)
+            updateCountSize()
         }
-        updateCountSize()
     }
 
     override fun increaseCount(id: Long) {
-        val cartProduct = cachedCartProducts.find { it.product.id == id }
-        cartProduct?.id?.let { cartRepository.updateCount(it, getCount(id) + 1) }
-        cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) + 1
-        view.updateItem(id, getCount(id))
-    }
-
-    override fun decreaseCount(id: Long) {
-        val cartProduct = cachedCartProducts.find { it.product.id == id }
-        cartProduct?.id?.let { cartRepository.updateCount(it, getCount(id) - 1) }
-        cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) - 1
-        view.updateItem(id, getCount(id))
-    }
-
-    override fun updateCountSize() {
-        cartRepository.getAllProductInCart().getOrNull()?.let { cartProducts ->
-            cachedCartProducts.clear()
-            cachedCartProducts.addAll(cartProducts)
-            view.showCountSize(cachedCartProducts.size)
+        cartRepository.findByProductId(id) {
+            if (it == null) {
+                insertItem(id, 1)
+                return@findByProductId
+            }
+            updateCartProductQuantity(it, it.quantity + 1)
         }
     }
 
-    private fun getCount(id: Long): Int {
-        return cachedCartProducts.find { it.product.id == id }?.quantity ?: 0
+    override fun decreaseCount(id: Long) {
+        cartRepository.findByProductId(id) {
+            if (it != null) {
+                updateCartProductQuantity(it, it.quantity - 1)
+            }
+        }
+    }
+
+    override fun updateCountSize() {
+        cartRepository.getAllProductInCart { cartProducts ->
+            view.showCountSize(cartProducts.size)
+        }
+    }
+
+    private fun updateCartProductQuantity(cartProduct: CartProduct, count: Int) {
+        cartRepository.updateCount(cartProduct.id, count) {
+            view.updateItem(cartProduct.product.id, count)
+        }
     }
 
     companion object {

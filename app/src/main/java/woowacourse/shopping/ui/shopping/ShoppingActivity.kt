@@ -8,11 +8,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -38,13 +36,15 @@ class ShoppingActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping)
+        binding = ActivityShoppingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
                 ProductRemoteDataSourceImpl(),
+                ShoppingCartDataSourceImpl(),
             ),
             RecentProductDatabase(this),
             CartRepositoryImpl(
@@ -114,13 +114,10 @@ class ShoppingActivity :
 
     override fun setProducts(data: List<ProductsItemType>) {
         binding.productRecyclerview.adapter = ProductsAdapter(
-            data,
+            data.toMutableList(),
             this,
             presenter::fetchMoreProducts,
         )
-
-        binding.productRecyclerview.visibility = View.VISIBLE
-        binding.includeShoppingSkeleton.rootView.visibility = View.GONE
     }
 
     override fun navigateToProductDetail(id: Long, latestProduct: ProductUIModel?) {

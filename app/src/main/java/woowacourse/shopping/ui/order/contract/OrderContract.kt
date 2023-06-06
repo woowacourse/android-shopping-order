@@ -14,7 +14,7 @@ interface OrderContract {
         fun getOrder()
         fun getOriginalPrice()
         fun getCoupons()
-        fun getTotalPrice(couponName: String)
-        fun navigateToOrderDetail()
+        fun getTotalPrice(couponId: Int)
+        fun navigateToOrderDetail(couponId: Int)
     }
 }
