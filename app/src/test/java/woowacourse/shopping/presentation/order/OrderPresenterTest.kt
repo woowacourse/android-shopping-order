@@ -58,4 +58,23 @@ class OrderPresenterTest {
             )
         }
     }
+
+    @Test
+    fun `캐시 잔액을 불러온다`() {
+        // given : 캐시 잔액을 불러올 수 있는 상태다.
+        every { view.showCash(5000) } just runs
+
+        every {
+            cashRepository.loadCash(any())
+        } answers {
+            val callback = args[0] as (Int) -> Unit
+            callback(5000)
+        }
+
+        // when : 캐시 잔액 불러오기 요청을 보낸다.
+        presenter.loadCash()
+
+        // then : 캐시 잔액이 화면에 노출된다.
+        verify { view.showCash(5000) }
+    }
 }
