@@ -45,6 +45,9 @@ class ProductDetailPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -64,6 +67,9 @@ class ProductDetailPresenter(
                         is DataResult.NotSuccessfulError -> {
                             view.showNotSuccessfulErrorToast()
                         }
+                        is DataResult.WrongResponse -> {
+                            view.showServerResponseWrongToast()
+                        }
                     }
                 }
                 return
@@ -78,6 +84,9 @@ class ProductDetailPresenter(
                     }
                     is DataResult.NotSuccessfulError -> {
                         view.showNotSuccessfulErrorToast()
+                    }
+                    is DataResult.WrongResponse -> {
+                        view.showServerResponseWrongToast()
                     }
                 }
             }

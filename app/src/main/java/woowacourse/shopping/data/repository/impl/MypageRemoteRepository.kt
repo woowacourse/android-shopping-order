@@ -23,7 +23,8 @@ class MypageRemoteRepository(
                         callback(DataResult.NotSuccessfulError)
                         return
                     }
-                    callback(DataResult.Success(it.totalCash))
+                    if (!it.isNotNull) callback(DataResult.WrongResponse)
+                    callback(DataResult.Success(it.totalCash ?: 0))
                 }
             }
 
@@ -41,7 +42,11 @@ class MypageRemoteRepository(
                         callback(DataResult.NotSuccessfulError)
                         return
                     }
-                    callback(DataResult.Success(it.totalCash))
+                    if (!it.isNotNull) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
+                    callback(DataResult.Success(it.totalCash ?: 0))
                 }
             }
 

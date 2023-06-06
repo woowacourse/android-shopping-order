@@ -1,12 +1,17 @@
 package woowacourse.shopping.data.remote
 
 import retrofit2.Call
-import retrofit2.http.*
-import woowacourse.shopping.domain.model.CartProduct
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Path
+import woowacourse.shopping.data.remote.dto.CartProductDTO
 
 interface CartApi {
     @GET("cart-items")
-    fun requestCartItems(): Call<List<CartProduct>>
+    fun requestCartItems(): Call<List<CartProductDTO>>
 
     @POST("cart-items")
     fun requestInsertCart(

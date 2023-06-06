@@ -29,6 +29,9 @@ class OrderPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -51,6 +54,9 @@ class OrderPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }

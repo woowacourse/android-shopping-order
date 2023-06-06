@@ -5,8 +5,9 @@ import retrofit2.Response
 import woowacourse.shopping.data.remote.OrderApi
 import woowacourse.shopping.data.remote.RetrofitGenerator
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
-import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
 import woowacourse.shopping.data.remote.dto.OrdersDTO
+import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ServerStoreRespository
@@ -28,7 +29,11 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
                     return
                 }
                 response.body()?.let {
-                    callback(DataResult.Success(it.orders))
+                    if (!it.isNotNull) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
+                    callback(DataResult.Success(it.toDomain()))
                 }
             }
 
@@ -39,21 +44,25 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
     }
 
     override fun getOrder(id: Int, callback: (DataResult<Order>) -> Unit) {
-        orderService.requestOrderDetail(id).enqueue(object : retrofit2.Callback<OrderDTO> {
+        orderService.requestOrderDetail(id).enqueue(object : retrofit2.Callback<OrderSubmitDTO> {
             override fun onResponse(
-                call: Call<OrderDTO>,
-                response: Response<OrderDTO>,
+                call: Call<OrderSubmitDTO>,
+                response: Response<OrderSubmitDTO>,
             ) {
                 if (!response.isSuccessful) {
                     callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let {
+                    if (!it.isNotNull) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
                     callback(DataResult.Success(it.toDomain()))
                 }
             }
 
-            override fun onFailure(call: Call<OrderDTO>, t: Throwable) {
+            override fun onFailure(call: Call<OrderSubmitDTO>, t: Throwable) {
                 callback(DataResult.Failure)
             }
         })
@@ -68,6 +77,10 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
                 }
                 response.body()?.let {
                     val orderId = response.headers()["Location"]?.substringAfterLast("/")?.toInt()
+                    if (orderId == null) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
                     callback(DataResult.Success(orderId))
                 }
             }
@@ -76,9 +89,5 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
                 callback(DataResult.Failure)
             }
         })
-    }
-
-    private fun OrderDTO.toDomain(): Order {
-        return Order(orderId, orderedDateTime, products, totalPrice)
     }
 }

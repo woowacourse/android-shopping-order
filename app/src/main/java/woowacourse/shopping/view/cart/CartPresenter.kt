@@ -56,6 +56,9 @@ class CartPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -128,6 +131,9 @@ class CartPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -193,6 +199,9 @@ class CartPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }

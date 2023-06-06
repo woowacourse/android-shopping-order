@@ -37,6 +37,9 @@ class ProductListPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -84,6 +87,9 @@ class ProductListPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -100,6 +106,9 @@ class ProductListPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }
@@ -119,6 +128,9 @@ class ProductListPresenter(
                     is DataResult.NotSuccessfulError -> {
                         view.showNotSuccessfulErrorToast()
                     }
+                    is DataResult.WrongResponse -> {
+                        view.showServerResponseWrongToast()
+                    }
                 }
             }
             return
@@ -133,6 +145,9 @@ class ProductListPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }
@@ -149,6 +164,9 @@ class ProductListPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }
@@ -183,6 +201,9 @@ class ProductListPresenter(
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -208,6 +229,9 @@ class ProductListPresenter(
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }

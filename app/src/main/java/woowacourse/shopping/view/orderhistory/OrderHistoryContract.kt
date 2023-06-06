@@ -8,6 +8,7 @@ interface OrderHistoryContract {
         fun setUpPresenter()
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
     interface Presenter {
         fun fetchOrders()

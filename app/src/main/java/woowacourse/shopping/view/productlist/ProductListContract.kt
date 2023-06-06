@@ -12,6 +12,7 @@ interface ProductListContract {
         fun stopLoading()
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {

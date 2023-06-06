@@ -5,10 +5,14 @@ import retrofit2.Response
 import woowacourse.shopping.data.remote.CartApi
 import woowacourse.shopping.data.remote.RequestInsertBody
 import woowacourse.shopping.data.remote.RetrofitGenerator
+import woowacourse.shopping.data.remote.dto.CartProductDTO
+import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
+import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ServerStoreRespository
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Order
 
 class CartRemoteRepository(
     serverRepository: ServerStoreRespository,
@@ -18,21 +22,25 @@ class CartRemoteRepository(
         RetrofitGenerator.create(serverRepository.getServerUrl(), CartApi::class.java)
 
     override fun getAll(callback: (DataResult<List<CartProduct>>) -> Unit) {
-        cartService.requestCartItems().enqueue(object : retrofit2.Callback<List<CartProduct>> {
+        cartService.requestCartItems().enqueue(object : retrofit2.Callback<List<CartProductDTO>> {
             override fun onResponse(
-                call: Call<List<CartProduct>>,
-                response: Response<List<CartProduct>>,
+                call: Call<List<CartProductDTO>>,
+                response: Response<List<CartProductDTO>>,
             ) {
                 if (!response.isSuccessful) {
                     callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let { cartProducts ->
-                    callback(DataResult.Success(cartProducts))
+                    if (!cartProducts.all { it.isNotNull }) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
+                    callback(DataResult.Success(cartProducts.map { it.toDomain() }))
                 }
             }
 
-            override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
+            override fun onFailure(call: Call<List<CartProductDTO>>, t: Throwable) {
                 callback(DataResult.Failure)
             }
         })
@@ -47,7 +55,11 @@ class CartRemoteRepository(
                         return
                     }
                     val cartId = response.headers()["Location"]?.substringAfterLast("/")?.toInt()
-                    callback(DataResult.Success(cartId ?: -1))
+                    if (cartId == null) {
+                        callback(DataResult.WrongResponse)
+                        return
+                    }
+                    callback(DataResult.Success(cartId))
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
@@ -88,4 +100,6 @@ class CartRemoteRepository(
             }
         })
     }
+
+
 }

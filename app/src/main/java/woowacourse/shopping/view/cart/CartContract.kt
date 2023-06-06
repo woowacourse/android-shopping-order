@@ -14,6 +14,7 @@ interface CartContract {
         fun showProductsNothingToast()
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {

@@ -9,6 +9,7 @@ interface ProductDetailContract {
         fun showProductDetail(product: ProductModel, lastViewedProduct: ProductModel?)
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {

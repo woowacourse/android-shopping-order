@@ -24,6 +24,12 @@ class ProductListPagination(
                 is DataResult.Failure -> {
                     callback(it)
                 }
+                is DataResult.WrongResponse -> {
+                    callback(it)
+                }
+                is DataResult.NotSuccessfulError -> {
+                    callback(it)
+                }
             }
         }
     }

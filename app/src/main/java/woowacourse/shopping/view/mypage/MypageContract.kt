@@ -7,6 +7,7 @@ interface MypageContract {
         fun showNegativeIntErrorToast()
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
     interface Presenter {
         val cash: LiveData<Int>

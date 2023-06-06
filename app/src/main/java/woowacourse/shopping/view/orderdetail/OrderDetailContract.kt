@@ -7,6 +7,7 @@ interface OrderDetailContract {
         fun showOrderDetail(orderDetailModel: OrderDetailModel)
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {

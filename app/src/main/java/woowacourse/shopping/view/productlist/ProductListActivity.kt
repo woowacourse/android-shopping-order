@@ -127,6 +127,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         Toast.makeText(this, getString(R.string.server_not_response_error), Toast.LENGTH_LONG).show()
     }
 
+    override fun showServerResponseWrongToast() {
+        Toast.makeText(this, getString(R.string.server_response_wrong), Toast.LENGTH_LONG).show()
+    }
+
     override fun onClickProductDetail(product: ProductModel, lastViewedProduct: ProductModel?) {
         val intent =
             ProductDetailActivity.newIntent(binding.root.context, product)

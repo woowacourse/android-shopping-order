@@ -64,6 +64,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
     }
 
+    override fun showServerResponseWrongToast() {
+        Toast.makeText(this, getString(R.string.server_response_wrong), Toast.LENGTH_LONG).show()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {

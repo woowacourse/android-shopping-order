@@ -9,6 +9,7 @@ interface OrderContract {
         fun showOrderComplete(orderId: Int)
         fun showNotSuccessfulErrorToast()
         fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
     interface Presenter {
         fun fetchOrder()

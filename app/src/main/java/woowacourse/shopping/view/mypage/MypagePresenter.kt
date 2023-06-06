@@ -22,6 +22,9 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
                 }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
@@ -41,6 +44,9 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
                 }
                 is DataResult.NotSuccessfulError -> {
                     view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }

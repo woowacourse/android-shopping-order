@@ -48,6 +48,10 @@ class MypageActivity : AppCompatActivity(), MypageContract.View {
         Toast.makeText(this, getString(R.string.server_not_response_error), Toast.LENGTH_LONG).show()
     }
 
+    override fun showServerResponseWrongToast() {
+        Toast.makeText(this, getString(R.string.server_response_wrong), Toast.LENGTH_LONG).show()
+    }
+
     private fun setUpActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

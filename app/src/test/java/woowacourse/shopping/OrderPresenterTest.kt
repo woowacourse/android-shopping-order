@@ -5,7 +5,7 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
-import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
 import woowacourse.shopping.data.remote.dto.OrdersDTO
 import woowacourse.shopping.data.repository.MypageRepository
 import woowacourse.shopping.data.repository.OrderRepository
@@ -33,7 +33,7 @@ class OrderPresenterTest {
             override fun getAll(callback: (OrdersDTO) -> Unit) {
             }
 
-            override fun getOrder(id: Int, callback: (OrderDTO) -> Unit) {
+            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
             }
 
             override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {

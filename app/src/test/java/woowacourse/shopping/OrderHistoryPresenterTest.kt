@@ -5,7 +5,7 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
-import woowacourse.shopping.data.remote.dto.OrderDTO
+import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
 import woowacourse.shopping.data.remote.dto.OrdersDTO
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.Price
@@ -27,7 +27,7 @@ class OrderHistoryPresenterTest {
                 callback(
                     OrdersDTO(
                         listOf(
-                            OrderDTO(
+                            OrderSubmitDTO(
                                 1,
                                 "2023-02-03 11:11:00",
                                 listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
@@ -38,7 +38,7 @@ class OrderHistoryPresenterTest {
                 )
             }
 
-            override fun getOrder(id: Int, callback: (OrderDTO) -> Unit) {
+            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
                 // val orderId: Int, val orderedDateTime: String, val products: List<ProductWithQuantity>, val totalPrice: Int
             }
 
