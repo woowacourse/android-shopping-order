@@ -23,10 +23,10 @@ class OrderPresenterTest {
 
     @Before
     fun setUp() {
-        view = mockk()
-        orderRepository = mockk()
-        cartRepository = mockk()
-        cashRepository = mockk()
+        view = mockk(relaxed = true)
+        orderRepository = mockk(relaxed = true)
+        cartRepository = mockk(relaxed = true)
+        cashRepository = mockk(relaxed = true)
         presenter = OrderPresenter(view, cartRepository, cashRepository, orderRepository)
     }
 
@@ -98,5 +98,33 @@ class OrderPresenterTest {
 
         // then : 충전 후 캐시 잔액이 화면에 노출된다.
         verify { view.showCash(totalCash) }
+    }
+
+    @Test
+    fun `장바구니 상품들을 주문한다`() {
+        // given : 장바구니 상품들을 주문할 수 있는 상태다.
+        every {
+            cartRepository.getCartProducts(any())
+        } answers {
+            val callback = args[0] as (List<CartProduct>) -> Unit
+            callback(CartProductFixture.getCartProducts(quantity = 1, 1, 2, 3, 4, 5))
+        }
+
+        presenter.loadOrderCarts(listOf(1, 2, 3))
+
+        every { view.showOrderDetail(orderId = 1) } just runs
+
+        every {
+            orderRepository.orderCartProducts(any(), any())
+        } answers {
+            val callback = args[1] as (Long) -> Unit
+            callback(1)
+        }
+
+        // when : 장바구니 주문 결제 요청을 보낸다.
+        presenter.orderCartProducts()
+
+        // then : 주문이 완료된다.
+        verify { view.showOrderDetail(orderId = 1) }
     }
 }
