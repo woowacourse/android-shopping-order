@@ -220,4 +220,25 @@ class CartPresenterTest {
             )
         }
     }
+
+    @Test
+    fun `이전 페이지로 넘긴다`() {
+        // given : 이전 페이지로 돌아갈 수 있는 상태다.
+        every {
+            view.showCartProductModels(
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4, 5),
+            )
+        } just runs
+        presenter.loadCarts()
+
+        // when : 이전 페이지로 돌아가기 요청을 보낸다.
+        presenter.plusPage()
+
+        // then : 이전 페이지 장바구니 상품들이 노출된다.
+        verify {
+            view.showCartProductModels(
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4, 5),
+            )
+        }
+    }
 }
