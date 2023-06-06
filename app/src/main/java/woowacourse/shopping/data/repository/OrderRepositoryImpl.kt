@@ -63,7 +63,7 @@ class OrderRepositoryImpl(
         orderService.addOrder(OrderRequestDto(cartIds, orderPaymentPrice))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.isSuccessful.not()) onFailure()
+                    if (response.isSuccessful.not()) return onFailure()
                     val responseHeader = response.headers()["Location"] ?: return onFailure()
                     val orderId = URI(responseHeader).path.substringAfterLast("/").toLong()
                     onSuccess(orderId)
