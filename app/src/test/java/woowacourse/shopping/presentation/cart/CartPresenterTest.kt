@@ -24,6 +24,15 @@ class CartPresenterTest {
         cartRepository = mockk(relaxed = true)
         recentProductRepository = mockk(relaxed = true)
         presenter = CartPresenter(view, cartRepository)
+
+        every {
+            cartRepository.getCartProducts(
+                callback = any(),
+            )
+        } answers {
+            val callback = args[0] as (List<CartProduct>) -> Unit
+            callback(CartProductFixture.getCartProducts(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        }
     }
 
     @Test
@@ -34,15 +43,6 @@ class CartPresenterTest {
                 CartProductFixture.getCheckableCartProductModels(1, 2, 3, 4, 5),
             )
         } just runs
-
-        every {
-            cartRepository.getCartProducts(
-                callback = any(),
-            )
-        } answers {
-            val callback = args[0] as (List<CartProduct>) -> Unit
-            callback(CartProductFixture.getCartProducts(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-        }
 
         // when : 장바구니 목록 불러오기 요청을 보낸다.
         presenter.loadCarts()
@@ -57,29 +57,31 @@ class CartPresenterTest {
 
     @Test
     fun `장바구니 아이템을 삭제한다`() {
-        // given : 장바구니 목록을 불러올 수 있는 상태다.
+        // given : 장바구니 아이템을 삭제할 수 있는 상태다.
         every {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(1, 2, 3, 4, 5),
+                CartProductFixture.getCheckableCartProductModels(2, 3, 4, 5, 6),
             )
         } just runs
 
         every {
-            cartRepository.getCartProducts(
-                callback = any(),
-            )
+            cartRepository.deleteCartProduct(1, any())
         } answers {
-            val callback = args[0] as (List<CartProduct>) -> Unit
-            callback(CartProductFixture.getCartProducts(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+            val callback = args[1] as () -> Unit
+            callback()
         }
 
-        // when : 장바구니 목록 불러오기 요청을 보낸다.
         presenter.loadCarts()
 
-        // then : 장바구니 목록이 노출된다.
+        // when : 장바구니 아이템 삭제 요청을 보낸다.
+        presenter.deleteCartProductModel(
+            cartProductModel = CartProductFixture.getCheckableCartProductModel(1),
+        )
+
+        // then : 삭제되고 남은 아이템이 노출된다.
         verify {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(1, 2, 3, 4, 5),
+                CartProductFixture.getCheckableCartProductModels(2, 3, 4, 5, 6),
             )
         }
     }
