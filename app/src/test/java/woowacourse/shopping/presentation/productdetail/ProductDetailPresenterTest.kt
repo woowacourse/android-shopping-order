@@ -52,4 +52,34 @@ class ProductDetailPresenterTest {
             )
         }
     }
+
+    @Test
+    fun `최근 본 상품 하나를 불러온다`() {
+        // given : 최근 본 상품을 불러올 수 있는 상태다.
+        every {
+            view.showRecentProduct(
+                productModel = CartProductFixture.getProductModel(2),
+            )
+        } just runs
+
+        every {
+            cartRepository.findProductById(
+                productId = any(),
+                callback = any(),
+            )
+        } answers {
+            val callback = args[1] as (Product) -> Unit
+            callback(CartProductFixture.getProduct(2))
+        }
+
+        // when : 최근 본 상품을 불러온다.
+        presenter.loadRecentProduct(2)
+
+        // then : 최근 본 상품이 화면에 노출된다.
+        verify {
+            view.showRecentProduct(
+                productModel = CartProductFixture.getProductModel(2),
+            )
+        }
+    }
 }
