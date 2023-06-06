@@ -50,9 +50,9 @@ class ProductDetailPresenter(
 
     override fun saveProductInRepository(count: Int) {
         cartRepository.addCartItem(productModel.id) {
-            cartRepository.updateCartItemQuantity(productModel.id, count) {
+            cartRepository.updateCartItemQuantity(productModel.id, count, onSuccess = {
                 view.showCompleteMessage(productModel.name)
-            }
+            }, onFailure = {})
         }
     }
 }

@@ -19,11 +19,11 @@ class ProductListPresenter(
     private var size = PRODUCTS_SIZE
     override fun refreshProductItems() {
         productRepository.getProductsWithRange(0, size) { products ->
-            cartRepository.getAllCartItems { allCartItems ->
+            cartRepository.getAllCartItems(onSuccess = { allCartItems ->
                 val foundCartItems = products.findCartItem(allCartItems)
                 view.loadProductItems(foundCartItems.map { it.toPresentation() })
                 view.setLoadingViewVisible(false)
-            }
+            }, onFailure = {})
         }
     }
 
@@ -54,9 +54,9 @@ class ProductListPresenter(
     }
 
     override fun updateCartCount() {
-        cartRepository.getAllCartItems {
+        cartRepository.getAllCartItems(onSuccess = {
             view.showCartCount(CartProductInfoList(it).count)
-        }
+        }, onFailure = {})
     }
 
     override fun addCartItem(cartProductModel: CartProductInfoModel) {
@@ -68,25 +68,33 @@ class ProductListPresenter(
 
     override fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int) {
         if (count == 0) {
-            cartRepository.deleteCartItem(cartProductModel.id) {
-                updateCartCount()
-                refreshProductItems()
-            }
+            cartRepository.deleteCartItem(
+                cartProductModel.id, onSuccess = {
+                    updateCartCount()
+                    refreshProductItems()
+                }, onFailure = {}
+            )
         } else {
             cartRepository.updateCartItemQuantity(
                 cartProductModel.id,
                 count,
-            ) {
-                updateCartCount()
-                refreshProductItems()
-            }
+                onSuccess = {
+                    updateCartCount()
+                    refreshProductItems()
+                },
+                onFailure = {}
+            )
         }
     }
 
     override fun showMyCart() {
-        cartRepository.getAllCartItems { cartProducts ->
-            view.navigateToCart(cartProducts.map { it.toPresentation() })
-        }
+        cartRepository.getAllCartItems(
+            onSuccess = { cartProducts ->
+                view.navigateToCart(cartProducts.map { it.toPresentation() })
+            },
+            onFailure =
+            {}
+        )
     }
 
     companion object {

@@ -65,11 +65,12 @@ class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) 
                     call: Call<BaseResponse<OrderDetailDataModel>>,
                     response: Response<BaseResponse<OrderDetailDataModel>>
                 ) {
-                    if (response.body()?.result == null) {
+                    val responseBody = response.body()
+                    if (responseBody == null) {
                         onFailure()
                         return
                     }
-                    onSuccess(response.body()?.result!!)
+                    onSuccess(responseBody.result)
                 }
 
                 override fun onFailure(

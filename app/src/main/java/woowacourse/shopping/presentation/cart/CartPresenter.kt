@@ -21,14 +21,14 @@ class CartPresenter(
     private val pageProducts get() = cartProducts.getItemsInRange(offset, paging.limit)
 
     init {
-        cartRepository.getAllCartItems {
+        cartRepository.getAllCartItems(onSuccess = {
             cartProducts = CartProductInfoList(it)
             refreshCurrentPage()
             updateOrderCount()
             updateOrderPrice()
             view.setPage(paging.currentPage.value.toString())
             view.setLoadingViewVisible(false)
-        }
+        }, onFailure = {})
     }
 
     override fun checkPlusPageAble() {
@@ -59,12 +59,14 @@ class CartPresenter(
         cartRepository.updateCartItemQuantity(
             cartProductModel.id,
             count,
-        ) {
-            cartProducts = cartProducts.updateItemCount(cartProductModel.toDomain(), count)
-            refreshCurrentPage()
-            updateOrderCount()
-            updateOrderPrice()
-        }
+            onSuccess = {
+                cartProducts = cartProducts.updateItemCount(cartProductModel.toDomain(), count)
+                refreshCurrentPage()
+                updateOrderCount()
+                updateOrderPrice()
+            },
+            onFailure = {}
+        )
     }
 
     override fun updateProductPrice(cartProductModel: CartProductInfoModel) {
@@ -100,14 +102,14 @@ class CartPresenter(
     }
 
     override fun deleteProductItem(cartProductModel: CartProductInfoModel) {
-        cartRepository.deleteCartItem(cartProductModel.id) {
+        cartRepository.deleteCartItem(cartProductModel.id, onSuccess = {
             cartProducts = cartProducts.delete(cartProductModel.toDomain())
             updateOrderCount()
             updateOrderPrice()
             refreshCurrentPage()
             checkCurrentPageProductsOrderState()
             checkPlusPageAble()
-        }
+        }, onFailure = {})
     }
 
     override fun plusPage() {

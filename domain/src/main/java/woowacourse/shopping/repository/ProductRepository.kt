@@ -6,6 +6,7 @@ interface ProductRepository {
     fun findProductById(
         id: Int,
         onSuccess: (Product?) -> Unit,
+        onFailure: () -> Unit
     )
 
     fun getProductsWithRange(

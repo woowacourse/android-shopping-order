@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart
 
-import android.util.Log
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.Page
@@ -21,12 +20,12 @@ class CartOffsetPaging(
     }
 
     private fun loadPageItems(page: Page, onSuccess: (List<CartProductInfo>) -> Unit) {
-        cartRepository.getAllCartItems {
+        cartRepository.getAllCartItems(onSuccess = {
             var cartItems = CartProductInfoList(it)
             cartItems = cartItems.getItemsInRange(page.getOffset(limit), limit)
-            Log.d("wooseok", "${page.value}  " + cartItems.items.toString())
             onSuccess(cartItems.items)
-        }
+        }, onFailure = {
+        })
     }
 
     fun isPlusPageAble(onSuccess: (Boolean) -> Unit) {

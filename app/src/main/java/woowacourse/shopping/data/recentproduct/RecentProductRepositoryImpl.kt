@@ -35,7 +35,7 @@ class RecentProductRepositoryImpl constructor(
         onSuccess: (List<Product>) -> Unit,
     ) {
         if (recentProductIdList.isEmpty()) return
-        productRepository.findProductById(id = recentProductIdList[index]) {
+        productRepository.findProductById(id = recentProductIdList[index], onSuccess = {
             if (it != null) productList.add(it)
             if (index == recentProductIdList.lastIndex) onSuccess(productList)
             if (index + 1 <= recentProductIdList.lastIndex) {
@@ -46,13 +46,15 @@ class RecentProductRepositoryImpl constructor(
                     onSuccess,
                 )
             }
-        }
+        }, onFailure = {})
     }
 
     override fun getMostRecentProduct(onSuccess: (Product?) -> Unit) {
         val mostRecentProductId = recentProductLocalDataSource.getMostRecentProductId()
-        return productRepository.findProductById(id = mostRecentProductId) {
-            onSuccess(it)
-        }
+        return productRepository.findProductById(
+            id = mostRecentProductId,
+            onSuccess = { onSuccess(it) },
+            onFailure = {}
+        )
     }
 }
