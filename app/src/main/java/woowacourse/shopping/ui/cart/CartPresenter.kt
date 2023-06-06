@@ -3,8 +3,6 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.PageUIModel
@@ -24,7 +22,8 @@ class CartPresenter(
     private val _allCheck = MutableLiveData<Boolean>(false)
     override val allCheck: LiveData<Boolean> get() = _allCheck
 
-    private val lock = ReentrantLock()
+    private var isCheckChanging = false
+
     init {
         cartRepository.getAll()
         setUpAllButton()
@@ -64,8 +63,8 @@ class CartPresenter(
     }
 
     override fun setUpProductsCheck(checked: Boolean) {
-        if (lock.isLocked) return
-        cartRepository.updateAllChecked(checked)
+        if (isCheckChanging) return
+        cartRepository.setCurrentPageChecked(checked)
         fetchCartProducts()
     }
 
@@ -92,12 +91,12 @@ class CartPresenter(
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
         cartRepository.updateChecked(productId, checked)
-        if (lock.isLocked) return
-        lock.withLock {
-            setUPTotalPrice()
-            setUpCheckedCount()
-            setUpAllButton()
-        }
+        if (isCheckChanging) return
+        isCheckChanging = true
+        setUPTotalPrice()
+        setUpCheckedCount()
+        setUpAllButton()
+        isCheckChanging = false
     }
 
     override fun getPageIndex(): Int {

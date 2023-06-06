@@ -12,7 +12,7 @@ interface CartRepository {
     fun hasPrevPage(): Boolean
     fun updateCountWithProductId(productId: Int, count: Int): Result<Int>
     fun updateChecked(id: Int, checked: Boolean)
-    fun updateAllChecked(checked: Boolean)
+    fun setCurrentPageChecked(checked: Boolean)
     fun getCurrentPage(): Int
     fun getCurrentPageChecked(): Int
     fun getChecked(): Result<List<CartProduct>>

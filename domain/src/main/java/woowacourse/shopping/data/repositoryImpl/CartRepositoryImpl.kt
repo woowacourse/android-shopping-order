@@ -70,7 +70,7 @@ class CartRepositoryImpl(
         localDataSource.updateChecked(id, checked)
     }
 
-    override fun updateAllChecked(checked: Boolean) {
+    override fun setCurrentPageChecked(checked: Boolean) {
         localDataSource.setCurrentPageChecked(checked)
     }
 

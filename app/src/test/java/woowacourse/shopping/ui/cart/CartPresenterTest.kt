@@ -77,7 +77,7 @@ class CartPresenterTest {
         every { cartRepository.getTotalCheckedCount() } returns 10
         every { cartRepository.hasNextPage() } returns true
         every { cartRepository.hasPrevPage() } returns true
-        every { cartRepository.updateAllChecked(any()) } answers { nothing }
+        every { cartRepository.setCurrentPageChecked(any()) } answers { nothing }
 
         every { view.setPage(any(), any()) } answers { nothing }
 
@@ -87,7 +87,7 @@ class CartPresenterTest {
 
         // then
         verify(exactly = 1) {
-            cartRepository.updateAllChecked(any())
+            cartRepository.setCurrentPageChecked(any())
         }
         verify(exactly = 2) { view.setPage(any(), any()) }
     }
