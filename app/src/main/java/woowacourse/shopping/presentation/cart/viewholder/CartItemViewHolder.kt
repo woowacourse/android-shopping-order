@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart.viewholder
 
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.cart.CartContract
@@ -10,7 +9,6 @@ import woowacourse.shopping.presentation.model.CartProductInfoModel
 class CartItemViewHolder(
     private val binding: ItemCartBinding,
     private val presenter: CartContract.Presenter,
-    private val updateProductPrice: (TextView, CartProductInfoModel) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private lateinit var cartProductModel: CartProductInfoModel
     private val counterListener = object : CounterListener {
@@ -34,7 +32,6 @@ class CartItemViewHolder(
     fun bind(item: CartProductInfoModel) {
         cartProductModel = item
         binding.cartProduct = cartProductModel
-        updateProductPrice(binding.textCartProductPrice, cartProductModel)
         setUpCounterView()
         checkBoxChange()
     }

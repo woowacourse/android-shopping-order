@@ -39,6 +39,7 @@ fun CartProductInfo.toPresentation(): CartProductInfoModel {
         productModel = product.toPresentation(),
         count = count,
         isOrdered = isOrdered,
+        totalPrice = totalPrice
     )
 }
 

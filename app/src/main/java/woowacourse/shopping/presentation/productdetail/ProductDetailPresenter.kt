@@ -34,7 +34,12 @@ class ProductDetailPresenter(
     }
 
     override fun showProductCart() {
-        val cartProduct = CartProductInfoModel(0, productModel, 1)
+        val cartProduct = CartProductInfoModel(
+            0,
+            productModel,
+            1,
+            totalPrice = productModel.price
+        )
         view.showProductCart(cartProduct)
     }
 

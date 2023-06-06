@@ -19,7 +19,6 @@ interface CartContract {
         fun updateProductCount(cartProductModel: CartProductInfoModel, count: Int)
         fun deleteProductItem(cartProductModel: CartProductInfoModel)
         fun refreshCurrentPageItems()
-        fun updateProductPrice(cartProductModel: CartProductInfoModel)
         fun loadCartItems()
         fun order()
     }
@@ -31,7 +30,6 @@ interface CartContract {
         fun setOrderPrice(totalPrice: Int)
         fun setOrderCount(count: Int)
         fun setAllIsOrderCheck(isAllOrder: Boolean)
-        fun setProductPrice(price: Int)
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
         fun showOrderView(orderProductsModel: OrderProductsModel)

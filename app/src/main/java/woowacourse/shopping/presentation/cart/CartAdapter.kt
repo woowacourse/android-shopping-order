@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.cart.viewholder.CartItemViewHolder
@@ -11,7 +10,6 @@ import woowacourse.shopping.presentation.model.CartProductInfoModel
 
 class CartAdapter(
     private val presenter: CartContract.Presenter,
-    private val updateProductPrice: (TextView, CartProductInfoModel) -> Unit,
 ) : ListAdapter<CartProductInfoModel, CartItemViewHolder>(CartProductDiffItemCallback()) {
 
     private lateinit var binding: ItemCartBinding
@@ -22,7 +20,6 @@ class CartAdapter(
         return CartItemViewHolder(
             binding = binding,
             presenter = presenter,
-            updateProductPrice = updateProductPrice,
         )
     }
 

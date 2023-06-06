@@ -5,14 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
-import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.OrderProductsModel
@@ -21,14 +19,13 @@ import woowacourse.shopping.presentation.order.OrderActivity
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var cartAdapter: CartAdapter
-    private lateinit var cartProductPriceView: TextView
     private val httpErrorHandler = HttpErrorHandler(this)
     private val presenter: CartContract.Presenter by lazy { initPresenter() }
 
     private fun initPresenter(): CartContract.Presenter {
         return CartPresenter(
             this,
-            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this)), httpErrorHandler),
+            CartRepositoryImpl(CartServiceHelper(), httpErrorHandler),
         )
     }
 
@@ -60,14 +57,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initCartAdapter() {
         cartAdapter = CartAdapter(
             presenter = presenter,
-            updateProductPrice = ::updateProductPrice,
         )
         binding.recyclerCart.adapter = cartAdapter
-    }
-
-    private fun updateProductPrice(textView: TextView, cartProductInfoModel: CartProductInfoModel) {
-        cartProductPriceView = textView
-        presenter.updateProductPrice(cartProductInfoModel)
     }
 
     private fun setToolBar() {
@@ -152,10 +143,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun setAllIsOrderCheck(isAllOrdered: Boolean) {
         binding.checkboxAllCart.isChecked = isAllOrdered
     }
-    override fun setProductPrice(price: Int) {
-        cartProductPriceView.text = getString(R.string.price_format, price)
-    }
-
     override fun setPage(page: String) {
         binding.textCartPage.text = page
     }

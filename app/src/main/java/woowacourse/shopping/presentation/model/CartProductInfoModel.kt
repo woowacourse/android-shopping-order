@@ -9,6 +9,7 @@ data class CartProductInfoModel(
     val productModel: ProductModel,
     val count: Int,
     val isOrdered: Boolean = false,
+    val totalPrice: Int,
 ) : Parcelable {
     companion object {
         fun defaultInfo(): CartProductInfoModel = CartProductInfoModel(
@@ -21,6 +22,7 @@ data class CartProductInfoModel(
             ),
             count = 4792,
             isOrdered = false,
+            totalPrice = 0,
         )
     }
 }

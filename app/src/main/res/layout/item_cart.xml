@@ -82,6 +82,7 @@
                     android:id="@+id/text_cart_product_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{@string/price_format(cartProduct.totalPrice)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/counter_cart_product"
                     android:layout_marginEnd="13dp"

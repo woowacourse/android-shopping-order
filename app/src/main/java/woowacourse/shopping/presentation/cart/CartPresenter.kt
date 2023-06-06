@@ -87,13 +87,6 @@ class CartPresenter(
             if (cartProductModel.isOrdered) updateOrder()
         }
     }
-
-    override fun updateProductPrice(cartProductModel: CartProductInfoModel) {
-        val price = cartProductModel.toDomain().totalPrice
-        view.setProductPrice(price)
-        if (cartProductModel.isOrdered) updateOrder()
-    }
-
     override fun changeCurrentPageProductsOrder(allIsOrdered: Boolean) {
         if (allIsOrdered) {
             cartProducts = cartProducts.replaceItemList(pageProducts.updateAllItemOrdered(true))
