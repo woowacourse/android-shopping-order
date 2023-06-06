@@ -6,7 +6,8 @@ interface OrderHistoryContract {
     interface View {
         fun showOrders(orders: List<OrderDetailModel>)
         fun setUpPresenter()
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
     interface Presenter {
         fun fetchOrders()

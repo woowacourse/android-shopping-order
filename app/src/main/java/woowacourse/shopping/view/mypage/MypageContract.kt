@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 interface MypageContract {
     interface View {
         fun showNegativeIntErrorToast()
-
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
     interface Presenter {
         val cash: LiveData<Int>

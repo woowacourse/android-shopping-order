@@ -51,7 +51,10 @@ class CartPresenter(
                     }
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -120,7 +123,10 @@ class CartPresenter(
                     view.changeItems(cartItems)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -183,7 +189,10 @@ class CartPresenter(
                     view.changeItems(cartItems)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }

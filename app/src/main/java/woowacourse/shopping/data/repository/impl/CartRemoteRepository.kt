@@ -24,7 +24,7 @@ class CartRemoteRepository(
                 response: Response<List<CartProduct>>,
             ) {
                 if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let { cartProducts ->
@@ -33,7 +33,7 @@ class CartRemoteRepository(
             }
 
             override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
     }
@@ -43,7 +43,7 @@ class CartRemoteRepository(
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     val cartId = response.headers()["Location"]?.substringAfterLast("/")?.toInt()
@@ -51,7 +51,7 @@ class CartRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    callback(DataResult.Failure(t.message ?: ""))
+                    callback(DataResult.Failure)
                 }
             })
     }
@@ -61,14 +61,14 @@ class CartRemoteRepository(
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     callback(DataResult.Success(response.isSuccessful))
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    callback(DataResult.Failure(t.message ?: ""))
+                    callback(DataResult.Failure)
                 }
             })
     }
@@ -77,19 +77,15 @@ class CartRemoteRepository(
         retrofitService.requestDeleteCart(cartId).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    callback(DataResult.NotSuccessfulError)
                     return
                 }
                 callback(DataResult.Success(response.isSuccessful))
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
-    }
-
-    companion object {
-        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

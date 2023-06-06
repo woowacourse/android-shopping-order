@@ -7,8 +7,8 @@ interface OrderContract {
         fun showOrder(orderUserInfoModel: OrderUserInfoModel)
         fun showUnableToast()
         fun showOrderComplete(orderId: Int)
-
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
     interface Presenter {
         fun fetchOrder()

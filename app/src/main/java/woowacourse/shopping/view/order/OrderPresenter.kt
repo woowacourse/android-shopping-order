@@ -24,7 +24,10 @@ class OrderPresenter(
                     view.showOrder(OrderUserInfoModel(products, ownCash, ownCash - totalPrice, totalPrice))
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -44,7 +47,10 @@ class OrderPresenter(
                     }
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }

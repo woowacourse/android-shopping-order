@@ -5,8 +5,8 @@ import woowacourse.shopping.model.OrderDetailModel
 interface OrderDetailContract {
     interface View {
         fun showOrderDetail(orderDetailModel: OrderDetailModel)
-
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
 
     interface Presenter {

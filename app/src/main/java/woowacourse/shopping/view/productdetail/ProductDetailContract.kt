@@ -7,8 +7,8 @@ interface ProductDetailContract {
     interface View {
         fun finishActivity(isAdd: Boolean)
         fun showProductDetail(product: ProductModel, lastViewedProduct: ProductModel?)
-
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
 
     interface Presenter {

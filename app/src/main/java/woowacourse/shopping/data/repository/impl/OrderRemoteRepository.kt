@@ -24,7 +24,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
                 response: Response<OrdersDTO>,
             ) {
                 if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let {
@@ -33,7 +33,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
             }
 
             override fun onFailure(call: Call<OrdersDTO>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
     }
@@ -45,7 +45,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
                 response: Response<OrderDTO>,
             ) {
                 if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let {
@@ -54,7 +54,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
             }
 
             override fun onFailure(call: Call<OrderDTO>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
     }
@@ -63,7 +63,7 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
         retrofitService.requestOrderCartItems(cartProducts).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
-                    onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                    callback(DataResult.NotSuccessfulError)
                     return
                 }
                 response.body()?.let {
@@ -73,16 +73,12 @@ class OrderRemoteRepository(serverRepository: ServerStoreRespository) : OrderRep
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
     }
 
     private fun OrderDTO.toDomain(): Order {
         return Order(orderId, orderedDateTime, products, totalPrice)
-    }
-
-    companion object {
-        private const val SERVER_ERROR_MESSAGE = ""
     }
 }

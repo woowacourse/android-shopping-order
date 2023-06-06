@@ -16,7 +16,10 @@ class OrderHistoryPresenter(
                     view.showOrders(orders)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }

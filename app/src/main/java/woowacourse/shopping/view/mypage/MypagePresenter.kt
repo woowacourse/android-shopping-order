@@ -17,7 +17,10 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
                     _cash.value = result.response
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -34,7 +37,10 @@ class MypagePresenter(private val view: MypageContract.View, private val mypageR
                     _cash.value = result.response
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }

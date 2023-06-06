@@ -17,7 +17,10 @@ class OrderDetailPresenter(
                     view.showOrderDetail(model)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }

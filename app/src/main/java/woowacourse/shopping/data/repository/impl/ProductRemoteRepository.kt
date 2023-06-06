@@ -28,7 +28,7 @@ class ProductRemoteRepository(
                     response: Response<ProductsWithCartItemDTO>,
                 ) {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     response.body()?.let {
@@ -37,7 +37,7 @@ class ProductRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<ProductsWithCartItemDTO>, t: Throwable) {
-                    callback(DataResult.Failure(t.message ?: ""))
+                    callback(DataResult.Failure)
                 }
             })
     }
@@ -50,7 +50,7 @@ class ProductRemoteRepository(
                     response: Response<ProductWithCartInfo>,
                 ) {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     response.body()?.let {
@@ -59,12 +59,8 @@ class ProductRemoteRepository(
                 }
 
                 override fun onFailure(call: Call<ProductWithCartInfo>, t: Throwable) {
-                    callback(DataResult.Failure(t.message ?: ""))
+                    callback(DataResult.Failure)
                 }
             })
-    }
-
-    companion object {
-        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

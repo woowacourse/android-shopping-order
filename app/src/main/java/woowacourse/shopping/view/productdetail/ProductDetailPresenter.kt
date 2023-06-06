@@ -40,7 +40,10 @@ class ProductDetailPresenter(
                     product = result.response.toUiModel()
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -56,7 +59,10 @@ class ProductDetailPresenter(
                             view.finishActivity(result.response > 0)
                         }
                         is DataResult.Failure -> {
-                            view.showErrorMessageToast(result.message)
+                            view.showServerFailureToast()
+                        }
+                        is DataResult.NotSuccessfulError -> {
+                            view.showNotSuccessfulErrorToast()
                         }
                     }
                 }
@@ -68,7 +74,10 @@ class ProductDetailPresenter(
                         view.finishActivity(result.response)
                     }
                     is DataResult.Failure -> {
-                        view.showErrorMessageToast(result.message)
+                        view.showServerFailureToast()
+                    }
+                    is DataResult.NotSuccessfulError -> {
+                        view.showNotSuccessfulErrorToast()
                     }
                 }
             }

@@ -44,19 +44,20 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             finish()
         }
         presenter = OrderDetailPresenter(
-            orderId, this,
+            orderId,
+            this,
             OrderRemoteRepository(
-                ServerPreferencesRepository(this)
-            )
+                ServerPreferencesRepository(this),
+            ),
         )
     }
 
-    override fun showErrorMessageToast(message: String?) {
-        if (message == null) {
-            Toast.makeText(this, getString(R.string.notify_nothing_data), Toast.LENGTH_LONG).show()
-            return
-        }
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    override fun showNotSuccessfulErrorToast() {
+        Toast.makeText(this, getString(R.string.server_communication_error), Toast.LENGTH_LONG).show()
+    }
+
+    override fun showServerFailureToast() {
+        Toast.makeText(this, getString(R.string.server_not_response_error), Toast.LENGTH_LONG).show()
     }
 
     private fun showDataNothingToast() {

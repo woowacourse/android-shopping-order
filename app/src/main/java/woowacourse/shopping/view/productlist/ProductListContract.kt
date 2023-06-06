@@ -10,7 +10,8 @@ interface ProductListContract {
         fun onClickProductDetail(product: ProductModel, lastViewedProduct: ProductModel?)
         fun changeItems(newItems: List<ProductListViewItem>)
         fun stopLoading()
-        fun showErrorMessageToast(message: String?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
     }
 
     interface Presenter {

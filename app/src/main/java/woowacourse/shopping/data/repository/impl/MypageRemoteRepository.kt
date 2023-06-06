@@ -20,7 +20,7 @@ class MypageRemoteRepository(
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     callback(DataResult.Success(it.totalCash))
@@ -28,7 +28,7 @@ class MypageRemoteRepository(
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
     }
@@ -38,7 +38,7 @@ class MypageRemoteRepository(
             override fun onResponse(call: Call<TotalCashDTO>, response: Response<TotalCashDTO>) {
                 response.body()?.let {
                     if (!response.isSuccessful) {
-                        onFailure(call, Throwable(SERVER_ERROR_MESSAGE))
+                        callback(DataResult.NotSuccessfulError)
                         return
                     }
                     callback(DataResult.Success(it.totalCash))
@@ -46,12 +46,8 @@ class MypageRemoteRepository(
             }
 
             override fun onFailure(call: Call<TotalCashDTO>, t: Throwable) {
-                callback(DataResult.Failure(t.message ?: ""))
+                callback(DataResult.Failure)
             }
         })
-    }
-
-    companion object {
-        private const val SERVER_ERROR_MESSAGE = "서버와의 통신이 원활하지 않습니다."
     }
 }

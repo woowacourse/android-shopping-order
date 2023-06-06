@@ -32,7 +32,10 @@ class ProductListPresenter(
                     view.stopLoading()
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -76,7 +79,10 @@ class ProductListPresenter(
                     view.changeItems(productsListItems)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -90,7 +96,10 @@ class ProductListPresenter(
                     fetchCartCount()
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -105,7 +114,10 @@ class ProductListPresenter(
                         fetchCartCount()
                     }
                     is DataResult.Failure -> {
-                        view.showErrorMessageToast(result.message)
+                        view.showServerFailureToast()
+                    }
+                    is DataResult.NotSuccessfulError -> {
+                        view.showNotSuccessfulErrorToast()
                     }
                 }
             }
@@ -117,7 +129,10 @@ class ProductListPresenter(
                     fetchProductCount(productId)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -130,7 +145,10 @@ class ProductListPresenter(
                     view.showCartCount(result.response.size)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -160,7 +178,10 @@ class ProductListPresenter(
                     }
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
@@ -183,7 +204,10 @@ class ProductListPresenter(
                     view.changeItems(productsListItems)
                 }
                 is DataResult.Failure -> {
-                    view.showErrorMessageToast(result.message)
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
                 }
             }
         }
