@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.mapper
 
 import woowacourse.shopping.OrderCartInfo
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
-fun OrderCartInfoModel.toDomain(): OrderCartInfo {
+fun OrderCartModel.toDomain(): OrderCartInfo {
     return OrderCartInfo(
         cartId = id,
         product = productModel.toDomain(),

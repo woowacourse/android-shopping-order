@@ -14,7 +14,7 @@ import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.user.UserRemoteDataSource
 import woowacourse.shopping.data.user.UserRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 import woowacourse.shopping.presentation.order.adapter.OrderCartAdapter
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 import woowacourse.shopping.util.getParcelableArrayListExtraCompat
@@ -91,13 +91,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initOrderProduct() {
-        intent.getParcelableArrayListExtraCompat<OrderCartInfoModel>(ORDER_CART_KEY_VALUE)
+        intent.getParcelableArrayListExtraCompat<OrderCartModel>(ORDER_CART_KEY_VALUE)
             ?.let { orderCarts ->
                 presenter.initOrderCarts(orderCarts)
             } ?: noIntentExceptionHandler(getString(R.string.order_cart_model_null_error_message))
     }
 
-    override fun showOrderCarts(orderCarts: List<OrderCartInfoModel>) {
+    override fun showOrderCarts(orderCarts: List<OrderCartModel>) {
         orderCartAdapter.submitList(orderCarts)
     }
 
@@ -108,7 +108,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     companion object {
         private const val ORDER_CART_KEY_VALUE = "ORDER_CART_KEY_VALUE"
-        fun getIntent(context: Context, orderCart: List<OrderCartInfoModel>): Intent {
+        fun getIntent(context: Context, orderCart: List<OrderCartModel>): Intent {
             return Intent(context, OrderActivity::class.java)
                 .putParcelableArrayListExtra(ORDER_CART_KEY_VALUE, ArrayList(orderCart))
         }

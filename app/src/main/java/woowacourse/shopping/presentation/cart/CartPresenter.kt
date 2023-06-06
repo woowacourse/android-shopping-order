@@ -4,7 +4,7 @@ import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.mapper.toOrderCartInfo
 import woowacourse.shopping.presentation.mapper.toPresentation
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.repository.CartRepository
 
 class CartPresenter(
@@ -41,21 +41,21 @@ class CartPresenter(
         view.setUpMinusPageState(paging.isMinusPageAble())
     }
 
-    override fun addProductInOrder(cartProductModel: CartProductInfoModel) {
+    override fun addProductInOrder(cartProductModel: CartProductModel) {
         cartProducts = cartProducts.updateItemOrdered(cartProductModel.toDomain(), true)
     }
 
-    private fun CartProductInfoList.toPresentationList(): List<CartProductInfoModel> {
+    private fun CartProductInfoList.toPresentationList(): List<CartProductModel> {
         return this.items.map {
             it.toPresentation()
         }
     }
 
-    override fun deleteProductInOrder(cartProductModel: CartProductInfoModel) {
+    override fun deleteProductInOrder(cartProductModel: CartProductModel) {
         cartProducts = cartProducts.updateItemOrdered(cartProductModel.toDomain(), false)
     }
 
-    override fun updateProductCount(cartProductModel: CartProductInfoModel, count: Int) {
+    override fun updateProductCount(cartProductModel: CartProductModel, count: Int) {
         cartRepository.updateCartItemQuantity(
             cartProductModel.id,
             count,
@@ -69,7 +69,7 @@ class CartPresenter(
         )
     }
 
-    override fun updateProductPrice(cartProductModel: CartProductInfoModel) {
+    override fun updateProductPrice(cartProductModel: CartProductModel) {
         val price = cartProductModel.toDomain().totalPrice
         view.setProductPrice(price)
     }
@@ -101,7 +101,7 @@ class CartPresenter(
         view.setOrderCount(count)
     }
 
-    override fun deleteProductItem(cartProductModel: CartProductInfoModel) {
+    override fun deleteProductItem(cartProductModel: CartProductModel) {
         cartRepository.deleteCartItem(cartProductModel.id, onSuccess = {
             cartProducts = cartProducts.delete(cartProductModel.toDomain())
             updateOrderCount()

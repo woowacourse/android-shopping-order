@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class CartProductInfoListModel(val items: List<CartProductInfoModel>) : Parcelable
+data class CartProductListModel(val items: List<CartProductModel>) : Parcelable

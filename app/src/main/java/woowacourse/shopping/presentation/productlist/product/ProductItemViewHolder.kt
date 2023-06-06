@@ -4,7 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.presentation.common.CounterListener
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.ProductListContract
 
@@ -12,7 +12,7 @@ class ProductItemViewHolder(
     private val binding: ItemProductBinding,
     private val presenter: ProductListContract.Presenter,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private lateinit var cartProductModel: CartProductInfoModel
+    private lateinit var cartProductModel: CartProductModel
     private val counterListener = object : CounterListener {
         override fun onPlus(count: Int) {
             presenter.updateCartItemQuantity(cartProductModel, count)
@@ -27,7 +27,7 @@ class ProductItemViewHolder(
         itemViewClick()
     }
 
-    fun bind(item: CartProductInfoModel) {
+    fun bind(item: CartProductModel) {
         cartProductModel = item
         binding.cartProductModel = cartProductModel
         setUpCounterView()

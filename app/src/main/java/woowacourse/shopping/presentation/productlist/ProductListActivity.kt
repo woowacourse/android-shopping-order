@@ -22,8 +22,8 @@ import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.BadgeCartBinding
 import woowacourse.shopping.presentation.cart.CartActivity
-import woowacourse.shopping.presentation.model.CartProductInfoListModel
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductListModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
@@ -103,10 +103,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         activityBinding.recyclerProduct.adapter = productListAdapter
     }
 
-    override fun loadProductItems(cartProductModels: List<CartProductInfoModel>) {
+    override fun loadProductItems(cartProductModels: List<CartProductModel>) {
         val newList =
-            listOf(CartProductInfoModel.defaultInfo()) + cartProductModels + listOf(
-                CartProductInfoModel.defaultInfo(),
+            listOf(CartProductModel.defaultInfo()) + cartProductModels + listOf(
+                CartProductModel.defaultInfo(),
             )
         productListAdapter.submitList(newList)
     }
@@ -158,8 +158,8 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         presenter.updateCartCount()
     }
 
-    override fun navigateToCart(cartProductInfoModels: List<CartProductInfoModel>) {
-        startActivity(CartActivity.getIntent(this, CartProductInfoListModel(cartProductInfoModels)))
+    override fun navigateToCart(cartProductModels: List<CartProductModel>) {
+        startActivity(CartActivity.getIntent(this, CartProductListModel(cartProductModels)))
     }
 
     override fun setLoadingViewVisible(isVisible: Boolean) {

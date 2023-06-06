@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.mapper
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.Price
 import woowacourse.shopping.Product
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 
 fun Product.toPresentation(): ProductModel {
@@ -24,8 +24,8 @@ fun ProductModel.toDomain(): Product {
     )
 }
 
-fun CartProductInfo.toPresentation(): CartProductInfoModel {
-    return CartProductInfoModel(
+fun CartProductInfo.toPresentation(): CartProductModel {
+    return CartProductModel(
         id = id,
         productModel = product.toPresentation(),
         count = count,
@@ -33,7 +33,7 @@ fun CartProductInfo.toPresentation(): CartProductInfoModel {
     )
 }
 
-fun CartProductInfoModel.toDomain(): CartProductInfo {
+fun CartProductModel.toDomain(): CartProductInfo {
     return CartProductInfo(
         id = id,
         product = productModel.toDomain(),

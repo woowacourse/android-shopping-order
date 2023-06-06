@@ -1,16 +1,16 @@
 package woowacourse.shopping.presentation.common
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
-class OrderCartDiffItemCallback : DiffUtil.ItemCallback<OrderCartInfoModel>() {
+class OrderCartDiffItemCallback : DiffUtil.ItemCallback<OrderCartModel>() {
     override fun areItemsTheSame(
-        oldItem: OrderCartInfoModel,
-        newItem: OrderCartInfoModel,
+        oldItem: OrderCartModel,
+        newItem: OrderCartModel,
     ): Boolean = (oldItem.productModel.id == newItem.productModel.id)
 
     override fun areContentsTheSame(
-        oldItem: OrderCartInfoModel,
-        newItem: OrderCartInfoModel,
+        oldItem: OrderCartModel,
+        newItem: OrderCartModel,
     ): Boolean = oldItem == newItem
 }

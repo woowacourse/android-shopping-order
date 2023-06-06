@@ -4,14 +4,14 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class CartProductInfoModel(
+data class CartProductModel(
     val id: Int,
     val productModel: ProductModel,
     val count: Int,
     val isOrdered: Boolean = false,
 ) : Parcelable {
     companion object {
-        fun defaultInfo(): CartProductInfoModel = CartProductInfoModel(
+        fun defaultInfo(): CartProductModel = CartProductModel(
             id = 5000,
             productModel = ProductModel(
                 id = 7187,

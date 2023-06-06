@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.mapper
 
-import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
-fun CartProductInfoModel.toOrderCartInfo(): OrderCartInfoModel {
-    return OrderCartInfoModel(
+fun CartProductModel.toOrderCartInfo(): OrderCartModel {
+    return OrderCartModel(
         id = id,
         productModel = productModel,
         count = count

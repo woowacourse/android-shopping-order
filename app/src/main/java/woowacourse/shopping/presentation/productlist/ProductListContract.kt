@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.productlist
 
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 
 interface ProductListContract {
@@ -9,16 +9,16 @@ interface ProductListContract {
         fun loadRecentProductItems()
         fun updateCartCount()
         fun loadMoreProductItems()
-        fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int)
+        fun updateCartItemQuantity(cartProductModel: CartProductModel, count: Int)
         fun showMyCart()
-        fun addCartItem(cartProductModel: CartProductInfoModel)
+        fun addCartItem(cartProductModel: CartProductModel)
     }
 
     interface View {
-        fun loadProductItems(cartProductModels: List<CartProductInfoModel>)
+        fun loadProductItems(cartProductModels: List<CartProductModel>)
         fun loadRecentProductItems(productModels: List<ProductModel>)
         fun showCartCount(count: Int)
-        fun navigateToCart(cartProductInfoModels: List<CartProductInfoModel>)
+        fun navigateToCart(cartProductModels: List<CartProductModel>)
         fun setLoadingViewVisible(isVisible: Boolean)
     }
 }

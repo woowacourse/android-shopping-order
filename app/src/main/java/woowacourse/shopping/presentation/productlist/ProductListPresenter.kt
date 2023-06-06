@@ -4,7 +4,7 @@ import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.Product
 import woowacourse.shopping.presentation.mapper.toPresentation
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
@@ -59,14 +59,14 @@ class ProductListPresenter(
         }, onFailure = {})
     }
 
-    override fun addCartItem(cartProductModel: CartProductInfoModel) {
+    override fun addCartItem(cartProductModel: CartProductModel) {
         cartRepository.addCartItem(cartProductModel.productModel.id) {
             updateCartCount()
             refreshProductItems()
         }
     }
 
-    override fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int) {
+    override fun updateCartItemQuantity(cartProductModel: CartProductModel, count: Int) {
         if (count == 0) {
             cartRepository.deleteCartItem(
                 cartProductModel.id, onSuccess = {

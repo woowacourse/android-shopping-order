@@ -6,7 +6,7 @@ import woowacourse.shopping.data.order.response.OrderCartDataModel
 import woowacourse.shopping.data.order.response.OrderRequestDataModel
 import woowacourse.shopping.data.user.UserRepository
 import woowacourse.shopping.presentation.mapper.toDomain
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
 class OrderPresenter(
     private val view: OrderContract.View,
@@ -16,7 +16,7 @@ class OrderPresenter(
     private lateinit var orderCarts: OrderCartInfoList
     private var totalPrice: Int = 0
 
-    override fun initOrderCarts(orderCarts: List<OrderCartInfoModel>) {
+    override fun initOrderCarts(orderCarts: List<OrderCartModel>) {
         this.orderCarts = OrderCartInfoList(orderCarts.map { it.toDomain() })
         totalPrice = this.orderCarts.getTotalPrice()
         view.showOrderCarts(orderCarts)

@@ -17,7 +17,7 @@ import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.util.getParcelableExtraCompat
 import woowacourse.shopping.util.noIntentExceptionHandler
@@ -101,7 +101,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         startActivity(intent)
     }
 
-    override fun showProductCart(cartProductModel: CartProductInfoModel) {
+    override fun showProductCart(cartProductModel: CartProductModel) {
         productDetailDialog = ProductDetailDialog(
             cartProductModel = cartProductModel,
             presenter = presenter,

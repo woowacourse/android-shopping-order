@@ -12,9 +12,9 @@ import woowacourse.shopping.data.cart.CartRemoteDataSource
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.model.CartProductInfoListModel
-import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.CartProductListModel
+import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 import woowacourse.shopping.presentation.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -111,7 +111,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setCartItems(productModels: List<CartProductInfoModel>) {
+    override fun setCartItems(productModels: List<CartProductModel>) {
         cartAdapter.submitList(productModels)
     }
 
@@ -137,9 +137,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.checkboxAllCart.isChecked = isAllOrdered
     }
 
-    private fun updateProductPrice(textView: TextView, cartProductInfoModel: CartProductInfoModel) {
+    private fun updateProductPrice(textView: TextView, cartProductModel: CartProductModel) {
         cartProductPriceView = textView
-        presenter.updateProductPrice(cartProductInfoModel)
+        presenter.updateProductPrice(cartProductModel)
     }
 
     override fun setProductPrice(price: Int) {
@@ -174,14 +174,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun showOrderView(orderCarts: ArrayList<OrderCartInfoModel>) {
+    override fun showOrderView(orderCarts: ArrayList<OrderCartModel>) {
         val intent = OrderActivity.getIntent(this, orderCarts)
         startActivity(intent)
     }
 
     companion object {
         private const val CART_PRODUCTS_KEY = "CART_PRODUCTS_KEY"
-        fun getIntent(context: Context, cartProducts: CartProductInfoListModel): Intent {
+        fun getIntent(context: Context, cartProducts: CartProductListModel): Intent {
             val intent = Intent(context, CartActivity::class.java)
             intent.putExtra(CART_PRODUCTS_KEY, cartProducts)
             return intent

@@ -1,17 +1,17 @@
 package woowacourse.shopping.presentation.cart
 
-import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
 interface CartContract {
     interface Presenter {
 
         fun checkPlusPageAble()
         fun checkMinusPageAble()
-        fun addProductInOrder(cartProductModel: CartProductInfoModel)
-        fun deleteProductInOrder(cartProductModel: CartProductInfoModel)
-        fun updateProductCount(cartProductModel: CartProductInfoModel, count: Int)
-        fun deleteProductItem(cartProductModel: CartProductInfoModel)
+        fun addProductInOrder(cartProductModel: CartProductModel)
+        fun deleteProductInOrder(cartProductModel: CartProductModel)
+        fun updateProductCount(cartProductModel: CartProductModel, count: Int)
+        fun deleteProductItem(cartProductModel: CartProductModel)
         fun plusPage()
         fun minusPage()
         fun refreshCurrentPage()
@@ -19,12 +19,12 @@ interface CartContract {
         fun checkCurrentPageProductsOrderState()
         fun updateOrderPrice()
         fun updateOrderCount()
-        fun updateProductPrice(cartProductModel: CartProductInfoModel)
+        fun updateProductPrice(cartProductModel: CartProductModel)
         fun orderSelectedCart()
     }
 
     interface View {
-        fun setCartItems(productModels: List<CartProductInfoModel>)
+        fun setCartItems(productModels: List<CartProductModel>)
         fun setUpPlusPageState(isEnable: Boolean)
         fun setUpMinusPageState(isEnable: Boolean)
         fun setOrderPrice(totalPrice: Int)
@@ -33,6 +33,6 @@ interface CartContract {
         fun setProductPrice(price: Int)
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
-        fun showOrderView(orderCarts: ArrayList<OrderCartInfoModel>)
+        fun showOrderView(orderCarts: ArrayList<OrderCartModel>)
     }
 }

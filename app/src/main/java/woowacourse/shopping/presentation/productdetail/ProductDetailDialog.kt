@@ -8,10 +8,10 @@ import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.DialogProductDetailBinding
 import woowacourse.shopping.presentation.common.CounterListener
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 
 class ProductDetailDialog(
-    private val cartProductModel: CartProductInfoModel,
+    private val cartProductModel: CartProductModel,
     private val presenter: ProductDetailContract.Presenter,
 ) : DialogFragment() {
 

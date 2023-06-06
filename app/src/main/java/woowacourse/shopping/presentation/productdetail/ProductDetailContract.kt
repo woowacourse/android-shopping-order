@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.productdetail
 
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 
 interface ProductDetailContract {
@@ -17,7 +17,7 @@ interface ProductDetailContract {
         fun showCompleteMessage(productName: String)
         fun setMostRecentProductVisible(visible: Boolean, mostRecentProductModel: ProductModel)
         fun navigateToMostRecent(mostRecentProductModel: ProductModel)
-        fun showProductCart(cartProductModel: CartProductInfoModel)
+        fun showProductCart(cartProductModel: CartProductModel)
         fun setTotalPrice(price: Int)
     }
 }

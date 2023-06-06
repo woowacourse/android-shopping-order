@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.order
 
-import woowacourse.shopping.presentation.model.OrderCartInfoModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
 interface OrderContract {
     interface View {
-        fun showOrderCarts(orderCarts: List<OrderCartInfoModel>)
+        fun showOrderCarts(orderCarts: List<OrderCartModel>)
         fun showPoint(point: Int)
         fun updateTotalPrice(price: Int)
         fun showOrderSuccess()
@@ -12,7 +12,7 @@ interface OrderContract {
     }
 
     interface Presenter {
-        fun initOrderCarts(orderCarts: List<OrderCartInfoModel>)
+        fun initOrderCarts(orderCarts: List<OrderCartModel>)
         fun loadPoint()
         fun loadTotalPrice()
         fun checkPointOver(usingPoint: String)

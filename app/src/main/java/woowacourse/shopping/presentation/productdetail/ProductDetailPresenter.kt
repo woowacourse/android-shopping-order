@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.productdetail
 import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.presentation.mapper.toDomain
 import woowacourse.shopping.presentation.mapper.toPresentation
-import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.RecentProductRepository
@@ -34,7 +34,7 @@ class ProductDetailPresenter(
     }
 
     override fun showProductCart() {
-        val cartProduct = CartProductInfoModel(0, productModel, 1)
+        val cartProduct = CartProductModel(0, productModel, 1)
         view.showProductCart(cartProduct)
     }
 
