@@ -10,8 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
-import woowacourse.shopping.data.cart.CartRemoteService
-import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.CartRemoteRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -28,8 +27,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: ProductDetailContract.Presenter by lazy {
         val product: ProductState? by lazy { intent.getParcelableExtra(PRODUCT_KEY) }
-        val recentProduct: RecentProductState? by lazy { intent.getParcelableExtra(RECENT_PRODUCT_KEY) }
-        val cartRepository: CartRepository = CartRepositoryImpl(serverUrl, CartRemoteService())
+        val recentProduct: RecentProductState? by lazy {
+            intent.getParcelableExtra(RECENT_PRODUCT_KEY)
+        }
+        val cartRepository: CartRepository = CartRemoteRepository(url = serverUrl)
         ProductDetailPresenter(this, product, recentProduct, cartRepository)
     }
 
@@ -37,10 +38,12 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         super.onCreate(savedInstanceState)
         _binding = ActivityProductDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.productDetailTb)
         presenter.loadProduct()
         presenter.loadRecentProduct()
         binding.addCartProductTv.setOnClickListener { presenter.selectCount() }
         binding.mostRecentProductLayout.setOnClickListener { presenter.navigateProductDetail() }
+        binding.cancelButton.setOnClickListener { finish() }
     }
 
     override fun onDestroy() {

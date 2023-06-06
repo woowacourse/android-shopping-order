@@ -1,29 +1,32 @@
 package com.example.domain.repository
 
 import com.example.domain.CartProduct
+import com.example.domain.Pagination
 
 interface CartRepository {
 
-    fun getAll(
-        onSuccess: (List<CartProduct>) -> Unit,
+    fun requestFetchCartProductsUnit(
+        unitSize: Int,
+        page: Int,
+        onSuccess: (List<CartProduct>, Pagination) -> Unit,
         onFailure: () -> Unit
     )
 
     fun addCartProduct(
-        productId: Int,
-        onSuccess: (cartId: Int) -> Unit,
+        productId: Long,
+        onSuccess: (cartId: Long) -> Unit,
         onFailure: () -> Unit
     )
 
     fun updateCartProductQuantity(
-        id: Int,
+        id: Long,
         quantity: Int,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     )
 
     fun deleteCartProduct(
-        id: Int,
+        id: Long,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     )

@@ -9,6 +9,17 @@
         android:orientation="vertical"
         tools:context=".feature.cart.CartActivity">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/cart_tb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#555555"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Cart"
+            app:titleTextColor="@color/white" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cart_product_rv"
             android:layout_width="0dp"
@@ -21,7 +32,7 @@
             app:layout_constraintBottom_toTopOf="@+id/page_selector_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cart_tb"
             tools:listitem="@layout/item_cart_product" />
 
         <LinearLayout
@@ -33,7 +44,7 @@
             app:layout_constraintBottom_toTopOf="@+id/page_selector_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/cart_tb">
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -203,6 +214,7 @@
                 android:layout_marginStart="@dimen/margin_small"
                 android:layout_marginBottom="4dp"
                 android:padding="0dp"
+                android:checked="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

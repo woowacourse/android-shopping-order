@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.cart
 
 import woowacourse.shopping.model.CartProductState
+import woowacourse.shopping.model.CartState
 
 interface CartContract {
 
@@ -11,21 +12,27 @@ interface CartContract {
         fun setCartPageNumberMinusEnable(isEnable: Boolean)
         fun setCartProductCount(count: Int)
         fun setTotalCost(paymentAmount: Int)
+        fun setAllPickChecked(checked: Boolean)
         fun showPageSelectorView()
         fun showCartProducts()
         fun hidePageSelectorView()
         fun updateItem(newItem: CartProductState)
+        fun showOrderPage(cart: CartState)
     }
 
     interface Presenter {
+        fun initContents()
         fun loadCart()
-        fun loadCheckedCartProductCount()
         fun plusPageNumber()
         fun minusPageNumber()
         fun plusQuantity(cartProductState: CartProductState)
         fun minusQuantity(cartProductState: CartProductState)
-        fun updateChecked(productId: Int, checked: Boolean)
+        fun updatePickedByCartId(cartId: Long, checked: Boolean)
+        fun updatePaymentAmount()
+        fun updatePickedCartProductCount()
         fun deleteCartProduct(cartProductState: CartProductState)
-        fun checkAll()
+        fun changeAllPicked()
+        fun pickAll()
+        fun attachCartToOrder()
     }
 }

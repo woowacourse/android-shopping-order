@@ -12,7 +12,7 @@ class CartProductViewHolder(
     private val onCartProductDeleteClick: (CartProductState) -> Unit,
     private val minusQuantity: (cartProductState: CartProductState) -> Unit,
     private val plusQuantity: (cartProductState: CartProductState) -> Unit,
-    private val updateChecked: (productId: Int, checked: Boolean) -> Unit
+    private val updateChecked: (cartId: Long, checked: Boolean) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val binding = binding as ItemCartProductBinding
 
@@ -22,7 +22,7 @@ class CartProductViewHolder(
 
         binding.cartProductCheckBox.isChecked = cartProductState.isPicked
         binding.cartClearImageView.setOnClickListener {
-            updateChecked(cartProductState.productId, false)
+            updateChecked(cartProductState.id, false)
             onCartProductDeleteClick(cartProductState)
         }
         binding.counterView.plusClickListener = {
@@ -34,14 +34,8 @@ class CartProductViewHolder(
             binding.counterView.count = cartProductState.quantity
         }
         binding.cartProductCheckBox.setOnClickListener {
-            updateChecked(cartProductState.productId, binding.cartProductCheckBox.isChecked)
+            updateChecked(cartProductState.id, binding.cartProductCheckBox.isChecked)
         }
-
-        /*
-            홀더 또한 뷰이기 때문에 값을 더하거나 빼는 등의 로직은 presenter와 같은 위치에 있는 것이 좋을 것 같으나
-            어떻게 하면 좋을지 잘 모르겠습니다...
-            이런 로직을 holder 밖으로 뺄 수 있는 방법이 있을까요?
-         */
     }
 
     companion object {
@@ -50,7 +44,7 @@ class CartProductViewHolder(
             onCartProductDeleteClick: (CartProductState) -> Unit,
             minusQuantity: (cartProductState: CartProductState) -> Unit,
             plusQuantity: (cartProductState: CartProductState) -> Unit,
-            updateChecked: (productId: Int, checked: Boolean) -> Unit
+            updateChecked: (productId: Long, checked: Boolean) -> Unit
         ): CartProductViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemCartProductBinding.inflate(inflater, parent, false)

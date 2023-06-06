@@ -5,4 +5,14 @@
 
     <string name="left_charactor"><![CDATA[<]]></string>
     <string name="right_charactor"><![CDATA[>]]></string>
+
+    <string name="recent_viewed_list_title">최근 본 목록</string>
+    <string name="order_products_list_title">주문할 상품</string>
+    <string name="order_price_summary_title">결제금액</string>
+    <string name="order_products_sum_title">주문금액</string>
+    <string name="order_discount_price">할인금액</string>
+    <string name="order_final_price_title">총 결제금액</string>
+    <string name="order_summary_format">- %s %d개 (%,d원)</string>
+    <string name="order_price_format">%,d원</string>
+    <string name="order_pay_format">%,d원 결제하기</string>
 </resources>

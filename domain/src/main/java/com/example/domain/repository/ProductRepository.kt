@@ -1,36 +1,19 @@
 package com.example.domain.repository
 
+import com.example.domain.Pagination
 import com.example.domain.Product
 
 interface ProductRepository {
-    fun getAll(
-        onSuccess: (List<Product>) -> Unit,
+    fun requestFetchProductsUnit(
+        unitSize: Int,
+        page: Int,
+        onSuccess: (List<Product>, Pagination) -> Unit,
         onFailure: () -> Unit
     )
 
-    fun getProduct(
-        id: Int,
+    fun requestFetchProductById(
+        id: Long,
         onSuccess: (product: Product?) -> Unit,
-        onFailure: () -> Unit
-    )
-
-    fun addProduct(
-        name: String,
-        price: Int,
-        imageUrl: String,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
-    )
-
-    fun updateProduct(
-        product: Product,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
-    )
-
-    fun deleteProduct(
-        id: Int,
-        onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit
     )
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="order_detail_text_medium">16sp</dimen>
+
     <dimen name="product_detail_item_name_text_size">24sp</dimen>
     <dimen name="product_detail_item_medium_text_size">20sp</dimen>
     <dimen name="product_main_item_text_size">16sp</dimen>
@@ -15,6 +17,14 @@
 
     <dimen name="count_select_dialog_large_text_size">18sp</dimen>
     <dimen name="count_select_dialog_medium_text_size">16sp</dimen>
+
+    <dimen name="order_large_text_size">18sp</dimen>
+    <dimen name="order_medium_text_size">16sp</dimen>
+    <dimen name="order_small_text_size">12sp</dimen>
+
+    <dimen name="order_product_item_large_text_size">18sp</dimen>
+    <dimen name="order_product_item_medium_text_size">16sp</dimen>
+    <dimen name="order_product_item_small_text_size">12sp</dimen>
 
     <dimen name="margin_large">18dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
