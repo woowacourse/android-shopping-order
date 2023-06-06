@@ -10,6 +10,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dataSource.remote.ProductService
 import woowacourse.shopping.data.model.dto.response.ProductDto
+import woowacourse.shopping.data.util.responseParseCustomError
 
 class ProductRepositoryImpl(
     private val service: ProductService,
@@ -25,18 +26,22 @@ class ProductRepositoryImpl(
                     call: Call<List<ProductDto>>,
                     response: Response<List<ProductDto>>
                 ) {
-                    val products = response.body() ?: emptyList()
-                    allProducts.clear()
-                    allProducts.addAll(
-                        products.map {
-                            with(it) {
-                                Product(id, name, imageUrl, Price(price))
+                    if (response.isSuccessful) {
+                        val products = response.body() ?: emptyList()
+                        allProducts.clear()
+                        allProducts.addAll(
+                            products.map {
+                                with(it) {
+                                    Product(id, name, imageUrl, Price(price))
+                                }
                             }
-                        }
-                    )
-                    val nextProducts = allProducts.take(UNIT_SIZE)
-                    cache.addProducts(nextProducts)
-                    callBack(BaseResponse.SUCCESS(nextProducts))
+                        )
+                        val nextProducts = allProducts.take(UNIT_SIZE)
+                        cache.addProducts(nextProducts)
+                        callBack(BaseResponse.SUCCESS(nextProducts))
+                    } else {
+                        responseParseCustomError(response.errorBody(), callBack)
+                    }
                 }
 
                 override fun onFailure(call: Call<List<ProductDto>>, t: Throwable) {
@@ -63,15 +68,18 @@ class ProductRepositoryImpl(
     ) {
         service.getProductById(productId).enqueue(object : Callback<ProductDto> {
             override fun onResponse(call: Call<ProductDto>, response: Response<ProductDto>) {
-                // todo
-                val product = response.body() ?: return callBack(BaseResponse.FAILED(200, ""))
-                callBack(
-                    BaseResponse.SUCCESS(
-                        with(product) {
-                            Product(id, name, imageUrl, Price(price))
-                        }
+                val product = response.body()
+                if (response.isSuccessful && product != null) {
+                    callBack(
+                        BaseResponse.SUCCESS(
+                            with(product) {
+                                Product(id, name, imageUrl, Price(price))
+                            }
+                        )
                     )
-                )
+                } else {
+                    responseParseCustomError(response.errorBody(), callBack)
+                }
             }
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
