@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.order.dto.Order
 import woowacourse.shopping.data.order.dto.OrderCartItemDtos
 import woowacourse.shopping.data.order.dto.Orders
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class OrderRemoteDataSource(
     retrofit: Retrofit,
@@ -17,17 +18,9 @@ class OrderRemoteDataSource(
     override fun loadOrders(callback: (Orders?) -> Unit) {
         retrofitService.loadOrders()
             .enqueue(
-                object : retrofit2.Callback<Orders> {
-                    override fun onResponse(
-                        call: Call<Orders>,
-                        response: Response<Orders>,
-                    ) {
-                        val orders = response.body()
-                        callback(orders)
-                    }
-
-                    override fun onFailure(call: Call<Orders>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
+                object : RetrofitCallback<Orders>() {
+                    override fun onSuccess(response: Orders?) {
+                        callback(response)
                     }
                 },
             )
@@ -36,17 +29,9 @@ class OrderRemoteDataSource(
     override fun loadOrder(orderId: Long, callback: (Order?) -> Unit) {
         retrofitService.loadOrder(orderId)
             .enqueue(
-                object : retrofit2.Callback<Order> {
-                    override fun onResponse(
-                        call: Call<Order>,
-                        response: Response<Order>,
-                    ) {
-                        val order = response.body()
-                        callback(order)
-                    }
-
-                    override fun onFailure(call: Call<Order>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
+                object : RetrofitCallback<Order>() {
+                    override fun onSuccess(response: Order?) {
+                        callback(response)
                     }
                 },
             )

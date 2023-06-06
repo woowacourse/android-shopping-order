@@ -1,9 +1,7 @@
 package woowacourse.shopping.data.cash
 
-import android.util.Log
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Retrofit
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class CashRemoteDataSource(
     retrofit: Retrofit,
@@ -14,17 +12,10 @@ class CashRemoteDataSource(
     override fun loadCash(callback: (Int) -> Unit) {
         retrofitService.getCash()
             .enqueue(
-                object : retrofit2.Callback<TotalCash> {
-                    override fun onResponse(
-                        call: Call<TotalCash>,
-                        response: Response<TotalCash>,
-                    ) {
-                        val totalCash = response.body()?.totalCash ?: 0
+                object : RetrofitCallback<TotalCash>() {
+                    override fun onSuccess(response: TotalCash?) {
+                        val totalCash = response?.totalCash ?: 0
                         callback(totalCash)
-                    }
-
-                    override fun onFailure(call: Call<TotalCash>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -33,17 +24,10 @@ class CashRemoteDataSource(
     override fun chargeCash(cash: Int, callback: (Int) -> Unit) {
         retrofitService.chargeCash(cash)
             .enqueue(
-                object : retrofit2.Callback<TotalCash> {
-                    override fun onResponse(
-                        call: Call<TotalCash>,
-                        response: Response<TotalCash>,
-                    ) {
-                        val totalCash = response.body()?.totalCash ?: 0
+                object : RetrofitCallback<TotalCash>() {
+                    override fun onSuccess(response: TotalCash?) {
+                        val totalCash = response?.totalCash ?: 0
                         callback(totalCash)
-                    }
-
-                    override fun onFailure(call: Call<TotalCash>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
                     }
                 },
             )

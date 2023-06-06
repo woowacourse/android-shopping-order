@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.data.cart.dto.CartProduct
 import woowacourse.shopping.data.cart.dto.ProductInsertCartRequest
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
 
@@ -37,16 +38,9 @@ class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
     override fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit) {
         retrofitService.updateCartProduct(cartId, quantity)
             .enqueue(
-                object : retrofit2.Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
+                object : RetrofitCallback<Unit>() {
+                    override fun onSuccess(response: Unit?) {
                         callback()
-                    }
-
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -55,16 +49,9 @@ class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
     override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
         retrofitService.deleteCartProduct(cartId)
             .enqueue(
-                object : retrofit2.Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
+                object : RetrofitCallback<Unit>() {
+                    override fun onSuccess(response: Unit?) {
                         callback()
-                    }
-
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
                     }
                 },
             )
@@ -73,17 +60,9 @@ class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
     override fun getAllCartProducts(callback: (List<CartProduct>) -> Unit) {
         retrofitService.requestCartProducts()
             .enqueue(
-                object : retrofit2.Callback<List<CartProduct>> {
-                    override fun onResponse(
-                        call: Call<List<CartProduct>>,
-                        response: Response<List<CartProduct>>,
-                    ) {
-                        val cartProducts = response.body() ?: listOf()
-                        callback(cartProducts)
-                    }
-
-                    override fun onFailure(call: Call<List<CartProduct>>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
+                object : RetrofitCallback<List<CartProduct>>() {
+                    override fun onSuccess(response: List<CartProduct>?) {
+                        callback(response ?: listOf())
                     }
                 },
             )
