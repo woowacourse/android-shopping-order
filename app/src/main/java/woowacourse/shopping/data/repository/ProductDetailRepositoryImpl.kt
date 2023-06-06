@@ -4,14 +4,14 @@ import com.example.domain.model.Product
 import com.example.domain.repository.ProductDetailRepository
 import retrofit2.Call
 import retrofit2.Callback
-import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailSource
+import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailRemoteSource
 import woowacourse.shopping.mapper.toDomain
 
 class ProductDetailRepositoryImpl(
-    private val productDetailSource: ProductDetailSource,
+    private val productDetailRemoteSource: ProductDetailRemoteSource,
 ) : ProductDetailRepository {
     override fun getById(id: Long): Result<Product> {
-        val result = productDetailSource.getById(id)
+        val result = productDetailRemoteSource.getById(id)
         return if (result.isSuccess) {
             val productDomain = result.getOrNull()?.toDomain()
             Result.success(productDomain ?: throw IllegalArgumentException())

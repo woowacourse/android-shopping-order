@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
 import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 import java.util.concurrent.Executors
 
-class ShoppingCartDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) :
+class ShoppingCartDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) :
     ShoppingCartDataSource {
 
-    private val token = authInfoDataSource.getAuthInfo() ?: throw IllegalArgumentException()
+    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
 
     override fun getAllProductInCart(): Result<List<CartProductDTO>> {
         val executor = Executors.newSingleThreadExecutor()

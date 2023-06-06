@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.local
 
-interface AuthInfoDataSource {
+interface AuthInfoLocalDataSource {
 
     fun getAuthInfo(): String?
     fun setAuthInfo()

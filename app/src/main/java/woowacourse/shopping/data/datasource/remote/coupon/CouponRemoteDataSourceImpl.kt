@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.datasource.remote.coupon
 
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSource
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
 import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.CouponDTO
 import woowacourse.shopping.data.remote.request.CouponDiscountPriceDTO
 import java.util.concurrent.Executors
 
-class CouponDataSourceImpl(private val authInfoDataSource: AuthInfoDataSource) : CouponDataSource {
+class CouponRemoteDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) : CouponRemoteDataSource {
 
-    private val token = authInfoDataSource.getAuthInfo() ?: throw IllegalArgumentException()
+    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
 
     override fun getCoupons(): Result<List<CouponDTO>> {
         val executor = Executors.newSingleThreadExecutor()

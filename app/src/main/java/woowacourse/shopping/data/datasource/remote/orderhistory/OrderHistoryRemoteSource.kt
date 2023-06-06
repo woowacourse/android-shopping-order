@@ -2,6 +2,6 @@ package woowacourse.shopping.data.datasource.remote.orderhistory
 
 import woowacourse.shopping.data.remote.request.OrderDTO
 
-interface OrderHistorySource {
+interface OrderHistoryRemoteSource {
     fun getOrderList(): Result<List<OrderDTO>>
 }

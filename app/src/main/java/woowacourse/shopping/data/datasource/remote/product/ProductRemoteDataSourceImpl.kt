@@ -4,7 +4,7 @@ import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
 import woowacourse.shopping.data.remote.request.ProductDTO
 import java.util.concurrent.Executors
 
-class ProductDataSourceImpl : ProductDataSource {
+class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
 
     override fun getSubListProducts(limit: Int, scrollCount: Int): Result<List<ProductDTO>> {
         val executor = Executors.newSingleThreadExecutor()

@@ -3,13 +3,13 @@ package woowacourse.shopping.data.repository
 import android.util.Log
 import com.example.domain.model.Order
 import com.example.domain.repository.OrderRepository
-import woowacourse.shopping.data.datasource.remote.order.OrderDataSource
+import woowacourse.shopping.data.datasource.remote.order.OrderRemoteDataSource
 import woowacourse.shopping.mapper.toDomain
 
-class OrderRepositoryImpl(private val orderDataSource: OrderDataSource) : OrderRepository {
+class OrderRepositoryImpl(private val orderRemoteDataSource: OrderRemoteDataSource) : OrderRepository {
 
     override fun insertOrderWithCoupon(cartItemsIds: List<Long>, couponId: Long): Result<Order> {
-        val result = orderDataSource.postOrderWithCoupon(cartItemsIds, couponId)
+        val result = orderRemoteDataSource.postOrderWithCoupon(cartItemsIds, couponId)
         return if (result.isSuccess) {
             val orderDomain = result.getOrNull()?.toDomain()
             Result.success(orderDomain ?: throw IllegalArgumentException())
@@ -19,7 +19,7 @@ class OrderRepositoryImpl(private val orderDataSource: OrderDataSource) : OrderR
     }
 
     override fun insertOrderWithoutCoupon(cartItemsIds: List<Long>): Result<Order> {
-        val result = orderDataSource.postOrderWithoutCoupon(cartItemsIds)
+        val result = orderRemoteDataSource.postOrderWithoutCoupon(cartItemsIds)
         return if (result.isSuccess) {
             val orderDomain = result.getOrNull()?.toDomain()
             Result.success(orderDomain ?: throw IllegalArgumentException())

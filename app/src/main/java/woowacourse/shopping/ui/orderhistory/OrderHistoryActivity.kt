@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistorySourceImpl
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistoryRemoteSourceImpl
 import woowacourse.shopping.data.repository.OrderHistoryRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.OrderUIModel
@@ -30,8 +30,8 @@ class OrderHistoryActivity :
         presenter = OrderHistoryPresenter(
             this,
             OrderHistoryRepositoryImpl(
-                OrderHistorySourceImpl(
-                    AuthInfoDataSourceImpl.getInstance(
+                OrderHistoryRemoteSourceImpl(
+                    AuthInfoLocalDataSourceImpl.getInstance(
                         this,
                     ),
                 ),

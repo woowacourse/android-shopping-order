@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.coupon.CouponDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.coupon.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -34,8 +34,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
             intent.intentSerializable("KEY_CART_ITEMS", CartItemsUIModel::class.java)
                 ?: throw IllegalArgumentException(),
             this,
-            CouponRepositoryImpl(CouponDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this))),
-            OrderRepositoryImpl(OrderDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this))),
+            CouponRepositoryImpl(CouponRemoteDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
+            OrderRepositoryImpl(OrderRemoteDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
         )
 
         binding.listener = this

@@ -5,9 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.orderdetail.OrderDetailSourceImpl
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.orderdetail.OrderRemoteDetailSourceImpl
 import woowacourse.shopping.data.repository.OrderDetailRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.OrderProductUIModel
@@ -28,7 +27,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         presenter = OrderDetailPresenter(
             this,
-            OrderDetailRepositoryImpl(OrderDetailSourceImpl(AuthInfoDataSourceImpl.getInstance(this))),
+            OrderDetailRepositoryImpl(OrderRemoteDetailSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
         )
         presenter.getOrderDetail(intent.getLongExtra("KEY_ORDER_ID", 0))
     }

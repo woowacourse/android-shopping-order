@@ -3,11 +3,10 @@ package woowacourse.shopping.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -30,7 +29,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, CartClickListener {
         setContentView(binding.root)
 
         presenter = CartPresenter(
-            CartRepositoryImpl(ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this))),
+            CartRepositoryImpl(ShoppingCartDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
             this,
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )

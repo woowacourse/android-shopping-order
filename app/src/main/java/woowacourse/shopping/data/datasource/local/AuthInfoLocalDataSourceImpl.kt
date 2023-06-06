@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.local
 import android.content.Context
 import android.content.SharedPreferences
 
-class AuthInfoDataSourceImpl private constructor(context: Context) : AuthInfoDataSource {
+class AuthInfoLocalDataSourceImpl private constructor(context: Context) : AuthInfoLocalDataSource {
 
     private val sharedPreference: SharedPreferences =
         context.getSharedPreferences(AUTH_INFO, Context.MODE_PRIVATE)
@@ -24,10 +24,10 @@ class AuthInfoDataSourceImpl private constructor(context: Context) : AuthInfoDat
         private const val AUTH_INFO = "AUTH_INFO"
         private const val USER_ACCESS_TOKEN = "USER_ACCESS_TOKEN"
 
-        private val authInfoDataSourceImpl: AuthInfoDataSourceImpl? = null
-        fun getInstance(context: Context): AuthInfoDataSourceImpl {
+        private val authInfoDataSourceImpl: AuthInfoLocalDataSourceImpl? = null
+        fun getInstance(context: Context): AuthInfoLocalDataSourceImpl {
             return authInfoDataSourceImpl ?: synchronized(this) {
-                AuthInfoDataSourceImpl(context)
+                AuthInfoLocalDataSourceImpl(context)
             }
         }
     }
