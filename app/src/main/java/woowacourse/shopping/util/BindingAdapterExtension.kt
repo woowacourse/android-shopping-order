@@ -5,7 +5,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 
-@BindingAdapter("imageGlide")
+@BindingAdapter("image_resource")
 fun setImageResource(view: ImageView, imageUrl: String?) {
     Glide.with(view.context)
         .load(imageUrl)
