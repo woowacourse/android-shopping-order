@@ -1,19 +1,17 @@
 package woowacourse.shopping.data.datasource.remote.coupon
 
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
-import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.RetrofitClient
 import woowacourse.shopping.data.remote.request.CouponDTO
 import woowacourse.shopping.data.remote.request.CouponDiscountPriceDTO
 import java.util.concurrent.Executors
 
-class CouponRemoteDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) : CouponRemoteDataSource {
-
-    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
+class CouponRemoteDataSourceImpl :
+    CouponRemoteDataSource {
 
     override fun getCoupons(): Result<List<CouponDTO>> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<List<CouponDTO>>> {
-            val response = ServicePool.couponDataService.getCoupons(token).execute()
+            val response = RetrofitClient.getInstance().couponDataService.getCoupons().execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {
@@ -31,7 +29,10 @@ class CouponRemoteDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLo
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<CouponDiscountPriceDTO>> {
             val response =
-                ServicePool.couponDataService.getCouponDiscount(token, originalPrice, couponId)
+                RetrofitClient.getInstance().couponDataService.getCouponDiscount(
+                    originalPrice,
+                    couponId,
+                )
                     .execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())

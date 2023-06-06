@@ -30,11 +30,7 @@ class OrderHistoryActivity :
         presenter = OrderHistoryPresenter(
             this,
             OrderHistoryRepositoryImpl(
-                OrderHistoryRemoteSourceImpl(
-                    AuthInfoLocalDataSourceImpl.getInstance(
-                        this,
-                    ),
-                ),
+                OrderHistoryRemoteSourceImpl(),
             ),
         )
         presenter.getOrderHistory()

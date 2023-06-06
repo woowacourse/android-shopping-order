@@ -1,22 +1,18 @@
 package woowacourse.shopping.data.datasource.remote.order
 
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
-import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.RetrofitClient
 import woowacourse.shopping.data.remote.request.OrderDTO
 import woowacourse.shopping.data.remote.request.OrderRequestWithCoupon
 import woowacourse.shopping.data.remote.request.OrderRequestWithoutCoupon
 import java.util.concurrent.Executors
 
-class OrderRemoteDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) : OrderRemoteDataSource {
-
-    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
+class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
 
     override fun postOrderWithCoupon(cartItemsIds: List<Long>, couponId: Long): Result<OrderDTO> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<OrderDTO>> {
             val response =
-                ServicePool.orderDataService.postOrderWithCoupon(
-                    token,
+                RetrofitClient.getInstance().orderDataService.postOrderWithCoupon(
                     OrderRequestWithCoupon(cartItemsIds, couponId),
                 )
                     .execute()
@@ -34,8 +30,7 @@ class OrderRemoteDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLoc
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<OrderDTO>> {
             val response =
-                ServicePool.orderDataService.postOrderWithoutCoupon(
-                    token,
+                RetrofitClient.getInstance().orderDataService.postOrderWithoutCoupon(
                     OrderRequestWithoutCoupon(cartItemsIds),
                 ).execute()
             if (response.isSuccessful) {

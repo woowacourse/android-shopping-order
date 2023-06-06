@@ -13,7 +13,7 @@ class AuthInfoLocalDataSourceImpl private constructor(context: Context) : AuthIn
     }
 
     override fun getAuthInfo(): String? {
-        return sharedPreference.getString(USER_ACCESS_TOKEN, null)
+        return sharedPreference.getString(USER_ACCESS_TOKEN, "")
     }
 
     override fun setAuthInfo() {

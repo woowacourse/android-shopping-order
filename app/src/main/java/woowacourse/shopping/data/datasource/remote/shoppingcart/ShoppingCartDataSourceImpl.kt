@@ -1,20 +1,18 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
-import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.RetrofitClient
 import woowacourse.shopping.data.remote.request.CartItemRequest
 import woowacourse.shopping.data.remote.request.CartProductDTO
 import java.util.concurrent.Executors
 
-class ShoppingCartDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) :
+class ShoppingCartDataSourceImpl :
     ShoppingCartDataSource {
-
-    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
 
     override fun getAllProductInCart(): Result<List<CartProductDTO>> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<List<CartProductDTO>>> {
-            val response = ServicePool.shoppingCartService.getAllProductInCart(token).execute()
+            val response =
+                RetrofitClient.getInstance().shoppingCartService.getAllProductInCart().execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: emptyList())
             } else {
@@ -29,7 +27,9 @@ class ShoppingCartDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLo
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.postProductToCart(token, CartItemRequest(productId, quantity)).execute()
+                RetrofitClient.getInstance().shoppingCartService.postProductToCart(
+                    CartItemRequest(productId, quantity),
+                ).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
@@ -44,7 +44,10 @@ class ShoppingCartDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLo
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.patchProductCount(token, cartItemId, quantity)
+                RetrofitClient.getInstance().shoppingCartService.patchProductCount(
+                    cartItemId,
+                    quantity,
+                )
                     .execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
@@ -60,7 +63,8 @@ class ShoppingCartDataSourceImpl(private val authInfoLocalDataSource: AuthInfoLo
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<Unit>> {
             val response =
-                ServicePool.shoppingCartService.deleteProductInCart(token, productId).execute()
+                RetrofitClient.getInstance().shoppingCartService.deleteProductInCart(productId)
+                    .execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {

@@ -27,7 +27,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         presenter = OrderDetailPresenter(
             this,
-            OrderDetailRepositoryImpl(OrderRemoteDetailSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
+            OrderDetailRepositoryImpl(OrderRemoteDetailSourceImpl()),
         )
         presenter.getOrderDetail(intent.getLongExtra("KEY_ORDER_ID", 0))
     }

@@ -46,7 +46,7 @@ class ProductDetailActivity :
                 ProductDetailRemoteSourceImpl(),
             ),
             CartRepositoryImpl(
-                ShoppingCartDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this)),
+                ShoppingCartDataSourceImpl(),
             ),
             RecentProductDatabase(this),
         )

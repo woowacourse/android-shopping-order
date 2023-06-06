@@ -48,7 +48,7 @@ class ShoppingActivity :
             ),
             RecentProductDatabase(this),
             CartRepositoryImpl(
-                ShoppingCartDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this)),
+                ShoppingCartDataSourceImpl(),
             ),
         )
 

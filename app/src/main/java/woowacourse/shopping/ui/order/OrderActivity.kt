@@ -34,8 +34,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View, OrderListener {
             intent.intentSerializable("KEY_CART_ITEMS", CartItemsUIModel::class.java)
                 ?: throw IllegalArgumentException(),
             this,
-            CouponRepositoryImpl(CouponRemoteDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
-            OrderRepositoryImpl(OrderRemoteDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
+            CouponRepositoryImpl(CouponRemoteDataSourceImpl()),
+            OrderRepositoryImpl(OrderRemoteDataSourceImpl()),
         )
 
         binding.listener = this

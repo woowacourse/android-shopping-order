@@ -1,19 +1,16 @@
 package woowacourse.shopping.data.datasource.remote.orderhistory
 
-import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSource
-import woowacourse.shopping.data.datasource.remote.retrofit.ServicePool
+import woowacourse.shopping.data.datasource.remote.retrofit.RetrofitClient
 import woowacourse.shopping.data.remote.request.OrderDTO
 import java.util.concurrent.Executors
 
-class OrderHistoryRemoteSourceImpl(private val authInfoLocalDataSource: AuthInfoLocalDataSource) :
+class OrderHistoryRemoteSourceImpl :
     OrderHistoryRemoteSource {
-
-    private val token = authInfoLocalDataSource.getAuthInfo() ?: throw IllegalArgumentException()
 
     override fun getOrderList(): Result<List<OrderDTO>> {
         val executor = Executors.newSingleThreadExecutor()
         val result = executor.submit<Result<List<OrderDTO>>> {
-            val response = ServicePool.orderDataService.getOrderList(token).execute()
+            val response = RetrofitClient.getInstance().orderDataService.getOrderList().execute()
             if (response.isSuccessful) {
                 Result.success(response.body() ?: throw IllegalArgumentException())
             } else {

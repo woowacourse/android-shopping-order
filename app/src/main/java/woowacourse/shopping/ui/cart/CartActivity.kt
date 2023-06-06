@@ -29,7 +29,7 @@ class CartActivity : AppCompatActivity(), CartContract.View, CartClickListener {
         setContentView(binding.root)
 
         presenter = CartPresenter(
-            CartRepositoryImpl(ShoppingCartDataSourceImpl(AuthInfoLocalDataSourceImpl.getInstance(this))),
+            CartRepositoryImpl(ShoppingCartDataSourceImpl()),
             this,
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
