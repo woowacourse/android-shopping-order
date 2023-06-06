@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.main
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
@@ -50,10 +51,10 @@ internal class MainPresenterTest {
             2L to 3000
         )
         every {
-            productRepository.fetchFirstProducts(onSuccess = any(), any())
+            productRepository.fetchFirstProducts(any())
         } answers {
-            val successBlock = arg<(List<Product>) -> Unit>(0)
-            successBlock(mockProducts)
+            val successBlock = arg<(BaseResponse<List<Product>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockProducts))
         }
 
         val mockCartProducts = CartFixture.getMockCarts(
@@ -128,10 +129,10 @@ internal class MainPresenterTest {
         // given
         val mockProduct = Product(1L, 2000)
         every {
-            productRepository.fetchProductById(1L, onSuccess = any(), any())
+            productRepository.fetchProductById(1L, any())
         } answers {
-            val successBlock = arg<(Product) -> Unit>(1)
-            successBlock(mockProduct)
+            val successBlock = arg<(BaseResponse.SUCCESS<Product>) -> Unit>(1)
+            successBlock(BaseResponse.SUCCESS(mockProduct))
         }
 
         every {

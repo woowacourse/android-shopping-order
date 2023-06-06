@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
@@ -30,6 +29,8 @@ import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
 import woowacourse.shopping.feature.order.list.OrderListActivity
 import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var binding: ActivityMainBinding
@@ -138,11 +139,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 binding.skeletonMainLoadingLayout.visibility = View.GONE
                 binding.productRecyclerView.visibility = View.VISIBLE
             }
+            MainContract.View.MainScreenEvent.ShowFailedLoadProduct -> {
+                showToastShort(R.string.failed_load_product_detail_info)
+            }
+            MainContract.View.MainScreenEvent.ShowNetworkError -> {
+                showToastNetworkError()
+            }
         }
     }
 
     private fun hideLoadMore() {
-        Toast.makeText(this, getString(R.string.load_more_end), Toast.LENGTH_SHORT).show()
+        showToastShort(R.string.load_more_end)
         loadAdapter.hide()
     }
 

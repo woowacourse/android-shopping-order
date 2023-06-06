@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
@@ -33,15 +34,13 @@ class DetailPresenter(
         }
 
     override fun initPresenter() {
-        productRepository.fetchProductById(
-            productId,
-            onSuccess = { product ->
-                findCartInfoByProduct(product)
-            },
-            onFailure = {
-                failedLoadDetailData()
+        productRepository.fetchProductById(productId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> findCartInfoByProduct(result.response)
+                is BaseResponse.FAILED -> failedLoadDetailData()
+                is BaseResponse.NETWORK_ERROR -> {}
             }
-        )
+        }
 
         if (isRecentProduct || recentProductUiModel == null) {
             view.hideRecentScreen()

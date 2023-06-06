@@ -18,6 +18,7 @@ import woowacourse.shopping.databinding.ActivityOrderConfirmBinding
 import woowacourse.shopping.model.MoneySaleUiModel
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.util.keyError
 import woowacourse.shopping.util.toMoneyFormat
 
 class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
@@ -28,8 +29,9 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_confirm)
-        val cartIds =
-            intent.getSerializableExtraCompat<ArrayList<Long>>(CART_ID_KEY) ?: return finish()
+        val cartIds = intent.getSerializableExtraCompat<ArrayList<Long>>(CART_ID_KEY)
+            ?: return keyError(CART_ID_KEY)
+
         binding.orderProductRecyclerView.adapter = orderConfirmAdapter
         initPresenter(cartIds)
         initObserve()

@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import com.example.domain.cache.ProductCache
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.Price
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
@@ -16,8 +17,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     private val allProducts: MutableList<Product> = mutableListOf()
     override fun fetchFirstProducts(
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<List<Product>>) -> Unit,
     ) {
         if (cache?.productList?.isEmpty() == true) {
             service.getAllProducts().enqueue(object : Callback<List<ProductDto>> {
@@ -36,46 +36,46 @@ class ProductRepositoryImpl(
                     )
                     val nextProducts = allProducts.take(UNIT_SIZE)
                     cache.addProducts(nextProducts)
-                    onSuccess(nextProducts)
+                    callBack(BaseResponse.SUCCESS(nextProducts))
                 }
 
                 override fun onFailure(call: Call<List<ProductDto>>, t: Throwable) {
-                    onFailure()
+                    callBack(BaseResponse.NETWORK_ERROR())
                 }
             })
         } else {
-            onSuccess(cache?.productList ?: emptyList())
+            callBack(BaseResponse.SUCCESS(cache?.productList ?: emptyList()))
         }
     }
 
     override fun fetchNextProducts(
         lastProductId: Long,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<List<Product>>) -> Unit,
     ) {
         val nextProducts = allProducts.filter { it.id > lastProductId }.take(UNIT_SIZE)
-        if (nextProducts.isEmpty()) onFailure()
         cache?.addProducts(nextProducts)
-        onSuccess(nextProducts)
+        callBack(BaseResponse.SUCCESS(nextProducts))
     }
 
     override fun fetchProductById(
         productId: Long,
-        onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<Product>) -> Unit,
     ) {
         service.getProductById(productId).enqueue(object : Callback<ProductDto> {
             override fun onResponse(call: Call<ProductDto>, response: Response<ProductDto>) {
-                val product = response.body() ?: return onFailure()
-                onSuccess(
-                    with(product) {
-                        Product(id, name, imageUrl, Price(price))
-                    }
+                // todo
+                val product = response.body() ?: return callBack(BaseResponse.FAILED(200, ""))
+                callBack(
+                    BaseResponse.SUCCESS(
+                        with(product) {
+                            Product(id, name, imageUrl, Price(price))
+                        }
+                    )
                 )
             }
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
-                onFailure()
+                callBack(BaseResponse.NETWORK_ERROR())
             }
         })
     }

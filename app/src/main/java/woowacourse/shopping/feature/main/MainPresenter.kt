@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
@@ -11,6 +12,7 @@ import woowacourse.shopping.feature.main.MainContract.View.MainScreenEvent
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toPresentation
 import woowacourse.shopping.model.CartProductUiModel
+import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
 class MainPresenter(
@@ -36,25 +38,34 @@ class MainPresenter(
 
     override fun initLoadProducts() {
         _mainScreenEvent.value = MainScreenEvent.ShowLoading
-        productRepository.fetchFirstProducts(
-            onSuccess = { products -> loadCartInfo(products) },
-            onFailure = {}
-        )
+        productRepository.fetchFirstProducts { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    loadCartInfo(result.response)
+                }
+                is BaseResponse.FAILED -> {
+                }
+                is BaseResponse.NETWORK_ERROR -> showNetworkError()
+            }
+        }
     }
 
     override fun loadMoreProducts() {
         val lastProductId = _products.value?.lastOrNull()?.productUiModel?.id ?: 0
-        productRepository.fetchNextProducts(
-            lastProductId,
-            onSuccess = { nextProducts ->
-                val alreadyProducts =
-                    _products.value?.map { it.productUiModel.toDomain() } ?: emptyList()
-                loadCartInfo(alreadyProducts + nextProducts)
-            },
-            onFailure = {
-                _mainScreenEvent.postValue(MainScreenEvent.HideLoadMore)
+        productRepository.fetchNextProducts(lastProductId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val alreadyProducts =
+                        _products.value?.map { it.productUiModel.toDomain() } ?: emptyList()
+                    val nextProducts = result.response
+                    loadCartInfo(alreadyProducts + nextProducts)
+                }
+                is BaseResponse.FAILED -> {
+                    _mainScreenEvent.postValue(MainScreenEvent.HideLoadMore)
+                }
+                is BaseResponse.NETWORK_ERROR -> showNetworkError()
             }
-        )
+        }
     }
 
     private fun loadCartInfo(products: List<Product>) {
@@ -84,19 +95,31 @@ class MainPresenter(
     }
 
     override fun showProductDetail(productId: Long) {
-        productRepository.fetchProductById(
-            productId,
-            onSuccess = { product ->
-                val productUiModel = product.toPresentation()
-                val recentProduct = _recentProducts.value?.firstOrNull()
-                recentProductRepository.addRecentProduct(
-                    productUiModel.toDomain(),
-                    onSuccess = {
-                        _mainScreenEvent.postValue(
-                            MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct)
-                        )
-                    },
-                    onFailure = {}
+        productRepository.fetchProductById(productId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val productUiModel = result.response.toPresentation()
+                    val recentProductUiModel = _recentProducts.value?.firstOrNull()
+                    navigateDetailScreen(productUiModel, recentProductUiModel)
+                }
+                is BaseResponse.FAILED -> showFailedLoadProduct()
+                is BaseResponse.NETWORK_ERROR -> showNetworkError()
+            }
+        }
+    }
+
+    private fun navigateDetailScreen(
+        productUiModel: ProductUiModel,
+        recentProductUiModel: RecentProductUiModel?
+    ) {
+        recentProductRepository.addRecentProduct(
+            productUiModel.toDomain(),
+            onSuccess = {
+                _mainScreenEvent.postValue(
+                    MainScreenEvent.ShowProductDetailScreen(
+                        productUiModel,
+                        recentProductUiModel
+                    )
                 )
             },
             onFailure = {}
@@ -166,6 +189,14 @@ class MainPresenter(
 
     override fun moveToOrderList() {
         _mainScreenEvent.value = MainScreenEvent.ShowOrderListScreen
+    }
+
+    private fun showFailedLoadProduct() {
+        _mainScreenEvent.value = MainScreenEvent.ShowFailedLoadProduct
+    }
+
+    private fun showNetworkError() {
+        _mainScreenEvent.value = MainScreenEvent.ShowNetworkError
     }
 
     private fun createCartProductUiModels(

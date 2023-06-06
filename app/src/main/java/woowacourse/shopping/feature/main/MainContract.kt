@@ -15,9 +15,11 @@ interface MainContract {
                 val recentProduct: RecentProductUiModel?,
             ) : MainScreenEvent()
 
+            object ShowFailedLoadProduct : MainScreenEvent()
             object HideLoadMore : MainScreenEvent()
             object ShowLoading : MainScreenEvent()
             object HideLoading : MainScreenEvent()
+            object ShowNetworkError : MainScreenEvent()
         }
     }
 

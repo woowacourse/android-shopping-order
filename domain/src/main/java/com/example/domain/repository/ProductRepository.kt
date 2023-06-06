@@ -1,22 +1,20 @@
 package com.example.domain.repository
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.Product
 
 interface ProductRepository {
     fun fetchFirstProducts(
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<List<Product>>) -> Unit,
     )
 
     fun fetchNextProducts(
         lastProductId: Long,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<List<Product>>) -> Unit,
     )
 
     fun fetchProductById(
         productId: Long,
-        onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<Product>) -> Unit,
     )
 }
