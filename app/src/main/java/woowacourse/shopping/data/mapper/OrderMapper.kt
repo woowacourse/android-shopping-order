@@ -14,7 +14,6 @@ import woowacourse.shopping.util.LocalDateTimeHelper
 
 fun OrderDataModel.toDomain(): Order {
     return Order(
-
         orderId = orderId,
         imageUrl = imageUrl,
         orderDate = LocalDateTimeHelper.convertStringToLocalDateTime(createdAt),

@@ -29,7 +29,6 @@ class ServerSettingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(binding.root)
         setupView()
     }
@@ -44,8 +43,7 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun startMain(newUrl: String) {
-        ApiClient.initClient(newUrl)
-        presenter.saveBaseUrl(newUrl)
+        ApiClient.getInstance(this).initRetrofitBuilder(newUrl)
         presenter.saveAuthToken()
         presenter.deleteCart()
         startActivity(ProductListActivity.getIntent(this))

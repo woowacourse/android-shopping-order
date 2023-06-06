@@ -13,7 +13,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
-import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.product.ProductServiceHelper
@@ -48,7 +47,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 ProductServiceHelper,
                 httpErrorHandler,
             ),
-            CartRepositoryImpl(CartServiceHelper(PreferenceUtil(this)), httpErrorHandler),
+            CartRepositoryImpl(CartServiceHelper(), httpErrorHandler),
         )
     }
 

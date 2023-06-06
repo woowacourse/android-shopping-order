@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.HttpErrorHandler
-import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
 import woowacourse.shopping.databinding.ActivityMyOrderBinding
@@ -22,7 +21,7 @@ class MyOrderActivity : AppCompatActivity(), MyOrderContract.View {
         MyOrderPresenter(
             view = this,
             orderRepository = OrderRepositoryImpl(
-                OrderServiceHelper(PreferenceUtil(this)),
+                OrderServiceHelper(),
                 HttpErrorHandler(this)
             )
         )

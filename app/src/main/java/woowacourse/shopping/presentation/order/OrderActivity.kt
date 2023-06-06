@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.HttpErrorHandler
-import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.OrderServiceHelper
 import woowacourse.shopping.data.user.UserRepositoryImpl
@@ -53,11 +52,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                     view = this,
                     orderProductsModel = receivedProduct,
                     orderRepository = OrderRepositoryImpl(
-                        OrderServiceHelper(PreferenceUtil(this)),
+                        OrderServiceHelper(),
                         httpErrorHandler
                     ),
                     userRepository = UserRepositoryImpl(
-                        UserServiceHelper(PreferenceUtil(this)),
+                        UserServiceHelper(),
                         httpErrorHandler
                     )
                 )

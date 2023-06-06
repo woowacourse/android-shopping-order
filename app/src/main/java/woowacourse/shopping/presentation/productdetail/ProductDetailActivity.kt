@@ -12,7 +12,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.CartServiceHelper
-import woowacourse.shopping.data.common.PreferenceUtil
 import woowacourse.shopping.data.product.ProductServiceHelper
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
@@ -49,9 +48,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         presenter = ProductDetailPresenter(
             view = this,
             cartRepository = CartRepositoryImpl(
-                cartRemoteDataSource = CartServiceHelper(
-                    PreferenceUtil(this),
-                ),
+                cartRemoteDataSource = CartServiceHelper(),
                 httpErrorHandler
             ),
             productModel = productModel,

@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.serversetting
 
-import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.SharedPreferencesDb
 import woowacourse.shopping.repository.RecentProductRepository
 import java.util.Base64
@@ -15,11 +14,6 @@ class ServerSettingPresenter constructor(
             encodeCredentialsToBase64(TEST_ID, TEST_PASSWORD),
         )
     }
-
-    override fun saveBaseUrl(url: String) {
-        ApiClient.initClient(url)
-    }
-
     override fun deleteCart() {
         recentProductRepository.deleteAllProducts()
     }
