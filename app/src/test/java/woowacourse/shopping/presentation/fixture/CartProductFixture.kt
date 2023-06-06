@@ -9,13 +9,13 @@ import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.UnCheckableCartProductModel
 
 object CartProductFixture {
-    fun getCartProducts(vararg ids: Long) = ids.map { getCartProduct(it) }
+    fun getCartProducts(quantity: Int, vararg ids: Long) = ids.map { getCartProduct(it, quantity) }
 
     fun getCartProduct(id: Long, quantity: Int = 1) =
         CartProduct(id, getProduct(id), quantity, true)
 
-    fun getCheckableCartProductModels(vararg ids: Long) =
-        ids.map { getCheckableCartProductModel(it) }
+    fun getCheckableCartProductModels(quantity: Int, vararg ids: Long) =
+        ids.map { getCheckableCartProductModel(it, quantity) }
 
     fun getCheckableCartProductModel(
         id: Long,

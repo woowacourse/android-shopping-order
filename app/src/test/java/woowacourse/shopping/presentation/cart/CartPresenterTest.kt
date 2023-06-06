@@ -31,7 +31,12 @@ class CartPresenterTest {
             )
         } answers {
             val callback = args[0] as (List<CartProduct>) -> Unit
-            callback(CartProductFixture.getCartProducts(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+            callback(
+                CartProductFixture.getCartProducts(
+                    quantity = 2,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                ),
+            )
         }
     }
 
@@ -40,7 +45,7 @@ class CartPresenterTest {
         // given : 장바구니 목록을 불러올 수 있는 상태다.
         every {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(1, 2, 3, 4, 5),
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4, 5),
             )
         } just runs
 
@@ -50,7 +55,7 @@ class CartPresenterTest {
         // then : 장바구니 목록이 노출된다.
         verify {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(1, 2, 3, 4, 5),
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4, 5),
             )
         }
     }
@@ -60,7 +65,7 @@ class CartPresenterTest {
         // given : 장바구니 아이템을 삭제할 수 있는 상태다.
         every {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(2, 3, 4, 5, 6),
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 3, 4, 5, 6),
             )
         } just runs
 
@@ -81,8 +86,34 @@ class CartPresenterTest {
         // then : 삭제되고 남은 아이템이 노출된다.
         verify {
             view.showCartProductModels(
-                CartProductFixture.getCheckableCartProductModels(2, 3, 4, 5, 6),
+                CartProductFixture.getCheckableCartProductModels(quantity = 2, 2, 3, 4, 5, 6),
             )
         }
+    }
+
+    @Test
+    fun `장바구니 아이템의 상품 개수를 증가시킨다`() {
+        // given : 장바구니 아이템의 상품 개수를 증가시킬 수 있는 상태다.
+
+        val expected = CartProductFixture.getCheckableCartProductModels(quantity = 2, 1, 2, 3, 4) +
+            CartProductFixture.getCheckableCartProductModel(5, 3)
+
+        every { view.showCartProductModels(expected) } just runs
+
+        every {
+            cartRepository.updateCartProductCount(any(), any(), any())
+        } answers {
+            val callback = args[2] as () -> Unit
+            callback()
+        }
+        presenter.loadCarts()
+
+        // when : 장바구니 아이템 상품 개수 증가 요청을 보낸다.
+        presenter.addProductCartCount(
+            cartProductModel = CartProductFixture.getCheckableCartProductModel(5),
+        )
+
+        // then : 장바구니 아이템 상품 개수가 증가되어 화면에 노출된다.
+        verify { view.showCartProductModels(expected) }
     }
 }
