@@ -44,6 +44,7 @@ class ProductListPresenter(
 
     override fun loadMoreProductItems() {
         size += PRODUCTS_SIZE
+        view.setLoadingViewVisible(true)
         refreshProductItems()
     }
 

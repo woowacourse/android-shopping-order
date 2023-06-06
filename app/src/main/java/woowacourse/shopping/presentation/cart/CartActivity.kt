@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -98,13 +99,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) { // 뒤로가기
             android.R.id.home -> {
+                setResult(Activity.RESULT_OK)
                 finish()
             }
             else -> return super.onOptionsItemSelected(item)
         }
         return true
     }
-
+    override fun onBackPressed() = Unit
     private fun allOrderedCheckBoxChange() {
         binding.checkboxAllCart.setOnCheckedChangeListener { _, isChecked ->
             presenter.changeCurrentPageProductsOrder(isChecked)

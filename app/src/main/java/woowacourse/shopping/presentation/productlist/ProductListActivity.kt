@@ -1,12 +1,15 @@
 package woowacourse.shopping.presentation.productlist
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
@@ -51,19 +54,22 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         )
     }
 
+    private val activityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d("wooseok", "launcher")
+            updateView()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityBinding = ActivityProductListBinding.inflate(layoutInflater)
         setContentView(activityBinding.root)
         initView()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        setLoadingViewVisible(true)
         updateView()
     }
-
     private fun initView() {
         setSupportActionBar(activityBinding.toolbarProductList.toolbar)
         initRecentProductAdapter()
@@ -85,13 +91,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun showProductDetail(productModel: ProductModel) {
-        startActivity(ProductDetailActivity.getIntent(this, productModel))
+        activityResultLauncher.launch(ProductDetailActivity.getIntent(this, productModel))
     }
 
     private fun initProductAdapter() {
         productListAdapter = ProductListAdapter(
             recentProductAdapter = recentProductAdapter,
             presenter = presenter,
+            ::showProductDetail
         )
 
         val layoutManager = GridLayoutManager(this, SPAN_COUNT)
@@ -144,7 +151,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             )
         cartMenuItem.actionView = cartIconBinding?.root
         cartIconBinding?.iconCartMenu?.setOnClickListener {
-            startActivity(CartActivity.getIntent(this))
+            activityResultLauncher.launch(CartActivity.getIntent(this))
         }
         presenter.updateCartCount()
     }

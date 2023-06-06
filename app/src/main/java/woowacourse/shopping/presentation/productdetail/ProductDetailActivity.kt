@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.productdetail
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -130,6 +131,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun showCompleteMessage(productName: String) {
+        setResult(Activity.RESULT_OK)
         Toast.makeText(
             this,
             getString(R.string.put_in_cart_complete_message, productName),

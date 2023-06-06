@@ -9,6 +9,7 @@ import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductContainerBinding
 import woowacourse.shopping.presentation.common.CartProductDiffItemCallback
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.productlist.ProductListContract
 import woowacourse.shopping.presentation.productlist.product.ProductListViewType.MORE_ITEM
 import woowacourse.shopping.presentation.productlist.product.ProductListViewType.PRODUCT
@@ -19,6 +20,7 @@ import woowacourse.shopping.presentation.productlist.recentproduct.RecentProduct
 class ProductListAdapter(
     private val recentProductAdapter: RecentProductAdapter,
     private val presenter: ProductListContract.Presenter,
+    private val showProductDetail: (ProductModel) -> Unit,
 ) : ListAdapter<CartProductInfoModel, RecyclerView.ViewHolder>(CartProductDiffItemCallback()) {
 
     private lateinit var itemProductBinding: ItemProductBinding
@@ -52,6 +54,7 @@ class ProductListAdapter(
                 ProductItemViewHolder(
                     itemProductBinding,
                     presenter,
+                    showProductDetail,
                 )
             }
             MORE_ITEM -> {

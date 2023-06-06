@@ -5,12 +5,13 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.presentation.common.CounterListener
 import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
+import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.productlist.ProductListContract
 
 class ProductItemViewHolder(
     private val binding: ItemProductBinding,
     private val presenter: ProductListContract.Presenter,
+    showProductDetail: (ProductModel) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private lateinit var cartProductModel: CartProductInfoModel
     private val counterListener = object : CounterListener {
@@ -24,7 +25,7 @@ class ProductItemViewHolder(
     }
 
     init {
-        itemViewClick()
+        itemView.setOnClickListener { showProductDetail(cartProductModel.productModel) }
     }
 
     fun bind(item: CartProductInfoModel) {
@@ -33,22 +34,6 @@ class ProductItemViewHolder(
         setUpCounterView()
         setUpAddButtonView()
     }
-
-    private fun itemViewClick() {
-        itemView.setOnClickListener {
-            showProductDetail()
-        }
-    }
-
-    private fun showProductDetail() {
-        itemView.context.startActivity(
-            ProductDetailActivity.getIntent(
-                itemView.context,
-                cartProductModel.productModel,
-            ),
-        )
-    }
-
     private fun setUpCounterView() {
         binding.counterProductList.setUpView(
             counterListener = counterListener,
