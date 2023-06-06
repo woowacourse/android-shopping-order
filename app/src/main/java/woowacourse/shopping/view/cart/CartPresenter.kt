@@ -72,7 +72,7 @@ class CartPresenter(
     override fun fetchPrevPage() {
         cartItems.clear()
         cartPagination.fetchPrevItems { cartProducts ->
-//            fetchNewItems(cartProducts)
+            fetchNewItems(cartProducts)
         }
     }
 
