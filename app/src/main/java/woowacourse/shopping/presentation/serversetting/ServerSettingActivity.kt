@@ -42,8 +42,7 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun startMain(newUrl: String) {
-        ApiClient.initClient(newUrl)
-        presenter.saveBaseUrl(newUrl)
+        ApiClient.initClient(newUrl, PreferenceUtil(this))
         presenter.saveAuthToken()
         presenter.deleteCart()
         startActivity(ProductListActivity.getIntent(this))

@@ -19,7 +19,7 @@ class CartRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) :
         sharedPreferences.getString(ServerSettingPresenter.AUTHORIZATION_TOKEN, "")
 
     override fun addCartItem(productId: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
-        retrofitService.addCartItem(getAuthToken(), AddCartRequestBody(productId))
+        retrofitService.addCartItem(AddCartRequestBody(productId))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     val locationHeader = response.headers()["Location"]
@@ -41,7 +41,7 @@ class CartRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) :
     }
 
     override fun deleteCartItem(cartItemId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
-        retrofitService.deleteCartItem(getAuthToken(), cartItemId)
+        retrofitService.deleteCartItem(cartItemId)
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -64,7 +64,6 @@ class CartRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) :
         onFailure: () -> Unit
     ) {
         return retrofitService.updateCartItemCount(
-            credentials = getAuthToken(),
             cartItemId = cartId,
             quantityBody = UpdateQuantityRequestBody(count)
         ).enqueue(object : Callback<Unit> {
@@ -83,7 +82,7 @@ class CartRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) :
         onSuccess: (List<CartProductInfo>) -> Unit,
         onFailure: () -> Unit
     ) {
-        retrofitService.getAllCartItems(getAuthToken())
+        retrofitService.getAllCartItems()
             .enqueue(object : Callback<BaseResponse<List<CartDataModel>>> {
                 override fun onResponse(
                     call: Call<BaseResponse<List<CartDataModel>>>,

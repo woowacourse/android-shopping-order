@@ -23,7 +23,6 @@ class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) 
         onFailure: () -> Unit
     ) {
         orderClient.order(
-            credentials = getAuthToken(),
             orderRequestBody
         ).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -37,7 +36,7 @@ class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) 
     }
 
     override fun loadOrderList(onSuccess: (List<OrderDataModel>) -> Unit, onFailure: () -> Unit) {
-        orderClient.loadOrderList(credentials = getAuthToken())
+        orderClient.loadOrderList()
             .enqueue(object : Callback<BaseResponse<List<OrderDataModel>>> {
                 override fun onResponse(
                     call: Call<BaseResponse<List<OrderDataModel>>>,
@@ -59,7 +58,7 @@ class OrderRemoteDataSource(private val sharedPreferences: SharedPreferencesDb) 
         onSuccess: (OrderDetailDataModel) -> Unit,
         onFailure: () -> Unit
     ) {
-        orderClient.loadOrderDetail(credentials = getAuthToken(), id)
+        orderClient.loadOrderDetail(id)
             .enqueue(object : Callback<BaseResponse<OrderDetailDataModel>> {
                 override fun onResponse(
                     call: Call<BaseResponse<OrderDetailDataModel>>,
