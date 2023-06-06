@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.productlist
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.ProductModel
 
@@ -40,17 +41,10 @@ class ProductListAdapter(
     }
 
     fun updateItems(newItems: List<ProductListViewItem>) {
-        val original = items.toList()
+        val diffCallback = ProductListDiffCallback(items, newItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         items.clear()
         items.addAll(newItems)
-        if (original.size < items.size) { // 더보기 클릭한 경우
-            notifyItemRemoved(original.size - 1)
-            notifyItemRangeInserted(original.size - 1, items.size - original.size + 1)
-            return
-        }
-        val updatedItems = (newItems - original.toSet()).toList()
-        for (item in updatedItems) {
-            notifyItemChanged(items.indexOf(item))
-        }
+        diffResult.dispatchUpdatesTo(this)
     }
 }
