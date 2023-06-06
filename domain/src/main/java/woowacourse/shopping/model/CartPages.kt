@@ -41,12 +41,8 @@ class CartPages(
         cartProducts.changeSelectedProduct(product)
     }
 
-    fun selectPageProducts() {
-        cartProducts.selectProductsRange(getStartIndex(), PRODUCT_CART_SIZE)
-    }
-
-    fun unselectPageProducts() {
-        cartProducts.unselectProductsRange(getStartIndex(), PRODUCT_CART_SIZE)
+    fun selectPageProducts(isSelect: Boolean) {
+        cartProducts.selectProductsRange(isSelect, getStartIndex(), PRODUCT_CART_SIZE)
     }
 
     fun isAllProductSelected(): Boolean =

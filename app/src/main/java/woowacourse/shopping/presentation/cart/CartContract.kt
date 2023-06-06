@@ -10,11 +10,10 @@ interface CartContract {
         fun subProductCartCount(cartProductModel: CartProductModel)
         fun addProductCartCount(cartProductModel: CartProductModel)
         fun changeProductSelected(productModel: ProductModel)
-        fun selectAllProduct()
-        fun unselectAllProduct()
+        fun selectAllProduct(isSelect: Boolean)
         fun plusPage()
         fun minusPage()
-        fun loadCartOrder()
+        fun navigateCartOrder()
     }
 
     interface View {

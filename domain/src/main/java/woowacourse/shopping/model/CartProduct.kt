@@ -9,6 +9,5 @@ data class CartProduct(
     fun getTotalPrice() = quantity * product.price.value
     operator fun plus(count: Int) = copy(quantity = quantity + count)
     operator fun minus(count: Int) = copy(quantity = quantity - count)
-    fun select() = copy(isChecked = true)
-    fun unselect() = copy(isChecked = false)
+    fun select(isSelect: Boolean) = copy(isChecked = isSelect)
 }

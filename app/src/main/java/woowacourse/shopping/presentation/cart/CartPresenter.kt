@@ -89,17 +89,12 @@ class CartPresenter(
         updateProductsInCurrentPage()
     }
 
-    override fun selectAllProduct() {
-        cartPages.selectPageProducts()
+    override fun selectAllProduct(isSelect: Boolean) {
+        cartPages.selectPageProducts(isSelect)
         updateProductsInCurrentPage()
     }
 
-    override fun unselectAllProduct() {
-        cartPages.unselectPageProducts()
-        updateProductsInCurrentPage()
-    }
-
-    override fun loadCartOrder() {
+    override fun navigateCartOrder() {
         val selectedCartIds = cartPages.getSelectedCartIds()
         if (selectedCartIds.isEmpty()) {
             view.showNotOrderAble()

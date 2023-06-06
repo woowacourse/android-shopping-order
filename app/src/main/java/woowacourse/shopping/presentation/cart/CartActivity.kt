@@ -76,7 +76,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initOrderClick() {
         binding.textOrderCount.setOnClickListener {
-            presenter.loadCartOrder()
+            presenter.navigateCartOrder()
         }
     }
 
@@ -142,11 +142,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initCheckBoxClick() {
         binding.checkBoxSelectAll.setOnClickListener {
-            if (binding.checkBoxSelectAll.isChecked) {
-                presenter.selectAllProduct()
-            } else {
-                presenter.unselectAllProduct()
-            }
+            presenter.selectAllProduct(binding.checkBoxSelectAll.isChecked)
         }
     }
 

@@ -6,17 +6,13 @@ class CartProducts(cartProducts: List<CartProduct> = listOf()) {
 
     val size get(): Int = _items.size
     fun isProductSelectedByRange(startIndex: Int, productSize: Int): Boolean {
-        if (startIndex + productSize > size) {
-            return (startIndex until size).all { _items[it].isChecked }
-        }
-        return (startIndex until startIndex + productSize).all { _items[it].isChecked }
+        val minSize = minOf(size, startIndex + productSize)
+        return (startIndex until minSize).all { _items[it].isChecked }
     }
 
     fun getProductsInRange(startIndex: Int, productSize: Int): CartProducts {
-        if (startIndex + productSize > size) {
-            return CartProducts(_items.subList(startIndex, size))
-        }
-        return CartProducts(_items.subList(startIndex, startIndex + productSize))
+        val minSize = minOf(size, startIndex + productSize)
+        return CartProducts(_items.subList(startIndex, minSize))
     }
 
     fun addProducts(products: List<CartProduct>) {
@@ -56,27 +52,12 @@ class CartProducts(cartProducts: List<CartProduct> = listOf()) {
     fun changeSelectedProduct(product: Product) {
         val targetIndex = _items.indexOfLast { it.product == product }
         val targetProduct = _items[targetIndex]
-        _items[targetIndex] = if (targetProduct.isChecked) {
-            targetProduct.unselect()
-        } else {
-            targetProduct.select()
-        }
+        _items[targetIndex] = targetProduct.select(!targetProduct.isChecked)
     }
 
-    fun selectProductsRange(startIndex: Int, productSize: Int) {
-        if (startIndex + productSize > size) {
-            (startIndex until size).forEach { _items[it] = _items[it].select() }
-            return
-        }
-        (startIndex until startIndex + productSize).forEach { _items[it] = _items[it].select() }
-    }
-
-    fun unselectProductsRange(startIndex: Int, productSize: Int) {
-        if (startIndex + productSize > size) {
-            (startIndex until size).forEach { _items[it] = _items[it].unselect() }
-            return
-        }
-        (startIndex until startIndex + productSize).forEach { _items[it] = _items[it].unselect() }
+    fun selectProductsRange(isSelect: Boolean, startIndex: Int, productSize: Int) {
+        val minSize = minOf(startIndex + productSize, size)
+        (startIndex until minSize).forEach { _items[it] = _items[it].select(isSelect) }
     }
 
     fun getSelectedProductsPrice(): Int {

@@ -32,7 +32,7 @@ class ProductListPresenterTest {
         // given : 상품을 불러올 수 있는 상태다.
         every {
             view.showProductModels(
-                cartProductModels = CartProductFixture.getCartProductModels(1, 2, 3),
+                cartProductModels = CartProductFixture.getCheckableCartProductModels(1, 2, 3),
                 isLast = false,
             )
         } just runs
@@ -45,7 +45,7 @@ class ProductListPresenterTest {
             )
         } answers {
             val callback = args[2] as (List<CartProductModel>, Boolean) -> Unit
-            callback(CartProductFixture.getCartProductModels(1, 2, 3), false)
+            callback(CartProductFixture.getCheckableCartProductModels(1, 2, 3), false)
         }
 
         // when : 상품 목록 요청을 보낸다.
@@ -54,7 +54,7 @@ class ProductListPresenterTest {
         // then : 상품을 노출시킨다.
         verify {
             view.showProductModels(
-                cartProductModels = CartProductFixture.getCartProductModels(1, 2, 3),
+                cartProductModels = CartProductFixture.getCheckableCartProductModels(1, 2, 3),
                 isLast = false,
             )
         }
@@ -126,7 +126,7 @@ class ProductListPresenterTest {
         // given : 장바구니의 상품 개수를 증가시킬 수 있는 상태다.
         every {
             view.replaceProductModel(
-                cartProductModel = CartProductFixture.getCartProductModel(1, 2),
+                cartProductModel = CartProductFixture.getUncheckableCartProductModel(1, 2),
             )
         } just runs
 
@@ -138,12 +138,12 @@ class ProductListPresenterTest {
         }
 
         // when : 장바구니 상품 개수 증가 요청을 보낸다.
-        presenter.addCartProductCount(CartProductFixture.getCartProductModel(1))
+        presenter.addCartProductCount(CartProductFixture.getUncheckableCartProductModel(1))
 
         // then : 증가된 상품 개수가 노출된다.
         verify {
             view.replaceProductModel(
-                cartProductModel = CartProductFixture.getCartProductModel(1, 2),
+                cartProductModel = CartProductFixture.getUncheckableCartProductModel(1, 2),
             )
         }
     }
@@ -153,7 +153,7 @@ class ProductListPresenterTest {
         // given : 장바구니의 상품 개수를 감소시킬 수 있는 상태다.
         every {
             view.replaceProductModel(
-                cartProductModel = CartProductFixture.getCartProductModel(1, 1),
+                cartProductModel = CartProductFixture.getUncheckableCartProductModel(1, 1),
             )
         } just runs
 
@@ -165,12 +165,12 @@ class ProductListPresenterTest {
         }
 
         // when : 장바구니 상품 개수 감소 요청을 보낸다.
-        presenter.subCartProductCount(CartProductFixture.getCartProductModel(1, 2))
+        presenter.subCartProductCount(CartProductFixture.getUncheckableCartProductModel(1, 2))
 
         // then : 감소된 상품 개수가 노출된다.
         verify {
             view.replaceProductModel(
-                cartProductModel = CartProductFixture.getCartProductModel(1, 1),
+                cartProductModel = CartProductFixture.getUncheckableCartProductModel(1, 1),
             )
         }
     }
