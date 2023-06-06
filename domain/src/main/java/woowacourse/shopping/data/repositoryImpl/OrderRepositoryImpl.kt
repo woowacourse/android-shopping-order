@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repositoryImpl
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderHistories
 import woowacourse.shopping.model.OrderHistory
 
 class OrderRepositoryImpl(
@@ -12,8 +13,8 @@ class OrderRepositoryImpl(
         return orderRemoteDataSource.getOrder(cartIds)
     }
 
-    override fun getOrderHistoriesNext(): Result<List<OrderHistory>> {
-        return orderRemoteDataSource.getOrderHistoriesNext()
+    override fun getOrderHistoriesNext(lastOrderId: Long): Result<OrderHistories> {
+        return orderRemoteDataSource.getOrderHistoriesNext(lastOrderId = lastOrderId)
     }
 
     override fun getOrderHistory(id: Long): Result<OrderHistory> {

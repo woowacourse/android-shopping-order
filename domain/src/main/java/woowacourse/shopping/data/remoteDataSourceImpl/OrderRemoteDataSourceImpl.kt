@@ -4,40 +4,31 @@ import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.dto.PostOrderRequestDto
 import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderHistories
 import woowacourse.shopping.model.OrderHistory
 
 class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
-    private var lastOrderId: Long = 0
-
     override fun getOrder(cartIds: List<Int>): Result<Order> = runCatching {
         RetrofitClient.getInstance().retrofitOrderService
             .getOrderList(cartIds.joinToString(","))
             .execute().body()!!
     }
 
-    override fun getOrderHistoriesNext(): Result<List<OrderHistory>> {
+    override fun getOrderHistoriesNext(lastOrderId: Long): Result<OrderHistories> {
         return when (lastOrderId) {
             0L -> getOrderHistoriesFirst()
-            else -> getOrderHistories()
+            else -> getOrderHistories(lastOrderId)
         }
     }
 
-    private fun getOrderHistoriesFirst(): Result<List<OrderHistory>> = runCatching {
+    private fun getOrderHistoriesFirst(): Result<OrderHistories> = runCatching {
         RetrofitClient.getInstance().retrofitOrderService
-            .getOrders().execute().body()!!
-            .let { response ->
-                lastOrderId = response.lastOrderId
-                return Result.success(response.orderHistories.map { it.toDomain() })
-            }
+            .getOrders().execute().body()!!.toDomain()
     }
 
-    private fun getOrderHistories(): Result<List<OrderHistory>> = runCatching {
+    private fun getOrderHistories(lastOrderId: Long): Result<OrderHistories> = runCatching {
         RetrofitClient.getInstance().retrofitOrderService
-            .getOrdersNext(lastOrderId).execute().body()!!
-            .let { response ->
-                lastOrderId = response.lastOrderId
-                return Result.success(response.orderHistories.map { it.toDomain() })
-            }
+            .getOrdersNext(lastOrderId).execute().body()!!.toDomain()
     }
 
     override fun getOrderHistory(id: Long): Result<OrderHistory> = runCatching {

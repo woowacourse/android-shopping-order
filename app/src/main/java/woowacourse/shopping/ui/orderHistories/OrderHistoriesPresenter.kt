@@ -11,16 +11,22 @@ class OrderHistoriesPresenter(
     private val orderRepository: OrderRepository
 ) : OrderHistoriesContract.Presenter {
     private val histories = mutableListOf<OrderHistoryUIModel>()
+    private var lastOrderId: Long = 0
 
     override fun fetchOrderHistories() {
-        CompletableFuture.supplyAsync {
-            orderRepository.getOrderHistoriesNext()
-        }.thenAccept { result ->
-            result.onSuccess { nextHistories ->
-                histories.addAll(nextHistories.toUIModel())
+        if (lastOrderId == -1L) return
+
+        CompletableFuture.supplyAsync { orderRepository.getOrderHistoriesNext(lastOrderId) }.get()
+            .onSuccess { nextHistories ->
+                if (nextHistories.orderHistories.isEmpty()) {
+                    lastOrderId = -1
+                    return@onSuccess
+                }
+                histories.addAll(nextHistories.toUIModel().orderHistories)
+                lastOrderId = nextHistories.lastOrderId
                 view.showOrderHistories(histories)
-            }.onFailure { e -> LogUtil.logError(e) }
-        }
+            }
+            .onFailure { e -> LogUtil.logError(e) }
     }
 
     override fun navigateToOrderHistory(orderId: Long) {
