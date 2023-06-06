@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.shopping
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import retrofit2.Retrofit
 import woowacourse.shopping.Storage
 import woowacourse.shopping.data.cart.DefaultCartRemoteDataSource
 import woowacourse.shopping.data.cart.DefaultCartRepository
@@ -18,29 +17,29 @@ import woowacourse.shopping.data.recentproduct.DefaultRecentProductRepository
 import woowacourse.shopping.data.server.ShoppingRetrofit
 
 object RepositoryInjector {
-    fun injectProductRepository(retrofit: Retrofit) =
+    fun injectProductRepository(retrofit: ShoppingRetrofit) =
         DefaultProductRepository(
-            productRemoteDataSource = DefaultProductRemoteDataSource(retrofit),
-            cartRemoteDataSource = DefaultCartRemoteDataSource(retrofit)
+            productRemoteDataSource = DefaultProductRemoteDataSource(retrofit.productService),
+            cartRemoteDataSource = DefaultCartRemoteDataSource(retrofit.cartService)
         )
 
     fun injectRecentProductRepository(
         database: SQLiteDatabase,
         server: String,
-        retrofit: Retrofit
+        retrofit: ShoppingRetrofit
     ) = DefaultRecentProductRepository(
         recentProductDao = RecentProductDao(database, server),
-        productRemoteDataSource = DefaultProductRemoteDataSource(retrofit)
+        productRemoteDataSource = DefaultProductRemoteDataSource(retrofit.productService)
     )
 
-    fun injectCartRepository(retrofit: Retrofit) =
-        DefaultCartRepository(DefaultCartRemoteDataSource(retrofit))
+    fun injectCartRepository(retrofit: ShoppingRetrofit) =
+        DefaultCartRepository(DefaultCartRemoteDataSource(retrofit.cartService))
 
-    fun injectMemberRepository(retrofit: Retrofit) =
-        DefaultMemberRepository(DefaultMemberRemoteDataSource(retrofit))
+    fun injectMemberRepository(retrofit: ShoppingRetrofit) =
+        DefaultMemberRepository(DefaultMemberRemoteDataSource(retrofit.memberService))
 
-    fun injectOrderRepository(retrofit: Retrofit) =
-        DefaultOrderRepository(DefaultOrderRemoteDataSource(retrofit))
+    fun injectOrderRepository(retrofit: ShoppingRetrofit) =
+        DefaultOrderRepository(DefaultOrderRemoteDataSource(retrofit.orderService))
 }
 
 object DatabaseInjector {
@@ -49,7 +48,7 @@ object DatabaseInjector {
 }
 
 object RetrofitInjector {
-    fun inject(context: Context): Retrofit {
+    fun inject(context: Context): ShoppingRetrofit {
         val storage = Storage.getInstance(context.applicationContext)
         return ShoppingRetrofit.getInstance(storage)
     }

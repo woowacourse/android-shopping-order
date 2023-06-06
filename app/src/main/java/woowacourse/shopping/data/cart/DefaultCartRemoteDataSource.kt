@@ -6,17 +6,14 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.data.entity.mapper.CartProductMapper.toDomain
 import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 
-class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
-    private val cartService: CartService = retrofit.create(CartService::class.java)
-
+class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteDataSource {
     override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: (String) -> Unit) {
-        cartService.requestCartProducts().enqueue(object : Callback<List<CartProductEntity>> {
+        service.requestCartProducts().enqueue(object : Callback<List<CartProductEntity>> {
             override fun onResponse(
                 call: Call<List<CartProductEntity>>,
                 response: Response<List<CartProductEntity>>
@@ -39,7 +36,7 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
             .put("productId", id)
             .put("quantity", quantity)
         val body = json.toString().toRequestBody("application/json".toMediaType())
-        cartService.createCartProduct(body).enqueue(object : Callback<Unit> {
+        service.createCartProduct(body).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 val header = response.headers()
                 val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
@@ -66,7 +63,7 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
         val json = JSONObject()
             .put("quantity", quantity)
         val body = json.toString().toRequestBody("application/json".toMediaType())
-        cartService.updateCartProductQuantity(id, body).enqueue(object : Callback<Unit> {
+        service.updateCartProductQuantity(id, body).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.isSuccessful) {
                     onSuccess()
@@ -87,7 +84,7 @@ class DefaultCartRemoteDataSource(retrofit: Retrofit): CartRemoteDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
-        cartService.deleteCartProduct(cartProductId).enqueue(object : Callback<Unit> {
+        service.deleteCartProduct(cartProductId).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.isSuccessful) {
                     onSuccess()

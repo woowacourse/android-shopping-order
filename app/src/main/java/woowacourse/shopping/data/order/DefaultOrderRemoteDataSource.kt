@@ -3,16 +3,13 @@ package woowacourse.shopping.data.order
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import woowacourse.shopping.data.entity.PayRequest
 import woowacourse.shopping.data.entity.PayResponse
 import woowacourse.shopping.data.server.OrderRemoteDataSource
 
-class DefaultOrderRemoteDataSource(retrofit: Retrofit) : OrderRemoteDataSource {
-    private val orderService: OrderService = retrofit.create(OrderService::class.java)
-
+class DefaultOrderRemoteDataSource(private val service: OrderService) : OrderRemoteDataSource {
     override fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
-        orderService.requestOrder(order).enqueue(object : Callback<PayResponse> {
+        service.requestOrder(order).enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.orderId)
