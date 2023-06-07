@@ -21,7 +21,7 @@ class OrderDetailPresenter(
         }
     }
 
-    private fun onFailure(message: String) {
-        view.handleErrorView(message)
+    private fun onFailure(throwable: Throwable) {
+        throwable.message?.let { view.handleErrorView(it) }
     }
 }

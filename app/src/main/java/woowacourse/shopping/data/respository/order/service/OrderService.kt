@@ -5,8 +5,11 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import woowacourse.shopping.data.model.dto.request.OrderRequest
 import woowacourse.shopping.data.model.dto.response.OrderDetailResponse
+import woowacourse.shopping.data.model.dto.response.PointResponse
+import woowacourse.shopping.data.model.dto.response.SavingPointResponse
 
 interface OrderService {
     @POST("/orders")
@@ -23,4 +26,13 @@ interface OrderService {
 
     @GET("/orders")
     fun requestOrderList(): Call<List<OrderDetailResponse>>
+
+    @GET("/points")
+    fun requestPoint(): Call<PointResponse>
+
+    @GET("/saving-point?")
+    fun requestPredictionSavePoint(
+        @Query("totalPrice")
+        totalPrice: Int,
+    ): Call<SavingPointResponse>
 }

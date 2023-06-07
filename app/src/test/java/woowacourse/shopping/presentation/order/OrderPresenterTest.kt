@@ -18,7 +18,6 @@ import woowacourse.shopping.presentation.view.order.OrderPresenter
 import woowacouse.shopping.data.repository.card.CardRepository
 import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.data.repository.order.OrderRepository
-import woowacouse.shopping.data.repository.point.PointRepository
 import woowacouse.shopping.model.cart.CartProduct
 import woowacouse.shopping.model.cart.CartProducts
 import woowacouse.shopping.model.order.Order
@@ -29,7 +28,6 @@ class OrderPresenterTest {
     private lateinit var view: OrderContract.View
     private lateinit var cardRepository: CardRepository
     private lateinit var cartRepository: CartRepository
-    private lateinit var pointRepository: PointRepository
     private lateinit var orderRepository: OrderRepository
 
     @Before
@@ -38,14 +36,12 @@ class OrderPresenterTest {
 
         cardRepository = mockk()
         cartRepository = mockk()
-        pointRepository = mockk()
         orderRepository = mockk()
 
         presenter = OrderPresenter(
             view,
             cardRepository,
             cartRepository,
-            pointRepository,
             orderRepository
         )
     }
@@ -96,7 +92,7 @@ class OrderPresenterTest {
         // 유저 가용 포인트를 조회한다.
         val pointOnSuccess = slot<(Point) -> Unit>()
         every {
-            pointRepository.loadPoint(
+            orderRepository.loadPoint(
                 onFailure = any(),
                 onSuccess = capture(pointOnSuccess)
             )
@@ -107,7 +103,7 @@ class OrderPresenterTest {
         // 예상 적립 포인트를 조회한다.
         val predictionPointOnSuccess = slot<(Point) -> Unit>()
         every {
-            pointRepository.loadPredictionSavePoint(
+            orderRepository.loadPredictionSavePoint(
                 orderPrice,
                 onFailure = any(),
                 onSuccess = capture(predictionPointOnSuccess),
@@ -176,7 +172,7 @@ class OrderPresenterTest {
         // 유저 가용 포인트를 조회한다.
         val pointOnSuccess = slot<(Point) -> Unit>()
         every {
-            pointRepository.loadPoint(
+            orderRepository.loadPoint(
                 onFailure = any(),
                 onSuccess = capture(pointOnSuccess)
             )
@@ -187,7 +183,7 @@ class OrderPresenterTest {
         // 예상 적립 포인트를 조회한다.
         val predictionPointOnSuccess = slot<(Point) -> Unit>()
         every {
-            pointRepository.loadPredictionSavePoint(
+            orderRepository.loadPredictionSavePoint(
                 orderPrice,
                 onFailure = any(),
                 onSuccess = capture(predictionPointOnSuccess),

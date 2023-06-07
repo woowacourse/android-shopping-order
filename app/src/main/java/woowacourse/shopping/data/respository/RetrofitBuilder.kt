@@ -9,7 +9,6 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.source.service.CartService
 import woowacourse.shopping.data.respository.order.service.OrderService
-import woowacourse.shopping.data.respository.point.service.PointService
 import woowacourse.shopping.data.respository.product.service.ProductService
 import java.util.concurrent.TimeUnit
 
@@ -54,10 +53,6 @@ class RetrofitBuilder private constructor(
 
     fun createOrderService(): OrderService {
         return retrofit.create(OrderService::class.java)
-    }
-
-    fun createPointService(): PointService {
-        return retrofit.create(PointService::class.java)
     }
 
     companion object {

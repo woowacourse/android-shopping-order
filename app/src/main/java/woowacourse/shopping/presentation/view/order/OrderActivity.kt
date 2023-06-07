@@ -19,8 +19,6 @@ import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSour
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.point.PointRepositoryImpl
-import woowacourse.shopping.data.respository.point.source.remote.PointRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CardModel
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -77,14 +75,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
         val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
-        val pointRemoteDataSource = PointRemoteDataSourceImpl(retrofitBuilder.createPointService())
         val orderRemoteDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
 
         presenter = OrderPresenter(
             this,
             cardRepository = CardRepositoryImpl(CardDAO),
             cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            pointRepository = PointRepositoryImpl(pointRemoteDataSource),
             orderRepository = OrderRepositoryImpl(orderRemoteDataSource),
         )
     }

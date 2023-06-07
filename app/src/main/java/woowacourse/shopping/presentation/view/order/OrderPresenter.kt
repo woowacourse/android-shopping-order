@@ -10,13 +10,11 @@ import woowacourse.shopping.presentation.model.PointModel
 import woowacouse.shopping.data.repository.card.CardRepository
 import woowacouse.shopping.data.repository.cart.CartRepository
 import woowacouse.shopping.data.repository.order.OrderRepository
-import woowacouse.shopping.data.repository.point.PointRepository
 
 class OrderPresenter(
     private val view: OrderContract.View,
     private val cardRepository: CardRepository,
     private val cartRepository: CartRepository,
-    private val pointRepository: PointRepository,
     private val orderRepository: OrderRepository,
 ) : OrderContract.Presenter {
     private lateinit var orderProducts: List<CartProductModel>
@@ -53,7 +51,7 @@ class OrderPresenter(
     }
 
     private fun loadUserPoint() {
-        pointRepository.loadPoint(::onFailure) {
+        orderRepository.loadPoint(::onFailure) {
             point = it.toUIModel()
             view.showUserPointView(it.toUIModel())
             view.setPointTextChangeListener(orderPrice, point)
@@ -61,7 +59,7 @@ class OrderPresenter(
     }
 
     private fun loadSavePredictionPoint(orderPrice: Int) {
-        pointRepository.loadPredictionSavePoint(orderPrice, ::onFailure) {
+        orderRepository.loadPredictionSavePoint(orderPrice, ::onFailure) {
             view.showSavePredictionPointView(it.toUIModel())
         }
     }
@@ -77,10 +75,6 @@ class OrderPresenter(
             cartRepository.deleteCarts(order.toModel().cartIds)
             view.showOrderDetailView(orderId)
         }
-    }
-
-    private fun onFailure(message: String) {
-        view.handleErrorView(message)
     }
 
     private fun onFailure(throwable: Throwable) {
