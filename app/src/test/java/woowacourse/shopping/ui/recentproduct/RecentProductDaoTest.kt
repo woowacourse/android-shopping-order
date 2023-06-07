@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.recentproduct
 import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.test.core.app.ApplicationProvider
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -27,11 +26,6 @@ class RecentProductDaoTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = ShoppingDatabase(context)
         recentProductDao = RecentProductDaoImpl(database)
-    }
-
-    @After
-    fun tearDown() {
-        database.close()
     }
 
     @Test
