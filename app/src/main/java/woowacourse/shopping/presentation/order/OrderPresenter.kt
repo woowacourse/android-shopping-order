@@ -1,6 +1,9 @@
 package woowacourse.shopping.presentation.order
 
 import woowacourse.shopping.OrderCartInfoList
+import woowacourse.shopping.Payment
+import woowacourse.shopping.Point
+import woowacourse.shopping.Price
 import woowacourse.shopping.data.remote.order.response.OrderCartDataModel
 import woowacourse.shopping.data.remote.order.response.OrderRequestDataModel
 import woowacourse.shopping.data.remote.user.UserRepository
@@ -15,6 +18,7 @@ class OrderPresenter(
 ) : OrderContract.Presenter {
     private lateinit var orderCarts: OrderCartInfoList
     private var totalPrice: Int = 0
+    private var payment = Payment(Price(totalPrice), Point(0))
 
     override fun initOrderCarts(orderCarts: List<OrderCartModel>) {
         this.orderCarts = OrderCartInfoList(orderCarts.map { it.toDomain() })
@@ -26,8 +30,10 @@ class OrderPresenter(
         userRepository.getPoint(
             onSuccess = {
                 view.showPoint(it.value)
+                payment = Payment(Price(totalPrice), Point(it.value))
             }, onFailure = {
             view.showPoint(0)
+            payment = Payment(Price(totalPrice), Point(0))
         }
         )
     }
@@ -37,7 +43,12 @@ class OrderPresenter(
     }
 
     override fun checkPointOver(usingPoint: String) {
-        view.updateTotalPrice(totalPrice - usingPoint.toInt())
+        val point = Point(usingPoint.toIntOrNull() ?: 0)
+        if (payment.discountable(point))
+            view.updateTotalPrice(payment.discount(point).value)
+        else {
+            view.showPointOver()
+        }
     }
 
     override fun order(spendPoint: String) {

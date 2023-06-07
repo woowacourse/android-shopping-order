@@ -88,8 +88,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         })
     }
 
+    override fun showPointOver() {
+        Toast.makeText(this, getString(R.string.order_point_error_message), Toast.LENGTH_SHORT)
+            .show()
+    }
+
     private fun initOrderProduct() {
-        intent.getParcelableArrayListExtraCompat<OrderCartModel>("")
+        intent.getParcelableArrayListExtraCompat<OrderCartModel>(ORDER_CART_KEY_VALUE)
             ?.let { orderCarts ->
                 presenter.initOrderCarts(orderCarts)
                 initPoint()

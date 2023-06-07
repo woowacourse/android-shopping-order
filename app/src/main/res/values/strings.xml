@@ -27,4 +27,5 @@
     <string name="order_detail_total_price">주문 금액</string>
     <string name="order_detail_spend_point">사용한 포인트</string>
     <string name="order_detail_spend_price">결제 금액</string>
+    <string name="order_point_error_message">사용할 포인트를 다시 확인해 주세요</string>
 </resources>

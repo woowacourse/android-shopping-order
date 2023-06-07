@@ -9,6 +9,7 @@ interface OrderContract {
         fun updateTotalPrice(price: Int)
         fun showOrderSuccess()
         fun showOrderFail()
+        fun showPointOver()
     }
 
     interface Presenter {
