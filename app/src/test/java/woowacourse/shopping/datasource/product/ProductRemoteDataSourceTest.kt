@@ -41,11 +41,11 @@ class ProductRemoteDataSourceTest {
         // when
         var result: DataResult<ProductsWithCartItemDTO>? = null
         productRemoteDataSource.getProductsByRange(0, 3) {
-            // then
             result = it
             countDownLatch.countDown()
         }
         countDownLatch.await()
+        // then
         assertTrue(result is DataResult.Success && (result as DataResult.Success<ProductsWithCartItemDTO>).response.isNotNull)
     }
 
@@ -56,11 +56,11 @@ class ProductRemoteDataSourceTest {
         // when
         var result: DataResult<ProductWithCartInfoDTO>? = null
         productRemoteDataSource.getProductById(1) {
-            // then
             result = it
             countDownLatch.countDown()
         }
         countDownLatch.await()
+        // then
         assertTrue(result is DataResult.Success && (result as DataResult.Success<ProductWithCartInfoDTO>).response.isNotNull)
     }
 }
