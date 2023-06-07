@@ -13,6 +13,5 @@ data class CartProductDto(
 fun CartProductDto.toDomain(): CartProduct = CartProduct(
     cartProductId = id.toLong(),
     product = product.toDomain(),
-    count = quantity,
-    isSelected = true
+    count = quantity
 )
