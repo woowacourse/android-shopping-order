@@ -7,8 +7,10 @@ import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
 import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
 import woowacourse.shopping.data.remote.dto.OrdersDTO
+import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.MypageRepository
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.view.order.OrderContract
 import woowacourse.shopping.view.order.OrderPresenter
 
@@ -22,22 +24,25 @@ class OrderPresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
         mypageRepository = object : MypageRepository {
-            override fun getCash(callback: (Int) -> Unit) {
-                callback(40000)
+            override fun getCash(callback: (DataResult<Int>) -> Unit) {
+                callback(DataResult.Success(40000))
             }
 
-            override fun chargeCash(cash: Int, callback: (Int) -> Unit) {
+            override fun chargeCash(cash: Int, callback: (DataResult<Int>) -> Unit) {
             }
         }
         orderRepository = object : OrderRepository {
-            override fun getAll(callback: (OrdersDTO) -> Unit) {
+            override fun getAll(callback: (DataResult<List<Order>>) -> Unit) {
             }
 
-            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
+            override fun getOrder(id: Int, callback: (DataResult<Order>) -> Unit) {
             }
 
-            override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {
-                callback(1)
+            override fun order(
+                cartProducts: OrderCartItemsDTO,
+                callback: (DataResult<Int?>) -> Unit
+            ) {
+                callback(DataResult.Success(1))
             }
         }
         presenter = OrderPresenter(
@@ -73,11 +78,11 @@ class OrderPresenterTest {
     fun 보유한_캐시가_총_가격_미만일_때_주문을_할_수_없다() {
         // give
         mypageRepository = object : MypageRepository {
-            override fun getCash(callback: (Int) -> Unit) {
-                callback(10000)
+            override fun getCash(callback: (DataResult<Int>) -> Unit) {
+                callback(DataResult.Success(10000))
             }
 
-            override fun chargeCash(cash: Int, callback: (Int) -> Unit) {
+            override fun chargeCash(cash: Int, callback: (DataResult<Int>) -> Unit) {
             }
         }
         presenter = OrderPresenter(

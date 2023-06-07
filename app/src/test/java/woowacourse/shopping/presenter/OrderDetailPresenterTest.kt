@@ -7,7 +7,9 @@ import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
 import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
 import woowacourse.shopping.data.remote.dto.OrdersDTO
+import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
@@ -23,22 +25,25 @@ class OrderDetailPresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
         orderRepository = object : OrderRepository {
-            override fun getAll(callback: (OrdersDTO) -> Unit) {
+            override fun getAll(callback: (DataResult<List<Order>>) -> Unit) {
             }
 
-            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
+            override fun getOrder(id: Int, callback: (DataResult<Order>) -> Unit) {
                 callback(
-                    OrderSubmitDTO(
+                    DataResult.Success(Order(
                         1,
                         "2023-02-03 11:11:00",
                         listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
                         10000,
-                    ),
+                    )),
                 )
             }
 
-            override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {
-                callback(1)
+            override fun order(
+                cartProducts: OrderCartItemsDTO,
+                callback: (DataResult<Int?>) -> Unit
+            ) {
+                callback(DataResult.Success(1))
             }
         }
         presenter = OrderDetailPresenter(

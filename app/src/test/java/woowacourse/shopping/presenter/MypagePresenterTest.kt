@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.MypageRepository
 import woowacourse.shopping.view.mypage.MypageContract
 import woowacourse.shopping.view.mypage.MypagePresenter
@@ -23,12 +24,12 @@ class MypagePresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
         mypageRepository = object : MypageRepository {
-            override fun getCash(callback: (Int) -> Unit) {
-                callback(10000)
+            override fun getCash(callback: (DataResult<Int>) -> Unit) {
+                callback(DataResult.Success(10000))
             }
 
-            override fun chargeCash(cash: Int, callback: (Int) -> Unit) {
-                callback(10000 + cash)
+            override fun chargeCash(cash: Int, callback: (DataResult<Int>) -> Unit) {
+                callback(DataResult.Success(10000 + cash))
             }
         }
         presenter = MypagePresenter(view, mypageRepository)

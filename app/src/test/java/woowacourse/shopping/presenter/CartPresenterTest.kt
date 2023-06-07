@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.toUiModel
@@ -25,20 +26,28 @@ class CartPresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
         cartRepository = object : CartRepository {
-            override fun getAll(callback: (List<CartProduct>) -> Unit) {
-                callback(CartProductsFixture.cartProducts)
+            override fun getAll(callback: (DataResult<List<CartProduct>>) -> Unit) {
+                callback(DataResult.Success(CartProductsFixture.cartProducts))
             }
 
-            override fun insert(productId: Int, quantity: Int, callback: (Int) -> Unit) {
-                callback(1)
+            override fun insert(
+                productId: Int,
+                quantity: Int,
+                callback: (DataResult<Int>) -> Unit
+            ) {
+                callback(DataResult.Success(1))
             }
 
-            override fun update(cartId: Int, quantity: Int, callback: (Boolean) -> Unit) {
-                callback(true)
+            override fun update(
+                cartId: Int,
+                quantity: Int,
+                callback: (DataResult<Boolean>) -> Unit
+            ) {
+                callback(DataResult.Success(true))
             }
 
-            override fun remove(cartId: Int, callback: (Boolean) -> Unit) {
-                callback(true)
+            override fun remove(cartId: Int, callback: (DataResult<Boolean>) -> Unit) {
+                callback(DataResult.Success(true))
             }
         }
 
@@ -65,7 +74,7 @@ class CartPresenterTest {
         presenter.fetchNextPage()
 
         // then
-        verify(exactly = 1) { view.showChangedItems() }
+        verify(exactly = 1) { view.changeItems(any()) }
     }
 
     @Test
@@ -78,7 +87,7 @@ class CartPresenterTest {
         presenter.fetchPrevPage()
 
         // then
-        verify(exactly = 2) { view.showChangedItems() }
+        verify(exactly = 2) { view.changeItems(any()) }
     }
 
     @Test
@@ -90,7 +99,7 @@ class CartPresenterTest {
         presenter.removeProduct(1)
 
         // then
-        verify(exactly = 1) { view.showChangedItems() }
+        verify(exactly = 1) { view.changeItems(any()) }
     }
 
     @Test
@@ -102,7 +111,7 @@ class CartPresenterTest {
         presenter.updateCartProductCount(1, 3)
 
         // then
-        verify(exactly = 1) { view.showChangedItem(any()) }
+        verify(exactly = 1) { view.changeItems(any()) }
     }
 
     @Test
@@ -114,7 +123,7 @@ class CartPresenterTest {
         presenter.updateCartProductCount(1, 0)
 
         // then
-        verify(exactly = 0) { view.showChangedItem(any()) }
+        verify(exactly = 0) { view.changeItems(any()) }
     }
 
     @Test
@@ -144,7 +153,6 @@ class CartPresenterTest {
         presenter.fetchProducts()
         presenter.checkProductsAll()
 
-        val expectedIndexes = listOf(0, 1, 2, 3, 4)
         val expectedTotalPrice = 50000
         val expectedTotalCount = 5
         val expectedTotalCheckAll = true
@@ -153,11 +161,9 @@ class CartPresenterTest {
         val actualTotalCount = presenter.cartSystemResult.value?.totalCount
         val actualTotalCheckAll = presenter.isCheckedAll.value
 
-        expectedIndexes.forEach {
-            verify { view.showChangedItem(it) }
-        }
         assertEquals(expectedTotalPrice, actualTotalPrice)
         assertEquals(expectedTotalCount, actualTotalCount)
         assertEquals(expectedTotalCheckAll, actualTotalCheckAll)
+        verify { view.changeItems(any()) }
     }
 }

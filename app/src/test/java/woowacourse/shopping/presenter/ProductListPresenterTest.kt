@@ -4,13 +4,14 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.remote.dto.ProductsWithCartItemDTO
+import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentViewedRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithCartInfo
+import woowacourse.shopping.domain.model.ProductsWithCartItem
 import woowacourse.shopping.model.toUiModel
 import woowacourse.shopping.view.productlist.ProductListContract
 import woowacourse.shopping.view.productlist.ProductListPresenter
@@ -29,23 +30,28 @@ class ProductListPresenterTest {
             override fun getProductsByRange(
                 lastId: Int,
                 pageItemCount: Int,
-                callback: (ProductsWithCartItemDTO) -> Unit,
+                callback: (DataResult<ProductsWithCartItem>) -> Unit,
             ) {
                 callback(
-                    ProductsWithCartItemDTO(
-                        ProductListFixture.products.map {
-                            ProductWithCartInfo(
-                                it,
-                                ProductWithCartInfo.CartItem(1, 1),
-                            )
-                        },
-                        false,
+                    DataResult.Success(
+                        ProductsWithCartItem(
+                            ProductListFixture.products.map {
+                                ProductWithCartInfo(
+                                    it,
+                                    ProductWithCartInfo.CartItem(1, 1),
+                                )
+                            },
+                            false,
+                        ),
                     ),
                 )
             }
 
-            override fun getProductById(id: Int, callback: (ProductWithCartInfo) -> Unit) {
-                callback(ProductWithCartInfo(ProductListFixture.products[0], null))
+            override fun getProductById(
+                id: Int,
+                callback: (DataResult<ProductWithCartInfo>) -> Unit
+            ) {
+                callback(DataResult.Success(ProductWithCartInfo(ProductListFixture.products[0], null)))
             }
         }
 
@@ -62,20 +68,28 @@ class ProductListPresenterTest {
         }
 
         cartRepository = object : CartRepository {
-            override fun getAll(callback: (List<CartProduct>) -> Unit) {
-                callback(CartProductsFixture.cartProducts)
+            override fun getAll(callback: (DataResult<List<CartProduct>>) -> Unit) {
+                callback(DataResult.Success(CartProductsFixture.cartProducts))
             }
 
-            override fun insert(productId: Int, quantity: Int, callback: (Int) -> Unit) {
-                callback(1)
+            override fun insert(
+                productId: Int,
+                quantity: Int,
+                callback: (DataResult<Int>) -> Unit
+            ) {
+                callback(DataResult.Success(1))
             }
 
-            override fun update(cartId: Int, quantity: Int, callback: (Boolean) -> Unit) {
-                callback(true)
+            override fun update(
+                cartId: Int,
+                quantity: Int,
+                callback: (DataResult<Boolean>) -> Unit
+            ) {
+                callback(DataResult.Success(true))
             }
 
-            override fun remove(cartId: Int, callback: (Boolean) -> Unit) {
-                callback(true)
+            override fun remove(cartId: Int, callback: (DataResult<Boolean>) -> Unit) {
+                callback(DataResult.Success(true))
             }
         }
 
@@ -102,7 +116,15 @@ class ProductListPresenterTest {
         // when
         presenter.showProductDetail(ProductListFixture.products[0].toUiModel(null, 0))
         // then
-        verify(exactly = 1) { view.onClickProductDetail(ProductListFixture.products[0].toUiModel(null, 0), any()) }
+        verify(exactly = 1) {
+            view.onClickProductDetail(
+                ProductListFixture.products[0].toUiModel(
+                    null,
+                    0,
+                ),
+                any(),
+            )
+        }
     }
 
     @Test
@@ -114,7 +136,7 @@ class ProductListPresenterTest {
         presenter.loadMoreProducts()
 
         // then
-        verify(exactly = 1) { view.notifyAddProducts(any(), any()) }
+        verify(exactly = 1) { view.changeItems(any()) }
     }
 
     @Test
@@ -126,7 +148,7 @@ class ProductListPresenterTest {
 
         // then
         verify(exactly = 1) { view.showCartCount(any()) }
-        verify(exactly = 1) { view.notifyDataChanged(any()) }
+        verify(exactly = 1) { view.changeItems(any()) }
     }
 
     @Test
@@ -138,7 +160,7 @@ class ProductListPresenterTest {
         presenter.updateCartProductCount(1, 2, 3)
 
         //
-        verify { view.notifyDataChanged(any()) }
+        verify { view.changeItems(any()) }
     }
 
     @Test
@@ -150,7 +172,7 @@ class ProductListPresenterTest {
         presenter.updateCartProductCount(0, 0, 0)
 
         // then
-        verify { view.notifyDataChanged(any()) }
+        verify { view.changeItems(any()) }
         verify { view.showCartCount(any()) }
     }
 
@@ -174,7 +196,7 @@ class ProductListPresenterTest {
         presenter.fetchProductsCounts()
 
         // then
-        verify { view.notifyDataChanged(any()) }
+        verify { view.changeItems(any()) }
     }
 
     @Test
@@ -186,7 +208,7 @@ class ProductListPresenterTest {
         presenter.fetchProductCount(1)
 
         // then
-        verify { view.notifyDataChanged(any()) }
+        verify { view.changeItems(any()) }
     }
 
     @Test
@@ -198,6 +220,6 @@ class ProductListPresenterTest {
         presenter.updateRecentViewed(1)
 
         // then
-        verify { view.notifyRecentViewedChanged() }
+        verify { view.changeItems(any()) }
     }
 }
