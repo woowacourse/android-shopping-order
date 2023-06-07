@@ -164,7 +164,6 @@ class ProductDetailPresenterTest {
             slotLoadAllCartsOnSuccess.captured(emptyList())
         }
 
-        justRun { cartRepository.addLocalCart(1L) }
         justRun { view.addCartSuccessView() }
         justRun { view.exitProductDetailView() }
 
@@ -172,7 +171,6 @@ class ProductDetailPresenterTest {
         presenter.addCart(1L, 1)
 
         // then
-        verify { cartRepository.addLocalCart(1L) }
         verify { view.addCartSuccessView() }
         verify { view.exitProductDetailView() }
     }

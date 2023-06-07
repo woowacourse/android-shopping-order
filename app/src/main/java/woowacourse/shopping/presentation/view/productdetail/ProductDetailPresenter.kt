@@ -24,10 +24,6 @@ class ProductDetailPresenter(
         throwable.message?.let { view.handleErrorView(it) }
     }
 
-    private fun onFailure(message: String) {
-        view.handleErrorView(message)
-    }
-
     private fun loadProductInfo() {
         if (product.id == UNABLE_ID) {
             view.handleErrorView("")
@@ -50,7 +46,6 @@ class ProductDetailPresenter(
             val cartProduct = carts.find { cartProduct -> cartProduct.product.id == productId }
             if (cartProduct == null) {
                 cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
-                    cartRepository.addLocalCart(cartId)
 
                     view.addCartSuccessView()
                     view.exitProductDetailView()

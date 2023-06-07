@@ -1,9 +1,8 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
-import woowacourse.shopping.data.model.dto.request.ProductIdRequest
 import woowacourse.shopping.data.model.dto.response.ProductResponse
 import woowacourse.shopping.data.respository.product.service.ProductService
-import woowacourse.shopping.data.util.responseCallback
+import woowacourse.shopping.data.util.responseBodyCallback
 
 class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
@@ -14,7 +13,7 @@ class ProductRemoteDataSourceImpl(
         onSuccess: (products: List<ProductResponse>) -> Unit,
     ) {
         productService.requestDatas().enqueue(
-            responseCallback<List<ProductResponse>>(
+            responseBodyCallback<List<ProductResponse>>(
                 onFailure = onFailure,
                 onSuccess = onSuccess,
             )
@@ -26,9 +25,8 @@ class ProductRemoteDataSourceImpl(
         onFailure: (throwable: Throwable) -> Unit,
         onSuccess: (product: ProductResponse) -> Unit,
     ) {
-        val productIdRequest = ProductIdRequest(productId)
-        productService.requestData(productIdRequest).enqueue(
-            responseCallback(
+        productService.requestData(productId).enqueue(
+            responseBodyCallback(
                 onFailure = onFailure,
                 onSuccess = onSuccess,
             )

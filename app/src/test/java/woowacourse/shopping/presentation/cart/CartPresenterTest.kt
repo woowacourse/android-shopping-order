@@ -49,7 +49,7 @@ class CartPresenterTest {
         val slotItems = slot<List<CartProductModel>>()
         val slotTotalPrice = slot<Int>()
 
-        every { cartRepository.getAllLocalCart() } returns CartFixture.getFixture()
+        every { cartRepository.loadAllCartChecked() } returns CartFixture.getFixture()
             .map { it.toModel() }
         justRun { view.setEnableOrderButton(true) }
         justRun { view.showCartItemsView(capture(slotItems)) }
@@ -71,7 +71,7 @@ class CartPresenterTest {
         assertEquals(expectedItemsCount, actualItemsCount)
         assertEquals(expectedTotalPrice, actualTotalPrice)
 
-        verify { cartRepository.getAllLocalCart() }
+        verify { cartRepository.loadAllCartChecked() }
         verify { view.setEnableOrderButton(true) }
         verify { view.showCartItemsView(slotItems.captured) }
         verify { view.showTotalPriceView(slotTotalPrice.captured) }
@@ -87,7 +87,6 @@ class CartPresenterTest {
         val targetCartId = 1L
         presenter.setPageNation(CartFixture.getFixture(), 1)
 
-        justRun { cartRepository.deleteLocalCart(targetCartId) }
         justRun { cartRepository.deleteCart(targetCartId) }
 
         justRun { view.setEnableOrderButton(true) }
@@ -127,7 +126,6 @@ class CartPresenterTest {
             ),
         )
         assertEquals(expected, actual)
-        verify { cartRepository.deleteLocalCart(targetCartId) }
         verify { cartRepository.deleteCart(targetCartId) }
         verify { view.setEnableOrderButton(true) }
         verify { view.setEnableLeftButton(false) }
@@ -193,7 +191,6 @@ class CartPresenterTest {
             slotOnSuccess.captured.invoke()
         }
 
-        justRun { cartRepository.deleteLocalCart(targetCart.id) }
         justRun { cartRepository.deleteCart(targetCart.id) }
         justRun { view.setEnableLeftButton(false) }
         justRun { view.setEnableRightButton(false) }
@@ -202,7 +199,6 @@ class CartPresenterTest {
         presenter.updateProductCount(targetCart.id, 0)
 
         // then
-        verify { cartRepository.deleteLocalCart(targetCart.id) }
         verify { cartRepository.deleteCart(targetCart.id) }
         verify { view.setEnableLeftButton(false) }
         verify { view.setEnableRightButton(false) }
@@ -212,14 +208,14 @@ class CartPresenterTest {
     fun `상품의 체크 상태를 갱신할 수 있다`() {
         // given
         presenter.setPageNation(CartFixture.getFixture(), 1)
-        justRun { cartRepository.updateLocalCartChecked(1L, false) }
+        justRun { cartRepository.updateCartChecked(1L, false) }
         justRun { view.setAllCartChecked(false) }
 
         // when
         presenter.updateProductChecked(1L, false)
 
         // then
-        justRun { cartRepository.updateLocalCartChecked(1L, false) }
+        justRun { cartRepository.updateCartChecked(1L, false) }
         verify { view.setAllCartChecked(false) }
     }
 

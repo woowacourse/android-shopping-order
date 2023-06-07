@@ -67,10 +67,6 @@ class ProductListPresenter(
         throwable.message?.let { view.handleErrorView(it) }
     }
 
-    private fun onFailure(message: String) {
-        view.handleErrorView(message)
-    }
-
     override fun setCartProductItems(products: List<CartProductModel>) {
         cartProducts = CartProductsModel(products)
     }
@@ -151,8 +147,6 @@ class ProductListPresenter(
                         .carts
                 )
 
-                cartRepository.addLocalCart(cartId)
-
                 setCartProductItems(
                     cartProducts.toModel()
                         .updateCartId(cartId, productId)
@@ -169,15 +163,10 @@ class ProductListPresenter(
 
         cartRepository.loadAllCarts(::onFailure) { carts ->
             val remoteCartProduct = carts.find { it.product.id == productId } ?: return@loadAllCarts
-            cartRepository.addLocalCart(remoteCartProduct.id)
 
             val newCartProduct = remoteCartProduct.copy(count = count)
 
             cartRepository.updateCartCount(newCartProduct, ::onFailure) {
-                if (count == 0) {
-                    cartRepository.deleteLocalCart(newCartProduct.id)
-                }
-
                 setCartProductItems(
                     cartProducts.toModel()
                         .updateCartCountByCartId(remoteCartProduct.id, count)

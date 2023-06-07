@@ -218,7 +218,7 @@ class OrderPresenterTest {
             addOrderOnSuccess.captured(orderId)
         }
 
-        justRun { cartRepository.deleteLocalCarts(order.cartIds) }
+        justRun { cartRepository.deleteCarts(order.cartIds) }
         justRun { view.showOrderDetailView(orderId) }
 
         // when
@@ -232,7 +232,7 @@ class OrderPresenterTest {
         verify { view.showOrderPriceView(orderPrice) }
         verify { view.showProductItemsView(carts.map { it.toUIModel() }) }
         verify { view.setLayoutVisibility() }
-        verify { cartRepository.deleteLocalCarts(order.cartIds) }
+        verify { cartRepository.deleteCarts(order.cartIds) }
         verify { view.showOrderDetailView(orderId) }
     }
 }

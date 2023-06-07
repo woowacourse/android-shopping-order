@@ -223,7 +223,6 @@ class ProductListPresenterTest {
             slotOnSuccess.captured(3L)
         }
 
-        justRun { cartRepository.addLocalCart(3L) }
         justRun { view.updateToolbarCartCountView(3) }
         justRun { view.setVisibleToolbarCartCountView() }
 
@@ -231,7 +230,6 @@ class ProductListPresenterTest {
         presenter.updateCount(3L, 1)
 
         // then
-        verify { cartRepository.addLocalCart(3L) }
         verify { view.updateToolbarCartCountView(3) }
         verify { view.setVisibleToolbarCartCountView() }
     }

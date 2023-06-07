@@ -74,12 +74,16 @@ class OrderPresenter(
             cards[0],
         )
         orderRepository.addOrder(order.toModel(), ::onFailure) { orderId ->
-            cartRepository.deleteLocalCarts(order.toModel().cartIds)
+            cartRepository.deleteCarts(order.toModel().cartIds)
             view.showOrderDetailView(orderId)
         }
     }
 
     private fun onFailure(message: String) {
         view.handleErrorView(message)
+    }
+
+    private fun onFailure(throwable: Throwable) {
+        throwable.message?.let { view.handleErrorView(it) }
     }
 }

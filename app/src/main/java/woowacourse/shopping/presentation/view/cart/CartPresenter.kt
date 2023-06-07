@@ -13,8 +13,8 @@ class CartPresenter(
 ) : CartContract.Presenter {
     private lateinit var pageNation: PageNation
 
-    private fun onFailure(message: String) {
-        view.handleErrorView(message)
+    private fun onFailure(throwable: Throwable) {
+        throwable.message?.let { view.handleErrorView(it) }
     }
 
     override fun initCartItems() {
@@ -49,7 +49,7 @@ class CartPresenter(
     }
 
     private fun loadLocalCartItemChecked() {
-        cartRepository.getAllLocalCart().forEach { cart ->
+        cartRepository.loadAllCartChecked().forEach { cart ->
             pageNation = pageNation.updateCartCheckedByCartId(cart.id, cart.checked)
         }
     }
@@ -57,7 +57,6 @@ class CartPresenter(
     override fun deleteCartItem(cartId: Long) {
         pageNation = pageNation.deleteCartByCartId(cartId)
 
-        cartRepository.deleteLocalCart(cartId)
         cartRepository.deleteCart(cartId)
 
         setEnabledOrder()
@@ -99,7 +98,7 @@ class CartPresenter(
     override fun updateProductChecked(cartId: Long, isChecked: Boolean) {
         pageNation = pageNation.updateCartCheckedByCartId(cartId, isChecked)
 
-        cartRepository.updateLocalCartChecked(cartId, isChecked)
+        cartRepository.updateCartChecked(cartId, isChecked)
         calculateTotalPrice()
         view.setAllCartChecked(pageNation.isAllChecked)
     }
