@@ -1,10 +1,9 @@
 package woowacourse.shopping
 
-class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
+data class CartProductInfoList(private val cartProductInfos: List<CartProductInfo>) {
     private val _items = cartProductInfos.toMutableList()
     val items get() = _items.toList()
 
-    val size: Int get() = items.size
     val count: Int get() = items.sumOf { it.count }
     val totalPrice: Int get() = items.sumOf { it.totalPrice }
     val orders: CartProductInfoList
@@ -13,35 +12,28 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         }
     val isAllOrdered: Boolean get() = items.all { it.isOrdered }
 
-    fun add(item: CartProductInfo): CartProductInfoList {
-        if (items.none { it.id == item.id }) {
-            _items.add(item)
-        }
-        return CartProductInfoList(items)
-    }
-
-    fun addAll(newItems: List<CartProductInfo>): CartProductInfoList {
-        newItems.forEach { add(it) }
-        return CartProductInfoList(items)
-    }
-
     fun delete(item: CartProductInfo): CartProductInfoList {
         _items.removeAll { it.id == item.id }
         return CartProductInfoList(items)
     }
 
-    fun updateItemCount(index: Int, count: Int): CartProductInfoList {
+    fun updateItemCount(cartProductInfo: CartProductInfo, count: Int): CartProductInfoList {
+        val index = findIndexById(cartProductInfo.id) ?: return this
         _items[index] = _items[index].setCount(count)
         return CartProductInfoList(items)
     }
 
-    fun updateItemOrdered(index: Int, isOrdered: Boolean): CartProductInfoList {
-        _items[index] = _items[index].setOrderState(isOrdered)
+    fun updateItemOrdered(
+        cartProductInfo: CartProductInfo,
+        isOrdered: Boolean,
+    ): CartProductInfoList {
+        val index = findIndexById(cartProductInfo.id) ?: return this
+        _items[index] = items[index].setOrderState(isOrdered)
         return CartProductInfoList(items)
     }
 
     fun updateAllItemOrdered(isOrdered: Boolean): CartProductInfoList {
-        _items.indices.forEach { updateItemOrdered(it, isOrdered) }
+        items.forEach { updateItemOrdered(it, isOrdered) }
         return CartProductInfoList(items)
     }
 
@@ -58,7 +50,7 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         }
     }
 
-    fun replaceItem(newItem: CartProductInfo): CartProductInfoList {
+    private fun replaceItem(newItem: CartProductInfo): CartProductInfoList {
         _items.forEachIndexed { index, item ->
             if (item.id == newItem.id) _items[index] = newItem
         }
@@ -70,11 +62,10 @@ class CartProductInfoList(cartProductInfos: List<CartProductInfo>) {
         return CartProductInfoList(items)
     }
 
-    fun findCountByProductId(productId: Int): Int {
-        return _items.find { it.product.id == productId }?.count ?: 0
-    }
-
-    fun findCartIdByProductId(productId: Int): Int {
-        return _items.find { it.product.id == productId }?.id ?: -1
+    private fun findIndexById(id: Int): Int? {
+        items.forEachIndexed { index, cartProductInfo ->
+            if (cartProductInfo.id == id) return index
+        }
+        return null
     }
 }

@@ -1,65 +1,78 @@
 package woowacourse.shopping.presentation.productlist
 
+import woowacourse.shopping.CartProductInfo
 import woowacourse.shopping.CartProductInfoList
-import woowacourse.shopping.Products
+import woowacourse.shopping.Product
 import woowacourse.shopping.presentation.mapper.toPresentation
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import woowacourse.shopping.util.SafeLiveData
-import woowacourse.shopping.util.SafeMutableLiveData
 
 class ProductListPresenter(
     private val view: ProductListContract.View,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    initProducts: Products = Products(listOf()),
-    initCartProducts: CartProductInfoList = CartProductInfoList(listOf()),
 ) : ProductListContract.Presenter {
 
-    private var products = initProducts
-
-    private val _cartProductInfoList = SafeMutableLiveData(initCartProducts)
-    override val cartProductInfoList: SafeLiveData<CartProductInfoList> get() = _cartProductInfoList
-
-    override fun updateProductItems() {
-        val receivedProducts =
-            productRepository.getProductsWithRange(products.size, PRODUCTS_SIZE)
-        products = products.addProducts(receivedProducts)
-        view.loadProductModels(products.toPresentation())
+    private var size = PRODUCTS_SIZE
+    override fun refreshProductItems() {
+        productRepository.getProductsWithRange(0, size) { products ->
+            cartRepository.getAllCartItems { allCartItems ->
+                val foundCartItems = products.findCartItem(allCartItems)
+                view.loadProductItems(foundCartItems.map { it.toPresentation() })
+                view.setLoadingViewVisible(false)
+            }
+        }
     }
 
-    override fun updateRecentProductItems() {
-        val recentProducts = getRecentProducts()
-        view.loadRecentProductModels(recentProducts.toPresentation())
+    private fun List<Product>.findCartItem(cartItems: List<CartProductInfo>): List<CartProductInfo> {
+        return this.map { product ->
+            cartItems.find { cartItem -> product.id == cartItem.product.id }
+                ?: makeQuantityZeroCartItem(product)
+        }
     }
 
-    override fun putProductInCart(productModel: ProductModel) {
-        cartRepository.putProductInCart(productModel.id)
+    private fun makeQuantityZeroCartItem(product: Product): CartProductInfo {
+        return CartProductInfo(
+            1000 + product.id,
+            product,
+            0,
+        )
     }
 
-    override fun updateCartProductCount(productModel: ProductModel, count: Int) {
-        val cartId = cartRepository.getCartIdByProductId(productModel.id)
-        if (count == 0) cartRepository.deleteCartProductId(cartId)
-        cartRepository.updateCartProductCount(cartId, count)
+    override fun loadMoreProductItems() {
+        size += PRODUCTS_SIZE
+        view.setLoadingViewVisible(true)
+        refreshProductItems()
     }
 
-    override fun updateCartProductInfoList() {
-        val cartProductInfoList = cartRepository.getAllCartProductsInfo()
-        _cartProductInfoList.value = cartProductInfoList
-        view.loadProductModels(products.toPresentation())
+    override fun loadRecentProductItems() {
+        recentProductRepository.getRecentProducts(RECENT_PRODUCTS_SIZE) { products ->
+            view.loadRecentProductItems(products.map { it.toPresentation() })
+        }
     }
 
-    private fun getRecentProducts(): Products {
-        return Products(recentProductRepository.getRecentProducts(RECENT_PRODUCTS_SIZE))
+    override fun updateCartCount() {
+        cartRepository.getAllCartItems {
+            view.showCartCount(CartProductInfoList(it).count)
+        }
     }
 
-    private fun Products.toPresentation(): List<ProductModel> {
-        return items.map { it.toPresentation() }
+    override fun addCartItem(cartProductModel: CartProductInfoModel) {
+        cartRepository.addCartItem(cartProductModel.productModel.id) {
+            updateCartCount()
+            refreshProductItems()
+        }
     }
 
+    override fun updateCartItemQuantity(cartProductModel: CartProductInfoModel, count: Int) {
+        cartRepository.updateCartItemQuantity(cartProductModel.id, count) {
+            updateCartCount()
+            refreshProductItems()
+        }
+    }
     companion object {
         private const val PRODUCTS_SIZE = 20
         private const val RECENT_PRODUCTS_SIZE = 10

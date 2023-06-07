@@ -2,8 +2,10 @@ package woowacourse.shopping.presentation.serversetting
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.ApiClient
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.product.ProductService
+import woowacourse.shopping.data.product.ProductServiceHelper
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -19,14 +21,14 @@ class ServerSettingActivity : AppCompatActivity() {
             PreferenceUtil(this),
             RecentProductRepositoryImpl(
                 recentProductLocalDataSource = RecentProductDao(RecentProductDbHelper(this)),
-                productRemoteDataSource = ProductService()
-            )
+                productRemoteDataSource = ProductServiceHelper,
+                HttpErrorHandler(this),
+            ),
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(binding.root)
         setupView()
     }
@@ -40,8 +42,8 @@ class ServerSettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMain(baseUrl: String) {
-        presenter.saveBaseUrl(baseUrl)
+    private fun startMain(newUrl: String) {
+        ApiClient.getInstance(this).initRetrofitBuilder(newUrl)
         presenter.saveAuthToken()
         presenter.deleteCart()
         startActivity(ProductListActivity.getIntent(this))

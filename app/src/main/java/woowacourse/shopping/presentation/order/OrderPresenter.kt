@@ -1,0 +1,62 @@
+package woowacourse.shopping.presentation.order
+
+import woowacourse.shopping.presentation.mapper.toDomain
+import woowacourse.shopping.presentation.model.OrderProductModel
+import woowacourse.shopping.presentation.model.OrderProductsModel
+import woowacourse.shopping.repository.OrderRepository
+import woowacourse.shopping.repository.UserRepository
+
+class OrderPresenter constructor(
+    private val view: OrderContract.View,
+    private val orderProductsModel: OrderProductsModel,
+    private val orderRepository: OrderRepository,
+    private val userRepository: UserRepository,
+    private var userTotalPoint: Int = MINIMUM_POINT,
+    private var usagePoint: Int = MINIMUM_POINT,
+) : OrderContract.Presenter {
+    private val orderProducts = orderProductsModel.toDomain()
+
+    override fun loadOrderItems() {
+        view.setOrderItems(orderProductsModel.list)
+    }
+
+    override fun showUserTotalPoint() {
+        userRepository.getUserPoint {
+            userTotalPoint = it?.point?.value ?: MINIMUM_POINT
+            view.setUserTotalPoint(userTotalPoint)
+        }
+    }
+
+    override fun checkPointAble(usePointText: String) {
+        usagePoint = usePointText.toIntOrNull() ?: userTotalPoint
+        when {
+            usagePoint < MINIMUM_POINT -> view.setUsagePoint("")
+            usagePoint > userTotalPoint -> view.setUsagePoint(userTotalPoint.toString())
+        }
+    }
+
+    override fun updateOrderProductTotalPrice(orderProductModel: OrderProductModel) {
+        val price = orderProductModel.toDomain().totalPrice
+        view.setOrderProductTotalPrice(price)
+    }
+
+    override fun showOrderPrice() {
+        val price = orderProducts.totalPrice
+        view.setOrderPrice(price)
+    }
+
+    override fun showPaymentPrice() {
+        val price = orderProducts.totalPrice - usagePoint
+        view.setPaymentPrice(price)
+    }
+
+    override fun order() {
+        orderRepository.addOrder(usagePoint, orderProducts) {
+            view.showAddOrderComplete(it)
+        }
+    }
+
+    companion object {
+        private const val MINIMUM_POINT = 0
+    }
+}

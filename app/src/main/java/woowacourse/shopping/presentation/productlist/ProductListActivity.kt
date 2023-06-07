@@ -1,60 +1,65 @@
 package woowacourse.shopping.presentation.productlist
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.CartService
-import woowacourse.shopping.data.common.PreferenceUtil
+import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.product.ProductService
+import woowacourse.shopping.data.product.ProductServiceHelper
 import woowacourse.shopping.data.recentproduct.RecentProductDao
 import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.BadgeCartBinding
 import woowacourse.shopping.presentation.cart.CartActivity
+import woowacourse.shopping.presentation.model.CartProductInfoModel
 import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.myorder.MyOrderActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.productlist.product.ProductListAdapter
 import woowacourse.shopping.presentation.productlist.recentproduct.RecentProductAdapter
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private lateinit var activityBinding: ActivityProductListBinding
+    private var cartIconBinding: BadgeCartBinding? = null
+
     private lateinit var productListAdapter: ProductListAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private lateinit var cartMenuItem: MenuItem
-    private var cartIconBinding: BadgeCartBinding? = null
-    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductService() }
+    private val httpErrorHandler = HttpErrorHandler(this)
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductServiceHelper }
     private val presenter: ProductListPresenter by lazy {
         ProductListPresenter(
             this,
-            ProductRepositoryImpl(productRemoteDataSource),
+            ProductRepositoryImpl(productRemoteDataSource, httpErrorHandler),
             RecentProductRepositoryImpl(
                 RecentProductDao(RecentProductDbHelper(this)),
-                productRemoteDataSource,
+                ProductServiceHelper,
+                httpErrorHandler,
             ),
-            CartRepositoryImpl(CartService(PreferenceUtil(this))),
+            CartRepositoryImpl(CartServiceHelper(), httpErrorHandler),
         )
     }
 
-    private val handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            if (msg.what == SHOW_SKELETON_MESSAGE_CODE) {
-                setLoadingUiVisible(false)
-            }
+    private val activityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d("wooseok", "launcher")
+            updateView()
         }
     }
 
@@ -63,40 +68,18 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         activityBinding = ActivityProductListBinding.inflate(layoutInflater)
         setContentView(activityBinding.root)
         initView()
-    }
-
-    override fun onStart() {
-        super.onStart()
         updateView()
     }
-
-    private fun setLoadingUiVisible(enable: Boolean) {
-        if (enable) {
-            activityBinding.flProductList.visibility = View.VISIBLE
-            activityBinding.recyclerProduct.visibility = View.GONE
-            return
-        }
-        activityBinding.flProductList.visibility = View.GONE
-        activityBinding.recyclerProduct.visibility = View.VISIBLE
-    }
-
     private fun initView() {
-        setLoadingUiVisible(true)
         setSupportActionBar(activityBinding.toolbarProductList.toolbar)
         initRecentProductAdapter()
         initProductAdapter()
-        val thread = Thread {
-            runOnUiThread {
-                presenter.updateProductItems()
-            }
-        }
-        thread.start()
-        thread.join()
     }
 
     private fun updateView() {
-        presenter.updateRecentProductItems()
-        presenter.updateCartProductInfoList()
+        presenter.refreshProductItems()
+        presenter.loadRecentProductItems()
+        presenter.updateCartCount()
     }
 
     private fun initRecentProductAdapter() {
@@ -108,13 +91,14 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun showProductDetail(productModel: ProductModel) {
-        startActivity(ProductDetailActivity.getIntent(this, productModel))
+        activityResultLauncher.launch(ProductDetailActivity.getIntent(this, productModel))
     }
 
     private fun initProductAdapter() {
         productListAdapter = ProductListAdapter(
             recentProductAdapter = recentProductAdapter,
             presenter = presenter,
+            ::showProductDetail
         )
 
         val layoutManager = GridLayoutManager(this, SPAN_COUNT)
@@ -125,13 +109,20 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         activityBinding.recyclerProduct.adapter = productListAdapter
     }
 
-    override fun loadProductModels(productModels: List<ProductModel>) {
-        productListAdapter.setItems(productModels)
-        handler.sendEmptyMessage(SHOW_SKELETON_MESSAGE_CODE)
+    override fun loadProductItems(cartProductModels: List<CartProductInfoModel>) {
+        val newList =
+            listOf(CartProductInfoModel.defaultInfo()) + cartProductModels + listOf(
+                CartProductInfoModel.defaultInfo(),
+            )
+        productListAdapter.submitList(newList)
     }
 
-    override fun loadRecentProductModels(productModels: List<ProductModel>) {
+    override fun loadRecentProductItems(productModels: List<ProductModel>) {
         recentProductAdapter.submitList(productModels)
+    }
+
+    override fun showCartCount(count: Int) {
+        cartIconBinding?.badgeCartCounter?.text = count.toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -143,6 +134,11 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     private fun initCartIcon(menu: Menu) {
         menuInflater.inflate(R.menu.menu_product_list_toolbar, menu)
         cartMenuItem = menu.findItem(R.id.icon_cart)
+        val myOrderItem = menu.findItem(R.id.icon_my_order)
+        myOrderItem.setOnMenuItemClickListener {
+            startActivity(MyOrderActivity.getIntent(this))
+            true
+        }
         setUpCartIconBinding()
     }
 
@@ -154,17 +150,23 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 false,
             )
         cartMenuItem.actionView = cartIconBinding?.root
-        cartIconBinding?.presenter = presenter
-        cartIconBinding?.lifecycleOwner = this
         cartIconBinding?.iconCartMenu?.setOnClickListener {
-            startActivity(CartActivity.getIntent(this))
+            activityResultLauncher.launch(CartActivity.getIntent(this))
+        }
+        presenter.updateCartCount()
+    }
+    override fun setLoadingViewVisible(isVisible: Boolean) {
+        if (isVisible) {
+            activityBinding.flProductList.visibility = View.VISIBLE
+            activityBinding.recyclerProduct.visibility = View.GONE
+        } else {
+            activityBinding.recyclerProduct.visibility = View.VISIBLE
+            activityBinding.flProductList.visibility = View.GONE
         }
     }
 
     companion object {
         private const val SPAN_COUNT = 2
-        private const val SHOW_SKELETON_MESSAGE_CODE = 0
-
         fun getIntent(context: Context): Intent {
             return Intent(context, ProductListActivity::class.java)
         }

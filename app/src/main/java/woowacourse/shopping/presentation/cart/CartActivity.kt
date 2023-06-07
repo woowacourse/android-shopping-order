@@ -1,73 +1,58 @@
 package woowacourse.shopping.presentation.cart
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.HttpErrorHandler
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.CartService
-import woowacourse.shopping.data.common.PreferenceUtil
+import woowacourse.shopping.data.cart.CartServiceHelper
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartProductInfoModel
+import woowacourse.shopping.presentation.model.OrderProductsModel
+import woowacourse.shopping.presentation.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var cartAdapter: CartAdapter
-    private val presenter: CartContract.Presenter by lazy {
-        CartPresenter(
+    private val httpErrorHandler = HttpErrorHandler(this)
+    private val presenter: CartContract.Presenter by lazy { initPresenter() }
+
+    private fun initPresenter(): CartContract.Presenter {
+        return CartPresenter(
             this,
-            CartRepositoryImpl(CartService(PreferenceUtil(this))),
+            CartRepositoryImpl(CartServiceHelper(), httpErrorHandler),
         )
-    }
-
-    private val handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            if (msg.what == SHOW_SKELETON_MESSAGE_CODE) {
-                setLoadingUiVisible(false)
-            }
-        }
-    }
-
-    private fun setLoadingUiVisible(enable: Boolean) {
-        if (enable) {
-            binding.containerCart.visibility = View.GONE
-            binding.flCartList.visibility = View.VISIBLE
-            return
-        }
-        binding.containerCart.visibility = View.VISIBLE
-        binding.flCartList.visibility = View.GONE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpBinding()
-        setLoadingUiVisible(true)
-        initView()
         managePaging()
+        initView()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setLoadingViewVisible(true)
+        presenter.loadCartItems()
     }
 
     private fun setUpBinding() {
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.lifecycleOwner = this
     }
 
     private fun initView() {
         initCartAdapter()
         setToolBar()
-        Thread {
-            runOnUiThread {
-                updateView()
-            }
-        }.start()
-        binding.presenter = presenter
+        allOrderedCheckBoxChange()
+        orderButtonClick()
     }
 
     private fun initCartAdapter() {
@@ -83,13 +68,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_back_24)
     }
 
-    private fun updateView() {
-        presenter.loadCurrentPageProducts()
-        presenter.updateCurrentPageCartView()
-        presenter.checkPlusPageAble()
-        presenter.checkMinusPageAble()
-    }
-
     private fun managePaging() {
         onPlusPage()
         onMinusPage()
@@ -98,34 +76,52 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun onPlusPage() {
         binding.buttonPlusPage.setOnClickListener {
             presenter.plusPage()
-            updateView()
+            onPageChanged()
+        }
+    }
+
+    private fun onPageChanged() {
+        with(presenter) {
+            refreshCurrentPageItems()
+            checkPlusPageAble()
+            checkMinusPageAble()
+            checkCurrentPageProductsIsOrdered()
         }
     }
 
     private fun onMinusPage() {
         binding.buttonMinusPage.setOnClickListener {
             presenter.minusPage()
-            updateView()
+            onPageChanged()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        when (item.itemId) { // 뒤로가기
             android.R.id.home -> {
+                setResult(Activity.RESULT_OK)
                 finish()
             }
             else -> return super.onOptionsItemSelected(item)
         }
         return true
     }
+    override fun onBackPressed() = Unit
+    private fun allOrderedCheckBoxChange() {
+        binding.checkboxAllCart.setOnCheckedChangeListener { _, isChecked ->
+            presenter.changeCurrentPageProductsOrder(isChecked)
+            presenter.updateOrderPrice()
+            presenter.updateOrderCount()
+        }
+    }
 
+    private fun orderButtonClick() {
+        binding.buttonCartOrder.setOnClickListener {
+            presenter.order()
+        }
+    }
     override fun setCartItems(productModels: List<CartProductInfoModel>) {
-        cartAdapter.setItems(productModels)
-        handler.sendMessage(
-            Message().apply {
-                what = SHOW_SKELETON_MESSAGE_CODE
-            }
-        )
+        cartAdapter.submitList(productModels)
     }
 
     override fun setUpPlusPageState(isEnable: Boolean) {
@@ -146,11 +142,42 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun setAllIsOrderCheck(isAllOrdered: Boolean) {
+        binding.checkboxAllCart.isChecked = isAllOrdered
+    }
+    override fun setPage(page: String) {
+        binding.textCartPage.text = page
+    }
+
+    override fun setLoadingViewVisible(isVisible: Boolean) {
+        if (isVisible) {
+            binding.containerCart.visibility = View.GONE
+            binding.flCartList.visibility = View.VISIBLE
+        } else {
+            binding.containerCart.visibility = View.VISIBLE
+            binding.flCartList.visibility = View.GONE
+        }
+    }
+    override fun setOrderPrice(totalPrice: Int) {
+        binding.textCartPrice.text = getString(R.string.price_format, totalPrice)
+    }
+
+    override fun setOrderCount(count: Int) {
+        binding.buttonCartOrder.text = getString(R.string.order_format, count)
+    }
+
+    override fun showOrderView(orderProductsModel: OrderProductsModel) {
+        if (orderProductsModel.list.isEmpty()) Toast.makeText(
+            this,
+            getString(R.string.no_order_in_cart_message),
+            Toast.LENGTH_SHORT
+        ).show()
+        else startActivity(OrderActivity.getIntent(this, orderProductsModel))
+    }
+
     companion object {
         fun getIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }
-
-        private const val SHOW_SKELETON_MESSAGE_CODE = 0
     }
 }

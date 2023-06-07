@@ -1,32 +1,37 @@
 package woowacourse.shopping.presentation.cart
 
-import woowacourse.shopping.CartProductInfo
-import woowacourse.shopping.CartProductInfoList
 import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.util.OffsetPaging
-import woowacourse.shopping.util.SafeLiveData
+import woowacourse.shopping.presentation.model.OrderProductsModel
 
 interface CartContract {
     interface Presenter {
-        val paging: OffsetPaging<CartProductInfo>
-        val loadedCartProducts: SafeLiveData<CartProductInfoList>
-        val pageProducts: SafeLiveData<CartProductInfoList>
-        fun loadCurrentPageProducts()
-        fun plusPage()
-        fun minusPage()
+
         fun checkPlusPageAble()
         fun checkMinusPageAble()
-        fun deleteProductItem(position: Int)
-        fun addProductInOrder(position: Int)
-        fun deleteProductInOrder(position: Int)
-        fun updateProductCount(position: Int, count: Int)
-        fun updateCurrentPageCartView()
-        fun changeCurrentPageProductsOrder()
+        fun plusPage()
+        fun minusPage()
+        fun addProductInOrder(cartProductModel: CartProductInfoModel)
+        fun deleteProductInOrder(cartProductModel: CartProductInfoModel)
+        fun changeCurrentPageProductsOrder(isOrdered: Boolean)
+        fun checkCurrentPageProductsIsOrdered()
+        fun updateOrderPrice()
+        fun updateOrderCount()
+        fun updateProductCount(cartProductModel: CartProductInfoModel, count: Int)
+        fun deleteProductItem(cartProductModel: CartProductInfoModel)
+        fun refreshCurrentPageItems()
+        fun loadCartItems()
+        fun order()
     }
 
     interface View {
         fun setCartItems(productModels: List<CartProductInfoModel>)
         fun setUpPlusPageState(isEnable: Boolean)
         fun setUpMinusPageState(isEnable: Boolean)
+        fun setOrderPrice(totalPrice: Int)
+        fun setOrderCount(count: Int)
+        fun setAllIsOrderCheck(isAllOrder: Boolean)
+        fun setPage(page: String)
+        fun setLoadingViewVisible(isVisible: Boolean)
+        fun showOrderView(orderProductsModel: OrderProductsModel)
     }
 }
