@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.order.confirm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 import com.example.domain.model.MoneySalePolicy
 import com.example.domain.repository.CartRepository
@@ -48,9 +49,10 @@ internal class OrderConfirmPresenterTest {
             Triple(3L, Product(3L, 9000), 1),
             Triple(4L, Product(4L, 4000), 2),
         )
-        val successSlot = slot<(List<CartProduct>) -> Unit>()
-        every { cartRepository.fetchAll(capture(successSlot), any()) } answers {
-            successSlot.captured(mockCartProducts)
+
+        every { cartRepository.fetchAll(any()) } answers {
+            val successBlock = arg<(BaseResponse<List<CartProduct>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockCartProducts))
         }
         every { view.showSaleInfo() } just Runs
         every { view.setSaleInfo(any()) } just Runs

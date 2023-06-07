@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.cart
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
 import io.mockk.Runs
@@ -31,10 +32,10 @@ internal class CartPresenterTest {
         cartRepository = mockk(relaxed = true)
         presenter = CartPresenter(view, cartRepository)
         every {
-            cartRepository.fetchAll(any(), any())
+            cartRepository.fetchAll(any())
         } answers {
-            val successBlock = arg<(List<CartProduct>) -> Unit>(0)
-            successBlock(mockCartProducts)
+            val successBlock = arg<(BaseResponse<List<CartProduct>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockCartProducts))
         }
     }
 
@@ -84,17 +85,17 @@ internal class CartPresenterTest {
         presenter.loadInitCartProduct()
         val slot = slot<Long>()
         every {
-            cartRepository.deleteCartProduct(capture(slot), onSuccess = any(), any())
+            cartRepository.deleteCartProduct(capture(slot), any())
         } answers {
-            val successBlock = arg<(Long) -> Unit>(1)
-            successBlock(slot.captured)
+            val successBlock = arg<(BaseResponse<Long>) -> Unit>(1)
+            successBlock(BaseResponse.SUCCESS(slot.captured))
         }
 
         // when
         presenter.handleDeleteCartProductClick(4L)
 
         // then
-        verify { cartRepository.deleteCartProduct(4L, any(), any()) }
+        verify { cartRepository.deleteCartProduct(4L, any()) }
         val expected = 4L
         val actual = slot.captured
         assert(expected == actual)

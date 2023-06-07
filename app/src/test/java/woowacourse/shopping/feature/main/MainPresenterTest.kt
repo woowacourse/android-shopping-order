@@ -62,17 +62,17 @@ internal class MainPresenterTest {
             Triple(2L, Product(3L, 5000), 1),
         )
         every {
-            cartRepository.fetchAll(onSuccess = any(), any())
+            cartRepository.fetchAll(any())
         } answers {
-            val successBlock = arg<(List<CartProduct>) -> Unit>(0)
-            successBlock(mockCartProducts)
+            val successBlock = arg<(BaseResponse<List<CartProduct>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockCartProducts))
         }
 
         every {
-            cartRepository.fetchSize(any(), any())
+            cartRepository.fetchSize(any())
         } answers {
-            val successBlock = arg<(Int) -> Unit>(0)
-            successBlock(4)
+            val successBlock = arg<(BaseResponse<Int>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(4))
         }
 
         // when
