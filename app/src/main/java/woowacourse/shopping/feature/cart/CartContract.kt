@@ -8,6 +8,7 @@ interface CartContract {
         fun changeCartProducts(newItems: List<CartProductUiModel>)
         fun setPageState(hasPrevious: Boolean, hasNext: Boolean, pageNumber: Int)
         fun showPaymentScreen(cartProducts: List<CartProductUiModel>, totalPrice: Int)
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {

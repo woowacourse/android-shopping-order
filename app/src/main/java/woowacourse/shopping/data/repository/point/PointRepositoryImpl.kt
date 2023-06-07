@@ -30,7 +30,6 @@ class PointRepositoryImpl : PointRepository {
             override fun onFailure(call: Call<PointDto>, t: Throwable) {
                 onFailure(FailureInfo.Default(throwable = t))
             }
-
         })
     }
 }

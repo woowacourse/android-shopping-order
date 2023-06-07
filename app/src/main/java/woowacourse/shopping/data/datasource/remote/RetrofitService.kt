@@ -18,5 +18,4 @@ object RetrofitService {
         RetrofitClient.getInstanceWithToken(token).create(CartService::class.java)
     val orderService: OrderService =
         RetrofitClient.getInstanceWithToken(token).create(OrderService::class.java)
-
 }

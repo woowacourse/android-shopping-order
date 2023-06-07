@@ -12,18 +12,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.recent.RecentDao
+import woowacourse.shopping.data.datasource.remote.ServerInfo
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recent.RecentProductRepositoryImpl
-import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
-import woowacourse.shopping.data.datasource.remote.ServerInfo
-import woowacourse.shopping.data.datasource.local.recent.RecentDao
-import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
-import woowacourse.shopping.feature.detail.DetailActivity
 import woowacourse.shopping.feature.common.load.LoadAdapter
+import woowacourse.shopping.feature.detail.DetailActivity
 import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         initLayoutManager()
         initPresenter()
 
-        Thread { presenter.loadProducts() }.start()
+        presenter.loadProducts()
     }
 
     private fun initAdapters() {
@@ -64,15 +64,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             listOf(),
             object : MainProductClickListener {
                 override fun onPlusClick(product: ProductUiModel, previousCount: Int) {
-                    Thread { presenter.increaseCartProduct(product, previousCount) }.start()
+                    presenter.increaseCartProduct(product, previousCount)
                 }
 
                 override fun onMinusClick(product: ProductUiModel, previousCount: Int) {
-                    Thread { presenter.decreaseCartProduct(product, previousCount) }.start()
+                    presenter.decreaseCartProduct(product, previousCount)
                 }
 
                 override fun onProductClick(product: ProductUiModel) {
-                    Thread { presenter.moveToDetail(product) }.start()
+                    presenter.moveToDetail(product)
                 }
             }
         )
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
         loadAdapter = LoadAdapter {
-            Thread { presenter.loadProducts() }.start()
+            presenter.loadProducts()
         }
         binding.productRv.adapter = concatAdapter
     }
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onResume() {
         super.onResume()
-        Thread { presenter.updateProducts() }.start()
+        presenter.updateProducts()
     }
 
     override fun showCartScreen() {
@@ -122,20 +122,18 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         product: ProductUiModel,
         recentProduct: ProductUiModel?
     ) {
-        runOnUiThread { startActivity(DetailActivity.getIntent(this, product, recentProduct)) }
+        startActivity(DetailActivity.getIntent(this, product, recentProduct))
     }
 
     override fun addProducts(products: List<ProductUiModel>) {
-        runOnUiThread {
-            binding.mainSkeleton.visibility = View.GONE
-            binding.productRv.visibility = View.VISIBLE
-            mainProductAdapter.addItems(products)
-            Thread { presenter.loadRecent() }.start()
-        }
+        binding.mainSkeleton.visibility = View.GONE
+        binding.productRv.visibility = View.VISIBLE
+        mainProductAdapter.addItems(products)
+        presenter.loadRecent()
     }
 
     override fun updateRecent(recent: List<RecentProductUiModel>) {
-        runOnUiThread { recentAdapter.setItems(recent) }
+        recentAdapter.setItems(recent)
     }
 
     override fun showProductDetailScreenByRecent(recentProduct: RecentProductUiModel) {
@@ -144,20 +142,18 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun updateCartProductCount(count: Int) {
         if (::cartProductCountTv.isInitialized) {
-            runOnUiThread {
-                if (count == 0) cartProductCountTv.visibility = View.GONE
-                else cartProductCountTv.visibility = View.VISIBLE
-                cartProductCountTv.text = count.toString()
-            }
+            if (count == 0) cartProductCountTv.visibility = View.GONE
+            else cartProductCountTv.visibility = View.VISIBLE
+            cartProductCountTv.text = count.toString()
         }
     }
 
     override fun updateProductsCount(products: List<ProductUiModel>) {
-        runOnUiThread { mainProductAdapter.updateItems(products) }
+        mainProductAdapter.updateItems(products)
     }
 
     override fun updateProductCount(product: ProductUiModel) {
-        runOnUiThread { mainProductAdapter.updateItem(product) }
+        mainProductAdapter.updateItem(product)
     }
 
     override fun showFailureMessage(message: String) {

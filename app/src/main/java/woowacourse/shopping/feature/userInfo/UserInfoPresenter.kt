@@ -33,6 +33,5 @@ class UserInfoPresenter(
             },
             onFailure = { view.showFailureMessage(it.message) }
         )
-
     }
 }

@@ -2,13 +2,13 @@ package woowacourse.shopping.feature.payment
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
@@ -31,7 +31,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
 
         initPresenter()
         val cartIds = intent.getIntegerArrayListExtra(CART_ITEM_IDS)
-        Thread { presenter.loadCartProducts(cartIds?.toList() ?: emptyList()) }.start()
+        presenter.loadCartProducts(cartIds?.toList() ?: emptyList())
         setup()
 
         supportActionBar?.title = getString(R.string.payment_page)
@@ -66,7 +66,7 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     override fun showCartProducts(cartProducts: List<CartProductUiModel>) {
-        runOnUiThread { binding.recyclerview.adapter = PaymentAdapter(cartProducts) }
+        binding.recyclerview.adapter = PaymentAdapter(cartProducts)
     }
 
     override fun showPoint(point: PointUiModel) {

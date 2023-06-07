@@ -21,9 +21,11 @@ class ProductRetrofitService : ProductRemoteDataSource {
                 response: Response<List<ProductDto>>
             ) {
                 response.body()?.let {
-                    onSuccess(it.map { productEntity ->
-                        productEntity.toDomain()
-                    })
+                    onSuccess(
+                        it.map { productEntity ->
+                            productEntity.toDomain()
+                        }
+                    )
                 }
             }
 
@@ -32,5 +34,4 @@ class ProductRetrofitService : ProductRemoteDataSource {
             }
         })
     }
-
 }

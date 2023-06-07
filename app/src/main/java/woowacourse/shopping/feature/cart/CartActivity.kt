@@ -5,11 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.payment.PaymentActivity
 import woowacourse.shopping.model.CartProductUiModel
@@ -39,9 +40,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter = cartPresenter
         binding.presenter = cartPresenter
 
-        Thread {
-            presenter.setup()
-        }.start()
+        presenter.setup()
     }
 
     private fun initAdapter() {
@@ -49,11 +48,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             listOf(),
             object : CartProductClickListener {
                 override fun onPlusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    Thread { presenter.increaseCartProduct(cartProduct, previousCount) }.start()
+                    presenter.increaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onMinusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    Thread { presenter.decreaseCartProduct(cartProduct, previousCount) }.start()
+                    presenter.decreaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onCheckClick(cartProduct: CartProductUiModel, isSelected: Boolean) {
@@ -61,7 +60,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
 
                 override fun onDeleteClick(cartProduct: CartProductUiModel) {
-                    Thread { presenter.deleteCartProduct(cartProduct) }.start()
+                    presenter.deleteCartProduct(cartProduct)
                 }
             }
         )
@@ -69,20 +68,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun changeCartProducts(newItems: List<CartProductUiModel>) {
-        runOnUiThread {
-            binding.cartListGroup.visibility = View.VISIBLE
-            binding.skeletonLayout.visibility = View.GONE
-            cartProductAdapter.setItems(newItems)
-        }
+        binding.cartListGroup.visibility = View.VISIBLE
+        binding.skeletonLayout.visibility = View.GONE
+        cartProductAdapter.setItems(newItems)
     }
 
     override fun setPageState(hasPrevious: Boolean, hasNext: Boolean, pageNumber: Int) {
-        runOnUiThread {
-            binding.apply {
-                previousPageBtn.isEnabled = hasPrevious
-                nextPageBtn.isEnabled = hasNext
-                pageCountTextView.text = pageNumber.toString()
-            }
+        binding.apply {
+            previousPageBtn.isEnabled = hasPrevious
+            nextPageBtn.isEnabled = hasNext
+            pageCountTextView.text = pageNumber.toString()
         }
     }
 
@@ -93,6 +88,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             totalPrice
         )
         startActivity(intent)
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

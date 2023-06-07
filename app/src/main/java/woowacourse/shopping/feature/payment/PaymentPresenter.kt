@@ -19,17 +19,22 @@ class PaymentPresenter(
     private lateinit var point: Point
 
     override fun loadCartProducts(cartProductIds: List<Int>) {
-        val cartProducts = mutableListOf<CartProductUiModel>()
-        val orders = mutableListOf<OrderProduct>()
-        val all = cartRepository.getAll()
-        cartProductIds.forEach { id ->
-            all.findById(id)?.let {
-                cartProducts.add(it.toPresentation())
-                orders.add(OrderProduct(it.count, it.product))
-            }
-        }
-        orderProducts = orders
-        view.showCartProducts(cartProducts.toList())
+
+        cartRepository.getAll(
+            onSuccess = {
+                val cartProducts = mutableListOf<CartProductUiModel>()
+                val orders = mutableListOf<OrderProduct>()
+                cartProductIds.forEach { id ->
+                    it.findById(id)?.let { cartProduct ->
+                        cartProducts.add(cartProduct.toPresentation())
+                        orders.add(OrderProduct(cartProduct.count, cartProduct.product))
+                    }
+                }
+                orderProducts = orders
+                view.showCartProducts(cartProducts.toList())
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 
     override fun loadPoint() {
@@ -40,7 +45,6 @@ class PaymentPresenter(
             },
             onFailure = { view.showFailureMessage(it.message) }
         )
-
     }
 
     override fun placeOrder(usedPoint: Int) {

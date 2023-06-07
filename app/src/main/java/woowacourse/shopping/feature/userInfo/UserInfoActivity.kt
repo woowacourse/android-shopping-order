@@ -1,9 +1,9 @@
 package woowacourse.shopping.feature.userInfo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
@@ -58,11 +58,11 @@ class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
     }
 
     override fun showOrders(orders: List<OrderUiModel>) {
-        runOnUiThread { orderHistoryAdapter.submitList(orders) }
+        orderHistoryAdapter.submitList(orders)
     }
 
     override fun showPoint(point: PointUiModel) {
-        runOnUiThread { binding.point = point }
+        binding.point = point
     }
 
     override fun showFailureMessage(message: String) {

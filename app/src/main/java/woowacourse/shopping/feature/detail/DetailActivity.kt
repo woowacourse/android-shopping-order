@@ -7,12 +7,13 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -62,13 +63,17 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         startActivity(intent)
     }
 
-    override fun showCartScreen() = runOnUiThread { startActivity(CartActivity.getIntent(this)) }
+    override fun showCartScreen() = startActivity(CartActivity.getIntent(this))
 
     override fun showSelectCountScreen(product: ProductUiModel) {
         val binding = DialogSelectCountBinding.inflate(LayoutInflater.from(this))
         binding.presenter = presenter
         val dialog: AlertDialog = createSelectCountDialog(binding)
         dialog.show()
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun createSelectCountDialog(binding: DialogSelectCountBinding) =
@@ -82,7 +87,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
                 presenter.decreaseCount()
             }
             binding.putBtn.setOnClickListener {
-                Thread { presenter.addCart() }.start()
+                presenter.addCart()
             }
         }.create()
 

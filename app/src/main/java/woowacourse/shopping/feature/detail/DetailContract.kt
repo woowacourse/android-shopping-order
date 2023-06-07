@@ -6,6 +6,7 @@ interface DetailContract {
     interface View {
         fun showCartScreen()
         fun showSelectCountScreen(product: ProductUiModel)
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {

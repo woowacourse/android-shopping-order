@@ -29,29 +29,39 @@ class CartPresenter(
     private lateinit var cartProducts: CartProducts
 
     override fun setup() {
-        cartProducts = cartRepository.getAll()
-        page = PageUiModel(cartProducts.size, 1)
-        _allSelected.postValue(isAllSelected())
+        cartRepository.getAll(
+            onSuccess = {
+                cartProducts = it
+                page = PageUiModel(cartProducts.size, 1)
+                _allSelected.postValue(isAllSelected())
 
-        updateTotalSelectedValues()
-        changePageState(getCurrentPageItems())
+                updateTotalSelectedValues()
+                changePageState(getCurrentPageItems())
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 
     override fun deleteCartProduct(cartProduct: CartProductUiModel) {
-        cartRepository.deleteProduct(cartProduct.cartProductId.toInt())
-        cartProducts.delete(cartProduct.toDomain())
+        cartRepository.deleteProduct(
+            cartItemId = cartProduct.cartProductId.toInt(),
+            onSuccess = {
+                cartProducts.delete(cartProduct.toDomain())
 
-        this.page = this.page.copy(allSize = this.page.allSize - 1)
+                this.page = this.page.copy(allSize = this.page.allSize - 1)
 
-        var loadedItems = getCurrentPageItems()
-        if (loadedItems.isEmpty() && this.page.currentPage != 1) {
-            this.page = this.page.previousPage()
-            loadedItems = getCurrentPageItems()
-        }
+                var loadedItems = getCurrentPageItems()
+                if (loadedItems.isEmpty() && this.page.currentPage != 1) {
+                    this.page = this.page.previousPage()
+                    loadedItems = getCurrentPageItems()
+                }
 
-        changePageState(loadedItems)
-        updateTotalSelectedValues()
-        _allSelected.postValue(isAllSelected())
+                changePageState(loadedItems)
+                updateTotalSelectedValues()
+                _allSelected.postValue(isAllSelected())
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 
     override fun loadPreviousPage() {
@@ -73,23 +83,44 @@ class CartPresenter(
 
     override fun increaseCartProduct(cartProduct: CartProductUiModel, previousCount: Int) {
         if (previousCount == 0) {
-            cartRepository.addProduct(cartProduct.productUiModel.toDomain())
-            cartProducts = cartRepository.getAll()
+            cartRepository.addProduct(
+                product = cartProduct.productUiModel.toDomain(),
+                onSuccess = {
+                    cartRepository.getAll(onSuccess = {
+                        cartProducts = it
+                        updateTotalSelectedValues()
+                    }, onFailure = { view.showFailureMessage(it.message) })
+                },
+                onFailure = { view.showFailureMessage(it.message) }
+            )
         } else {
-            cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount + 1)
-            cartProducts.updateProductCount(cartProduct.toDomain(), previousCount + 1)
+            cartRepository.updateProduct(
+                cartItemId = cartProduct.cartProductId.toInt(),
+                previousCount + 1,
+                onSuccess = {
+                    cartProducts.updateProductCount(cartProduct.toDomain(), previousCount + 1)
+                    updateTotalSelectedValues()
+                },
+                onFailure = { view.showFailureMessage(it.message) }
+            )
         }
-        updateTotalSelectedValues()
     }
 
     override fun decreaseCartProduct(cartProduct: CartProductUiModel, previousCount: Int) {
         if (previousCount == 1) {
             deleteCartProduct(cartProduct)
+            updateTotalSelectedValues()
         } else {
-            cartRepository.updateProduct(cartProduct.cartProductId.toInt(), previousCount - 1)
-            cartProducts.updateProductCount(cartProduct.toDomain(), previousCount - 1)
+            cartRepository.updateProduct(
+                cartItemId = cartProduct.cartProductId.toInt(),
+                count = previousCount - 1,
+                onSuccess = {
+                    cartProducts.updateProductCount(cartProduct.toDomain(), previousCount - 1)
+                    updateTotalSelectedValues()
+                },
+                onFailure = { view.showFailureMessage(it.message) }
+            )
         }
-        updateTotalSelectedValues()
     }
 
     override fun toggleCartProduct(cartProduct: CartProductUiModel, isSelected: Boolean) {

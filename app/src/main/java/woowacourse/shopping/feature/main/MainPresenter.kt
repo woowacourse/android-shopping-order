@@ -24,13 +24,18 @@ class MainPresenter(
     private var cartProducts: CartProducts = CartProducts(listOf())
 
     override fun loadProducts() {
-        cartProducts = cartRepository.getAll()
-        productRepository.getProducts(
-            page = page,
+        cartRepository.getAll(
             onSuccess = {
-                val productItems = matchCartProductCount(it)
-                view.addProducts(productItems)
-                ++page
+                cartProducts = it
+                productRepository.getProducts(
+                    page = page,
+                    onSuccess = {
+                        val productItems = matchCartProductCount(it)
+                        view.addProducts(productItems)
+                        ++page
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
+                )
             },
             onFailure = { view.showFailureMessage(it.message) }
         )
@@ -87,50 +92,77 @@ class MainPresenter(
 
     override fun increaseCartProduct(product: ProductUiModel, previousCount: Int) {
         if (previousCount == 0) {
-            cartRepository.addProduct(product.toDomain())
-            cartProducts = cartRepository.getAll()
-            ++totalCount
-            view.updateCartProductCount(totalCount)
+            cartRepository.addProduct(
+                product = product.toDomain(),
+                onSuccess = {
+                    cartRepository.getAll(
+                        onSuccess = {
+                            cartProducts = it
+                            ++totalCount
+                            view.updateCartProductCount(totalCount)
+                            view.updateProductCount(product.copy(count = previousCount + 1))
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
+                    )
+                },
+                onFailure = { view.showFailureMessage(it.message) }
+            )
         } else {
             cartProducts.findByProductId(productId = product.toDomain().id)
                 ?.let { cartProduct ->
                     cartRepository.updateProduct(
-                        cartProduct.cartProductId.toInt(),
-                        previousCount + 1
+                        cartItemId = cartProduct.cartProductId.toInt(),
+                        count = previousCount + 1,
+                        onSuccess = {
+                            cartProducts.updateProductCount(cartProduct, previousCount + 1)
+                            view.updateProductCount(product.copy(count = previousCount + 1))
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
                     )
-                    cartProducts.updateProductCount(cartProduct, previousCount + 1)
                 }
         }
-        view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun decreaseCartProduct(product: ProductUiModel, previousCount: Int) {
         cartProducts.findByProductId(product.toDomain().id)?.let { cartProduct ->
             if (previousCount == 1) {
-                cartRepository.deleteProduct(cartProduct.cartProductId.toInt())
-                cartProducts.delete(cartProduct)
-                --totalCount
-                view.updateCartProductCount(totalCount)
+                cartRepository.deleteProduct(
+                    cartItemId = cartProduct.cartProductId.toInt(),
+                    onSuccess = {
+                        cartProducts.delete(cartProduct)
+                        --totalCount
+                        view.updateCartProductCount(totalCount)
+                        view.updateProductCount(product.copy(count = 0))
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
+                )
             } else {
                 cartRepository.updateProduct(
-                    cartProduct.cartProductId.toInt(),
-                    previousCount - 1
+                    cartItemId = cartProduct.cartProductId.toInt(),
+                    count = previousCount - 1,
+                    onSuccess = {
+                        cartProducts.updateProductCount(cartProduct, previousCount - 1)
+                        view.updateProductCount(product.copy(count = previousCount - 1))
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
                 )
-                cartProducts.updateProductCount(cartProduct, previousCount - 1)
             }
         }
-        view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun updateProducts() {
-        cartProducts = cartRepository.getAll()
+        cartRepository.getAll(
+            onSuccess = {
+                cartProducts = it
+                val products = cartProducts.data.map {
+                    it.product.toPresentation(count = it.count)
+                }
+                totalCount = products.size
 
-        val products = cartProducts.data.map {
-            it.product.toPresentation(count = it.count)
-        }
-        totalCount = products.size
-
-        view.updateProductsCount(products)
-        view.updateCartProductCount(products.size)
+                view.updateProductsCount(products)
+                view.updateCartProductCount(products.size)
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 }

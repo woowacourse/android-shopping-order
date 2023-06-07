@@ -35,7 +35,6 @@ class OrderRepositoryImpl : OrderRepository {
             override fun onFailure(call: Call<OrderListDto>, t: Throwable) {
                 onFailure(FailureInfo.Default(throwable = t))
             }
-
         })
     }
 
@@ -95,7 +94,6 @@ class OrderRepositoryImpl : OrderRepository {
             override fun onFailure(call: Call<Unit>, t: Throwable) {
                 onFailure(FailureInfo.Default(throwable = t))
             }
-
         })
     }
 }
