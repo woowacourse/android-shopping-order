@@ -1,33 +1,48 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.basket.BasketDataSource
-import woowacourse.shopping.data.mapper.toData
-import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSource
+import woowacourse.shopping.data.mapper.toDomainModel
+import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
+import java.util.concurrent.CompletableFuture
 
 class BasketRepositoryImpl(
-    private val localBasketDataSource: BasketDataSource.Local,
-    private val remoteBasketDataSource: BasketDataSource.Remote
-) :
-    BasketRepository {
+    private val basketRemoteDataSource: BasketRemoteDataSource,
+) : BasketRepository {
 
-    override fun getAll(onReceived: (List<BasketProduct>) -> Unit) {
-        remoteBasketDataSource.getAll { dataBasketProduct ->
-            onReceived(dataBasketProduct.map { it.toDomain() })
+    override fun getAll(): CompletableFuture<Result<List<BasketProduct>>> {
+
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.getAll().mapCatching { basketProducts ->
+                basketProducts.map { it.toDomainModel() }
+            }
         }
     }
 
-    override fun add(product: Product, onReceived: (Int) -> Unit) {
-        remoteBasketDataSource.add(product.toData(), onReceived)
+    override fun add(
+        product: Product,
+    ): CompletableFuture<Result<Int>> {
+
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.add(product.toEntity()).map { productId ->
+                productId.toInt()
+            }
+        }
     }
 
-    override fun update(basketProduct: BasketProduct) {
-        remoteBasketDataSource.update(basketProduct.toData())
+    override fun update(basketProduct: BasketProduct): CompletableFuture<Result<Unit>> {
+
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.update(basketProduct.toEntity())
+        }
     }
 
-    override fun remove(basketProduct: BasketProduct) {
-        remoteBasketDataSource.remove(basketProduct.toData())
+    override fun remove(basketProduct: BasketProduct): CompletableFuture<Result<Unit>> {
+
+        return CompletableFuture.supplyAsync {
+            basketRemoteDataSource.remove(basketProduct.toEntity())
+        }
     }
 }

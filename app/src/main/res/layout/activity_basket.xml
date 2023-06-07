@@ -133,17 +133,18 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/tv_order"
+                app:layout_constraintEnd_toStartOf="@+id/btn_order"
                 app:layout_constraintHorizontal_weight="238"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:layout_editor_absoluteY="29dp"
                 tools:text="183,200원" />
 
             <TextView
-                android:id="@+id/tv_order"
+                android:id="@+id/btn_order"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@color/woowa_previous_enable"
+                android:background="@drawable/shape_colored_previous"
+                android:enabled="false"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:text="@{@string/tv_order(checkedCount)}"

@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.database.dao.recentproduct
 
-import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.model.DataRecentProduct
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 
 interface RecentProductDao {
     fun getSize(): Int
-    fun getPartially(size: Int): List<DataRecentProduct>
-    fun add(recentProduct: DataProduct)
+    fun getPartially(size: Int): List<RecentProductEntity>
+    fun add(product: ProductEntity)
     fun removeLast()
 }

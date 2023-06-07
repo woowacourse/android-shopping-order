@@ -4,14 +4,13 @@ import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.RecentProducts
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.mapper.toDomain
-import woowacourse.shopping.ui.mapper.toUi
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
-import woowacourse.shopping.util.secondOrNull
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.mapper.toUiModel
+import woowacourse.shopping.ui.model.ProductUiModel
 import kotlin.concurrent.thread
 
 class ShoppingPresenter(
@@ -21,8 +20,8 @@ class ShoppingPresenter(
     private val basketRepository: BasketRepository,
     private var hasNext: Boolean = false,
     private var lastId: Int = -1,
-    private var totalProducts: List<UiProduct> = listOf(),
-    private var recentProducts: List<UiRecentProduct> = listOf()
+    private var totalProducts: List<ProductUiModel> = listOf(),
+    private var recentProducts: RecentProducts = RecentProducts(listOf()),
 ) : ShoppingContract.Presenter {
     private lateinit var basket: Basket
     private var isLoaded: Boolean = false
@@ -34,7 +33,7 @@ class ShoppingPresenter(
 
     private fun fetchBasketCount() {
         totalProducts = totalProducts.map {
-            UiProduct(
+            ProductUiModel(
                 it.id,
                 it.name,
                 it.price,
@@ -45,19 +44,27 @@ class ShoppingPresenter(
     }
 
     override fun initBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
+        basketRepository.getAll().thenAccept { basketProducts ->
+            basket = Basket(basketProducts.getOrThrow())
             fetchTotalBasketCount()
             updateProducts()
+        }.exceptionally { error ->
+            error.message?.let {
+                view.showErrorMessage(it)
+            }
+            null
         }
     }
 
     override fun updateBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
-            fetchTotalBasketCount()
-            fetchBasketCount()
-            view.updateProducts(totalProducts)
+        basketRepository.getAll().thenAccept { basketProducts ->
+            basket = Basket(basketProducts.getOrThrow())
+            updateBothProducts()
+        }.exceptionally { error ->
+            error.message?.let {
+                view.showErrorMessage(it)
+            }
+            null
         }
     }
 
@@ -67,41 +74,52 @@ class ShoppingPresenter(
 
     override fun plusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
-        )
-        basket = basket.plus(BasketProduct(count = Count(1), product = product))
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
+            basketProduct = basket.getProductByProductId(product.id).plusCount()
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.plus(BasketProduct(count = Count(1), product = product))
+            updateBothProducts()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
-        )
-        basket = basket.minus(BasketProduct(count = Count(1), product = product))
-        fetchBasketCount()
-        fetchTotalBasketCount()
-        view.updateProducts(totalProducts)
+            basketProduct = basket.getProductByProductId(product.id).minusCount()
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.minus(BasketProduct(count = Count(1), product = product))
+            updateBothProducts()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun addBasketProduct(product: Product) {
-        basketRepository.add(product) {
-            basket = basket.plus(BasketProduct(id = it, count = Count(1), product = product))
+        basketRepository.add(product).thenAccept { basketProductId ->
+            basket = basket.plus(
+                BasketProduct(
+                    id = basketProductId.getOrThrow(),
+                    count = Count(1),
+                    product = product
+                )
+            )
             fetchBasketCount()
             fetchTotalBasketCount()
             view.updateProducts(totalProducts)
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
         }
     }
 
     override fun updateProducts() {
-        productRepository
-            .getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId) { products ->
-                var uiProducts = products.map { it.toUi() }
+        productRepository.getPartially(TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE, lastId)
+            .thenAccept { products ->
+                var uiProducts = products.getOrThrow().map { it.toUiModel() }
                 lastId = uiProducts.maxOfOrNull { it.id } ?: -1
                 hasNext = checkHasNext(uiProducts)
                 lastId -= if (hasNext) 1 else 0
@@ -114,27 +132,49 @@ class ShoppingPresenter(
             }
     }
 
-    private fun checkHasNext(products: List<UiProduct>): Boolean =
+    private fun updateBothProducts() {
+        fetchBasketCount()
+        fetchTotalBasketCount()
+        view.updateProducts(totalProducts)
+    }
+
+    private fun checkHasNext(products: List<ProductUiModel>): Boolean =
         products.size == TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE
 
     override fun fetchRecentProducts() {
-        recentProducts = recentProductRepository.getPartially(RECENT_PRODUCT_SIZE)
-            .map { it.toUi() }
-        view.updateRecentProducts(recentProducts)
+        recentProducts = RecentProducts(
+            values = recentProductRepository.getPartially(RECENT_PRODUCT_SIZE)
+        )
+
+        view.updateRecentProducts(
+            recentProducts = recentProducts.values.map {
+                it.toUiModel()
+            }
+        )
     }
 
-    override fun inquiryProductDetail(product: UiProduct) {
-        val previousProduct =
-            if (recentProducts.firstOrNull()?.product == product) recentProducts.secondOrNull()?.product else recentProducts.firstOrNull()?.product
+    override fun inquiryProductDetail(product: ProductUiModel) {
+        val previousProduct = recentProducts.getLatestProduct(
+            product = product.toDomainModel()
+        )?.toUiModel()
+
+        val previousBasketId = previousProduct?.run {
+            runCatching {
+                basket.getProductByProductId(id).id
+            }.getOrNull()
+        }
+
+        val currentProductBasketId = runCatching {
+            basket.getProductByProductId(product.id).id
+        }.getOrNull()
+
         view.showProductDetail(
             currentProduct = product,
-            currentProductBasketId = basket.getProductByProductId(product.id)?.id,
+            currentProductBasketId = currentProductBasketId,
             previousProduct = previousProduct,
-            previousProductBasketId = if (previousProduct != null) basket.getProductByProductId(
-                previousProduct.id
-            )?.id else null
+            previousProductBasketId = previousBasketId
         )
-        thread { recentProductRepository.add(product.toDomain()) }
+        thread { recentProductRepository.add(product.toDomainModel()) }
     }
 
     override fun fetchHasNext() {
@@ -147,7 +187,5 @@ class ShoppingPresenter(
         private const val PRODUCT_SIZE_FOR_HAS_NEXT = 1
         private const val TOTAL_LOAD_PRODUCT_SIZE_AT_ONCE =
             LOAD_PRODUCT_SIZE_AT_ONCE + PRODUCT_SIZE_FOR_HAS_NEXT
-
-        private const val NOT_EXIST_PRODUCT_ERROR = "장바구니에 담겨있지 않은 상품을 조회하였습니다."
     }
 }

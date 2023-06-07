@@ -5,17 +5,17 @@ import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
-import woowacourse.shopping.ui.mapper.toDomain
-import woowacourse.shopping.ui.mapper.toUi
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.mapper.toUiModel
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class BasketPresenter(
     override val view: BasketContract.View,
     private val basketRepository: BasketRepository,
     private var currentPage: Int = 1,
-    private var startId: Int = 0
+    private var startId: Int = 0,
 ) : BasketContract.Presenter {
-    private lateinit var basket: Basket
+    override lateinit var basket: Basket
     private val hasNext: Boolean get() = basket.products.lastIndex >= startId + BASKET_PAGING_SIZE
     private var isLoaded: Boolean = false
 
@@ -25,11 +25,16 @@ class BasketPresenter(
     }
 
     private fun updateBasket() {
-        basketRepository.getAll {
-            basket = Basket(it)
+        basketRepository.getAll().thenAccept { basketProducts ->
+            basket = Basket(basketProducts.getOrThrow())
             updateBasketProducts()
             isLoaded = true
             view.updateSkeletonState(isLoaded)
+        }.exceptionally { error ->
+            error.message?.let {
+                view.showErrorMessage(it)
+            }
+            null
         }
     }
 
@@ -42,6 +47,7 @@ class BasketPresenter(
     override fun updateBasketProductCheckState(basketProduct: BasketProduct) {
         basket.updateCheck(basketProduct)
         updateOrderInformation()
+        updateStateToOrder()
         view.updateTotalCheckBox(getTotalIsChecked())
     }
 
@@ -55,22 +61,28 @@ class BasketPresenter(
 
     override fun plusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.plusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
-        )
-        basket = basket.plus(BasketProduct(count = Count(1), product = product))
-        updateBasketProductViewData()
+            basketProduct = basket.getProductByProductId(product.id).plusCount()
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.plus(BasketProduct(count = Count(1), product = product))
+            updateBasketProductViewData()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun minusBasketProductCount(product: Product) {
         basketRepository.update(
-            basket.getProductByProductId(product.id)?.minusCount() ?: throw IllegalStateException(
-                NOT_EXIST_PRODUCT_ERROR
-            )
-        )
-        basket = basket.minus(BasketProduct(count = Count(1), product = product))
-        updateBasketProductViewData()
+            basketProduct = basket.getProductByProductId(product.id).minusCount()
+        ).thenAccept {
+            it.getOrThrow()
+            basket = basket.minus(BasketProduct(count = Count(1), product = product))
+            updateBasketProductViewData()
+        }.exceptionally { error ->
+            error.message?.let { view.showErrorMessage(it) }
+            null
+        }
     }
 
     override fun updateBasketProducts() {
@@ -100,17 +112,30 @@ class BasketPresenter(
             basket.getSubBasketByStartId(
                 startId,
                 BASKET_PAGING_SIZE
-            ).products.map { it.toUi() }
+            ).products.map { it.toUiModel() }
         )
     }
 
     override fun deleteBasketProduct(
-        product: UiBasketProduct
+        product: BasketProductUiModel,
     ) {
-        basketRepository.remove(product.toDomain())
-        basket = basket.remove(product.toDomain())
-        amendStartId()
-        updateBasketProductViewData()
+        basketRepository.remove(product.toDomainModel())
+            .thenAccept {
+                it.getOrThrow()
+                basket = basket.remove(product.toDomainModel())
+                amendStartId()
+                updateBasketProductViewData()
+            }
+            .exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
+            }
+    }
+
+    private fun updateStateToOrder() {
+        val hasCheckedProduct = basket.products.any { it.checked }
+
+        view.updateOrderButtonState(hasCheckedProduct)
     }
 
     private fun amendStartId() {
@@ -128,9 +153,18 @@ class BasketPresenter(
         view.updateCurrentPage(currentPage)
     }
 
+    override fun startPayment() {
+        val products = basket.products
+            .filter { it.checked }
+            .map { it.toUiModel() }
+
+        view.showPaymentView(
+            basketProducts = products,
+            totalPrice = basket.getCheckedProductsTotalPrice()
+        )
+    }
+
     companion object {
         private const val BASKET_PAGING_SIZE = 5
-
-        private const val NOT_EXIST_PRODUCT_ERROR = "장바구니에 담겨있지 않은 상품을 조회하였습니다."
     }
 }

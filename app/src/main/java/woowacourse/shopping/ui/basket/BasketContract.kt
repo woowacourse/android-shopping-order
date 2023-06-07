@@ -1,13 +1,14 @@
 package woowacourse.shopping.ui.basket
 
+import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 interface BasketContract {
     interface View {
 
-        fun updateBasketProducts(basketProducts: List<UiBasketProduct>)
+        fun updateBasketProducts(basketProducts: List<BasketProductUiModel>)
 
         fun updateNavigatorEnabled(previous: Boolean, next: Boolean)
 
@@ -20,10 +21,18 @@ interface BasketContract {
         fun updateTotalCheckBox(isChecked: Boolean)
 
         fun updateSkeletonState(isLoaded: Boolean)
+
+        fun updateOrderButtonState(isAvailable: Boolean)
+
+        fun showPaymentView(basketProducts: List<BasketProductUiModel>, totalPrice: Int)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {
+
         val view: View
+        var basket: Basket
 
         fun fetchTotalCheckToCurrentPage(totalIsChecked: Boolean)
 
@@ -39,6 +48,8 @@ interface BasketContract {
 
         fun updateNextPage()
 
-        fun deleteBasketProduct(product: UiBasketProduct)
+        fun deleteBasketProduct(product: BasketProductUiModel)
+
+        fun startPayment()
     }
 }

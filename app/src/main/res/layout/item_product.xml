@@ -9,7 +9,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.ui.model.Product" />
+            type="woowacourse.shopping.ui.model.ProductUiModel" />
 
         <variable
             name="addClickListener"

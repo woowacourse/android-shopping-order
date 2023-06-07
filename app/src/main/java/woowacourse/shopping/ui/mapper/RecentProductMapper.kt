@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.mapper
 
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.RecentProductUiModel
 
-fun UiRecentProduct.toDomain(): RecentProduct =
-    RecentProduct(id = id, product = product.toDomain())
+fun RecentProductUiModel.toDomainModel(): RecentProduct =
+    RecentProduct(id = id, product = product.toDomainModel())
 
-fun RecentProduct.toUi(): UiRecentProduct =
-    UiRecentProduct(id = id, product = product.toUi())
+fun RecentProduct.toUiModel(): RecentProductUiModel =
+    RecentProductUiModel(id = id, product = product.toUiModel())

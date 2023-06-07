@@ -5,9 +5,8 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import woowacourse.shopping.data.database.contract.RecentProductContract
-import woowacourse.shopping.data.model.DataPrice
-import woowacourse.shopping.data.model.DataProduct
-import woowacourse.shopping.data.model.DataRecentProduct
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.data.datasource.response.RecentProductEntity
 
 class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProductDao {
 
@@ -24,8 +23,8 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
     }
 
     @SuppressLint("Range")
-    override fun getPartially(size: Int): List<DataRecentProduct> {
-        val products = mutableListOf<DataRecentProduct>()
+    override fun getPartially(size: Int): List<RecentProductEntity> {
+        val products = mutableListOf<RecentProductEntity>()
         database.writableDatabase.use { db ->
             val cursor = db.rawQuery(GET_PARTIALLY_QUERY, arrayOf(size.toString()))
             while (cursor.moveToNext()) {
@@ -34,25 +33,30 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
                     cursor.getInt(cursor.getColumnIndex(RecentProductContract.PRODUCT_ID))
                 val name: String =
                     cursor.getString(cursor.getColumnIndex(RecentProductContract.COLUMN_NAME))
-                val price: DataPrice =
-                    DataPrice(cursor.getInt(cursor.getColumnIndex(RecentProductContract.COLUMN_PRICE)))
+                val price: Int =
+                    cursor.getInt(cursor.getColumnIndex(RecentProductContract.COLUMN_PRICE))
                 val imageUrl: String =
                     cursor.getString(cursor.getColumnIndex(RecentProductContract.COLUMN_IMAGE_URL))
-                products.add(DataRecentProduct(id, DataProduct(productId, name, price, imageUrl)))
+                products.add(
+                    RecentProductEntity(
+                        id,
+                        ProductEntity(productId, name, price, imageUrl)
+                    )
+                )
             }
             cursor.close()
         }
         return products
     }
 
-    override fun add(recentProduct: DataProduct) {
-        removeByProductId(recentProduct.id)
+    override fun add(product: ProductEntity) {
+        removeByProductId(product.id)
 
         val contentValues = ContentValues().apply {
-            put(RecentProductContract.PRODUCT_ID, recentProduct.id)
-            put(RecentProductContract.COLUMN_NAME, recentProduct.name)
-            put(RecentProductContract.COLUMN_PRICE, recentProduct.price.value)
-            put(RecentProductContract.COLUMN_IMAGE_URL, recentProduct.imageUrl)
+            put(RecentProductContract.PRODUCT_ID, product.id)
+            put(RecentProductContract.COLUMN_NAME, product.name)
+            put(RecentProductContract.COLUMN_PRICE, product.price)
+            put(RecentProductContract.COLUMN_IMAGE_URL, product.imageUrl)
         }
 
         database.writableDatabase.use { db ->

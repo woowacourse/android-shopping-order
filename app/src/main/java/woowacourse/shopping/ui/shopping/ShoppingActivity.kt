@@ -1,8 +1,10 @@
 package woowacourse.shopping.ui.shopping
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -11,19 +13,18 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.database.dao.basket.BasketDaoImpl
 import woowacourse.shopping.data.database.dao.recentproduct.RecentProductDaoImpl
-import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
-import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
-import woowacourse.shopping.data.datasource.product.remote.RemoteProductDataSource
-import woowacourse.shopping.data.datasource.recentproduct.local.LocalRecentProductDataSource
+import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.recentproduct.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.ui.basket.BasketActivity
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentProductUiModel
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingViewType.MORE_BUTTON
 import woowacourse.shopping.ui.shopping.ShoppingViewType.PRODUCT
@@ -69,6 +70,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initRecentProductsData()
         initButtonBasketClickListener()
         initShoppingRecyclerViewScrollListener()
+        initOrderHistoryClickListener()
     }
 
     override fun onResume() {
@@ -81,34 +83,31 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                RemoteProductDataSource()
+                ProductRemoteDataSourceImpl()
             ),
             RecentProductRepositoryImpl(
-                LocalRecentProductDataSource(RecentProductDaoImpl(shoppingDatabase))
+                RecentProductLocalDataSourceImpl(RecentProductDaoImpl(shoppingDatabase))
             ),
-            BasketRepositoryImpl(
-                LocalBasketDataSource(BasketDaoImpl(shoppingDatabase)),
-                RemoteBasketDataSource()
-            )
+            BasketRepositoryImpl(BasketRemoteDataSourceImpl())
         )
     }
 
-    override fun updateProducts(products: List<UiProduct>) {
+    override fun updateProducts(products: List<ProductUiModel>) {
         runOnUiThread {
             productAdapter.submitList(products)
         }
     }
 
-    override fun updateRecentProducts(recentProducts: List<UiRecentProduct>) {
+    override fun updateRecentProducts(recentProducts: List<RecentProductUiModel>) {
         recentProductAdapter.submitList(recentProducts)
         recentProductWrapperAdapter.notifyDataSetChanged()
     }
 
     override fun showProductDetail(
-        currentProduct: UiProduct,
+        currentProduct: ProductUiModel,
         currentProductBasketId: Int?,
-        previousProduct: UiProduct?,
-        previousProductBasketId: Int?
+        previousProduct: ProductUiModel?,
+        previousProductBasketId: Int?,
     ) {
         activityResultLauncher.launch(
             ProductDetailActivity.getIntent(
@@ -131,6 +130,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun updateSkeletonState(isLoaded: Boolean) {
         binding.isLoaded = isLoaded
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun initSkeletonAdapter() {
@@ -198,6 +201,14 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         }
     }
 
+    private fun initOrderHistoryClickListener() {
+        binding.ivOrderHistory.setOnClickListener {
+            val intent = OrderHistoryActivity.getIntent(this)
+
+            startActivity(intent)
+        }
+    }
+
     companion object {
         private const val LOAD_POSITION = 4
         private const val STATE_LOWEST = 1
@@ -205,5 +216,13 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         private const val FROM_ANOTHER_ACTIVITY = "FromAnotherActivity"
 
         fun getResultIntent() = Intent().putExtra(FROM_ANOTHER_ACTIVITY, true)
+
+        fun getIntent(context: Context): Intent {
+            val intent = Intent(context, ShoppingActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+
+            return intent
+        }
     }
 }

@@ -7,16 +7,16 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemBasketBinding
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.mapper.toDomain
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.model.BasketProductUiModel
 
 class BasketAdapter(
-    private val onRemoveItemClick: (UiBasketProduct) -> Unit,
+    private val onRemoveItemClick: (BasketProductUiModel) -> Unit,
     private val minusClickListener: (Product) -> Unit,
     private val plusClickListener: (Product) -> Unit,
     private val onCheckedChangeListener: (BasketProduct) -> Unit
 ) :
-    ListAdapter<UiBasketProduct, BasketViewHolder>(basketDiffUtil) {
+    ListAdapter<BasketProductUiModel, BasketViewHolder>(basketDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasketViewHolder {
         val binding =
@@ -24,13 +24,13 @@ class BasketAdapter(
         return BasketViewHolder(
             binding,
             { onRemoveItemClick(it) },
-            { minusClickListener(it.toDomain()) },
-            { plusClickListener(it.toDomain()) },
+            { minusClickListener(it.toDomainModel()) },
+            { plusClickListener(it.toDomainModel()) },
             { basketProduct, isChecked ->
-                var processedBasketProduct = BasketProduct(
+                val processedBasketProduct = BasketProduct(
                     id = basketProduct.id,
-                    count = basketProduct.count.toDomain(),
-                    product = basketProduct.product.toDomain(),
+                    count = basketProduct.count.toDomainModel(),
+                    product = basketProduct.product.toDomainModel(),
                     checked = isChecked
                 )
                 onCheckedChangeListener(processedBasketProduct)
@@ -43,11 +43,11 @@ class BasketAdapter(
     }
 
     companion object {
-        private val basketDiffUtil = object : DiffUtil.ItemCallback<UiBasketProduct>() {
-            override fun areItemsTheSame(oldItem: UiBasketProduct, newItem: UiBasketProduct):
+        private val basketDiffUtil = object : DiffUtil.ItemCallback<BasketProductUiModel>() {
+            override fun areItemsTheSame(oldItem: BasketProductUiModel, newItem: BasketProductUiModel):
                 Boolean = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: UiBasketProduct, newItem: UiBasketProduct):
+            override fun areContentsTheSame(oldItem: BasketProductUiModel, newItem: BasketProductUiModel):
                 Boolean = oldItem == newItem
         }
     }

@@ -1,0 +1,68 @@
+package woowacourse.shopping.ui.orerdetail
+
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.Before
+import org.junit.Test
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.ui.OrderFixture
+import woowacourse.shopping.ui.mapper.toUiModel
+import woowacourse.shopping.ui.orderdetail.OrderDetailContract
+import woowacourse.shopping.ui.orderdetail.OrderDetailNavigation
+import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
+import java.util.concurrent.CompletableFuture
+
+class OrderDetailPresenterTest {
+
+    private lateinit var presenter: OrderDetailContract.Presenter
+    private lateinit var view: OrderDetailContract.View
+    private lateinit var repository: OrderRepository
+    private lateinit var navigation: OrderDetailNavigation.ShoppingViewCase
+
+    @Before
+    fun setUp() {
+        repository = mockk(relaxed = true)
+        view = mockk(relaxed = true)
+        navigation = mockk(relaxed = true)
+        every { navigation.orderId } returns 10
+
+        presenter = OrderDetailPresenter(
+            view = view,
+            orderRepository = repository,
+            navigation = navigation
+        )
+    }
+
+    @Test
+    fun `저장소로부터 주문 식별번호에 해당하는 주문 정보를 얻어온 후 뷰를 초기화한다`() {
+        // given
+        val order = OrderFixture.createOrder()
+
+        every {
+            repository.getOrder(orderId = 10)
+        } returns CompletableFuture.completedFuture(Result.success(order))
+
+        // when: 저장소로부터 주문 정보룰 받아온다.
+        presenter.getOrder()
+
+        // then: 받아온 주문 정보로 뷰가 초기화된다.
+        verify { view.initView(order.toUiModel()) }
+    }
+
+    @Test
+    fun `저장소로부터 주문 식별번호에 해당하는 주문 정보를 얻어오지 못한 경우 에러 메시지를 띄운다`() {
+        // given
+        val errorMessage = "주문 정보를 불러올 수 없습니다"
+
+        every {
+            repository.getOrder(10)
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
+
+        // when: 저장소로부터 주문 정보룰 받아온다.
+        presenter.getOrder()
+
+        // then: 받아오지 못한 경우 에러메시지를 띄운다
+        verify { view.showErrorMessage(any()) }
+    }
+}

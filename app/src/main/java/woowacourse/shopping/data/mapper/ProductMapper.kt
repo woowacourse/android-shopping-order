@@ -1,10 +1,19 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.data.datasource.response.ProductEntity
+import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.Product
 
-fun DataProduct.toDomain(): Product =
-    Product(id = id, name = name, price = price.toDomain(), imageUrl = imageUrl)
+fun ProductEntity.toDomainModel() = Product(
+    id = id,
+    name = name,
+    price = Price(price),
+    imageUrl = imageUrl
+)
 
-fun Product.toData(): DataProduct =
-    DataProduct(id = id, name = name, price = price.toData(), imageUrl = imageUrl)
+fun Product.toEntity() = ProductEntity(
+    id = id,
+    name = name,
+    price = price.value,
+    imageUrl = imageUrl
+)

@@ -54,6 +54,11 @@ data class Basket(val products: List<BasketProduct>) {
         products.map { it.checked = isChecked }
     }
 
-    fun getProductByProductId(productId: Int): BasketProduct? =
+    fun getProductByProductId(productId: Int): BasketProduct =
         products.find { it.product.id == productId }
+            ?: throw NoSuchElementException(NOT_EXIST_PRODUCT_ERROR)
+
+    companion object {
+        private const val NOT_EXIST_PRODUCT_ERROR = "장바구니에 담겨있지 않은 상품을 조회하였습니다."
+    }
 }

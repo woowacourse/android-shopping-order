@@ -11,7 +11,7 @@
 
         <variable
             name="basketProduct"
-            type="woowacourse.shopping.ui.model.BasketProduct" />
+            type="woowacourse.shopping.ui.model.BasketProductUiModel" />
 
         <variable
             name="ivCloseClickListener"

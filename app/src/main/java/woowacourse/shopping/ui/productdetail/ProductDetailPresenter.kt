@@ -1,31 +1,36 @@
 package woowacourse.shopping.ui.productdetail
 
+import woowacourse.shopping.domain.Basket
 import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Count
 import woowacourse.shopping.domain.repository.BasketRepository
-import woowacourse.shopping.ui.mapper.toDomain
-import woowacourse.shopping.ui.model.UiProduct
+import woowacourse.shopping.ui.mapper.toDomainModel
+import woowacourse.shopping.ui.model.ProductUiModel
 
 class ProductDetailPresenter(
     override val view: ProductDetailContract.View,
     private val basketRepository: BasketRepository,
-    private var currentProduct: UiProduct,
+    private var currentProduct: ProductUiModel,
     private var currentProductBasketId: Int?,
-    private var previousProduct: UiProduct?,
-    private var previousProductBasketId: Int?
+    private var previousProduct: ProductUiModel?,
+    private var previousProductBasketId: Int?,
 ) : ProductDetailContract.Presenter {
 
     init {
-        basketRepository.getAll { basketProducts ->
-            currentProduct.basketCount =
-                basketProducts.find { it.product.id == currentProduct.id }?.count?.value ?: 0
-        }
-        if (previousProduct != null) {
-            basketRepository.getAll { basketProducts ->
-                previousProduct?.basketCount =
-                    basketProducts.find { it.product.id == requireNotNull(previousProduct).id }?.count?.value
-                        ?: 0
+        basketRepository.getAll().thenAccept { basketProducts ->
+            val basket = Basket(basketProducts.getOrThrow())
+            val currentProductCount = basket.getCountByProductId(currentProduct.id)
+            val previousProductCount = previousProduct?.run {
+                basket.getCountByProductId(id)
+            } ?: 0
+
+            currentProduct.basketCount = currentProductCount
+            previousProduct?.basketCount = previousProductCount
+        }.exceptionally { error ->
+            error.message?.let {
+                view.showErrorMessage(it)
             }
+            null
         }
     }
 
@@ -58,26 +63,33 @@ class ProductDetailPresenter(
             updateCurrentProduct()
             view.showBasket()
         } else {
-            basketRepository.add(currentProduct.toDomain()) {
-                currentProductBasketId = it
+            basketRepository.add(currentProduct.toDomainModel()).thenAccept { basketProductId ->
+                currentProductBasketId = basketProductId.getOrThrow()
                 if (currentProduct.basketCount > 1) {
                     updateCurrentProduct()
                 }
                 view.showBasket()
+            }.exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
             }
         }
     }
 
     private fun updateCurrentProduct() {
-        basketRepository.update(
-            getAddableCurrentProduct()
-        )
+        basketRepository.update(getAddableCurrentProduct())
+            .thenAccept {
+                it.getOrThrow()
+            }.exceptionally { error ->
+                error.message?.let { view.showErrorMessage(it) }
+                null
+            }
     }
 
     private fun getAddableCurrentProduct() = BasketProduct(
         id = requireNotNull(currentProductBasketId),
         count = Count(currentProduct.basketCount),
-        product = currentProduct.toDomain()
+        product = currentProduct.toDomainModel()
     )
 
     override fun selectPreviousProduct() {

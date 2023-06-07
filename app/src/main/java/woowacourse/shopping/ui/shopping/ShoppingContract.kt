@@ -1,20 +1,20 @@
 package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentProductUiModel
 
 interface ShoppingContract {
     interface View {
 
-        fun updateProducts(products: List<UiProduct>)
+        fun updateProducts(products: List<ProductUiModel>)
 
-        fun updateRecentProducts(recentProducts: List<UiRecentProduct>)
+        fun updateRecentProducts(recentProducts: List<RecentProductUiModel>)
 
         fun showProductDetail(
-            currentProduct: UiProduct,
+            currentProduct: ProductUiModel,
             currentProductBasketId: Int?,
-            previousProduct: UiProduct?,
+            previousProduct: ProductUiModel?,
             previousProductBasketId: Int?
         )
 
@@ -23,6 +23,8 @@ interface ShoppingContract {
         fun updateTotalBasketCount(totalBasketCount: Int)
 
         fun updateSkeletonState(isLoaded: Boolean)
+
+        fun showErrorMessage(errorMessage: String)
     }
 
     interface Presenter {
@@ -45,7 +47,7 @@ interface ShoppingContract {
 
         fun fetchRecentProducts()
 
-        fun inquiryProductDetail(product: UiProduct)
+        fun inquiryProductDetail(product: ProductUiModel)
 
         fun fetchHasNext()
     }

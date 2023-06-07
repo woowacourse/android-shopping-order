@@ -1,36 +1,28 @@
 package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
-import io.mockk.slot
 import io.mockk.verify
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.domain.Price
+import woowacourse.shopping.domain.BasketProduct
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.model.UiPrice
-import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.BasketProductFixture
+import woowacourse.shopping.ui.ProductFixture
+import woowacourse.shopping.ui.RecentProductFixture
+import woowacourse.shopping.ui.mapper.toUiModel
+import woowacourse.shopping.ui.model.ProductUiModel
+import java.util.concurrent.CompletableFuture
 
-class ShoppingPresenterTest() {
+class ShoppingPresenterTest {
     private lateinit var view: ShoppingContract.View
     private lateinit var productRepository: ProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var basketRepository: BasketRepository
     private lateinit var presenter: ShoppingPresenter
-    private val pagingSize = 10
-    private val hasNextStandard = 1
-    private val onceLoadingSize = pagingSize + hasNextStandard
-
-    // 초기화 할때 한번 불리기 때문에 verify test시 더해줘야한다.
-    private val initialUpdateTotalBasketCount = 1
 
     @Before
     fun initPresenter() {
@@ -38,169 +30,232 @@ class ShoppingPresenterTest() {
         productRepository = mockk(relaxed = true)
         recentProductRepository = mockk(relaxed = true)
         basketRepository = mockk(relaxed = true)
-        presenter =
-            ShoppingPresenter(view, productRepository, recentProductRepository, basketRepository)
+        presenter = ShoppingPresenter(
+            view = view,
+            productRepository = productRepository,
+            recentProductRepository = recentProductRepository,
+            basketRepository = basketRepository
+        )
     }
 
     @Test
-    fun `상품 데이터를 불러오면 화면이 업데이트 된다`() {
+    fun `프레젠터가 생성되면서 상품이 로드 되지 않았을 때 보이는 스켈레톤 뷰의 상태가 업데이트 된다`() {
         // given
-        every { view.updateProducts(any()) } just runs
-        every { productRepository.getPartially(any(), any()) } returns List(onceLoadingSize) {
-            Product(
-                1,
-                "더미입니다만",
-                Price(1000),
-                "url"
-            )
-        }
 
         // when
-        presenter.initProducts()
+        ShoppingPresenter(
+            view = view,
+            productRepository = productRepository,
+            recentProductRepository = recentProductRepository,
+            basketRepository = basketRepository
+        )
 
         // then
-        verify(exactly = 1) { view.updateProducts(any()) }
+        verify { view.updateSkeletonState(false) }
+    }
+
+    @Test
+    fun `저장소로부터 장바구니 상품들을 받아와 장바구니 개수를 갱신한다`() {
+        // given
+        val basketProducts = BasketProductFixture.createBasketProducts()
+        val totalBasketProductCount = basketProducts.sumOf { it.count.value }
+
+        every {
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.success(basketProducts))
+
+        // when
+        presenter.initBasket()
+
+        // then
+        verify { view.updateTotalBasketCount(totalBasketProductCount) }
+    }
+
+    @Test
+    fun `저장소로부터 장바구니 상품들을 받아오지 못한 경우 에러 메시지를 보여준다`() {
+        // given
+        val errorMessage = "장바구니 상품을 불러올 수 없습니다."
+
+        every {
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
+
+        // when
+        presenter.initBasket()
+
+        // then
+        verify { view.showErrorMessage(any()) }
+    }
+
+    @Test
+    fun `저장소로부터 상품을 받아와 상품 뷰를 갱신한다`() {
+        // given
+        val products = ProductFixture.createProducts()
+
+        setUpBasket(
+            products = products,
+            basketProducts = listOf()
+        )
+
+        every {
+            productRepository.getPartially(any(), any())
+        } returns CompletableFuture.completedFuture(Result.success(products))
+
+        // when
+        presenter.updateProducts()
+
+        // then
+        verify { view.updateProducts(products.map { it.toUiModel() }) }
     }
 
     @Test
     fun `최근 본 상품 목록을 업데이트 하면 화면 업데이트 로직도 호출된다`() {
         // given
-        every { view.updateRecentProducts(any()) } just runs
-        every { recentProductRepository.getPartially(any()) } returns listOf(
-            RecentProduct(
-                1,
-                Product(1, "더미입니다만", Price(1000), "url")
-            )
-        )
+        val products = RecentProductFixture.createProducts()
+
+        every { recentProductRepository.getPartially(any()) } returns products
+
         // when
         presenter.fetchRecentProducts()
 
         // then
-        verify(exactly = 1) { view.updateRecentProducts(any()) }
-    }
-
-    @Test
-    fun `장바구니를 업데이트하면 관련 데이터인 상품이 장바구니에 담긴 갯수 전체 장바구니 count 수가 업데이트 된다`() {
-        // given
-        every { view.updateProducts(any()) } just runs
-        every { view.updateTotalBasketCount(any()) } just runs
-        // when
-        presenter.initBasket()
-        // then
-        verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
-    }
-
-    @Test
-    fun `장바구니 물품 총 갯수를 계산하고 뷰에 업데이트 한다`() {
-        // given
-        every { view.updateTotalBasketCount(any()) } just runs
-
-        // when
-        presenter.fetchTotalBasketCount()
-        // then
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
+        verify { view.updateRecentProducts(products.map { it.toUiModel() }) }
     }
 
     @Test
     fun `장바구니에 물품을 추가하면 데이터베이스에 저장하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
         // given
-        every { view.updateProducts(any()) } just runs
-        every { view.updateTotalBasketCount(any()) } just runs
-        every { basketRepository.add(any()) } just runs
+        val products = ProductFixture.createProducts()
+        val basketProducts = BasketProductFixture.createBasketProducts()
+
+        setUpBasket(
+            products = products,
+            basketProducts = basketProducts
+        )
+
         // when
-        presenter.plusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
+        presenter.plusBasketProductCount(products.first())
+
         // then
-        verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
-        verify(exactly = 1) { basketRepository.add(any()) }
+        val expected = products.map { product ->
+            ProductUiModel(
+                id = product.id,
+                name = product.name,
+                price = product.price.toUiModel(),
+                imageUrl = product.imageUrl,
+                basketCount = basketProducts.first { it.product.id == product.id }.count.value
+            )
+        }
+
+        verify { view.updateProducts(expected) }
+        verify { view.updateTotalBasketCount(basketProducts.sumOf { it.count.value }) }
+        verify {
+            basketRepository.update(
+                basketProduct = basketProducts.find { it.product.id == products.first().id }!!,
+            )
+        }
     }
 
     @Test
-    fun `장바구니에 물품을 빼면 데이터베이스에서도 빼는 로직을 실행하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
+    fun `장바구니 물품 추가에 대해서 실패하면 에러 메시지를 보여준다`() {
         // given
-        every { view.updateProducts(any()) } just runs
-        every { view.updateTotalBasketCount(any()) } just runs
-        every { basketRepository.minus(any()) } just runs
+        val products = ProductFixture.createProducts()
+        val errorMessage = "물품을 장바구니에 추가하지 못했습니다."
+
+        setUpBasket(products)
+        every {
+            basketRepository.add(products.first())
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
+
         // when
-        presenter.minusBasketProductCount(Product(1, "더미입니다만", Price(1), "url"))
+        presenter.addBasketProduct(products.first())
+
         // then
-        verify(exactly = 1) { view.updateProducts(any()) }
-        verify(exactly = initialUpdateTotalBasketCount + 1) { view.updateTotalBasketCount(any()) }
-        verify(exactly = 1) { basketRepository.minus(any()) }
+        verify { view.showErrorMessage(any()) }
+    }
+
+    @Test
+    fun `장바구니 물품의 개수를 빼면 데이터베이스에서도 빼는 로직을 실행하고 관련 데이터(상품이 장바구니에 담긴 갯수 전체 장바구니 count 수)를 업데이트 한다`() {
+        // given
+        val products = ProductFixture.createProducts()
+        val basketProducts = BasketProductFixture.createBasketProducts()
+
+        setUpBasket(
+            products = products,
+            basketProducts = basketProducts
+        )
+
+        // when
+        presenter.minusBasketProductCount(products.first())
+
+        // then
+        val expected = products.map { product ->
+            ProductUiModel(
+                id = product.id,
+                name = product.name,
+                price = product.price.toUiModel(),
+                imageUrl = product.imageUrl,
+                basketCount = basketProducts.first { it.product.id == product.id }.count.value
+            )
+        }
+
+        verify { view.updateProducts(expected) }
+        verify { view.updateTotalBasketCount(basketProducts.sumOf { it.count.value }) }
+        verify {
+            basketRepository.update(
+                basketProduct = basketProducts.find { it.product.id == products.first().id }!!,
+            )
+        }
+    }
+
+    @Test
+    fun `장바구니 물품의 개수를 빼는 것을 실패하면 에러 메시지를 띄운다`() {
+        // given
+        val products = ProductFixture.createProducts()
+        val basketProducts = BasketProductFixture.createBasketProducts()
+        val basketProduct = basketProducts.find { it.product.id == products.first().id }
+        val errorMessage = "물품의 개수 감소시키는 것을 실패했습니다"
+
+        setUpBasket(
+            products = products,
+            basketProducts = basketProducts
+        )
+        every {
+            basketRepository.update(
+                basketProduct = basketProduct!!,
+            )
+        } returns CompletableFuture.completedFuture(Result.failure(Throwable(errorMessage)))
+
+        // when
+        presenter.minusBasketProductCount(products.first())
+
+        // then
+        verify { view.showErrorMessage(any()) }
     }
 
     @Test
     fun `페이지네이션의 다음페이지가 존재여부를 더보기 버튼의 visibility를 업데이트 하기위해 전달한다`() {
         // given
-        every { view.updateMoreButtonState(any()) } just runs
+
         // when
         presenter.fetchHasNext()
+
         // then
-        verify(exactly = 1) { view.updateMoreButtonState(any()) }
+        verify { view.updateMoreButtonState(any()) }
     }
 
-    @Test
-    fun `상세조회 페이지로 넘어갈때 가장최근에 본상품을 다시 조회하면 그다음으로 최근에 본상품을 previousProduct로 전달한다`() {
-        // given
-        every { recentProductRepository.add(any()) } just runs
-        val currentProductSlot = slot<UiProduct>()
-        val previousProductSlot = slot<UiProduct>()
+    private fun setUpBasket(
+        products: List<Product> = ProductFixture.createProducts(),
+        basketProducts: List<BasketProduct> = BasketProductFixture.createBasketProducts(),
+    ) {
         every {
-            view.showProductDetail(
-                capture(currentProductSlot),
-                capture(previousProductSlot)
-            )
-        } just runs
+            productRepository.getPartially(any(), any())
+        } returns CompletableFuture.completedFuture(Result.success(products))
 
-        // when
-        val recentProducts =
-            List(4) { UiRecentProduct(it, UiProduct(it, "더미입니다만", UiPrice(1000), "url")) }
-        presenter =
-            ShoppingPresenter(
-                view,
-                productRepository,
-                recentProductRepository,
-                basketRepository,
-                recentProducts = recentProducts
-            )
-        val selectedProducts = UiProduct(0, "더미입니다만", UiPrice(1000), "url")
-        presenter.inquiryProductDetail(selectedProducts)
-
-        // then
-        assertEquals(currentProductSlot.captured, selectedProducts)
-        assertEquals(previousProductSlot.captured, UiProduct(1, "더미입니다만", UiPrice(1000), "url"))
-    }
-
-    @Test
-    fun `상세조회 페이지로 넘어갈때 가장최근에 본상품을 제외한 다른상품을 조회하면 가장 최근에 본상품을 previousProduct로 전달한다`() {
-        // given
-        every { recentProductRepository.add(any()) } just runs
-        val currentProductSlot = slot<UiProduct>()
-        val previousProductSlot = slot<UiProduct>()
         every {
-            view.showProductDetail(
-                capture(currentProductSlot),
-                capture(previousProductSlot)
-            )
-        } just runs
+            basketRepository.getAll()
+        } returns CompletableFuture.completedFuture(Result.success(basketProducts))
 
-        // when
-        val recentProducts =
-            List(4) { UiRecentProduct(it, UiProduct(it, "더미입니다만", UiPrice(1000), "url")) }
-        presenter =
-            ShoppingPresenter(
-                view,
-                productRepository,
-                recentProductRepository,
-                basketRepository,
-                recentProducts = recentProducts
-            )
-        val selectedProducts = UiProduct(3, "더미입니다만", UiPrice(1000), "url")
-        presenter.inquiryProductDetail(selectedProducts)
-
-        // then
-        assertEquals(currentProductSlot.captured, selectedProducts)
-        assertEquals(previousProductSlot.captured, UiProduct(0, "더미입니다만", UiPrice(1000), "url"))
+        presenter.initBasket()
     }
 }

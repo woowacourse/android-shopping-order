@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.mapper
 
 import woowacourse.shopping.domain.Count
-import woowacourse.shopping.ui.model.UiCount
+import woowacourse.shopping.ui.model.CountUiModel
 
-fun UiCount.toDomain(): Count =
+fun CountUiModel.toDomainModel(): Count =
     Count(value)
 
-fun Count.toUi(): UiCount =
-    UiCount(value)
+fun Count.toUiModel(): CountUiModel =
+    CountUiModel(value)

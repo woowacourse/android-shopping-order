@@ -4,23 +4,21 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.database.dao.basket.BasketDaoImpl
-import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
-import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
+import woowacourse.shopping.data.datasource.basket.BasketRemoteDataSourceImpl
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
-import woowacourse.shopping.ui.model.UiBasketProduct
+import woowacourse.shopping.ui.model.BasketProductUiModel
+import woowacourse.shopping.ui.payment.PaymentActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
 class BasketActivity : AppCompatActivity(), BasketContract.View {
     private lateinit var presenter: BasketContract.Presenter
-
     private lateinit var binding: ActivityBasketBinding
     private lateinit var basketAdapter: BasketAdapter
 
@@ -35,6 +33,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         initToolbarBackButton()
         navigatorClickListener()
         initTotalCheckBoxOnCheckedChangedListener()
+        initOrderButtonListener()
     }
 
     private fun initSkeletonAdapter() {
@@ -53,11 +52,10 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     private fun initPresenter() {
         presenter = BasketPresenter(
-            this,
-            BasketRepositoryImpl(
-                LocalBasketDataSource(BasketDaoImpl(ShoppingDatabase(this))),
-                RemoteBasketDataSource()
-            )
+            view = this,
+            basketRepository = BasketRepositoryImpl(
+                basketRemoteDataSource = BasketRemoteDataSourceImpl()
+            ),
         )
     }
 
@@ -86,7 +84,7 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
         }
     }
 
-    override fun updateBasketProducts(basketProducts: List<UiBasketProduct>) {
+    override fun updateBasketProducts(basketProducts: List<BasketProductUiModel>) {
         runOnUiThread {
             basketAdapter.submitList(basketProducts)
         }
@@ -115,6 +113,36 @@ class BasketActivity : AppCompatActivity(), BasketContract.View {
 
     override fun updateSkeletonState(isLoaded: Boolean) {
         binding.isLoaded = isLoaded
+    }
+
+    override fun updateOrderButtonState(isAvailable: Boolean) {
+        binding.btnOrder.isEnabled = isAvailable
+    }
+
+    override fun showPaymentView(
+        basketProducts: List<BasketProductUiModel>,
+        totalPrice: Int,
+    ) {
+        val intent = PaymentActivity.getIntent(
+            context = this,
+            totalPrice = totalPrice,
+            basketProducts = basketProducts.toTypedArray()
+        )
+
+        startActivity(intent)
+    }
+
+    override fun showErrorMessage(errorMessage: String) {
+        val intent = ShoppingActivity.getIntent(this)
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        startActivity(intent)
+    }
+
+    private fun initOrderButtonListener() {
+        binding.btnOrder.setOnClickListener {
+            presenter.startPayment()
+        }
     }
 
     companion object {
