@@ -22,13 +22,14 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             orderRepository = OrderRepositoryImpl(
                 orderRemoteDataSource = OrderRemoteDataSourceImpl()
             ),
-            orderId = intent.getIntExtra(ORDER_ID_KEY, -1),
-            order = intent.getSerializableCompat(ORDER_KEY)
+            navigation = OrderDetailNavigation.valueOf(
+                context = this,
+                orderId = intent.getIntExtra(ORDER_ID_KEY, -1),
+                order = intent.getSerializableCompat(ORDER_KEY)
+            )
         )
     }
-    override val navigator: OrderDetailNavigator by lazy {
-        OrderDetailNavigatorImpl(this)
-    }
+
     private val binding: ActivityOrderDetailBinding by lazy {
         DataBindingUtil.setContentView(this, R.layout.activity_order_detail)
     }

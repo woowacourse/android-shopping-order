@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.orerdetail
 
 import io.mockk.every
-import io.mockk.invoke
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
@@ -10,6 +9,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.OrderFixture
 import woowacourse.shopping.ui.mapper.toUiModel
 import woowacourse.shopping.ui.orderdetail.OrderDetailContract
+import woowacourse.shopping.ui.orderdetail.OrderDetailNavigation
 import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 import java.util.concurrent.CompletableFuture
 
@@ -18,16 +18,19 @@ class OrderDetailPresenterTest {
     private lateinit var presenter: OrderDetailContract.Presenter
     private lateinit var view: OrderDetailContract.View
     private lateinit var repository: OrderRepository
+    private lateinit var navigation: OrderDetailNavigation.ShoppingViewCase
 
     @Before
     fun setUp() {
         repository = mockk(relaxed = true)
         view = mockk(relaxed = true)
+        navigation = mockk(relaxed = true)
+        every { navigation.orderId } returns 10
+
         presenter = OrderDetailPresenter(
             view = view,
             orderRepository = repository,
-            orderId = 10,
-            order = null
+            navigation = navigation
         )
     }
 

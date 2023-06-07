@@ -2,18 +2,19 @@ package woowacourse.shopping.ui.orderdetail
 
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.mapper.toUiModel
-import woowacourse.shopping.ui.model.OrderUiModel
+import woowacourse.shopping.ui.orderdetail.OrderDetailNavigation.PreviousViewCase
+import woowacourse.shopping.ui.orderdetail.OrderDetailNavigation.ShoppingViewCase
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
     private val orderRepository: OrderRepository,
-    private val orderId: Int,
-    private val order: OrderUiModel?,
+    private val navigation: OrderDetailNavigation,
 ) : OrderDetailContract.Presenter {
 
     override fun getOrder() {
-        if (orderId != -1) {
-            orderRepository.getOrder(orderId)
+        when (navigation) {
+            is PreviousViewCase -> view.initView(navigation.order)
+            is ShoppingViewCase -> orderRepository.getOrder(navigation.orderId)
                 .thenAccept {
                     val order = it.getOrThrow().toUiModel()
 
@@ -24,19 +25,9 @@ class OrderDetailPresenter(
                     null
                 }
         }
-
-        order?.let {
-            view.initView(it)
-        }
     }
 
     override fun handleNavigator() {
-        order?.let {
-            return view.navigator.navigateToPreviousView(
-                onFailed = view::showErrorMessage
-            )
-        }
-
-        view.navigator.navigateToShoppingView()
+        navigation.navigate()
     }
 }

@@ -6,8 +6,6 @@ interface OrderDetailContract {
 
     interface View {
 
-        val navigator: OrderDetailNavigator
-
         fun initView(order: OrderUiModel)
 
         fun showErrorMessage(errorMessage: String)
