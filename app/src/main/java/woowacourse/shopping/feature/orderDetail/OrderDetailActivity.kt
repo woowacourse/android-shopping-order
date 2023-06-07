@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.RetrofitClient
@@ -57,6 +58,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

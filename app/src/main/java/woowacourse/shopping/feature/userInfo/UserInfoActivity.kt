@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.userInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
@@ -74,6 +75,10 @@ class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
 
     override fun showPoint(point: PointUiModel) {
         runOnUiThread { binding.point = point }
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showOrderDetailScreen(orderId: Int) {

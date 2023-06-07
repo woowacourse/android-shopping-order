@@ -6,6 +6,7 @@ interface OrderDetailContract {
     interface View {
         fun showOrderDetail(orderDetail: OrderDetailUiModel)
         fun moveToMainScreen()
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {

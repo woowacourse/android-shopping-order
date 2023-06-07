@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
@@ -169,6 +170,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun updateProductCount(product: ProductUiModel) {
         runOnUiThread { mainProductAdapter.updateItem(product) }
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

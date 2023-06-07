@@ -32,7 +32,7 @@ class MainPresenter(
                 view.addProducts(productItems)
                 ++page
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 

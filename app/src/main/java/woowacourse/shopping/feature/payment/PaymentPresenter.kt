@@ -38,7 +38,7 @@ class PaymentPresenter(
                 view.showPoint(it.toPresentation())
                 point = it
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
 
     }
@@ -50,7 +50,7 @@ class PaymentPresenter(
             onSuccess = {
                 view.showPaymentDoneScreen()
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 

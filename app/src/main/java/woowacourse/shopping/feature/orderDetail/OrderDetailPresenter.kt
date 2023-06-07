@@ -17,7 +17,7 @@ class OrderDetailPresenter(
             onSuccess = {
                 view.showOrderDetail(orderDetail = it.toPresentation())
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 
@@ -27,7 +27,7 @@ class OrderDetailPresenter(
             onSuccess = {
                 view.moveToMainScreen()
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 }

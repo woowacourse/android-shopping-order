@@ -22,7 +22,7 @@ class UserInfoPresenter(
                 ++page
                 view.showOrders(orders.map { it.toPresentation() })
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 
@@ -31,7 +31,7 @@ class UserInfoPresenter(
             onSuccess = {
                 view.showPoint(point = it.toPresentation())
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
 
     }

@@ -100,6 +100,10 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
         binding.pointEt.setText(usedPoint.toString(), TextView.BufferType.EDITABLE)
     }
 
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun setEditTextState(point: PointUiModel, productsPrice: Int) {
         binding.pointEt.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit

@@ -7,6 +7,7 @@ interface UserInfoContract {
     interface View {
         fun showOrders(orders: List<OrderUiModel>)
         fun showPoint(point: PointUiModel)
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {

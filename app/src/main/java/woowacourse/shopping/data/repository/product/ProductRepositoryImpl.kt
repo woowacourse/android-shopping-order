@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository.product
 
-import android.util.Log
 import com.example.domain.ProductCache
+import com.example.domain.model.FailureInfo
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSource
@@ -14,7 +14,7 @@ class ProductRepositoryImpl(
     override fun getProducts(
         page: Int,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (FailureInfo) -> Unit
     ) {
         if (productCache.productList.isEmpty()) {
             remoteDataSource.requestProducts(
@@ -23,7 +23,7 @@ class ProductRepositoryImpl(
                     sleep(2000)
                     onSuccess(productCache.getSubProducts(1, LOAD_SIZE))
                 },
-                onFailure = { Log.d("Hash", "failure: $it") }
+                onFailure = { onFailure(FailureInfo.Default(throwable = it)) }
             )
         } else {
             onSuccess(productCache.getSubProducts(page, LOAD_SIZE))

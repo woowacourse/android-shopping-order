@@ -9,6 +9,7 @@ interface PaymentContract {
         fun showPoint(point: PointUiModel)
         fun showPaymentDoneScreen()
         fun setPoint(usedPoint: Int)
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {

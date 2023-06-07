@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.order
 
+import com.example.domain.model.FailureInfo
 import com.example.domain.model.Order
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderProduct
@@ -13,21 +14,26 @@ import woowacourse.shopping.data.model.OrderListDto
 import woowacourse.shopping.data.model.OrderRequestDto
 import woowacourse.shopping.data.model.toData
 import woowacourse.shopping.data.model.toDomain
+import woowacourse.shopping.data.util.failureInfo
 
 class OrderRepositoryImpl(
     private val service: OrderService
 ) : OrderRepository {
-    override fun getOrders(page: Int, onSuccess: (List<Order>) -> Unit, onFailure: () -> Unit) {
+    override fun getOrders(
+        page: Int,
+        onSuccess: (List<Order>) -> Unit,
+        onFailure: (FailureInfo) -> Unit
+    ) {
         service.getAll(page).enqueue(object : Callback<OrderListDto> {
             override fun onResponse(call: Call<OrderListDto>, response: Response<OrderListDto>) {
-                if (response.code() >= 400) onFailure()
+                if (response.code() >= 400) onFailure(failureInfo(response.code()))
                 response.body()?.let { orderListDto ->
                     onSuccess(orderListDto.contents.map { it.toDomain() })
                 }
             }
 
             override fun onFailure(call: Call<OrderListDto>, t: Throwable) {
-                onFailure()
+                onFailure(FailureInfo.Default(throwable = t))
             }
 
         })
@@ -37,18 +43,18 @@ class OrderRepositoryImpl(
         usedPoint: Int,
         orderProducts: List<OrderProduct>,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        onFailure: (FailureInfo) -> Unit
     ) {
         val orderRequest = OrderRequestDto(usedPoint, orderProducts.map { it.toData() })
 
         service.placeOrder(orderRequest).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.code() >= 400) onFailure()
+                if (response.code() >= 400) onFailure(failureInfo(response.code()))
                 onSuccess()
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(FailureInfo.Default(throwable = t))
             }
         })
     }
@@ -56,34 +62,38 @@ class OrderRepositoryImpl(
     override fun getOrderDetail(
         orderId: Int,
         onSuccess: (OrderDetail) -> Unit,
-        onFailure: () -> Unit
+        onFailure: (FailureInfo) -> Unit
     ) {
         service.getOrderDetail(orderId).enqueue(object : Callback<OrderDetailDto> {
             override fun onResponse(
                 call: Call<OrderDetailDto>,
                 response: Response<OrderDetailDto>
             ) {
-                if (response.code() >= 400) onFailure()
+                if (response.code() >= 400) onFailure(failureInfo(response.code()))
                 response.body()?.let {
                     onSuccess(it.toDomain())
                 }
             }
 
             override fun onFailure(call: Call<OrderDetailDto>, t: Throwable) {
-                onFailure()
+                onFailure(FailureInfo.Default(throwable = t))
             }
         })
     }
 
-    override fun cancelOrder(orderId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun cancelOrder(
+        orderId: Int,
+        onSuccess: () -> Unit,
+        onFailure: (FailureInfo) -> Unit
+    ) {
         service.deleteOrder(orderId).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.code() >= 400) onFailure()
+                if (response.code() >= 400) onFailure(failureInfo(response.code()))
                 onSuccess()
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(FailureInfo.Default(throwable = t))
             }
 
         })
