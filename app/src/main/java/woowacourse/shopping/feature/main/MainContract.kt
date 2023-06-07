@@ -15,7 +15,11 @@ interface MainContract {
                 val recentProduct: RecentProductUiModel?,
             ) : MainScreenEvent()
 
+            data class ReBindProductItem(val productId: Long) : MainScreenEvent()
+
             object ShowFailedLoadProduct : MainScreenEvent()
+            object ShowFailedLoadCartInfo : MainScreenEvent()
+            object ShowFailedChangeCartCount : MainScreenEvent()
             object HideLoadMore : MainScreenEvent()
             object ShowLoading : MainScreenEvent()
             object HideLoading : MainScreenEvent()

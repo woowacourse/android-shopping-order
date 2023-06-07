@@ -19,6 +19,8 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.order.confirm.OrderConfirmActivity
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 import woowacourse.shopping.util.toMoneyFormat
 
 class CartActivity : AppCompatActivity(), CartContract.View {
@@ -109,6 +111,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun showFailedLoadCartInfo() {
+        showToastShort(R.string.failed_load_cart_info)
+    }
+
+    override fun reBindProductItem(cartId: Long) {
+        cartProductAdapter.reBindItem(cartId)
+    }
+
     override fun exitCartScreen() = finish()
 
     override fun hideLoadingView() {
@@ -130,6 +140,18 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showOrderUnavailableMessage() {
         Toast.makeText(this, getString(R.string.order_unavailable_message), Toast.LENGTH_SHORT)
             .show()
+    }
+
+    override fun showFailedChangeCartCount() {
+        showToastShort(R.string.failed_change_cart_count)
+    }
+
+    override fun showFailedOrderRequest() {
+        showToastShort(R.string.failed_order_request)
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

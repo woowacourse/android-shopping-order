@@ -24,6 +24,14 @@ class MainProductAdapter(
         submitList(newItems)
     }
 
+    fun reBindItem(productId: Long) {
+        val cartProductUiModel = currentList.find { it.productUiModel.id == productId }
+        cartProductUiModel?.let {
+            val index = currentList.indexOf(it)
+            notifyItemChanged(index)
+        }
+    }
+
     companion object {
         const val VIEW_TYPE = 222
 

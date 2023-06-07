@@ -7,11 +7,16 @@ import woowacourse.shopping.model.PageBottomNavigationUiModel
 
 interface CartContract {
     interface View {
+        fun showFailedLoadCartInfo()
+        fun reBindProductItem(cartId: Long)
         fun exitCartScreen()
         fun hideLoadingView()
         fun showLoadingView()
         fun showOrderConfirmScreen(cartIds: List<Long>)
         fun showOrderUnavailableMessage()
+        fun showFailedChangeCartCount()
+        fun showFailedOrderRequest()
+        fun showNetworkError()
     }
 
     interface Presenter {

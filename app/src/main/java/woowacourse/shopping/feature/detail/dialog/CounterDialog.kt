@@ -15,6 +15,8 @@ import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getParcelableCompat
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class CounterDialog : DialogFragment(), CounterDialogContract.View {
     private var _binding: DialogCounterBinding? = null
@@ -76,6 +78,14 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
                 Toast.LENGTH_SHORT,
             ).show()
         }
+    }
+
+    override fun showFailedChangeCartCount() {
+        requireActivity().showToastShort(R.string.failed_change_cart_count)
+    }
+
+    override fun showNetworkError() {
+        requireActivity().showToastNetworkError()
     }
 
     override fun exit() {

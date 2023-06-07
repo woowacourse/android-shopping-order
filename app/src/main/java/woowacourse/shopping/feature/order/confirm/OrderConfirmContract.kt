@@ -6,6 +6,7 @@ import woowacourse.shopping.model.MoneySaleUiModel
 
 interface OrderConfirmContract {
     interface View {
+        fun showFailedLoadCartInfo()
         fun setSaleInfo(moneySaleUiModel: MoneySaleUiModel)
         fun setPayInfo(originMoney: Int, saleApplyMoney: Int)
         fun setFinalPayInfo(saleApplyMoney: Int)
@@ -13,6 +14,7 @@ interface OrderConfirmContract {
         fun showNoneSaleInfo()
         fun showOrderSuccess(cartIds: List<Long>)
         fun showOrderFailed()
+        fun showNetworkError()
         fun exitScreen()
     }
 

@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProducts
 import com.example.domain.model.Pagination
 import com.example.domain.repository.CartRepository
@@ -44,13 +45,17 @@ class CartPresenter(
 
     override fun loadInitCartProduct() {
         view.showLoadingView()
-        cartRepository.fetchAll(
-            onSuccess = {
-                _page = Pagination(CartProducts(it), 1).toPresentation()
-                view.hideLoadingView()
-            },
-            onFailure = {},
-        )
+        cartRepository.fetchAll { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val cartsInfo = result.response
+                    _page = Pagination(CartProducts(cartsInfo), 1).toPresentation()
+                    view.hideLoadingView()
+                }
+                is BaseResponse.FAILED -> view.showFailedLoadCartInfo()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     override fun loadPreviousPage() {
@@ -64,24 +69,33 @@ class CartPresenter(
     }
 
     override fun handleDeleteCartProductClick(cartId: Long) {
-        cartRepository.deleteCartProduct(
-            cartId,
-            onSuccess = {
-                _page = page.toDomain().remove(cartId).toPresentation()
-            },
-            onFailure = {},
-        )
+        cartRepository.deleteCartProduct(cartId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    _page = page.toDomain().remove(cartId).toPresentation()
+                }
+                is BaseResponse.FAILED -> view.showFailedChangeCartCount()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     override fun handleCartProductCartCountChange(cartId: Long, count: Int) {
-        cartRepository.changeCartProductCount(
-            cartId,
-            count,
-            onSuccess = {
-                _page = page.toDomain().changeCountState(cartId, count).toPresentation()
-            },
-            onFailure = {},
-        )
+        cartRepository.changeCartProductCount(cartId, count) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    _page = page.toDomain().changeCountState(cartId, count).toPresentation()
+                }
+                is BaseResponse.FAILED -> {
+                    view.showFailedChangeCartCount()
+                    view.reBindProductItem(cartId)
+                }
+                is BaseResponse.NETWORK_ERROR -> {
+                    view.showNetworkError()
+                    view.reBindProductItem(cartId)
+                }
+            }
+        }
     }
 
     override fun handlePurchaseSelectedCheckedChange(cartId: Long, checked: Boolean) {

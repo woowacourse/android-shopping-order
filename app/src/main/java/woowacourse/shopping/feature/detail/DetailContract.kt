@@ -6,7 +6,7 @@ import woowacourse.shopping.model.RecentProductUiModel
 
 interface DetailContract {
     interface View {
-        fun failedLoadProductInfo()
+        fun showFailedLoadProductInfo()
         fun showCartScreen()
         fun hideRecentScreen()
         fun setRecentScreen(title: String, money: String)
@@ -14,6 +14,7 @@ interface DetailContract {
         fun exitDetailScreen()
         fun showSelectCartProductCountScreen(product: ProductUiModel, cartId: Long?)
         fun showRetryMessage()
+        fun showNetworkError()
     }
 
     interface Presenter {

@@ -1,34 +1,30 @@
 package com.example.domain.repository
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 
 interface CartRepository {
     fun fetchAll(
-        onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (BaseResponse<List<CartProduct>>) -> Unit,
     )
 
     fun fetchSize(
-        onSuccess: (cartCount: Int) -> Unit,
-        onFailure: () -> Unit
+        callBack: (cartCount: BaseResponse<Int>) -> Unit,
     )
 
     fun addCartProduct(
         productId: Long,
-        onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (cartId: BaseResponse<Long>) -> Unit,
     )
 
     fun changeCartProductCount(
         cartId: Long,
         count: Int,
-        onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (cartId: BaseResponse<Long>) -> Unit,
     )
 
     fun deleteCartProduct(
         cartId: Long,
-        onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        callBack: (cartId: BaseResponse<Long>) -> Unit,
     )
 }

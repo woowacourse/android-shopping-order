@@ -143,11 +143,20 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             MainContract.View.MainScreenEvent.ShowFailedLoadProduct -> {
                 showToastShort(R.string.failed_load_product_detail_info)
             }
+            MainContract.View.MainScreenEvent.ShowFailedLoadCartInfo -> {
+                showToastShort(R.string.failed_load_cart_info)
+            }
+            MainContract.View.MainScreenEvent.ShowFailedChangeCartCount -> {
+                showToastShort(R.string.failed_change_cart_count)
+            }
             MainContract.View.MainScreenEvent.ShowNetworkError -> {
                 showToastNetworkError()
             }
             MainContract.View.MainScreenEvent.ShowRetryMessage -> {
                 showToastRetryAgainLater()
+            }
+            is MainContract.View.MainScreenEvent.ReBindProductItem -> {
+                mainProductAdapter.reBindItem(event.productId)
             }
         }
     }

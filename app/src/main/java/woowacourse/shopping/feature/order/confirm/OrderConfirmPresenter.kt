@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.order.confirm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
 import com.example.domain.model.MoneySalePolicy
 import com.example.domain.repository.CartRepository
@@ -23,14 +24,18 @@ class OrderConfirmPresenter(
     private var paymentPrice: Int = 0
 
     override fun loadSelectedCarts() {
-        cartRepository.fetchAll(
-            onSuccess = { cartProducts ->
-                val selectedCartItems = cartProducts.filter { it.cartId in cartIds }
-                _cartProducts.postValue(selectedCartItems.map { it.toPresentation() })
-                payInfo(selectedCartItems)
-            },
-            onFailure = { }
-        )
+        cartRepository.fetchAll { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val cartProducts = result.response
+                    val selectedCartItems = cartProducts.filter { it.cartId in cartIds }
+                    _cartProducts.postValue(selectedCartItems.map { it.toPresentation() })
+                    payInfo(selectedCartItems)
+                }
+                is BaseResponse.FAILED -> view.showFailedLoadCartInfo()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     private fun payInfo(cartProducts: List<CartProduct>) {

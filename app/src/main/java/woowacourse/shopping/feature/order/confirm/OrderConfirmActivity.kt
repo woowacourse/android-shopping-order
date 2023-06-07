@@ -17,9 +17,7 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderConfirmBinding
 import woowacourse.shopping.model.MoneySaleUiModel
 import woowacourse.shopping.module.ApiModule
-import woowacourse.shopping.util.getSerializableExtraCompat
-import woowacourse.shopping.util.keyError
-import woowacourse.shopping.util.toMoneyFormat
+import woowacourse.shopping.util.*
 
 class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     private lateinit var binding: ActivityOrderConfirmBinding
@@ -68,6 +66,10 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
         }
     }
 
+    override fun showFailedLoadCartInfo() {
+        showToastShort(R.string.failed_load_cart_info)
+    }
+
     override fun setSaleInfo(moneySaleUiModel: MoneySaleUiModel) {
         binding.saleCategoryTextView.text =
             getString(R.string.sale_boundary_condition, moneySaleUiModel.saleBoundary)
@@ -103,6 +105,10 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
 
     override fun showOrderFailed() {
         Toast.makeText(this, getString(R.string.order_failed_message), Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     override fun exitScreen() = finish()

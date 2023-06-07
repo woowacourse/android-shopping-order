@@ -51,18 +51,22 @@ class DetailPresenter(
     }
 
     private fun findCartInfoByProduct(product: Product) {
-        cartRepository.fetchAll(
-            onSuccess = { cartProducts ->
-                val productUiModel =
-                    cartProducts.find { it.product.id == productId }
-                        ?.toPresentation()?.productUiModel
+        cartRepository.fetchAll { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val cartProducts = result.response
+                    val productUiModel =
+                        cartProducts.find { it.product.id == productId }
+                            ?.toPresentation()?.productUiModel
 
-                productUiModel?.let {
-                    _product.postValue(it)
-                } ?: _product.postValue(product.toPresentation())
-            },
-            onFailure = { }
-        )
+                    productUiModel?.let {
+                        _product.postValue(it)
+                    } ?: _product.postValue(product.toPresentation())
+                }
+                is BaseResponse.FAILED -> view.showFailedLoadProductInfo()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     override fun updateProductCount(count: Int) {
@@ -72,14 +76,18 @@ class DetailPresenter(
 
     override fun handleAddCartClick() {
         _product.value?.let {
-            cartRepository.fetchAll(
-                onSuccess = { carts ->
-                    val cartProductId =
-                        carts.find { it.product.id == productId }?.cartId
-                    view.showSelectCartProductCountScreen(it, cartProductId)
-                },
-                onFailure = {},
-            )
+            cartRepository.fetchAll { result ->
+                when (result) {
+                    is BaseResponse.SUCCESS -> {
+                        val carts = result.response
+                        val cartProductId =
+                            carts.find { it.product.id == productId }?.cartId
+                        view.showSelectCartProductCountScreen(it, cartProductId)
+                    }
+                    is BaseResponse.FAILED -> view.showFailedLoadProductInfo()
+                    is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+                }
+            }
         }
     }
 
@@ -101,7 +109,7 @@ class DetailPresenter(
     }
 
     private fun failedLoadDetailData() {
-        view.failedLoadProductInfo()
+        view.showFailedLoadProductInfo()
         view.exitDetailScreen()
     }
 

@@ -43,8 +43,7 @@ class MainPresenter(
                 is BaseResponse.SUCCESS -> {
                     loadCartInfo(result.response)
                 }
-                is BaseResponse.FAILED -> {
-                }
+                is BaseResponse.FAILED -> showFailedLoadProduct()
                 is BaseResponse.NETWORK_ERROR -> showNetworkError()
             }
         }
@@ -69,15 +68,19 @@ class MainPresenter(
     }
 
     private fun loadCartInfo(products: List<Product>) {
-        cartRepository.fetchAll(
-            onSuccess = { cartsInfo ->
-                val cartProductUiModels = createCartProductUiModels(products, cartsInfo)
-                _products.postValue(cartProductUiModels)
-                _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
-                updateCartCountBadge()
-            },
-            onFailure = {}
-        )
+        cartRepository.fetchAll { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val cartsInfo = result.response
+                    val cartProductUiModels = createCartProductUiModels(products, cartsInfo)
+                    _products.postValue(cartProductUiModels)
+                    _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
+                    updateCartCountBadge()
+                }
+                is BaseResponse.FAILED -> showFailedLoadCartInfo()
+                is BaseResponse.NETWORK_ERROR -> showNetworkError()
+            }
+        }
     }
 
     override fun loadRecentProducts() {
@@ -143,48 +146,74 @@ class MainPresenter(
 
     private fun addFirstProductToCart(cartProductUiModel: CartProductUiModel) {
         val productId = cartProductUiModel.productUiModel.id
-        cartRepository.addCartProduct(
-            productId,
-            onSuccess = { cartId ->
-                cartProductUiModel.cartId = cartId
-                cartProductUiModel.productUiModel.count = 1
-                updateCartCountBadge()
-            },
-            onFailure = {},
-        )
+        cartRepository.addCartProduct(productId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val cartId = result.response
+                    cartProductUiModel.cartId = cartId
+                    cartProductUiModel.productUiModel.count = 1
+                    updateCartCountBadge()
+                }
+                is BaseResponse.FAILED -> resetProductsStateForFail(productId)
+                is BaseResponse.NETWORK_ERROR -> resetProductsStateForNetwork(productId)
+            }
+        }
     }
 
     private fun deleteCartProduct(cartProductUiModel: CartProductUiModel) {
         val cartId = cartProductUiModel.cartId
-        cartRepository.deleteCartProduct(
-            cartId,
-            onSuccess = {
-                cartProductUiModel.cartId = -1
-                cartProductUiModel.productUiModel.count = 0
-                updateCartCountBadge()
-            },
-            onFailure = {},
-        )
+        val productId = cartProductUiModel.productUiModel.id
+        cartRepository.deleteCartProduct(cartId) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    cartProductUiModel.cartId = -1
+                    cartProductUiModel.productUiModel.count = 0
+                    updateCartCountBadge()
+                }
+                is BaseResponse.FAILED -> resetProductsStateForFail(productId)
+                is BaseResponse.NETWORK_ERROR -> resetProductsStateForNetwork(productId)
+            }
+        }
     }
 
     private fun updateCartProductCount(cartProductUiModel: CartProductUiModel, count: Int) {
         val cartId = cartProductUiModel.cartId
-        cartRepository.changeCartProductCount(
-            cartId,
-            count,
-            onSuccess = {
-                cartProductUiModel.productUiModel.count = count
-                updateCartCountBadge()
-            },
-            onFailure = {},
-        )
+        val productId = cartProductUiModel.productUiModel.id
+        cartRepository.changeCartProductCount(cartId, count) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    cartProductUiModel.productUiModel.count = count
+                    updateCartCountBadge()
+                }
+                is BaseResponse.FAILED -> resetProductsStateForFail(productId)
+                is BaseResponse.NETWORK_ERROR -> resetProductsStateForNetwork(productId)
+            }
+        }
     }
 
     private fun updateCartCountBadge() {
-        cartRepository.fetchSize(
-            onSuccess = { size -> _badgeCount.postValue(size) },
-            onFailure = {}
-        )
+        cartRepository.fetchSize { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    val size = result.response
+                    _badgeCount.postValue(size)
+                }
+                is BaseResponse.FAILED -> {}
+                is BaseResponse.NETWORK_ERROR -> showNetworkError()
+            }
+        }
+    }
+
+    private fun resetProductsStateForFail(productId: Long) {
+        _products.value = _products.value?.toList()
+        _mainScreenEvent.value = MainScreenEvent.ReBindProductItem(productId)
+        showFailedChangeCartCount()
+    }
+
+    private fun resetProductsStateForNetwork(productId: Long) {
+        _products.value = _products.value?.toList()
+        _mainScreenEvent.value = MainScreenEvent.ReBindProductItem(productId)
+        showNetworkError()
     }
 
     override fun moveToCart() {
@@ -197,6 +226,14 @@ class MainPresenter(
 
     private fun showFailedLoadProduct() {
         _mainScreenEvent.value = MainScreenEvent.ShowFailedLoadProduct
+    }
+
+    private fun showFailedLoadCartInfo() {
+        _mainScreenEvent.value = MainScreenEvent.ShowFailedLoadCartInfo
+    }
+
+    private fun showFailedChangeCartCount() {
+        _mainScreenEvent.value = MainScreenEvent.ShowFailedChangeCartCount
     }
 
     private fun showNetworkError() {

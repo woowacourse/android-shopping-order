@@ -24,6 +24,7 @@ import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getParcelableCompat
+import woowacourse.shopping.util.showToastNetworkError
 
 class DetailActivity : AppCompatActivity(), DetailContract.View {
 
@@ -76,7 +77,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         }
     }
 
-    override fun failedLoadProductInfo() {
+    override fun showFailedLoadProductInfo() {
         runOnUiThread {
             Toast.makeText(
                 this,
@@ -117,6 +118,10 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
 
     override fun showRetryMessage() {
         showRetryMessage()
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

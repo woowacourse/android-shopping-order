@@ -6,6 +6,8 @@ interface CounterDialogContract {
     interface View {
         fun setCountState(count: Int)
         fun notifyChangeApplyCount(changeApplyCount: Int)
+        fun showFailedChangeCartCount()
+        fun showNetworkError()
         fun exit()
     }
 
