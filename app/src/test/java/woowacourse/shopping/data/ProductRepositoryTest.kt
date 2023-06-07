@@ -5,7 +5,7 @@ import com.example.domain.model.Product
 import org.junit.Test
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 import woowacourse.shopping.data.datasource.remote.product.ProductMockWebService
-import woowacourse.shopping.data.repository.product.ProductRemoteMockRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import java.util.concurrent.CountDownLatch
 
 internal class ProductRepositoryTest {
@@ -14,7 +14,7 @@ internal class ProductRepositoryTest {
 
     @Test
     fun `처음 상품 목록을 가져온다`() {
-        val productRemoteRepository = ProductRemoteMockRepositoryImpl(
+        val productRemoteRepository = ProductRepositoryImpl(
             productMockWebService,
             ProductCacheImpl.apply { clear() }
         )

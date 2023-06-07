@@ -48,9 +48,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         )
         presenter = cartPresenter
         binding.presenter = cartPresenter
-        runOnUiThread {
 
-        }
         Thread {
             presenter.setup()
         }.start()

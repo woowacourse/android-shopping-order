@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.data.datasource.local.cart.CartCache
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 
 object ServerInfo {
@@ -20,7 +19,6 @@ object ServerInfo {
     fun setBaseUrl(serverName: String) {
         _currentBaseUrl = baseUrlMap[serverName] ?: ""
         _serverName = serverName
-        CartCache.clear()
         ProductCacheImpl.clear()
     }
 }
