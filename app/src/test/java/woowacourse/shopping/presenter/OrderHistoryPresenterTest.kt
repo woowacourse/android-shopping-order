@@ -5,8 +5,6 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
-import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
-import woowacourse.shopping.data.remote.dto.OrdersDTO
 import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.Order

@@ -5,8 +5,6 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.remote.dto.OrderCartItemsDTO
-import woowacourse.shopping.data.remote.dto.OrderSubmitDTO
-import woowacourse.shopping.data.remote.dto.OrdersDTO
 import woowacourse.shopping.data.remote.result.DataResult
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.Order
@@ -30,12 +28,14 @@ class OrderDetailPresenterTest {
 
             override fun getOrder(id: Int, callback: (DataResult<Order>) -> Unit) {
                 callback(
-                    DataResult.Success(Order(
-                        1,
-                        "2023-02-03 11:11:00",
-                        listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
-                        10000,
-                    )),
+                    DataResult.Success(
+                        Order(
+                            1,
+                            "2023-02-03 11:11:00",
+                            listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
+                            10000,
+                        )
+                    ),
                 )
             }
 
