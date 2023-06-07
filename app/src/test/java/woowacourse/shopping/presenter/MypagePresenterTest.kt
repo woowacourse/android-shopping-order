@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presenter
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.mockk

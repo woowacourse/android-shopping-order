@@ -1,11 +1,9 @@
 package woowacourse.shopping.view.cart
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.CartProductModel
-import woowacourse.shopping.view.productlist.ProductListDiffCallback
 
 class CartAdapter(
     private val items: MutableList<CartViewItem>,

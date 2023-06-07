@@ -4,12 +4,11 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import woowacourse.shopping.data.repository.ServerStoreRespository
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 
-class RecentViewedDBHelper(context: Context, serverRepository: ServerStoreRespository) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
-    private val server = serverRepository.getServerUrl()
+class RecentViewedDBHelper(context: Context, url: String) : SQLiteOpenHelper(context, "recent_viewed", null, 1) {
+    private val server = url
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(
             "CREATE TABLE ${RecentViewedContract.TABLE_NAME} (" +

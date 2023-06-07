@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presenter
 
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product

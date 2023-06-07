@@ -22,12 +22,12 @@ fun CartProductDTO.toDomain(): CartProduct {
     )
 }
 
-fun OrderSubmitDTO.toDomain(): Order {
+fun OrdersDTO.OrderDTO.toDomain(): Order {
     if (!isNotNull) throw IllegalArgumentException()
     return Order(
         orderId ?: -1,
         orderedDateTime ?: "",
-        products?.map { it?.toDomain() ?: ProductWithQuantity(Product(-1, "", Price(0), ""), 0) }
+        products?.map { it.toDomain() }
             ?: emptyList(),
         totalPrice ?: -1,
     )
@@ -35,23 +35,13 @@ fun OrderSubmitDTO.toDomain(): Order {
 
 fun ProductWithQuantityDTO.toDomain(): ProductWithQuantity {
     if (!isNotNull) throw IllegalArgumentException()
-    return ProductWithQuantity(productDTO?.toDomain() ?: Product(-1, "", Price(0), ""), 0)
+    return ProductWithQuantity(product?.toDomain() ?: Product(-1, "", Price(0), ""), quantity ?: -1)
 }
 
 fun OrdersDTO.toDomain(): List<Order> {
     if (!isNotNull) throw IllegalArgumentException()
     return orders?.map {
-        Order(
-            it?.orderId ?: -1,
-            it?.orderedDateTime ?: "",
-            it?.products?.map { productWithQuantity ->
-                productWithQuantity?.toDomain() ?: ProductWithQuantity(
-                    Product(-1, "", Price(0), ""),
-                    0,
-                )
-            } ?: emptyList(),
-            it?.totalPrice ?: 0,
-        )
+        it.toDomain()
     } ?: emptyList()
 }
 

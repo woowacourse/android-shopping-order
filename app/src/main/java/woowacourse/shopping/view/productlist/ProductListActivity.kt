@@ -17,6 +17,10 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.RecentViewedDbDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.CartRemoteRepository
 import woowacourse.shopping.data.repository.impl.ProductRemoteRepository
 import woowacourse.shopping.data.repository.impl.RecentViewedDbRepository
@@ -78,12 +82,16 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
     }
 
     private fun setUpPresenter() {
+        val serverPreferencesRepository = ServerPreferencesRepository(
+            ServerStorePreferenceDataSource(this),
+        )
+        val url = serverPreferencesRepository.getServerUrl()
         presenter =
             ProductListPresenter(
                 this,
-                ProductRemoteRepository(ServerPreferencesRepository(this)),
-                RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
-                CartRemoteRepository(ServerPreferencesRepository(this)),
+                ProductRemoteRepository(ProductRemoteDataSource(url)),
+                RecentViewedDbRepository(RecentViewedDbDataSource(this, url)),
+                CartRemoteRepository(CartRemoteDataSource(url)),
             )
     }
 

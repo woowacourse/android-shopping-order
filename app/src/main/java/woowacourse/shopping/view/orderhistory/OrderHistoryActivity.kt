@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
 import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
@@ -29,7 +31,10 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun setUpPresenter() {
-        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(ServerPreferencesRepository(this)))
+        val serverPreferencesRepository = ServerPreferencesRepository(
+            ServerStorePreferenceDataSource(this)
+        )
+        presenter = OrderHistoryPresenter(this, OrderRemoteRepository(OrderRemoteDataSource(serverPreferencesRepository.getServerUrl())))
     }
 
     override fun showOrders(orders: List<OrderDetailModel>) {

@@ -1,8 +1,11 @@
-package woowacourse.shopping
+package woowacourse.shopping.presenter
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.data.remote.dto.ProductsWithCartItemDTO
 import woowacourse.shopping.data.repository.CartRepository
@@ -12,15 +15,18 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithCartInfo
 import woowacourse.shopping.model.toUiModel
-import woowacourse.shopping.view.productlist.ProductListContract
-import woowacourse.shopping.view.productlist.ProductListPresenter
+import woowacourse.shopping.view.productdetail.ProductDetailContract
+import woowacourse.shopping.view.productdetail.ProductDetailPresenter
 
-class ProductListPresenterTest {
-    private lateinit var presenter: ProductListContract.Presenter
-    private lateinit var view: ProductListContract.View
+class ProductDetailPresenterTest {
+    private lateinit var view: ProductDetailContract.View
+    private lateinit var presenter: ProductDetailContract.Presenter
     private lateinit var cartRepository: CartRepository
     private lateinit var productRepository: ProductRepository
     private lateinit var recentViewedRepository: RecentViewedRepository
+
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setUp() {
@@ -79,20 +85,14 @@ class ProductListPresenterTest {
             }
         }
 
-        presenter =
-            ProductListPresenter(view, productRepository, recentViewedRepository, cartRepository)
-    }
-
-    @Test
-    fun 최근_본_상품과_상품들을_띄울_수_있다() {
-        // given
-
-        // when
-        presenter.fetchProducts()
-
-        // then
-        verify(exactly = 1) { view.showProducts(any()) }
-        verify(exactly = 1) { view.stopLoading() }
+        presenter = ProductDetailPresenter(
+            1,
+            1,
+            view,
+            productRepository,
+            cartRepository,
+            recentViewedRepository,
+        )
     }
 
     @Test
@@ -100,104 +100,45 @@ class ProductListPresenterTest {
         // given
 
         // when
-        presenter.showProductDetail(ProductListFixture.products[0].toUiModel(null, 0))
-        // then
-        verify(exactly = 1) { view.onClickProductDetail(ProductListFixture.products[0].toUiModel(null, 0), any()) }
-    }
-
-    @Test
-    fun 상품을_추가로_띄울_수_있다() {
-        // given
-        presenter.fetchProducts()
-
-        // when
-        presenter.loadMoreProducts()
+        presenter.fetchProductDetail()
 
         // then
-        verify(exactly = 1) { view.notifyAddProducts(any(), any()) }
+        verify(exactly = 1) { view.showProductDetail(any(), any()) }
     }
 
     @Test
     fun 장바구니에_상품을_추가할_수_있다() {
         // given
-        presenter.fetchProducts()
+
         // when
-        presenter.insertCartProduct(1)
+        presenter.putInCart(ProductListFixture.products[1].toUiModel(null, 2))
 
         // then
-        verify(exactly = 1) { view.showCartCount(any()) }
-        verify(exactly = 1) { view.notifyDataChanged(any()) }
+        verify(exactly = 1) { view.finishActivity(true) }
     }
 
     @Test
-    fun 장바구니_상품_개수를_1이상으로_지정하면_업데이트할_수_있다() {
+    fun 상품_개수를_추가할_수_있다() {
         // given
-        presenter.fetchProducts()
 
         // when
-        presenter.updateCartProductCount(1, 2, 3)
+        presenter.plusCount()
 
-        //
-        verify { view.notifyDataChanged(any()) }
+        // then
+        assertEquals(2, presenter.quantity.value)
     }
 
     @Test
-    fun 장바구니_상품_개수를_0으로_지정하면_장바구니에서_삭제하고_뱃지_숫자도_변경한다() {
+    fun 상품_개수를_뺄_수_있다() {
         // given
-        presenter.fetchProducts()
+        presenter.plusCount()
+        presenter.plusCount()
+        presenter.plusCount()
 
         // when
-        presenter.updateCartProductCount(0, 0, 0)
+        presenter.minusCount()
 
         // then
-        verify { view.notifyDataChanged(any()) }
-        verify { view.showCartCount(any()) }
-    }
-
-    @Test
-    fun 장바구니_상품_개수를_띄울_수_있다() {
-        // given
-
-        // when
-        presenter.fetchCartCount()
-
-        // then
-        verify { view.showCartCount(any()) }
-    }
-
-    @Test
-    fun 여러_개의_상품_개수를_업데이트할_수_있다() {
-        // given
-        presenter.fetchProducts()
-
-        // when
-        presenter.fetchProductsCounts()
-
-        // then
-        verify { view.notifyDataChanged(any()) }
-    }
-
-    @Test
-    fun 특정_상품_개수를_업데이트할_수_있다() {
-        // given
-        presenter.fetchProducts()
-
-        // when
-        presenter.fetchProductCount(1)
-
-        // then
-        verify { view.notifyDataChanged(any()) }
-    }
-
-    @Test
-    fun 최근에_본_상품_리스트를_업데이트할_수_있다() {
-        // given
-        presenter.fetchProducts()
-
-        // when
-        presenter.updateRecentViewed(1)
-
-        // then
-        verify { view.notifyRecentViewedChanged() }
+        assertEquals(3, presenter.quantity.value)
     }
 }

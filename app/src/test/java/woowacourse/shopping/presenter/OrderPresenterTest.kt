@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presenter
 
 import io.mockk.mockk
 import io.mockk.verify
@@ -40,7 +40,10 @@ class OrderPresenterTest {
                 callback(1)
             }
         }
-        presenter = OrderPresenter(view, OrderCartProductModelFixture.orderCartProductsModel, orderRepository, mypageRepository)
+        presenter = OrderPresenter(
+            view,
+            OrderCartProductModelFixture.orderCartProductsModel, orderRepository, mypageRepository
+        )
     }
 
     @Test
@@ -77,7 +80,10 @@ class OrderPresenterTest {
             override fun chargeCash(cash: Int, callback: (Int) -> Unit) {
             }
         }
-        presenter = OrderPresenter(view, OrderCartProductModelFixture.orderCartProductsModel, orderRepository, mypageRepository)
+        presenter = OrderPresenter(
+            view,
+            OrderCartProductModelFixture.orderCartProductsModel, orderRepository, mypageRepository
+        )
         presenter.fetchOrder()
 
         // when

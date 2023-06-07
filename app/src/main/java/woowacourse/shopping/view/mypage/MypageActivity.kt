@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.MypageRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.MypageRemoteRepository
 import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityMypageBinding
@@ -20,7 +22,7 @@ class MypageActivity : AppCompatActivity(), MypageContract.View {
     private val presenter: MypageContract.Presenter by lazy {
         MypagePresenter(
             this,
-            MypageRemoteRepository(ServerPreferencesRepository(this)),
+            MypageRemoteRepository(MypageRemoteDataSource(ServerPreferencesRepository(ServerStorePreferenceDataSource(this)).getServerUrl())),
         )
     }
 

@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
 import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
@@ -43,11 +45,14 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             showDataNothingToast()
             finish()
         }
+        val serverPreferencesRepository = ServerPreferencesRepository(
+            ServerStorePreferenceDataSource(this),
+        )
         presenter = OrderDetailPresenter(
             orderId,
             this,
             OrderRemoteRepository(
-                ServerPreferencesRepository(this),
+                OrderRemoteDataSource(serverPreferencesRepository.getServerUrl()),
             ),
         )
     }

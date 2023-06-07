@@ -12,6 +12,8 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.CartRemoteRepository
 import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -25,7 +27,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val presenter: CartContract.Presenter by lazy {
         CartPresenter(
             this,
-            CartRemoteRepository(ServerPreferencesRepository(this)),
+            CartRemoteRepository(
+                CartRemoteDataSource(
+                    ServerPreferencesRepository(ServerStorePreferenceDataSource(this)).getServerUrl(),
+                ),
+            ),
         )
     }
     private lateinit var adapter: CartAdapter
@@ -98,11 +104,13 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showNotSuccessfulErrorToast() {
-        Toast.makeText(this, getString(R.string.server_communication_error), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.server_communication_error), Toast.LENGTH_LONG)
+            .show()
     }
 
     override fun showServerFailureToast() {
-        Toast.makeText(this, getString(R.string.server_not_response_error), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.server_not_response_error), Toast.LENGTH_LONG)
+            .show()
     }
 
     override fun showServerResponseWrongToast() {

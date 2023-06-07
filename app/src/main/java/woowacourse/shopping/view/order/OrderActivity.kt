@@ -7,6 +7,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.MypageRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.MypageRemoteRepository
 import woowacourse.shopping.data.repository.impl.OrderRemoteRepository
 import woowacourse.shopping.data.repository.impl.ServerPreferencesRepository
@@ -36,11 +39,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             finish()
             return
         }
+        val serverPreferencesRepository = ServerPreferencesRepository(ServerStorePreferenceDataSource(this))
         presenter = OrderPresenter(
             this,
             products,
-            OrderRemoteRepository(ServerPreferencesRepository(this)),
-            MypageRemoteRepository(ServerPreferencesRepository(this)),
+            OrderRemoteRepository(OrderRemoteDataSource(serverPreferencesRepository.getServerUrl())),
+            MypageRemoteRepository(MypageRemoteDataSource(serverPreferencesRepository.getServerUrl())),
         )
     }
 

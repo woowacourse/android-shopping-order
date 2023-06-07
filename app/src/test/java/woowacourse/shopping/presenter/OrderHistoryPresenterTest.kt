@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.presenter
 
 import io.mockk.mockk
 import io.mockk.verify
@@ -11,12 +11,12 @@ import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
-import woowacourse.shopping.view.orderdetail.OrderDetailContract
-import woowacourse.shopping.view.orderdetail.OrderDetailPresenter
+import woowacourse.shopping.view.orderhistory.OrderHistoryContract
+import woowacourse.shopping.view.orderhistory.OrderHistoryPresenter
 
-class OrderDetailPresenterTest {
-    private lateinit var view: OrderDetailContract.View
-    private lateinit var presenter: OrderDetailContract.Presenter
+class OrderHistoryPresenterTest {
+    private lateinit var view: OrderHistoryContract.View
+    private lateinit var presenter: OrderHistoryContract.Presenter
     private lateinit var orderRepository: OrderRepository
 
     @Before
@@ -24,25 +24,28 @@ class OrderDetailPresenterTest {
         view = mockk(relaxed = true)
         orderRepository = object : OrderRepository {
             override fun getAll(callback: (OrdersDTO) -> Unit) {
-            }
-
-            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
                 callback(
-                    OrderSubmitDTO(
-                        1,
-                        "2023-02-03 11:11:00",
-                        listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
-                        10000,
+                    OrdersDTO(
+                        listOf(
+                            OrderSubmitDTO(
+                                1,
+                                "2023-02-03 11:11:00",
+                                listOf(ProductWithQuantity(Product(1, "현미밥", Price(10000), ""), 1)),
+                                10000,
+                            ),
+                        ),
                     ),
                 )
             }
 
+            override fun getOrder(id: Int, callback: (OrderSubmitDTO) -> Unit) {
+                // val orderId: Int, val orderedDateTime: String, val products: List<ProductWithQuantity>, val totalPrice: Int
+            }
+
             override fun order(cartProducts: OrderCartItemsDTO, callback: (Int?) -> Unit) {
-                callback(1)
             }
         }
-        presenter = OrderDetailPresenter(
-            1,
+        presenter = OrderHistoryPresenter(
             view,
             orderRepository,
         )
@@ -53,9 +56,9 @@ class OrderDetailPresenterTest {
         // given
 
         // when
-        presenter.fetchOrder()
+        presenter.fetchOrders()
 
         // then
-        verify(exactly = 1) { view.showOrderDetail(any()) }
+        verify(exactly = 1) { view.showOrders(any()) }
     }
 }

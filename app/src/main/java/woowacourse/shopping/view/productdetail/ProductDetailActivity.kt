@@ -11,6 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.data.datasource.impl.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.impl.RecentViewedDbDataSource
+import woowacourse.shopping.data.datasource.impl.ServerStorePreferenceDataSource
 import woowacourse.shopping.data.repository.impl.CartRemoteRepository
 import woowacourse.shopping.data.repository.impl.ProductRemoteRepository
 import woowacourse.shopping.data.repository.impl.RecentViewedDbRepository
@@ -41,14 +45,18 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setUpPresenter(id: Int) {
+        val serverPreferencesRepository = ServerPreferencesRepository(
+            ServerStorePreferenceDataSource(this),
+        )
+        val url = serverPreferencesRepository.getServerUrl()
         presenter =
             ProductDetailPresenter(
                 INITIAL_COUNT,
                 id,
                 this,
-                ProductRemoteRepository(ServerPreferencesRepository(this)),
-                CartRemoteRepository(ServerPreferencesRepository(this)),
-                RecentViewedDbRepository(this, ServerPreferencesRepository(this)),
+                ProductRemoteRepository(ProductRemoteDataSource(url)),
+                CartRemoteRepository(CartRemoteDataSource(url)),
+                RecentViewedDbRepository(RecentViewedDbDataSource(this, url)),
             )
     }
 
