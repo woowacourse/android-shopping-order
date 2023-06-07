@@ -1,67 +1,37 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
-import android.util.Log
-import woowacourse.shopping.data.mapper.toModel
+import woowacourse.shopping.data.model.dto.request.ProductIdRequest
 import woowacourse.shopping.data.model.dto.response.ProductResponse
 import woowacourse.shopping.data.respository.product.service.ProductService
-import woowacouse.shopping.model.product.Product
+import woowacourse.shopping.data.util.responseCallback
 
 class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
 ) : ProductRemoteDataSource {
 
     override fun requestDatas(
-        onFailure: (message: String) -> Unit,
-        onSuccess: (products: List<Product>) -> Unit,
+        onFailure: (Throwable) -> Unit,
+        onSuccess: (products: List<ProductResponse>) -> Unit,
     ) {
-        productService.requestDatas().enqueue(object : retrofit2.Callback<List<ProductResponse>> {
-            override fun onResponse(
-                call: retrofit2.Call<List<ProductResponse>>,
-                response: retrofit2.Response<List<ProductResponse>>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { products ->
-                        onSuccess(products.map { it.toModel() })
-                    } ?: response.errorBody()?.let { onFailure(it.string()) }
-                } else {
-                    response.errorBody()?.let { onFailure(it.string()) }
-                }
-            }
-
-            override fun onFailure(call: retrofit2.Call<List<ProductResponse>>, t: Throwable) {
-                Log.e("Request Failed", t.toString())
-                onFailure(ERROR_CONNECT)
-            }
-        })
+        productService.requestDatas().enqueue(
+            responseCallback<List<ProductResponse>>(
+                onFailure = onFailure,
+                onSuccess = onSuccess,
+            )
+        )
     }
 
     override fun requestData(
         productId: Long,
-        onFailure: (message: String) -> Unit,
-        onSuccess: (products: Product) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
+        onSuccess: (product: ProductResponse) -> Unit,
     ) {
-        productService.requestData(productId).enqueue(object : retrofit2.Callback<ProductResponse> {
-            override fun onResponse(
-                call: retrofit2.Call<ProductResponse>,
-                response: retrofit2.Response<ProductResponse>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { product ->
-                        onSuccess(product.toModel())
-                    } ?: response.errorBody()?.let { onFailure(it.string()) }
-                } else {
-                    response.errorBody()?.let { onFailure(it.string()) }
-                }
-            }
-
-            override fun onFailure(call: retrofit2.Call<ProductResponse>, t: Throwable) {
-                Log.e("Request Failed", t.toString())
-                onFailure(ERROR_CONNECT)
-            }
-        })
-    }
-
-    companion object {
-        private const val ERROR_CONNECT = "연결에 실패하였습니다. 다시 시도해주세요"
+        val productIdRequest = ProductIdRequest(productId)
+        productService.requestData(productIdRequest).enqueue(
+            responseCallback(
+                onFailure = onFailure,
+                onSuccess = onSuccess,
+            )
+        )
     }
 }

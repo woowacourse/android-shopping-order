@@ -4,12 +4,12 @@ import woowacouse.shopping.model.product.Product
 
 interface ProductRepository {
     fun loadDatas(
-        onFailure: (message: String) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
         onSuccess: (products: List<Product>) -> Unit,
     )
     fun loadDataById(
         productId: Long,
-        onFailure: (message: String) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
         onSuccess: (products: Product) -> Unit,
     )
 }

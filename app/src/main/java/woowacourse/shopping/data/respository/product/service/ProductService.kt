@@ -3,6 +3,7 @@ package woowacourse.shopping.data.respository.product.service
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
+import woowacourse.shopping.data.model.dto.request.ProductIdRequest
 import woowacourse.shopping.data.model.dto.response.ProductResponse
 
 interface ProductService {
@@ -11,6 +12,6 @@ interface ProductService {
 
     @GET("/products/{productId}")
     fun requestData(
-        @Path("productId") productId: Long
+        @Path("productId") productId: ProductIdRequest
     ): Call<ProductResponse>
 }

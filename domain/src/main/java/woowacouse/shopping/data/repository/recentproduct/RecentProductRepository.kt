@@ -5,7 +5,7 @@ import woowacouse.shopping.model.recentproduct.RecentProducts
 interface RecentProductRepository {
     fun getRecentProducts(
         limit: Int,
-        onFailure: (message: String) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
         onSuccess: (RecentProducts) -> Unit
     )
     fun deleteNotTodayRecentProducts(today: String)

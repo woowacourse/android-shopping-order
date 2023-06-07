@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.respository.recentproduct
 
+import woowacourse.shopping.data.mapper.toModel
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSource
 import woowacouse.shopping.data.repository.recentproduct.RecentProductRepository
@@ -13,14 +14,14 @@ class RecentProductRepositoryImpl(
 
     override fun getRecentProducts(
         limit: Int,
-        onFailure: (message: String) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
         onSuccess: (RecentProducts) -> Unit
     ) {
         productRemoteDataSource.requestDatas(onFailure) { products ->
             val recentProductEntities = recentProductLocalDataSource.getAllRecentProducts(limit)
             val recentProducts = recentProductEntities.mapNotNull { recentProductEntity ->
                 products.find { it.id == recentProductEntity.productId }?.let { product ->
-                    RecentProduct(recentProductEntity.id, product)
+                    RecentProduct(recentProductEntity.id, product.toModel())
                 }
             }.toList()
             onSuccess(RecentProducts(recentProducts))
