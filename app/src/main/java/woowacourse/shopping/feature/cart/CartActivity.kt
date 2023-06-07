@@ -1,23 +1,33 @@
 package woowacourse.shopping.feature.cart
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
+import woowacourse.shopping.data.preferences.UserPreference
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.order.confirm.OrderConfirmActivity
+import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 import woowacourse.shopping.util.toMoneyFormat
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
     private lateinit var presenter: CartContract.Presenter
     private lateinit var cartProductAdapter: CartProductAdapter
+
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     private val cartProductClickListener: CartProductClickListener by lazy {
         object : CartProductClickListener {
@@ -48,10 +58,21 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         setRecyclerViewAnimator()
         observePresenter()
+
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val cartIds =
+                        result.data?.getSerializableExtraCompat<ArrayList<Long>>(
+                            OrderConfirmActivity.ORDER_CART_ID_KEY
+                        )
+                    cartIds?.let { presenter.processRemoveOrderCheckedItems() }
+                }
+            }
     }
 
     private fun initPresenter() {
-        val cartProductRemoteService = CartProductRemoteService()
+        val cartProductRemoteService = ApiModule.getInstance(UserPreference).createCartService()
         presenter = CartPresenter(this, CartRepositoryImpl(cartProductRemoteService))
     }
 
@@ -89,7 +110,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun showFailedLoadCartInfo() {
+        showToastShort(R.string.failed_load_cart_info)
+    }
+
+    override fun reBindProductItem(cartId: Long) {
+        cartProductAdapter.reBindItem(cartId)
+    }
+
     override fun exitCartScreen() = finish()
+
     override fun hideLoadingView() {
         runOnUiThread {
             binding.cartLayout.visibility = View.VISIBLE
@@ -100,6 +130,26 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     override fun showLoadingView() {
         binding.cartLayout.visibility = View.GONE
         binding.skeletonCartLoadingLayout.visibility = View.VISIBLE
+    }
+
+    override fun showOrderConfirmScreen(cartIds: List<Long>) {
+        resultLauncher.launch(OrderConfirmActivity.getIntent(this, cartIds))
+    }
+
+    override fun showOrderUnavailableMessage() {
+        showToastShort(R.string.order_unavailable_message)
+    }
+
+    override fun showFailedChangeCartCount() {
+        showToastShort(R.string.failed_change_cart_count)
+    }
+
+    override fun showFailedOrderRequest() {
+        showToastShort(R.string.failed_order_request)
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

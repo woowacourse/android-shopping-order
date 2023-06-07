@@ -1,10 +1,8 @@
 package woowacourse.shopping.feature.cart
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.domain.datasource.productsDatasource
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.CartProduct
-import com.example.domain.model.Price
-import com.example.domain.model.Product
 import com.example.domain.repository.CartRepository
 import io.mockk.Runs
 import io.mockk.every
@@ -15,6 +13,8 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import woowacourse.shopping.feature.CartFixture
+import woowacourse.shopping.feature.Product
 import woowacourse.shopping.feature.getOrAwaitValue
 import woowacourse.shopping.mapper.toPresentation
 
@@ -30,8 +30,13 @@ internal class CartPresenterTest {
     fun init() {
         view = mockk(relaxed = true)
         cartRepository = mockk(relaxed = true)
-        every { cartRepository.getAll() } returns mockCartProducts
         presenter = CartPresenter(view, cartRepository)
+        every {
+            cartRepository.fetchAll(any())
+        } answers {
+            val successBlock = arg<(BaseResponse<List<CartProduct>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockCartProducts))
+        }
     }
 
     @Test
@@ -43,24 +48,6 @@ internal class CartPresenterTest {
         val actual = presenter.currentPageCartProducts.getOrAwaitValue()
         val expected = mockCartProducts.take(5).map { it.toPresentation() }
         assert(expected == actual)
-    }
-
-    @Test
-    fun `주문아이디가 일치하는 주문 상품을 삭제한다`() {
-        // given
-        presenter.loadInitCartProduct()
-        val slot = slot<CartProduct>()
-        every { cartRepository.deleteProduct(capture(slot)) } just Runs
-
-        // when
-        presenter.handleDeleteCartProductClick(4L)
-
-        // then
-        verify { cartRepository.deleteProduct(mockCartProducts[4]) }
-        val expected = 4L
-        val actual = slot.captured
-
-        assert(expected == actual.cartId)
     }
 
     @Test
@@ -93,47 +80,68 @@ internal class CartPresenterTest {
     }
 
     @Test
-    fun `장바구니에서 카트 상품을 제거한다`() {
+    fun `주문아이디가 일치하는 주문 상품을 삭제한다`() {
         // given
         presenter.loadInitCartProduct()
-        val slot = slot<CartProduct>()
-        every { cartRepository.deleteProduct(capture(slot)) } just Runs
+        val slot = slot<Long>()
+        every {
+            cartRepository.deleteCartProduct(capture(slot), any())
+        } answers {
+            val successBlock = arg<(BaseResponse<Long>) -> Unit>(1)
+            successBlock(BaseResponse.SUCCESS(slot.captured))
+        }
 
         // when
         presenter.handleDeleteCartProductClick(4L)
 
         // then
-        verify { cartRepository.deleteProduct(mockCartProducts[4]) }
-        assert(mockCartProducts[4] == slot.captured)
+        verify { cartRepository.deleteCartProduct(4L, any()) }
+        val expected = 4L
+        val actual = slot.captured
+        assert(expected == actual)
+
+        val actualCurrentPageCartProducts = presenter.currentPageCartProducts.getOrAwaitValue()
+        val expectedCurrentPageCartProducts = CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 3000), 3),
+            Triple(2L, Product(2L, 3000), 3),
+            Triple(3L, Product(3L, 3000), 3),
+            Triple(5L, Product(5L, 3000), 3),
+            Triple(6L, Product(6L, 3000), 3),
+        ).map { it.toPresentation() }
+        assert(actualCurrentPageCartProducts == expectedCurrentPageCartProducts)
     }
 
     @Test
-    fun `장바구니에 화면에서 상품의 수량을 조정한다`() {
+    fun `주문하기 버튼을 누르면, 주문 화면으로 넘어간다`() {
         // given
         presenter.loadInitCartProduct()
-        val slot = slot<Product>()
-        val countSlot = slot<Int>()
-        every { cartRepository.changeCartProductCount(capture(slot), capture(countSlot)) } just Runs
+        val slot = slot<List<Long>>()
+        every { view.showOrderConfirmScreen(capture(slot)) } just Runs
 
         // when
-        presenter.handleCartProductCartCountChange(0L, 3)
+        presenter.requestOrderConfirmScreen()
 
         // then
-        verify { cartRepository.changeCartProductCount(any(), any()) }
-        assert(productsDatasource[0] == slot.captured)
-        assert(3 == countSlot.captured)
+        val actual = slot.captured
+        val expected = mockCartProducts.map { it.cartId }
+        assert(actual == expected)
     }
 
-    private val mockCartProducts = List(15) {
-        CartProduct(
-            it.toLong(), productsDatasource[it], it + 1, true
+    private val mockCartProducts =
+        CartFixture.getMockCarts(
+            Triple(1L, Product(1L, 3000), 3),
+            Triple(2L, Product(2L, 3000), 3),
+            Triple(3L, Product(3L, 3000), 3),
+            Triple(4L, Product(4L, 3000), 3),
+            Triple(5L, Product(5L, 3000), 3),
+            Triple(6L, Product(6L, 3000), 3),
+            Triple(7L, Product(7L, 3000), 3),
+            Triple(8L, Product(8L, 3000), 3),
+            Triple(9L, Product(9L, 3000), 3),
+            Triple(10L, Product(10L, 3000), 3),
+            Triple(11L, Product(11L, 3000), 3),
+            Triple(12L, Product(12L, 3000), 3),
+            Triple(13L, Product(13L, 3000), 3),
+            Triple(14L, Product(14L, 3000), 3),
         )
-    }
-
-    private val mockProduct = Product(
-        5,
-        "유명산지 고당도사과 1.5kg",
-        "https://product-image.kurly.com/cdn-cgi/image/quality=85,width=676/product/image/b573ba85-9bfa-433b-bafc-3356b081440b.jpg",
-        Price(13000)
-    )
 }

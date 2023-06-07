@@ -12,7 +12,7 @@ internal class CartProductsTest {
     // 테스트할 메소드이름_테스트상황_결과
 
     @Test
-    fun `constructor_0개 담딘 상품이 섞여있다_예외 발생`() {
+    fun `constructor_0개 담긴 상품이 섞여있다_예외 발생`() {
         // given
         val carts = listOf(
             CartProduct(1, productsDatasource[0], 0, false)

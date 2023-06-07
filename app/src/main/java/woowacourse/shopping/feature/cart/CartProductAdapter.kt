@@ -20,6 +20,14 @@ class CartProductAdapter(private val cartProductClickListener: CartProductClickL
         submitList(newItems)
     }
 
+    fun reBindItem(cartId: Long) {
+        val cartProductUiModel = currentList.find { it.cartId == cartId }
+        cartProductUiModel?.let {
+            val index = currentList.indexOf(it)
+            notifyItemChanged(index)
+        }
+    }
+
     companion object {
         private val CartDiffUtil = object : DiffUtil.ItemCallback<CartProductUiModel>() {
             override fun areItemsTheSame(

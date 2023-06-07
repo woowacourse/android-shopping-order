@@ -4,16 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
-import woowacourse.shopping.common_ui.CounterView
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
+import woowacourse.shopping.commonUi.CounterView
+import woowacourse.shopping.data.preferences.UserPreference
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.DialogCounterBinding
 import woowacourse.shopping.model.ProductUiModel
+import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getParcelableCompat
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class CounterDialog : DialogFragment(), CounterDialogContract.View {
     private var _binding: DialogCounterBinding? = null
@@ -43,7 +45,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
 
         binding.counterView.countStateChangeListener =
             object : CounterView.OnCountStateChangeListener {
-                override fun onCountChanged(counterNavigationView: CounterView?, count: Int) {
+                override fun onCountChanged(counterView: CounterView?, count: Int) {
                     presenter.changeCount(count)
                 }
             }
@@ -52,7 +54,7 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
     private fun setInitPresenter(product: ProductUiModel, cartId: Long?) {
         presenter = CounterDialogPresenter(
             this,
-            CartRepositoryImpl(CartProductRemoteService()),
+            CartRepositoryImpl(ApiModule.getInstance(UserPreference).createCartService()),
             product,
             cartId,
         )
@@ -68,13 +70,17 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
             CHANGE_COUNTER_APPLY_KEY,
             bundleOf(COUNT_KEY to changeApplyCount),
         )
-        requireActivity().runOnUiThread {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.success_add_cart),
-                Toast.LENGTH_SHORT,
-            ).show()
+        with(requireActivity()) {
+            runOnUiThread { showToastShort(R.string.success_add_cart) }
         }
+    }
+
+    override fun showFailedChangeCartCount() {
+        requireActivity().showToastShort(R.string.failed_change_cart_count)
+    }
+
+    override fun showNetworkError() {
+        requireActivity().showToastNetworkError()
     }
 
     override fun exit() {

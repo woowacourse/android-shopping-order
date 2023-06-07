@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.detail.dialog
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.model.ProductUiModel
 
@@ -28,15 +29,17 @@ class CounterDialogPresenter(
         when {
             product.count == 0 && changeCount == 1 -> insertProduct()
             product.count == 0 && changeCount > 1 -> {
-                cartRepository.addCartProduct(
-                    product.id,
-                    onSuccess = {
-                        product.count = 1
-                        cartId = it
-                    },
-                    onFailure = {},
-                )
-                changeCartProductCount()
+                cartRepository.addCartProduct(product.id) { result ->
+                    when (result) {
+                        is BaseResponse.SUCCESS -> {
+                            product.count = 1
+                            cartId = result.response
+                            changeCartProductCount()
+                        }
+                        is BaseResponse.FAILED -> view.showFailedChangeCartCount()
+                        is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+                    }
+                }
             }
             product.count != 0 && changeCount > 0 -> changeCartProductCount()
             product.count != 0 && changeCount == 0 -> deleteCartProduct()
@@ -44,46 +47,51 @@ class CounterDialogPresenter(
     }
 
     private fun insertProduct() {
-        cartRepository.addCartProduct(
-            product.id,
-            onSuccess = {
-                product.count = 1
-                cartId = it
-                view.notifyChangeApplyCount(changeCount)
-                view.exit()
-            },
-            onFailure = {},
-        )
+        cartRepository.addCartProduct(product.id) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    product.count = 1
+                    cartId = result.response
+                    view.notifyChangeApplyCount(changeCount)
+                    view.exit()
+                }
+                is BaseResponse.FAILED -> view.showFailedChangeCartCount()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     private fun changeCartProductCount() {
         cartId?.let {
-            cartRepository.changeCartProductCount(
-                it,
-                changeCount,
-                onSuccess = { cartId ->
-                    product.count = changeCount
-                    this.cartId = cartId
-                    view.notifyChangeApplyCount(changeCount)
-                    view.exit()
-                },
-                onFailure = {},
-            )
+            cartRepository.changeCartProductCount(it, changeCount) { result ->
+                when (result) {
+                    is BaseResponse.SUCCESS -> {
+                        product.count = changeCount
+                        this.cartId = it
+                        view.notifyChangeApplyCount(changeCount)
+                        view.exit()
+                    }
+                    is BaseResponse.FAILED -> view.showFailedChangeCartCount()
+                    is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+                }
+            }
         }
     }
 
     private fun deleteCartProduct() {
         cartId?.let {
-            cartRepository.deleteCartProduct(
-                it,
-                onSuccess = {
-                    product.count = 0
-                    cartId = null
-                    view.notifyChangeApplyCount(changeCount)
-                    view.exit()
-                },
-                onFailure = {},
-            )
+            cartRepository.deleteCartProduct(it) { result ->
+                when (result) {
+                    is BaseResponse.SUCCESS -> {
+                        product.count = 0
+                        cartId = null
+                        view.notifyChangeApplyCount(changeCount)
+                        view.exit()
+                    }
+                    is BaseResponse.FAILED -> view.showFailedChangeCartCount()
+                    is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+                }
+            }
         }
     }
 }

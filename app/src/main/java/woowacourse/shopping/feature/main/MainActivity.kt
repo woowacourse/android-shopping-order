@@ -6,19 +6,18 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.domain.cache.ProductLocalCache
 import woowacourse.shopping.R
-import woowacourse.shopping.common_ui.CartCounterBadge
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
-import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
-import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.commonUi.CartCounterBadge
+import woowacourse.shopping.data.dataSource.local.RecentDao
+import woowacourse.shopping.data.preferences.UserPreference
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
@@ -28,6 +27,11 @@ import woowacourse.shopping.feature.main.product.ProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.order.list.OrderListActivity
+import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastRetryAgainLater
+import woowacourse.shopping.util.showToastShort
 
 class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var binding: ActivityMainBinding
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val recentProductClickListener: RecentProductClickListener =
         object : RecentProductClickListener {
             override fun onClick(productId: Long) {
-                presenter.showRecentProductDetail(productId)
+                presenter.showProductDetail(productId)
             }
         }
 
@@ -79,7 +83,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         mainProductAdapter = MainProductAdapter(productClickListener)
         recentAdapter = RecentAdapter(recentProductClickListener)
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
-        loadAdapter = LoadAdapter { presenter.loadMoreProduct() }
+        loadAdapter = LoadAdapter { presenter.loadMoreProducts() }
     }
 
     private fun initLayoutManager() {
@@ -97,12 +101,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val productRemoteService = ProductRemoteService()
-        val cartProductRemoteService = CartProductRemoteService()
+        val apiModule = ApiModule.getInstance(UserPreference)
+        val productService = apiModule.createProductService()
+        val cartProductRemoteService = apiModule.createCartService()
         presenter = MainPresenter(
-            ProductRepositoryImpl(productRemoteService),
+            ProductRepositoryImpl(productService, ProductLocalCache()),
             CartRepositoryImpl(cartProductRemoteService),
-            RecentProductRepositoryImpl(RecentDao(this)),
+            RecentProductRepositoryImpl(RecentDao(this), productService),
         )
     }
 
@@ -118,31 +123,53 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             is MainContract.View.MainScreenEvent.ShowCartScreen -> {
                 startActivity(CartActivity.getIntent(this))
             }
-            is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
-                startActivity(DetailActivity.getIntent(this, event.product, event.recentProduct))
+            is MainContract.View.MainScreenEvent.ShowOrderListScreen -> {
+                startActivity(OrderListActivity.getIntent(this))
             }
-            is MainContract.View.MainScreenEvent.HideLoadMore -> {
-                hideLoadMore()
+            is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
+                startActivity(DetailActivity.getIntent(this, event.product.id, event.recentProduct))
             }
             is MainContract.View.MainScreenEvent.ShowLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.VISIBLE
                 binding.productRecyclerView.visibility = View.GONE
             }
+            is MainContract.View.MainScreenEvent.HideLoadMore -> {
+                hideLoadMore()
+            }
             is MainContract.View.MainScreenEvent.HideLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.GONE
                 binding.productRecyclerView.visibility = View.VISIBLE
+            }
+            MainContract.View.MainScreenEvent.ShowFailedLoadProduct -> {
+                showToastShort(R.string.failed_load_product_detail_info)
+            }
+            MainContract.View.MainScreenEvent.ShowFailedLoadCartInfo -> {
+                showToastShort(R.string.failed_load_cart_info)
+            }
+            MainContract.View.MainScreenEvent.ShowFailedChangeCartCount -> {
+                showToastShort(R.string.failed_change_cart_count)
+            }
+            MainContract.View.MainScreenEvent.ShowNetworkError -> {
+                showToastNetworkError()
+            }
+            MainContract.View.MainScreenEvent.ShowRetryMessage -> {
+                showToastRetryAgainLater()
+            }
+            is MainContract.View.MainScreenEvent.ReBindProductItem -> {
+                mainProductAdapter.reBindItem(event.productId)
             }
         }
     }
 
     private fun hideLoadMore() {
-        Toast.makeText(this, getString(R.string.load_more_end), Toast.LENGTH_SHORT).show()
+        showToastShort(R.string.load_more_end)
         loadAdapter.hide()
     }
 
     override fun onStart() {
         super.onStart()
-        presenter.initLoadData()
+        presenter.initLoadProducts()
+        presenter.loadRecentProducts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -151,7 +178,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.badge)
 
-        // presenter.loadCartCountSize()
+        presenter.showCartCount()
         return true
     }
 
@@ -161,7 +188,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 presenter.moveToCart()
                 true
             }
-
+            R.id.order_list -> {
+                presenter.moveToOrderList()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -176,17 +206,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         recentWrapperAdapter.onRestoreState(savedInstanceState)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) {
-            presenter.resetProducts()
-        }
-    }
-
     companion object {
-        fun getIntent(context: Context): Intent {
-            return Intent(context, MainActivity::class.java)
-        }
+        fun getIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
 
         private const val TOTAL_SPAN = 2
         private const val HALF_SPAN = TOTAL_SPAN / 2

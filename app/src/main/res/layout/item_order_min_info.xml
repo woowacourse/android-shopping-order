@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="orderItem"
+            type="woowacourse.shopping.model.OrderMinInfoItemUiModel" />
+
+        <variable
+            name="listener"
+            type="woowacourse.shopping.feature.order.list.OrderItemClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/sale_info_box"
+        android:onClick="@{()->listener.onClick(orderItem.id)}"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/order_date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="7dp"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="2023.5.30" />
+
+        <TextView
+            android:id="@+id/order_detail_move_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/order_detail_navigation_text"
+            android:textColor="@color/mint"
+            app:layout_constraintBottom_toBottomOf="@id/order_date_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/order_date_text_view" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/order_item_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sale_info_box"
+            android:paddingHorizontal="7dp"
+            android:paddingVertical="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/order_date_text_view">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/center_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.35" />
+
+            <ImageView
+                android:id="@+id/order_item_main_image_view"
+                imgUrl="@{orderItem.mainProductImage}"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/order_item_main_image_view_description"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="2:1"
+                app:layout_constraintEnd_toEndOf="@id/center_guideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/ic_launcher_round" />
+
+            <TextView
+                android:id="@+id/order_items_info_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@{(orderItem.extraProductCount == 0) ? orderItem.mainProductName : @string/order_items_info(orderItem.mainProductName,orderItem.extraProductCount)}"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="@id/center_guideline"
+                app:layout_constraintTop_toTopOf="@id/order_item_main_image_view"
+                tools:text="바나나 1kg 외 2종" />
+
+            <TextView
+                android:id="@+id/order_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/order_number(orderItem.id)}"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/order_item_payment_price"
+                app:layout_constraintStart_toStartOf="@id/order_items_info_text_view"
+                app:layout_constraintTop_toBottomOf="@id/order_items_info_text_view"
+                tools:text="주문번호 1" />
+
+            <TextView
+                android:id="@+id/order_item_payment_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/order_item_main_image_view"
+                app:layout_constraintStart_toStartOf="@id/order_number_text_view"
+                tools:text="4,5000원" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

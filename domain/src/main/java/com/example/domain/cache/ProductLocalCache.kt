@@ -2,7 +2,7 @@ package com.example.domain.cache
 
 import com.example.domain.model.Product
 
-object ProductLocalCache : ProductCache {
+class ProductLocalCache : ProductCache {
     private val _productList = mutableListOf<Product>()
     override val productList: List<Product>
         get() = _productList.toList()

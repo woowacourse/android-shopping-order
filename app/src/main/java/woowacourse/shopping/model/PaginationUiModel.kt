@@ -11,6 +11,12 @@ data class PaginationUiModel(
     val cartBottomNavigationUiModel: CartBottomNavigationUiModel,
     val pageTotalCount: Int,
 ) {
+    val checkedCartIds: List<Long>
+        get() = cartProducts.filter { it.checked }.map { it.cartId }
+
+    val selectedCount: Int
+        get() = cartProducts.filter { it.checked }.sumOf { it.productUiModel.count }
+
     fun toDomain(): Pagination {
         return Pagination(
             CartProducts(cartProducts.map { it.toDomain() }),

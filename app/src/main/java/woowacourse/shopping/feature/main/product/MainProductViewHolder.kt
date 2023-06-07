@@ -3,9 +3,9 @@ package woowacourse.shopping.feature.main.product
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.common_ui.CounterView
+import woowacourse.shopping.commonUi.CounterView
 import woowacourse.shopping.databinding.ItemMainProductBinding
-import woowacourse.shopping.model.ProductUiModel
+import woowacourse.shopping.model.CartProductUiModel
 
 class MainProductViewHolder private constructor(
     private val binding: ItemMainProductBinding,
@@ -16,15 +16,15 @@ class MainProductViewHolder private constructor(
 
         binding.counterView.countStateChangeListener =
             object : CounterView.OnCountStateChangeListener {
-                override fun onCountChanged(counterNavigationView: CounterView?, count: Int) {
+                override fun onCountChanged(counterView: CounterView?, count: Int) {
                     binding.product?.let { listener.onCartCountChanged(it.id, count) }
                 }
             }
     }
 
-    fun bind(product: ProductUiModel) {
-        binding.product = product
-        binding.counterView.setCountState(product.count, false)
+    fun bind(product: CartProductUiModel) {
+        binding.product = product.productUiModel
+        binding.counterView.setCountState(product.productUiModel.count, false)
     }
 
     companion object {
