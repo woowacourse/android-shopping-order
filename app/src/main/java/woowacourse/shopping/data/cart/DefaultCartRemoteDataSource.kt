@@ -1,22 +1,21 @@
 package woowacourse.shopping.data.cart
 
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.entity.CartProductEntity
-import woowacourse.shopping.data.entity.mapper.CartProductMapper.toDomain
+import woowacourse.shopping.data.cart.request.PatchCartProductQuantityRequest
+import woowacourse.shopping.data.cart.request.PostCartProductRequest
+import woowacourse.shopping.data.cart.response.GetCartProductResponse
+import woowacourse.shopping.data.dto.mapper.CartProductMapper.toDomain
 import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 
 class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteDataSource {
     override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: (String) -> Unit) {
-        service.requestCartProducts().enqueue(object : Callback<List<CartProductEntity>> {
+        service.requestCartProducts().enqueue(object : Callback<List<GetCartProductResponse>> {
             override fun onResponse(
-                call: Call<List<CartProductEntity>>,
-                response: Response<List<CartProductEntity>>
+                call: Call<List<GetCartProductResponse>>,
+                response: Response<List<GetCartProductResponse>>
             ) {
                 if(response.isSuccessful) {
                     onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
@@ -25,18 +24,15 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
                 }
             }
 
-            override fun onFailure(call: Call<List<CartProductEntity>>, t: Throwable) {
+            override fun onFailure(call: Call<List<GetCartProductResponse>>, t: Throwable) {
                 onFailure(MESSAGE_GET_PRODUCTS_FAILED)
             }
         })
     }
 
     override fun addCartProduct(id: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
-        val json = JSONObject()
-            .put("productId", id)
-            .put("quantity", quantity)
-        val body = json.toString().toRequestBody("application/json".toMediaType())
-        service.createCartProduct(body).enqueue(object : Callback<Unit> {
+        val requestBody = PostCartProductRequest(id, quantity)
+        service.createCartProduct(requestBody).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 val header = response.headers()
                 val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
@@ -60,10 +56,8 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
-        val json = JSONObject()
-            .put("quantity", quantity)
-        val body = json.toString().toRequestBody("application/json".toMediaType())
-        service.updateCartProductQuantity(id, body).enqueue(object : Callback<Unit> {
+        val requestBody = PatchCartProductQuantityRequest(quantity)
+        service.updateCartProductQuantity(id, requestBody).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.isSuccessful) {
                     onSuccess()

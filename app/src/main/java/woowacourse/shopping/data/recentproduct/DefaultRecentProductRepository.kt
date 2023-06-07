@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.recentproduct
 
 import woowacourse.shopping.data.database.dao.RecentProductDao
-import woowacourse.shopping.data.entity.RecentProductEntity
+import woowacourse.shopping.data.dto.RecentProductEntity
 import woowacourse.shopping.data.server.ProductRemoteDataSource
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.RecentProducts

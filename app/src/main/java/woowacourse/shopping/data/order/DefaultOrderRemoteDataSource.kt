@@ -3,14 +3,14 @@ package woowacourse.shopping.data.order
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.entity.PayRequest
-import woowacourse.shopping.data.entity.PayResponse
+import woowacourse.shopping.data.order.request.PostOrderRequest
+import woowacourse.shopping.data.order.response.PostOrderResponse
 import woowacourse.shopping.data.server.OrderRemoteDataSource
 
 class DefaultOrderRemoteDataSource(private val service: OrderService) : OrderRemoteDataSource {
-    override fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
-        service.requestOrder(order).enqueue(object : Callback<PayResponse> {
-            override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
+    override fun addOrder(order: PostOrderRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
+        service.requestOrder(order).enqueue(object : Callback<PostOrderResponse> {
+            override fun onResponse(call: Call<PostOrderResponse>, response: Response<PostOrderResponse>) {
                 if(response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!.orderId)
                 }
@@ -19,7 +19,7 @@ class DefaultOrderRemoteDataSource(private val service: OrderService) : OrderRem
                 }
             }
 
-            override fun onFailure(call: Call<PayResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PostOrderResponse>, t: Throwable) {
                 onFailure(MESSAGE_ORDER_FAILED)
             }
         })

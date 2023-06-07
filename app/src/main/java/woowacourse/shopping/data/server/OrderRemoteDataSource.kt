@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.server
 
-import woowacourse.shopping.data.entity.PayRequest
+import woowacourse.shopping.data.order.request.PostOrderRequest
 
 interface OrderRemoteDataSource {
-    fun addOrder(order: PayRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit)
+    fun addOrder(order: PostOrderRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit)
 }

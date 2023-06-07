@@ -1,29 +1,30 @@
-package woowacourse.shopping.data.entity.mapper
+package woowacourse.shopping.data.dto.mapper
 
-import woowacourse.shopping.data.entity.OrderEntity
-import woowacourse.shopping.data.entity.OrderProductEntity
+import woowacourse.shopping.data.member.response.GetOrderResponse
+import woowacourse.shopping.data.dto.OrderProduct
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.URL
 
-object OrderMapper : Mapper<Order, OrderEntity> {
-    override fun Order.toEntity(): OrderEntity {
-        return OrderEntity(
+object OrderMapper : Mapper<Order, GetOrderResponse> {
+    override fun Order.toEntity(): GetOrderResponse {
+        return GetOrderResponse(
             orderItems = products.map {
-                OrderProductEntity(
+                OrderProduct(
                     name = it.product.title,
                     imageUrl = it.product.picture.value,
                     count = it.quantity,
                     price = it.product.price
-                )},
+                )
+            },
             originalPrice,
             usedPoints,
             orderPrice = finalPrice
         )
     }
 
-    override fun OrderEntity.toDomain(): Order {
+    override fun GetOrderResponse.toDomain(): Order {
         return Order(
             products = orderItems.map {
                 CartProduct(

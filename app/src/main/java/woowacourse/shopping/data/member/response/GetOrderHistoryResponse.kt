@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.entity
+package woowacourse.shopping.data.member.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrderHistoryEntity(
+data class GetOrderHistoryResponse(
     val orderId: Int,
     val orderPrice: Int,
     val totalAmount: Int,

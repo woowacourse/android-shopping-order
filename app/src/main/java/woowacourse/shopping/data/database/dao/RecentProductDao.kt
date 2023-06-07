@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import woowacourse.shopping.data.database.table.SqlRecentProduct
-import woowacourse.shopping.data.entity.RecentProductEntity
+import woowacourse.shopping.data.dto.RecentProductEntity
 import java.time.LocalDateTime
 
 class RecentProductDao(private val database: SQLiteDatabase, private val server: String) {

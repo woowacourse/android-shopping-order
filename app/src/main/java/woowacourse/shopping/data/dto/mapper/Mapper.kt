@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.entity.mapper
+package woowacourse.shopping.data.dto.mapper
 
 interface Mapper<T, R> {
     fun T.toEntity(): R

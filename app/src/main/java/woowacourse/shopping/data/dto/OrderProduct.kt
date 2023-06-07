@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.entity
+package woowacourse.shopping.data.dto
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrderProductEntity(
+data class OrderProduct(
     val name: String,
     val imageUrl: String,
     val count: Int,
