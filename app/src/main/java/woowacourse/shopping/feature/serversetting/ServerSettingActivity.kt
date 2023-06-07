@@ -1,13 +1,13 @@
 package woowacourse.shopping.feature.serversetting
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.preferences.UserPreference
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.feature.main.MainActivity
+import woowacourse.shopping.util.showToastShort
 
 class ServerSettingActivity : AppCompatActivity(), ServerContract.View {
     private lateinit var binding: ActivityServerSettingBinding
@@ -21,8 +21,7 @@ class ServerSettingActivity : AppCompatActivity(), ServerContract.View {
     }
 
     override fun showMainScreen(serverName: String) {
-        Toast.makeText(this, getString(R.string.enter_server_text, serverName), Toast.LENGTH_SHORT)
-            .show()
+        showToastShort(R.string.enter_server_text, serverName)
         startActivity(MainActivity.getIntent(this))
     }
 }

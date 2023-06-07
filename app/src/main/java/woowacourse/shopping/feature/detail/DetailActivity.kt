@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -25,6 +24,7 @@ import woowacourse.shopping.model.RecentProductUiModel
 import woowacourse.shopping.module.ApiModule
 import woowacourse.shopping.util.getParcelableCompat
 import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class DetailActivity : AppCompatActivity(), DetailContract.View {
 
@@ -78,13 +78,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     }
 
     override fun showFailedLoadProductInfo() {
-        runOnUiThread {
-            Toast.makeText(
-                this,
-                getString(R.string.failed_load_product_detail_info),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        runOnUiThread { showToastShort(R.string.failed_load_product_detail_info) }
     }
 
     override fun showCartScreen() = startActivity(CartActivity.getIntent(this))

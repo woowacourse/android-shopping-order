@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.R
@@ -71,12 +70,8 @@ class CounterDialog : DialogFragment(), CounterDialogContract.View {
             CHANGE_COUNTER_APPLY_KEY,
             bundleOf(COUNT_KEY to changeApplyCount),
         )
-        requireActivity().runOnUiThread {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.success_add_cart),
-                Toast.LENGTH_SHORT,
-            ).show()
+        with(requireActivity()) {
+            runOnUiThread { showToastShort(R.string.success_add_cart) }
         }
     }
 

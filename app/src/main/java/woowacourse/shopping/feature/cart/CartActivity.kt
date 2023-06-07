@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -138,8 +137,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showOrderUnavailableMessage() {
-        Toast.makeText(this, getString(R.string.order_unavailable_message), Toast.LENGTH_SHORT)
-            .show()
+        showToastShort(R.string.order_unavailable_message)
     }
 
     override fun showFailedChangeCartCount() {

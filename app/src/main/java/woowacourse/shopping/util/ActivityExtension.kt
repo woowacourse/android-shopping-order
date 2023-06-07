@@ -12,16 +12,30 @@ fun Activity.keyError(key: String) {
 
 fun Activity.showToastShort(
     @StringRes
-    messageId: Int
+    messageId: Int,
+    vararg any: Any
 ) {
-    Toaster.showShort(this, getString(messageId))
+    val message = getString(messageId)
+    val formattedMessage = if (any.isNotEmpty()) {
+        message.format(*any.map { it.toString() }.toTypedArray())
+    } else {
+        message
+    }
+    Toaster.showShort(this, formattedMessage)
 }
 
 fun Activity.showToastLong(
     @StringRes
-    messageId: Int
+    messageId: Int,
+    vararg any: Any
 ) {
-    Toaster.showLong(this, getString(messageId))
+    val message = getString(messageId)
+    val formattedMessage = if (any.isNotEmpty()) {
+        message.format(*any.map { it.toString() }.toTypedArray())
+    } else {
+        message
+    }
+    Toaster.showLong(this, formattedMessage)
 }
 
 fun Activity.showToastNetworkError() {

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.domain.model.MoneySalePolicy
@@ -17,7 +16,11 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderConfirmBinding
 import woowacourse.shopping.model.MoneySaleUiModel
 import woowacourse.shopping.module.ApiModule
-import woowacourse.shopping.util.*
+import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.util.keyError
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
+import woowacourse.shopping.util.toMoneyFormat
 
 class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     private lateinit var binding: ActivityOrderConfirmBinding
@@ -104,7 +107,7 @@ class OrderConfirmActivity : AppCompatActivity(), OrderConfirmContract.View {
     }
 
     override fun showOrderFailed() {
-        Toast.makeText(this, getString(R.string.order_failed_message), Toast.LENGTH_SHORT).show()
+        showToastShort(R.string.order_failed_message)
     }
 
     override fun showNetworkError() {
