@@ -13,6 +13,8 @@ import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.feature.order.detail.OrderDetailActivity
 import woowacourse.shopping.model.OrderMinInfoItemUiModel
 import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private lateinit var binding: ActivityOrderListBinding
@@ -61,12 +63,20 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         }
     }
 
+    override fun showFailedLoadOrderList() {
+        showToastShort(R.string.failed_load_order_list_info)
+    }
+
     override fun setOrderListItems(orderItems: List<OrderMinInfoItemUiModel>) {
         orderListAdapter.setOrderItems(orderItems)
     }
 
     override fun showOrderDetail(orderId: Long) {
         startActivity(OrderDetailActivity.getIntent(this, orderId))
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     companion object {

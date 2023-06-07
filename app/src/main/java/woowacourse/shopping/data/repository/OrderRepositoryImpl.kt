@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderMinInfoItem
 import com.example.domain.repository.OrderRepository
@@ -10,46 +11,54 @@ import woowacourse.shopping.data.dataSource.remote.OrderService
 import woowacourse.shopping.data.model.dto.request.OrderRequestDto
 import woowacourse.shopping.data.model.dto.response.OrderDetailDto
 import woowacourse.shopping.data.model.dto.response.OrderMinInfoItemDto
+import woowacourse.shopping.data.util.responseParseCustomError
 import java.net.URI
 
 class OrderRepositoryImpl(
     private val orderService: OrderService
 ) : OrderRepository {
-    override fun fetchAllOrders(onSuccess: (List<OrderMinInfoItem>) -> Unit, onFailure: () -> Unit) {
+    override fun fetchAllOrders(callBack: (BaseResponse<List<OrderMinInfoItem>>) -> Unit) {
         orderService.getOrders().enqueue(object : Callback<List<OrderMinInfoItemDto>> {
             override fun onResponse(
                 call: Call<List<OrderMinInfoItemDto>>,
                 response: Response<List<OrderMinInfoItemDto>>
             ) {
-                if (response.isSuccessful.not()) onFailure()
-                onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
+                if (response.isSuccessful.not())
+                    return responseParseCustomError(response.errorBody(), callBack)
+
+                callBack(
+                    BaseResponse.SUCCESS(
+                        response.body()?.map { it.toDomain() }
+                            ?: emptyList()
+                    )
+                )
             }
 
             override fun onFailure(call: Call<List<OrderMinInfoItemDto>>, t: Throwable) {
-                onFailure()
+                callBack(BaseResponse.NETWORK_ERROR())
             }
         })
     }
 
     override fun fetchOrderDetailById(
         orderId: Long,
-        onSuccess: (OrderDetail) -> Unit,
-        onFailure: () -> Unit
+        callBack: (BaseResponse<OrderDetail>) -> Unit
     ) {
         orderService.getOrderDetail(orderId).enqueue(object : Callback<OrderDetailDto> {
             override fun onResponse(
                 call: Call<OrderDetailDto>,
                 response: Response<OrderDetailDto>
             ) {
-                if (response.isSuccessful.not()) onFailure()
+                if (response.isSuccessful.not() || response.body() == null)
+                    return responseParseCustomError(response.errorBody(), callBack)
+
                 response.body()?.let {
-                    return onSuccess(it.toDomain())
+                    return callBack(BaseResponse.SUCCESS(it.toDomain()))
                 }
-                return onFailure()
             }
 
             override fun onFailure(call: Call<OrderDetailDto>, t: Throwable) {
-                onFailure()
+                callBack(BaseResponse.NETWORK_ERROR())
             }
         })
     }
@@ -57,20 +66,23 @@ class OrderRepositoryImpl(
     override fun addOrder(
         cartIds: List<Long>,
         orderPaymentPrice: Int,
-        onSuccess: (orderId: Long) -> Unit,
-        onFailure: () -> Unit
+        callBack: (orderId: BaseResponse<Long>) -> Unit
     ) {
         orderService.addOrder(OrderRequestDto(cartIds, orderPaymentPrice))
             .enqueue(object : Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.isSuccessful.not()) return onFailure()
-                    val responseHeader = response.headers()["Location"] ?: return onFailure()
+                    if (response.isSuccessful.not())
+                        return responseParseCustomError(response.errorBody(), callBack)
+
+                    val responseHeader = response.headers()["Location"]
+                        ?: return responseParseCustomError(response.errorBody(), callBack)
+
                     val orderId = URI(responseHeader).path.substringAfterLast("/").toLong()
-                    onSuccess(orderId)
+                    callBack(BaseResponse.SUCCESS(orderId))
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
+                    callBack(BaseResponse.NETWORK_ERROR())
                 }
             })
     }

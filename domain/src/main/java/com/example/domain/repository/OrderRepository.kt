@@ -1,15 +1,15 @@
 package com.example.domain.repository
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderMinInfoItem
 
 interface OrderRepository {
-    fun fetchAllOrders(onSuccess: (List<OrderMinInfoItem>) -> Unit, onFailure: () -> Unit)
-    fun fetchOrderDetailById(orderId: Long, onSuccess: (OrderDetail) -> Unit, onFailure: () -> Unit)
+    fun fetchAllOrders(callBack: (BaseResponse<List<OrderMinInfoItem>>) -> Unit)
+    fun fetchOrderDetailById(orderId: Long, callBack: (BaseResponse<OrderDetail>) -> Unit)
     fun addOrder(
         cartIds: List<Long>,
         orderPaymentPrice: Int,
-        onSuccess: (orderId: Long) -> Unit,
-        onFailure: () -> Unit
+        callBack: (orderId: BaseResponse<Long>) -> Unit
     )
 }

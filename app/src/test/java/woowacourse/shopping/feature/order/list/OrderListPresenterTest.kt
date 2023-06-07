@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.order.list
 
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.OrderMinInfoItem
 import com.example.domain.repository.OrderRepository
 import io.mockk.Runs
@@ -30,9 +31,10 @@ internal class OrderListPresenterTest {
         // given
         val mockOrderMinInfoItems =
             OrderFixture.getOrderMinInfoItems(listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L))
-        val successSlot = slot<(List<OrderMinInfoItem>) -> Unit>()
-        every { orderRepository.fetchAllOrders(capture(successSlot), any()) } answers {
-            successSlot.captured(mockOrderMinInfoItems)
+
+        every { orderRepository.fetchAllOrders(any()) } answers {
+            val successBlock = arg<(BaseResponse<List<OrderMinInfoItem>>) -> Unit>(0)
+            successBlock(BaseResponse.SUCCESS(mockOrderMinInfoItems))
         }
 
         val ordersSlot = slot<List<OrderMinInfoItemUiModel>>()

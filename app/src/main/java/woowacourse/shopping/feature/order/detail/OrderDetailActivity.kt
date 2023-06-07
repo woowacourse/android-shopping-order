@@ -12,6 +12,8 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.OrderProductUiModel
 import woowacourse.shopping.module.ApiModule
+import woowacourse.shopping.util.showToastNetworkError
+import woowacourse.shopping.util.showToastShort
 
 class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private lateinit var binding: ActivityOrderDetailBinding
@@ -47,6 +49,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         }
     }
 
+    override fun showFailedLoadOrder() {
+        showToastShort(R.string.failed_load_order_detail_info)
+    }
+
     override fun setOrderProductsInfo(list: List<OrderProductUiModel>) {
         adapter.setItems(list)
     }
@@ -63,6 +69,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding.orderDetailProductTotalPriceTextView.text = saleBeforePrice
         binding.orderDetailSaleAmountTextView.text = saleAmount
         binding.totalFinalPayPriceTextView.text = saleAfterPrice
+    }
+
+    override fun showNetworkError() {
+        showToastNetworkError()
     }
 
     companion object {

@@ -89,15 +89,16 @@ internal class OrderConfirmPresenterTest {
 
         val cartIdsSlot = slot<List<Long>>()
         val paymentSlot = slot<Int>()
-        val successSlot = slot<(Long) -> Unit>()
         every {
             orderRepository.addOrder(
                 capture(cartIdsSlot),
                 capture(paymentSlot),
-                capture(successSlot),
                 any()
             )
-        } answers { successSlot.captured(1L) }
+        } answers {
+            val successBlock = arg<(BaseResponse<Long>) -> Unit>(2)
+            successBlock(BaseResponse.SUCCESS(1L))
+        }
 
         every { view.showOrderSuccess(any()) } just Runs
         every { view.exitScreen() } just Runs

@@ -55,15 +55,16 @@ class OrderConfirmPresenter(
     }
 
     override fun requestOrder() {
-        orderRepository.addOrder(
-            cartIds,
-            paymentPrice,
-            onSuccess = {
-                view.showOrderSuccess(cartIds)
-                view.exitScreen()
-            },
-            onFailure = { view.showOrderFailed() }
-        )
+        orderRepository.addOrder(cartIds, paymentPrice) { result ->
+            when (result) {
+                is BaseResponse.SUCCESS -> {
+                    view.showOrderSuccess(cartIds)
+                    view.exitScreen()
+                }
+                is BaseResponse.FAILED -> view.showOrderFailed()
+                is BaseResponse.NETWORK_ERROR -> view.showNetworkError()
+            }
+        }
     }
 
     companion object {

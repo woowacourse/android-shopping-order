@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.order.detail
 
 import com.example.domain.datasource.productsDatasource
+import com.example.domain.model.BaseResponse
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderProduct
 import com.example.domain.model.Price
@@ -40,9 +41,10 @@ internal class OrderDetailPresenterTest {
                 OrderProduct(productsDatasource[1], 1)
             )
         )
-        val successSlot = slot<(OrderDetail) -> Unit>()
-        every { orderRepository.fetchOrderDetailById(orderId, capture(successSlot), any()) } answers {
-            successSlot.captured(mockOrderDetail)
+
+        every { orderRepository.fetchOrderDetailById(orderId, any()) } answers {
+            val successBlock = arg<(BaseResponse<OrderDetail>) -> Unit>(1)
+            successBlock(BaseResponse.SUCCESS(mockOrderDetail))
         }
         val slot = slot<List<OrderProductUiModel>>()
         every { view.setOrderProductsInfo(capture(slot)) } just Runs
