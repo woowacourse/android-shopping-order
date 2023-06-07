@@ -71,6 +71,7 @@ class ApiModule private constructor(
 
         private const val HTTP_LOG_TAG = "OkHttpLog:"
 
+        @Volatile
         private var apiModule: ApiModule? = null
 
         fun getInstance(userStore: UserStore): ApiModule {
