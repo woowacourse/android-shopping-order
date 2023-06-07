@@ -7,9 +7,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.order.OrderService
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.feature.main.MainActivity
@@ -26,11 +23,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding = ActivityOrderDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
-        val orderService = RetrofitClient.getInstanceWithToken(token)
-            .create(OrderService::class.java)
-
-        presenter = OrderDetailPresenter(this, OrderRepositoryImpl(orderService))
+        presenter = OrderDetailPresenter(this, OrderRepositoryImpl())
 
         val orderId = intent.getIntExtra(ORDER_ID, -1)
         presenter.loadOrderDetail(orderId)

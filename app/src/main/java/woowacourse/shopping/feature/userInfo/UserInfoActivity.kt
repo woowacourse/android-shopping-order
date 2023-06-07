@@ -6,10 +6,6 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.order.OrderService
-import woowacourse.shopping.data.datasource.remote.point.PointService
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -54,18 +50,10 @@ class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
     }
 
     private fun initPresenter() {
-
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
-        val orderService = RetrofitClient.getInstanceWithToken(token)
-            .create(OrderService::class.java)
-
-        val pointService = RetrofitClient.getInstanceWithToken(token)
-            .create(PointService::class.java)
-
         presenter = UserInfoPresenter(
             this,
-            OrderRepositoryImpl(orderService),
-            PointRepositoryImpl(pointService)
+            OrderRepositoryImpl(),
+            PointRepositoryImpl()
         )
     }
 

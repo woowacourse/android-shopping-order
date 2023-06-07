@@ -16,14 +16,10 @@ import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recent.RecentProductRepositoryImpl
-import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
 import woowacourse.shopping.data.datasource.remote.ServerInfo
 import woowacourse.shopping.data.datasource.local.recent.RecentDao
-import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.cart.CartService
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.product.ProductService
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
@@ -105,19 +101,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
-
-        val productService = RetrofitClient.retrofit
-            .create(ProductService::class.java)
-
-        val cartService = RetrofitClient.getInstanceWithToken(token)
-            .create(CartService::class.java)
-
         presenter = MainPresenter(
             this,
-            ProductRepositoryImpl(ProductRetrofitService(productService), ProductCacheImpl),
+            ProductRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRepositoryImpl(CartDataSourceImpl(cartService))
+            CartRepositoryImpl(CartDataSourceImpl())
         )
     }
 

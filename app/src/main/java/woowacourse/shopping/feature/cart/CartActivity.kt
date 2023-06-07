@@ -9,9 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.cart.CartService
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.payment.PaymentActivity
@@ -37,15 +34,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
 
-        val cartService = RetrofitClient.getInstanceWithToken(token)
-            .create(CartService::class.java)
-
-        val cartPresenter = CartPresenter(
-            this,
-            CartRepositoryImpl(CartDataSourceImpl(cartService))
-        )
+        val cartPresenter = CartPresenter(this, CartRepositoryImpl(CartDataSourceImpl()))
         presenter = cartPresenter
         binding.presenter = cartPresenter
 

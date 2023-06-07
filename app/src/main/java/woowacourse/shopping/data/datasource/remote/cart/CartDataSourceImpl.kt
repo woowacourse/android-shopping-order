@@ -1,11 +1,12 @@
 package woowacourse.shopping.data.datasource.remote.cart
 
 import com.example.domain.model.CartProduct
+import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.toDomain
 
-class CartDataSourceImpl(
-    private val cartService: CartService
-) : CartRemoteDataSource {
+class CartDataSourceImpl: CartRemoteDataSource {
+
+    private val cartService = RetrofitService.cartService
 
     override fun loadAll(): List<CartProduct> {
         return cartService.getAll().execute().body()?.map { it.toDomain() } ?: emptyList()

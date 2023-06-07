@@ -10,12 +10,7 @@ import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.auth.TokenSharedPreference
-import woowacourse.shopping.data.datasource.remote.RetrofitClient
-import woowacourse.shopping.data.datasource.remote.cart.CartService
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.order.OrderService
-import woowacourse.shopping.data.datasource.remote.point.PointService
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.point.PointRepositoryImpl
@@ -44,22 +39,11 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
-
-        val cartService = RetrofitClient.getInstanceWithToken(token)
-            .create(CartService::class.java)
-
-        val orderService = RetrofitClient.getInstanceWithToken(token)
-            .create(OrderService::class.java)
-
-        val pointService = RetrofitClient.getInstanceWithToken(token)
-            .create(PointService::class.java)
-
         presenter = PaymentPresenter(
             this,
-            CartRepositoryImpl(CartDataSourceImpl(cartService)),
-            PointRepositoryImpl(pointService),
-            OrderRepositoryImpl(orderService)
+            CartRepositoryImpl(CartDataSourceImpl()),
+            PointRepositoryImpl(),
+            OrderRepositoryImpl()
         )
     }
 

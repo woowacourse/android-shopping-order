@@ -8,7 +8,7 @@ import com.example.domain.repository.OrderRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.datasource.remote.order.OrderService
+import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.OrderDetailDto
 import woowacourse.shopping.data.model.OrderListDto
 import woowacourse.shopping.data.model.OrderRequestDto
@@ -16,9 +16,9 @@ import woowacourse.shopping.data.model.toData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.util.failureInfo
 
-class OrderRepositoryImpl(
-    private val service: OrderService
-) : OrderRepository {
+class OrderRepositoryImpl : OrderRepository {
+    private val service = RetrofitService.orderService
+
     override fun getOrders(
         page: Int,
         onSuccess: (List<Order>) -> Unit,

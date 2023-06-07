@@ -6,14 +6,15 @@ import com.example.domain.repository.PointRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.datasource.remote.point.PointService
+import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.PointDto
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.util.failureInfo
 
-class PointRepositoryImpl(
-    private val service: PointService
-) : PointRepository {
+class PointRepositoryImpl : PointRepository {
+
+    private val service = RetrofitService.pointService
+
     override fun getPoint(
         onSuccess: (Point) -> Unit,
         onFailure: (FailureInfo) -> Unit
