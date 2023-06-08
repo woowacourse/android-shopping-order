@@ -15,15 +15,8 @@ import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 import woowacourse.shopping.data.model.PointEntity
 import woowacourse.shopping.data.model.SavingPointEntity
-import woowacourse.shopping.presentation.model.ProductModel
 
 interface RetrofitService {
-    @GET(PATH_PRODUCT)
-    fun requestProducts(): Call<List<ProductModel>>
-
-    @GET("$PATH_PRODUCT/{$PATH_ID}")
-    fun requestProductById(@Path(PATH_ID) id: Long): Call<ProductModel>
-
     @GET(PATH_CART)
     fun requestCartProducts(@Header(AUTHORIZATION) token: String): Call<List<CartRemoteEntity>>
 
@@ -81,9 +74,7 @@ interface RetrofitService {
     companion object {
         private const val HEADER_JSON = "Content-Type: application/json"
 
-        private const val PATH_PRODUCT = "/products"
         private const val PATH_CART = "/cart-items"
-        private const val PATH_ID = "id"
         private const val PATH_ORDER_ID = "id"
         private const val PATH_CART_ID = "cartItemId"
         private const val PATH_TOTAL_PRICE = "totalPrice"
