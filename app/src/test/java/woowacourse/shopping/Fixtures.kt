@@ -35,7 +35,12 @@ fun createOrderModel(
     finalPrice: Int = 4000
 ): OrderModel = OrderModel(products, originalPrice, usedPoints, finalPrice)
 
-fun createProduct(): Product = Product(0, URL(""), "글로", 1000)
+fun createProduct(
+    id: Int = 0,
+    picture: URL = URL(""),
+    title: String = "글로",
+    price: Int = 1000
+): Product = Product(id, picture, title, price)
 fun createRecentProduct(): RecentProduct =
     RecentProduct(LocalDateTime.now(), createProduct())
 fun createCartProduct(
