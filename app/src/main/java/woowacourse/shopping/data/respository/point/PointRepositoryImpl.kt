@@ -3,21 +3,16 @@ package woowacourse.shopping.data.respository.point
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.PointEntity
 import woowacourse.shopping.data.model.SavingPointEntity
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.presentation.view.util.RetrofitService
+import woowacourse.shopping.data.respository.point.service.PointService
 
 class PointRepositoryImpl(
-    private val server: Server,
+    retrofit: Retrofit,
 ) : PointRepository {
 
-    private val pointRetrofit = Retrofit.Builder()
-        .baseUrl(server.url)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitService::class.java)
+    private val pointRetrofit = retrofit.create(PointService::class.java)
 
     override fun requestReservedPoint(
         onFailure: () -> Unit,

@@ -7,25 +7,10 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
-import woowacourse.shopping.data.model.PointEntity
-import woowacourse.shopping.data.model.SavingPointEntity
 
 interface RetrofitService {
-
-    @Headers(HEADER_JSON)
-    @GET(PATH_POINT)
-    fun requestReservedPoint(
-        @Header(AUTHORIZATION) token: String,
-    ): Call<PointEntity>
-
-    @Headers(HEADER_JSON)
-    @GET(PATH_SAVING_POINT)
-    fun requestSavingPoint(
-        @Query(PATH_TOTAL_PRICE) totalPrice: String,
-    ): Call<SavingPointEntity>
 
     @Headers(HEADER_JSON)
     @POST(PATH_ORDER_POST)
@@ -49,9 +34,7 @@ interface RetrofitService {
         private const val HEADER_JSON = "Content-Type: application/json"
 
         private const val PATH_ORDER_ID = "id"
-        private const val PATH_TOTAL_PRICE = "totalPrice"
-        private const val PATH_POINT = "/points"
-        private const val PATH_SAVING_POINT = "/saving-point"
+
         private const val PATH_ORDER = "/orders"
         private const val PATH_ORDER_POST = "/orders"
 

@@ -17,6 +17,7 @@ import woowacourse.shopping.presentation.view.order.adapter.CardAdapter
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
 import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.util.createRetrofit
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -47,7 +48,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         cartItems = intent.getParcelableArrayListExtra<CartModel>(KEY_CART_ITEMS)?.toList()
             ?: return finish()
 
-        val pointRepository = PointRepositoryImpl(server)
+        val retrofit = createRetrofit(server)
+
+        val pointRepository = PointRepositoryImpl(retrofit)
         val orderRepository = OrderRepositoryImpl(server)
 
         presenter = OrderPresenter(this, cartItems, pointRepository, orderRepository)
