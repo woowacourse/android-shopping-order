@@ -75,7 +75,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         val retrofit = createRetrofit(server)
         val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofit)
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         presenter = ProductDetailPresenter(
             this,
             productId = productId,

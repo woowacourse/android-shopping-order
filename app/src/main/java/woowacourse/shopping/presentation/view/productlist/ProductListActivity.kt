@@ -132,8 +132,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private fun setPresenter() {
         val retrofit = createRetrofit(server)
         val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofit)
+
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, server)
         presenter = ProductListPresenter(
             this,

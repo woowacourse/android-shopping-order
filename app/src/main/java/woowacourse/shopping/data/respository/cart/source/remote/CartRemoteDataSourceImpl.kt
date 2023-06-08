@@ -1,20 +1,14 @@
 package woowacourse.shopping.data.respository.cart.source.remote
 
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.presentation.view.util.RetrofitService
+import woowacourse.shopping.data.respository.cart.source.remote.service.CartService
 
 class CartRemoteDataSourceImpl(
-    private val server: Server,
+    retrofit: Retrofit,
 ) : CartRemoteDataSource {
-    private val cartService =
-        Retrofit.Builder()
-            .baseUrl(server.url)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(RetrofitService::class.java)
+    private val cartService = retrofit.create(CartService::class.java)
 
     override fun requestDatas(
         onFailure: () -> Unit,
