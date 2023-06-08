@@ -2,9 +2,10 @@ package woowacourse.shopping.feature.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.TokenSharedPreference
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.cache.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
 import woowacourse.shopping.databinding.ActivityLoginBinding
 import woowacourse.shopping.feature.main.MainActivity
 import java.util.Base64
@@ -18,22 +19,21 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.loginBtn.setOnClickListener {
-            val email = binding.emailEt.text.toString()
-            val password = binding.passwordEt.text.toString()
-            if (login(email, password)) {
-                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            } else {
-                Toast.makeText(this, "Invalid User", Toast.LENGTH_SHORT).show()
-            }
+        binding.btnUser1.setOnClickListener {
+            login("a@a.com")
+        }
+
+        binding.btnUser2.setOnClickListener {
+            login("b@b.com")
         }
     }
 
-    private fun login(email: String, password: String): Boolean {
-
-        val encoded = Base64.getEncoder().encodeToString("$email:$password".toByteArray())
+    private fun login(email: String) {
+        CartCache.clear()
+        ProductCacheImpl.clear()
+        val encoded = Base64.getEncoder().encodeToString("$email:1234".toByteArray())
         TokenSharedPreference.getInstance(applicationContext)
             .setToken(encoded)
-        return true
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
     }
 }

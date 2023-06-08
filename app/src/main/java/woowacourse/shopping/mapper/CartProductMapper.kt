@@ -1,6 +1,6 @@
 package woowacourse.shopping.mapper
 
-import com.example.domain.model.CartProduct
+import com.example.domain.model.cart.CartProduct
 import woowacourse.shopping.model.CartProductUiModel
 
 fun CartProduct.toPresentation(): CartProductUiModel =

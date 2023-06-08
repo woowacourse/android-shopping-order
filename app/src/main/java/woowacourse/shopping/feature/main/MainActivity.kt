@@ -1,25 +1,31 @@
 package woowacourse.shopping.feature.main
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.ProductCacheImpl
-import woowacourse.shopping.data.ProductRemoteRepositoryImpl
-import woowacourse.shopping.data.RecentProductRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.CartRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
-import woowacourse.shopping.data.service.ServerInfo
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.cache.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.recent.RecentDao
+import woowacourse.shopping.data.datasource.remote.ServerInfo
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.point.PointDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.point.PointRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.recentProduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
+import woowacourse.shopping.databinding.DialogCheckPointBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.detail.DetailActivity
 import woowacourse.shopping.feature.main.load.LoadAdapter
@@ -27,6 +33,7 @@ import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.orderHistory.OrderHistoryActivity
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
@@ -99,12 +106,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter = MainPresenter(
             this,
-            ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
+            ProductRemoteRepositoryImpl(ProductDataSourceImpl(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
+            CartRemoteRepositoryImpl(CartDataSourceImpl(), CartCache),
+            PointRemoteRepositoryImpl(PointDataSourceImpl())
         )
     }
 
@@ -165,6 +172,33 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
         presenter.setCartProductCount()
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.order_history -> navigateToOrderHistory()
+            R.id.check_point -> presenter.loadPointInfo()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun navigateToOrderHistory() {
+        startActivity(
+            Intent(
+                this,
+                OrderHistoryActivity::class.java,
+            ),
+        )
+    }
+
+    override fun createCheckPointDialog(havePoint: Int, expirePoint: Int) {
+        val binding = DialogCheckPointBinding.inflate(LayoutInflater.from(this))
+        AlertDialog.Builder(this).apply {
+            setView(binding.root)
+            binding.tvHavePoint.text = getString(R.string.point_format, havePoint)
+            binding.tvExpirePoint.text = getString(R.string.point_format, expirePoint)
+        }.create().show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

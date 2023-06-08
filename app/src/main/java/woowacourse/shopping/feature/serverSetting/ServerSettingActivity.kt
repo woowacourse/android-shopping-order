@@ -3,7 +3,7 @@ package woowacourse.shopping.feature.serverSetting
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.service.ServerInfo
+import woowacourse.shopping.data.datasource.remote.ServerInfo
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.feature.login.LoginActivity
 

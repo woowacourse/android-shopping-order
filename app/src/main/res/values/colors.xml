@@ -13,4 +13,5 @@
     <color name="gray_dark">#333333</color>
     <color name="skeleton_light_gray">#F3F3F3</color>
     <color name="skeleton_gray">#E2E2E2</color>
+    <color name="red">#B83B3B</color>
 </resources>

@@ -8,59 +8,34 @@
         android:layout_height="match_parent"
         tools:context=".feature.login.LoginActivity">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/email_layout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_user1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/email"
+            android:background="@drawable/bg_round_border"
+            android:backgroundTint="@color/mint"
+            android:text="@string/user1"
+            android:textColor="@color/white"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.35"
-            app:layout_constraintWidth_percent="0.8">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/email_et"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/password_layout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/password"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/email_layout"
-            app:layout_constraintWidth_percent="0.8">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password_et"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:inputType="textPassword" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+            app:layout_constraintVertical_bias="0.45" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/login_btn"
-            android:layout_width="0dp"
+            android:id="@+id/btn_user2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:background="@color/mint"
-            android:text="@string/sign_in"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_round_border"
+            android:backgroundTint="@color/mint"
+            android:text="@string/user2"
             android:textColor="@color/white"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/password_layout"
-            app:layout_constraintWidth_percent="0.8" />
-
+            app:layout_constraintTop_toBottomOf="@id/btn_user1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

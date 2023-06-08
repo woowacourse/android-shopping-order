@@ -1,9 +1,11 @@
 package woowacourse.shopping.data
 
 import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 import org.junit.Test
-import woowacourse.shopping.data.service.ProductMockWebService
+import woowacourse.shopping.data.cache.ProductCacheImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductMockWebService
+import woowacourse.shopping.data.repository.product.ProductRemoteMockRepositoryImpl
 import java.util.concurrent.CountDownLatch
 
 internal class ProductRepositoryTest {
