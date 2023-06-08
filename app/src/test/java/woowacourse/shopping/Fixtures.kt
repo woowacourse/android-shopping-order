@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import woowacourse.shopping.data.dto.RecentProductEntity
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.OrderHistory
@@ -41,8 +42,11 @@ fun createProduct(
     title: String = "글로",
     price: Int = 1000
 ): Product = Product(id, picture, title, price)
-fun createRecentProduct(): RecentProduct =
-    RecentProduct(LocalDateTime.now(), createProduct())
+fun createRecentProduct(
+    time: LocalDateTime = LocalDateTime.now(),
+    product: Product = createProduct()
+): RecentProduct =
+    RecentProduct(time, product)
 fun createCartProduct(
     id: Int = 1,
     quantity: Int = 10,
@@ -61,3 +65,8 @@ fun createOrder(
     usedPoints: Int = 1000,
     finalPrice: Int = 4000
 ): Order = Order(products, originalPrice, usedPoints, finalPrice)
+
+fun createRecentProductEntity(
+    id: Int = 0,
+    time: LocalDateTime = LocalDateTime.now()
+): RecentProductEntity = RecentProductEntity(id, time)
