@@ -17,9 +17,9 @@ class RemoteOrderDataSource(
         onFailure: (Exception) -> Unit,
     ) {
         service.orderCart(ids).enqueue(
-            createResponseCallback(
-                onSuccess = onSuccess,
-                onFailure = onFailure,
+            createResponseCallback<OrderInfoDto>(
+                onSuccess = { onSuccess(it) },
+                onFailure = { onFailure(it) },
             ),
         )
     }
@@ -32,7 +32,7 @@ class RemoteOrderDataSource(
         service.postOrderItem(orderRequest).enqueue(
             createResponseCallback(
                 onSuccess = { onSuccess() },
-                onFailure = onFailure,
+                onFailure = { onFailure(it) },
             ),
         )
     }
@@ -42,9 +42,9 @@ class RemoteOrderDataSource(
         onFailure: (Exception) -> Unit,
     ) {
         service.getOrders().enqueue(
-            createResponseCallback(
-                onSuccess = onSuccess,
-                onFailure = onFailure,
+            createResponseCallback<OrderListResponse>(
+                onSuccess = { onSuccess(it) },
+                onFailure = { onFailure(it) },
             ),
         )
     }
@@ -55,9 +55,9 @@ class RemoteOrderDataSource(
         onFailure: (Exception) -> Unit,
     ) {
         service.getOrder(id).enqueue(
-            createResponseCallback(
-                onSuccess = onSuccess,
-                onFailure = onFailure,
+            createResponseCallback<OrderHistoryDto>(
+                onSuccess = { onSuccess(it) },
+                onFailure = { onFailure(it) },
             ),
         )
     }

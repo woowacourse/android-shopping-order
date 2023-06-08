@@ -28,11 +28,14 @@ class ShoppingPresenter(
     }
 
     override fun setUpNextProducts() {
-        productRepository.getAll { products ->
-            products?.let {
-                view.addMoreProducts(products.map { it.toUIModel() })
-            }
-        }
+        productRepository.getAll(
+            { products ->
+                products.let {
+                    view.addMoreProducts(products.map { it.toUIModel() })
+                }
+            },
+            {},
+        )
     }
 
     override fun setUpRecentProducts() {
@@ -56,11 +59,15 @@ class ShoppingPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        productRepository.findById(productId) {
-            it?.let {
-                view.navigateToProductDetail(it.toUIModel())
-            }
-        }
+        productRepository.findById(
+            productId,
+            {
+                it.let {
+                    view.navigateToProductDetail(it.toUIModel())
+                }
+            },
+            {},
+        )
     }
 
     companion object {

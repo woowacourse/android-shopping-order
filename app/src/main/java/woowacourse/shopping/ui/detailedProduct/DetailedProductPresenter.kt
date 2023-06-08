@@ -22,9 +22,13 @@ class DetailedProductPresenter(
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }
             ?.let {
-                productRepository.findById(it) { product ->
-                    lastProduct = product?.toUIModel()
-                }
+                productRepository.findById(
+                    it,
+                    { product ->
+                        lastProduct = product.toUIModel()
+                    },
+                    {},
+                )
             }
         sharedPreferenceUtils.setLastProductId(product.id)
     }

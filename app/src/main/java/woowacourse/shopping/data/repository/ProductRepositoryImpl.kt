@@ -8,19 +8,26 @@ import woowacourse.shopping.repository.ProductRepository
 class ProductRepositoryImpl(
     private val remoteDatabase: ProductDataSource,
 ) : ProductRepository {
-    override fun getAll(callback: (List<Product>?) -> Unit) {
-        remoteDatabase.getAll {
-            callback(it?.map { productDto -> productDto.toDomain() })
-        }
+    override fun getAll(
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        remoteDatabase.getAll(
+            {
+                onSuccess(it.map { productDto -> productDto.toDomain() })
+            },
+            {
+            },
+        )
     }
 
-    override fun getNext(count: Int, callback: (List<Product>?) -> Unit) {
-//        remoteDatabase.getNext(count, callback)
-    }
-
-    override fun findById(id: Int, callback: (Product?) -> Unit) {
-        remoteDatabase.findById(id) {
-            callback(it?.toDomain())
-        }
+    override fun findById(id: Int, onSuccess: (Product) -> Unit, onFailure: (Exception) -> Unit) {
+        remoteDatabase.findById(
+            id,
+            {
+                onSuccess(it.toDomain())
+            },
+            {},
+        )
     }
 }
