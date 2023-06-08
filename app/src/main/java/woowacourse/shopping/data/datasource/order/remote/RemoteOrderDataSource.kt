@@ -9,6 +9,7 @@ import woowacourse.shopping.data.httpclient.response.order.Individualorder.Indiv
 import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderErrorBody
 import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderFailureException
 import woowacourse.shopping.data.model.DataOrder
+import woowacourse.shopping.support.framework.data.httpclient.getIdFromHeaders
 import woowacourse.shopping.support.framework.data.httpclient.getParsedErrorBody
 import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 
@@ -37,7 +38,7 @@ class RemoteOrderDataSource : OrderDataSource.Remote {
         onReceived: (Result<Int>) -> Unit
     ) {
         if (response.isSuccessful) {
-            val orderId = response.headers()["Location"]?.split("/")?.last()?.toInt()
+            val orderId = response.headers().getIdFromHeaders("Location")
             orderId?.let { onReceived(Result.success(it)) }
         } else {
             val errorData =

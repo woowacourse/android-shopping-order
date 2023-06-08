@@ -1,6 +1,7 @@
 package woowacourse.shopping.support.framework.data.httpclient
 
 import android.util.Log
+import okhttp3.Headers
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,3 +30,6 @@ inline fun <reified T> Retrofit.getParsedErrorBody(errorBody: ResponseBody?): T?
             T::class.java.annotations
         ).convert(errorBody)
     }
+
+fun Headers.getIdFromHeaders(headerName: String): Int? =
+    this[headerName]?.split("/")?.lastOrNull()?.toInt()

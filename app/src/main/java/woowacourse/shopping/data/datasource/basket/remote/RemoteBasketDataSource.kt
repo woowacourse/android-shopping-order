@@ -6,6 +6,7 @@ import woowacourse.shopping.data.httpclient.request.BasketAddRequest
 import woowacourse.shopping.data.httpclient.request.BasketUpdateRequest
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.support.framework.data.httpclient.getIdFromHeaders
 import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
@@ -23,7 +24,7 @@ class RemoteBasketDataSource : BasketDataSource.Remote {
             getRetrofitCallback<Unit>(
                 failureLogTag = this::class.java.name,
                 onResponse = { _, response ->
-                    val basketId = response.headers()["Location"]?.split("/")?.last()?.toInt()
+                    val basketId = response.headers().getIdFromHeaders("Location")
                     basketId?.let { onReceived(it) }
                 }
             )
