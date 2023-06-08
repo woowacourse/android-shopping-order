@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.member
 
+import android.os.Handler
+import android.os.Looper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,20 +15,22 @@ import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.OrderHistory
 
 class DefaultMemberRemoteDataSource(private val service: MemberService) : MemberRemoteDataSource {
+    private val mainHandler = Handler(Looper.getMainLooper())
+
     override fun getPoints(onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         service.requestPoints().enqueue(object : Callback<GetPointsResponse> {
             override fun onResponse(call: Call<GetPointsResponse>, response: Response<GetPointsResponse>) {
                 val responseBody = response.body()
                 if(response.isSuccessful && responseBody != null) {
-                    onSuccess(responseBody.points)
+                    postToMainHandler { onSuccess(responseBody.points) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_POINTS_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_POINTS_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<GetPointsResponse>, t: Throwable) {
-                onFailure(MESSAGE_GET_POINTS_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_POINTS_FAILED) }
             }
         })
     }
@@ -39,15 +43,15 @@ class DefaultMemberRemoteDataSource(private val service: MemberService) : Member
             ) {
                 val responseBody = response.body()
                 if(response.isSuccessful && responseBody != null) {
-                    onSuccess(responseBody.map { it.toDomain() })
+                    postToMainHandler { onSuccess(responseBody.map { it.toDomain() }) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_HISTORIES_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_HISTORIES_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<List<GetOrderHistoryResponse>>, t: Throwable) {
-                onFailure(MESSAGE_GET_ORDER_HISTORIES_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_ORDER_HISTORIES_FAILED) }
             }
         })
     }
@@ -57,17 +61,23 @@ class DefaultMemberRemoteDataSource(private val service: MemberService) : Member
             override fun onResponse(call: Call<GetOrderResponse>, response: Response<GetOrderResponse>) {
                 val responseBody = response.body()
                 if(response.isSuccessful && responseBody != null) {
-                    onSuccess(responseBody.toDomain())
+                    postToMainHandler { onSuccess(responseBody.toDomain()) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<GetOrderResponse>, t: Throwable) {
-                onFailure(MESSAGE_GET_ORDER_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_ORDER_FAILED) }
             }
         })
+    }
+
+    private fun postToMainHandler(block: () -> Unit) {
+        mainHandler.post {
+            block()
+        }
     }
 
     companion object {

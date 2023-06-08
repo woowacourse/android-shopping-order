@@ -134,7 +134,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         shoppingCartAction?.actionView?.setOnClickListener {
             onOptionsItemSelected(shoppingCartAction)
         }
-        shoppingCartAmount = shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
+        shoppingCartAmount =
+            shoppingCartAction?.actionView?.findViewById(R.id.tv_shopping_cart_amount)
 
         memberPoints = menu?.findItem(R.id.member_points)
 
@@ -193,7 +194,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         startProductDetailActivity(productModel, recentProductModel)
     }
 
-    private fun startProductDetailActivity(productModel: ProductModel, recentProductModel: ProductModel?) {
+    private fun startProductDetailActivity(
+        productModel: ProductModel,
+        recentProductModel: ProductModel?
+    ) {
         val intent = ProductDetailActivity.createIntent(this, productModel, recentProductModel)
         activityResultLauncher.launch(intent)
     }
@@ -216,14 +220,17 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun notifyFailure(message: String) {
-        runOnUiThread {
-            Toaster.showToast(this, message)
-        }
+        Toaster.showToast(this, message)
     }
 
     override fun showPoints(points: Int) {
         val spannableString = SpannableString(getString(R.string.points, points))
-        spannableString.setSpan(ForegroundColorSpan(getColor(R.color.primary)), 0, spannableString.length, 0)
+        spannableString.setSpan(
+            ForegroundColorSpan(getColor(R.color.primary)),
+            0,
+            spannableString.length,
+            0
+        )
         spannableString.setSpan(AbsoluteSizeSpan(50), 0, spannableString.length, 0)
         spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, spannableString.length, 0)
         memberPoints?.title = spannableString
@@ -246,7 +253,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         val server = Storage.getInstance(this).server
         val retrofit = RetrofitInjector.inject(this)
         val productRepository = RepositoryInjector.injectProductRepository(retrofit)
-        val recentProductRepository = RepositoryInjector.injectRecentProductRepository(database, server, retrofit)
+        val recentProductRepository =
+            RepositoryInjector.injectRecentProductRepository(database, server, retrofit)
         val cartRepository = RepositoryInjector.injectCartRepository(retrofit)
         val memberRepository = RepositoryInjector.injectMemberRepository(retrofit)
 

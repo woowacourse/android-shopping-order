@@ -50,13 +50,11 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     override fun notifyFailure(message: String) {
-        runOnUiThread {
-            Toaster.showToast(this, message)
-        }
+        Toaster.showToast(this, message)
     }
 
     override fun finish() {
-        when(OrderDetailPurpose.getPurpose(extraPurpose)) {
+        when (OrderDetailPurpose.getPurpose(extraPurpose)) {
             OrderDetailPurpose.SHOW_ORDER_COMPLETE -> startShoppingActivity()
             OrderDetailPurpose.SHOW_ORDER_DETAIL -> {}
         }
@@ -73,7 +71,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         private const val EXTRA_KEY_ID = "id"
         private const val EXTRA_KEY_PURPOSE = "purpose"
 
-        fun createIntent(context: Context, id: Int, purpose: String) : Intent {
+        fun createIntent(context: Context, id: Int, purpose: String): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
             intent.putExtra(EXTRA_KEY_ID, id)
             intent.putExtra(EXTRA_KEY_PURPOSE, purpose)

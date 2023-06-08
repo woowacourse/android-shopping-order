@@ -64,13 +64,12 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     override fun notifyFailure(message: String) {
-        runOnUiThread {
-            Toaster.showToast(this, message)
-        }
+        Toaster.showToast(this, message)
     }
 
     override fun showDetail(id: Int) {
-        val intent = OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_DETAIL.name)
+        val intent =
+            OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_DETAIL.name)
         startActivity(intent)
     }
 

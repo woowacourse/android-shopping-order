@@ -82,10 +82,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun notifyFailure(message: String) {
-
-        runOnUiThread {
-            Toaster.showToast(this, message)
-        }
+        Toaster.showToast(this, message)
     }
 
     override fun showOrder(ids: List<Int>) {

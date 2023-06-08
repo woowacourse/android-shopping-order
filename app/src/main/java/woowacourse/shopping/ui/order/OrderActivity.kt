@@ -67,7 +67,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if(binding.usePoints.isFocused && s != null) {
+                if (binding.usePoints.isFocused && s != null) {
                     presenter.usePoints(s.toString().toIntOrNull() ?: 0)
                 }
             }
@@ -94,7 +94,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun updatePointsUsed(points: Int) {
-        if(points == 0) return
+        if (points == 0) return
         binding.usePoints.clearFocus()
         binding.usePoints.setText(points.toString())
         binding.usePoints.setSelection(binding.usePoints.length())
@@ -117,14 +117,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showOrderDetail(id: Int) {
-        val intent = OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_COMPLETE.name)
+        val intent =
+            OrderDetailActivity.createIntent(this, id, OrderDetailPurpose.SHOW_ORDER_COMPLETE.name)
         startActivity(intent)
     }
 
     override fun notifyFailure(message: String) {
-        runOnUiThread {
-            Toaster.showToast(this, message)
-        }
+        Toaster.showToast(this, message)
     }
 
     companion object {

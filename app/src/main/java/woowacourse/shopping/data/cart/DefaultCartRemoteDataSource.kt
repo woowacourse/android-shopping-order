@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.cart
 
+import android.os.Handler
+import android.os.Looper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,6 +13,8 @@ import woowacourse.shopping.data.server.CartRemoteDataSource
 import woowacourse.shopping.domain.CartProduct
 
 class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteDataSource {
+    private val mainHandler = Handler(Looper.getMainLooper())
+
     override fun getCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: (String) -> Unit) {
         service.requestCartProducts().enqueue(object : Callback<List<GetCartProductResponse>> {
             override fun onResponse(
@@ -18,14 +22,14 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
                 response: Response<List<GetCartProductResponse>>
             ) {
                 if(response.isSuccessful) {
-                    onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
+                    postToMainHandler { onSuccess(response.body()?.map { it.toDomain() } ?: emptyList()) }
                 }else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<List<GetCartProductResponse>>, t: Throwable) {
-                onFailure(MESSAGE_GET_PRODUCTS_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_PRODUCTS_FAILED) }
             }
         })
     }
@@ -37,15 +41,15 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
                 val header = response.headers()
                 val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
                 if(response.isSuccessful && cartId != null) {
-                    onSuccess(cartId)
+                    postToMainHandler { onSuccess(cartId) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_ADD_PRODUCT_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_ADD_PRODUCT_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure(MESSAGE_ADD_PRODUCT_FAILED)
+                postToMainHandler { onFailure(MESSAGE_ADD_PRODUCT_FAILED) }
             }
         })
     }
@@ -60,15 +64,15 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
         service.updateCartProductQuantity(id, requestBody).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.isSuccessful) {
-                    onSuccess()
+                    postToMainHandler { onSuccess() }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_UPDATE_QUANTITY_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_UPDATE_QUANTITY_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure(MESSAGE_UPDATE_QUANTITY_FAILED)
+                postToMainHandler { onFailure(MESSAGE_UPDATE_QUANTITY_FAILED) }
             }
         })
     }
@@ -81,17 +85,23 @@ class DefaultCartRemoteDataSource(private val service: CartService): CartRemoteD
         service.deleteCartProduct(cartProductId).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.isSuccessful) {
-                    onSuccess()
+                    postToMainHandler { onSuccess() }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_DELETE_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_DELETE_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure(MESSAGE_DELETE_FAILED)
+                postToMainHandler { onFailure(MESSAGE_DELETE_FAILED) }
             }
         })
+    }
+
+    private fun postToMainHandler(block: () -> Unit) {
+        mainHandler.post {
+            block()
+        }
     }
 
     companion object {

@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.product
 
+import android.os.Handler
+import android.os.Looper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -9,6 +11,8 @@ import woowacourse.shopping.data.server.ProductRemoteDataSource
 import woowacourse.shopping.domain.Product
 
 class DefaultProductRemoteDataSource(private val service: ProductService) : ProductRemoteDataSource {
+    private val mainHandler = Handler(Looper.getMainLooper())
+
     override fun getProducts(onSuccess: (List<Product>) -> Unit, onFailure: (String) -> Unit) {
         service.requestProducts().enqueue(object : Callback<List<GetProductResponse>> {
             override fun onResponse(
@@ -16,15 +20,15 @@ class DefaultProductRemoteDataSource(private val service: ProductService) : Prod
                 response: Response<List<GetProductResponse>>
             ) {
                 if(response.isSuccessful) {
-                    onSuccess(response.body()?.map { it.toDomain() } ?: emptyList())
+                    postToMainHandler { onSuccess(response.body()?.map { it.toDomain() } ?: emptyList()) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCTS_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<List<GetProductResponse>>, t: Throwable) {
-                onFailure(MESSAGE_GET_PRODUCTS_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_PRODUCTS_FAILED) }
             }
         })
     }
@@ -34,17 +38,23 @@ class DefaultProductRemoteDataSource(private val service: ProductService) : Prod
             override fun onResponse(call: Call<GetProductResponse>, response: Response<GetProductResponse>) {
                 val responseBody = response.body()
                 if(response.isSuccessful && responseBody != null) {
-                    onSuccess(responseBody.toDomain())
+                    postToMainHandler { onSuccess(responseBody.toDomain()) }
                 }
                 else {
-                    onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCT_FAILED })
+                    postToMainHandler { onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCT_FAILED }) }
                 }
             }
 
             override fun onFailure(call: Call<GetProductResponse>, t: Throwable) {
-                onFailure(MESSAGE_GET_PRODUCT_FAILED)
+                postToMainHandler { onFailure(MESSAGE_GET_PRODUCT_FAILED) }
             }
         })
+    }
+
+    private fun postToMainHandler(block: () -> Unit) {
+        mainHandler.post {
+            block()
+        }
     }
 
     companion object {
