@@ -3,10 +3,10 @@ package woowacourse.shopping.feature.product
 import com.example.domain.Pagination
 import com.example.domain.cart.Cart
 import com.example.domain.cart.CartProduct
-import com.example.domain.cart.CartRepository
 import com.example.domain.product.Product
-import com.example.domain.product.ProductRepository
-import com.example.domain.product.recent.RecentProductRepository
+import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
 import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE

@@ -3,7 +3,7 @@ package woowacourse.shopping.feature.cart
 import com.example.domain.Pagination
 import com.example.domain.cart.Cart
 import com.example.domain.cart.CartProduct
-import com.example.domain.cart.CartRepository
+import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.mapper.toUi
 

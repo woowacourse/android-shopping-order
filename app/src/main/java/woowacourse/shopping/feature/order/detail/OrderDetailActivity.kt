@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.order.OrderProduct
-import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.data.order.OrderRemoteRepository
+import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.data.util.RetrofitManager
 import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding

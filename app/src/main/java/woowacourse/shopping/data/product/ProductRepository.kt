@@ -1,6 +1,7 @@
-package com.example.domain.product
+package woowacourse.shopping.data.product
 
 import com.example.domain.Pagination
+import com.example.domain.product.Product
 
 interface ProductRepository {
     fun requestFetchProductsUnit(

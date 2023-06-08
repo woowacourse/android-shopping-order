@@ -1,6 +1,8 @@
-package com.example.domain.order
+package woowacourse.shopping.data.order
 
 import com.example.domain.FixedDiscountPolicy
+import com.example.domain.order.Order
+import com.example.domain.order.OrderSummary
 
 interface OrderRepository {
 

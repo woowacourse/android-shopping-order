@@ -2,7 +2,6 @@ package woowacourse.shopping.data.product
 
 import com.example.domain.Pagination
 import com.example.domain.product.Product
-import com.example.domain.product.ProductRepository
 import retrofit2.Retrofit
 import retrofit2.create
 import woowacourse.shopping.data.cart.model.toDomain

@@ -3,13 +3,13 @@ package woowacourse.shopping.feature.order
 import com.example.domain.FixedDiscountPolicy
 import com.example.domain.cart.Cart
 import com.example.domain.cart.CartProduct
-import com.example.domain.order.OrderRepository
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.data.order.OrderRepository
 
 class OrderPresenterTest {
 

@@ -3,12 +3,12 @@ package woowacourse.shopping.feature.order.detail
 
 import com.example.domain.order.Order
 import com.example.domain.order.OrderProduct
-import com.example.domain.order.OrderRepository
 import com.example.domain.product.Product
 import io.mockk.justRun
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.model.mapper.toUi
 import woowacourse.shopping.util.AbstractTest
 

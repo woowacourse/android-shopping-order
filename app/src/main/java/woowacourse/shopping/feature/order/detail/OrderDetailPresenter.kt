@@ -1,6 +1,6 @@
 package woowacourse.shopping.feature.order.detail
 
-import com.example.domain.order.OrderRepository
+import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.model.mapper.toUi
 
 class OrderDetailPresenter(

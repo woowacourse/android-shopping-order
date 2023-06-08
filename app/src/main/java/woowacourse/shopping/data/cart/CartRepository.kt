@@ -1,6 +1,7 @@
-package com.example.domain.cart
+package woowacourse.shopping.data.cart
 
 import com.example.domain.Pagination
+import com.example.domain.cart.CartProduct
 
 interface CartRepository {
 

@@ -3,14 +3,12 @@ package woowacourse.shopping.data.order
 import android.util.Log
 import com.example.domain.FixedDiscountPolicy
 import com.example.domain.order.Order
-import com.example.domain.order.OrderRepository
 import com.example.domain.order.OrderSummary
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.create
-import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.data.order.model.dto.request.OrderRequest
 import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyResponse
 import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse

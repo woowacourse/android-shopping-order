@@ -3,7 +3,6 @@ package woowacourse.shopping.data.cart
 import android.util.Log
 import com.example.domain.Pagination
 import com.example.domain.cart.CartProduct
-import com.example.domain.cart.CartRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -12,7 +11,6 @@ import retrofit2.create
 import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 import woowacourse.shopping.data.cart.model.dto.response.CartResponse
 import woowacourse.shopping.data.cart.model.toDomain
-import woowacourse.shopping.data.product.model.toDomain
 import woowacourse.shopping.data.util.RetrofitCallback
 
 class CartRemoteRepository(

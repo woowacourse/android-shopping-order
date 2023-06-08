@@ -1,6 +1,7 @@
-package com.example.domain.product.recent
+package woowacourse.shopping.data.recentproduct
 
 import com.example.domain.product.Product
+import com.example.domain.product.recent.RecentProduct
 import java.time.LocalDateTime
 
 interface RecentProductRepository {
