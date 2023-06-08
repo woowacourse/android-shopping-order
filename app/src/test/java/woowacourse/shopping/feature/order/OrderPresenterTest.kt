@@ -38,7 +38,7 @@ class OrderPresenterTest {
     fun `장바구니에서 선택한 상품들을 가져온다`() {
         // given
         val slot = slot<List<CartProductUiModel>>()
-        justRun { view.initAdapter(capture(slot)) }
+        justRun { view.initOrderProducts(capture(slot)) }
 
         // when
         presenter.loadProducts()
@@ -48,7 +48,7 @@ class OrderPresenterTest {
         val expected = slot.captured
 
         assertEquals(expected, actual)
-        verify { view.initAdapter(any()) }
+        verify { view.initOrderProducts(any()) }
     }
 
     @Test

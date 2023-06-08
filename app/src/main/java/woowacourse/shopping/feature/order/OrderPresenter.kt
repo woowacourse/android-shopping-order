@@ -21,7 +21,7 @@ class OrderPresenter(
     }
 
     override fun loadProducts() {
-        view.initAdapter(orderProducts)
+        view.initOrderProducts(orderProducts)
     }
 
     override fun loadPayment() {
@@ -32,6 +32,18 @@ class OrderPresenter(
                 view.showErrorMessage(Throwable("오류 발생"))
             }
         )
+    }
+
+    override fun validatePointCondition(inputValue: CharSequence?, point: Int) {
+        val sumOfProductPrice = orderProducts.sumOf { it.totalPrice() }
+        val inputPoint =
+            if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
+
+        if (inputPoint > point) {
+            view.overOwnPoint(sumOfProductPrice)
+        } else {
+            view.updateTotalPriceBtn(sumOfProductPrice - inputPoint)
+        }
     }
 
     override fun orderProducts(usedPoint: Int) {

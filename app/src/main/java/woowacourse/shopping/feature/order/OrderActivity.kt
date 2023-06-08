@@ -46,7 +46,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             )
     }
 
-    override fun initAdapter(orderProducts: List<CartProductUiModel>) {
+    override fun initOrderProducts(orderProducts: List<CartProductUiModel>) {
         binding.recyclerviewOrderProducts.adapter = OrderProductAdapter(
             products = orderProducts
         )
@@ -69,35 +69,37 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             }
         }
 
-        setEditTextState(point, productsPrice)
+        setEditTextState(point)
     }
 
     override fun successOrder() {
         finish()
     }
 
-    private fun setEditTextState(point: Int, productsPrice: Int) {
+    private fun setEditTextState(point: Int) {
         binding.etUsePoint.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun beforeTextChanged(inputValue: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
-            override fun onTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val inputPoint =
-                    if (inputValue.isNullOrBlank()) 0 else inputValue.toString().toInt()
-                if (inputPoint > point) {
-                    Toast.makeText(this@OrderActivity, OVER_POINT_ERROR, Toast.LENGTH_SHORT)
-                        .show()
-                    binding.etUsePoint.text = null
-                    binding.btnOrder.text = getString(R.string.order_btn, productsPrice)
-                } else {
-                    binding.btnOrder.text =
-                        getString(R.string.order_btn, productsPrice - inputPoint)
-                }
+            override fun onTextChanged(inputValue: CharSequence?, start: Int, before: Int, count: Int) {
+                presenter.validatePointCondition(inputValue, point)
             }
 
-            override fun afterTextChanged(p0: Editable?) {
+            override fun afterTextChanged(inputValue: Editable?) {
             }
         })
+    }
+
+    override fun overOwnPoint(productsPrice: Int) {
+        Toast.makeText(this@OrderActivity, OVER_POINT_ERROR, Toast.LENGTH_SHORT)
+            .show()
+        binding.etUsePoint.text = null
+        binding.btnOrder.text = getString(R.string.order_btn, productsPrice)
+    }
+
+    override fun updateTotalPriceBtn(totalPrice: Int) {
+        binding.btnOrder.text =
+            getString(R.string.order_btn, totalPrice)
     }
 
     override fun showErrorMessage(t: Throwable) {
