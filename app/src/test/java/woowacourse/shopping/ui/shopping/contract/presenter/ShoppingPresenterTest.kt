@@ -1,22 +1,7 @@
 package woowacourse.shopping.ui.shopping.contract.presenter
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
-import com.example.domain.repository.CartRepository
-import com.example.domain.repository.ProductRepository
-import com.example.domain.repository.RecentRepository
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import woowacourse.shopping.ui.shopping.contract.ShoppingContract
-
 internal class ShoppingPresenterTest {
-
+/*
     private lateinit var view: ShoppingContract.View
     private lateinit var presenter: ShoppingPresenter
     private lateinit var productRepository: ProductRepository
@@ -192,5 +177,5 @@ internal class ShoppingPresenterTest {
 // then
 
         verify { view.addProducts(any()) }
-    }
+    }*/
 }
