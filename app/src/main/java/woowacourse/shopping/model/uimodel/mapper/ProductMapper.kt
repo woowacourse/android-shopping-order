@@ -1,8 +1,11 @@
 package woowacourse.shopping.model.uimodel.mapper
 
 import com.shopping.domain.CartProduct
+import com.shopping.domain.Count
 import com.shopping.domain.Product
 import com.shopping.domain.RecentProduct
+import woowacourse.shopping.model.data.dto.CartProductDTO
+import woowacourse.shopping.model.data.dto.ProductDTO
 import woowacourse.shopping.model.uimodel.CartProductUIModel
 import woowacourse.shopping.model.uimodel.ProductUIModel
 import woowacourse.shopping.model.uimodel.RecentProductUIModel
@@ -28,3 +31,7 @@ fun CartProduct.toUIModel() =
 fun List<ProductUIModel>.toDomain() = this.map { Product(it.id, it.name, it.url, it.price) }
 
 fun List<Product>.toUIModel() = this.map { ProductUIModel(it.id, it.name, it.url, it.price) }
+
+fun ProductDTO.toDomain(): Product = Product(id, name, imageUrl, price)
+
+fun CartProductDTO.toDomain(): CartProduct = CartProduct(id, product.toDomain(), Count(quantity), true)

@@ -1,12 +1,10 @@
 package woowacourse.shopping.model.data.repository
 
 import com.shopping.domain.CartProduct
-import com.shopping.domain.Count
 import com.shopping.domain.Product
 import com.shopping.repository.CartProductRepository
-import woowacourse.shopping.model.data.dto.CartProductDTO
-import woowacourse.shopping.model.data.dto.ProductDTO
 import woowacourse.shopping.model.data.dto.RequestCartDTO
+import woowacourse.shopping.model.uimodel.mapper.toDomain
 import woowacourse.shopping.server.retrofit.CartItemsService
 import woowacourse.shopping.server.retrofit.createResponseCallback
 
@@ -121,10 +119,4 @@ class CartProductRepositoryImpl(
     private fun fetchCartProducts() {
         getAll(onSuccess = { }, onFailure = { })
     }
-
-    private fun ProductDTO.toDomain(): Product =
-        Product(id, name, imageUrl, price)
-
-    private fun CartProductDTO.toDomain(): CartProduct =
-        CartProduct(id, product.toDomain(), Count(quantity), true)
 }
