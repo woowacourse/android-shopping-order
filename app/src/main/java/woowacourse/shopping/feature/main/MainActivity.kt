@@ -1,32 +1,34 @@
 package woowacourse.shopping.feature.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.ProductCacheImpl
-import woowacourse.shopping.data.ProductRemoteRepositoryImpl
-import woowacourse.shopping.data.RecentProductRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.CartRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
-import woowacourse.shopping.data.service.ServerInfo
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.data.datasource.local.product.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.recent.RecentDao
+import woowacourse.shopping.data.datasource.remote.ServerInfo
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductRetrofitService
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
+import woowacourse.shopping.feature.common.load.LoadAdapter
 import woowacourse.shopping.feature.detail.DetailActivity
-import woowacourse.shopping.feature.main.load.LoadAdapter
 import woowacourse.shopping.feature.main.product.MainProductAdapter
 import woowacourse.shopping.feature.main.product.MainProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.userInfo.UserInfoActivity
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
@@ -99,12 +101,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter = MainPresenter(
             this,
-            ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
+            ProductRepositoryImpl(ProductRetrofitService(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
+            CartRepositoryImpl(CartDataSourceImpl())
         )
     }
 
@@ -125,12 +126,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun addProducts(products: List<ProductUiModel>) {
-        runOnUiThread {
-            binding.mainSkeleton.visibility = View.GONE
-            binding.productRv.visibility = View.VISIBLE
-            mainProductAdapter.addItems(products)
-            presenter.loadRecent()
-        }
+        binding.mainSkeleton.visibility = View.GONE
+        binding.productRv.visibility = View.VISIBLE
+        mainProductAdapter.addItems(products)
+        presenter.loadRecent()
     }
 
     override fun updateRecent(recent: List<RecentProductUiModel>) {
@@ -157,6 +156,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         mainProductAdapter.updateItem(product)
     }
 
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_bar_menu, menu)
         menu?.findItem(R.id.cart_action)?.actionView?.let { view ->
@@ -165,6 +168,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
         presenter.setCartProductCount()
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.user_action -> {
+                startActivity(Intent(this, UserInfoActivity::class.java))
+                true
+            }
+
+            else -> false
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

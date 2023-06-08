@@ -43,12 +43,10 @@ class MainProductAdapter(
 
     fun updateItems(cartProducts: List<ProductUiModel>) {
         _items.forEachIndexed { index, item ->
-            if (item.count != 0) {
-                _items[index] = _items[index].copy(
-                    count = cartProducts.find { it.id == item.id }?.count ?: 0
-                )
-                notifyItemChanged(index)
-            }
+            _items[index] = _items[index].copy(
+                count = cartProducts.find { it.id == item.id }?.count ?: 0
+            )
+            notifyItemChanged(index)
         }
     }
 

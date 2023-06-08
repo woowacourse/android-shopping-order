@@ -29,7 +29,36 @@ class DetailPresenter(
     }
 
     override fun addCart() {
-        cartRepository.addProduct(_product.toDomain(), product.count + _count)
-        view.showCartScreen()
+        cartRepository.getCartProductByProduct(
+            product = product.toDomain(),
+            onSuccess = {
+                if (it == null) {
+                    cartRepository.addProduct(
+                        product = product.toDomain(),
+                        onSuccess = { cartItemId ->
+                            cartRepository.updateProduct(
+                                cartItemId = cartItemId,
+                                count = _count,
+                                onSuccess = {
+                                    view.showCartScreen()
+                                },
+                                onFailure = { view.showFailureMessage(it.message) }
+                            )
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
+                    )
+                } else {
+                    cartRepository.updateProduct(
+                        cartItemId = it.cartProductId.toInt(),
+                        count = it.count + _count,
+                        onSuccess = {
+                            view.showCartScreen()
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
+                    )
+                }
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 }

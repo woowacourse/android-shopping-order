@@ -71,7 +71,6 @@
             android:textStyle="bold"
             android:layout_marginHorizontal="12dp"
             android:backgroundTint="@color/mint"
-            android:onClick="@{()->presenter.addCart()}"
             app:layout_constraintTop_toBottomOf="@id/count_view" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

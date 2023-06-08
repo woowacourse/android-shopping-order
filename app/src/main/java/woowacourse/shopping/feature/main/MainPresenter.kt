@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.main
 
+import com.example.domain.model.CartProducts
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.CartRepository
@@ -20,23 +21,29 @@ class MainPresenter(
 
     private var totalCount: Int = 0
     private var page = 1
+    private var cartProducts: CartProducts = CartProducts(listOf())
 
     override fun loadProducts() {
-        productRepository.getProducts(
-            page = page,
+        cartRepository.getAll(
             onSuccess = {
-                val productItems = matchCartProductCount(it)
-                view.addProducts(productItems)
-                ++page
+                cartProducts = it
+                productRepository.getProducts(
+                    page = page,
+                    onSuccess = {
+                        val productItems = matchCartProductCount(it)
+                        view.addProducts(productItems)
+                        ++page
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
+                )
             },
-            onFailure = {}
+            onFailure = { view.showFailureMessage(it.message) }
         )
     }
 
     private fun matchCartProductCount(products: List<Product>): List<ProductUiModel> {
-        val cartProducts = cartRepository.getAll()
         return products.map { product ->
-            val count = cartProducts.find { it.product.id == product.id }?.count ?: 0
+            val count = cartProducts.findByProductId(productId = product.id)?.count ?: 0
             product.toPresentation(count)
         }
     }
@@ -55,8 +62,8 @@ class MainPresenter(
     }
 
     override fun setCartProductCount() {
-        val count = cartRepository.getAll().size
-        view.updateCartProductCount(count)
+        totalCount = cartProducts.size
+        view.updateCartProductCount(totalCount)
     }
 
     override fun moveToCart() {
@@ -84,28 +91,78 @@ class MainPresenter(
     }
 
     override fun increaseCartProduct(product: ProductUiModel, previousCount: Int) {
-        cartRepository.addProduct(product.toDomain(), previousCount + 1)
-        totalCount = cartRepository.getAll().size
-        view.updateCartProductCount(totalCount)
-        view.updateProductCount(product.copy(count = previousCount + 1))
+        if (previousCount == 0) {
+            cartRepository.addProduct(
+                product = product.toDomain(),
+                onSuccess = {
+                    cartRepository.getAll(
+                        onSuccess = {
+                            cartProducts = it
+                            ++totalCount
+                            view.updateCartProductCount(totalCount)
+                            view.updateProductCount(product.copy(count = previousCount + 1))
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
+                    )
+                },
+                onFailure = { view.showFailureMessage(it.message) }
+            )
+        } else {
+            cartProducts.findByProductId(productId = product.toDomain().id)
+                ?.let { cartProduct ->
+                    cartRepository.updateProduct(
+                        cartItemId = cartProduct.cartProductId.toInt(),
+                        count = previousCount + 1,
+                        onSuccess = {
+                            cartProducts.updateProductCount(cartProduct, previousCount + 1)
+                            view.updateProductCount(product.copy(count = previousCount + 1))
+                        },
+                        onFailure = { view.showFailureMessage(it.message) }
+                    )
+                }
+        }
     }
 
     override fun decreaseCartProduct(product: ProductUiModel, previousCount: Int) {
-        if (previousCount == 1) {
-            cartRepository.deleteProduct(product.toDomain())
-            totalCount = cartRepository.getAll().size
-            view.updateCartProductCount(totalCount)
-        } else {
-            cartRepository.addProduct(product.toDomain(), previousCount - 1)
+        cartProducts.findByProductId(product.toDomain().id)?.let { cartProduct ->
+            if (previousCount == 1) {
+                cartRepository.deleteProduct(
+                    cartItemId = cartProduct.cartProductId.toInt(),
+                    onSuccess = {
+                        cartProducts.delete(cartProduct)
+                        --totalCount
+                        view.updateCartProductCount(totalCount)
+                        view.updateProductCount(product.copy(count = 0))
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
+                )
+            } else {
+                cartRepository.updateProduct(
+                    cartItemId = cartProduct.cartProductId.toInt(),
+                    count = previousCount - 1,
+                    onSuccess = {
+                        cartProducts.updateProductCount(cartProduct, previousCount - 1)
+                        view.updateProductCount(product.copy(count = previousCount - 1))
+                    },
+                    onFailure = { view.showFailureMessage(it.message) }
+                )
+            }
         }
-        view.updateProductCount(product.copy(count = previousCount + 1))
     }
 
     override fun updateProducts() {
-        val products = cartRepository.getAll().map {
-            it.product.toPresentation(count = it.count)
-        }
-        view.updateProductsCount(products)
-        view.updateCartProductCount(products.size)
+        cartRepository.getAll(
+            onSuccess = {
+                cartProducts = it
+                val products = cartProducts.data.map {
+                    it.product.toPresentation(count = it.count)
+                }
+                totalCount = products.size
+
+                view.updateProductsCount(products)
+                view.updateCartProductCount(products.size)
+            },
+            onFailure = { view.showFailureMessage(it.message) }
+        )
     }
 }

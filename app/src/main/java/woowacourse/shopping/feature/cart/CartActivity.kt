@@ -5,14 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.CartCache
-import woowacourse.shopping.data.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.feature.payment.PaymentActivity
 import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.PageUiModel
 
@@ -35,13 +35,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
-        val cartPresenter = CartPresenter(
-            this,
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache)
-        )
+
+        val cartPresenter = CartPresenter(this, CartRepositoryImpl(CartDataSourceImpl()))
         presenter = cartPresenter
         binding.presenter = cartPresenter
+
         presenter.setup()
     }
 
@@ -50,11 +48,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             listOf(),
             object : CartProductClickListener {
                 override fun onPlusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.increaseCartProduct(cartProduct.productUiModel, previousCount)
+                    presenter.increaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onMinusClick(cartProduct: CartProductUiModel, previousCount: Int) {
-                    presenter.decreaseCartProduct(cartProduct.productUiModel, previousCount)
+                    presenter.decreaseCartProduct(cartProduct, previousCount)
                 }
 
                 override fun onCheckClick(cartProduct: CartProductUiModel, isSelected: Boolean) {
@@ -62,7 +60,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
                 }
 
                 override fun onDeleteClick(cartProduct: CartProductUiModel) {
-                    presenter.deleteCartProduct(cartProduct.productUiModel)
+                    presenter.deleteCartProduct(cartProduct)
                 }
             }
         )
@@ -81,6 +79,19 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             nextPageBtn.isEnabled = hasNext
             pageCountTextView.text = pageNumber.toString()
         }
+    }
+
+    override fun showPaymentScreen(cartProducts: List<CartProductUiModel>, totalPrice: Int) {
+        val intent = PaymentActivity.getIntent(
+            this,
+            ArrayList(cartProducts.map { it.cartProductId.toInt() }),
+            totalPrice
+        )
+        startActivity(intent)
+    }
+
+    override fun showFailureMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -13,6 +13,7 @@ interface MainContract {
         fun updateCartProductCount(count: Int)
         fun updateProductsCount(products: List<ProductUiModel>)
         fun updateProductCount(product: ProductUiModel)
+        fun showFailureMessage(message: String)
     }
 
     interface Presenter {
