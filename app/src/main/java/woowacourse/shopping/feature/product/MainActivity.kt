@@ -51,9 +51,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         ProductListAdapter(
             cartProductStates = listOf(),
             onProductClick = presenter::showProductDetail,
-            cartProductAddFab = { Thread { presenter.storeCartProduct(it) }.start() },
-            cartProductCountMinus = { Thread { presenter.minusCartProductQuantity(it) }.start() },
-            cartProductCountPlus = { Thread { presenter.plusCartProductQuantity(it) }.start() }
+            cartProductAddFab = { presenter.storeCartProduct(it) },
+            cartProductCountMinus = { presenter.minusCartProductQuantity(it) },
+            cartProductCountPlus = { presenter.plusCartProductQuantity(it) }
         )
     }
     private val recentProductListAdapter by lazy {
@@ -85,11 +85,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onResume() {
         super.onResume()
-        runOnUiThread {
-            presenter.loadCartProductsQuantity()
-            presenter.loadRecentProducts()
-            presenter.loadCartSizeBadge()
-        }
+        presenter.loadCartProductsQuantity()
+        presenter.loadRecentProducts()
+        presenter.loadCartSizeBadge()
     }
 
     override fun onDestroy() {
@@ -98,21 +96,19 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun addProductItems(products: List<ProductState>) {
-        runOnUiThread { productListAdapter.addItems(products) }
+        productListAdapter.addItems(products)
     }
 
     override fun setProducts(products: List<Product>) {
-        runOnUiThread {
-            productListAdapter.setItems(products.map(Product::toUi))
-        }
+        productListAdapter.setItems(products.map(Product::toUi))
     }
 
     override fun setRecentProducts(recentProducts: List<RecentProduct>) {
-        runOnUiThread { recentProductListAdapter.setItems(recentProducts.map(RecentProduct::toUi)) }
+        recentProductListAdapter.setItems(recentProducts.map(RecentProduct::toUi))
     }
 
     override fun setCartProductCounts(cartProducts: List<CartProduct>) {
-        runOnUiThread { productListAdapter.setCartProducts(cartProducts.map(CartProduct::toUi)) }
+        productListAdapter.setCartProducts(cartProducts.map(CartProduct::toUi))
     }
 
     override fun showProductDetail(
@@ -122,25 +118,23 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         ProductDetailActivity.startActivity(this, serverUrl, productState, recentProductState)
     }
 
-    override fun showEmptyProducts() = runOnUiThread { showToast("제품이 없습니다.") }
+    override fun showEmptyProducts() = showToast("제품이 없습니다.")
 
     override fun setCartProductCountBadge(count: Int) {
-        runOnUiThread { binding.cartCountTv.text = count.toString() }
+        binding.cartCountTv.text = count.toString()
     }
 
     override fun showCartProductCountBadge() {
-        runOnUiThread { binding.cartCountTv.visibility = VISIBLE }
+        binding.cartCountTv.visibility = VISIBLE
     }
 
     override fun hideCartProductCount() {
-        runOnUiThread { binding.cartCountTv.visibility = GONE }
+        binding.cartCountTv.visibility = GONE
     }
 
     override fun showProducts() {
-        runOnUiThread {
-            binding.productRv.visibility = VISIBLE
-            binding.skeletonGl.visibility = GONE
-        }
+        binding.productRv.visibility = VISIBLE
+        binding.skeletonGl.visibility = GONE
     }
 
     private fun initList() {

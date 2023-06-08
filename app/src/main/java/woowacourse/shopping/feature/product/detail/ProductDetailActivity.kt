@@ -97,7 +97,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             selectCountDialogBinding.counterView.minusClickListener =
                 { presenter.minusCount(selectCountDialogBinding) }
             selectCountDialogBinding.addToCartBtn.setOnClickListener {
-                runOnUiThread { presenter.addCartProduct(selectCountDialogBinding.counterView.count) }
+                presenter.addCartProduct(selectCountDialogBinding.counterView.count)
             }
         }.create()
     }

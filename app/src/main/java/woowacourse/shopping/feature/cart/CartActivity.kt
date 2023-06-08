@@ -59,11 +59,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartProducts(cartProducts: List<CartProductState>) {
-        runOnUiThread { adapter.setItems(cartProducts) }
+        adapter.setItems(cartProducts)
     }
 
     override fun setCartPageNumber(number: Int) {
-        runOnUiThread { binding.pageNumberTv.text = number.toString() }
+        binding.pageNumberTv.text = number.toString()
     }
 
     override fun setCartPageNumberPlusEnable(isEnable: Boolean) {
@@ -83,13 +83,11 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setCartProductCount(count: Int) {
-        runOnUiThread {
-            binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count)
-        }
+        binding.orderBtn.text = getString(R.string.cart_order_btn_text).format(count)
     }
 
     override fun setTotalCost(paymentAmount: Int) {
-        runOnUiThread { binding.totalCostTv.formatPriceWon(paymentAmount) }
+        binding.totalCostTv.formatPriceWon(paymentAmount)
     }
 
     override fun setAllPickChecked(checked: Boolean) {
@@ -105,8 +103,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showCartProducts() {
-        runOnUiThread { binding.cartProductRv.visibility = VISIBLE }
-        runOnUiThread { binding.skeletonLl.visibility = GONE }
+        binding.cartProductRv.visibility = VISIBLE
+        binding.skeletonLl.visibility = GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
