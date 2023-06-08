@@ -1,10 +1,8 @@
 package woowacourse.shopping.data.datasource.product.remote
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.model.DataProduct
 import java.lang.Integer.min
 
@@ -16,17 +14,13 @@ class RemoteProductDataSource() : ProductDataSource.Remote {
         onReceived: (products: List<DataProduct>) -> Unit
     ) {
         RetrofitModule.productService.getAllProducts().enqueue(
-            object : Callback<List<DataProduct>> {
-                override fun onResponse(
-                    call: Call<List<DataProduct>>,
-                    response: Response<List<DataProduct>>
-                ) {
+            getRetrofitCallback<List<DataProduct>>(
+                failureLogTag = this::class.java.name,
+                onResponse = { _, response ->
                     val productCache: List<DataProduct> = response.body() ?: listOf()
                     onReceived(getDataProductsFromCache(size, lastId, productCache))
                 }
-
-                override fun onFailure(call: Call<List<DataProduct>>, t: Throwable) {}
-            }
+            )
         )
     }
 
