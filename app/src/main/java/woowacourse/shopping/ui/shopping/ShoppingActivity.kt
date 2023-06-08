@@ -51,93 +51,73 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun setRecentlyViewedProducts(recentlyViewedProducts: List<RecentlyViewedProductUIState>) {
-        runOnUiThread {
-            if (recentlyViewedProducts.isEmpty()) {
-                setUIAboutRecentlyViewedProductIsVisible(false)
-                return@runOnUiThread
-            }
-            setUIAboutRecentlyViewedProductIsVisible(true)
-
-            binding.recyclerViewRecentlyViewed.adapter =
-                RecentlyViewedProductListAdapter(recentlyViewedProducts) {
-                    ProductDetailActivity.startActivity(this, it)
-                }
+        if (recentlyViewedProducts.isEmpty()) {
+            setUIAboutRecentlyViewedProductIsVisible(false)
+            return
         }
+        setUIAboutRecentlyViewedProductIsVisible(true)
+
+        binding.recyclerViewRecentlyViewed.adapter =
+            RecentlyViewedProductListAdapter(recentlyViewedProducts) {
+                ProductDetailActivity.startActivity(this, it)
+            }
     }
 
     override fun addProducts(products: List<ProductUIState>) {
-        runOnUiThread {
-            shoppingAdapter.addItems(products)
-        }
+        shoppingAdapter.addItems(products)
     }
 
     override fun changeProduct(product: ProductUIState) {
-        runOnUiThread {
-            shoppingAdapter.changeItem(product)
-        }
+        shoppingAdapter.changeItem(product)
     }
 
     override fun setProducts(products: List<ProductUIState>) {
-        runOnUiThread {
-            binding.layoutSkeletonProductList.isVisible = false
-            binding.viewProductList.isVisible = true
-            shoppingAdapter.setItems(products)
-            binding.recyclerViewMainProduct.smoothScrollToPosition(0)
-        }
+        binding.layoutSkeletonProductList.isVisible = false
+        binding.viewProductList.isVisible = true
+        shoppingAdapter.setItems(products)
+        binding.recyclerViewMainProduct.smoothScrollToPosition(0)
     }
 
     override fun setCanLoadMore(canLoadMore: Boolean) {
-        runOnUiThread {
-            binding.btnLoading.isVisible = canLoadMore
-        }
+        binding.btnLoading.isVisible = canLoadMore
     }
 
     override fun setCartItemCount(count: Int) {
-        runOnUiThread {
-            binding.cartCount = count
-        }
+        binding.cartCount = count
     }
 
     override fun showCart() {
-        runOnUiThread {
-            CartActivity.startActivity(this)
-        }
+        CartActivity.startActivity(this)
     }
 
     override fun showOrderList() {
-        runOnUiThread {
-            OrderListActivity.startActivity(this)
-        }
+        OrderListActivity.startActivity(this)
     }
 
     override fun showUserList(users: List<User>) {
-        runOnUiThread {
-            binding.shoppingUserSpinner.adapter = ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                users.map { it.email }
-            )
-            binding.shoppingUserSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        presenter.selectUser(users[position])
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
+        binding.shoppingUserSpinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            users.map { it.email }
+        )
+        binding.shoppingUserSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    presenter.selectUser(users[position])
                 }
-        }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
     }
 
     override fun showError(message: Int) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun initToolBar() {

@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.cart
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
@@ -21,6 +23,7 @@ class CartPresenter(
     private var currentPage: Int = 0
 ) : CartContract.Presenter {
     private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
+    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadCartItemsOfNextPage() {
         currentPage++
@@ -125,7 +128,9 @@ class CartPresenter(
         orderRepository.findDiscountPolicy(totalPrice, currentUser.rank.toString())
             .thenAccept { orderResult ->
                 val order = orderResult.getOrThrow()
-                view.showPayment(order.toUIState(), totalPrice - order.calculateDiscountPrice())
+                mainLooperHandler.post {
+                    view.showPayment(order.toUIState(), totalPrice - order.calculateDiscountPrice())
+                }
             }.exceptionally {
                 it.handle(view)
                 null
@@ -136,7 +141,9 @@ class CartPresenter(
         orderRepository.save(selectedCart.value.map { it.id }, currentUser)
             .thenAccept { orderIdResult ->
                 val orderId = orderIdResult.getOrThrow()
-                view.showOrderDetail(orderId)
+                mainLooperHandler.post {
+                    view.showOrderDetail(orderId)
+                }
             }.exceptionally {
                 it.handle(view)
                 null
@@ -147,7 +154,10 @@ class CartPresenter(
         getCartItemsOf(page).thenAccept { cartItems ->
             val cartItemUIStates =
                 cartItems.map { cartItem -> cartItem.toUIState(cartItem.id in selectedCartItems.value.map { it.id }) }
-            view.setCartItems(cartItemUIStates, initScroll)
+
+            mainLooperHandler.post {
+                view.setCartItems(cartItemUIStates, initScroll)
+            }
         }
     }
 
@@ -159,7 +169,9 @@ class CartPresenter(
 
     private fun showAllSelectionUI(currentPage: Int, selectedCartItems: Cart) {
         getCartItemsOf(currentPage).thenAccept { cartItems ->
-            view.setStateOfAllSelection(cartItems.all { it in selectedCartItems.value } && cartItems.isNotEmpty())
+            mainLooperHandler.post {
+                view.setStateOfAllSelection(cartItems.all { it in selectedCartItems.value } && cartItems.isNotEmpty())
+            }
         }
     }
 
@@ -175,20 +187,28 @@ class CartPresenter(
     }
 
     private fun showOrderUI(selectedCartItems: Cart) {
-        view.setOrderPrice(selectedCartItems.calculateTotalPrice())
-        view.setOrderCount(selectedCartItems.value.size)
+        mainLooperHandler.post {
+            view.setOrderPrice(selectedCartItems.calculateTotalPrice())
+            view.setOrderCount(selectedCartItems.value.size)
+        }
     }
 
     private fun showPageUI(currentPage: Int) {
         refreshStateThatCanRequestPage(currentPage)
-        view.setPage(currentPage)
+        mainLooperHandler.post {
+            view.setPage(currentPage)
+        }
     }
 
     private fun refreshStateThatCanRequestPage(currentPage: Int) {
-        view.setStateThatCanRequestPreviousPage(currentPage > 1)
+        mainLooperHandler.post {
+            view.setStateThatCanRequestPreviousPage(currentPage > 1)
+        }
         getMaxPage().thenAccept { maxPage ->
-            view.setStateThatCanRequestNextPage(currentPage < maxPage)
-            view.setStateThatCanRequestPage(maxPage > 1)
+            mainLooperHandler.post {
+                view.setStateThatCanRequestNextPage(currentPage < maxPage)
+                view.setStateThatCanRequestPage(maxPage > 1)
+            }
         }
     }
 

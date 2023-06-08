@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.productdetail
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.CartItemRepository
@@ -19,13 +21,16 @@ class ProductDetailPresenter(
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository
 ) : ProductDetailContract.Presenter {
     private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
+    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadProduct(productId: Long) {
         productRepository.findById(productId).thenAccept {
             val product = it.getOrThrow()
             val isProductExistInCart =
                 cartItemRepository.existByProductId(product.id, currentUser).get().getOrThrow()
-            view.setProduct(product.toUIState(isProductExistInCart))
+            mainLooperHandler.post {
+                view.setProduct(product.toUIState(isProductExistInCart))
+            }
             recentlyViewedProductRepository.save(product, LocalDateTime.now())
         }.exceptionally {
             it.handle(view)
@@ -43,7 +48,9 @@ class ProductDetailPresenter(
             cartItemRepository.updateCountById(savedCartItem.id, count, currentUser)
         }.thenAccept {
             it.getOrThrow()
-            view.showCartView()
+            mainLooperHandler.post {
+                view.showCartView()
+            }
         }.exceptionally {
             it.handle(view)
             null
@@ -53,7 +60,9 @@ class ProductDetailPresenter(
     override fun showCartCounter(productId: Long) {
         productRepository.findById(productId).thenAccept {
             val product = it.getOrThrow()
-            view.openCartCounter(product.toUIState(false))
+            mainLooperHandler.post {
+                view.openCartCounter(product.toUIState(false))
+            }
         }.exceptionally {
             it.handle(view)
             null
@@ -64,12 +73,16 @@ class ProductDetailPresenter(
         recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(limit).thenAccept {
             val recentlyViewedProducts = it.getOrThrow()
             if (recentlyViewedProducts.isEmpty()) {
-                view.setLastViewedProduct(null)
+                mainLooperHandler.post {
+                    view.setLastViewedProduct(null)
+                }
                 return@thenAccept
             }
 
             val productDetailUIState = recentlyViewedProducts.first().toUIState()
-            view.setLastViewedProduct(productDetailUIState)
+            mainLooperHandler.post {
+                view.setLastViewedProduct(productDetailUIState)
+            }
         }.exceptionally {
             it.handle(view)
             null

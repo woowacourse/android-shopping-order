@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
+import android.os.Handler
+import android.os.Looper
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.user.User
@@ -22,6 +24,7 @@ class ShoppingPresenter(
 ) : ShoppingContract.Presenter {
     private var currentPage = 1
     private var currentUser: User
+    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     init {
         val users = userRepository.findAll().get().getOrThrow()
@@ -33,7 +36,9 @@ class ShoppingPresenter(
             .thenAccept { recentlyViewedProduct ->
                 val recentlyViewedProductUIStates =
                     recentlyViewedProduct.getOrThrow().map { it.toUIState() }
-                view.setRecentlyViewedProducts(recentlyViewedProductUIStates)
+                mainLooperHandler.post {
+                    view.setRecentlyViewedProducts(recentlyViewedProductUIStates)
+                }
             }.exceptionally {
                 it.handle(view)
                 null
@@ -47,7 +52,9 @@ class ShoppingPresenter(
             val cartItems = cartItemRepository.findAll(currentUser).get().getOrThrow()
             createProductUIState(cartItems, products)
         }.thenAccept { cart ->
-            view.addProducts(cart)
+            mainLooperHandler.post {
+                view.addProducts(cart)
+            }
             refreshCanLoadMore()
         }.exceptionally {
             it.handle(view)
@@ -60,7 +67,9 @@ class ShoppingPresenter(
             val products = productsResult.getOrThrow()
             val cartItems = cartItemRepository.findAll(currentUser).get().getOrThrow()
             val product = createProductUIState(cartItems, products)
-            view.setProducts(product)
+            mainLooperHandler.post {
+                view.setProducts(product)
+            }
             refreshCanLoadMore()
         }.exceptionally {
             it.handle(view)
@@ -75,7 +84,9 @@ class ShoppingPresenter(
             cartItemRepository.save(cartItem, currentUser)
         }.thenAccept { savedCartItemResult ->
             val savedCartItem = savedCartItemResult.getOrThrow()
-            view.changeProduct(savedCartItem.toUIState())
+            mainLooperHandler.post {
+                view.changeProduct(savedCartItem.toUIState())
+            }
             loadCartItemCount()
         }.exceptionally {
             it.handle(view)
@@ -87,27 +98,33 @@ class ShoppingPresenter(
         cartItemRepository.findById(cartItemId, currentUser).thenApply { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             loadedCartItem.plusQuantity()
-        }.thenApply { cartItem ->
+        }.thenAccept { cartItem ->
             cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser).get()
-            view.changeProduct(cartItem.toUIState())
+            mainLooperHandler.post {
+                view.changeProduct(cartItem.toUIState())
+            }
         }.exceptionally {
             it.handle(view)
+            null
         }
     }
 
     override fun minusCartItemQuantity(cartItemId: Long) {
-        cartItemRepository.findById(cartItemId, currentUser).thenApply { loadedCartItemResult ->
+        cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             minusCartItem(loadedCartItem, cartItemId)
         }.exceptionally {
             it.handle(view)
+            null
         }
     }
 
     override fun loadCartItemCount() {
         cartItemRepository.countAll(currentUser).thenAccept { countResult ->
             val count = countResult.getOrThrow()
-            view.setCartItemCount(count)
+            mainLooperHandler.post {
+                view.setCartItemCount(count)
+            }
         }.exceptionally {
             it.handle(view)
             null
@@ -125,7 +142,9 @@ class ShoppingPresenter(
     override fun loadUsers() {
         userRepository.findAll().thenAccept { usersResult ->
             val users = usersResult.getOrThrow()
-            view.showUserList(users)
+            mainLooperHandler.post {
+                view.showUserList(users)
+            }
         }.exceptionally {
             it.handle(view)
             null
@@ -150,13 +169,17 @@ class ShoppingPresenter(
         }
         val cartItem = loadedCartItem.minusQuantity()
         cartItemRepository.updateCountById(cartItemId, cartItem.quantity, currentUser).thenAccept {
-            view.changeProduct(cartItem.toUIState())
+            mainLooperHandler.post {
+                view.changeProduct(cartItem.toUIState())
+            }
         }
     }
 
     private fun deleteCartItem(loadedCartItem: CartItem, cartItemId: Long) {
         cartItemRepository.deleteById(cartItemId, currentUser).get().getOrThrow()
-        view.changeProduct(loadedCartItem.copy(id = -1, quantity = 0).toUIState())
+        mainLooperHandler.post {
+            view.changeProduct(loadedCartItem.copy(id = -1, quantity = 0).toUIState())
+        }
         loadCartItemCount()
     }
 
@@ -177,7 +200,11 @@ class ShoppingPresenter(
     private fun refreshCanLoadMore() {
         val count = productRepository.countAll().get().getOrThrow()
         val maxPage = (count - 1) / pageSize + 1
-        if (currentPage >= maxPage) view.setCanLoadMore(false)
+        if (currentPage >= maxPage) {
+            mainLooperHandler.post {
+                view.setCanLoadMore(false)
+            }
+        }
     }
 
     private fun calculateOffset() = (currentPage - 1) * pageSize

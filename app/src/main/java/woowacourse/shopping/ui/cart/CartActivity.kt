@@ -57,89 +57,67 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun setStateThatCanRequestPreviousPage(canRequest: Boolean) {
-        runOnUiThread {
-            binding.btnPageDown.isEnabled = canRequest
-        }
+        binding.btnPageDown.isEnabled = canRequest
     }
 
     override fun setStateThatCanRequestNextPage(canRequest: Boolean) {
-        runOnUiThread {
-            binding.btnPageUp.isEnabled = canRequest
-        }
+        binding.btnPageUp.isEnabled = canRequest
     }
 
     override fun setStateThatCanRequestPage(canRequest: Boolean) {
-        runOnUiThread {
-            binding.tvCartPage.isVisible = canRequest
-            binding.btnPageUp.isVisible = canRequest
-            binding.btnPageDown.isVisible = canRequest
-        }
+        binding.tvCartPage.isVisible = canRequest
+        binding.btnPageUp.isVisible = canRequest
+        binding.btnPageDown.isVisible = canRequest
     }
 
     override fun setPage(page: Int) {
-        runOnUiThread {
-            binding.tvCartPage.text = page.toString()
-        }
+        binding.tvCartPage.text = page.toString()
     }
 
     override fun setCartItems(cartItems: List<CartItemUIState>, initScroll: Boolean) {
-        runOnUiThread {
-            binding.layoutSkeletonCartList.isVisible = false
-            binding.layoutCartList.isVisible = true
-            if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
-            cartListAdapter.setCartItems(cartItems)
-        }
+        binding.layoutSkeletonCartList.isVisible = false
+        binding.layoutCartList.isVisible = true
+        if (initScroll) binding.recyclerViewCart.smoothScrollToPosition(0)
+        cartListAdapter.setCartItems(cartItems)
     }
 
     override fun setStateOfAllSelection(isAllSelected: Boolean) {
-        runOnUiThread {
-            binding.cbPageAllSelect.isChecked = isAllSelected
-        }
+        binding.cbPageAllSelect.isChecked = isAllSelected
     }
 
     override fun setOrderPrice(price: Int) {
-        runOnUiThread {
-            binding.tvOrderPrice.text = getString(R.string.product_price).format(price)
-        }
+        binding.tvOrderPrice.text = getString(R.string.product_price).format(price)
     }
 
     override fun setOrderCount(count: Int) {
-        runOnUiThread {
-            binding.btnOrder.text = getString(R.string.order_with_count).format(count)
-        }
+        binding.btnOrder.text = getString(R.string.order_with_count).format(count)
     }
 
     override fun showPayment(payment: PaymentUIState, totalPrice: Int) {
-        runOnUiThread {
-            val orderDialog = CustomOrderBinding.inflate(layoutInflater)
+        val orderDialog = CustomOrderBinding.inflate(layoutInflater)
 
-            AlertDialog.Builder(this).apply {
-                setView(orderDialog.root)
-                create()
-                setPositiveButton(getString(R.string.cart_dialog_payment_positive)) { dialog, _ ->
-                    presenter.placeOrder()
-                    dialog.dismiss()
-                }
-                setNegativeButton(getString(R.string.cart_dialog_payment_negative)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-            }.show()
+        AlertDialog.Builder(this).apply {
+            setView(orderDialog.root)
+            create()
+            setPositiveButton(getString(R.string.cart_dialog_payment_positive)) { dialog, _ ->
+                presenter.placeOrder()
+                dialog.dismiss()
+            }
+            setNegativeButton(getString(R.string.cart_dialog_payment_negative)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        }.show()
 
-            orderDialog.totalPrice = totalPrice
-            orderDialog.payment = payment
-        }
+        orderDialog.totalPrice = totalPrice
+        orderDialog.payment = payment
     }
 
     override fun showOrderDetail(orderId: Long) {
-        runOnUiThread {
-            OrderDetailActivity.startActivity(this, orderId)
-        }
+        OrderDetailActivity.startActivity(this, orderId)
     }
 
     override fun showError(message: Int) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun loadLastPageIfFromCartItemAdd() {

@@ -60,30 +60,22 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun setLastViewedProduct(product: LastViewedProductUIState?) {
-        runOnUiThread {
-            lastViewedProductViewHolder.bind(product)
-        }
+        lastViewedProductViewHolder.bind(product)
     }
 
     override fun openCartCounter(product: ProductDetailUIState) {
-        runOnUiThread {
-            AddToCartDialog(product) { productId, count ->
-                presenter.addProductToCart(productId, count)
-            }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
-        }
+        AddToCartDialog(product) { productId, count ->
+            presenter.addProductToCart(productId, count)
+        }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
     }
 
     override fun showCartView() {
-        runOnUiThread {
-            finish()
-            CartActivity.startActivity(this, true)
-        }
+        finish()
+        CartActivity.startActivity(this, true)
     }
 
     override fun showError(message: Int) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun setActionBar() {

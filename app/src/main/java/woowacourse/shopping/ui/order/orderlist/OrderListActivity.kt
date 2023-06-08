@@ -42,21 +42,15 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     override fun showOrders(orders: List<OrderUIState>) {
-        runOnUiThread {
-            orderListAdapter.setOrders(orders)
-        }
+        orderListAdapter.setOrders(orders)
     }
 
     override fun showOrderDetail(orderId: Long) {
-        runOnUiThread {
-            OrderDetailActivity.startActivity(this, orderId)
-        }
+        OrderDetailActivity.startActivity(this, orderId)
     }
 
     override fun showError(message: Int) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun initToolbar() {

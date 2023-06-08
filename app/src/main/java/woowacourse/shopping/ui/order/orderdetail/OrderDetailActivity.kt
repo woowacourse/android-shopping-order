@@ -44,17 +44,13 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     override fun showOrder(order: OrderUIState, payment: PaymentUIState) {
-        runOnUiThread {
-            binding.order = order
-            binding.payment = payment
-            orderListAdapter.setOrders(listOf(order))
-        }
+        binding.order = order
+        binding.payment = payment
+        orderListAdapter.setOrders(listOf(order))
     }
 
     override fun showError(message: Int) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun validateExtra() {
