@@ -6,10 +6,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.service.retrofit.cart.RetrofitCartProductService
-import woowacourse.shopping.data.service.retrofit.order.RetrofitOrderService
-import woowacourse.shopping.data.service.retrofit.order.RetrofitPointService
-import woowacourse.shopping.data.service.retrofit.product.RetrofitProductService
+import woowacourse.shopping.data.service.cart.RetrofitCartProductService
+import woowacourse.shopping.data.service.order.RetrofitOrderService
+import woowacourse.shopping.data.service.order.RetrofitPointService
+import woowacourse.shopping.data.service.product.RetrofitProductService
 import java.lang.reflect.Type
 
 object RetrofitUtil {

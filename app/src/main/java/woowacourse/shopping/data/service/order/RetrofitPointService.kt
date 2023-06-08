@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service.retrofit.order
+package woowacourse.shopping.data.service.order
 
 import retrofit2.Call
 import retrofit2.http.GET
