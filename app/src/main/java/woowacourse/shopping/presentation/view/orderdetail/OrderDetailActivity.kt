@@ -12,6 +12,7 @@ import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.util.createRetrofit
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -36,7 +37,9 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
     private fun setPresenter() {
         server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        val orderRepository = OrderRepositoryImpl(server)
+
+        val retrofit = createRetrofit(server)
+        val orderRepository = OrderRepositoryImpl(retrofit)
         presenter = OrderDetailPresenter(this, orderId, orderRepository)
     }
 

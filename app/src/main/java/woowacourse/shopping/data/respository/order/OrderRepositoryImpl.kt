@@ -4,20 +4,15 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.presentation.view.util.RetrofitService
+import woowacourse.shopping.data.respository.order.service.OrderService
 
 class OrderRepositoryImpl(
-    private val server: Server,
+    retrofit: Retrofit,
 ) : OrderRepository {
-    private val orderService = Retrofit.Builder()
-        .baseUrl(server.url)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitService::class.java)
+    private val orderService = retrofit.create(OrderService::class.java)
 
     override fun requestPostOrder(
         orderPostEntity: OrderPostEntity,

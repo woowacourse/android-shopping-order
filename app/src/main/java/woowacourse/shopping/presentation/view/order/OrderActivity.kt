@@ -51,7 +51,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val retrofit = createRetrofit(server)
 
         val pointRepository = PointRepositoryImpl(retrofit)
-        val orderRepository = OrderRepositoryImpl(server)
+        val orderRepository = OrderRepositoryImpl(retrofit)
 
         presenter = OrderPresenter(this, cartItems, pointRepository, orderRepository)
     }

@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.util
+package woowacourse.shopping.data.respository.order.service
 
 import retrofit2.Call
 import retrofit2.http.Body
@@ -10,8 +10,7 @@ import retrofit2.http.Path
 import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
 
-interface RetrofitService {
-
+interface OrderService {
     @Headers(HEADER_JSON)
     @POST(PATH_ORDER_POST)
     fun requestPostOrder(
@@ -34,7 +33,6 @@ interface RetrofitService {
         private const val HEADER_JSON = "Content-Type: application/json"
 
         private const val PATH_ORDER_ID = "id"
-
         private const val PATH_ORDER = "/orders"
         private const val PATH_ORDER_POST = "/orders"
 
