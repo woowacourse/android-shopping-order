@@ -16,13 +16,15 @@ object RetrofitClient {
 
     private var retrofitWithToken: Retrofit? = null
 
+    private const val PRE_CREDENTIAL = "Basic "
+
     fun getInstanceWithToken(token: String): Retrofit {
         return retrofitWithToken ?: synchronized(this) {
             val okHttpClient = OkHttpClient().newBuilder()
                 .addInterceptor(
                     Interceptor { chain ->
                         val builder = chain.request().newBuilder()
-                        builder.addHeader("Authorization", "Basic $token")
+                        builder.addHeader("Authorization", PRE_CREDENTIAL + token)
                         chain.proceed(builder.build())
                     }
                 )
