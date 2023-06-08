@@ -10,36 +10,26 @@ object ServicePool {
             .addInterceptor(AuthInterceptor())
             .build()
     }
-    var retrofitService: ShoppingOrderService = buildRetrofit(UrlPool.LOGEON)
-        private set
-
     var server: UrlPool = UrlPool.LOGEON
         private set
 
+    val retrofitService: ShoppingOrderService get() = server.service
+
     fun init(tag: UrlPool) {
-        retrofitService = buildRetrofit(tag)
         server = tag
     }
 
-    private fun buildRetrofit(tag: UrlPool): ShoppingOrderService {
+    private fun buildRetrofit(baseUrl: String): ShoppingOrderService {
         return Retrofit.Builder()
-            .baseUrl(tag.baseUrl)
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
             .create(ShoppingOrderService::class.java)
     }
 
-    enum class UrlPool(val baseUrl: String) {
-        SUNGHA("http://43.200.181.131:8080"),
-        LOGEON("http://13.125.169.219:8080"), ;
-
-        companion object {
-            private const val TAG = "UrlPool"
-            fun find(tag: String): UrlPool {
-                return values().find { it.name == tag }
-                    ?: throw IllegalArgumentException("$TAG / 잘못된 tag입니다. 현재 tag: $tag")
-            }
-        }
+    enum class UrlPool(val service: ShoppingOrderService) {
+        SUNGHA(buildRetrofit("http://43.200.181.131:8080")),
+        LOGEON(buildRetrofit("http://13.125.169.219:8080")),
     }
 }
