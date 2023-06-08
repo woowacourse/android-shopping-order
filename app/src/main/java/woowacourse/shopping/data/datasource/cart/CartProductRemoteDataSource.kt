@@ -11,14 +11,14 @@ import woowacourse.shopping.domain.model.CartProduct
 
 class CartProductRemoteDataSource : CartProductDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
-    private val retrofitService = getCartProductByRetrofit(baseUrl)
+    private val cartProductService = getCartProductByRetrofit(baseUrl)
 
     override fun requestCartProducts(
         token: String,
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestCartProducts(token)
+        val call = cartProductService.requestCartProducts(token)
         call.enqueue(object : retrofit2.Callback<List<CartProductDto>> {
             override fun onResponse(
                 call: Call<List<CartProductDto>>,
@@ -47,7 +47,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.addCartProductByProductId(token, productId)
+        val call = cartProductService.addCartProductByProductId(token, productId)
         call.enqueue(object : retrofit2.Callback<Int> {
             override fun onResponse(
                 call: Call<Int>,
@@ -75,7 +75,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.updateCartProductCountById(token, cartItemId, quantity)
+        val call = cartProductService.updateCartProductCountById(token, cartItemId, quantity)
         call.enqueue(object : retrofit2.Callback<Void> {
             override fun onResponse(
                 call: Call<Void>,
@@ -102,7 +102,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.deleteCartProductById(token, cartItemId)
+        val call = cartProductService.deleteCartProductById(token, cartItemId)
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
             override fun onResponse(
                 call: Call<CartProductDto>,
@@ -129,7 +129,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         onSuccess: (CartProduct) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestCartProductByProductId(token, productId.toString())
+        val call = cartProductService.requestCartProductByProductId(token, productId.toString())
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
             override fun onResponse(
                 call: Call<CartProductDto>,

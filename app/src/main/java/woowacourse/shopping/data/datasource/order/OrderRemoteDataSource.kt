@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.model.OrderResponse
 
 class OrderRemoteDataSource : OrderDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
-    private val retrofitService = RetrofitUtil.getOrderProductByRetrofit(baseUrl)
+    private val orderService = RetrofitUtil.getOrderProductByRetrofit(baseUrl)
 
     override fun orderProducts(
         token: String,
@@ -23,7 +23,7 @@ class OrderRemoteDataSource : OrderDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.orderProducts(token, orderRequest.toDto())
+        val call = orderService.orderProducts(token, orderRequest.toDto())
         call.enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) {
@@ -45,7 +45,7 @@ class OrderRemoteDataSource : OrderDataSource {
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestOrders(token, page.value, page.sizePerPage)
+        val call = orderService.requestOrders(token, page.value, page.sizePerPage)
         call.enqueue(object : retrofit2.Callback<OrderResponsesDto> {
             override fun onResponse(
                 call: Call<OrderResponsesDto>,
@@ -74,7 +74,7 @@ class OrderRemoteDataSource : OrderDataSource {
         onSuccess: (OrderResponse) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestSpecificOrder(token, orderId)
+        val call = orderService.requestSpecificOrder(token, orderId)
         call.enqueue(object : retrofit2.Callback<OrderResponseDto> {
             override fun onResponse(call: Call<OrderResponseDto>, response: Response<OrderResponseDto>) {
                 if (response.isSuccessful) {

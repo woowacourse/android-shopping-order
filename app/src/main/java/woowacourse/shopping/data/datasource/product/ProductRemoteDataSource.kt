@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.model.Product
 
 class ProductRemoteDataSource : ProductDataSource {
     private val baseUrl: String = pref.getBaseUrl().toString()
-    private val retrofitService = getProductByRetrofit(baseUrl)
+    private val productService = getProductByRetrofit(baseUrl)
 
     override fun requestProducts(
         page: Int,
@@ -20,7 +20,7 @@ class ProductRemoteDataSource : ProductDataSource {
         onSuccess: (List<Product>) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestProducts(page, size)
+        val call = productService.requestProducts(page, size)
         call.enqueue(object : retrofit2.Callback<ProductsDto> {
             override fun onResponse(
                 call: Call<ProductsDto>,
@@ -47,7 +47,7 @@ class ProductRemoteDataSource : ProductDataSource {
         onSuccess: (Product?) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.requestProductById(productId)
+        val call = productService.requestProductById(productId)
         call.enqueue(object : retrofit2.Callback<ProductDto?> {
             override fun onResponse(
                 call: Call<ProductDto?>,
@@ -75,7 +75,7 @@ class ProductRemoteDataSource : ProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.insertProduct(product)
+        val call = productService.insertProduct(product)
 
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
@@ -102,7 +102,7 @@ class ProductRemoteDataSource : ProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.updateProduct(productId, product)
+        val call = productService.updateProduct(productId, product)
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
                 call: Call<ProductDto>,
@@ -127,7 +127,7 @@ class ProductRemoteDataSource : ProductDataSource {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = retrofitService.deleteProduct(productId)
+        val call = productService.deleteProduct(productId)
         call.enqueue(object : retrofit2.Callback<ProductDto> {
             override fun onResponse(
                 call: Call<ProductDto>,
