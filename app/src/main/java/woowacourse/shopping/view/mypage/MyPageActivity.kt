@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityMyPageBinding
+import woowacourse.shopping.model.data.repository.MemberRepositoryImpl
 import woowacourse.shopping.server.retrofit.RetrofitClient
 import woowacourse.shopping.view.orderhistory.OrderHistoryActivity
 
@@ -25,7 +26,7 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
     }
 
     private fun setPresenter() {
-        presenter = MyPagePresenter(this, RetrofitClient.membersService)
+        presenter = MyPagePresenter(this, MemberRepositoryImpl(RetrofitClient.membersService))
     }
 
     override fun updatePointView(point: Int) {

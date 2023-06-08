@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
+import woowacourse.shopping.model.data.repository.MemberRepositoryImpl
 import woowacourse.shopping.model.uimodel.OrderUIModel
 import woowacourse.shopping.server.retrofit.RetrofitClient
 import woowacourse.shopping.view.orderdetail.OrderDetailActivity
@@ -27,7 +28,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     }
 
     private fun setPresenter() {
-        presenter = OrderHistoryPresenter(this, RetrofitClient.membersService)
+        presenter = OrderHistoryPresenter(this, MemberRepositoryImpl(RetrofitClient.membersService))
     }
 
     private fun setAdapter() {

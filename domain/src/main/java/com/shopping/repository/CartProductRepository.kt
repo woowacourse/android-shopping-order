@@ -1,6 +1,7 @@
 package com.shopping.repository
 
 import com.shopping.domain.CartProduct
+import com.shopping.domain.OrderProduct
 import com.shopping.domain.Product
 
 interface CartProductRepository {
@@ -15,4 +16,5 @@ interface CartProductRepository {
     fun getTotalPrice(): Int
     fun getTotalCount(): Int
     fun getCheckedCartItems(): Array<Long>
+    fun getCartItemsWithIds(cartItemIds: List<Long>, onSuccess: (List<OrderProduct>) -> Unit)
 }

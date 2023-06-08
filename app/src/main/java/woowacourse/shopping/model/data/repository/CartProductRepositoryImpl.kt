@@ -1,10 +1,12 @@
 package woowacourse.shopping.model.data.repository
 
 import com.shopping.domain.CartProduct
+import com.shopping.domain.OrderProduct
 import com.shopping.domain.Product
 import com.shopping.repository.CartProductRepository
 import woowacourse.shopping.model.data.dto.RequestCartDTO
 import woowacourse.shopping.model.uimodel.mapper.toDomain
+import woowacourse.shopping.model.uimodel.mapper.transformToOrderProduct
 import woowacourse.shopping.server.retrofit.CartItemsService
 import woowacourse.shopping.server.retrofit.createResponseCallback
 
@@ -114,6 +116,26 @@ class CartProductRepositoryImpl(
             }
         }
         return cartItemIds.toTypedArray()
+    }
+
+    override fun getCartItemsWithIds(cartItemIds: List<Long>, onSuccess: (List<OrderProduct>) -> Unit) {
+        service.getCartItems().enqueue(
+            createResponseCallback(
+                onSuccess = { cartProducts ->
+                    val orderProducts = mutableListOf<OrderProduct>()
+                    cartItemIds.forEach { cartId ->
+                        val orderProduct = cartProducts.find { cartProduct ->
+                            cartProduct.id == cartId
+                        } ?: throw IllegalStateException("해당 상품을 찾을 수 없습니다.")
+                        orderProducts.add(orderProduct.transformToOrderProduct())
+                    }
+                    onSuccess(orderProducts)
+                },
+                onFailure = {
+                    throw IllegalStateException("상품을 불러오는데 실패했습니다.")
+                }
+            )
+        )
     }
 
     private fun fetchCartProducts() {

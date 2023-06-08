@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.data.BundleKeys
+import woowacourse.shopping.model.data.repository.MemberRepositoryImpl
 import woowacourse.shopping.model.uimodel.OrderDetailUIModel
 import woowacourse.shopping.model.uimodel.OrderProductUIModel
 import woowacourse.shopping.server.retrofit.RetrofitClient
@@ -29,7 +30,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun setPresenter() {
-        presenter = OrderDetailPresenter(this, RetrofitClient.membersService)
+        presenter = OrderDetailPresenter(this, MemberRepositoryImpl(RetrofitClient.membersService))
     }
 
     private fun setAdapter() {

@@ -8,6 +8,9 @@ import androidx.core.widget.addTextChangedListener
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.model.data.BundleKeys.CART_IDS
+import woowacourse.shopping.model.data.repository.CartProductRepositoryImpl
+import woowacourse.shopping.model.data.repository.MemberRepositoryImpl
+import woowacourse.shopping.model.data.repository.PayRepositoryImpl
 import woowacourse.shopping.model.uimodel.OrderProductUIModel
 import woowacourse.shopping.model.uimodel.PointUIModel
 import woowacourse.shopping.model.uimodel.PriceUIModel
@@ -37,9 +40,9 @@ class PaymentActivity : AppCompatActivity(), PaymentContract.View {
     private fun setPresenter() {
         presenter = PaymentPresenter(
             this,
-            RetrofitClient.cartItemsService,
-            RetrofitClient.membersService,
-            RetrofitClient.payService
+            CartProductRepositoryImpl(RetrofitClient.cartItemsService),
+            MemberRepositoryImpl(RetrofitClient.membersService),
+            PayRepositoryImpl(RetrofitClient.payService)
         )
     }
 
