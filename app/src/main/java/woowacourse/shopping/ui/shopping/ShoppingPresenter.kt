@@ -13,10 +13,6 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
-    init {
-        productRepository.clearCache()
-    }
-
     override fun fetchCartCounts() {
         CompletableFuture.supplyAsync {
             cartRepository.getAll()

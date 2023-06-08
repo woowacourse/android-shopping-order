@@ -9,6 +9,11 @@ class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {
     private val db = ShoppingDBHelper(context).writableDatabase
 
     private var offset = 0
+
+    init {
+        clear()
+    }
+
     override fun getAll(): Result<List<Product>> {
         val products = mutableListOf<Product>()
         db.rawQuery(ProductConstant.getGetAllQuery(), null).use {

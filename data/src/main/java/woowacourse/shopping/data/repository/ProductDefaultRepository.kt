@@ -8,9 +8,6 @@ class ProductDefaultRepository(
     private val localDataSource: ProductLocalDataSource,
     private val remoteDataSource: ProductRemoteDataSource
 ) : ProductRepository {
-    override fun clearCache() {
-        localDataSource.clear()
-    }
 
     override fun getAll(): Result<List<Product>> {
         return when (localDataSource.isCached()) {

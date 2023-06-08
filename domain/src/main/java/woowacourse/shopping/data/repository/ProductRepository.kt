@@ -7,5 +7,4 @@ interface ProductRepository {
     fun getNext(count: Int): Result<List<Product>>
     fun insert(product: Product): Result<Int>
     fun findById(id: Int): Result<Product>
-    fun clearCache()
 }
