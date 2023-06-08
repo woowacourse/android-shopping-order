@@ -3,97 +3,132 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="presenter"
-            type="woowacourse.shopping.view.cart.CartContract.Presenter" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.cart.CartActivity">
+        tools:context=".presentation.cart.CartActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_cart"
+        <include
+            android:id="@+id/toolbar_cart"
+            layout="@layout/toolbar_cart" />
+
+
+        <ScrollView
+            android:id="@+id/scroll_cart_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/container_order"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_cart"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_cart"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/item_cart" />
+
+                <TextView
+                    android:id="@+id/text_cart_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginBottom="50dp"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recycler_cart"
+                    tools:text="1" />
+
+                <ImageView
+                    android:id="@+id/button_left_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/icon_left_page_true"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_cart_page"
+                    app:layout_constraintEnd_toStartOf="@+id/text_cart_page"
+                    app:layout_constraintTop_toTopOf="@+id/text_cart_page" />
+
+                <ImageView
+                    android:id="@+id/button_right_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/icon_right_page_true"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_cart_page"
+                    app:layout_constraintStart_toEndOf="@+id/text_cart_page"
+                    app:layout_constraintTop_toTopOf="@+id/text_cart_page" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <include
+            android:id="@+id/skeleton_carts"
+            layout="@layout/skeleton_activity_cart"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/layout_bottom_price_area"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_bottom_price_area"
-            android:layout_width="0dp"
-            android:layout_height="78dp"
-            android:background="@color/gray_700"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recycler_cart">
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="23dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-                <CheckBox
-                    android:id="@+id/checkbox_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{presenter.isCheckedAll()}"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:onClick="@{() -> presenter.checkProductsAll()}" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/all"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/text_total_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:text="@{@string/korean_won2(presenter.cartSystemResult.totalPrice)}"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_order"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="10,000원" />
-
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_order"
+            <CheckBox
+                android:id="@+id/check_box_select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:background="@drawable/back_rectangle"
-                android:paddingHorizontal="14dp"
-                android:text="@{@string/order_count(presenter.cartSystemResult.totalCount)}"
+                android:background="@color/toolbar_background"
+                android:text="@string/select_all"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_order_money"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@color/toolbar_background"
+                android:gravity="end"
+                android:padding="10dp"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@id/text_order_count"
+                app:layout_constraintStart_toEndOf="@id/check_box_select_all"
+                tools:text="354,600원" />
+
+            <TextView
+                android:id="@+id/text_order_count"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/put_in_cart_button_color"
+                android:gravity="center"
+                android:padding="10dp"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="주문하기" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
-

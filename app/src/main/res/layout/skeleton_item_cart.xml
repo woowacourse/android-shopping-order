@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="25dp">
+
+    <ImageView
+        android:id="@+id/img_product"
+        android:layout_width="172dp"
+        android:layout_height="80dp"
+        android:background="@color/gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_price_1" />
+
+    <TextView
+        android:id="@+id/text_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="100dp"
+        android:background="@color/gray"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_price_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/gray"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/img_product"
+        app:layout_constraintTop_toBottomOf="@+id/text_name" />
+
+    <TextView
+        android:id="@+id/text_price_3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/gray"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/text_price_1"
+        app:layout_constraintStart_toStartOf="@+id/text_price_1"
+        app:layout_constraintTop_toBottomOf="@+id/text_price_2"
+        tools:layout_editor_absoluteY="104dp" />
+
+    <TextView
+        android:id="@+id/text_price_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/gray"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/text_price_1"
+        app:layout_constraintStart_toStartOf="@+id/text_price_1"
+        app:layout_constraintTop_toBottomOf="@+id/text_price_1" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
