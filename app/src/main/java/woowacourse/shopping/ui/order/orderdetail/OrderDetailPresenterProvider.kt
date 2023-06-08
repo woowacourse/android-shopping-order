@@ -11,7 +11,7 @@ object OrderDetailPresenterProvider {
         val repositoryContainer = RepositoryContainer.getInstance(context)
 
         return OrderDetailPresenter(
-            view, repositoryContainer.orderRepository, repositoryContainer.userRepository
+            view, repositoryContainer.orderRepository
         )
     }
 }

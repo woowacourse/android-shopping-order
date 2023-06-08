@@ -14,13 +14,21 @@ class RepositoryContainer private constructor(context: Context) {
             localDataSourceContainer.recentlyViewedProduct, remoteDataSourceContainer.product
         )
     }
-    val cartItemRepository by lazy { DefaultCartItemRepository(remoteDataSourceContainer.cart) }
     val userRepository by lazy {
         DefaultUserRepository(
             localDataSourceContainer.user, remoteDataSourceContainer.user
         )
     }
-    val orderRepository by lazy { DefaultOrderRepository(remoteDataSourceContainer.order) }
+    val cartItemRepository by lazy {
+        DefaultCartItemRepository(
+            userRepository, remoteDataSourceContainer.cart
+        )
+    }
+    val orderRepository by lazy {
+        DefaultOrderRepository(
+            userRepository, remoteDataSourceContainer.order
+        )
+    }
 
     companion object {
         private lateinit var instance: RepositoryContainer

@@ -5,39 +5,51 @@ import woowacourse.shopping.data.entity.DiscountEntity.Companion.toDomain
 import woowacourse.shopping.data.entity.OrderEntity.Companion.toDomain
 import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.order.Payment
-import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.OrderRepository
+import woowacourse.shopping.repository.UserRepository
 import java.util.concurrent.CompletableFuture
 
-class DefaultOrderRepository(private val orderDataSource: OrderDataSource) : OrderRepository {
-    override fun save(cartItemIds: List<Long>, user: User): CompletableFuture<Result<Long>> {
+class DefaultOrderRepository(
+    private val userRepository: UserRepository,
+    private val orderDataSource: OrderDataSource
+) : OrderRepository {
+    override fun save(cartItemIds: List<Long>): CompletableFuture<Result<Long>> {
         return CompletableFuture.supplyAsync {
-            orderDataSource.save(cartItemIds, user.token)
-        }
-    }
-
-    override fun findById(id: Long, user: User): CompletableFuture<Result<Order>> {
-        return CompletableFuture.supplyAsync {
-            orderDataSource.findById(id, user.token).mapCatching {
-                it.toDomain()
+            runCatching {
+                val user = userRepository.findCurrent().get().getOrThrow()
+                orderDataSource.save(cartItemIds, user.token).getOrThrow()
             }
         }
     }
 
-    override fun findAll(user: User): CompletableFuture<Result<List<Order>>> {
+    override fun findById(id: Long): CompletableFuture<Result<Order>> {
         return CompletableFuture.supplyAsync {
-            orderDataSource.findAll(user.token).mapCatching { orders ->
+            runCatching {
+                val user = userRepository.findCurrent().get().getOrThrow()
+                val order = orderDataSource.findById(id, user.token).getOrThrow()
+                order.toDomain()
+            }
+        }
+    }
+
+    override fun findAll(): CompletableFuture<Result<List<Order>>> {
+        return CompletableFuture.supplyAsync {
+            runCatching {
+                val user = userRepository.findCurrent().get().getOrThrow()
+                val orders = orderDataSource.findAll(user.token).getOrThrow()
                 orders.map { it.toDomain() }
             }
         }
     }
 
     override fun findDiscountPolicy(
-        price: Int,
-        memberGrade: String
+        price: Int
     ): CompletableFuture<Result<Payment>> {
         return CompletableFuture.supplyAsync {
-            orderDataSource.findDiscountPolicy(price, memberGrade).mapCatching { discounts ->
+            runCatching {
+                val user = userRepository.findCurrent().get().getOrThrow()
+                val discounts =
+                    orderDataSource.findDiscountPolicy(price, user.rank.toString()).getOrThrow()
                 Payment(discounts.discountInformation.map { it.toDomain() })
             }
         }

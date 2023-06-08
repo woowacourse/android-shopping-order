@@ -3,11 +3,9 @@ package woowacourse.shopping.ui.productdetail
 import android.os.Handler
 import android.os.Looper
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState.Companion.toUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState.Companion.toUIState
 import woowacourse.shopping.utils.ErrorHandler.handle
@@ -17,17 +15,15 @@ class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository,
-    userRepository: UserRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository
 ) : ProductDetailContract.Presenter {
-    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
     private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadProduct(productId: Long) {
         productRepository.findById(productId).thenAccept {
             val product = it.getOrThrow()
             val isProductExistInCart =
-                cartItemRepository.existByProductId(product.id, currentUser).get().getOrThrow()
+                cartItemRepository.existByProductId(product.id).get().getOrThrow()
             mainLooperHandler.post {
                 view.setProduct(product.toUIState(isProductExistInCart))
             }
@@ -44,8 +40,8 @@ class ProductDetailPresenter(
         productRepository.findById(productId).thenCompose {
             val product = it.getOrThrow()
             val cartItem = CartItem(-1, count, product)
-            val savedCartItem = cartItemRepository.save(cartItem, currentUser).get().getOrThrow()
-            cartItemRepository.updateCountById(savedCartItem.id, count, currentUser)
+            val savedCartItem = cartItemRepository.save(cartItem).get().getOrThrow()
+            cartItemRepository.updateCountById(savedCartItem.id, count)
         }.thenAccept {
             it.getOrThrow()
             mainLooperHandler.post {

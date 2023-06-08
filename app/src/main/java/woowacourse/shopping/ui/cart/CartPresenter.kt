@@ -4,10 +4,8 @@ import android.os.Handler
 import android.os.Looper
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.user.User
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.OrderRepository
-import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState.Companion.toUIState
 import woowacourse.shopping.ui.order.uistate.PaymentUIState.Companion.toUIState
 import woowacourse.shopping.utils.ErrorHandler.handle
@@ -17,12 +15,10 @@ class CartPresenter(
     private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
     private val orderRepository: OrderRepository,
-    userRepository: UserRepository,
     private val pageSize: Int,
     private var selectedCart: Cart = Cart(emptySet()),
     private var currentPage: Int = 0
 ) : CartContract.Presenter {
-    private val currentUser: User = userRepository.findCurrent().get().getOrElse { throw it }
     private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadCartItemsOfNextPage() {
@@ -41,7 +37,7 @@ class CartPresenter(
     }
 
     override fun loadCartItemsOfLastPage() {
-        cartItemRepository.countAll(currentUser).thenAccept {
+        cartItemRepository.countAll().thenAccept {
             val count = it.getOrThrow()
             currentPage = (count - 1) / pageSize + 1
             showCartItems(currentPage, selectedCart, true)
@@ -54,7 +50,7 @@ class CartPresenter(
     }
 
     override fun deleteCartItem(cartItemId: Long) {
-        cartItemRepository.deleteById(cartItemId, currentUser).thenAccept {
+        cartItemRepository.deleteById(cartItemId).thenAccept {
             selectedCart = Cart(selectedCart.value.filter { it.id != cartItemId }.toSet())
             showPageUI(currentPage)
             updateCartUI()
@@ -65,7 +61,7 @@ class CartPresenter(
     }
 
     override fun updateSelectionCartItem(cartItemId: Long, isSelected: Boolean) {
-        cartItemRepository.findById(cartItemId, currentUser).thenAccept {
+        cartItemRepository.findById(cartItemId).thenAccept {
             val loadedCartItem = it.getOrThrow()
             selectedCart = if (isSelected) {
                 selectedCart.copy(value = selectedCart.value + loadedCartItem)
@@ -83,7 +79,7 @@ class CartPresenter(
     override fun updateSelectionTotalCartItems(isSelected: Boolean) {
         val offset = (currentPage - 1) * pageSize
         cartItemRepository.findAllOrderByAddedTime(
-            pageSize, offset, currentUser
+            pageSize, offset
         ).thenAccept { cartItemOfCurrentPageResult ->
             val cartItemsOfCurrentPage = cartItemOfCurrentPageResult.getOrThrow()
             if (isSelected) {
@@ -102,7 +98,7 @@ class CartPresenter(
     }
 
     override fun plusQuantity(cartItemId: Long) {
-        cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
+        cartItemRepository.findById(cartItemId).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.plusQuantity()
             updateCount(cartItem)
@@ -113,7 +109,7 @@ class CartPresenter(
     }
 
     override fun minusQuantity(cartItemId: Long) {
-        cartItemRepository.findById(cartItemId, currentUser).thenAccept { loadedCartItemResult ->
+        cartItemRepository.findById(cartItemId).thenAccept { loadedCartItemResult ->
             val loadedCartItem = loadedCartItemResult.getOrThrow()
             val cartItem = loadedCartItem.minusQuantity()
             updateCount(cartItem)
@@ -125,29 +121,27 @@ class CartPresenter(
 
     override fun checkPayment() {
         val totalPrice = selectedCart.calculateTotalPrice()
-        orderRepository.findDiscountPolicy(totalPrice, currentUser.rank.toString())
-            .thenAccept { orderResult ->
-                val order = orderResult.getOrThrow()
-                mainLooperHandler.post {
-                    view.showPayment(order.toUIState(), totalPrice - order.calculateDiscountPrice())
-                }
-            }.exceptionally {
-                it.handle(view)
-                null
+        orderRepository.findDiscountPolicy(totalPrice).thenAccept { orderResult ->
+            val order = orderResult.getOrThrow()
+            mainLooperHandler.post {
+                view.showPayment(order.toUIState(), totalPrice - order.calculateDiscountPrice())
             }
+        }.exceptionally {
+            it.handle(view)
+            null
+        }
     }
 
     override fun placeOrder() {
-        orderRepository.save(selectedCart.value.map { it.id }, currentUser)
-            .thenAccept { orderIdResult ->
-                val orderId = orderIdResult.getOrThrow()
-                mainLooperHandler.post {
-                    view.showOrderDetail(orderId)
-                }
-            }.exceptionally {
-                it.handle(view)
-                null
+        orderRepository.save(selectedCart.value.map { it.id }).thenAccept { orderIdResult ->
+            val orderId = orderIdResult.getOrThrow()
+            mainLooperHandler.post {
+                view.showOrderDetail(orderId)
             }
+        }.exceptionally {
+            it.handle(view)
+            null
+        }
     }
 
     private fun showCartItems(page: Int, selectedCartItems: Cart, initScroll: Boolean) {
@@ -178,7 +172,7 @@ class CartPresenter(
     private fun getCartItemsOf(page: Int): CompletableFuture<List<CartItem>> {
         val offset = (page - 1) * pageSize
         return cartItemRepository.findAllOrderByAddedTime(
-            pageSize, offset, currentUser
+            pageSize, offset
         ).thenApply {
             it.getOrElse {
                 emptyList()
@@ -213,7 +207,7 @@ class CartPresenter(
     }
 
     private fun getMaxPage(): CompletableFuture<Int> {
-        return cartItemRepository.countAll(currentUser).thenApply {
+        return cartItemRepository.countAll().thenApply {
             val count = it.getOrElse {
                 return@thenApply 0
             }
@@ -222,10 +216,9 @@ class CartPresenter(
     }
 
     private fun updateCount(cartItem: CartItem) {
-        cartItemRepository.updateCountById(cartItem.id, cartItem.quantity, currentUser)
-            .thenAccept { result ->
-                result.getOrThrow()
-                showCartItems(currentPage, selectedCart, false)
-            }
+        cartItemRepository.updateCountById(cartItem.id, cartItem.quantity).thenAccept { result ->
+            result.getOrThrow()
+            showCartItems(currentPage, selectedCart, false)
+        }
     }
 }

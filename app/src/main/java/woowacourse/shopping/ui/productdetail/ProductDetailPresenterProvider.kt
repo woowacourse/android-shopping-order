@@ -13,7 +13,6 @@ object ProductDetailPresenterProvider {
             view,
             repositoryContainer.productRepository,
             repositoryContainer.cartItemRepository,
-            repositoryContainer.userRepository,
             repositoryContainer.recentlyViewedProductRepository,
         )
     }

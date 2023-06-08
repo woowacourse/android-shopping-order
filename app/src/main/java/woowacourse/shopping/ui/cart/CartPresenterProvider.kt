@@ -14,7 +14,6 @@ object CartPresenterProvider {
             view,
             repositoryContainer.cartItemRepository,
             repositoryContainer.orderRepository,
-            repositoryContainer.userRepository,
             pageSize
         )
     }

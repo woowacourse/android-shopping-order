@@ -10,7 +10,7 @@ object OrderListPresenterProvider {
     ): OrderListContract.Presenter {
         val repositoryContainer = RepositoryContainer.getInstance(context)
         return OrderListPresenter(
-            view, repositoryContainer.orderRepository, repositoryContainer.userRepository
+            view, repositoryContainer.orderRepository
         )
     }
 }
