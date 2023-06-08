@@ -1,9 +1,11 @@
 package woowacourse.shopping.support.framework.data.httpclient
 
 import android.util.Log
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 
 fun <T> getRetrofitCallback(
     failureLogTag: String = "no tag",
@@ -19,3 +21,11 @@ fun <T> getRetrofitCallback(
         onFailure(call, t)
     }
 }
+
+inline fun <reified T> Retrofit.getParsedErrorBody(errorBody: ResponseBody?): T? =
+    errorBody?.let {
+        responseBodyConverter<T>(
+            T::class.java,
+            T::class.java.annotations
+        ).convert(errorBody)
+    }
