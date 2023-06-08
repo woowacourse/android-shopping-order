@@ -13,12 +13,12 @@ fun <T> createResponseCallback(
             if (responseBody != null) {
                 onSuccess(responseBody)
             } else {
-                onFailure(Exception("Response null"))
+                onFailure(Exception(response.message()))
             }
         }
 
         override fun onFailure(call: Call<T>, t: Throwable) {
-            onFailure(Exception("Response unsuccessful"))
+            onFailure(Exception(t.message))
         }
     }
 }

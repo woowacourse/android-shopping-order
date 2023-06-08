@@ -65,7 +65,7 @@ class CartRepositoryImpl(
                 remoteDatabase.postItem(id, {
                     getAll({}, {})
                     onSuccess()
-                }, { })
+                }, onFailure)
             }
 
             cartItem == null -> {
@@ -76,7 +76,7 @@ class CartRepositoryImpl(
                 remoteDatabase.deleteItem(cartItem.id, {
                     getAll({}, {})
                     onSuccess()
-                }, { })
+                }, onFailure)
 
             count < 1 -> {
                 return
@@ -86,7 +86,7 @@ class CartRepositoryImpl(
                 remoteDatabase.patchItemQuantity(cartItem.id, count, {
                     getAll({}, {})
                     onSuccess()
-                }, { })
+                }, onFailure)
         }
     }
 

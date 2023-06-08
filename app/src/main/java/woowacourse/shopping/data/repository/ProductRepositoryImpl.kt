@@ -16,8 +16,7 @@ class ProductRepositoryImpl(
             {
                 onSuccess(it.map { productDto -> productDto.toDomain() })
             },
-            {
-            },
+            onFailure,
         )
     }
 
@@ -27,7 +26,7 @@ class ProductRepositoryImpl(
             {
                 onSuccess(it.toDomain())
             },
-            {},
+            onFailure,
         )
     }
 }

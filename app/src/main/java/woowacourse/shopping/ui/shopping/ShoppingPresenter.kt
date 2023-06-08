@@ -4,6 +4,7 @@ import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentRepository
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -24,7 +25,7 @@ class ShoppingPresenter(
                 .associateBy { it.product.id }
                 .mapValues { it.value.quantity }
             view.setCartProducts(cartProducts)
-        }, {})
+        }, { showErrorMessage(it.message) })
     }
 
     override fun setUpNextProducts() {
@@ -34,7 +35,7 @@ class ShoppingPresenter(
                     view.addMoreProducts(products.map { it.toUIModel() })
                 }
             },
-            {},
+            { showErrorMessage(it.message) },
         )
     }
 
@@ -51,22 +52,24 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count, {
-            cartRepository.getAll({
-                setUpTotalCount()
-            }, {})
-        }, {})
+        cartRepository.updateCount(
+            productId,
+            count,
+            {
+                cartRepository.getAll(
+                    { setUpTotalCount() },
+                    { showErrorMessage(it.message) },
+                )
+            },
+            { showErrorMessage(it.message) },
+        )
     }
 
     override fun navigateToItemDetail(productId: Int) {
         productRepository.findById(
             productId,
-            {
-                it.let {
-                    view.navigateToProductDetail(it.toUIModel())
-                }
-            },
-            {},
+            { view.navigateToProductDetail(it.toUIModel()) },
+            { showErrorMessage(it.message) },
         )
     }
 

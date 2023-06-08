@@ -6,6 +6,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentRepository
 import woowacourse.shopping.uimodel.ProductUIModel
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(
@@ -27,7 +28,7 @@ class DetailedProductPresenter(
                     { product ->
                         lastProduct = product.toUIModel()
                     },
-                    {},
+                    { showErrorMessage(it.message) },
                 )
             }
         sharedPreferenceUtils.setLastProductId(product.id)
@@ -39,9 +40,12 @@ class DetailedProductPresenter(
 
     override fun addProductToCart(count: Int) {
         cartRepository.insert(product.id)
-        cartRepository.updateCount(product.id, count, {
-            view.navigateToCart()
-        }, {})
+        cartRepository.updateCount(
+            product.id,
+            count,
+            { view.navigateToCart() },
+            { showErrorMessage(it.message) },
+        )
     }
 
     override fun addProductToRecent() {

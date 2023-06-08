@@ -1,7 +1,9 @@
 package woowacourse.shopping.ui.orderdetail
 
 import woowacourse.shopping.mapper.toUIModel
+import woowacourse.shopping.model.OrderProduct
 import woowacourse.shopping.repository.OrderRepository
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
@@ -12,11 +14,9 @@ class OrderDetailPresenter(
             id,
             { history ->
                 view.setOrderHistory(history.toUIModel())
-                view.setOrderList(history.orderItems.map { orderItem -> orderItem.toUIModel() })
+                view.setOrderList(history.orderItems.map(OrderProduct::toUIModel))
             },
-            {
-                throw IllegalArgumentException("주문 내역을 가져오는데 실패했습니다.")
-            },
+            { showErrorMessage(it.message) },
         )
     }
 }

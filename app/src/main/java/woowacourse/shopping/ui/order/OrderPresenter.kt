@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.order
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.uimodel.OrderInfoUIModel
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 
 class OrderPresenter(
     private val view: OrderContract.View,
@@ -18,9 +19,7 @@ class OrderPresenter(
                 view.initOrderPageInfo(orderInfo)
                 view.updatePurchasePrice(0, orderInfo.totalPrice)
             },
-            {
-                throw IllegalArgumentException("주문 정보를 가져오는데 실패했습니다.")
-            },
+            { showErrorMessage(it.message) },
         )
     }
 
@@ -61,11 +60,14 @@ class OrderPresenter(
     override fun order(point: Int) {
         val orderItemIds: List<Int> = orderInfo.cartItems.map { it.id }
 
-        orderRepository.postOrder(orderItemIds, point, {
-            view.showOrderSuccessMessage()
-            view.navigateToShopping()
-        }, {
-            throw IllegalArgumentException("주문하기를 실패했습니다.")
-        })
+        orderRepository.postOrder(
+            orderItemIds,
+            point,
+            {
+                view.showOrderSuccessMessage()
+                view.navigateToShopping()
+            },
+            { showErrorMessage(it.message) },
+        )
     }
 }

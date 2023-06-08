@@ -54,12 +54,12 @@ class RemoteCartDataSource(
                     if (response.isSuccessful) {
                         onSuccess()
                     } else {
-                        onFailure(IllegalArgumentException("삭제를 실패했습니다."))
+                        onFailure(IllegalArgumentException("삭제에 실패했습니다."))
                     }
                 }
 
                 override fun onFailure(call: Call<String>, t: Throwable) {
-                    onFailure(IllegalArgumentException("삭제를 실패했습니다."))
+                    onFailure(Exception(t.message))
                 }
             },
         )
