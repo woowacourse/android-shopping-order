@@ -16,7 +16,7 @@ class PointRemoteDataSource : PointDataSource {
     override fun requestPoints(
         token: String,
         onSuccess: (Point) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestPoints(token)
         call.enqueue(object : retrofit2.Callback<PointDto> {
@@ -33,8 +33,7 @@ class PointRemoteDataSource : PointDataSource {
             }
 
             override fun onFailure(call: Call<PointDto>, t: Throwable) {
-                onFailure()
-                Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure(t.message.toString())
             }
         })
     }

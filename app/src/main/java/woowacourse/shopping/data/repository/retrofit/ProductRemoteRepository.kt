@@ -13,7 +13,7 @@ class ProductRemoteRepository(
     override fun getAllProducts(
         page: Page,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         productDataSource.requestProducts(
             page = page.value,
@@ -26,7 +26,7 @@ class ProductRemoteRepository(
     override fun findProductById(
         id: Int,
         onSuccess: (Product?) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         productDataSource.requestProductById(
             id.toString(),
@@ -38,7 +38,7 @@ class ProductRemoteRepository(
     override fun insertProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         productDataSource.insertProduct(
             product.toDto(),
@@ -50,7 +50,7 @@ class ProductRemoteRepository(
     override fun updateProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         productDataSource.updateProduct(
             product.id.toString(),
@@ -63,7 +63,7 @@ class ProductRemoteRepository(
     override fun deleteProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         productDataSource.deleteProduct(
             product.id.toString(),

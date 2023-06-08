@@ -18,7 +18,7 @@ class ProductRemoteDataSource : ProductDataSource {
         page: Int,
         size: Int,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestProducts(page, size)
         call.enqueue(object : retrofit2.Callback<ProductsDto> {
@@ -37,7 +37,7 @@ class ProductRemoteDataSource : ProductDataSource {
             }
 
             override fun onFailure(call: Call<ProductsDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure(t.message.toString())
             }
         })
     }
@@ -45,7 +45,7 @@ class ProductRemoteDataSource : ProductDataSource {
     override fun requestProductById(
         productId: String,
         onSuccess: (Product?) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestProductById(productId)
         call.enqueue(object : retrofit2.Callback<ProductDto?> {
@@ -65,8 +65,7 @@ class ProductRemoteDataSource : ProductDataSource {
             }
 
             override fun onFailure(call: Call<ProductDto?>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -74,7 +73,7 @@ class ProductRemoteDataSource : ProductDataSource {
     override fun insertProduct(
         product: ProductDto,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.insertProduct(product)
 
@@ -92,8 +91,7 @@ class ProductRemoteDataSource : ProductDataSource {
             }
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -102,7 +100,7 @@ class ProductRemoteDataSource : ProductDataSource {
         productId: String,
         product: ProductDto,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.updateProduct(productId, product)
         call.enqueue(object : retrofit2.Callback<ProductDto> {
@@ -119,8 +117,7 @@ class ProductRemoteDataSource : ProductDataSource {
             }
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -128,7 +125,7 @@ class ProductRemoteDataSource : ProductDataSource {
     override fun deleteProduct(
         productId: String,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.deleteProduct(productId)
         call.enqueue(object : retrofit2.Callback<ProductDto> {
@@ -145,8 +142,7 @@ class ProductRemoteDataSource : ProductDataSource {
             }
 
             override fun onFailure(call: Call<ProductDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }

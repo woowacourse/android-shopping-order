@@ -5,6 +5,6 @@ import woowacourse.shopping.domain.model.Point
 interface PointRepository {
     fun requestPoints(
         onSuccess: (Point) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }

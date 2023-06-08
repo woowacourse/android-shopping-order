@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -50,7 +51,7 @@ class CartPresenter(
                 _cartProduct.id,
                 _cartProduct.selectedCount,
                 onSuccess = { updateCart(newCart) },
-                onFailure = {},
+                onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
             )
         }
     }
@@ -76,7 +77,7 @@ class CartPresenter(
         cartRepository.deleteCartProductById(
             cartProduct.id,
             onSuccess = { updateCart(cart.delete(cartProduct.toDomain())) },
-            onFailure = {},
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 
@@ -104,7 +105,7 @@ class CartPresenter(
                 updateCart(cart.update(cartProducts))
                 _totalCheckSize.postValue(cartProducts.size)
             },
-            onFailure = {},
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 

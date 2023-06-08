@@ -96,7 +96,7 @@ class ShoppingPresenter(
             product.id,
             ProductCount(addCount),
             onSuccess = { loadProducts(currentPage) },
-            onFailure = {},
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 
@@ -111,7 +111,7 @@ class ShoppingPresenter(
                 }
                 Log.d("test", "page value: ${page.value}")
             },
-            onFailure = { println("[ERROR] 값을 불러오지 못했습니다.") },
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 
@@ -128,7 +128,7 @@ class ShoppingPresenter(
     private fun loadCartProducts(onLoaded: (List<CartProduct>) -> Unit) {
         cartRepository.getAllCartProducts(
             onSuccess = { cartProducts -> onLoaded(cartProducts) },
-            onFailure = {},
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 

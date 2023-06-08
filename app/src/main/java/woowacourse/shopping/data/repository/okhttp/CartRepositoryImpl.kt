@@ -10,14 +10,17 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductId
 
 class CartRepositoryImpl(private val service: CartService) : CartRepository {
-    override fun getAllCartProducts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
+    override fun getAllCartProducts(
+        onSuccess: (List<CartProduct>) -> Unit,
+        onFailure: (String) -> Unit,
+    ) {
         service.getAllCartProduct().map { it.toDomain() }
     }
 
     override fun addCartProductByProductId(
         productId: ProductId,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         service.addCartProductByProductId(productId)
     }
@@ -26,7 +29,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
         cartProductId: CartProductId,
         count: ProductCount,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         service.updateProductCountById(cartProductId, count.toData())
     }
@@ -34,7 +37,7 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
     override fun deleteCartProductById(
         cartProductId: CartProductId,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         service.deleteCartProductById(cartProductId)
     }
@@ -42,12 +45,17 @@ class CartRepositoryImpl(private val service: CartService) : CartRepository {
     override fun findCartProductByProductId(
         productId: ProductId,
         onSuccess: (CartProduct) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         service.findCartProductByProductId(productId)?.toDomain()
     }
 
-    override fun increaseProductCountByProductId(productId: Int, addCount: ProductCount, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun increaseProductCountByProductId(
+        productId: Int,
+        addCount: ProductCount,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit,
+    ) {
 //        val cartProduct = findCartProductByProductId(productId) ?: run {
 //            addCartProductByProductId(productId)
 //            val newCartProduct = findCartProductByProductId(productId) ?: return

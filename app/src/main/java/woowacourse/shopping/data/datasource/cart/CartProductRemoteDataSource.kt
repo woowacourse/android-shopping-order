@@ -16,7 +16,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
     override fun requestCartProducts(
         token: String,
         onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestCartProducts(token)
         call.enqueue(object : retrofit2.Callback<List<CartProductDto>> {
@@ -36,8 +36,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
             }
 
             override fun onFailure(call: Call<List<CartProductDto>>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -46,7 +45,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         token: String,
         productId: String,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.addCartProductByProductId(token, productId)
         call.enqueue(object : retrofit2.Callback<Int> {
@@ -64,8 +63,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
             }
 
             override fun onFailure(call: Call<Int>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -75,7 +73,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         cartItemId: String,
         quantity: Int,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.updateCartProductCountById(token, cartItemId, quantity)
         call.enqueue(object : retrofit2.Callback<Void> {
@@ -93,8 +91,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -103,7 +100,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         token: String,
         cartItemId: String,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.deleteCartProductById(token, cartItemId)
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
@@ -121,8 +118,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
             }
 
             override fun onFailure(call: Call<CartProductDto>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -131,7 +127,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
         token: String,
         productId: Int,
         onSuccess: (CartProduct) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestCartProductByProductId(token, productId.toString())
         call.enqueue(object : retrofit2.Callback<CartProductDto> {
@@ -151,8 +147,7 @@ class CartProductRemoteDataSource : CartProductDataSource {
             }
 
             override fun onFailure(call: Call<CartProductDto>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패: ${t.message}, $token")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }

@@ -9,20 +9,20 @@ interface OrderDataSource {
         token: String,
         orderRequest: OrderRequest,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun requestOrders(
         token: String,
         page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun requestSpecificOrder(
         token: String,
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }

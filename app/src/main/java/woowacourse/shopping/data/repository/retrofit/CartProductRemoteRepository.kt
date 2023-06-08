@@ -15,7 +15,7 @@ class CartProductRemoteRepository : CartRepository {
 
     override fun getAllCartProducts(
         onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.requestCartProducts(
             token!!,
@@ -27,7 +27,7 @@ class CartProductRemoteRepository : CartRepository {
     override fun addCartProductByProductId(
         productId: ProductId,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.addCartProductByProductId(
             token = token!!,
@@ -41,7 +41,7 @@ class CartProductRemoteRepository : CartRepository {
         cartProductId: CartProductId,
         count: ProductCount,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.updateCartProductCountById(
             token = token!!,
@@ -55,7 +55,7 @@ class CartProductRemoteRepository : CartRepository {
     override fun deleteCartProductById(
         cartProductId: CartProductId,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.deleteCartProductById(
             token = token!!,
@@ -68,7 +68,7 @@ class CartProductRemoteRepository : CartRepository {
     override fun findCartProductByProductId(
         productId: Int,
         onSuccess: (CartProduct) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.requestCartProductByProductId(
             token = token!!,
@@ -84,7 +84,7 @@ class CartProductRemoteRepository : CartRepository {
         productId: ProductId,
         addCount: ProductCount,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         findCartProductByProductId(
             productId = productId,

@@ -6,6 +6,6 @@ interface PointDataSource {
     fun requestPoints(
         token: String,
         onSuccess: (Point) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }

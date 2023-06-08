@@ -7,28 +7,28 @@ interface ProductRepository {
     fun getAllProducts(
         page: Page,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun findProductById(
         id: Int,
         onSuccess: (Product?) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun insertProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
     fun updateProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
     fun deleteProduct(
         product: Product,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }

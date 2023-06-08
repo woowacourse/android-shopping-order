@@ -6,14 +6,14 @@ interface CartProductDataSource {
     fun requestCartProducts(
         token: String,
         onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun addCartProductByProductId(
         token: String,
         productId: String,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun updateCartProductCountById(
@@ -21,20 +21,20 @@ interface CartProductDataSource {
         cartItemId: String,
         quantity: Int,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun deleteCartProductById(
         token: String,
         cartItemId: String,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun requestCartProductByProductId(
         token: String,
         productId: Int,
         onSuccess: (CartProduct) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }

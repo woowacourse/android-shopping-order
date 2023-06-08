@@ -16,7 +16,7 @@ class OrderProductRemoteRepository : OrderProductRepository {
     override fun orderProduct(
         orderRequest: OrderRequest,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         orderProductDataSource.orderProducts(
             token = token!!,
@@ -29,7 +29,7 @@ class OrderProductRemoteRepository : OrderProductRepository {
     override fun requestOrders(
         page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         orderProductDataSource.requestOrders(
             token = token!!,
@@ -42,7 +42,7 @@ class OrderProductRemoteRepository : OrderProductRepository {
     override fun requestSpecificOrder(
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         orderProductDataSource.requestSpecificOrder(
             token = token!!,

@@ -12,7 +12,7 @@ class PointRemoteRepository : PointRepository {
 
     override fun requestPoints(
         onSuccess: (Point) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         pointDataSource.requestPoints(
             token = token!!,

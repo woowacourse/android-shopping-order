@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.detail
 
+import android.util.Log
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.domain.repository.OrderProductRepository
 import woowacourse.shopping.ui.order.detail.OrderDetailContract.Presenter
@@ -18,7 +19,7 @@ class OrderDetailPresenter(
                 view.showOrderDetailProducts(orderResponse.toUiModel().orderedProducts)
                 view.showOrderDetailPaymentInfo(orderResponse.toUiModel().payment)
             },
-            onFailure = { },
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 

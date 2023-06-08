@@ -21,7 +21,7 @@ class OrderRemoteDataSource : OrderDataSource {
         token: String,
         orderRequest: OrderRequest,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.orderProducts(token, orderRequest.toDto())
         call.enqueue(object : retrofit2.Callback<Unit> {
@@ -30,13 +30,11 @@ class OrderRemoteDataSource : OrderDataSource {
                     onSuccess()
                 } else {
                     Log.d("test", "retrofit 실패 ${response.code()}, token: $token")
-                    Log.d("test", "orderRequest 값 : ${orderRequest.toDto().orderItems}, $orderRequest")
                 }
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.d("test", "onFailure retrofit 실패 ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -45,7 +43,7 @@ class OrderRemoteDataSource : OrderDataSource {
         token: String,
         page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestOrders(token, page.value, page.sizePerPage)
         call.enqueue(object : retrofit2.Callback<OrderResponsesDto> {
@@ -65,8 +63,7 @@ class OrderRemoteDataSource : OrderDataSource {
             }
 
             override fun onFailure(call: Call<OrderResponsesDto>, t: Throwable) {
-                Log.d("test", "retrofit 실패: ${t.message}")
-                onFailure()
+                onFailure(t.message.toString())
             }
         })
     }
@@ -75,7 +72,7 @@ class OrderRemoteDataSource : OrderDataSource {
         token: String,
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     ) {
         val call = retrofitService.requestSpecificOrder(token, orderId)
         call.enqueue(object : retrofit2.Callback<OrderResponseDto> {
@@ -92,8 +89,7 @@ class OrderRemoteDataSource : OrderDataSource {
             }
 
             override fun onFailure(call: Call<OrderResponseDto>, t: Throwable) {
-                onFailure()
-                Log.d("test", "retrofit 실패: ${t.message}")
+                onFailure(t.message.toString())
             }
         })
     }

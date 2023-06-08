@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.main
 
+import android.util.Log
 import woowacourse.shopping.domain.model.OrderItems
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.Payment
@@ -29,7 +30,7 @@ class OrderPresenter(
             onSuccess = { point ->
                 view.showAvailablePoint(point)
             },
-            onFailure = { },
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 
@@ -51,7 +52,7 @@ class OrderPresenter(
         orderProductRepository.orderProduct(
             orderRequest = OrderRequest(orderItems.toList(), payment),
             onSuccess = { view.navigateToHome(cartProducts.sumOf { it.selectedCount.value }) },
-            onFailure = { },
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 

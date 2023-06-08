@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.history
 
+import android.util.Log
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.domain.model.OrderResponse
 import woowacourse.shopping.domain.model.page.LoadMore
@@ -24,7 +25,7 @@ class OrderHistoryPresenter(
                 view.showOrderedProducts(orders.map { it.toUiModel() })
                 page = page.next()
             },
-            onFailure = { },
+            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
         )
     }
 

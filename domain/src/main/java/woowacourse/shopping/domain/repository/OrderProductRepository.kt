@@ -8,18 +8,18 @@ interface OrderProductRepository {
     fun orderProduct(
         orderRequest: OrderRequest,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun requestOrders(
         page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 
     fun requestSpecificOrder(
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (String) -> Unit,
     )
 }
