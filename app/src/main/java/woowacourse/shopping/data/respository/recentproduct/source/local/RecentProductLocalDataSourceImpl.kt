@@ -15,10 +15,12 @@ class RecentProductLocalDataSourceImpl(
     context: Context,
     url: Server.Url,
 ) : RecentProductLocalDataSource {
-    private val db = RecentProductHelper(context).writableDatabase
+    private val db = RecentProductHelper(context)
     private val tableName = getTableName(url)
 
     override fun insertRecentProduct(productId: Long) {
+        val db = this.db.writableDatabase
+
         val value = ContentValues().apply {
             put(RecentProductContract.RecentProduct.PRODUCT_ID, productId)
             put(RecentProductContract.RecentProduct.CREATE_DATE, LocalDateTime.now().toString())
@@ -30,9 +32,12 @@ class RecentProductLocalDataSourceImpl(
                 "${RecentProductContract.RecentProduct.PRODUCT_ID} = ? ",
                 arrayOf(productId.toString()),
             )
+            db.close()
             return
         }
         db.insert(tableName, null, value)
+
+        db.close()
     }
 
     private fun checkRecentProduct(selectProductId: Long): Boolean {
@@ -59,10 +64,12 @@ class RecentProductLocalDataSourceImpl(
     }
 
     override fun deleteNotToday(today: String) {
+        val db = this.db.writableDatabase
         val sql =
             "DELETE FROM $tableName WHERE ${RecentProductContract.RecentProduct.CREATE_DATE} NOT LIKE '$today%'"
 
         db.execSQL(sql)
+        db.close()
     }
 
     override fun getAllRecentProducts(limit: Int): List<RecentProductEntity> {
@@ -87,6 +94,7 @@ class RecentProductLocalDataSourceImpl(
     }
 
     private fun getCursor(limit: Int): Cursor {
+        val db = this.db.readableDatabase
         return db.query(
             tableName,
             null,
@@ -100,6 +108,7 @@ class RecentProductLocalDataSourceImpl(
     }
 
     private fun getCursorByProductId(productId: Long, limit: Int): Cursor {
+        val db = this.db.readableDatabase
         return db.query(
             tableName,
             null,

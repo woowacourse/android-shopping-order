@@ -15,10 +15,11 @@ class CartLocalDataSourceImpl(
     context: Context,
     url: Server.Url,
 ) : CartLocalDataSource {
-    private val db = CartHelper(context).writableDatabase
+    private val db = CartHelper(context)
     private val tableName = getTableName(url)
 
     override fun insertCart(cartId: Long) {
+        val db = this.db.writableDatabase
         if (hasCartId(cartId)) return
 
         val value = ContentValues().apply {
@@ -26,9 +27,11 @@ class CartLocalDataSourceImpl(
             put(CartContract.Cart.CHECKED, 1)
         }
         db.insert(tableName, null, value)
+        db.close()
     }
 
     private fun hasCartId(id: Long): Boolean {
+        val db = this.db.readableDatabase
         val cursor = db.query(
             tableName,
             null,
@@ -44,19 +47,23 @@ class CartLocalDataSourceImpl(
             return false
         }
         cursor.close()
+        db.close()
 
         return true
     }
 
     override fun deleteCart(cartId: Long) {
+        val db = this.db.writableDatabase
         db.delete(
             tableName,
             "${CartContract.Cart.ID} = ?",
             arrayOf(cartId.toString()),
         )
+        db.close()
     }
 
     override fun deleteCarts(cartIds: List<Long>) {
+        val db = this.db.writableDatabase
         cartIds.forEach {
             db.delete(
                 tableName,
@@ -64,9 +71,11 @@ class CartLocalDataSourceImpl(
                 arrayOf(it.toString())
             )
         }
+        db.close()
     }
 
     override fun updateCartChecked(cartId: Long, isChecked: Boolean) {
+        val db = this.db.writableDatabase
         val checked = if (isChecked) 1 else 0
 
         val value = ContentValues().apply {
@@ -79,6 +88,7 @@ class CartLocalDataSourceImpl(
             "${CartContract.Cart.ID} = ?",
             arrayOf(cartId.toString()),
         )
+        db.close()
     }
 
     override fun selectAllCarts(): List<CartProduct> {
@@ -99,8 +109,10 @@ class CartLocalDataSourceImpl(
         return result.toList()
     }
 
-    private fun getCursorAll(): Cursor =
-        db.query(
+    private fun getCursorAll(): Cursor {
+        val db = this.db.readableDatabase
+
+        return db.query(
             tableName,
             null,
             null,
@@ -109,4 +121,5 @@ class CartLocalDataSourceImpl(
             null,
             null,
         )
+    }
 }
