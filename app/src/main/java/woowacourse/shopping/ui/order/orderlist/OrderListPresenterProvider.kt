@@ -1,12 +1,14 @@
 package woowacourse.shopping.ui.order.orderlist
 
-import woowacourse.shopping.data.RepositoryContainer
+import android.content.Context
+import woowacourse.shopping.data.repository.RepositoryContainer
 
 object OrderListPresenterProvider {
     fun create(
         view: OrderListContract.View,
-        repositoryContainer: RepositoryContainer
+        context: Context
     ): OrderListContract.Presenter {
+        val repositoryContainer = RepositoryContainer.getInstance(context)
         return OrderListPresenter(
             view, repositoryContainer.orderRepository, repositoryContainer.userRepository
         )

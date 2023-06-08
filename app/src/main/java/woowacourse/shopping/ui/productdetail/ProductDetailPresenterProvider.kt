@@ -1,12 +1,14 @@
 package woowacourse.shopping.ui.productdetail
 
-import woowacourse.shopping.data.RepositoryContainer
+import android.content.Context
+import woowacourse.shopping.data.repository.RepositoryContainer
 
 object ProductDetailPresenterProvider {
     fun create(
         view: ProductDetailContract.View,
-        repositoryContainer: RepositoryContainer
+        context: Context
     ): ProductDetailContract.Presenter {
+        val repositoryContainer = RepositoryContainer.getInstance(context)
         return ProductDetailPresenter(
             view,
             repositoryContainer.productRepository,

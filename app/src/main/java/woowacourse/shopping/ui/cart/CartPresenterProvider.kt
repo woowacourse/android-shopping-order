@@ -1,13 +1,15 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.data.RepositoryContainer
+import android.content.Context
+import woowacourse.shopping.data.repository.RepositoryContainer
 
 object CartPresenterProvider {
     fun create(
         view: CartContract.View,
-        repositoryContainer: RepositoryContainer,
+        context: Context,
         pageSize: Int
     ): CartContract.Presenter {
+        val repositoryContainer = RepositoryContainer.getInstance(context)
         return CartPresenter(
             view,
             repositoryContainer.cartItemRepository,

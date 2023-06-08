@@ -1,21 +1,24 @@
 package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.data.RepositoryContainer
+import android.content.Context
+import woowacourse.shopping.data.repository.RepositoryContainer
 
 object ShoppingPresenterProvider {
-    private const val PAGE_SIZE = 20
 
     fun create(
         view: ShoppingContract.View,
-        repositoryContainer: RepositoryContainer
+        context: Context,
+        pageSize: Int
     ): ShoppingContract.Presenter {
+        val repositoryContainer = RepositoryContainer.getInstance(context)
+
         return ShoppingPresenter(
             view,
             repositoryContainer.recentlyViewedProductRepository,
             repositoryContainer.productRepository,
             repositoryContainer.cartItemRepository,
             repositoryContainer.userRepository,
-            PAGE_SIZE
+            pageSize
         )
     }
 }
