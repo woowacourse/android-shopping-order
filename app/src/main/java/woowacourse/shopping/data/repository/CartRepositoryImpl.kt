@@ -10,10 +10,83 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private val cartItems = CartProducts(emptyList())
 
-    override fun getPage(index: Int, size: Int, callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll { cartDtos ->
-            cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
-            callback(cartItems)
+    override fun getPage(
+        index: Int,
+        size: Int,
+        onSuccess: (CartProducts) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        remoteDatabase.getAll({ cartDtos ->
+            cartItems.replaceAll(cartDtos.map { it.toDomain() })
+            onSuccess(cartItems)
+        }, onFailure)
+    }
+
+    override fun getAll(
+        onSuccess: (CartProducts) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        remoteDatabase.getAll({ cartDtos ->
+            cartItems.replaceAll(cartDtos.map { it.toDomain() })
+            onSuccess(CartProducts(cartDtos.map { it.toDomain() }))
+        }, onFailure)
+    }
+
+    override fun remove(
+        id: Int,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        remoteDatabase.deleteItem(
+            id,
+            onSuccess,
+            onFailure,
+        )
+    }
+
+    override fun updateCount(
+        id: Int,
+        count: Int,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        if (cartItems.isEmpty()) {
+            remoteDatabase.getAll(
+                { cartDtos ->
+                    cartItems.replaceAll(cartDtos.map { it.toDomain() })
+                },
+                onFailure,
+            )
+        }
+
+        val cartItem = cartItems.findByProductId(id)
+        when {
+            cartItem == null && count == 1 -> {
+                remoteDatabase.postItem(id, {
+                    getAll({}, {})
+                    onSuccess()
+                }, { })
+            }
+
+            cartItem == null -> {
+                return
+            }
+
+            count == 0 ->
+                remoteDatabase.deleteItem(cartItem.id, {
+                    getAll({}, {})
+                    onSuccess()
+                }, { })
+
+            count < 1 -> {
+                return
+            }
+
+            else ->
+                remoteDatabase.patchItemQuantity(cartItem.id, count, {
+                    getAll({}, {})
+                    onSuccess()
+                }, { })
         }
     }
 
@@ -45,56 +118,12 @@ class CartRepositoryImpl(
         if (cartItems.findByProductId(productId) != null) {
             return
         }
-        remoteDatabase.postItem(productId) {
-            getAll {}
-        }
-    }
-
-    override fun remove(id: Int, callback: () -> Unit) {
-        remoteDatabase.deleteItem(id) {
-            callback()
-        }
-    }
-
-    override fun updateCount(id: Int, count: Int, callback: (Int?) -> Unit) {
-        if (cartItems.isEmpty()) {
-            remoteDatabase.getAll { cartDtos ->
-                cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
-            }
-        }
-
-        val cartItem = cartItems.findByProductId(id)
-        when {
-            cartItem == null && count == 1 -> remoteDatabase.postItem(id) {
-                getAll { }
-                callback(it)
-            }
-
-            cartItem == null -> {
-                return
-            }
-
-            count == 0 -> remoteDatabase.deleteItem(cartItem.id) {
-                getAll { }
-                callback(it)
-            }
-
-            count < 1 -> return
-            else -> remoteDatabase.patchItemQuantity(cartItem.id, count) {
-                getAll { }
-                callback(it)
-            }
-        }
+        remoteDatabase.postItem(productId, {
+            getAll({}, {})
+        }, {})
     }
 
     override fun updateChecked(id: Int, checked: Boolean) {
         cartItems.changeChecked(id, checked)
-    }
-
-    override fun getAll(callback: (CartProducts) -> Unit) {
-        remoteDatabase.getAll { cartDtos ->
-            cartItems.replaceAll(cartDtos?.map { it.toDomain() } ?: emptyList())
-            callback(CartProducts(cartDtos?.map { it.toDomain() } ?: emptyList()))
-        }
     }
 }

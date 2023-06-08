@@ -16,16 +16,16 @@ interface RetrofitCartService {
     @POST("cart-items")
     fun postCart(
         @Body productId: Int,
-    ): Call<Int>
+    ): Call<Unit>
 
     @PATCH("cart-items/{cartId}")
     fun patchCart(
         @Path("cartId") cartId: Int,
         @Body quantity: Int,
-    ): Call<Int>
+    ): Call<Unit>
 
     @DELETE("cart-items/{cartId}")
     fun deleteCart(
         @Path("cartId") cartId: Int,
-    ): Call<Int>
+    ): Call<String>
 }

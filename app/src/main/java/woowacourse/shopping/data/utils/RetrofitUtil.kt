@@ -13,7 +13,7 @@ fun <T> createResponseCallback(
             if (responseBody != null) {
                 onSuccess(responseBody)
             } else {
-                onFailure(Exception("Response unsuccessful"))
+                onFailure(Exception("Response null"))
             }
         }
 

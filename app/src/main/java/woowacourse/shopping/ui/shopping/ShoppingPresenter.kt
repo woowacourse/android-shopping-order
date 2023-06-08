@@ -19,12 +19,12 @@ class ShoppingPresenter(
     }
 
     override fun setUpCartCounts() {
-        cartRepository.getAll { carts ->
+        cartRepository.getAll({ carts ->
             val cartProducts = carts.all()
                 .associateBy { it.product.id }
                 .mapValues { it.value.quantity }
             view.setCartProducts(cartProducts)
-        }
+        }, {})
     }
 
     override fun setUpNextProducts() {
@@ -51,11 +51,11 @@ class ShoppingPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count) {
-            cartRepository.getAll {
+        cartRepository.updateCount(productId, count, {
+            cartRepository.getAll({
                 setUpTotalCount()
-            }
-        }
+            }, {})
+        }, {})
     }
 
     override fun navigateToItemDetail(productId: Int) {

@@ -33,11 +33,11 @@ class CartPresenter(
     private var isChangingItemCheck = false
 
     private fun fetchCartProducts(callback: () -> Unit) {
-        cartRepository.getPage(index, STEP) {
+        cartRepository.getPage(index, STEP, {
             currentPage.clear()
             currentPage.addAll(it.toUIModel())
             callback()
-        }
+        }, {})
     }
 
     private fun setUpCarts() {
@@ -71,7 +71,6 @@ class CartPresenter(
         }
 
         currentPage.replaceAll {
-            println("called: set up products check !")
             cartRepository.updateChecked(it.id, checked)
             it.copy(checked = checked)
         }
@@ -95,7 +94,7 @@ class CartPresenter(
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.updateCount(productId, count) {
+        cartRepository.updateCount(productId, count, {
             currentPage.indexOfFirst { it.id == productId }
                 .takeIf { it != -1 }
                 ?.let { currentPage[it] = currentPage[it].copy(count = count) }
@@ -104,7 +103,7 @@ class CartPresenter(
                 setUpCheckedCount()
                 setUPTotalPrice()
             }
-        }
+        }, {})
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
@@ -120,7 +119,7 @@ class CartPresenter(
     }
 
     override fun removeItem(productId: Int) {
-        cartRepository.remove(productId) {
+        cartRepository.remove(productId, {
             currentPage.removeIf { it.id == productId }
             if (currentPage.isEmpty() && index > 0) {
                 moveToPagePrev()
@@ -131,7 +130,7 @@ class CartPresenter(
                     setUPTotalPrice()
                 }
             }
-        }
+        }, {})
     }
 
     override fun getPageIndex(): Int {
@@ -139,13 +138,13 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        cartRepository.getAll { cartProducts ->
+        cartRepository.getAll({ cartProducts ->
             cartProducts.all()
                 .first { it.product.id == productId }
                 .toUIModel(true)
                 .toProduct()
                 .let { view.navigateToItemDetail(it.toUIModel()) }
-        }
+        }, {})
     }
 
     override fun navigateToOrder() {
