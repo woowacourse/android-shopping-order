@@ -17,34 +17,34 @@ class ShoppingPresenter(
         productRepository.clearCache()
     }
 
-    override fun setUpCartCounts() {
+    override fun fetchCartCounts() {
         CompletableFuture.supplyAsync {
             cartRepository.getAll()
         }.thenAccept { result ->
             result.onSuccess { carts ->
                 val cartCounts = carts.toList().associateBy({ it.product.id }, { it.quantity })
                 view.setCartProducts(cartCounts)
-                setUpTotalCount()
+                fetchTotalCount()
             }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
-    override fun setUpNextProducts() {
+    override fun fetchNextProducts() {
         CompletableFuture.supplyAsync {
             productRepository.getNext(PRODUCT_PAGE_SIZE)
         }.thenAccept { result ->
-            result.onSuccess { products -> view.addMoreProducts(products.map { it.toUIModel() }) }
+            result.onSuccess { products -> view.setMoreProducts(products.map { it.toUIModel() }) }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
-    override fun setUpRecentProducts() {
+    override fun fetchRecentProducts() {
         val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
             .map { it.toUIModel() }
         view.setRecentProducts(recentProducts)
     }
 
-    override fun setUpTotalCount() {
+    override fun fetchTotalCount() {
         view.setToolbar(
             cartRepository.getTotalCheckedQuantity()
         )
@@ -55,17 +55,17 @@ class ShoppingPresenter(
             cartRepository.updateCountWithProductId(productId, count)
             cartRepository.getAll()
         }.thenAccept { result ->
-            result.onSuccess { setUpTotalCount() }
+            result.onSuccess { fetchTotalCount() }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }
 
-    override fun navigateToItemDetail(productId: Int) {
+    override fun processToItemDetail(productId: Int) {
         view.navigateToProductDetail(productId)
     }
 
-    override fun navigateToOrders() {
-        view.navigateToOrders()
+    override fun processToOrderHistories() {
+        view.navigateToOrderHistories()
     }
 
     companion object {

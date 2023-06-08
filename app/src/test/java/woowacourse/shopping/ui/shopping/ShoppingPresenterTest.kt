@@ -63,13 +63,13 @@ class ShoppingPresenterTest {
     fun `상품들을 추가로 전달한다`() {
         // given
         every { productRepository.getNext(any()) } answers { Result.success(fakeProducts) }
-        justRun { view.addMoreProducts(any()) }
+        justRun { view.setMoreProducts(any()) }
 
         // when
-        presenter.setUpNextProducts()
+        presenter.fetchNextProducts()
 
         // then
-        verify(exactly = 1) { view.addMoreProducts(fakeProducts.map { it.toUIModel() }) }
+        verify(exactly = 1) { view.setMoreProducts(fakeProducts.map { it.toUIModel() }) }
     }
 
     @Test
@@ -79,7 +79,7 @@ class ShoppingPresenterTest {
         justRun { view.setRecentProducts(any()) }
 
         // when
-        presenter.setUpRecentProducts()
+        presenter.fetchRecentProducts()
 
         // then
         verify(exactly = 1) { view.setRecentProducts(fakeRecentProducts.toUIModel()) }
@@ -93,7 +93,7 @@ class ShoppingPresenterTest {
         justRun { view.setToolbar(any()) }
 
         // when
-        presenter.setUpCartCounts()
+        presenter.fetchCartCounts()
 
         // then
         verify(exactly = 1) { view.setCartProducts(fakeCartCounts) }
@@ -123,7 +123,7 @@ class ShoppingPresenterTest {
         justRun { view.navigateToProductDetail(any()) }
 
         // when
-        presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
+        presenter.processToItemDetail(fakeProduct.toUIModel().id)
 
         // then
         verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel().id) }

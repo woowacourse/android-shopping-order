@@ -35,25 +35,25 @@ class OrderPresenterTest {
         every { mockOrder.toUIModel() } answers { mockOrderUIModel }
         every { orderRepository.getOrder(any()) } answers { Result.success(mockOrder) }
         every { mockOrder.cartItems } returns listOf()
-        justRun { view.showOrder(any()) }
+        justRun { view.setOrder(any()) }
 
         // when
-        presenter.setUpOrder()
+        presenter.fetchOrder()
 
         // then
-        verify(exactly = 1) { view.showOrder(mockOrderUIModel) }
+        verify(exactly = 1) { view.setOrder(mockOrderUIModel) }
     }
 
     @Test
     fun `주문을 하면 메인 화면으로 간다`() {
         // given
         every { orderRepository.postOrder(any(), any()) } answers { Result.success(1) }
-        justRun { view.navigatetoOrder() }
+        justRun { view.navigateToOrderConfirmation() }
 
         // when
-        presenter.confirmOrder(1000)
+        presenter.processToOrderConfirmation(1000)
 
         // then
-        verify(exactly = 1) { view.navigatetoOrder() }
+        verify(exactly = 1) { view.navigateToOrderConfirmation() }
     }
 }

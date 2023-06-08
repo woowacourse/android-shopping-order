@@ -24,16 +24,16 @@ class OrderHistoriesPresenter(
                 }
                 histories.addAll(nextHistories.toUIModel().orderHistories)
                 lastOrderId = nextHistories.lastOrderId
-                view.showOrderHistories(histories)
+                view.setOrderHistories(histories)
             }
             .onFailure { e -> LogUtil.logError(e) }
     }
 
-    override fun navigateToOrderHistory(orderId: Long) {
+    override fun processToOrderHistory(orderId: Long) {
         view.navigateToOrderHistory(orderId)
     }
 
-    override fun navigateToProductDetail(productId: Int) {
+    override fun processToProductDetail(productId: Int) {
         view.navigateToProductDetail(productId)
     }
 }

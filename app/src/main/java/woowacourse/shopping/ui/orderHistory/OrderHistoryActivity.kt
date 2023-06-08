@@ -17,7 +17,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private lateinit var presenter: OrderHistoryContract.Presenter
 
     private val adapter = HistoryItemAdapter(
-        onItemClick = { productId -> presenter.navigateToProductDetail(productId) }
+        onItemClick = { productId -> presenter.processToProductDetail(productId) }
     )
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -58,7 +58,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 
     private fun initView() {
         binding.rvOrderProduct.adapter = adapter
-        presenter.fetchOrderDetail()
+        presenter.fetchOrderHistory()
     }
 
     override fun setOrderHistory(orderHistory: OrderHistoryUIModel) {

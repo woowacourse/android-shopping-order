@@ -36,7 +36,7 @@ class OrderHistoryPresenterTest {
         justRun { view.setOrderHistory(any()) }
 
         // when
-        presenter.fetchOrderDetail()
+        presenter.fetchOrderHistory()
 
         // then
         verify(exactly = 1) { view.setOrderHistory(mockOrderHistoryUIModel) }
@@ -49,7 +49,7 @@ class OrderHistoryPresenterTest {
         justRun { view.navigateToProductDetail(productId) }
 
         // when
-        presenter.navigateToProductDetail(productId)
+        presenter.processToProductDetail(productId)
 
         // then
         verify(exactly = 1) { view.navigateToProductDetail(productId) }

@@ -9,21 +9,21 @@ interface CartContract {
     interface View {
         fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel)
         fun navigateToItemDetail(productId: Int)
-        fun navigateToOrder(cartIds: List<Int>)
+        fun navigateToOrderCheckout(cartIds: List<Int>)
     }
 
     interface Presenter {
         val totalPrice: LiveData<Int>
         val checkedCount: LiveData<Int>
         val allCheck: LiveData<Boolean>
-        fun setUpProductsCheck(checked: Boolean)
+        fun fetchCartProducts()
         fun moveToPageNext()
         fun moveToPagePrev()
+        fun getPageIndex(): Int
+        fun updateItemsCheck(checked: Boolean)
         fun updateItemCount(productId: Int, count: Int)
         fun updateItemCheck(productId: Int, checked: Boolean)
-        fun getPageIndex(): Int
-        fun navigateToItemDetail(productId: Int)
-        fun checkOutOrder()
-        fun fetchCartProducts()
+        fun processToItemDetail(productId: Int)
+        fun processToOrderCheckout()
     }
 }

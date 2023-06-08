@@ -47,8 +47,8 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter.setUpRecentProducts()
-        presenter.setUpCartCounts()
+        presenter.fetchRecentProducts()
+        presenter.fetchCartCounts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,7 +57,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
             view.setOnClickListener { navigateToCart() }
             view.findViewById<TextView>(R.id.tv_counter)?.let { tvCount = it }
         }
-        presenter.setUpTotalCount()
+        presenter.fetchTotalCount()
         return true
     }
 
@@ -93,29 +93,29 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     private fun initView() {
-        presenter.setUpRecentProducts()
-        presenter.setUpNextProducts()
-        presenter.setUpCartCounts()
+        presenter.fetchRecentProducts()
+        presenter.fetchNextProducts()
+        presenter.fetchCartCounts()
 
         binding.rvProducts.adapter = adapter
         binding.rvProducts.itemAnimator = null
-        binding.bottom.navigateToOrders = presenter::navigateToOrders
+        binding.bottom.navigateToOrders = presenter::processToOrderHistories
     }
 
     private fun getAdapterListener() = object : ProductsListener {
         override fun onClickItem(productId: Int) {
-            presenter.navigateToItemDetail(productId)
+            presenter.processToItemDetail(productId)
         }
         override fun onReadMoreClick() {
-            presenter.setUpNextProducts()
+            presenter.fetchNextProducts()
         }
         override fun onAddCartOrUpdateCount(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
-            presenter.setUpTotalCount()
+            presenter.fetchTotalCount()
         }
     }
 
-    override fun addMoreProducts(products: List<ProductUIModel>) {
+    override fun setMoreProducts(products: List<ProductUIModel>) {
         runOnUiThread {
             binding.mainSkeleton.isVisible = false
             binding.rvProducts.isVisible = true
@@ -149,7 +149,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         startActivity(CartActivity.getIntent(this))
     }
 
-    override fun navigateToOrders() {
+    override fun navigateToOrderHistories() {
         startActivity(OrderHistoriesActivity.getIntent(this))
     }
 

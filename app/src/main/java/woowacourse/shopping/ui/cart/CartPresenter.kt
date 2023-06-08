@@ -49,25 +49,6 @@ class CartPresenter(
         }
     }
 
-    private fun setUPTotalPrice() {
-        _totalPrice.postValue(cartRepository.getTotalCheckedPrice())
-    }
-
-    private fun setUpCheckedCount() {
-        _checkedCount.postValue(cartRepository.getTotalCheckedQuantity())
-    }
-
-    private fun setUpAllButton() {
-        cartRepository.getPage(index * STEP, STEP)
-            .onSuccess { _allCheck.value = it.all { product -> product.checked } }
-    }
-
-    override fun setUpProductsCheck(checked: Boolean) {
-        if (isCheckChanging) return
-        cartRepository.updateCurrentPageChecked(checked)
-        fetchCartProducts()
-    }
-
     override fun moveToPageNext() {
         index += 1
         cartRepository.getPage(index * STEP, STEP)
@@ -89,6 +70,12 @@ class CartPresenter(
         }
     }
 
+    override fun updateItemsCheck(checked: Boolean) {
+        if (isCheckChanging) return
+        cartRepository.updateCurrentPageChecked(checked)
+        fetchCartProducts()
+    }
+
     override fun updateItemCheck(productId: Int, checked: Boolean) {
         cartRepository.updateChecked(productId, checked)
         if (isCheckChanging) return
@@ -103,18 +90,30 @@ class CartPresenter(
         return index
     }
 
-    override fun navigateToItemDetail(productId: Int) {
+    override fun processToItemDetail(productId: Int) {
         view.navigateToItemDetail(productId)
     }
 
-    override fun checkOutOrder() {
+    override fun processToOrderCheckout() {
         CompletableFuture.supplyAsync {
             cartRepository.getChecked()
         }.thenAccept { result ->
-            println(result)
-            result.onSuccess { cartProducts -> view.navigateToOrder(cartProducts.map { it.id }) }
-                .onFailure { throwable -> LogUtil.logError(throwable) }
+            result.onSuccess { cartProducts ->
+                view.navigateToOrderCheckout(cartProducts.map { it.id })
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
+    }
+
+    private fun setUPTotalPrice() {
+        _totalPrice.postValue(cartRepository.getTotalCheckedPrice())
+    }
+
+    private fun setUpCheckedCount() {
+        _checkedCount.postValue(cartRepository.getTotalCheckedQuantity())
+    }
+
+    private fun setUpAllButton() {
+        cartRepository.getPage(index * STEP, STEP)
     }
 
     companion object {

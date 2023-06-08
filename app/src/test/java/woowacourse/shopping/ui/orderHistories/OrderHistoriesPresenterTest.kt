@@ -5,6 +5,7 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.model.OrderHistories
 import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderHistoryUIModel
 
@@ -26,16 +27,16 @@ class OrderHistoriesPresenterTest {
         val mockOrderHistory = mockk<OrderHistory>()
         val mockOrderHistoryUIModel = mockk<OrderHistoryUIModel>()
 
-        every { orderRepository.getOrderHistoriesNext() }
-            .answers { Result.success(listOf(mockOrderHistory)) }
+        every { orderRepository.getOrderHistoriesNext(any()) }
+            .answers { Result.success(OrderHistories(listOf(mockOrderHistory), 1L)) }
 
-        every { view.showOrderHistories(any()) } answers { }
+        every { view.setOrderHistories(any()) } answers { }
 
         // when
         presenter.fetchOrderHistories()
 
         // then
-        view.showOrderHistories(listOf(mockOrderHistoryUIModel))
+        view.setOrderHistories(listOf(mockOrderHistoryUIModel))
     }
 
     @Test
@@ -45,7 +46,7 @@ class OrderHistoriesPresenterTest {
         every { view.navigateToOrderHistory(orderId) } answers { }
 
         // when
-        presenter.navigateToOrderHistory(orderId)
+        presenter.processToOrderHistory(orderId)
 
         // then
         view.navigateToOrderHistory(orderId)
@@ -58,7 +59,7 @@ class OrderHistoriesPresenterTest {
         every { view.navigateToProductDetail(productId) } answers { }
 
         // when
-        presenter.navigateToProductDetail(productId)
+        presenter.processToProductDetail(productId)
 
         // then
         view.navigateToProductDetail(productId)

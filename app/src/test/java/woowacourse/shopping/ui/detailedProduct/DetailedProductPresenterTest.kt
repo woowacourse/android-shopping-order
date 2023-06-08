@@ -63,7 +63,7 @@ class DetailedProductPresenterTest {
         every { sharedPreferenceUtils.setLastProductId(any()) } answers { nothing }
 
         // when
-        presenter.setUpLastProduct()
+        presenter.fetchLastProduct()
 
         // then
         verify(exactly = 1) { sharedPreferenceUtils.getLastProductId() }
@@ -76,7 +76,7 @@ class DetailedProductPresenterTest {
         every { view.setProductDetail(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpProductDetail()
+        presenter.fetchProductDetail()
 
         // then
         verify(exactly = 1) { view.setProductDetail(any(), any()) }
@@ -127,8 +127,8 @@ class DetailedProductPresenterTest {
         every { sharedPreferenceUtils.setLastProductId(any()) } answers { nothing }
 
         // when
-        presenter.setUpLastProduct()
-        presenter.navigateToDetailedProduct()
+        presenter.fetchLastProduct()
+        presenter.processToDetailedProduct()
 
         // then
         verify(exactly = 1) { view.navigateToDetailedProduct(any()) }
@@ -138,12 +138,12 @@ class DetailedProductPresenterTest {
     @Test
     fun `장바구니에 상품을 추가하는 다이얼로그로 이동한다`() {
         // given
-        every { view.navigateToAddToCartDialog(any()) } answers { nothing }
+        every { view.showCartDialog(any()) } answers { nothing }
 
         // when
-        presenter.navigateToAddToCartDialog()
+        presenter.processToCart()
 
         // then
-        verify(exactly = 1) { view.navigateToAddToCartDialog(any()) }
+        verify(exactly = 1) { view.showCartDialog(any()) }
     }
 }

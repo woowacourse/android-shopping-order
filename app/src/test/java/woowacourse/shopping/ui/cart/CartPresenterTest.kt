@@ -83,7 +83,7 @@ class CartPresenterTest {
 
         // when
         presenter.fetchCartProducts()
-        presenter.setUpProductsCheck(true)
+        presenter.updateItemsCheck(true)
 
         // then
         verify(exactly = 1) {
@@ -185,7 +185,7 @@ class CartPresenterTest {
         every { view.navigateToItemDetail(any()) } answers { nothing }
 
         // when
-        presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
+        presenter.processToItemDetail(fakeProduct.toUIModel().id)
 
         // then
         verify(exactly = 1) { view.navigateToItemDetail(fakeProduct.toUIModel().id) }

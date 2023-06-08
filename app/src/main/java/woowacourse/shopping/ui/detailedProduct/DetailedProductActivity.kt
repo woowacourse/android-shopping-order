@@ -77,18 +77,14 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
 
     private fun initView() {
         binding.presenter = presenter
-        presenter.setUpLastProduct()
-        presenter.setUpProductDetail()
+        presenter.fetchLastProduct()
+        presenter.fetchProductDetail()
         presenter.addProductToRecent()
     }
 
     override fun setProductDetail(product: ProductUIModel, lastProduct: ProductUIModel?) {
         binding.product = product
         binding.lastProduct = lastProduct
-    }
-
-    override fun showProductNotFound() {
-        finish()
     }
 
     override fun navigateToCart() {
@@ -103,7 +99,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
         )
     }
 
-    override fun navigateToAddToCartDialog(product: ProductUIModel) {
+    override fun showCartDialog(product: ProductUIModel) {
         CartDialog(this, product.name, product.price) { count ->
             presenter.addProductToCart(count)
         }.apply {

@@ -61,12 +61,14 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private fun initView() {
         binding.rvOrders.adapter = adapter
         binding.confirmOrder = {
-            presenter.confirmOrder(binding.etUsedPoint.text.toString().toIntOrNull() ?: 0)
+            presenter.processToOrderConfirmation(
+                binding.etUsedPoint.text.toString().toIntOrNull() ?: 0
+            )
         }
-        presenter.setUpOrder()
+        presenter.fetchOrder()
     }
 
-    override fun showOrder(order: OrderUIModel) {
+    override fun setOrder(order: OrderUIModel) {
         runOnUiThread {
             binding.order = order
             binding.etUsedPoint.addTextChangedListener(
@@ -90,7 +92,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         }
     }
 
-    override fun navigatetoOrder() {
+    override fun navigateToOrderConfirmation() {
         startActivity(
             ShoppingActivity.getIntent(this).apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP

@@ -10,20 +10,20 @@ class OrderPresenter(
     private val cartIds: List<Int>,
     private val orderRepository: OrderRepository
 ) : OrderContract.Presenter {
-    override fun setUpOrder() {
+    override fun fetchOrder() {
         CompletableFuture.supplyAsync {
             orderRepository.getOrder(cartIds)
         }.thenAccept { result ->
-            result.onSuccess { order -> view.showOrder(order.toUIModel()) }
+            result.onSuccess { order -> view.setOrder(order.toUIModel()) }
                 .onFailure { e -> LogUtil.logError(e) }
         }
     }
 
-    override fun confirmOrder(point: Int) {
+    override fun processToOrderConfirmation(point: Int) {
         CompletableFuture.supplyAsync {
             orderRepository.postOrder(point, cartIds)
         }.thenAccept { result ->
-            result.onSuccess { view.navigatetoOrder() }
+            result.onSuccess { view.navigateToOrderConfirmation() }
                 .onFailure { throwable -> LogUtil.logError(throwable) }
         }
     }

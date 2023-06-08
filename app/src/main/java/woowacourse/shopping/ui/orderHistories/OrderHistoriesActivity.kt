@@ -23,11 +23,11 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
     private val adapter = HistoriesAdapter(
         listener = object : HistoriesListener {
             override fun onItemClick(productId: Int) {
-                presenter.navigateToProductDetail(productId)
+                presenter.processToProductDetail(productId)
             }
 
             override fun onOrderDetailClick(orderId: Long) {
-                presenter.navigateToOrderHistory(orderId)
+                presenter.processToOrderHistory(orderId)
             }
         }
     )
@@ -79,7 +79,9 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount &&
+                    firstVisibleItemPosition >= 0
+                ) {
                     loadMoreData()
                 }
             }
@@ -91,7 +93,7 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
         presenter.fetchOrderHistories()
     }
 
-    override fun showOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
+    override fun setOrderHistories(orderHistories: List<OrderHistoryUIModel>) {
         runOnUiThread {
             adapter.submitList(orderHistories)
         }

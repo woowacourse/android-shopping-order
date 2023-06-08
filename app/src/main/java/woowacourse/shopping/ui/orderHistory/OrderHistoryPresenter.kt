@@ -11,7 +11,7 @@ class OrderHistoryPresenter(
     private val orderId: Long
 ) : OrderHistoryContract.Presenter {
 
-    override fun fetchOrderDetail() {
+    override fun fetchOrderHistory() {
         CompletableFuture.supplyAsync {
             orderRepository.getOrderHistory(orderId)
         }.thenAccept { result ->
@@ -19,7 +19,7 @@ class OrderHistoryPresenter(
                 .onFailure { e -> LogUtil.logError(e) }
         }
     }
-    override fun navigateToProductDetail(productId: Int) {
+    override fun processToProductDetail(productId: Int) {
         view.navigateToProductDetail(productId)
     }
 }

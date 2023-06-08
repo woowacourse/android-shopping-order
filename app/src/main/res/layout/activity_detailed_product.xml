@@ -94,7 +94,7 @@
         <include
             android:id="@+id/layout_last_product"
             layout="@layout/layout_detailed_product_last"
-            android:onClick="@{() -> presenter.navigateToDetailedProduct()}"
+            android:onClick="@{() -> presenter.processToDetailedProduct()}"
             bind:product="@{lastProduct}" />
 
         <View
@@ -108,7 +108,7 @@
             android:layout_height="50dp"
             android:background="@color/blue_green_04c09e"
             android:gravity="center"
-            android:onClick="@{() -> presenter.navigateToAddToCartDialog()}"
+            android:onClick="@{() -> presenter.processToCart()}"
             android:text="@string/product_detail_add_to_cart_btn"
             android:textColor="@color/white"
             android:textSize="20sp"

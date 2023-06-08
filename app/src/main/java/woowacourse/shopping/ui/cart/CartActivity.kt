@@ -97,8 +97,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.rvProducts.adapter = adapter
         binding.rvProducts.itemAnimator = null
 
-        binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
-        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.checkOutOrder() }
+        binding.cartBottom.onAllCheckClick = presenter::updateItemsCheck
+        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.processToOrderCheckout() }
 
         presenter.fetchCartProducts()
     }
@@ -114,7 +114,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.updateItemCount(productId, 0)
         }
         override fun onItemClick(product: CartProductUIModel) {
-            presenter.navigateToItemDetail(product.productId)
+            presenter.processToItemDetail(product.productId)
         }
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
@@ -136,7 +136,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         startActivity(DetailedProductActivity.getIntent(this, productId))
     }
 
-    override fun navigateToOrder(cartIds: List<Int>) {
+    override fun navigateToOrderCheckout(cartIds: List<Int>) {
         startActivity(OrderActivity.getIntent(this, cartIds))
     }
 

@@ -27,7 +27,7 @@ class DetailedProductPresenter(
             .onFailure { exception -> LogUtil.logError(exception) }
     }
 
-    override fun setUpLastProduct() {
+    override fun fetchLastProduct() {
         val lastId = sharedPreferenceUtils.getLastProductId()
         if (lastId in listOf(product.id, -1)) {
             sharedPreferenceUtils.setLastProductId(product.id)
@@ -40,7 +40,7 @@ class DetailedProductPresenter(
             .also { sharedPreferenceUtils.setLastProductId(product.id) }
     }
 
-    override fun setUpProductDetail() {
+    override fun fetchProductDetail() {
         view.setProductDetail(product, lastProduct)
     }
 
@@ -59,14 +59,14 @@ class DetailedProductPresenter(
         recentRepository.insert(product.toDomain())
     }
 
-    override fun navigateToDetailedProduct() {
+    override fun processToDetailedProduct() {
         lastProduct?.let {
             sharedPreferenceUtils.setLastProductId(-1)
             view.navigateToDetailedProduct(it.id)
         }
     }
 
-    override fun navigateToAddToCartDialog() {
-        view.navigateToAddToCartDialog(product)
+    override fun processToCart() {
+        view.showCartDialog(product)
     }
 }
