@@ -25,7 +25,7 @@ class OrderPresenter(
                 val cartProducts = it.map { it.toPresentation() }
                 cartIds.forEach { cartId ->
                     val cartProduct: CartProductUiModel? = cartProducts.find { it.cartId == cartId }
-                    if (cartProduct != null) products.add(cartProduct)
+                    cartProduct?.let { products.add(it) }
                 }
                 orderProducts = products
                 view.showProducts(orderProducts)
