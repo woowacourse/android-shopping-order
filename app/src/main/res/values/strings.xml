@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Shopping</string>
-    <string name="korean_won">%s원</string>
-    <string name="korean_won2">%,d원</string>
+    <string name="korean_won">%,d원</string>
     <string name="shoppingcart">장바구니</string>
     <string name="price">금액</string>
     <string name="put_in_cart">장바구니 담기</string>
@@ -15,4 +14,27 @@
     <string name="add_to_cart">담기</string>
     <string name="all">전체</string>
     <string name="order_count">주문하기(%d)</string>
+    <string name="sungha_server">성하 서버</string>
+    <string name="logan_server">로건 서버</string>
+    <string name="mypage">마이페이지</string>
+    <string name="charge">충전</string>
+    <string name="cash_on_hand">보유한 캐시 : %,d캐시</string>
+    <string name="order_product">주문 상품</string>
+    <string name="submit_order">주문하기</string>
+    <string name="cash">캐시</string>
+    <string name="usable_cash">사용 가능한 캐시</string>
+    <string name="after_use_cash">사용 후 캐시 잔액</string>
+    <string name="payment_amount">결제 금액</string>
+    <string name="order_price">주문 금액</string>
+    <string name="order_history">주문 내역</string>
+    <string name="cash_contain_price">%,d캐시</string>
+    <string name="notify_unable_order">캐시가 부족하여 주문할 수 없습니다.\n충전 후 다시 시도해주세요.</string>
+    <string name="notify_nothing_data">데이터가 없습니다. 다시 시도해주세요.</string>
+    <string name="product_quantity">%d개</string>
+    <string name="products_nothing">선택한 상품이 없습니다.</string>
+    <string name="order_multiple_name">%s 외 %d개</string>
+    <string name="unable_use_negative_int">양수를 입력해주세요.</string>
+    <string name="server_communication_error">서버와의 통신이 원활하지 않습니다.</string>
+    <string name="server_not_response_error">서버로부터 응답이 오지 않습니다.\n네트워크 상태를 확인해주세요.</string>
+    <string name="server_response_wrong">서버로부터 데이터가 오지 않습니다.\n잠시 후에 시도해주세요.</string>
 </resources>

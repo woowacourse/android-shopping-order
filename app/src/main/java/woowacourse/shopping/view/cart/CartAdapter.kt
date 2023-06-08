@@ -1,11 +1,12 @@
 package woowacourse.shopping.view.cart
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.CartProductModel
 
 class CartAdapter(
-    private val items: List<CartViewItem>,
+    private val items: MutableList<CartViewItem>,
     private val onItemClick: OnItemClick,
 ) : RecyclerView.Adapter<CartItemViewHolder>() {
 
@@ -32,5 +33,12 @@ class CartAdapter(
             is CartItemViewHolder.CartProductViewHolder -> holder.bind(items[position] as CartViewItem.CartProductItem)
             is CartItemViewHolder.CartPaginationViewHolder -> holder.bind(items[position] as CartViewItem.PaginationItem)
         }
+    }
+    fun updateItems(newItems: List<CartViewItem>) {
+        val diffCallback = CartDiffCallback(items, newItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        items.clear()
+        items.addAll(newItems)
+        diffResult.dispatchUpdatesTo(this)
     }
 }

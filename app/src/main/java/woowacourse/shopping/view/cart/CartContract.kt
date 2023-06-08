@@ -2,13 +2,19 @@ package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import woowacourse.shopping.domain.cartsystem.CartSystemResult
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.model.CartProductModel
 
 interface CartContract {
     interface View {
         fun showProducts(items: List<CartViewItem>)
-        fun showChangedItems()
-        fun showChangedItem(position: Int)
+        fun changeItems(newItems: List<CartViewItem>)
+        fun stopLoading()
+        fun showOrderActivity(selectedCartProducts: List<CartProduct>)
+        fun showProductsNothingToast()
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {
@@ -18,9 +24,10 @@ interface CartContract {
         fun fetchProducts()
         fun fetchNextPage()
         fun fetchPrevPage()
-        fun removeProduct(id: Int)
-        fun updateCartProductCount(id: Int, count: Int)
+        fun removeProduct(cartId: Int)
+        fun updateCartProductCount(cartId: Int, quantity: Int)
         fun checkProduct(product: CartProductModel)
         fun checkProductsAll()
+        fun order()
     }
 }

@@ -67,7 +67,7 @@
             android:id="@+id/text_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/korean_won2(cartProduct.price * cartProduct.count)}"
+            android:text="@{@string/korean_won(cartProduct.price * cartProduct.quantity)}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/layout_add_btns"
@@ -81,25 +81,26 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/btn_minus"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_left_rounded"
-                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.count - 1)}"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.quantity - 1)}"
                 android:text="@string/minus"
                 android:textColor="@color/gray_700"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toStartOf="@id/text_count"
+                android:textSize="17sp"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toStartOf="@id/text_quantity"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/text_count"
+                android:id="@+id/text_quantity"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@color/white"
                 android:gravity="center"
-                android:text="@{Integer.toString(cartProduct.count)}"
+                android:text="@{Integer.toString(cartProduct.quantity)}"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -107,16 +108,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/btn_plus"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:background="@drawable/back_right_rounded"
-                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.count + 1)}"
+                android:onClick="@{() -> onItemClick.onUpdateCount(cartProduct.cartId, cartProduct.quantity + 1)}"
                 android:text="@string/plus"
                 android:textColor="@color/gray_700"
-                android:textSize="22sp"
-                app:layout_constraintStart_toEndOf="@id/text_count"
+                android:textSize="17sp"
+                app:backgroundTint="@null"
+                app:layout_constraintStart_toEndOf="@id/text_quantity"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

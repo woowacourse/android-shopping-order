@@ -8,10 +8,11 @@ interface ProductListContract {
         fun showCartCount(count: Int)
         fun showToastAddInCart()
         fun onClickProductDetail(product: ProductModel, lastViewedProduct: ProductModel?)
-        fun notifyAddProducts(position: Int, size: Int)
-        fun notifyRecentViewedChanged()
-        fun notifyDataChanged(position: Int)
+        fun changeItems(newItems: List<ProductListViewItem>)
         fun stopLoading()
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {

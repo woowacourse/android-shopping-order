@@ -28,35 +28,31 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     ) : ProductViewHolder(binding.root) {
         init {
             binding.onItemClick = onItemClick
+            val onPlusClick = { cartId: Int, productId: Int ->
+                onItemClick.onProductUpdateCount(
+                    cartId,
+                    productId,
+                    Integer.parseInt(binding.textQuantity.text.toString()) + 1,
+                )
+                binding.textQuantity.text =
+                    (Integer.parseInt(binding.textQuantity.text.toString()) + 1).toString()
+            }
+            val onMinusClick = { cartId: Int, productId: Int ->
+                onItemClick.onProductUpdateCount(
+                    cartId,
+                    productId,
+                    Integer.parseInt(binding.textQuantity.text.toString()) - 1,
+                )
+                binding.textQuantity.text =
+                    (Integer.parseInt(binding.textQuantity.text.toString()) - 1).toString()
+            }
+            binding.onPlusClick = onPlusClick
+            binding.onMinusClick = onMinusClick
         }
 
         fun bind(item: ProductListViewItem.ProductItem) {
             binding.product = item.product
             Glide.with(binding.root.context).load(item.product.imageUrl).into(binding.imgProduct)
-            binding.btnAdd.setOnClickListener {
-                onItemClick.onProductClickAddFirst(item.product.id)
-                binding.textCount.text = "1"
-                binding.btnAdd.visibility = View.INVISIBLE
-                binding.layoutAddBtns.visibility = View.VISIBLE
-            }
-            binding.btnPlus.setOnClickListener {
-                onItemClick.onProductUpdateCount(
-                    item.product.cartId,
-                    item.product.id,
-                    Integer.parseInt(binding.textCount.text.toString()) + 1,
-                )
-                binding.textCount.text =
-                    (Integer.parseInt(binding.textCount.text.toString()) + 1).toString()
-            }
-            binding.btnMinus.setOnClickListener {
-                onItemClick.onProductUpdateCount(
-                    item.product.cartId,
-                    item.product.id,
-                    Integer.parseInt(binding.textCount.text.toString()) - 1,
-                )
-                binding.textCount.text =
-                    (Integer.parseInt(binding.textCount.text.toString()) - 1).toString()
-            }
         }
     }
 

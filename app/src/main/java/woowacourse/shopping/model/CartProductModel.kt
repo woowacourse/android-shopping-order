@@ -1,11 +1,15 @@
 package woowacourse.shopping.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class CartProductModel(
-    var isChecked: Boolean,
+    val isChecked: Boolean,
     val cartId: Int,
     val id: Int,
     val name: String,
     val imageUrl: String,
-    var count: Int,
+    var quantity: Int,
     val price: Int,
-)
+) : Parcelable

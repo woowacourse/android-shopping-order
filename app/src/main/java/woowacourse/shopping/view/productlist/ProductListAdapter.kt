@@ -1,11 +1,12 @@
 package woowacourse.shopping.view.productlist
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.ProductModel
 
 class ProductListAdapter(
-    private val items: List<ProductListViewItem>,
+    private val items: MutableList<ProductListViewItem>,
     private val onItemClick: OnItemClick,
 ) : RecyclerView.Adapter<ProductViewHolder>() {
     interface OnItemClick {
@@ -37,5 +38,13 @@ class ProductListAdapter(
                 return
             }
         }
+    }
+
+    fun updateItems(newItems: List<ProductListViewItem>) {
+        val diffCallback = ProductListDiffCallback(items, newItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        items.clear()
+        items.addAll(newItems)
+        diffResult.dispatchUpdatesTo(this)
     }
 }

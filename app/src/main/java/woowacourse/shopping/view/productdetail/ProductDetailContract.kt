@@ -6,13 +6,18 @@ import woowacourse.shopping.model.ProductModel
 interface ProductDetailContract {
     interface View {
         fun finishActivity(isAdd: Boolean)
+        fun showProductDetail(product: ProductModel, lastViewedProduct: ProductModel?)
+        fun showNotSuccessfulErrorToast()
+        fun showServerFailureToast()
+        fun showServerResponseWrongToast()
     }
 
     interface Presenter {
-        val count: LiveData<Int>
+        val quantity: LiveData<Int>
         fun putInCart(product: ProductModel)
-        fun updateRecentViewedProducts(id: Int)
+        fun updateRecentViewedProducts(product: ProductModel)
         fun plusCount()
         fun minusCount()
+        fun fetchProductDetail()
     }
 }

@@ -1,10 +1,10 @@
 package woowacourse.shopping.view.productlist
 
-import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentViewedRepository
+import woowacourse.shopping.data.pagination.ProductListPagination
+import woowacourse.shopping.data.remote.result.DataResult
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentViewedRepository
 import woowacourse.shopping.model.ProductModel
 import woowacourse.shopping.model.toUiModel
 
@@ -14,37 +14,46 @@ class ProductListPresenter(
     private val recentViewedRepository: RecentViewedRepository,
     private val cartRepository: CartRepository,
 ) : ProductListContract.Presenter {
-    private var mark: Int = 0
 
     private val productsListItems = mutableListOf<ProductListViewItem>()
+    private val pagination = ProductListPagination(PAGINATION_SIZE, productRepository)
 
     override fun fetchProducts() {
-        // 최근 본 항목
-        recentViewedRepository.findAll { viewedProducts ->
-            if (viewedProducts.isNotEmpty()) addViewedProductsItem(viewedProducts)
-            // 상품 리스트
-            productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
-                cartRepository.findAll {
-                    addProductsItem(products.toUiModels(it))
-                    mark += products.size
-                    // 더보기
+        // 최근 본 상품
+        addViewedProductsItem()
+        // 상품 리스트
+        pagination.fetchNextItems { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val productsWithCartInfo = result.response
+                    addProductsItem(productsWithCartInfo.map { it.toUiModel() })
                     addShowMoreItem()
+                    view.showProducts(productsListItems)
+                    view.stopLoading()
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }
     }
 
     private fun addShowMoreItem() {
-        productRepository.isExistByMark(mark) { isNextExist ->
-            if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
-            view.showProducts(productsListItems)
-            view.stopLoading()
-        }
+        if (pagination.isNextEnabled) productsListItems.add(ProductListViewItem.ShowMoreItem())
     }
 
-    private fun addViewedProductsItem(products: List<Product>) {
-        val viewedProductsModel = products.map { it.toUiModel() }
-        productsListItems.add(ProductListViewItem.RecentViewedItem(viewedProductsModel))
+    private fun addViewedProductsItem() {
+        recentViewedRepository.findAll { products ->
+            if (products.isEmpty()) return@findAll
+            val viewedProductsModel = products.map { it.toUiModel(null) }
+            productsListItems.add(ProductListViewItem.RecentViewedItem(viewedProductsModel))
+        }
     }
 
     private fun addProductsItem(products: List<ProductModel>) {
@@ -62,112 +71,182 @@ class ProductListPresenter(
     }
 
     override fun loadMoreProducts() {
-        val recentViewedItemSize =
-            productsListItems.filterIsInstance<ProductListViewItem.RecentViewedItem>().size
-        val productsItemSize =
-            productsListItems.filterIsInstance<ProductListViewItem.ProductItem>().size
-
-        val position = productsItemSize + recentViewedItemSize
-        productRepository.getProductsByRange(mark, PAGINATION_SIZE) { products ->
-            cartRepository.findAll { cartProducts ->
-                val nextProducts = products.toUiModels(cartProducts)
-                productsListItems.removeLast()
-                addProductsItem(nextProducts)
-                mark += nextProducts.size
-                productRepository.isExistByMark(mark) { isNextExist ->
-                    if (isNextExist) productsListItems.add(ProductListViewItem.ShowMoreItem())
-                    view.notifyAddProducts(position, nextProducts.size)
+        pagination.fetchNextItems { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val productsWithCartInfo = result.response
+                    if (productsWithCartInfo.isEmpty()) return@fetchNextItems
+                    productsListItems.removeLast()
+                    addProductsItem(productsWithCartInfo.map { it.toUiModel() })
+                    addShowMoreItem()
+                    view.changeItems(productsListItems)
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
                 }
             }
         }
     }
 
     override fun insertCartProduct(productId: Int) {
-        cartRepository.insert(productId) {
-            fetchProductCount(productId)
+        cartRepository.insert(productId, 1) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    fetchProductCount(productId)
+                    fetchCartCount()
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
+            }
         }
     }
 
     override fun updateCartProductCount(cartId: Int, productId: Int, count: Int) {
         if (count == 0) {
-            cartRepository.remove(cartId) {
-                fetchProductCount(productId)
-                fetchCartCount()
+            cartRepository.remove(cartId) { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        fetchProductCount(productId)
+                        fetchCartCount()
+                    }
+                    is DataResult.Failure -> {
+                        view.showServerFailureToast()
+                    }
+                    is DataResult.NotSuccessfulError -> {
+                        view.showNotSuccessfulErrorToast()
+                    }
+                    is DataResult.WrongResponse -> {
+                        view.showServerResponseWrongToast()
+                    }
+                }
             }
             return
         }
-        cartRepository.update(cartId, count) {
-            fetchProductCount(productId)
+        cartRepository.update(cartId, count) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    fetchProductCount(productId)
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
+            }
         }
     }
 
     override fun fetchCartCount() {
-        cartRepository.findAll { view.showCartCount(it.size) }
+        cartRepository.getAll { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    view.showCartCount(result.response.size)
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
+            }
+        }
     }
 
     override fun fetchProductsCounts() {
-        cartRepository.findAll { cartProducts ->
-            val itemsHaveCount = productsListItems
-                .asSequence()
-                .filterIsInstance<ProductListViewItem.ProductItem>()
-                .filter { it.product.count > 0 }
-                .toList()
+        cartRepository.getAll { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val cartProducts = result.response
+                    val itemsHaveCount = productsListItems
+                        .asSequence()
+                        .filterIsInstance<ProductListViewItem.ProductItem>()
+                        .filter { it.product.quantity > 0 }
+                        .toList()
 
-            itemsHaveCount.forEach { item ->
-                val cartProduct = cartProducts.find { it.cartId == item.product.id }
-                val position = productsListItems.indexOf(item)
-                productsListItems[position] = ProductListViewItem.ProductItem(
-                    (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                        cartId = cartProduct?.cartId ?: 0,
-                        count = cartProduct?.count ?: 0,
-                    ),
-                )
-                view.notifyDataChanged(position)
+                    itemsHaveCount.forEach { item ->
+                        val cartProduct = cartProducts.find { it.product.id == item.product.id }
+                        val position = productsListItems.indexOf(item)
+                        productsListItems[position] = ProductListViewItem.ProductItem(
+                            (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
+                                cartId = cartProduct?.id,
+                                quantity = cartProduct?.quantity ?: 0,
+                            ),
+                        )
+                        view.changeItems(productsListItems)
+                    }
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
             }
         }
     }
 
     override fun fetchProductCount(id: Int) {
         if (id == -1) return
-        cartRepository.findAll { cartProducts ->
-            val cartProduct = cartProducts.find { it.product.id == id }
-            val position =
-                productsListItems.indexOfFirst { it is ProductListViewItem.ProductItem && it.product.id == id }
-            productsListItems[position] = ProductListViewItem.ProductItem(
-                (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
-                    cartId = cartProduct?.cartId ?: 0,
-                    count = cartProduct?.count ?: 0,
-                ),
-            )
-            view.notifyDataChanged(position)
+        productRepository.getProductById(id) { result ->
+            when (result) {
+                is DataResult.Success -> {
+                    val productWithCartInfo = result.response
+                    val position =
+                        productsListItems.indexOfFirst { it is ProductListViewItem.ProductItem && it.product.id == id }
+                    productsListItems[position] = ProductListViewItem.ProductItem(
+                        (productsListItems[position] as ProductListViewItem.ProductItem).product.copy(
+                            cartId = productWithCartInfo.cartItem?.id,
+                            quantity = productWithCartInfo.cartItem?.quantity ?: 0,
+                        ),
+                    )
+                    view.changeItems(productsListItems)
+                }
+                is DataResult.Failure -> {
+                    view.showServerFailureToast()
+                }
+                is DataResult.NotSuccessfulError -> {
+                    view.showNotSuccessfulErrorToast()
+                }
+                is DataResult.WrongResponse -> {
+                    view.showServerResponseWrongToast()
+                }
+            }
         }
     }
 
     override fun updateRecentViewed(id: Int) {
         if (id == -1) return
-        if (isExistRecentViewed()) productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
+        productsListItems.removeIf { it is ProductListViewItem.RecentViewedItem }
 
         recentViewedRepository.findAll { products ->
-            cartRepository.findAll { cartProducts ->
-                productsListItems.add(
-                    0,
-                    ProductListViewItem.RecentViewedItem(products.toUiModels(cartProducts)),
-                )
-            }
-            view.notifyRecentViewedChanged()
-        }
-    }
-
-    private fun isExistRecentViewed(): Boolean =
-        productsListItems[0] is ProductListViewItem.RecentViewedItem
-
-    private fun List<Product>.toUiModels(cartProducts: List<CartProduct>): List<ProductModel> {
-        return this.map { product ->
-            val cartProduct = cartProducts.find { it.product.id == product.id }
-            product.toUiModel(
-                cartProduct?.cartId ?: 0,
-                cartProduct?.count ?: 0,
+            productsListItems.add(
+                0,
+                ProductListViewItem.RecentViewedItem(products.map { it.toUiModel(null) }),
             )
+            view.changeItems(productsListItems)
         }
     }
 
