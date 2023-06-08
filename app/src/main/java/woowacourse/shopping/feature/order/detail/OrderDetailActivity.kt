@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -55,6 +56,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding.textOrderDate.text = orderDetail.toDateFormat()
         initOrderPayInfo(orderDetail)
         initOrderedProducts(orderDetail.orderItems)
+    }
+
+    override fun failToLoadOrder(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun initOrderPayInfo(orderDetail: OrderDetailUiModel) {

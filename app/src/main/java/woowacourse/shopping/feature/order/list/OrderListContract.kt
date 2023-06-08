@@ -6,6 +6,7 @@ interface OrderListContract {
     interface View {
         fun showOrders(orderPreviews: List<OrderPreviewUiModel>)
         fun showOrderDetail(orderId: Long)
+        fun failToLoadOrders(message: String)
     }
 
     interface Presenter {

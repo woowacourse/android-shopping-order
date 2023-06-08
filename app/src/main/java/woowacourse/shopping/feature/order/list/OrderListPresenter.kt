@@ -12,7 +12,9 @@ class OrderListPresenter(
             onSuccess = { orderPreviews ->
                 view.showOrders(orderPreviews.map { it.toPresentation() })
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadOrders(it.message)
+            },
         )
     }
 

@@ -13,7 +13,9 @@ class OrderDetailPresenter(
             onSuccess = { orderDetail ->
                 view.showOrderDetail(orderDetail.toPresentation())
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadOrder(it.message)
+            },
         )
     }
 }

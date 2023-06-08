@@ -108,7 +108,7 @@ class OrderPresenterTest {
         presenter.order()
 
         // Then: 주문이 불가함을 알려준다.
-        verify { view.failToOrder() }
+        verify { view.failToOrder(any()) }
     }
 
     @Test

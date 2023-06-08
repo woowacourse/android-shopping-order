@@ -14,6 +14,7 @@ import woowacourse.shopping.model.CartProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
 class MainPresenter(
+    private val view: MainContract.View,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
@@ -43,6 +44,7 @@ class MainPresenter(
                 loadCartInfo(products)
             },
             onFailure = {
+                view.failToLoadProduct(it.message)
             },
         )
     }
@@ -80,7 +82,9 @@ class MainPresenter(
                     MainScreenEvent.ShowProductDetailScreen(productUiModel, recentProduct),
                 )
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 
@@ -104,7 +108,9 @@ class MainPresenter(
                 cartProductUiModel.productUiModel.count = 1
                 updateCartCountBadge()
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 
@@ -117,7 +123,9 @@ class MainPresenter(
                 cartProductUiModel.productUiModel.count = 0
                 updateCartCountBadge()
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 
@@ -130,7 +138,9 @@ class MainPresenter(
                 cartProductUiModel.productUiModel.count = count
                 updateCartCountBadge()
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 
@@ -142,14 +152,18 @@ class MainPresenter(
                 _mainScreenEvent.postValue(MainScreenEvent.HideLoading)
                 updateCartCountBadge()
             },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 
     private fun updateCartCountBadge() {
         cartRepository.getSize(
             onSuccess = { size -> _badgeCount.postValue(size) },
-            onFailure = {},
+            onFailure = {
+                view.failToLoadProduct(it.message)
+            },
         )
     }
 

@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     private fun initPresenter() {
         presenter = MainPresenter(
+            this,
             ProductRepositoryImpl(ProductRemoteService()),
             CartRepositoryImpl(CartRemoteService()),
             RecentProductRepositoryImpl(RecentDao(this)),
@@ -193,5 +194,9 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
         private const val TOTAL_SPAN = 2
         private const val HALF_SPAN = TOTAL_SPAN / 2
+    }
+
+    override fun failToLoadProduct(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

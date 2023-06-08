@@ -10,7 +10,7 @@ interface OrderContract {
         fun showPayAmountInfo(totalPrice: Int, discountAmount: Int = 0)
         fun showPayAmount(payAmount: Int)
         fun succeedInOrder(orderId: Long)
-        fun failToOrder()
+        fun failToOrder(message: String)
     }
 
     interface Presenter {

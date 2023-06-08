@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.order.order
 
+import com.example.domain.model.CustomError
 import com.example.domain.model.Discount
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.OrderRepository
@@ -46,12 +47,12 @@ class OrderPresenter(
                     view.succeedInOrder(orderId)
                 },
                 onFailure = {
-                    view.failToOrder()
+                    view.failToOrder(it.message)
                 },
             )
         } else {
             // view를 이용해 주문이 불가함을 알려준다.
-            view.failToOrder()
+            view.failToOrder(CustomError("최대 주문 수량을 초과했습니다.").message)
         }
     }
 

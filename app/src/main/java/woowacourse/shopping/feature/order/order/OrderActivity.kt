@@ -91,8 +91,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         startActivity(orderDetailIntent)
     }
 
-    override fun failToOrder() {
-        Toast.makeText(this, getString(R.string.order_fail), Toast.LENGTH_SHORT).show()
+    override fun failToOrder(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

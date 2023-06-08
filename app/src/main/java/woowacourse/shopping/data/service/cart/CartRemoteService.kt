@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.service.cart
 
 import com.example.domain.model.CartProduct
+import com.example.domain.model.CustomError
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,7 +16,7 @@ class CartRemoteService {
 
     private val authorization: String = "Basic ${ServerInfo.token}"
 
-    fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit) {
+    fun requestCarts(onSuccess: (List<CartProduct>) -> Unit, onFailure: (CustomError) -> Unit) {
         RetrofitApiGenerator.cartService.requestCarts(authorization)
             .enqueue(object : Callback<List<CartProductDto>> {
                 override fun onResponse(
@@ -30,7 +31,7 @@ class CartRemoteService {
                 }
 
                 override fun onFailure(call: Call<List<CartProductDto>>, t: Throwable) {
-                    onFailure()
+                    onFailure(CustomError())
                 }
             })
     }
@@ -38,7 +39,7 @@ class CartRemoteService {
     fun requestAddCartProduct(
         productId: Long,
         onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         RetrofitApiGenerator.cartService
             .requestAddCartProduct(authorization, AddCartRequestDto(productId))
@@ -46,14 +47,14 @@ class CartRemoteService {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.isSuccessful) {
                         val responseHeader: String =
-                            response.headers()["Location"] ?: return onFailure()
+                            response.headers()["Location"] ?: return onFailure(CustomError("헤더가 존재하지 않습니다."))
                         val cartId = URI(responseHeader).path.substringAfterLast("/").toLong()
                         onSuccess(cartId)
                     }
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
+                    onFailure(CustomError())
                 }
             })
     }
@@ -62,7 +63,7 @@ class CartRemoteService {
         cartId: Long,
         count: Int,
         onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         RetrofitApiGenerator.cartService.requestChangeCartProductCount(
             authorization,
@@ -71,11 +72,10 @@ class CartRemoteService {
         ).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) return onSuccess(cartId)
-                onFailure()
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                onFailure()
+                onFailure(CustomError())
             }
         })
     }
@@ -83,7 +83,7 @@ class CartRemoteService {
     fun requestDeleteCartProduct(
         cartId: Long,
         onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         RetrofitApiGenerator.cartService.requestDeleteCartProduct(authorization, cartId)
             .enqueue(object : Callback<Unit> {
@@ -92,16 +92,15 @@ class CartRemoteService {
                     response: Response<Unit>,
                 ) {
                     if (response.isSuccessful) return onSuccess(cartId)
-                    onFailure()
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
+                    onFailure(CustomError())
                 }
             })
     }
 
-    fun requestSize(onSuccess: (cartCount: Int) -> Unit, onFailure: () -> Unit) {
+    fun requestSize(onSuccess: (cartCount: Int) -> Unit, onFailure: (CustomError) -> Unit) {
         RetrofitApiGenerator.cartService.requestCarts(authorization)
             .enqueue(object : Callback<List<CartProductDto>> {
                 override fun onResponse(
@@ -117,7 +116,7 @@ class CartRemoteService {
                 }
 
                 override fun onFailure(call: Call<List<CartProductDto>>, t: Throwable) {
-                    onFailure()
+                    onFailure(CustomError())
                 }
             })
     }

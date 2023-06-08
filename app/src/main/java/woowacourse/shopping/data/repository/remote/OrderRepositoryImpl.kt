@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.remote
 
+import com.example.domain.model.CustomError
 import com.example.domain.model.OrderDetail
 import com.example.domain.model.OrderPreview
 import com.example.domain.repository.OrderRepository
@@ -10,12 +11,12 @@ class OrderRepositoryImpl(private val service: OrderRemoteService) : OrderReposi
         cartIds: List<Long>,
         totalPrice: Int,
         onSuccess: (orderId: Long) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         service.requestAddOrder(cartIds, totalPrice, onSuccess, onFailure)
     }
 
-    override fun getAll(onSuccess: (orders: List<OrderPreview>) -> Unit, onFailure: () -> Unit) {
+    override fun getAll(onSuccess: (orders: List<OrderPreview>) -> Unit, onFailure: (CustomError) -> Unit) {
         service.requestAll(
             onSuccess,
             onFailure,
@@ -25,7 +26,7 @@ class OrderRepositoryImpl(private val service: OrderRemoteService) : OrderReposi
     override fun getOrderDetail(
         orderId: Long,
         onSuccess: (orderDetail: OrderDetail) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         service.requestOrderDetail(orderId, onSuccess, onFailure)
     }

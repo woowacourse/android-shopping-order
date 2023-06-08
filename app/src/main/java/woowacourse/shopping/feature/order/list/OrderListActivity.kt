@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
@@ -45,6 +46,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     override fun showOrderDetail(orderId: Long) {
         startActivity(OrderDetailActivity.getIntent(this, orderId))
+    }
+
+    override fun failToLoadOrders(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

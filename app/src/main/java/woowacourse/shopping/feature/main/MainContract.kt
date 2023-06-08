@@ -7,6 +7,8 @@ import woowacourse.shopping.model.RecentProductUiModel
 
 interface MainContract {
     interface View {
+        fun failToLoadProduct(message: String)
+
         sealed class MainScreenEvent {
             object ShowCartScreen : MainScreenEvent()
             class ShowProductDetailScreen(

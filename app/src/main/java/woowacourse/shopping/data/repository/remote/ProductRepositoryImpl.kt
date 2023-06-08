@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository.remote
 
 import com.example.domain.cache.ProductCache
 import com.example.domain.cache.ProductLocalCache
+import com.example.domain.model.CustomError
 import com.example.domain.model.Product
 import com.example.domain.repository.ProductRepository
 import woowacourse.shopping.data.service.product.ProductRemoteService
@@ -13,7 +14,7 @@ class ProductRepositoryImpl(
     private val products: MutableList<Product> = mutableListOf()
     override fun fetchFirstProducts(
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         if (cache.productList.isEmpty()) {
             service.request(
@@ -34,10 +35,9 @@ class ProductRepositoryImpl(
     override fun fetchNextProducts(
         lastProductId: Long,
         onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         val nextProducts = products.filter { it.id > lastProductId }.take(20)
-        if (nextProducts.isEmpty()) onFailure()
         cache.addProducts(nextProducts)
         onSuccess(nextProducts)
     }
@@ -45,7 +45,7 @@ class ProductRepositoryImpl(
     override fun fetchProductById(
         productId: Long,
         onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit,
+        onFailure: (CustomError) -> Unit,
     ) {
         service.requestProduct(productId, onSuccess, onFailure)
     }
