@@ -27,22 +27,4 @@ interface OrderRetrofitApi {
     fun requestAll(
         @Header("Authorization") authorization: String,
     ): Call<List<OrderPreviewDto>>
-//    @POST("cart-items")
-//    fun requestAddCartProduct(
-//        @Header("Authorization") authorization: String,
-//        @Body body: RequestBody,
-//    ): Call<Unit>
-//
-//    @PATCH("cart-items/{cartId}")
-//    fun requestChangeCartProductCount(
-//        @Header("Authorization") authorization: String,
-//        @Path("cartId") cartId: Long,
-//        @Body body: RequestBody,
-//    ): Call<Unit>
-//
-//    @DELETE("cart-items/{cartId}")
-//    fun requestDeleteCartProduct(
-//        @Header("Authorization") authorization: String,
-//        @Path("cartId") cartId: Long,
-//    ): Call<Unit>
 }
