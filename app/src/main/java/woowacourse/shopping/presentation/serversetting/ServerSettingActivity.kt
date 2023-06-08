@@ -2,11 +2,12 @@ package woowacourse.shopping.presentation.serversetting
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.ApiClient
 import woowacourse.shopping.data.common.PreferenceUtil
-import woowacourse.shopping.data.product.ProductService
-import woowacourse.shopping.data.recentproduct.RecentProductDao
-import woowacourse.shopping.data.recentproduct.RecentProductDbHelper
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.local.recentproduct.RecentProductDao
+import woowacourse.shopping.data.local.recentproduct.RecentProductDbHelper
+import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.presentation.productlist.ProductListActivity
 
@@ -19,8 +20,8 @@ class ServerSettingActivity : AppCompatActivity() {
             PreferenceUtil(this),
             RecentProductRepositoryImpl(
                 recentProductLocalDataSource = RecentProductDao(RecentProductDbHelper(this)),
-                productRemoteDataSource = ProductService()
-            )
+                productDataSource = ProductRemoteDataSource,
+            ),
         )
     }
 
@@ -40,8 +41,8 @@ class ServerSettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMain(baseUrl: String) {
-        presenter.saveBaseUrl(baseUrl)
+    private fun startMain(newUrl: String) {
+        ApiClient.initClient(newUrl, PreferenceUtil(this))
         presenter.saveAuthToken()
         presenter.deleteCart()
         startActivity(ProductListActivity.getIntent(this))

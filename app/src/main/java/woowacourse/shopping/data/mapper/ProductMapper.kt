@@ -2,7 +2,7 @@ package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.Price
 import woowacourse.shopping.Product
-import woowacourse.shopping.data.product.ProductDataModel
+import woowacourse.shopping.data.remote.product.ProductDataModel
 
 fun ProductDataModel.toDomain(): Product {
     return Product(

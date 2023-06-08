@@ -1,32 +1,40 @@
 package woowacourse.shopping.presentation.cart
 
-import woowacourse.shopping.CartProductInfo
-import woowacourse.shopping.CartProductInfoList
-import woowacourse.shopping.presentation.model.CartProductInfoModel
-import woowacourse.shopping.util.OffsetPaging
-import woowacourse.shopping.util.SafeLiveData
+import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.model.OrderCartModel
 
 interface CartContract {
     interface Presenter {
-        val paging: OffsetPaging<CartProductInfo>
-        val loadedCartProducts: SafeLiveData<CartProductInfoList>
-        val pageProducts: SafeLiveData<CartProductInfoList>
-        fun loadCurrentPageProducts()
-        fun plusPage()
-        fun minusPage()
+
         fun checkPlusPageAble()
         fun checkMinusPageAble()
-        fun deleteProductItem(position: Int)
-        fun addProductInOrder(position: Int)
-        fun deleteProductInOrder(position: Int)
-        fun updateProductCount(position: Int, count: Int)
-        fun updateCurrentPageCartView()
-        fun changeCurrentPageProductsOrder()
+        fun addProductInOrder(cartProductModel: CartProductModel)
+        fun deleteProductInOrder(cartProductModel: CartProductModel)
+        fun updateProductCount(cartProductModel: CartProductModel, count: Int)
+        fun deleteProductItem(cartProductModel: CartProductModel)
+        fun plusPage()
+        fun minusPage()
+        fun refreshCurrentPage()
+        fun changeCurrentPageProductsOrder(isOrdered: Boolean)
+        fun checkCurrentPageProductsOrderState()
+        fun updateOrderPrice()
+        fun updateOrderCount()
+        fun updateProductPrice(cartProductModel: CartProductModel)
+        fun orderSelectedCart()
     }
 
     interface View {
-        fun setCartItems(productModels: List<CartProductInfoModel>)
+        fun setCartItems(productModels: List<CartProductModel>)
         fun setUpPlusPageState(isEnable: Boolean)
         fun setUpMinusPageState(isEnable: Boolean)
+        fun setOrderPrice(totalPrice: Int)
+        fun setOrderCount(count: Int)
+        fun setAllOrderState(isAllOrder: Boolean)
+        fun setProductPrice(price: Int)
+        fun setPage(page: String)
+        fun setLoadingViewVisible(isVisible: Boolean)
+        fun showOrderView(orderCarts: List<OrderCartModel>)
+        fun showCountUpdateFailView()
+        fun showCartInfoFailView()
     }
 }

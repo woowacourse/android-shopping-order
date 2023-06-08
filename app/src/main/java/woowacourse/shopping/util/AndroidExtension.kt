@@ -15,6 +15,15 @@ inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(key: String)
     }
 }
 
+@Suppress("DEPRECATION")
+inline fun <reified T : Parcelable> Intent.getParcelableArrayListExtraCompat(key: String): ArrayList<T>? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableArrayListExtra(key, T::class.java)
+    } else {
+        getParcelableArrayListExtra(key)
+    }
+}
+
 fun Activity.noIntentExceptionHandler(errorMessage: String) {
     Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     finish()
