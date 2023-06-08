@@ -11,8 +11,9 @@ class DefaultOrderRemoteDataSource(private val service: OrderService) : OrderRem
     override fun addOrder(order: PostOrderRequest, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         service.requestOrder(order).enqueue(object : Callback<PostOrderResponse> {
             override fun onResponse(call: Call<PostOrderResponse>, response: Response<PostOrderResponse>) {
-                if(response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()!!.orderId)
+                val responseBody = response.body()
+                if(response.isSuccessful && responseBody != null) {
+                    onSuccess(responseBody.orderId)
                 }
                 else {
                     onFailure(response.message().ifBlank { MESSAGE_ORDER_FAILED })

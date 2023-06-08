@@ -32,8 +32,9 @@ class DefaultProductRemoteDataSource(private val service: ProductService) : Prod
     override fun getProduct(id: Int, onSuccess: (Product) -> Unit, onFailure: (String) -> Unit) {
         service.requestProduct(id).enqueue(object : Callback<GetProductResponse> {
             override fun onResponse(call: Call<GetProductResponse>, response: Response<GetProductResponse>) {
-                if(response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()!!.toDomain())
+                val responseBody = response.body()
+                if(response.isSuccessful && responseBody != null) {
+                    onSuccess(responseBody.toDomain())
                 }
                 else {
                     onFailure(response.message().ifBlank { MESSAGE_GET_PRODUCT_FAILED })

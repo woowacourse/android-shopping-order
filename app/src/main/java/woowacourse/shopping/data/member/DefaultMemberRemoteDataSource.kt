@@ -16,8 +16,9 @@ class DefaultMemberRemoteDataSource(private val service: MemberService) : Member
     override fun getPoints(onSuccess: (Int) -> Unit, onFailure: (String) -> Unit) {
         service.requestPoints().enqueue(object : Callback<GetPointsResponse> {
             override fun onResponse(call: Call<GetPointsResponse>, response: Response<GetPointsResponse>) {
-                if(response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()!!.points)
+                val responseBody = response.body()
+                if(response.isSuccessful && responseBody != null) {
+                    onSuccess(responseBody.points)
                 }
                 else {
                     onFailure(response.message().ifBlank { MESSAGE_GET_POINTS_FAILED })
@@ -36,8 +37,9 @@ class DefaultMemberRemoteDataSource(private val service: MemberService) : Member
                 call: Call<List<GetOrderHistoryResponse>>,
                 response: Response<List<GetOrderHistoryResponse>>
             ) {
-                if(response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()!!.map { it.toDomain() })
+                val responseBody = response.body()
+                if(response.isSuccessful && responseBody != null) {
+                    onSuccess(responseBody.map { it.toDomain() })
                 }
                 else {
                     onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_HISTORIES_FAILED })
@@ -53,8 +55,9 @@ class DefaultMemberRemoteDataSource(private val service: MemberService) : Member
     override fun getOrder(id: Int, onSuccess: (Order) -> Unit, onFailure: (String) -> Unit) {
         service.requestOrder(id).enqueue(object : Callback<GetOrderResponse> {
             override fun onResponse(call: Call<GetOrderResponse>, response: Response<GetOrderResponse>) {
-                if(response.isSuccessful && response.body() != null) {
-                    onSuccess(response.body()!!.toDomain())
+                val responseBody = response.body()
+                if(response.isSuccessful && responseBody != null) {
+                    onSuccess(responseBody.toDomain())
                 }
                 else {
                     onFailure(response.message().ifBlank { MESSAGE_GET_ORDER_FAILED })
