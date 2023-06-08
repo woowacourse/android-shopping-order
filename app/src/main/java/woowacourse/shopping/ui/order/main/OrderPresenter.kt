@@ -31,7 +31,7 @@ class OrderPresenter(
                 view.showAvailablePoint(point)
             },
             onFailure = { errorMessage ->
-                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                Log.d(ERROR_TAG, "$ERROR_LOG_MESSAGE : $errorMessage")
                 view.showLoadFailed(errorMessage)
             },
         )
@@ -56,7 +56,7 @@ class OrderPresenter(
             orderRequest = OrderRequest(orderItems.toList(), payment),
             onSuccess = { view.navigateToHome(cartProducts.sumOf { it.selectedCount.value }) },
             onFailure = { errorMessage ->
-                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                Log.d(ERROR_TAG, "$ERROR_LOG_MESSAGE : $errorMessage")
                 view.showLoadFailed(errorMessage)
             },
         )
@@ -68,5 +68,10 @@ class OrderPresenter(
                 view.navigateToHome(0)
             }
         }
+    }
+
+    companion object {
+        private const val ERROR_TAG = "error"
+        private const val ERROR_LOG_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다."
     }
 }

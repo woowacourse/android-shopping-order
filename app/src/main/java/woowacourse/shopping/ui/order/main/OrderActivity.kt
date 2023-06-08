@@ -65,24 +65,28 @@ class OrderActivity : AppCompatActivity(), View {
 
     override fun watchUsedPoints() {
         binding.pointEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun beforeTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun onTextChanged(inputValue: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val inputPoint =
+                    if (inputValue.isNullOrBlank()) {
+                        0
+                    } else {
+                        inputValue.toString().toInt()
+                    }
+
+                binding.discountPayment.setDiscount(inputPoint)
+                presenter.calculateFinalPayment(inputPoint)
             }
 
-            override fun afterTextChanged(p0: Editable?) {
-                if (binding.pointEditText.text != null) {
-                    val discountPoint = binding.pointEditText.text.toString().toInt()
-                    binding.discountPayment.setDiscount(discountPoint)
-                    presenter.calculateFinalPayment(discountPoint)
-                }
-            }
+            override fun afterTextChanged(p0: Editable?) {}
         })
     }
 
     override fun showTotalPayment(totalPayment: UiPrice) {
         binding.originalPrice = totalPayment
+        showFinalPayment(UiPrice(totalPayment.value))
     }
 
     override fun showFinalPayment(finalPayment: UiPrice) {
