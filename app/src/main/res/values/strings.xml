@@ -28,4 +28,7 @@
     <string name="order_detail_spend_point">사용한 포인트</string>
     <string name="order_detail_spend_price">결제 금액</string>
     <string name="order_point_error_message">사용할 포인트를 다시 확인해 주세요</string>
+    <string name="count_update_fail">수량 업데이트에 실패했습니다.</string>
+    <string name="cart_info_fail">장바구니 정보를 받아오는데 실패하였습니다.</string>
+    <string name="error_server">오류가 발생하였습니다. 다시 시도해 주세요.</string>
 </resources>

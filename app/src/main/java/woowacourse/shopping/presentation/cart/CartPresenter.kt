@@ -28,7 +28,10 @@ class CartPresenter(
             updateOrderPrice()
             view.setPage(paging.currentPage.value.toString())
             view.setLoadingViewVisible(false)
-        }, onFailure = {})
+        }, onFailure = {
+            view.showCartInfoFailView()
+            view.setLoadingViewVisible(false)
+        })
     }
 
     override fun checkPlusPageAble() {
@@ -65,7 +68,9 @@ class CartPresenter(
                 updateOrderCount()
                 updateOrderPrice()
             },
-            onFailure = {}
+            onFailure = {
+                view.showCountUpdateFailView()
+            }
         )
     }
 

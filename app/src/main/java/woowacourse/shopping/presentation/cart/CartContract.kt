@@ -34,5 +34,7 @@ interface CartContract {
         fun setPage(page: String)
         fun setLoadingViewVisible(isVisible: Boolean)
         fun showOrderView(orderCarts: List<OrderCartModel>)
+        fun showCountUpdateFailView()
+        fun showCartInfoFailView()
     }
 }

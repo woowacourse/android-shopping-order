@@ -23,7 +23,9 @@ class ProductListPresenter(
                 val foundCartItems = products.findCartItem(allCartItems)
                 view.loadProductItems(foundCartItems.map { it.toPresentation() })
                 view.setLoadingViewVisible(false)
-            }, onFailure = {})
+            }, onFailure = {
+                view.showErrorForServerView()
+            })
         }
     }
 
@@ -56,7 +58,9 @@ class ProductListPresenter(
     override fun updateCartCount() {
         cartRepository.getAllCartItems(onSuccess = {
             view.showCartCount(CartProductInfoList(it).count)
-        }, onFailure = {})
+        }, onFailure = {
+            view.showErrorForServerView()
+        })
     }
 
     override fun addCartItem(cartProductModel: CartProductModel) {
@@ -72,7 +76,9 @@ class ProductListPresenter(
                 cartProductModel.id, onSuccess = {
                     updateCartCount()
                     refreshProductItems()
-                }, onFailure = {}
+                }, onFailure = {
+                view.showErrorForServerView()
+            }
             )
         } else {
             cartRepository.updateCartItemQuantity(
@@ -82,7 +88,9 @@ class ProductListPresenter(
                     updateCartCount()
                     refreshProductItems()
                 },
-                onFailure = {}
+                onFailure = {
+                    view.showErrorForServerView()
+                }
             )
         }
     }
@@ -93,7 +101,9 @@ class ProductListPresenter(
                 view.navigateToCart(cartProducts.map { it.toPresentation() })
             },
             onFailure =
-            {}
+            {
+                view.showErrorForServerView()
+            }
         )
     }
 

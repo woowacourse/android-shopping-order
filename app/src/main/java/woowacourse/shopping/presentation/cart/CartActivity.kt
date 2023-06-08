@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.common.PreferenceUtil
@@ -158,6 +159,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             binding.containerCart.visibility = View.VISIBLE
             binding.flCartList.visibility = View.GONE
         }
+    }
+
+    override fun showCountUpdateFailView() {
+        Toast.makeText(this, R.string.count_update_fail, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showCartInfoFailView() {
+        Toast.makeText(this, R.string.cart_info_fail, Toast.LENGTH_SHORT).show()
     }
 
     override fun setOrderPrice(totalPrice: Int) {

@@ -20,5 +20,6 @@ interface ProductListContract {
         fun showCartCount(count: Int)
         fun navigateToCart(cartProductModels: List<CartProductModel>)
         fun setLoadingViewVisible(isVisible: Boolean)
+        fun showErrorForServerView()
     }
 }

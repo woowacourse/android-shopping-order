@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
@@ -170,6 +171,10 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
             activityBinding.recyclerProduct.visibility = View.VISIBLE
             activityBinding.flProductList.visibility = View.GONE
         }
+    }
+
+    override fun showErrorForServerView() {
+        Toast.makeText(this, getString(R.string.error_server), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
