@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
-import woowacourse.shopping.RepositoryContainer
+import woowacourse.shopping.data.RepositoryContainer
 
 object ProductDetailPresenterProvider {
     fun create(

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.RepositoryContainer
+import woowacourse.shopping.data.RepositoryContainer
 
 object CartPresenterProvider {
     fun create(

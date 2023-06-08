@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.RepositoryContainer
+import woowacourse.shopping.data.RepositoryContainer
 
 object ShoppingPresenterProvider {
     private const val PAGE_SIZE = 20
