@@ -30,14 +30,18 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_order_products"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/view_footer"
             app:layout_constraintTop_toBottomOf="@id/tv_order_products_title" />
 
+
         <View
+            android:id="@+id/view_footer"
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:background="@color/boarder_color"

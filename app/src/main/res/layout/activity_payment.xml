@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_order_products_title" />
@@ -121,8 +122,8 @@
                 android:gravity="end"
                 android:hint="@string/hint_using_point"
                 android:inputType="number"
-                android:textColor="@color/main_color"
                 android:text="0"
+                android:textColor="@color/main_color"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_using_point_description"
                 app:layout_constraintEnd_toEndOf="parent"

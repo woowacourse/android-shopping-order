@@ -12,8 +12,8 @@ class OrderDetailPresenter(
         memberRepository.getOrderDetail(
             id,
             onSuccess = { orderDetail ->
-                view.setOrderDetail(orderDetail.toUIModel())
                 view.updateOrderProducts(orderDetail.toUIModel().orderItems)
+                view.setOrderDetail(orderDetail.toUIModel())
             }
         )
     }

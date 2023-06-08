@@ -19,5 +19,6 @@ class OrderDetailAdapter(
 
     fun update(orderItems: List<OrderProductUIModel>) {
         orderProducts = orderItems
+        notifyDataSetChanged()
     }
 }
