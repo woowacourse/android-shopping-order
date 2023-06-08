@@ -26,7 +26,16 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         binding = ActivityOrderDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initAdapter()
-        presenter.fetchOrderDetail(intent.getLongExtra(ORDER_ID, -1))
+        fetchData()
+    }
+
+    private fun fetchData() {
+        val id = intent.getLongExtra(ORDER_ID, -1)
+        if (id == -1L) {
+            showError("잘못된 아이디 값이 인텐트로 넘어왔습니다.")
+            finish()
+        }
+        presenter.fetchOrderDetail(id)
     }
 
     private fun initAdapter() {
