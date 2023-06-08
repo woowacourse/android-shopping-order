@@ -3,22 +3,24 @@ package woowacourse.shopping.data.remote
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.WoowaApplication
-import woowacourse.shopping.data.local.WoowaSharedPreference
 
 object ServicePool {
-    private val authStorage = WoowaSharedPreference(WoowaApplication.applicationContext)
-    private val client by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(authStorage.userToken))
-            .build()
-    }
     var server: UrlPool = UrlPool.LOGEON
         private set
-    val retrofitService: ShoppingOrderService get() = server.service
+    lateinit var retrofitService: ShoppingOrderService
+        private set
+    private lateinit var client: OkHttpClient
 
-    fun init(tag: UrlPool) {
+    fun init(tag: UrlPool, token: String) {
+        client = buildOkHttpClient(token)
         server = tag
+        retrofitService = buildRetrofit(tag.baseUrl)
+    }
+
+    private fun buildOkHttpClient(token: String): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(token))
+            .build()
     }
 
     private fun buildRetrofit(baseUrl: String): ShoppingOrderService {
@@ -30,8 +32,8 @@ object ServicePool {
             .create(ShoppingOrderService::class.java)
     }
 
-    enum class UrlPool(val service: ShoppingOrderService) {
-        SUNGHA(buildRetrofit("http://43.200.181.131:8080")),
-        LOGEON(buildRetrofit("http://13.125.169.219:8080")),
+    enum class UrlPool(val baseUrl: String) {
+        SUNGHA("http://43.200.181.131:8080"),
+        LOGEON("http://13.125.169.219:8080"),
     }
 }
