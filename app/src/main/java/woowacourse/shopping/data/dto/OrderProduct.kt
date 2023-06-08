@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class OrderProduct(
     val name: String,
     val imageUrl: String,
-    val count: Int,
+    val quantity: Int,
     val price: Int
 )

@@ -14,7 +14,7 @@ object OrderMapper : Mapper<Order, GetOrderResponse> {
                 OrderProduct(
                     name = it.product.title,
                     imageUrl = it.product.picture.value,
-                    count = it.quantity,
+                    quantity = it.quantity,
                     price = it.product.price
                 )
             },
@@ -29,7 +29,7 @@ object OrderMapper : Mapper<Order, GetOrderResponse> {
             products = orderItems.map {
                 CartProduct(
                     id = 0,
-                    quantity = it.count,
+                    quantity = it.quantity,
                     isChecked = true,
                     product = Product(
                         id = 0, picture = URL(it.imageUrl), title = it.name, price = it.price
