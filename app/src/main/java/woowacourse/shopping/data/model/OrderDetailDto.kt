@@ -1,9 +1,5 @@
 package woowacourse.shopping.data.model
 
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.OrderInfo
-import com.example.domain.model.Point
-import com.example.domain.model.Price
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,22 +12,3 @@ data class OrderDetailDto(
     val savedPoint: Int,
     val usedPoint: Int
 )
-
-@Serializable
-data class OrderDetailInfoDto(
-    val product: ProductDto,
-    val quantity: Int
-)
-
-fun OrderDetailDto.toDomain() =
-    OrderInfo(
-        orderId,
-        orderAt,
-        orderStatus.toDomain(),
-        Price(payAmount),
-        Point(usedPoint),
-        Point(savedPoint),
-        products.map { it.toDomain() }
-    )
-
-private fun OrderDetailInfoDto.toDomain() = OrderDetailProduct(quantity, product.toDomain())
