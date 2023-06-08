@@ -13,6 +13,7 @@ interface OrderContract {
         fun showFinalPayment(finalPayment: UiPrice)
         fun onOrderClickListener()
         fun navigateToHome(orderedProductCount: Int)
+        fun showLoadFailed(error: String)
     }
 
     abstract class Presenter(protected val view: View) {

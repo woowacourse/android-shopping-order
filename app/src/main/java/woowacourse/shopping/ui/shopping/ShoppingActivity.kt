@@ -29,6 +29,7 @@ import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.listener.CartProductClickListener
+import woowacourse.shopping.util.toast.Toaster
 import woowacourse.shopping.widget.SkeletonCounterView
 
 class ShoppingActivity :
@@ -127,6 +128,10 @@ class ShoppingActivity :
         presenter.updateCartCount(cartProduct, changedCount)
     }
 
+    override fun showLoadFailed(error: String) {
+        Toaster.showToast(this, LOAD_ERROR_MESSAGE.format(error))
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val product = intent?.getParcelableExtraCompat<UiProduct>(CART_PRODUCT_KEY) ?: return
@@ -138,6 +143,7 @@ class ShoppingActivity :
         private const val CART_PRODUCT_KEY = "product_key"
         private const val COUNT_KEY = "count_key"
         private const val SERVER_URL_KEY = "server_url_key"
+        private const val LOAD_ERROR_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다. : %s"
 
         fun getIntent(context: Context, product: UiProduct, count: Int): Intent =
             Intent(context, ShoppingActivity::class.java)

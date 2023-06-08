@@ -17,6 +17,7 @@ import woowacourse.shopping.ui.order.history.OrderHistoryContract.View
 import woowacourse.shopping.ui.order.history.recyclerview.adapter.history.HistoryAdapter
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.injectOrderHistoryPresenter
+import woowacourse.shopping.util.toast.Toaster
 
 class OrderHistoryActivity : AppCompatActivity(), View {
     private lateinit var binding: ActivityOrderHistoryBinding
@@ -40,6 +41,10 @@ class OrderHistoryActivity : AppCompatActivity(), View {
 
     override fun showOrderedProducts(orderedProducts: List<UiOrderResponse>) {
         adapter.submitList(orderedProducts)
+    }
+
+    override fun showLoadFailed(error: String) {
+        Toaster.showToast(this, LOAD_ERROR_MESSAGE.format(error))
     }
 
     private fun navigateToOrderDetail(orderId: Int) {
@@ -73,6 +78,8 @@ class OrderHistoryActivity : AppCompatActivity(), View {
     }
 
     companion object {
+        private const val LOAD_ERROR_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다. : %s"
+
         fun getIntent(context: Context): Intent = Intent(context, OrderHistoryActivity::class.java)
     }
 }

@@ -18,6 +18,7 @@ import woowacourse.shopping.ui.order.main.OrderActivity
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectCartPresenter
+import woowacourse.shopping.util.toast.Toaster
 
 class CartActivity : AppCompatActivity(), View, CartClickListener {
     private val presenter: CartPresenter by lazy {
@@ -71,6 +72,10 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
         showToast(getString(R.string.order_failed_message))
     }
 
+    override fun showLoadFailed(error: String) {
+        Toaster.showToast(this, LOAD_ERROR_MESSAGE.format(error))
+    }
+
     override fun navigateToHome() {
         finish()
     }
@@ -83,6 +88,7 @@ class CartActivity : AppCompatActivity(), View, CartClickListener {
 
     companion object {
         private const val START_PAGE = 1
+        private const val LOAD_ERROR_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다. : %s"
 
         fun getIntent(context: Context) = Intent(context, CartActivity::class.java)
     }

@@ -51,7 +51,10 @@ class CartPresenter(
                 _cartProduct.id,
                 _cartProduct.selectedCount,
                 onSuccess = { updateCart(newCart) },
-                onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
+                onFailure = { errorMessage ->
+                    Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                    view.showLoadFailed(errorMessage)
+                },
             )
         }
     }
@@ -77,7 +80,10 @@ class CartPresenter(
         cartRepository.deleteCartProductById(
             cartProduct.id,
             onSuccess = { updateCart(cart.delete(cartProduct.toDomain())) },
-            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
         )
     }
 
@@ -105,7 +111,10 @@ class CartPresenter(
                 updateCart(cart.update(cartProducts))
                 _totalCheckSize.postValue(cartProducts.size)
             },
-            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
         )
     }
 

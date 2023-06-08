@@ -30,7 +30,10 @@ class OrderPresenter(
             onSuccess = { point ->
                 view.showAvailablePoint(point)
             },
-            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
         )
     }
 
@@ -52,7 +55,10 @@ class OrderPresenter(
         orderProductRepository.orderProduct(
             orderRequest = OrderRequest(orderItems.toList(), payment),
             onSuccess = { view.navigateToHome(cartProducts.sumOf { it.selectedCount.value }) },
-            onFailure = { Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $it") },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
         )
     }
 

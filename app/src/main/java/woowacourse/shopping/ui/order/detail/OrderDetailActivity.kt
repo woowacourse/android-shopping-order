@@ -14,6 +14,7 @@ import woowacourse.shopping.ui.order.detail.OrderDetailContract.View
 import woowacourse.shopping.ui.order.detail.recyclerview.adapter.DetailAdapter
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.injectOrderDetailPresenter
+import woowacourse.shopping.util.toast.Toaster
 
 class OrderDetailActivity : AppCompatActivity(), View {
     private lateinit var binding: ActivityOrderDetailBinding
@@ -49,6 +50,10 @@ class OrderDetailActivity : AppCompatActivity(), View {
         binding.rvProducts.adapter = adapter
     }
 
+    override fun showLoadFailed(error: String) {
+        Toaster.showToast(this, LOAD_ERROR_MESSAGE.format(error))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         presenter.navigateToHome(item.itemId)
         return super.onOptionsItemSelected(item)
@@ -60,6 +65,7 @@ class OrderDetailActivity : AppCompatActivity(), View {
 
     companion object {
         private const val ORDER_DETAIL_KEY = "order_detail_key"
+        private const val LOAD_ERROR_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다. : %s"
 
         fun getIntent(context: Context, orderId: Int): Intent =
             Intent(context, OrderDetailActivity::class.java)

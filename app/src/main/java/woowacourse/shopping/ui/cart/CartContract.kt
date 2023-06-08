@@ -12,6 +12,7 @@ interface CartContract {
         fun updateTotalPrice(totalPrice: Int)
         fun showOrderComplete(cartProducts: List<CartProduct>, productCount: Int)
         fun showOrderFailed()
+        fun showLoadFailed(error: String)
         fun navigateToHome()
         fun navigateToOrder(cartProducts: List<CartProduct>)
     }

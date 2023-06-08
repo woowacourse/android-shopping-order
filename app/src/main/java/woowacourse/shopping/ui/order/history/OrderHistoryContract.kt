@@ -6,6 +6,7 @@ interface OrderHistoryContract {
     interface View {
         fun navigateToHome()
         fun showOrderedProducts(orderedProducts: List<UiOrderResponse>)
+        fun showLoadFailed(error: String)
     }
 
     abstract class Presenter(protected val view: View) {

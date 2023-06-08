@@ -8,6 +8,7 @@ interface OrderDetailContract {
         fun navigateToHome()
         fun showOrderDetailPaymentInfo(payment: UiPayment)
         fun showOrderDetailProducts(orderedProducts: List<UiOrderedProduct>)
+        fun showLoadFailed(error: String)
     }
 
     abstract class Presenter(protected val view: View) {
