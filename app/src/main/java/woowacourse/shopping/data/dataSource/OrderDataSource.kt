@@ -6,8 +6,26 @@ import woowacourse.shopping.data.dto.OrderListResponse
 import woowacourse.shopping.data.dto.OrderRequest
 
 interface OrderDataSource {
-    fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfoDto?) -> Unit)
-    fun postOrderItem(orderRequest: OrderRequest, callback: () -> Unit)
-    fun getOrderHistories(callback: (OrderListResponse?) -> Unit)
-    fun getOrderHistory(id: Int, callback: (OrderHistoryDto?) -> Unit)
+    fun getOrderItemsInfo(
+        ids: List<Int>,
+        onSuccess: (OrderInfoDto) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun postOrderItem(
+        orderRequest: OrderRequest,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun getOrderHistories(
+        onSuccess: (OrderListResponse) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun getOrderHistory(
+        id: Int,
+        onSuccess: (OrderHistoryDto) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
 }

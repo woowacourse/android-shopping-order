@@ -4,8 +4,27 @@ import woowacourse.shopping.model.OrderHistory
 import woowacourse.shopping.model.OrderInfo
 
 interface OrderRepository {
-    fun getOrderInfo(ids: List<Int>, callback: (OrderInfo?) -> Unit)
-    fun postOrder(ids: List<Int>, usedPoints: Int, callback: () -> Unit)
-    fun getOrderHistoryList(callback: (List<OrderHistory>?) -> Unit)
-    fun getOrderHistory(id: Int, callback: (OrderHistory?) -> Unit)
+    fun getOrderInfo(
+        ids: List<Int>,
+        onSuccess: (OrderInfo) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun postOrder(
+        ids: List<Int>,
+        usedPoints: Int,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun getOrderHistoryList(
+        onSuccess: (List<OrderHistory>) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
+
+    fun getOrderHistory(
+        id: Int,
+        onSuccess: (OrderHistory) -> Unit,
+        onFailure: (Exception) -> Unit,
+    )
 }

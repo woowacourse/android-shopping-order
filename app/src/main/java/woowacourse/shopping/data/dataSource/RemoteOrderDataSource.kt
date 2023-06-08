@@ -1,82 +1,64 @@
 package woowacourse.shopping.data.dataSource
 
-import retrofit2.Call
-import retrofit2.Response
 import woowacourse.shopping.data.dto.OrderHistoryDto
 import woowacourse.shopping.data.dto.OrderInfoDto
 import woowacourse.shopping.data.dto.OrderListResponse
 import woowacourse.shopping.data.dto.OrderRequest
 import woowacourse.shopping.data.service.RetrofitClient
 import woowacourse.shopping.data.service.RetrofitOrderService
+import woowacourse.shopping.data.utils.createResponseCallback
 
 class RemoteOrderDataSource(
     private val service: RetrofitOrderService = RetrofitClient.getInstance().retrofitOrderService,
 ) : OrderDataSource {
-    override fun getOrderItemsInfo(ids: List<Int>, callback: (OrderInfoDto?) -> Unit) {
+    override fun getOrderItemsInfo(
+        ids: List<Int>,
+        onSuccess: (OrderInfoDto) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
         service.orderCart(ids).enqueue(
-            object : retrofit2.Callback<OrderInfoDto> {
-                override fun onResponse(
-                    call: Call<OrderInfoDto>,
-                    response: Response<OrderInfoDto>,
-                ) {
-                    callback(response.body())
-                }
-
-                override fun onFailure(call: Call<OrderInfoDto>, t: Throwable) {
-                    callback(null)
-                }
-            },
+            createResponseCallback(
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            ),
         )
     }
 
-    override fun postOrderItem(orderRequest: OrderRequest, callback: () -> Unit) {
+    override fun postOrderItem(
+        orderRequest: OrderRequest,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
         service.postOrderItem(orderRequest).enqueue(
-            object : retrofit2.Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    callback()
-                }
-
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    callback()
-                }
-            },
+            createResponseCallback(
+                onSuccess = { onSuccess() },
+                onFailure = onFailure,
+            ),
         )
     }
 
-    override fun getOrderHistories(callback: (OrderListResponse?) -> Unit) {
+    override fun getOrderHistories(
+        onSuccess: (OrderListResponse) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
         service.getOrders().enqueue(
-            object : retrofit2.Callback<OrderListResponse> {
-                override fun onResponse(
-                    call: Call<OrderListResponse>,
-                    response: Response<OrderListResponse>,
-                ) {
-                    callback(response.body())
-                }
-
-                override fun onFailure(call: Call<OrderListResponse>, t: Throwable) {
-                    callback(null)
-                }
-            },
+            createResponseCallback(
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            ),
         )
     }
 
-    override fun getOrderHistory(id: Int, callback: (OrderHistoryDto?) -> Unit) {
+    override fun getOrderHistory(
+        id: Int,
+        onSuccess: (OrderHistoryDto) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
         service.getOrder(id).enqueue(
-            object : retrofit2.Callback<OrderHistoryDto> {
-                override fun onResponse(
-                    call: Call<OrderHistoryDto>,
-                    response: Response<OrderHistoryDto>,
-                ) {
-                    callback(response.body())
-                }
-
-                override fun onFailure(call: Call<OrderHistoryDto>, t: Throwable) {
-                    callback(null)
-                }
-            },
+            createResponseCallback(
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            ),
         )
     }
 }

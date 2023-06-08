@@ -11,11 +11,17 @@ class OrderPresenter(
     private lateinit var orderInfo: OrderInfoUIModel
 
     override fun getOrderInfo(ids: List<Int>) {
-        orderRepository.getOrderInfo(ids) {
-            orderInfo = it?.toUIModel() ?: throw IllegalArgumentException("주문 정보를 가져오는데 실패했습니다.")
-            view.initOrderPageInfo(orderInfo)
-            view.updatePurchasePrice(0, orderInfo.totalPrice)
-        }
+        orderRepository.getOrderInfo(
+            ids,
+            {
+                orderInfo = it.toUIModel()
+                view.initOrderPageInfo(orderInfo)
+                view.updatePurchasePrice(0, orderInfo.totalPrice)
+            },
+            {
+                throw IllegalArgumentException("주문 정보를 가져오는데 실패했습니다.")
+            },
+        )
     }
 
     override fun checkPointAvailable(pointPrice: Int?) {
@@ -54,9 +60,12 @@ class OrderPresenter(
 
     override fun order(point: Int) {
         val orderItemIds: List<Int> = orderInfo.cartItems.map { it.id }
-        orderRepository.postOrder(orderItemIds, point) {
+
+        orderRepository.postOrder(orderItemIds, point, {
             view.showOrderSuccessMessage()
             view.navigateToShopping()
-        }
+        }, {
+            throw IllegalArgumentException("주문하기를 실패했습니다.")
+        })
     }
 }
