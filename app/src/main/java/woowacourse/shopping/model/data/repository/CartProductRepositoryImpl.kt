@@ -13,7 +13,9 @@ import woowacourse.shopping.server.retrofit.createResponseCallback
 class CartProductRepositoryImpl(
     private val service: CartItemsService
 ) : CartProductRepository {
-    private var cartProducts = emptyList<CartProduct>()
+    private var _cartProducts = emptyList<CartProduct>()
+    override val cartProducts
+        get() = _cartProducts.toList()
 
     init {
         fetchCartProducts()
@@ -23,25 +25,19 @@ class CartProductRepositoryImpl(
         service.getCartItems().enqueue(
             createResponseCallback(
                 onSuccess = { received ->
-                    cartProducts = received.map { it.toDomain() }
-                    onSuccess(cartProducts)
+                    _cartProducts = received.map { it.toDomain() }
+                    onSuccess(_cartProducts)
                 },
                 onFailure = { throw IllegalStateException("서버 통신 실패") }
             )
         )
     }
 
-    override fun getAllProductsCount(): Int {
-        return cartProducts.sumOf { cartProduct ->
-            cartProduct.count.value
-        }
-    }
-
     override fun loadCartProducts(index: Pair<Int, Int>): List<CartProduct> {
-        if (index.first >= cartProducts.size) {
+        if (index.first >= _cartProducts.size) {
             return emptyList()
         }
-        return cartProducts.subList(index.first, minOf(index.second, cartProducts.size))
+        return _cartProducts.subList(index.first, minOf(index.second, _cartProducts.size))
     }
 
     override fun update(cartProduct: CartProduct) {
@@ -58,7 +54,7 @@ class CartProductRepositoryImpl(
     }
 
     override fun updateCount(product: Product, count: Int, updateCartBadge: () -> Unit) {
-        val cartProduct = cartProducts.find { it.product.id == product.id } ?: throw IllegalStateException("상품을 찾을 수 없습니다.")
+        val cartProduct = _cartProducts.find { it.product.id == product.id } ?: throw IllegalStateException("상품을 찾을 수 없습니다.")
         service.patchCartItem(cartProduct.id, count).enqueue(
             createResponseCallback(
                 onSuccess = {
@@ -82,19 +78,6 @@ class CartProductRepositoryImpl(
         fetchCartProducts()
     }
 
-    override fun findCountById(id: Long): Int {
-        val cartProduct = cartProducts.find {
-            it.product.id == id
-        } ?: return 0
-        return cartProduct.count.value
-    }
-
-    override fun getTotalPrice(): Int =
-        cartProducts.filter { it.isSelected }.sumOf { it.product.price * it.count.value }
-
-    override fun getTotalCount(): Int =
-        cartProducts.filter { it.isSelected }.sumOf { it.count.value }
-
     override fun remove(cartProduct: CartProduct) {
         service.deleteCartItem(cartProduct.id).enqueue(
             createResponseCallback(
@@ -106,16 +89,6 @@ class CartProductRepositoryImpl(
                 }
             )
         )
-    }
-
-    override fun getCheckedCartItems(): Array<Long> {
-        val cartItemIds = mutableListOf<Long>()
-        cartProducts.forEach { cartProduct ->
-            if (cartProduct.isSelected) {
-                cartItemIds.add(cartProduct.id)
-            }
-        }
-        return cartItemIds.toTypedArray()
     }
 
     override fun getCartItemsWithIds(cartItemIds: List<Long>, onSuccess: (List<OrderProduct>) -> Unit) {

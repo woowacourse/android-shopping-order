@@ -94,14 +94,19 @@ class ShoppingCartPresenter(
     }
 
     override fun getTotalPrice(): Int =
-        cartProductRepository.getTotalPrice()
+        cartProductRepository.cartProducts.filter { it.isSelected }.sumOf { it.product.price * it.count.value }
 
     override fun getTotalCount(): Int =
-        cartProductRepository.getTotalCount()
+        cartProductRepository.cartProducts.filter { it.isSelected }.sumOf { it.count.value }
 
     override fun getCheckedCartItems() {
-        val cartIds = cartProductRepository.getCheckedCartItems()
-        view.showPaymentPage(cartIds)
+        val cartItemIds = mutableListOf<Long>()
+        cartProductRepository.cartProducts.forEach { cartProduct ->
+            if (cartProduct.isSelected) {
+                cartItemIds.add(cartProduct.id)
+            }
+        }
+        view.showPaymentPage(cartItemIds.toTypedArray())
     }
 
     private fun setButtonViews() {

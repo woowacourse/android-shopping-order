@@ -50,11 +50,17 @@ class ShoppingMainPresenter(
     }
 
     override fun updateCartBadge() {
-        view.updateCartBadgeCount(cartProductRepository.getAllProductsCount())
+        val count = cartProductRepository.cartProducts.sumOf { cartProduct ->
+            cartProduct.count.value
+        }
+        view.updateCartBadgeCount(count)
     }
 
     override fun updateProductCartCount(productUIModel: ProductUIModel): Int {
-        return cartProductRepository.findCountById(productUIModel.id)
+        val cartProduct = cartProductRepository.cartProducts.find {
+            it.product.id == productUIModel.id
+        } ?: return 0
+        return cartProduct.count.value
     }
 
     override fun addToCart(productUIModel: ProductUIModel) {
