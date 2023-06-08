@@ -104,7 +104,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun showCartProducts() {
         binding.cartProductRv.visibility = VISIBLE
-        binding.skeletonLl.visibility = GONE
+        binding.skeletonLayout.visibility = GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

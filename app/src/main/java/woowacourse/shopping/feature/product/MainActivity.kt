@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun showProducts() {
         binding.productRv.visibility = VISIBLE
-        binding.skeletonGl.visibility = GONE
+        binding.skeletonLayout.visibility = GONE
     }
 
     private fun initList() {
