@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class OrderDetailEntity(
     val id: Long,
     val usedPoint: Int,

@@ -30,7 +30,6 @@ interface CartService {
     ): Call<Unit>
 
     companion object {
-        private const val HEADER_JSON = "Content-Type: application/json"
         private const val PATH_CART = "/cart-items"
         private const val PATH_CART_ID = "cartItemId"
     }

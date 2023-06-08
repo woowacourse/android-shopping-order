@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CartRemoteEntity(
     val id: Long,
     val quantity: Int,
-    @SerializedName("product")
-    val productEntity: ProductEntity,
+    val product: ProductEntity,
 ) {
     companion object {
         val errorData: CartRemoteEntity = CartRemoteEntity(-1L, -1, ProductEntity.errorData)

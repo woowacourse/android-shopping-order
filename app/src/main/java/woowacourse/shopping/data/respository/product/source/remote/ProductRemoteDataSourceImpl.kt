@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
 import retrofit2.Retrofit
-import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.model.ProductEntity
 import woowacourse.shopping.data.respository.product.source.remote.service.ProductService
-import woowacourse.shopping.presentation.model.ProductModel
 
 class ProductRemoteDataSourceImpl(
     retrofit: Retrofit,
@@ -17,10 +16,10 @@ class ProductRemoteDataSourceImpl(
         onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
         productService.requestProducts()
-            .enqueue(object : retrofit2.Callback<List<ProductModel>> {
+            .enqueue(object : retrofit2.Callback<List<ProductEntity>> {
                 override fun onResponse(
-                    call: retrofit2.Call<List<ProductModel>>,
-                    response: retrofit2.Response<List<ProductModel>>,
+                    call: retrofit2.Call<List<ProductEntity>>,
+                    response: retrofit2.Response<List<ProductEntity>>,
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body() ?: return onFailure()
@@ -28,14 +27,14 @@ class ProductRemoteDataSourceImpl(
                             CartRemoteEntity(
                                 DUMMY_CART_ID,
                                 DEFAULT_QUANTITY,
-                                productModel.toEntity(),
+                                productModel,
                             )
                         }
                         onSuccess(products)
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<List<ProductModel>>, t: Throwable) {
+                override fun onFailure(call: retrofit2.Call<List<ProductEntity>>, t: Throwable) {
                     onFailure()
                 }
             })
@@ -47,20 +46,20 @@ class ProductRemoteDataSourceImpl(
         onSuccess: (product: CartRemoteEntity) -> Unit,
     ) {
         productService.requestProductById(productId)
-            .enqueue(object : retrofit2.Callback<ProductModel> {
+            .enqueue(object : retrofit2.Callback<ProductEntity> {
                 override fun onResponse(
-                    call: retrofit2.Call<ProductModel>,
-                    response: retrofit2.Response<ProductModel>,
+                    call: retrofit2.Call<ProductEntity>,
+                    response: retrofit2.Response<ProductEntity>,
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body() ?: return onFailure()
                         val product =
-                            CartRemoteEntity(DUMMY_CART_ID, DEFAULT_QUANTITY, body.toEntity())
+                            CartRemoteEntity(DUMMY_CART_ID, DEFAULT_QUANTITY, body)
                         onSuccess(product)
                     }
                 }
 
-                override fun onFailure(call: retrofit2.Call<ProductModel>, t: Throwable) {
+                override fun onFailure(call: retrofit2.Call<ProductEntity>, t: Throwable) {
                     onFailure()
                 }
             })

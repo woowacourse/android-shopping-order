@@ -7,13 +7,13 @@ import woowacourse.shopping.presentation.model.CartModel
 fun CartRemoteEntity.toUIModel(): CartModel =
     CartModel(
         id = id,
-        product = productEntity.toUIModel(),
+        product = product.toUIModel(),
         count = quantity,
         checked = true,
     )
 
 fun CartRemoteEntity.toDomain(): CartProduct =
-    CartProduct(id, productEntity.toDomain(), quantity, checked = false)
+    CartProduct(id, product.toDomain(), quantity, checked = false)
 
 fun CartModel.toEntity(): CartRemoteEntity = CartRemoteEntity(id, count, product.toEntity())
 
