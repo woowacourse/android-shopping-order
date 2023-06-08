@@ -146,9 +146,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         finish()
     }
 
-    override fun handleErrorView(message: String) {
+    override fun handleErrorView(messageId: Int) {
         binding.root.post {
-            showToast(message)
+            showToast(getString(messageId))
             finish()
         }
     }

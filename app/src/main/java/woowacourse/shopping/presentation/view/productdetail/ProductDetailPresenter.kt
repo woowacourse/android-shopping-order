@@ -1,5 +1,8 @@
 package woowacourse.shopping.presentation.view.productdetail
 
+import okio.IOException
+import retrofit2.HttpException
+import woowacourse.shopping.R
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
@@ -21,12 +24,17 @@ class ProductDetailPresenter(
     }
 
     private fun onFailure(throwable: Throwable) {
-        throwable.message?.let { view.handleErrorView(it) }
+        val messageId = when (throwable) {
+            is IOException -> { R.string.toast_message_network_error }
+            is HttpException -> { R.string.toast_message_http_error }
+            else -> { R.string.toast_message_system_error }
+        }
+        view.handleErrorView(messageId)
     }
 
     private fun loadProductInfo() {
         if (product.id == UNABLE_ID) {
-            view.handleErrorView("")
+            view.handleErrorView(R.string.toast_message_wrong_approach)
             view.exitProductDetailView()
             return
         }

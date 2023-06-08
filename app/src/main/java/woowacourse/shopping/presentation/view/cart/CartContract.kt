@@ -14,7 +14,7 @@ interface CartContract {
         fun showPageCountView(page: Int)
         fun showTotalPriceView(totalPrice: Int)
         fun showOrderView(cartIds: ArrayList<Long>)
-        fun handleErrorView(message: String)
+        fun handleErrorView(messageId: Int)
     }
 
     interface Presenter {

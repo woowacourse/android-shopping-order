@@ -10,7 +10,7 @@ interface OrderDetailContract {
         fun showTotalPriceView(totalPrice: Int)
         fun showUsedPointView(usedPoint: Int)
         fun showSavedPointView(savedPoint: Int)
-        fun handleErrorView(message: String)
+        fun handleErrorView(messageId: Int)
     }
 
     interface Presenter {

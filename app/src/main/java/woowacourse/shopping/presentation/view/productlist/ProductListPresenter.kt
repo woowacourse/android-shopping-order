@@ -1,5 +1,8 @@
 package woowacourse.shopping.presentation.view.productlist
 
+import okio.IOException
+import retrofit2.HttpException
+import woowacourse.shopping.R
 import woowacourse.shopping.presentation.mapper.toModel
 import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -64,7 +67,11 @@ class ProductListPresenter(
     }
 
     private fun onFailure(throwable: Throwable) {
-        throwable.message?.let { view.handleErrorView(it) }
+        when (throwable) {
+            is IOException -> { view.handleErrorView(R.string.toast_message_network_error) }
+            is HttpException -> { view.handleErrorView(R.string.toast_message_http_error) }
+            else -> { view.handleErrorView(R.string.toast_message_system_error) }
+        }
     }
 
     override fun setCartProductItems(products: List<CartProductModel>) {

@@ -53,7 +53,11 @@
     <string name="toolbar_title_order_list">Order List</string>
 
     <string name="toast_message_success_add_cart">장바구니에 담았습니다.</string>
+    <string name="toast_message_wrong_approach">잘못된 접근입니다. 다시 시도 해주세요.</string>
     <string name="toast_message_system_error">시스템 오류가 발생했습니다. 다시 시도 해주세요.</string>
+    <string name="toast_message_network_error">네트워크 상태를 확인해주세요.</string>
+    <string name="toast_message_http_error">통신에 실패했습니다. 다시 시도 해주세요.</string>
+
     <string name="product_detail_price_info">금액</string>
     <string name="item_product_list_more_text">더보기</string>
     <string name="main_radio_button_text_sunny">써니 로그인</string>
