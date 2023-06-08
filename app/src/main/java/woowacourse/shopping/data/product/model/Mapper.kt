@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.product.model
 
-import com.example.domain.Product
+import com.example.domain.product.Product
 import woowacourse.shopping.data.product.model.dto.ProductDto
 
 fun ProductDto.toDomain(): Product {

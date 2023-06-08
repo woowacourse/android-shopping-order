@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import com.example.domain.Product
-import com.example.domain.RecentProduct
+import com.example.domain.product.Product
+import com.example.domain.product.recent.RecentProduct
 import woowacourse.shopping.util.BANDAL
 import java.time.LocalDateTime
 import java.time.ZoneOffset

@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.product.recent
 
 import java.time.LocalDateTime
 

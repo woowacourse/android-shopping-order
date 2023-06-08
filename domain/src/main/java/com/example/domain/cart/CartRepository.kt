@@ -1,6 +1,5 @@
-package com.example.domain.repository
+package com.example.domain.cart
 
-import com.example.domain.CartProduct
 import com.example.domain.Pagination
 
 interface CartRepository {

@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.repository.CartRepository
+import com.example.domain.cart.CartRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.cart.CartRemoteRepository

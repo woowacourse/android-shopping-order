@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.recentproduct
 
 import android.content.Context
-import com.example.domain.Product
-import com.example.domain.RecentProduct
-import com.example.domain.repository.RecentProductRepository
+import com.example.domain.product.Product
+import com.example.domain.product.recent.RecentProduct
+import com.example.domain.product.recent.RecentProductRepository
 import woowacourse.shopping.util.BANDAL
 import java.time.LocalDateTime
 

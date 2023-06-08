@@ -1,7 +1,6 @@
-package com.example.domain.repository
+package com.example.domain.product.recent
 
-import com.example.domain.Product
-import com.example.domain.RecentProduct
+import com.example.domain.product.Product
 import java.time.LocalDateTime
 
 interface RecentProductRepository {

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.order.OrderProduct
-import com.example.domain.repository.OrderRepository
+import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.order.OrderRemoteRepository

@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.domain.repository.OrderRepository
+import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.order.OrderRemoteRepository

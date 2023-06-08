@@ -1,9 +1,9 @@
 package woowacourse.shopping.feature.cart
 
-import com.example.domain.Cart
-import com.example.domain.CartProduct
 import com.example.domain.Pagination
-import com.example.domain.repository.CartRepository
+import com.example.domain.cart.Cart
+import com.example.domain.cart.CartProduct
+import com.example.domain.cart.CartRepository
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.mapper.toUi
 

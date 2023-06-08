@@ -2,8 +2,8 @@ package woowacourse.shopping.data.order
 
 import com.example.domain.FixedDiscountPolicy
 import com.example.domain.order.Order
+import com.example.domain.order.OrderRepository
 import com.example.domain.order.OrderSummary
-import com.example.domain.repository.OrderRepository
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback

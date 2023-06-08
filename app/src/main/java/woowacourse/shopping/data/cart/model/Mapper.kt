@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.cart.model
 
-import com.example.domain.Cart
-import com.example.domain.CartProduct
 import com.example.domain.Pagination
+import com.example.domain.cart.Cart
+import com.example.domain.cart.CartProduct
 import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 import woowacourse.shopping.data.cart.model.dto.response.CartResponse
 import woowacourse.shopping.data.product.model.dto.PaginationDto

@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.product
 
 data class Product(
     val id: Long,

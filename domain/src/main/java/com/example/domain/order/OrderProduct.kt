@@ -1,6 +1,6 @@
 package com.example.domain.order
 
-import com.example.domain.Product
+import com.example.domain.product.Product
 
 data class OrderProduct(
     val id: Long,

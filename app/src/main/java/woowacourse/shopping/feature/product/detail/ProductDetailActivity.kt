@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View.GONE
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.repository.CartRepository
+import com.example.domain.cart.CartRepository
 import woowacourse.shopping.R
 import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.cart.CartRemoteRepository

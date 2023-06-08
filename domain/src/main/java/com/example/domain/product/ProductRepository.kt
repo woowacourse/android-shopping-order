@@ -1,7 +1,6 @@
-package com.example.domain.repository
+package com.example.domain.product
 
 import com.example.domain.Pagination
-import com.example.domain.Product
 
 interface ProductRepository {
     fun requestFetchProductsUnit(

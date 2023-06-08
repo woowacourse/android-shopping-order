@@ -1,10 +1,10 @@
 
 package woowacourse.shopping.feature.order.detail
 
-import com.example.domain.Product
 import com.example.domain.order.Order
 import com.example.domain.order.OrderProduct
-import com.example.domain.repository.OrderRepository
+import com.example.domain.order.OrderRepository
+import com.example.domain.product.Product
 import io.mockk.justRun
 import io.mockk.mockk
 import org.junit.Before

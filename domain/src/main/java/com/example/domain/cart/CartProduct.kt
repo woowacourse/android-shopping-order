@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.cart
 
 class CartProduct(
     val id: Long,

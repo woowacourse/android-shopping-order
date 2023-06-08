@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.cart
 
-import com.example.domain.CartProduct
 import com.example.domain.Pagination
-import com.example.domain.repository.CartRepository
+import com.example.domain.cart.CartProduct
+import com.example.domain.cart.CartRepository
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback

@@ -1,9 +1,9 @@
 package woowacourse.shopping.feature.order
 
-import com.example.domain.Cart
-import com.example.domain.CartProduct
 import com.example.domain.FixedDiscountPolicy
-import com.example.domain.repository.OrderRepository
+import com.example.domain.cart.Cart
+import com.example.domain.cart.CartProduct
+import com.example.domain.order.OrderRepository
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk

@@ -1,7 +1,7 @@
 package woowacourse.shopping.feature.order
 
-import com.example.domain.Cart
-import com.example.domain.repository.OrderRepository
+import com.example.domain.cart.Cart
+import com.example.domain.order.OrderRepository
 import woowacourse.shopping.model.mapper.toUi
 
 class OrderPresenter(
