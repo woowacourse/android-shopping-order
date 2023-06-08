@@ -12,8 +12,9 @@ class CartProduct(
 
     var quantity: Int = quantity
         set(value) {
-            field = value.coerceAtMost(MAX_COUNT_VALUE)
-            field = value.coerceAtLeast(MIN_COUNT_VALUE)
+            field =
+                if (value > MAX_COUNT_VALUE) MAX_COUNT_VALUE
+                else value.coerceAtLeast(MIN_COUNT_VALUE)
         }
 
     companion object {

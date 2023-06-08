@@ -24,7 +24,7 @@ class CartPresenter(
         cartRepository.requestFetchCartProductsUnit(
             Cart.MAX_SIZE, pageNumber,
             onFailure = {}, onSuccess = { cartProducts: List<CartProduct>, _: Pagination ->
-            cart.updateAll(cartProducts)
+            cart.setAll(cartProducts)
             loadCart()
             view.setCartPageNumber(pageNumber)
             view.showCartProducts()
@@ -82,7 +82,7 @@ class CartPresenter(
             cartRepository.updateCartProductQuantity(
                 id = cartProduct.id, quantity = cartProduct.quantity,
                 onFailure = {}, onSuccess = {
-                cart.updateProductQuantityByIndex(cartProduct.id, cartProduct.quantity)
+                cart.setProductQuantityById(cartProduct.id, cartProduct.quantity)
                 view.updateItem(cartProductState)
                 updatePaymentAmount()
             }
@@ -98,7 +98,7 @@ class CartPresenter(
             cartRepository.updateCartProductQuantity(
                 id = cartProduct.id, quantity = cartProduct.quantity,
                 onFailure = {}, onSuccess = {
-                cart.updateProductQuantityByIndex(cartProduct.id, cartProduct.quantity)
+                cart.setProductQuantityById(cartProduct.id, cartProduct.quantity)
                 view.updateItem(cartProductState)
                 updatePaymentAmount()
             }
@@ -107,7 +107,7 @@ class CartPresenter(
     }
 
     override fun updatePickedByCartId(cartId: Long, checked: Boolean) {
-        cart.updatePickedByIndex(cartId, checked)
+        cart.setPickedById(cartId, checked)
         updatePaymentAmount()
     }
 
@@ -126,7 +126,7 @@ class CartPresenter(
     }
 
     override fun changeAllPicked() {
-        if (cart.isAllPicked()) {
+        if (cart.isAllPicked) {
             cart.setAllPicked(false)
             return
         }
@@ -134,7 +134,7 @@ class CartPresenter(
     }
 
     override fun pickAll() {
-        when (cart.isAllPicked()) {
+        when (cart.isAllPicked) {
             true -> {
                 cart.setAllPicked(false)
                 view.setAllPickChecked(false)
