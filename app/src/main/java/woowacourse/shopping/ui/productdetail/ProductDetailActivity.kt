@@ -8,7 +8,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.producdetail.ProductDetailSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -46,7 +45,7 @@ class ProductDetailActivity :
                 ProductDetailSourceImpl(),
             ),
             CartRepositoryImpl(
-                ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this)),
+                ShoppingCartDataSourceImpl(),
             ),
             RecentProductDatabase(this),
         )

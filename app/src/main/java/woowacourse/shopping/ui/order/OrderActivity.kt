@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.model.Coupon
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistoryDataSourceImpl
@@ -36,15 +35,12 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             OrderRepositoryImpl(
                 OrderDataSourceImpl(
                     ServiceFactory.orderService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
                 OrderCompleteDataSourceImpl(
                     ServiceFactory.orderCompleteService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
                 OrderHistoryDataSourceImpl(
                     ServiceFactory.orderHistoryService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
             ),
         )

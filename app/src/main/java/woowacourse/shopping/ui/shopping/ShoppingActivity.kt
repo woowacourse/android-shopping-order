@@ -12,7 +12,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -47,7 +46,7 @@ class ShoppingActivity :
             ),
             RecentProductDatabase(this),
             CartRepositoryImpl(
-                ShoppingCartDataSourceImpl(AuthInfoDataSourceImpl.getInstance(this)),
+                ShoppingCartDataSourceImpl(),
             ),
         )
 

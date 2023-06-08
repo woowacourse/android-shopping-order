@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistoryDataSourceImpl
@@ -27,15 +26,12 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
             OrderRepositoryImpl(
                 OrderDataSourceImpl(
                     ServiceFactory.orderService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
                 OrderCompleteDataSourceImpl(
                     ServiceFactory.orderCompleteService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
                 OrderHistoryDataSourceImpl(
                     ServiceFactory.orderHistoryService,
-                    AuthInfoDataSourceImpl.getInstance(this),
                 ),
             ),
         )
