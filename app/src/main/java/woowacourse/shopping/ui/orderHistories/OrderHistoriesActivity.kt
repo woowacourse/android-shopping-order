@@ -6,8 +6,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
+import woowacourse.shopping.data.remote.OrderRetrofitDataSource
+import woowacourse.shopping.data.repository.OrderDefaultRepository
 import woowacourse.shopping.databinding.ActivityOrderHistoriesBinding
 import woowacourse.shopping.model.OrderHistoryUIModel
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -57,7 +57,7 @@ class OrderHistoriesActivity : AppCompatActivity(), OrderHistoriesContract.View 
     private fun initPresenter() {
         presenter = OrderHistoriesPresenter(
             this,
-            OrderRepositoryImpl(OrderRemoteDataSourceImpl())
+            OrderDefaultRepository(OrderRetrofitDataSource())
         )
     }
 

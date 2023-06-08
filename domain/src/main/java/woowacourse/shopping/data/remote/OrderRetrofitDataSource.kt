@@ -1,13 +1,12 @@
-package woowacourse.shopping.data.remoteDataSourceImpl
+package woowacourse.shopping.data.remote
 
 import woowacourse.shopping.data.client.RetrofitClient
-import woowacourse.shopping.data.remoteDataSource.OrderRemoteDataSource
 import woowacourse.shopping.dto.PostOrderRequestDto
 import woowacourse.shopping.model.Order
 import woowacourse.shopping.model.OrderHistories
 import woowacourse.shopping.model.OrderHistory
 
-class OrderRemoteDataSourceImpl : OrderRemoteDataSource {
+class OrderRetrofitDataSource : OrderRemoteDataSource {
     override fun getOrder(cartIds: List<Int>): Result<Order> = runCatching {
         RetrofitClient.getInstance().retrofitOrderService
             .getOrderList(cartIds.joinToString(","))

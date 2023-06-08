@@ -9,8 +9,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
+import woowacourse.shopping.data.remote.OrderRetrofitDataSource
+import woowacourse.shopping.data.repository.OrderDefaultRepository
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.OrderUIModel
 import woowacourse.shopping.ui.order.orderProductAdapter.OrderProductAdapter
@@ -42,8 +42,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         presenter = OrderPresenter(
             view = this,
             intent.getIntegerArrayListExtra(KEY_CART_IDS) ?: listOf(),
-            orderRepository = OrderRepositoryImpl(
-                orderRemoteDataSource = OrderRemoteDataSourceImpl()
+            orderRepository = OrderDefaultRepository(
+                orderRemoteDataSource = OrderRetrofitDataSource()
             )
         )
     }

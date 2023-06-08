@@ -9,12 +9,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.localDataSource.CartDefaultLocalDataSource
-import woowacourse.shopping.data.remoteDataSourceImpl.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
-import woowacourse.shopping.data.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.data.repositoryImpl.ProductRepositoryImpl
-import woowacourse.shopping.data.repositoryImpl.RecentRepositoryImpl
+import woowacourse.shopping.data.local.CartDefaultLocalDataSource
+import woowacourse.shopping.data.remote.CartRetrofitDataSource
+import woowacourse.shopping.data.remote.ProductRetrofitDataSource
+import woowacourse.shopping.data.repository.CartDefaultRepository
+import woowacourse.shopping.data.repository.ProductDefaultRepository
+import woowacourse.shopping.data.repository.RecentDefaultRepository
 import woowacourse.shopping.database.product.ProductSqliteDataSource
 import woowacourse.shopping.database.recentProduct.RecentSqliteProductDataSource
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
@@ -60,15 +60,15 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
         presenter = DetailedProductPresenter(
             this,
             SharedPreferenceUtils(this),
-            productRepository = ProductRepositoryImpl(
+            productRepository = ProductDefaultRepository(
                 localDataSource = ProductSqliteDataSource(this),
-                remoteDataSource = ProductRemoteDataSourceImpl()
+                remoteDataSource = ProductRetrofitDataSource()
             ),
-            cartRepository = CartRepositoryImpl(
+            cartRepository = CartDefaultRepository(
                 localDataSource = CartDefaultLocalDataSource(),
-                remoteDataSource = CartRemoteDataSourceImpl()
+                remoteDataSource = CartRetrofitDataSource()
             ),
-            recentRepository = RecentRepositoryImpl(
+            recentRepository = RecentDefaultRepository(
                 localDataSource = RecentSqliteProductDataSource(this)
             ),
             intent.getIntExtra(KEY_PRODUCT_ID, -1)

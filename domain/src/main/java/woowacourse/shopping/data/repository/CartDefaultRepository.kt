@@ -1,12 +1,11 @@
-package woowacourse.shopping.data.repositoryImpl
+package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.localDataSource.CartLocalDataSource
-import woowacourse.shopping.data.remoteDataSource.CartRemoteDataSource
-import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.local.CartLocalDataSource
+import woowacourse.shopping.data.remote.CartRemoteDataSource
 import woowacourse.shopping.dto.toDomain
 import woowacourse.shopping.model.CartProduct
 
-class CartRepositoryImpl(
+class CartDefaultRepository(
     private val localDataSource: CartLocalDataSource,
     private val remoteDataSource: CartRemoteDataSource
 ) : CartRepository {

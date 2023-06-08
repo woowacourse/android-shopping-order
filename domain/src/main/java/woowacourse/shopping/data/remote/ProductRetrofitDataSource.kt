@@ -1,10 +1,9 @@
-package woowacourse.shopping.data.remoteDataSourceImpl
+package woowacourse.shopping.data.remote
 
 import woowacourse.shopping.data.client.RetrofitClient
-import woowacourse.shopping.data.remoteDataSource.ProductRemoteDataSource
 import woowacourse.shopping.model.Product
 
-class ProductRemoteDataSourceImpl : ProductRemoteDataSource {
+class ProductRetrofitDataSource : ProductRemoteDataSource {
 
     override fun getAll(): Result<List<Product>> = runCatching {
         RetrofitClient.getInstance().retrofitProductService

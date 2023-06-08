@@ -2,7 +2,7 @@ package woowacourse.shopping.database.cart
 
 import android.content.Context
 import android.database.Cursor
-import woowacourse.shopping.data.localDataSource.CartLocalDataSource
+import woowacourse.shopping.data.local.CartLocalDataSource
 import woowacourse.shopping.database.ShoppingDBHelper
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.Product

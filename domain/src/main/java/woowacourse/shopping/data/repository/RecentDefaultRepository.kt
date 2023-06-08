@@ -1,11 +1,10 @@
-package woowacourse.shopping.data.repositoryImpl
+package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.localDataSource.RecentLocalDataSource
-import woowacourse.shopping.data.repository.RecentRepository
+import woowacourse.shopping.data.local.RecentLocalDataSource
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
 
-class RecentRepositoryImpl(
+class RecentDefaultRepository(
     private val localDataSource: RecentLocalDataSource
 ) : RecentRepository {
     override fun insert(product: Product) {

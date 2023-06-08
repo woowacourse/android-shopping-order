@@ -4,20 +4,20 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.configure.ApplicationConfigure
-import woowacourse.shopping.data.remoteDataSourceImpl.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.remote.ProductRetrofitDataSource
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.utils.mockWebServer.MockWeb
 
-class ProductRemoteDataSourceImplTest {
+class ProductRetrofitDataSourceTest {
     private lateinit var mockWebServer: MockWeb
-    private lateinit var remoteProductRepository: ProductRemoteDataSourceImpl
+    private lateinit var remoteProductRepository: ProductRetrofitDataSource
 
     @Before
     fun setUp() {
         // given
         mockWebServer = MockWeb()
         ApplicationConfigure.BASE_URL = mockWebServer.url
-        remoteProductRepository = ProductRemoteDataSourceImpl()
+        remoteProductRepository = ProductRetrofitDataSource()
     }
 
     @Test

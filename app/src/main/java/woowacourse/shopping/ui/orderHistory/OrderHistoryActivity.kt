@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.remoteDataSourceImpl.OrderRemoteDataSourceImpl
-import woowacourse.shopping.data.repositoryImpl.OrderRepositoryImpl
+import woowacourse.shopping.data.remote.OrderRetrofitDataSource
+import woowacourse.shopping.data.repository.OrderDefaultRepository
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.OrderHistoryUIModel
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -44,8 +44,8 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private fun initPresenter() {
         presenter = OrderHistoryPresenter(
             this,
-            OrderRepositoryImpl(
-                OrderRemoteDataSourceImpl()
+            OrderDefaultRepository(
+                OrderRetrofitDataSource()
             ),
             intent.getLongExtra(KEY_ORDER_ID, -1)
         )
