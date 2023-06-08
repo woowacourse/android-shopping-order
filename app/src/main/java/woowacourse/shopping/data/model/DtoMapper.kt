@@ -10,6 +10,13 @@ import com.example.domain.model.Point
 import com.example.domain.model.PointInfo
 import com.example.domain.model.Price
 import com.example.domain.model.Product
+import woowacourse.shopping.data.model.cart.CartProductDto
+import woowacourse.shopping.data.model.order.ContentDto
+import woowacourse.shopping.data.model.order.OrderDetailDto
+import woowacourse.shopping.data.model.order.OrderDetailInfoDto
+import woowacourse.shopping.data.model.order.OrderHistoryInfoDto
+import woowacourse.shopping.data.model.order.PointDto
+import woowacourse.shopping.data.model.product.ProductDto
 
 fun ProductDto.toDomain() = Product(id, name, imageUrl, Price(price))
 

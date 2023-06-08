@@ -16,7 +16,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import woowacourse.shopping.data.product.ProductCacheImpl
+import woowacourse.shopping.data.cache.ProductCacheImpl
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel

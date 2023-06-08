@@ -6,9 +6,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.R
-import woowacourse.shopping.data.OrderRemoteRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.OrderRemoteService
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
+import woowacourse.shopping.data.repository.order.OrderRemoteRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.feature.main.load.LoadAdapter
 import woowacourse.shopping.feature.orderDetail.OrderDetailActivity
@@ -36,7 +36,7 @@ class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
     private fun initPresenter() {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter =
-            OrderHistoryPresenter(this, OrderRemoteRepositoryImpl(OrderRemoteService(token)))
+            OrderHistoryPresenter(this, OrderRemoteRepositoryImpl(OrderDataSourceImpl(token)))
     }
 
     private fun initAdapter() {

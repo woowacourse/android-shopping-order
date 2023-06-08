@@ -7,14 +7,14 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.OrderRemoteRepositoryImpl
-import woowacourse.shopping.data.PointRemoteRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.cart.CartCache
-import woowacourse.shopping.data.cart.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.service.CartRemoteService
-import woowacourse.shopping.data.service.OrderRemoteService
-import woowacourse.shopping.data.service.PointRemoteService
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.point.PointDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.order.OrderRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.point.PointRemoteRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.model.CartProductUiModel
 
@@ -42,9 +42,9 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter =
             OrderPresenter(
-                this, CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
-                PointRemoteRepositoryImpl(PointRemoteService(token)),
-                OrderRemoteRepositoryImpl(OrderRemoteService(token))
+                this, CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
+                PointRemoteRepositoryImpl(PointDataSourceImpl(token)),
+                OrderRemoteRepositoryImpl(OrderDataSourceImpl(token))
             )
     }
 

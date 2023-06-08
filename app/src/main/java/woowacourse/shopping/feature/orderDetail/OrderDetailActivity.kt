@@ -8,9 +8,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.OrderRemoteRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.service.OrderRemoteService
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
+import woowacourse.shopping.data.repository.order.OrderRemoteRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.feature.order.OrderProductAdapter
 import woowacourse.shopping.model.OrderDetailProductUiModel
@@ -40,7 +40,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         presenter =
             OrderDetailPresenter(
                 this, orderId,
-                OrderRemoteRepositoryImpl(OrderRemoteService(token))
+                OrderRemoteRepositoryImpl(OrderDataSourceImpl(token))
             )
     }
 

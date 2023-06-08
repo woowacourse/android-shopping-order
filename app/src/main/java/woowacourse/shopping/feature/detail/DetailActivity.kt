@@ -11,10 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.cart.CartCache
-import woowacourse.shopping.data.cart.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.service.CartRemoteService
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -35,7 +35,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
         presenter = DetailPresenter(
             this,
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
+            CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
             product
         )
         binding.presenter = presenter

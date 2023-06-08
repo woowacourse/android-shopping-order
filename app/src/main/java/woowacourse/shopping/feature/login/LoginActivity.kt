@@ -3,9 +3,9 @@ package woowacourse.shopping.feature.login
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.cart.CartCache
-import woowacourse.shopping.data.product.ProductCacheImpl
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.cache.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
 import woowacourse.shopping.databinding.ActivityLoginBinding
 import woowacourse.shopping.feature.main.MainActivity
 import java.util.Base64

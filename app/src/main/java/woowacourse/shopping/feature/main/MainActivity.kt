@@ -13,18 +13,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.PointRemoteRepositoryImpl
-import woowacourse.shopping.data.RecentProductRepositoryImpl
-import woowacourse.shopping.data.TokenSharedPreference
-import woowacourse.shopping.data.cart.CartCache
-import woowacourse.shopping.data.cart.CartRemoteRepositoryImpl
-import woowacourse.shopping.data.product.ProductCacheImpl
-import woowacourse.shopping.data.product.ProductRemoteRepositoryImpl
-import woowacourse.shopping.data.service.CartRemoteService
-import woowacourse.shopping.data.service.PointRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
-import woowacourse.shopping.data.service.ServerInfo
-import woowacourse.shopping.data.sql.recent.RecentDao
+import woowacourse.shopping.data.cache.CartCache
+import woowacourse.shopping.data.cache.ProductCacheImpl
+import woowacourse.shopping.data.datasource.local.TokenSharedPreference
+import woowacourse.shopping.data.datasource.local.recent.RecentDao
+import woowacourse.shopping.data.datasource.remote.ServerInfo
+import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.point.PointDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
+import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.point.PointRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRemoteRepositoryImpl
+import woowacourse.shopping.data.repository.recentProduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.databinding.DialogCheckPointBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -110,10 +110,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter = MainPresenter(
             this,
-            ProductRemoteRepositoryImpl(ProductRemoteService(), ProductCacheImpl),
+            ProductRemoteRepositoryImpl(ProductDataSourceImpl(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartRemoteService(token), CartCache),
-            PointRemoteRepositoryImpl(PointRemoteService(token))
+            CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
+            PointRemoteRepositoryImpl(PointDataSourceImpl(token))
         )
     }
 
