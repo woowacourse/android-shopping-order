@@ -31,7 +31,7 @@ class OrderActivity : AppCompatActivity(), View {
     private val presenter: Presenter by lazy {
         injectOrderPresenter(
             view = this,
-            cartProducts = intent.getParcelableExtraCompat(CART_PRODUCTS_KEY)!!,
+            cartProducts = intent.getParcelableExtraCompat(CART_PRODUCTS_KEY),
             baseUrl = pref.getBaseUrl().toString(),
         )
     }

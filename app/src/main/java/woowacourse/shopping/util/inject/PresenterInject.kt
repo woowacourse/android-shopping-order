@@ -94,11 +94,11 @@ fun inject(
 
 fun injectOrderPresenter(
     view: OrderContract.View,
-    cartProducts: CartProducts,
+    cartProducts: CartProducts?,
     baseUrl: String,
 ): OrderContract.Presenter = OrderPresenter(
     view = view,
-    cartProducts = cartProducts.items,
+    cartProducts = cartProducts?.items ?: listOf(),
     orderProductRepository = OrderProductRemoteRepository(
         OrderRemoteDataSource(
             getOrderProductByRetrofit(baseUrl),
