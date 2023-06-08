@@ -58,7 +58,13 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
     }
 
     private fun initUsePointButtonClickListener() {
-        binding.pointApplyClickListener = { presenter.applyPoint(it.toString().toInt()) }
+        binding.pointApplyClickListener = {
+            if (it.toString().isNullOrBlank()) binding.etPaymentUsingPoint.setText(
+                NO_INPUT_SETTING_POINT.toString()
+            )
+            val usePoint = if (it.toString().isNullOrBlank()) 0 else it.toString().toInt()
+            presenter.applyPoint(usePoint)
+        }
         binding.etPaymentUsingPoint.text.clear()
     }
 
@@ -126,6 +132,7 @@ class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View 
 
     companion object {
         private const val CURRENT_ORDER_BASKET_PRODUCTS = "currentOrderBasketProducts"
+        private const val NO_INPUT_SETTING_POINT = 0
 
         fun getIntent(context: Context, basketProducts: List<UiBasketProduct>): Intent =
             Intent(context, PaymentConfirmActivity::class.java).apply {
