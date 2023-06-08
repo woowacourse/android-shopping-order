@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cache.CartCache
-import woowacourse.shopping.data.datasource.local.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.data.repository.cart.CartRemoteRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
@@ -32,10 +31,9 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
         val product = intent.getParcelableCompat<ProductUiModel>(PRODUCT_KEY)
             ?: return keyError(PRODUCT_KEY)
-        val token = TokenSharedPreference.getInstance(applicationContext).getToken("") ?: ""
         presenter = DetailPresenter(
             this,
-            CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
+            CartRemoteRepositoryImpl(CartDataSourceImpl(), CartCache),
             product
         )
         binding.presenter = presenter

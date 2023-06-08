@@ -4,24 +4,16 @@ import com.example.domain.model.OrderDetailProduct
 import com.example.domain.model.OrderHistoryInfo
 import com.example.domain.model.OrderInfo
 import com.example.domain.model.Point
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
-import woowacourse.shopping.data.datasource.remote.ServerInfo
+import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.order.OrderDetailDto
 import woowacourse.shopping.data.model.order.OrderDetailProductDto
 import woowacourse.shopping.data.model.order.OrderHistoryInfoDto
 import woowacourse.shopping.data.model.order.OrderProductDto
 import woowacourse.shopping.data.model.toDomain
 
-class OrderDataSourceImpl(private val credential: String) : OrderRemoteDataSource {
+class OrderDataSourceImpl : OrderRemoteDataSource {
 
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(ServerInfo.currentBaseUrl)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
-        .create(OrderService::class.java)
+    private val orderService = RetrofitService.orderService
 
     override fun addOrder(
         usedPoint: Point,
@@ -35,8 +27,7 @@ class OrderDataSourceImpl(private val credential: String) : OrderRemoteDataSourc
             )
         }
         val orderInfo = OrderDetailProductDto(usedPoint.value, orderProducts)
-        retrofitService.addOrder(
-            "Basic $credential",
+        orderService.addOrder(
             orderInfo
         ).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(
@@ -57,8 +48,7 @@ class OrderDataSourceImpl(private val credential: String) : OrderRemoteDataSourc
         orderId: Int,
         callback: (Result<Unit>) -> Unit
     ) {
-        retrofitService.cancelOrder(
-            "Basic $credential",
+        orderService.cancelOrder(
             orderId
         ).enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(
@@ -79,8 +69,8 @@ class OrderDataSourceImpl(private val credential: String) : OrderRemoteDataSourc
         pageNum: Int,
         callback: (Result<OrderHistoryInfo>) -> Unit
     ) {
-        retrofitService.requestOrderHistory(
-            "Basic $credential", pageNum
+        orderService.requestOrderHistory(
+            pageNum
         ).enqueue(object : retrofit2.Callback<OrderHistoryInfoDto> {
             override fun onResponse(
                 call: retrofit2.Call<OrderHistoryInfoDto>,
@@ -103,8 +93,8 @@ class OrderDataSourceImpl(private val credential: String) : OrderRemoteDataSourc
         detailId: Int,
         callback: (Result<OrderInfo>) -> Unit
     ) {
-        retrofitService.requestOrderDetail(
-            "Basic $credential", detailId
+        orderService.requestOrderDetail(
+            detailId
         ).enqueue(object : retrofit2.Callback<OrderDetailDto> {
             override fun onResponse(
                 call: retrofit2.Call<OrderDetailDto>,

@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cache.CartCache
 import woowacourse.shopping.data.cache.ProductCacheImpl
-import woowacourse.shopping.data.datasource.local.TokenSharedPreference
 import woowacourse.shopping.data.datasource.local.recent.RecentDao
 import woowacourse.shopping.data.datasource.remote.ServerInfo
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
@@ -107,13 +106,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter = MainPresenter(
             this,
             ProductRemoteRepositoryImpl(ProductDataSourceImpl(), ProductCacheImpl),
             RecentProductRepositoryImpl(RecentDao(this, ServerInfo.serverName)),
-            CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
-            PointRemoteRepositoryImpl(PointDataSourceImpl(token))
+            CartRemoteRepositoryImpl(CartDataSourceImpl(), CartCache),
+            PointRemoteRepositoryImpl(PointDataSourceImpl())
         )
     }
 

@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cache.CartCache
-import woowacourse.shopping.data.datasource.local.TokenSharedPreference
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.point.PointDataSourceImpl
@@ -39,12 +38,11 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun initPresenter() {
-        val token = TokenSharedPreference.getInstance(this).getToken("") ?: ""
         presenter =
             OrderPresenter(
-                this, CartRemoteRepositoryImpl(CartDataSourceImpl(token), CartCache),
-                PointRemoteRepositoryImpl(PointDataSourceImpl(token)),
-                OrderRemoteRepositoryImpl(OrderDataSourceImpl(token))
+                this, CartRemoteRepositoryImpl(CartDataSourceImpl(), CartCache),
+                PointRemoteRepositoryImpl(PointDataSourceImpl()),
+                OrderRemoteRepositoryImpl(OrderDataSourceImpl())
             )
     }
 
