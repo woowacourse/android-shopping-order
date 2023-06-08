@@ -92,7 +92,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun failToOrder() {
-        println("주문 실패")
+        Toast.makeText(this, "주문에 실패하였습니다.", Toast.LENGTH_SHORT).show()
     }
 
     companion object {

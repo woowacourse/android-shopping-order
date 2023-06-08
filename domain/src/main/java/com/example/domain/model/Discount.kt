@@ -1,6 +1,4 @@
-package woowacourse.shopping.feature.order
-
-import com.example.domain.model.MerchandiseItem
+package com.example.domain.model
 
 class Discount(private val originalPrice: Int) : MerchandiseItem {
     override fun use(): Pair<Int, Condition?> {
