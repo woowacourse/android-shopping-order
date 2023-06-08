@@ -27,12 +27,12 @@ fun TextView.setDiscount(discount: Int?) {
     text = context.getString(R.string.discount_text, discount)
 }
 
-@BindingAdapter("bind:order_id")
+@BindingAdapter("bind:orderId")
 fun TextView.setOrderId(orderId: Int?) {
     text = context.getString(R.string.order_id_text, orderId)
 }
 
-@BindingAdapter("bind:history_names")
+@BindingAdapter("bind:historyNames")
 fun TextView.setNames(orderedProducts: List<UiOrderedProduct>?) {
     val names = mutableListOf<String>()
     orderedProducts?.forEach { names.add(it.name) }
