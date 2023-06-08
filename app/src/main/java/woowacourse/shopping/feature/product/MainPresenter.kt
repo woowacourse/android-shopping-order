@@ -28,11 +28,11 @@ class MainPresenter(
 
     override fun loadMoreProducts() {
         productRepository.requestFetchProductsUnit(
-            onFailure = {
+            failure = {
                 view.showEmptyProducts()
                 view.setProducts(listOf())
             },
-            onSuccess = { products, pagination ->
+            success = { products, pagination ->
                 view.addProductItems(products.map(Product::toUi))
                 loadCartProductsQuantity()
                 view.showProducts()
@@ -48,8 +48,8 @@ class MainPresenter(
     override fun loadCartSizeBadge() {
         view.showCartProductCountBadge()
         cartRepository.requestFetchCartProductsUnit(
-            unitSize = 0, page = 0, onFailure = {},
-            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+            unitSize = 0, page = 0, failure = {},
+            success = { cartProducts: List<CartProduct>, pagination: Pagination ->
                 if (MIN_COUNT_VALUE <= pagination.total) view.setCartProductCountBadge(pagination.total)
             }
         )
@@ -57,8 +57,8 @@ class MainPresenter(
 
     override fun loadCartProductsQuantity() {
         cartRepository.requestFetchCartProductsUnit(
-            unitSize = Cart.MAX_SIZE, page = 1, onFailure = {},
-            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+            unitSize = Cart.MAX_SIZE, page = 1, failure = {},
+            success = { cartProducts: List<CartProduct>, pagination: Pagination ->
                 view.setCartProductCounts(cartProducts)
                 currentPage = pagination.currentPage + 1
             }
@@ -90,12 +90,12 @@ class MainPresenter(
         cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
         if (cartProductState.quantity - 1 == 0) {
             cartRepository.deleteCartProduct(
-                id = cartProductState.id, onSuccess = {}, onFailure = {}
+                id = cartProductState.id, success = {}, failure = {}
             )
         }
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = { loadCartSizeBadge() }
+            failure = {}, success = { loadCartSizeBadge() }
         )
     }
 
@@ -103,7 +103,7 @@ class MainPresenter(
         cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = {}
+            failure = {}, success = {}
         )
     }
 

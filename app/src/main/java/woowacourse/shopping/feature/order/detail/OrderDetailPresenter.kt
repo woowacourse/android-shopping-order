@@ -12,7 +12,7 @@ class OrderDetailPresenter(
     override fun loadOrderInformation() {
         orderRepository.requestFetchOrderById(
             id = orderId,
-            onSuccess = { order ->
+            success = { order ->
                 order!!
                 view.setViewFixedContents(order.toUi())
                 view.setProductsSummary(
@@ -23,7 +23,7 @@ class OrderDetailPresenter(
                 view.setOrderNumber(orderId)
                 view.setOrderProducts(order.orderProducts)
             },
-            onFailure = {
+            failure = {
                 view.showAccessError()
                 view.closeOrderDetail()
             }

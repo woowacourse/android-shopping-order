@@ -17,7 +17,7 @@ class OrderPresenter(
 
     override fun calculatePrice() {
         orderRepository.requestFetchDiscountPolicy(
-            onSuccess = { fixedDiscountPolicies ->
+            success = { fixedDiscountPolicies ->
                 val productsSum = orderPendingCart.getPickedProductsTotalPrice()
                 val discountPrice = fixedDiscountPolicies.getDiscountPrice(productsSum)
                 finalPrice = fixedDiscountPolicies.getFinalPrice(productsSum)
@@ -26,7 +26,7 @@ class OrderPresenter(
                 view.setDiscountPrice(discountPrice)
                 view.setFinalPrice(finalPrice)
             },
-            onFailure = {}
+            failure = {}
         )
     }
 
@@ -34,10 +34,10 @@ class OrderPresenter(
         orderRepository.requestAddOrder(
             cartIds = orderPendingCart.products.map { it.id },
             finalPrice = finalPrice,
-            onSuccess = { orderId: Long ->
+            success = { orderId: Long ->
                 view.showOrderDetailPage(orderId)
             },
-            onFailure = {}
+            failure = {}
         )
     }
 }

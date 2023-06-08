@@ -3,13 +3,13 @@ package woowacourse.shopping.data.product
 import com.example.domain.Pagination
 import com.example.domain.product.Product
 import com.example.domain.product.ProductRepository
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.create
 import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.data.product.model.dto.ProductDto
 import woowacourse.shopping.data.product.model.dto.response.ProductsResponse
 import woowacourse.shopping.data.product.model.toDomain
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class ProductRemoteRepository(
     retrofit: Retrofit
@@ -20,29 +20,20 @@ class ProductRemoteRepository(
     override fun requestFetchProductsUnit(
         unitSize: Int,
         page: Int,
-        onSuccess: (List<Product>, Pagination) -> Unit,
-        onFailure: () -> Unit
+        success: (List<Product>, Pagination) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitProductService.requestFetchProductsUnit(
-            unitSize = unitSize,
-            page = page
-        ).enqueue(object : retrofit2.Callback<ProductsResponse> {
-            override fun onResponse(
-                call: Call<ProductsResponse>,
-                response: retrofit2.Response<ProductsResponse>
-            ) {
-                if (400 <= response.code()) return onFailure()
-
-                val result: ProductsResponse = response.body() ?: return
-                val products: List<Product> = result.products.map(ProductDto::toDomain)
-                val pagination: Pagination = result.pagination.toDomain()
-                onSuccess(products, pagination)
+        val retrofitCallback = object : RetrofitCallback<ProductsResponse>() {
+            override fun onSuccess(response: ProductsResponse?) {
+                if (response == null) return
+                val products: List<Product> = response.products.map(ProductDto::toDomain)
+                val pagination: Pagination = response.pagination.toDomain()
+                success(products, pagination)
             }
-
-            override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
-                onFailure()
-            }
-        })
+        }
+        retrofitProductService
+            .requestFetchProductsUnit(unitSize = unitSize, page = page)
+            .enqueue(retrofitCallback)
     }
 
     override fun requestFetchProductById(
@@ -50,21 +41,12 @@ class ProductRemoteRepository(
         onSuccess: (product: Product?) -> Unit,
         onFailure: () -> Unit
     ) {
-        retrofitProductService.requestFetchProductById(id)
-            .enqueue(object : retrofit2.Callback<Product> {
-                override fun onResponse(
-                    call: Call<Product>,
-                    response: retrofit2.Response<Product>
-                ) {
-                    val result: Product? = response.body()
-                    if (response.isSuccessful) onSuccess(result)
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result)
-                }
-
-                override fun onFailure(call: Call<Product>, t: Throwable) {
-                    onFailure()
-                }
-            })
+        val retrofitCallback = object : RetrofitCallback<Product>() {
+            override fun onSuccess(response: Product?) {
+                if (response == null) return
+                onSuccess(response)
+            }
+        }
+        retrofitProductService.requestFetchProductById(id).enqueue(retrofitCallback)
     }
 }

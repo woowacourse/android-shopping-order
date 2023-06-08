@@ -7,26 +7,26 @@ interface CartRepository {
     fun requestFetchCartProductsUnit(
         unitSize: Int,
         page: Int,
-        onSuccess: (List<CartProduct>, Pagination) -> Unit,
-        onFailure: () -> Unit
+        success: (List<CartProduct>, Pagination) -> Unit,
+        failure: () -> Unit
     )
 
     fun addCartProduct(
         productId: Long,
-        onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit
+        success: (cartId: Long) -> Unit,
+        failure: () -> Unit
     )
 
     fun updateCartProductQuantity(
         id: Long,
         quantity: Int,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        success: () -> Unit,
+        failure: () -> Unit
     )
 
     fun deleteCartProduct(
         id: Long,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        success: () -> Unit,
+        failure: () -> Unit
     )
 }

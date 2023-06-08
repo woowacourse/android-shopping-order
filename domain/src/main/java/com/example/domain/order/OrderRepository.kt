@@ -5,25 +5,25 @@ import com.example.domain.FixedDiscountPolicy
 interface OrderRepository {
 
     fun requestFetchAllOrders(
-        onSuccess: (List<OrderSummary>) -> Unit,
-        onFailure: () -> Unit
+        success: (List<OrderSummary>) -> Unit,
+        failure: () -> Unit
     )
 
     fun requestAddOrder(
         cartIds: List<Long>,
         finalPrice: Int,
-        onSuccess: (orderId: Long) -> Unit,
-        onFailure: () -> Unit
+        success: (orderId: Long) -> Unit,
+        failure: () -> Unit
     )
 
     fun requestFetchOrderById(
         id: Long,
-        onSuccess: (order: Order?) -> Unit,
-        onFailure: () -> Unit
+        success: (order: Order?) -> Unit,
+        failure: () -> Unit
     )
 
     fun requestFetchDiscountPolicy(
-        onSuccess: (fixedDiscountPolicy: FixedDiscountPolicy) -> Unit,
-        onFailure: () -> Unit
+        success: (fixedDiscountPolicy: FixedDiscountPolicy) -> Unit,
+        failure: () -> Unit
     )
 }

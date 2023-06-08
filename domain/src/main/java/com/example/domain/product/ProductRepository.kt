@@ -6,8 +6,8 @@ interface ProductRepository {
     fun requestFetchProductsUnit(
         unitSize: Int,
         page: Int,
-        onSuccess: (List<Product>, Pagination) -> Unit,
-        onFailure: () -> Unit
+        success: (List<Product>, Pagination) -> Unit,
+        failure: () -> Unit
     )
 
     fun requestFetchProductById(

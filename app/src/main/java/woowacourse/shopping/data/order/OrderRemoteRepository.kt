@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.order
 
+import android.util.Log
 import com.example.domain.FixedDiscountPolicy
 import com.example.domain.order.Order
 import com.example.domain.order.OrderRepository
@@ -9,10 +10,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.create
+import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.data.order.model.dto.request.OrderRequest
 import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyResponse
 import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse
 import woowacourse.shopping.data.order.model.toDomain
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class OrderRemoteRepository(
     retrofit: Retrofit
@@ -21,87 +24,61 @@ class OrderRemoteRepository(
     private val retrofitOrderService: RetrofitOrderService = retrofit.create()
 
     override fun requestFetchAllOrders(
-        onSuccess: (List<OrderSummary>) -> Unit,
-        onFailure: () -> Unit
+        success: (List<OrderSummary>) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitOrderService.requestAllOrders().enqueue(
-            object : Callback<List<OrderSummaryResponse>> {
-                override fun onResponse(
-                    call: Call<List<OrderSummaryResponse>>,
-                    response: Response<List<OrderSummaryResponse>>
-                ) {
-                    val result = response.body() ?: emptyList()
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result.map(OrderSummaryResponse::toDomain))
-                }
-
-                override fun onFailure(call: Call<List<OrderSummaryResponse>>, t: Throwable) {
-                    onFailure()
-                }
-            })
+        val retrofitCallback = object : RetrofitCallback<List<OrderSummaryResponse>>() {
+            override fun onSuccess(response: List<OrderSummaryResponse>?) {
+                if (response == null) return
+                success(response.map(OrderSummaryResponse::toDomain))
+            }
+        }
+        retrofitOrderService.requestAllOrders().enqueue(retrofitCallback)
     }
 
     override fun requestAddOrder(
         cartIds: List<Long>,
         finalPrice: Int,
-        onSuccess: (orderId: Long) -> Unit,
-        onFailure: () -> Unit
+        success: (orderId: Long) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitOrderService.requestAddOrder(request = OrderRequest(cartIds, finalPrice))
-            .enqueue(object : Callback<Unit> {
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    val resultOrderId: Long? =
-                        response.headers()["Location"]?.split("/")?.last()?.toLong()
-                    if (400 <= response.code()) return onFailure()
-                    if (resultOrderId == null) return onFailure()
-                    onSuccess(resultOrderId)
-                }
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
-                }
-            })
+        val retrofitCallback = object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                val cartId = response.headers()["Location"]?.split("/")?.last()?.toLong() ?: return
+                success(cartId)
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
+            }
+        }
+        val orderRequest = OrderRequest(cartIds, finalPrice)
+        retrofitOrderService.requestAddOrder(orderRequest).enqueue(retrofitCallback)
     }
 
     override fun requestFetchOrderById(
         id: Long,
-        onSuccess: (order: Order?) -> Unit,
-        onFailure: () -> Unit
+        success: (order: Order?) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitOrderService.requestFetchOrderById(
-            id = id
-        ).enqueue(object : Callback<Order> {
-            override fun onResponse(call: Call<Order>, response: Response<Order>) {
-                val resultOrder: Order? = response.body()
-                if (400 <= response.code()) return onFailure()
-                if (resultOrder == null) return onFailure()
-                onSuccess(resultOrder)
+        val retrofitCallback = object : RetrofitCallback<Order>() {
+            override fun onSuccess(response: Order?) {
+                if (response == null) return
+                success(response)
             }
-
-            override fun onFailure(call: Call<Order>, t: Throwable) {
-                onFailure()
-            }
-        })
+        }
+        retrofitOrderService.requestFetchOrderById(id).enqueue(retrofitCallback)
     }
 
     override fun requestFetchDiscountPolicy(
-        onSuccess: (fixedDiscountPolicy: FixedDiscountPolicy) -> Unit,
-        onFailure: () -> Unit
+        success: (fixedDiscountPolicy: FixedDiscountPolicy) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitOrderService.requestFetchDiscountPolicy()
-            .enqueue(object : Callback<FixedDiscountPolicyResponse> {
-                override fun onResponse(
-                    call: Call<FixedDiscountPolicyResponse>,
-                    response: Response<FixedDiscountPolicyResponse>
-                ) {
-                    val result: FixedDiscountPolicyResponse = response.body() ?: return onFailure()
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result.toDomain())
-                }
-
-                override fun onFailure(call: Call<FixedDiscountPolicyResponse>, t: Throwable) {
-                    onFailure()
-                }
+        val retrofitCallback = object : RetrofitCallback<FixedDiscountPolicyResponse>() {
+            override fun onSuccess(response: FixedDiscountPolicyResponse?) {
+                if (response == null) return
+                success(response.toDomain())
             }
-            )
+        }
+        retrofitOrderService.requestFetchDiscountPolicy().enqueue(retrofitCallback)
     }
 }

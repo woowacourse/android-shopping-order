@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart
 
+import android.util.Log
 import com.example.domain.Pagination
 import com.example.domain.cart.CartProduct
 import com.example.domain.cart.CartRepository
@@ -11,6 +12,8 @@ import retrofit2.create
 import woowacourse.shopping.data.cart.model.dto.response.CartProductResponse
 import woowacourse.shopping.data.cart.model.dto.response.CartResponse
 import woowacourse.shopping.data.cart.model.toDomain
+import woowacourse.shopping.data.product.model.toDomain
+import woowacourse.shopping.data.util.RetrofitCallback
 
 class CartRemoteRepository(
     retrofit: Retrofit
@@ -21,83 +24,61 @@ class CartRemoteRepository(
     override fun requestFetchCartProductsUnit(
         unitSize: Int,
         page: Int,
-        onSuccess: (List<CartProduct>, Pagination) -> Unit,
-        onFailure: () -> Unit
+        success: (List<CartProduct>, Pagination) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitCartService.requestFetchCartProductsUnit(unitSize, page)
-            .enqueue(object : Callback<CartResponse> {
-                override fun onResponse(
-                    call: Call<CartResponse>,
-                    response: Response<CartResponse>
-                ) {
-                    val result = response.body()!!
-                    if (response.code() >= 400) return onFailure()
-                    onSuccess(
-                        result.cartItems.map(CartProductResponse::toDomain),
-                        result.pagination.toDomain()
-                    )
-                }
-
-                override fun onFailure(call: Call<CartResponse>, t: Throwable) {
-                    onFailure()
-                }
-            })
+        val retrofitCallback = object : RetrofitCallback<CartResponse>() {
+            override fun onSuccess(response: CartResponse?) {
+                if (response == null) return
+                val products: List<CartProduct> =
+                    response.cartItems.map(CartProductResponse::toDomain)
+                val pagination: Pagination = response.pagination.toDomain()
+                success(products, pagination)
+            }
+        }
+        retrofitCartService
+            .requestFetchCartProductsUnit(unitSize = unitSize, page = page)
+            .enqueue(retrofitCallback)
     }
 
     override fun addCartProduct(
         productId: Long,
-        onSuccess: (cartId: Long) -> Unit,
-        onFailure: () -> Unit
+        success: (cartId: Long) -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitCartService.requestAddCartProduct(productId)
-            .enqueue(object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>
-                ) {
-                    val result: Long =
-                        response.headers()["Location"]?.split("/")?.last()?.toLong() ?: 0L
-                    if (400 <= response.code()) return onFailure()
-                    onSuccess(result)
-                }
+        val retrofitCallback = object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                val cartId = response.headers()["Location"]?.split("/")?.last()?.toLong() ?: return
+                success(cartId)
+            }
 
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
-                }
-            })
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
+            }
+        }
+        retrofitCartService.requestAddCartProduct(productId).enqueue(retrofitCallback)
     }
 
     override fun updateCartProductQuantity(
         id: Long,
         quantity: Int,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        success: () -> Unit,
+        failure: () -> Unit
     ) {
-        retrofitCartService.requestUpdateQuantity(id, quantity)
-            .enqueue(object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>
-                ) {
-                    onSuccess()
-                }
-
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
-                }
-            })
+        val retrofitCallback = object : RetrofitCallback<Unit>() {
+            override fun onSuccess(response: Unit?) {
+                success()
+            }
+        }
+        retrofitCartService.requestUpdateQuantity(id, quantity).enqueue(retrofitCallback)
     }
 
-    override fun deleteCartProduct(id: Long, onSuccess: () -> Unit, onFailure: () -> Unit) {
-        retrofitCartService.requestDeleteCartProduct(id)
-            .enqueue(object : Callback<Unit> {
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    onSuccess()
-                }
-
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    onFailure()
-                }
-            })
+    override fun deleteCartProduct(id: Long, success: () -> Unit, failure: () -> Unit) {
+        val retrofitCallback = object : RetrofitCallback<Unit>() {
+            override fun onSuccess(response: Unit?) {
+                success()
+            }
+        }
+        retrofitCartService.requestDeleteCartProduct(id).enqueue(retrofitCallback)
     }
 }

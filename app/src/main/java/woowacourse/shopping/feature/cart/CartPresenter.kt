@@ -23,7 +23,7 @@ class CartPresenter(
     override fun initContents() {
         cartRepository.requestFetchCartProductsUnit(
             Cart.MAX_SIZE, pageNumber,
-            onFailure = {}, onSuccess = { cartProducts: List<CartProduct>, _: Pagination ->
+            failure = {}, success = { cartProducts: List<CartProduct>, _: Pagination ->
             cart.setAll(cartProducts)
             loadCart()
             view.setCartPageNumber(pageNumber)
@@ -35,7 +35,7 @@ class CartPresenter(
     override fun loadCart() {
         cartRepository.requestFetchCartProductsUnit(
             maxProductsPerPage, pageNumber,
-            onFailure = {}, onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+            failure = {}, success = { cartProducts: List<CartProduct>, pagination: Pagination ->
             val cartProductStates: List<CartProductState> = cartProducts.map(CartProduct::toUi)
             maxPageNumber = pagination.lastPage
             pickAll()
@@ -81,7 +81,7 @@ class CartPresenter(
             cartProductState.quantity = cartProduct.quantity
             cartRepository.updateCartProductQuantity(
                 id = cartProduct.id, quantity = cartProduct.quantity,
-                onFailure = {}, onSuccess = {
+                failure = {}, success = {
                 cart.setProductQuantityById(cartProduct.id, cartProduct.quantity)
                 view.updateItem(cartProductState)
                 updatePaymentAmount()
@@ -97,7 +97,7 @@ class CartPresenter(
             cartProductState.quantity = cartProduct.quantity
             cartRepository.updateCartProductQuantity(
                 id = cartProduct.id, quantity = cartProduct.quantity,
-                onFailure = {}, onSuccess = {
+                failure = {}, success = {
                 cart.setProductQuantityById(cartProduct.id, cartProduct.quantity)
                 view.updateItem(cartProductState)
                 updatePaymentAmount()
@@ -118,8 +118,8 @@ class CartPresenter(
 
     override fun deleteCartProduct(cartProductState: CartProductState) {
         cartRepository.deleteCartProduct(
-            id = cartProductState.id, onFailure = {},
-            onSuccess = {
+            id = cartProductState.id, failure = {},
+            success = {
                 loadCart()
             },
         )

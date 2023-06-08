@@ -39,8 +39,8 @@ class ProductDetailPresenter(
         product!!
 
         cartRepository.addCartProduct(
-            product.id, onFailure = { },
-            onSuccess = { cartRepository.updateCartProductQuantity(it, quantity, {}, {}) }
+            product.id, failure = { },
+            success = { cartRepository.updateCartProductQuantity(it, quantity, {}, {}) }
         )
 
         view.showCart()
