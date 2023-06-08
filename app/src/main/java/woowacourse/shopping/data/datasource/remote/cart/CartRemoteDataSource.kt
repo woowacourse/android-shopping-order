@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote.cart
 
-import com.example.domain.model.CartProduct
+import com.example.domain.model.cart.CartProduct
 
 interface CartRemoteDataSource {
 

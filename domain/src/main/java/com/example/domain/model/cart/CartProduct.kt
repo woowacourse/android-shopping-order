@@ -1,4 +1,6 @@
-package com.example.domain.model
+package com.example.domain.model.cart
+
+import com.example.domain.model.product.Product
 
 data class CartProduct(
     val cartProductId: Long,

@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.point
 
-import com.example.domain.model.PointInfo
+import com.example.domain.model.point.PointInfo
 import com.example.domain.repository.PointRepository
 import woowacourse.shopping.data.datasource.remote.point.PointDataSourceImpl
 

@@ -5,8 +5,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
+import com.example.domain.model.cart.CartProduct
+import com.example.domain.model.product.Product
 import woowacourse.shopping.data.model.cart.CartEntity
 
 class CartDao(

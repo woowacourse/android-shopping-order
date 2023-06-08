@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote.point
 
-import com.example.domain.model.PointInfo
+import com.example.domain.model.point.PointInfo
 
 interface PointRemoteDataSource {
 

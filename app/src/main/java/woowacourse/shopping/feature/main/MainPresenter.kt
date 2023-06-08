@@ -1,7 +1,7 @@
 package woowacourse.shopping.feature.main
 
-import com.example.domain.model.Product
-import com.example.domain.model.RecentProduct
+import com.example.domain.model.product.Product
+import com.example.domain.model.recentProduct.RecentProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.PointRepository
 import com.example.domain.repository.ProductRepository

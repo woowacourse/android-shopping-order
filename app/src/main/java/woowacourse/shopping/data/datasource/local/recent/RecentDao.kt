@@ -5,8 +5,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.Product
-import com.example.domain.model.RecentProduct
+import com.example.domain.model.product.Product
+import com.example.domain.model.recentProduct.RecentProduct
 import woowacourse.shopping.data.model.recentProduct.RecentProductEntity
 import java.time.LocalDateTime
 import java.time.ZoneOffset

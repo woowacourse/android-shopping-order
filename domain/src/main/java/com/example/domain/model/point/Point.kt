@@ -1,4 +1,4 @@
-package com.example.domain.model
+package com.example.domain.model.point
 
 @JvmInline
 value class Point(val value: Int) {

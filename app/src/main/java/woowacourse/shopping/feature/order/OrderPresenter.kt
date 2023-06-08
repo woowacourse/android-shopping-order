@@ -1,7 +1,7 @@
 package woowacourse.shopping.feature.order
 
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.Point
+import com.example.domain.model.order.OrderDetailProduct
+import com.example.domain.model.point.Point
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.PointRepository

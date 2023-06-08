@@ -1,8 +1,8 @@
 package woowacourse.shopping.mapper
 
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.OrderInfo
-import com.example.domain.model.OrderState
+import com.example.domain.model.order.Order
+import com.example.domain.model.order.OrderDetailProduct
+import com.example.domain.model.order.OrderState
 import woowacourse.shopping.model.OrderDetailProductUiModel
 import woowacourse.shopping.model.OrderInfoUiModel
 import woowacourse.shopping.model.OrderStateUiModel
@@ -10,7 +10,7 @@ import woowacourse.shopping.model.OrderStateUiModel
 fun OrderDetailProduct.toPresentation() =
     OrderDetailProductUiModel(quantity, product.toPresentation())
 
-fun OrderInfo.toPresentation() =
+fun Order.toPresentation() =
     OrderInfoUiModel(
         orderId,
         orderAt,

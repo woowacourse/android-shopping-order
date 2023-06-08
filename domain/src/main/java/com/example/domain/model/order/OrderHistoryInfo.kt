@@ -1,4 +1,4 @@
-package com.example.domain.model
+package com.example.domain.model.order
 
 data class OrderHistoryInfo(
     val totalPages: Int,

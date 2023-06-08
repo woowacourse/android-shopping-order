@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cache
 
-import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
+import com.example.domain.model.cart.CartProduct
+import com.example.domain.model.product.Product
 
 object CartCache {
     private val _cartProducts = mutableListOf<CartProduct>()

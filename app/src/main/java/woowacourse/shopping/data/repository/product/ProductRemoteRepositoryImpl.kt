@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository.product
 
 import com.example.domain.ProductCache
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 import com.example.domain.repository.ProductRepository
 import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
 import woowacourse.shopping.data.model.toDomain

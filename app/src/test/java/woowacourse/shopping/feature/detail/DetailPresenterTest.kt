@@ -1,7 +1,7 @@
 package woowacourse.shopping.feature.detail
 
 import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 import com.example.domain.repository.CartRepository
 import io.mockk.Runs
 import io.mockk.every

@@ -1,6 +1,6 @@
 package com.example.domain
 
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 
 interface ProductCache {
     val productList: List<Product>

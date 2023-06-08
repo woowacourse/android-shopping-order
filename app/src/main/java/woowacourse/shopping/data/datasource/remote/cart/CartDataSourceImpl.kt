@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote.cart
 
-import com.example.domain.model.CartProduct
+import com.example.domain.model.cart.CartProduct
 import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.cart.CartProductDto
 import woowacourse.shopping.data.model.toDomain

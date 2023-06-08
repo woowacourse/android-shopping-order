@@ -1,7 +1,7 @@
 package com.example.domain.datasource
 
 import com.example.domain.model.Price
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 
 val productsDatasource = listOf<Product>(
     Product(

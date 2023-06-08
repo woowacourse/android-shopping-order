@@ -1,6 +1,6 @@
 package com.example.domain.repository
 
-import com.example.domain.model.PointInfo
+import com.example.domain.model.point.PointInfo
 
 interface PointRepository {
     fun getPoint(

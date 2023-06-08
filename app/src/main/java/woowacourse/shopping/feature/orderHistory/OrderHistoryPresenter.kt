@@ -1,6 +1,6 @@
 package woowacourse.shopping.feature.orderHistory
 
-import com.example.domain.model.OrderHistoryInfo
+import com.example.domain.model.order.OrderHistoryInfo
 import com.example.domain.repository.OrderRepository
 import woowacourse.shopping.mapper.toPresentation
 

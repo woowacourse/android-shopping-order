@@ -1,9 +1,9 @@
 package com.example.domain.repository
 
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.OrderHistoryInfo
-import com.example.domain.model.OrderInfo
-import com.example.domain.model.Point
+import com.example.domain.model.order.Order
+import com.example.domain.model.order.OrderDetailProduct
+import com.example.domain.model.order.OrderHistoryInfo
+import com.example.domain.model.point.Point
 
 interface OrderRepository {
 
@@ -25,7 +25,7 @@ interface OrderRepository {
 
     fun getOrderDetail(
         orderId: Int,
-        callback: (Result<OrderInfo>) -> Unit
+        callback: (Result<Order>) -> Unit
 
     )
 }

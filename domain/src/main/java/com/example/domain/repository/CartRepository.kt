@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
-import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
+import com.example.domain.model.cart.CartProduct
+import com.example.domain.model.product.Product
 
 interface CartRepository {
     fun getAll(): List<CartProduct>

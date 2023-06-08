@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.datasource.remote.order
 
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.OrderHistoryInfo
-import com.example.domain.model.OrderInfo
-import com.example.domain.model.Point
+import com.example.domain.model.order.Order
+import com.example.domain.model.order.OrderDetailProduct
+import com.example.domain.model.order.OrderHistoryInfo
+import com.example.domain.model.point.Point
 import woowacourse.shopping.data.datasource.remote.RetrofitService
 import woowacourse.shopping.data.model.order.OrderDetailDto
 import woowacourse.shopping.data.model.order.OrderDetailProductDto
@@ -91,7 +91,7 @@ class OrderDataSourceImpl : OrderRemoteDataSource {
 
     override fun loadDetail(
         detailId: Int,
-        callback: (Result<OrderInfo>) -> Unit
+        callback: (Result<Order>) -> Unit
     ) {
         orderService.requestOrderDetail(
             detailId

@@ -1,6 +1,9 @@
-package com.example.domain.model
+package com.example.domain.model.order
 
-data class OrderInfo(
+import com.example.domain.model.Price
+import com.example.domain.model.point.Point
+
+data class Order(
     val orderId: Int,
     val orderAt: String,
     val orderState: OrderState,

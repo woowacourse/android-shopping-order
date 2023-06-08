@@ -1,6 +1,6 @@
 package com.example.domain.repository
 
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 
 interface ProductRepository {
     fun getProducts(

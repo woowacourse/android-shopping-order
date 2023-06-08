@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository.cart
 
-import com.example.domain.model.CartProduct
-import com.example.domain.model.Product
+import com.example.domain.model.cart.CartProduct
+import com.example.domain.model.product.Product
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.data.cache.CartCache
 import woowacourse.shopping.data.datasource.remote.cart.CartDataSourceImpl

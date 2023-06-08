@@ -1,4 +1,6 @@
-package com.example.domain.model
+package com.example.domain.model.product
+
+import com.example.domain.model.Price
 
 data class Product(
     val id: Long,

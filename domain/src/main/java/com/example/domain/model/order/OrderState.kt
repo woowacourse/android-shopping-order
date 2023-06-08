@@ -1,4 +1,4 @@
-package com.example.domain.model
+package com.example.domain.model.order
 
 enum class OrderState(val value: String) {
     PENDING("Pending"),

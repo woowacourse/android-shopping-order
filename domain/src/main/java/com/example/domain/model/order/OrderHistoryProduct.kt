@@ -1,4 +1,6 @@
-package com.example.domain.model
+package com.example.domain.model.order
+
+import com.example.domain.model.Price
 
 data class OrderHistoryProduct(
     val orderId: Int,

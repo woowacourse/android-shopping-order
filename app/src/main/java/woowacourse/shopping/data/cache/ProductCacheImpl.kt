@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cache
 
 import com.example.domain.ProductCache
-import com.example.domain.model.Product
+import com.example.domain.model.product.Product
 
 object ProductCacheImpl : ProductCache {
     private val _productList = mutableListOf<Product>()

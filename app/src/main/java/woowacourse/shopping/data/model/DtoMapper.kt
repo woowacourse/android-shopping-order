@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.model
 
-import com.example.domain.model.CartProduct
-import com.example.domain.model.OrderDetailProduct
-import com.example.domain.model.OrderHistoryInfo
-import com.example.domain.model.OrderHistoryProduct
-import com.example.domain.model.OrderInfo
-import com.example.domain.model.OrderState
-import com.example.domain.model.Point
-import com.example.domain.model.PointInfo
 import com.example.domain.model.Price
-import com.example.domain.model.Product
+import com.example.domain.model.cart.CartProduct
+import com.example.domain.model.order.Order
+import com.example.domain.model.order.OrderDetailProduct
+import com.example.domain.model.order.OrderHistoryInfo
+import com.example.domain.model.order.OrderHistoryProduct
+import com.example.domain.model.order.OrderState
+import com.example.domain.model.point.Point
+import com.example.domain.model.point.PointInfo
+import com.example.domain.model.product.Product
 import woowacourse.shopping.data.model.cart.CartProductDto
 import woowacourse.shopping.data.model.order.ContentDto
 import woowacourse.shopping.data.model.order.OrderDetailDto
@@ -25,7 +25,7 @@ fun CartProductDto.toDomain() = CartProduct(id, product.toDomain(), quantity, tr
 fun PointDto.toDomain() = PointInfo(currentPoint, toBeExpiredPoint)
 
 fun OrderDetailDto.toDomain() =
-    OrderInfo(
+    Order(
         orderId,
         orderAt,
         toDomain(orderStatus),

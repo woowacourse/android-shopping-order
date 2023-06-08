@@ -2,7 +2,7 @@ package woowacourse.shopping.feature.cart
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.domain.datasource.productsDatasource
-import com.example.domain.model.CartProduct
+import com.example.domain.model.cart.CartProduct
 import com.example.domain.repository.CartRepository
 import io.mockk.Runs
 import io.mockk.every
