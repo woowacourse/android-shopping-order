@@ -12,14 +12,12 @@ class ProductRemoteDataSource(
     private val retrofitService = retrofit.create(ProductsRetrofitService::class.java)
 
     override fun findProductById(id: Long, callback: (ProductDetail) -> Unit) {
-        retrofitService.getProductDetail(id)
-            .enqueue(
-                object : RetrofitCallback<ProductDetail>() {
-                    override fun onSuccess(response: ProductDetail?) {
-                        if (response != null) callback(response)
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<ProductDetail>() {
+            override fun onSuccess(response: ProductDetail?) {
+                if (response != null) callback(response)
+            }
+        }
+        retrofitService.getProductDetail(id).enqueue(retrofitCallback)
     }
 
     override fun getProductsWithRange(
@@ -27,14 +25,12 @@ class ProductRemoteDataSource(
         pageItemCount: Int,
         callback: (List<ProductDetail>, Boolean) -> Unit,
     ) {
-        retrofitService.getProductDetails(lastId, pageItemCount)
-            .enqueue(
-                object : RetrofitCallback<ProductListInfo>() {
-                    override fun onSuccess(response: ProductListInfo?) {
-                        val productDetails = response?.products ?: listOf()
-                        callback(productDetails, response?.last ?: true)
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<ProductListInfo>() {
+            override fun onSuccess(response: ProductListInfo?) {
+                val productDetails = response?.products ?: listOf()
+                callback(productDetails, response?.last ?: true)
+            }
+        }
+        retrofitService.getProductDetails(lastId, pageItemCount).enqueue(retrofitCallback)
     }
 }

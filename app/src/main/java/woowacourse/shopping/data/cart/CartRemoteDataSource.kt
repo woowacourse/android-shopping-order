@@ -17,55 +17,49 @@ class CartRemoteDataSource(retrofit: Retrofit) : CartDataSource {
         quantity: Int,
         callback: (cartId: Long) -> Unit,
     ) {
-        retrofitService.insertCartProduct(ProductInsertCartRequest(productId, quantity))
-            .enqueue(
-                object : retrofit2.Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        val location = response.headers()[LOCATION]?.split("/")?.last()
-                        callback(location?.toLong() ?: 0)
-                    }
+        val retrofitCallback = object : retrofit2.Callback<Unit> {
+            override fun onResponse(
+                call: Call<Unit>,
+                response: Response<Unit>,
+            ) {
+                val location = response.headers()[LOCATION]?.split("/")?.last()
+                callback(location?.toLong() ?: 0)
+            }
 
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
-                    }
-                },
-            )
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
+            }
+        }
+        retrofitService
+            .insertCartProduct(ProductInsertCartRequest(productId, quantity))
+            .enqueue(retrofitCallback)
     }
 
     override fun updateCartProduct(cartId: Long, quantity: Int, callback: () -> Unit) {
-        retrofitService.updateCartProduct(cartId, quantity)
-            .enqueue(
-                object : RetrofitCallback<Unit>() {
-                    override fun onSuccess(response: Unit?) {
-                        callback()
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<Unit>() {
+            override fun onSuccess(response: Unit?) {
+                callback()
+            }
+        }
+        retrofitService.updateCartProduct(cartId, quantity).enqueue(retrofitCallback)
     }
 
     override fun deleteCartProduct(cartId: Long, callback: () -> Unit) {
-        retrofitService.deleteCartProduct(cartId)
-            .enqueue(
-                object : RetrofitCallback<Unit>() {
-                    override fun onSuccess(response: Unit?) {
-                        callback()
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<Unit>() {
+            override fun onSuccess(response: Unit?) {
+                callback()
+            }
+        }
+        retrofitService.deleteCartProduct(cartId).enqueue(retrofitCallback)
     }
 
     override fun getAllCartProducts(callback: (List<CartProduct>) -> Unit) {
-        retrofitService.requestCartProducts()
-            .enqueue(
-                object : RetrofitCallback<List<CartProduct>>() {
-                    override fun onSuccess(response: List<CartProduct>?) {
-                        callback(response ?: listOf())
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<List<CartProduct>>() {
+            override fun onSuccess(response: List<CartProduct>?) {
+                callback(response ?: listOf())
+            }
+        }
+        retrofitService.requestCartProducts().enqueue(retrofitCallback)
     }
 
     companion object {

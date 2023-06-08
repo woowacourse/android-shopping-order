@@ -16,44 +16,38 @@ class OrderRemoteDataSource(
         retrofit.create(OrderRetrofitService::class.java)
 
     override fun loadOrders(callback: (Orders?) -> Unit) {
-        retrofitService.loadOrders()
-            .enqueue(
-                object : RetrofitCallback<Orders>() {
-                    override fun onSuccess(response: Orders?) {
-                        callback(response)
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<Orders>() {
+            override fun onSuccess(response: Orders?) {
+                callback(response)
+            }
+        }
+        retrofitService.loadOrders().enqueue(retrofitCallback)
     }
 
     override fun loadOrder(orderId: Long, callback: (Order?) -> Unit) {
-        retrofitService.loadOrder(orderId)
-            .enqueue(
-                object : RetrofitCallback<Order>() {
-                    override fun onSuccess(response: Order?) {
-                        callback(response)
-                    }
-                },
-            )
+        val retrofitCallback = object : RetrofitCallback<Order>() {
+            override fun onSuccess(response: Order?) {
+                callback(response)
+            }
+        }
+        retrofitService.loadOrder(orderId).enqueue(retrofitCallback)
     }
 
     override fun orderCartProducts(orderCartItems: OrderCartItemDtos, callback: (Long) -> Unit) {
-        retrofitService.orderCartItems(orderCartItems)
-            .enqueue(
-                object : retrofit2.Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        val location = response.headers()[LOCATION]?.split("/")?.last()
-                        callback(location?.toLong() ?: 0)
-                    }
+        val retrofitCallback = object : retrofit2.Callback<Unit> {
+            override fun onResponse(
+                call: Call<Unit>,
+                response: Response<Unit>,
+            ) {
+                val location = response.headers()[LOCATION]?.split("/")?.last()
+                callback(location?.toLong() ?: 0)
+            }
 
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.e("Request Failed", t.toString())
-                    }
-                },
-            )
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e("Request Failed", t.toString())
+            }
+        }
+        retrofitService.orderCartItems(orderCartItems).enqueue(retrofitCallback)
     }
 
     companion object {

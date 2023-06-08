@@ -25,22 +25,27 @@ class DefaultRecentProductRepository(
             System.currentTimeMillis(),
         )
         Thread {
-            recentProductDao.upsertRecentProduct(recentProduct)
-            callback()
+            requestUpsertRecentProduct(recentProduct, callback)
         }.start()
     }
 
-    override fun getRecentProductsBySize(
-        size: Int,
-        callback: (List<Product>) -> Unit,
-    ) {
+    private fun requestUpsertRecentProduct(recentProduct: RecentProduct, callback: () -> Unit) {
+        recentProductDao.upsertRecentProduct(recentProduct)
+        callback()
+    }
+
+    override fun getRecentProductsBySize(size: Int, callback: (List<Product>) -> Unit) {
         Thread {
-            val recentProducts = recentProductDao.loadAllRecentProducts(userInfo, baseUrl)
-            if (recentProducts.size > size) {
-                callback(recentProducts.subList(0, size).toProduct())
-            }
-            callback(recentProducts.toProduct())
+            requestRecentProduct(size, callback)
         }.start()
+    }
+
+    private fun requestRecentProduct(size: Int, callback: (List<Product>) -> Unit) {
+        val recentProducts = recentProductDao.loadAllRecentProducts(userInfo, baseUrl)
+        if (recentProducts.size > size) {
+            callback(recentProducts.subList(0, size).toProduct())
+        }
+        callback(recentProducts.toProduct())
     }
 
     private fun List<RecentProduct>.toProduct() =
