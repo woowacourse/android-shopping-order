@@ -10,20 +10,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.data.order.OrderRemoteRepository
-import woowacourse.shopping.data.util.RetrofitManager
 import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.order.detail.OrderDetailActivity
 import woowacourse.shopping.model.CartState
 import woowacourse.shopping.model.mapper.toDomain
+import woowacourse.shopping.util.Injector
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
-    private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY)!! }
+    private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY)!! }
     private val presenter: OrderContract.Presenter by lazy {
-        val orderPendingCart: CartState by lazy { intent.getParcelableExtra(ORDER_PRODUCTS_KEY)!! }
-        val orderRepository: OrderRepository =
-            OrderRemoteRepository(RetrofitManager.getInstance(url).retrofit)
+        val orderPendingCart: CartState = intent.getParcelableExtra(ORDER_PRODUCTS_KEY)!!
+        val orderRepository: OrderRepository = Injector.provideOrderRemoteRepository(serverUrl)
         OrderPresenter(
             view = this,
             orderPendingCart = orderPendingCart.toDomain(),
@@ -87,7 +85,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun showOrderDetailPage(orderId: Long) {
-        OrderDetailActivity.startActivity(this, orderId = orderId, serverUrl = url)
+        OrderDetailActivity.startActivity(this, orderId = orderId, serverUrl = serverUrl)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

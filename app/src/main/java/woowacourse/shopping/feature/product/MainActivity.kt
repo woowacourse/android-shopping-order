@@ -9,16 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.domain.cart.CartProduct
-import com.example.domain.cart.CartRepository
 import com.example.domain.product.Product
-import com.example.domain.product.ProductRepository
 import com.example.domain.product.recent.RecentProduct
-import com.example.domain.product.recent.RecentProductRepository
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
-import woowacourse.shopping.data.cart.CartRemoteRepository
-import woowacourse.shopping.data.product.ProductRemoteRepository
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.util.RetrofitManager
 import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -28,6 +21,7 @@ import woowacourse.shopping.feature.product.recent.RecentProductListWrapperAdapt
 import woowacourse.shopping.model.ProductState
 import woowacourse.shopping.model.RecentProductState
 import woowacourse.shopping.model.mapper.toUi
+import woowacourse.shopping.util.Injector
 import woowacourse.shopping.util.SpanSizeLookUpManager
 import woowacourse.shopping.util.extension.showToast
 
@@ -37,14 +31,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val binding: ActivityMainBinding
         get() = _binding!!
 
-    private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
+    private val serverUrl: String by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: MainContract.Presenter by lazy {
-        val cartRepository: CartRepository =
-            CartRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
-        val productRepository: ProductRepository =
-            ProductRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
-        val recentProductRepository: RecentProductRepository =
-            RecentProductRepositoryImpl(this, serverUrl)
+        val cartRepository = Injector.provideCartRepository(serverUrl)
+        val productRepository = Injector.provideProductRepository(serverUrl)
+        val recentProductRepository = Injector.provideRecentProductRepository(this, serverUrl)
         MainPresenter(
             view = this, productRepository = productRepository,
             recentProductRepository = recentProductRepository, cartRepository = cartRepository

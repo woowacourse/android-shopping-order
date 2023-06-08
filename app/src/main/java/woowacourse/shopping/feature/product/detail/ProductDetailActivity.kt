@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.view.View.GONE
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.cart.CartRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRemoteRepository
-import woowacourse.shopping.data.util.RetrofitManager
 import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
@@ -18,6 +15,7 @@ import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
 import woowacourse.shopping.model.ProductState
 import woowacourse.shopping.model.RecentProductState
+import woowacourse.shopping.util.Injector
 import woowacourse.shopping.util.extension.showToast
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -27,12 +25,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: ProductDetailContract.Presenter by lazy {
-        val product: ProductState? by lazy { intent.getParcelableExtra(PRODUCT_KEY) }
-        val recentProduct: RecentProductState? by lazy {
-            intent.getParcelableExtra(RECENT_PRODUCT_KEY)
-        }
-        val cartRepository: CartRepository =
-            CartRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
+        val product: ProductState? = intent.getParcelableExtra(PRODUCT_KEY)
+        val recentProduct: RecentProductState? = intent.getParcelableExtra(RECENT_PRODUCT_KEY)
+        val cartRepository = Injector.provideCartRepository(serverUrl)
         ProductDetailPresenter(this, product, recentProduct, cartRepository)
     }
 
