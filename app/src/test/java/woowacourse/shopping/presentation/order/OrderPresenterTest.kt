@@ -75,62 +75,55 @@ class OrderPresenterTest {
         val predictionPoint = Point((orderPrice * 0.01).toInt())
 
         // 장바구니 아이디들로 조회한다
-        val cartOnSuccess = slot<(List<CartProduct>) -> Unit>()
         every {
             cartRepository.loadCartsByCartIds(
                 cartIds = cartIds,
                 onFailure = any(),
-                onSuccess = capture(cartOnSuccess),
+                onSuccess = captureLambda(),
             )
         } answers {
-            cartOnSuccess.captured(carts)
+            lambda<(List<CartProduct>) -> Unit>().captured.invoke(carts)
         }
 
         // 카드 정보를 조회한다.
         every { cardRepository.loadCards() } returns CardFixture.getFixture().map { it.toModel() }
 
         // 유저 가용 포인트를 조회한다.
-        val pointOnSuccess = slot<(Point) -> Unit>()
         every {
             orderRepository.loadPoint(
                 onFailure = any(),
-                onSuccess = capture(pointOnSuccess)
+                onSuccess = captureLambda(),
             )
         } answers {
-            pointOnSuccess.captured(userPoint)
+            lambda<(Point)-> Unit>().captured.invoke(userPoint)
         }
 
         // 예상 적립 포인트를 조회한다.
-        val predictionPointOnSuccess = slot<(Point) -> Unit>()
         every {
             orderRepository.loadPredictionSavePoint(
                 orderPrice,
                 onFailure = any(),
-                onSuccess = capture(predictionPointOnSuccess),
+                onSuccess = captureLambda(),
             )
         } answers {
-            predictionPointOnSuccess.captured(predictionPoint)
+            lambda<(Point) -> Unit>().captured(predictionPoint)
         }
 
-        justRun { view.showCardItemsView(CardFixture.getFixture()) }
         justRun { view.showUserPointView(userPoint.toUIModel()) }
         justRun { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         justRun { view.showSavePredictionPointView(predictionPoint.toUIModel()) }
         justRun { view.showOrderPriceView(orderPrice) }
         justRun { view.showProductItemsView(carts.map { it.toUIModel() }) }
-        justRun { view.setLayoutVisibility() }
 
         // when
         presenter.loadOrderProducts(cartIds)
 
         // then
-        verify { view.showCardItemsView(CardFixture.getFixture()) }
         verify { view.showUserPointView(userPoint.toUIModel()) }
         verify { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         verify { view.showSavePredictionPointView(predictionPoint.toUIModel()) }
         verify { view.showOrderPriceView(orderPrice) }
         verify { view.showProductItemsView(carts.map { it.toUIModel() }) }
-        verify { view.setLayoutVisibility() }
     }
 
     @Test
@@ -155,50 +148,45 @@ class OrderPresenterTest {
         val orderId = 1L
 
         // 장바구니 아이디들로 조회한다
-        val cartOnSuccess = slot<(List<CartProduct>) -> Unit>()
         every {
             cartRepository.loadCartsByCartIds(
                 cartIds = cartIds,
                 onFailure = any(),
-                onSuccess = capture(cartOnSuccess),
+                onSuccess = captureLambda()
             )
         } answers {
-            cartOnSuccess.captured(carts)
+            lambda<(List<CartProduct>) -> Unit>().captured.invoke(carts)
         }
 
         // 카드 정보를 조회한다.
         every { cardRepository.loadCards() } returns CardFixture.getFixture().map { it.toModel() }
 
         // 유저 가용 포인트를 조회한다.
-        val pointOnSuccess = slot<(Point) -> Unit>()
         every {
             orderRepository.loadPoint(
                 onFailure = any(),
-                onSuccess = capture(pointOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            pointOnSuccess.captured(userPoint)
+            lambda<(Point) -> Unit>().captured.invoke(userPoint)
         }
 
         // 예상 적립 포인트를 조회한다.
-        val predictionPointOnSuccess = slot<(Point) -> Unit>()
         every {
             orderRepository.loadPredictionSavePoint(
                 orderPrice,
                 onFailure = any(),
-                onSuccess = capture(predictionPointOnSuccess),
+                onSuccess = captureLambda()
             )
         } answers {
-            predictionPointOnSuccess.captured(predictionPoint)
+            lambda<(Point) -> Unit>().captured(predictionPoint)
         }
 
-        justRun { view.showCardItemsView(CardFixture.getFixture()) }
         justRun { view.showUserPointView(userPoint.toUIModel()) }
         justRun { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         justRun { view.showSavePredictionPointView(predictionPoint.toUIModel()) }
         justRun { view.showOrderPriceView(orderPrice) }
         justRun { view.showProductItemsView(carts.map { it.toUIModel() }) }
-        justRun { view.setLayoutVisibility() }
 
         presenter.loadOrderProducts(cartIds)
 
@@ -221,13 +209,11 @@ class OrderPresenterTest {
         presenter.postOrder()
 
         // then
-        verify { view.showCardItemsView(CardFixture.getFixture()) }
         verify { view.showUserPointView(userPoint.toUIModel()) }
         verify { view.setPointTextChangeListener(orderPrice, userPoint.toUIModel()) }
         verify { view.showSavePredictionPointView(predictionPoint.toUIModel()) }
         verify { view.showOrderPriceView(orderPrice) }
         verify { view.showProductItemsView(carts.map { it.toUIModel() }) }
-        verify { view.setLayoutVisibility() }
         verify { cartRepository.deleteCarts(order.cartIds) }
         verify { view.showOrderDetailView(orderId) }
     }

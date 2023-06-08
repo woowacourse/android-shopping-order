@@ -68,13 +68,14 @@ class ProductDetailPresenterTest {
         // given
         val slot = slot<ProductModel>()
         justRun { view.showProductInfoView(capture(slot)) }
-        val slotOnSuccess = slot<(Product) -> Unit>()
         every {
             productRepository.loadDataById(
-                1L, onFailure = any(), onSuccess = capture(slotOnSuccess)
+                1L,
+                onFailure = any(),
+                onSuccess = captureLambda()
             )
         } answers {
-            slotOnSuccess.captured(ProductFixture.getData().toModel())
+            lambda<(Product) -> Unit>().captured.invoke(ProductFixture.getData().toModel())
         }
 
         // when
@@ -88,13 +89,14 @@ class ProductDetailPresenterTest {
     fun `장바구니 담기를 누르면 상품의 개수를 정하는 다이얼로그가 보여진다`() {
         // given
         val product = ProductFixture.getData()
-        val slotOnSuccess = slot<(Product) -> Unit>()
         every {
             productRepository.loadDataById(
-                1L, onFailure = any(), onSuccess = capture(slotOnSuccess)
+                1L,
+                onFailure = any(),
+                onSuccess = captureLambda()
             )
         } answers {
-            slotOnSuccess.captured(product.toModel())
+            lambda<(Product) -> Unit>().captured.invoke(ProductFixture.getData().toModel())
         }
         presenter.setProduct(1L)
 
@@ -142,26 +144,24 @@ class ProductDetailPresenterTest {
     @Test
     fun `아이디가 1L인 상품을 장바구니에 1개 저장한다`() {
         // given
-        val slotAddCartOnSuccess = slot<(Long) -> Unit>()
         every {
             cartRepository.addCartProduct(
                 1L,
                 onFailure = any(),
-                onSuccess = capture(slotAddCartOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotAddCartOnSuccess.captured(1L)
+            lambda<(Long) -> Unit>().captured.invoke(1L)
         }
 
         // 장바구니는 현재 비어있다
-        val slotLoadAllCartsOnSuccess = slot<(List<CartProduct>) -> Unit>()
         every {
             cartRepository.loadAllCarts(
                 onFailure = any(),
-                onSuccess = capture(slotLoadAllCartsOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotLoadAllCartsOnSuccess.captured(emptyList())
+            lambda<(List<CartProduct>) -> Unit>().captured.invoke(emptyList())
         }
 
         justRun { view.addCartSuccessView() }

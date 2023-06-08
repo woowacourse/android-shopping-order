@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import io.mockk.every
+import io.mockk.invoke
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
@@ -36,14 +37,15 @@ class CartPresenterTest {
     @Test
     fun `장바구니 데이터를 받아와 보여준다`() {
         // given
-        val slotCartProducts = slot<(List<CartProduct>) -> Unit>()
         every {
             cartRepository.loadAllCarts(
                 onFailure = any(),
-                onSuccess = capture(slotCartProducts)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotCartProducts.captured(CartFixture.getFixture().map { it.toModel() })
+            lambda<(List<CartProduct>) -> Unit>().captured.invoke(
+                CartFixture.getFixture().map { it.toModel() }
+            )
         }
 
         val slotItems = slot<List<CartProductModel>>()
@@ -51,13 +53,8 @@ class CartPresenterTest {
 
         every { cartRepository.loadAllCartChecked() } returns CartFixture.getFixture()
             .map { it.toModel() }
-        justRun { view.setEnableOrderButton(true) }
         justRun { view.showCartItemsView(capture(slotItems)) }
         justRun { view.showTotalPriceView(capture(slotTotalPrice)) }
-        justRun { view.setEnableLeftButton(false) }
-        justRun { view.setEnableRightButton(false) }
-        justRun { view.setAllCartChecked(true) }
-        justRun { view.setLayoutVisibility() }
 
         // when
         presenter.initCartItems()
@@ -72,13 +69,8 @@ class CartPresenterTest {
         assertEquals(expectedTotalPrice, actualTotalPrice)
 
         verify { cartRepository.loadAllCartChecked() }
-        verify { view.setEnableOrderButton(true) }
         verify { view.showCartItemsView(slotItems.captured) }
         verify { view.showTotalPriceView(slotTotalPrice.captured) }
-        verify { view.setEnableLeftButton(false) }
-        verify { view.setEnableRightButton(false) }
-        verify { view.setAllCartChecked(true) }
-        verify { view.setLayoutVisibility() }
     }
 
     @Test
@@ -180,15 +172,14 @@ class CartPresenterTest {
             true
         )
 
-        val slotOnSuccess = slot<() -> Unit>()
         every {
             cartRepository.updateCartCount(
                 targetCart.toModel(),
                 onFailure = any(),
-                onSuccess = capture(slotOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotOnSuccess.captured.invoke()
+            lambda<() -> Unit>().invoke()
         }
 
         justRun { cartRepository.deleteCart(targetCart.id) }

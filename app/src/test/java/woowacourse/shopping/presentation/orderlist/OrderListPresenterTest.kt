@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.orderlist
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -34,14 +33,13 @@ class OrderListPresenterTest {
         // given
         val orders = listOf(OrderDetailFixture.getFixture().toModel())
 
-        val orderListOnSuccess = slot<(List<OrderDetail>) -> Unit>()
         every {
             orderRepository.loadOrderList(
                 onFailure = any(),
-                onSuccess = capture(orderListOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            orderListOnSuccess.captured(orders)
+            lambda<(List<OrderDetail>) -> Unit>().captured.invoke(orders)
         }
 
         justRun { view.showOrderListItemView(orders.map { it.toUIModel() }) }

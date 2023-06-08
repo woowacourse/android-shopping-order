@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.orderdetail
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -40,15 +39,14 @@ class OrderDetailPresenterTest {
         val totalPrice = orderDetail.products.sumOf { it.count * it.product.price }
 
         // 주문 정보를 조회한다
-        val loadOnSuccess = slot<(OrderDetail) -> Unit>()
         every {
             orderRepository.loadOrder(
                 orderId,
                 onFailure = any(),
-                onSuccess = capture(loadOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            loadOnSuccess.captured(orderDetail)
+            lambda<(OrderDetail) -> Unit>().captured.invoke(orderDetail)
         }
 
         justRun { view.showOrderProductItemView(orderDetail.products.map { it.toUIModel() }) }

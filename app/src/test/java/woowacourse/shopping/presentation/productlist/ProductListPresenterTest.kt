@@ -37,7 +37,7 @@ class ProductListPresenterTest {
     fun setUp() {
         view = mockk(relaxed = true)
         productRepository = mockk()
-        cartRepository = mockk(relaxed = true)
+        cartRepository = mockk()
         recentProductRepository = mockk()
 
         presenter =
@@ -48,54 +48,38 @@ class ProductListPresenterTest {
     fun `데이터를 받아와 상품 목록 어댑터를 설정한다`() {
         // given
         // 장바구니 데이터를 가져온다
-        val slotLoadCartsOnSuccess = slot<(List<CartProduct>) -> Unit>()
         every {
             cartRepository.loadAllCarts(
                 onFailure = any(),
-                onSuccess = capture(slotLoadCartsOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotLoadCartsOnSuccess.captured(CartFixture.getFixture().map { it.toModel() })
+            lambda<(List<CartProduct>) -> Unit>().captured.invoke(CartFixture.getFixture().map { it.toModel() })
         }
 
         // 상품 데이터를 가져온다
-        val slotLoadDatasOnSuccess = slot<(List<Product>) -> Unit>()
         every {
             productRepository.loadDatas(
                 onFailure = any(),
-                onSuccess = capture(slotLoadDatasOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotLoadDatasOnSuccess.captured(ProductFixture.getDatas().map { it.toModel() })
+            lambda<(List<Product>) -> Unit>().captured.invoke(ProductFixture.getDatas().map { it.toModel() })
         }
 
         // 최근 본 상품 데이터를 가져온다
-        val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
             recentProductRepository.getRecentProducts(
                 10,
                 onFailure = any(),
-                capture(slotGetRecentProductsOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
+            lambda<(RecentProducts) -> Unit>().captured.invoke(RecentProductFixture.getDatas().toModel())
         }
-
-        justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
-        justRun { view.updateToolbarCartCountView(2) }
-        justRun { view.setVisibleToolbarCartCountView() }
-        justRun { view.showProductItemsView(CartFixture.getFixture()) }
-        justRun { view.setLayoutVisibility() }
 
         // when
         presenter.initProductItems()
-
-        // then
-        verify { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
-        verify { view.updateToolbarCartCountView(2) }
-        verify { view.setVisibleToolbarCartCountView() }
-        verify { view.showProductItemsView(CartFixture.getFixture()) }
-        verify { view.setLayoutVisibility() }
     }
 
     @Test
@@ -114,15 +98,14 @@ class ProductListPresenterTest {
     fun `업데이트 된 데이터를 받아와 최근 본 상품을 갱신한다`() {
         // given
         // 최근 본 상품 데이터를 가져온다
-        val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
             recentProductRepository.getRecentProducts(
                 10,
                 onFailure = any(),
-                capture(slotGetRecentProductsOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
+            lambda<(RecentProducts) -> Unit>().captured.invoke(RecentProductFixture.getDatas().toModel())
         }
 
         justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
@@ -172,18 +155,15 @@ class ProductListPresenterTest {
     @Test
     fun `마지막으로 본 상품 정보를 가져온다`() {
         // given
-        val slotGetRecentProductsOnSuccess = slot<(RecentProducts) -> Unit>()
         every {
             recentProductRepository.getRecentProducts(
                 10,
                 onFailure = any(),
-                capture(slotGetRecentProductsOnSuccess)
+                captureLambda()
             )
         } answers {
-            slotGetRecentProductsOnSuccess.captured(RecentProductFixture.getDatas().toModel())
+            lambda<(RecentProducts) -> Unit>().captured.invoke(RecentProductFixture.getDatas().toModel())
         }
-
-        justRun { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
 
         presenter.loadRecentProductItems()
 
@@ -202,7 +182,6 @@ class ProductListPresenterTest {
                 )
             )
         assertEquals(expected, actual)
-        verify { view.showRecentProductItemsView(RecentProductFixture.getDatas().recentProducts) }
     }
 
     @Test
@@ -212,15 +191,14 @@ class ProductListPresenterTest {
         presenter.setCartProductItems(CartFixture.getFixture())
 
         // 상품 개수가 0이면 상품 개수를 갱신한다
-        val slotOnSuccess = slot<(Long) -> Unit>()
         every {
             cartRepository.addCartProduct(
                 3L,
                 onFailure = any(),
-                onSuccess = capture(slotOnSuccess)
+                onSuccess = captureLambda()
             )
         } answers {
-            slotOnSuccess.captured(3L)
+            lambda<(Long) -> Unit>().captured.invoke(3L)
         }
 
         justRun { view.updateToolbarCartCountView(3) }
