@@ -63,27 +63,23 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(s: Editable?) {
-                val availablePoint =
-                    binding.tvOrderAvailablePoint.text.toString().substringBeforeLast("포").toInt()
-
+                val availablePoint = binding.tvOrderAvailablePoint.text.toString().toInt()
                 presenter.setPoint(s, availablePoint)
             }
         })
 
         binding.btOrderPay.setOnClickListener {
-            val usedPoint =
-                binding.tvOrderPaymentDetailUsePoint.text.toString().substringBeforeLast("포")
-                    .toInt()
+            val usedPoint = binding.tvOrderPaymentDetailUsePoint.text.toString().toInt()
             presenter.order(usedPoint)
         }
     }
 
     override fun setAvailablePointView(point: Int) {
-        binding.tvOrderAvailablePoint.text = getString(R.string.point_format, point)
+        binding.tvOrderAvailablePoint.text = "$point"
     }
 
     override fun setSavingPoint(point: Int) {
-        binding.tvOrderPointSave.text = getString(R.string.point_format, point)
+        binding.tvOrderPointSave.text = "$point"
     }
 
     override fun setCartProductsView(products: List<CartModel>) {
@@ -98,12 +94,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun setTotalPriceView(totalPrice: Int) {
-        binding.tvOrderPaymentDetailOrderPrice.text =
+        binding.tvOrderPaymentDetailTotalPrice.text =
             getString(R.string.product_price_format, totalPrice)
+
+        binding.tvOrderPaymentDetailOrderPrice.text = "$totalPrice"
+        binding.tvOrderPaymentDetailUsePoint.text = "$DEFAULT_VALUE"
+        binding.etOrderUsePoint.setText("$DEFAULT_VALUE")
     }
 
     override fun setOrderPriceView(point: Int, totalPrice: Int) {
-        binding.tvOrderPaymentDetailUsePoint.text = getString(R.string.point_format, point)
+        binding.tvOrderPaymentDetailUsePoint.text = "$point"
         binding.tvOrderPaymentDetailTotalPrice.text =
             getString(R.string.product_price_format, totalPrice - point)
     }
@@ -130,6 +130,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     companion object {
         private const val KEY_CART_ITEMS = "KEY_CART_ITEMS"
+        private const val DEFAULT_VALUE = 0
 
         internal fun createIntent(
             context: Context,

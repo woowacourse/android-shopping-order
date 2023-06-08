@@ -12,7 +12,9 @@
             android:id="@+id/layout_order"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white">
+            android:background="@color/white"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="38dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -44,8 +46,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_order_product_title_info"
-                    tools:listitem="@layout/item_order_product_list"
-                    tools:itemCount="5"/>
+                    tools:itemCount="5"
+                    tools:listitem="@layout/item_order_product_list" />
 
                 <View
                     android:id="@+id/view_line_order1"
@@ -61,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:text="@string/order_point_title_info_text"
+                    android:text="@string/point_suffix_text"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -82,15 +84,25 @@
                     android:id="@+id/tv_order_available_point"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
                     android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_order_available_point_suffix"
                     app:layout_constraintStart_toEndOf="@id/tv_order_available_point_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_available_point_info"
-                    tools:text="1,000포인트" />
+                    tools:text="1,000" />
+
+                <TextView
+                    android:id="@+id/tv_order_available_point_suffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/point_suffix_text"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_order_available_point"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_order_use_point_title_info"
@@ -118,10 +130,22 @@
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@id/tv_order_use_point_title_info"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_order_use_point_suffix"
                     app:layout_constraintStart_toEndOf="@id/tv_order_use_point_title_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_use_point_title_info"
-                    tools:text="0원" />
+                    tools:text="0" />
+
+                <TextView
+                    android:id="@+id/tv_order_use_point_suffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/point_suffix_text"
+                    android:textColor="@color/main_color"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_available_point_info" />
 
                 <View
                     android:id="@+id/view_line_order2"
@@ -197,15 +221,25 @@
                     android:id="@+id/tv_order_payment_detail_order_price"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
                     android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_order_payment_detail_order_price_suffix"
                     app:layout_constraintStart_toEndOf="@id/tv_order_payment_detail_order_price_title_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_payment_detail_order_price_title_info"
-                    tools:text="10,000원" />
+                    tools:text="10,000" />
+
+                <TextView
+                    android:id="@+id/tv_order_payment_detail_order_price_suffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/price_text_suffix"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_order_payment_detail_order_price"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_order_payment_detail_use_point_title_info"
@@ -221,15 +255,25 @@
                     android:id="@+id/tv_order_payment_detail_use_point"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
                     android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_order_payment_detail_use_point_suffix"
                     app:layout_constraintStart_toEndOf="@id/tv_order_payment_detail_use_point_title_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_payment_detail_use_point_title_info"
-                    tools:text="1,000원" />
+                    tools:text="1,000" />
+
+                <TextView
+                    android:id="@+id/tv_order_payment_detail_use_point_suffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/point_suffix_text"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_order_payment_detail_use_point"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <LinearLayout
                     android:id="@+id/layout_order_total_price"
@@ -303,15 +347,25 @@
                     android:id="@+id/tv_order_point_save"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:ellipsize="middle"
                     android:gravity="end"
                     android:maxLines="1"
                     android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_order_point_save_suffix"
                     app:layout_constraintStart_toEndOf="@id/tv_order_point_save_title_info"
                     app:layout_constraintTop_toTopOf="@id/tv_order_point_save_title_info"
-                    tools:text="150원" />
+                    tools:text="150" />
+
+                <TextView
+                    android:id="@+id/tv_order_point_save_suffix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/point_suffix_text"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_order_point_save"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <Button
                     android:id="@+id/bt_order_pay"

@@ -33,7 +33,6 @@
     <string name="toolbar_item_order">주문목록</string>
     <string name="order_detail">주문상세</string>
     <string name="order_product_title_info_text">주문상품</string>
-    <string name="order_point_title_info_text">포인트</string>
     <string name="order_available_point_info_text">보유</string>
     <string name="order_use_point_title_info_text">사용</string>
     <string name="order_payment_title_info_text">결제수단</string>
@@ -52,4 +51,6 @@
     <string name="order_detail_order_used_point_info_text">포인트 사용</string>
     <string name="order_detail_order_saved_point_info_text">포인트 적립</string>
     <string name="order_detail_total_price_info_text">결제금액</string>
+    <string name="point_suffix_text">포인트</string>
+    <string name="price_text_suffix">원</string>
 </resources>
