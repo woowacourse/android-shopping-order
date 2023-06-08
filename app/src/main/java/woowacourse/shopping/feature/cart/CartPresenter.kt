@@ -5,14 +5,13 @@ import com.example.domain.CartProduct
 import com.example.domain.Pagination
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.model.CartProductState
-import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
-import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
 import woowacourse.shopping.model.mapper.toUi
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
 ) : CartContract.Presenter {
+
     private val cart: Cart = Cart()
     private val maxProductsPerPage: Int = 5
     private val minPageNumber: Int = 1
@@ -23,31 +22,27 @@ class CartPresenter(
 
     override fun initContents() {
         cartRepository.requestFetchCartProductsUnit(
-            Cart.MAX_SIZE,
-            pageNumber,
-            onFailure = {},
-            onSuccess = { cartProducts: List<CartProduct>, _: Pagination ->
-                cart.updateAll(cartProducts)
-                loadCart()
-                view.setCartPageNumber(pageNumber)
-                view.showCartProducts()
-            }
+            Cart.MAX_SIZE, pageNumber,
+            onFailure = {}, onSuccess = { cartProducts: List<CartProduct>, _: Pagination ->
+            cart.updateAll(cartProducts)
+            loadCart()
+            view.setCartPageNumber(pageNumber)
+            view.showCartProducts()
+        }
         )
     }
 
     override fun loadCart() {
         cartRepository.requestFetchCartProductsUnit(
-            maxProductsPerPage,
-            pageNumber,
-            onFailure = {},
-            onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
-                val cartProductStates: List<CartProductState> = cartProducts.map(CartProduct::toUi)
-                maxPageNumber = pagination.lastPage
-                pickAll()
-                view.setCartPageNumber(pageNumber)
-                view.setCartProducts(cartProductStates)
-                view.showCartProducts()
-            }
+            maxProductsPerPage, pageNumber,
+            onFailure = {}, onSuccess = { cartProducts: List<CartProduct>, pagination: Pagination ->
+            val cartProductStates: List<CartProductState> = cartProducts.map(CartProduct::toUi)
+            maxPageNumber = pagination.lastPage
+            pickAll()
+            view.setCartPageNumber(pageNumber)
+            view.setCartProducts(cartProductStates)
+            view.showCartProducts()
+        }
         )
 
         view.setCartPageNumber(pageNumber)
@@ -80,27 +75,35 @@ class CartPresenter(
     }
 
     override fun plusQuantity(cartProductState: CartProductState) {
-        cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
-        cartRepository.updateCartProductQuantity(
-            id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = {
-            cart.updateProductQuantityByIndex(cartProductState.id, cartProductState.quantity)
-            view.updateItem(cartProductState)
-            updatePaymentAmount()
+        val cartProduct: CartProduct? = cart.getById(cartProductState.id)
+        if (cartProduct != null) {
+            cartProduct.quantity++
+            cartProductState.quantity = cartProduct.quantity
+            cartRepository.updateCartProductQuantity(
+                id = cartProduct.id, quantity = cartProduct.quantity,
+                onFailure = {}, onSuccess = {
+                cart.updateProductQuantityByIndex(cartProduct.id, cartProduct.quantity)
+                view.updateItem(cartProductState)
+                updatePaymentAmount()
+            }
+            )
         }
-        )
     }
 
     override fun minusQuantity(cartProductState: CartProductState) {
-        cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
-        cartRepository.updateCartProductQuantity(
-            id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = {
-            cart.updateProductQuantityByIndex(cartProductState.id, cartProductState.quantity)
-            view.updateItem(cartProductState)
-            updatePaymentAmount()
+        val cartProduct: CartProduct? = cart.getById(cartProductState.id)
+        if (cartProduct != null) {
+            cartProduct.quantity--
+            cartProductState.quantity = cartProduct.quantity
+            cartRepository.updateCartProductQuantity(
+                id = cartProduct.id, quantity = cartProduct.quantity,
+                onFailure = {}, onSuccess = {
+                cart.updateProductQuantityByIndex(cartProduct.id, cartProduct.quantity)
+                view.updateItem(cartProductState)
+                updatePaymentAmount()
+            }
+            )
         }
-        )
     }
 
     override fun updatePickedByCartId(cartId: Long, checked: Boolean) {

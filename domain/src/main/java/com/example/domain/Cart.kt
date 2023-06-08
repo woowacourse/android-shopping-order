@@ -6,9 +6,7 @@ class Cart(products: List<CartProduct> = emptyList()) {
     val products: List<CartProduct>
         get() = _products.toList()
 
-    fun updateAll(cartProducts: List<CartProduct>) {
-        _products = cartProducts.toMutableList()
-    }
+    fun isAllPicked(): Boolean = products.count() == products.count { it.isPicked }
 
     fun removeById(id: Long): Boolean = _products.removeIf { it.id == id }
 
@@ -20,6 +18,13 @@ class Cart(products: List<CartProduct> = emptyList()) {
 
     fun getPickedProducts(): Cart = Cart(_products.filter { it.isPicked })
 
+    fun getById(id: Long): CartProduct? {
+        val index: Int = getIndexById(id)
+        return if (index != -1) _products[index] else null
+    }
+
+    fun add(cartProduct: CartProduct) = _products.add(cartProduct)
+
     fun updatePickedByIndex(cartId: Long, picked: Boolean) {
         val index = getIndexById(cartId)
         _products[index].isPicked = picked
@@ -30,7 +35,9 @@ class Cart(products: List<CartProduct> = emptyList()) {
         _products[index].quantity = quantity
     }
 
-    fun isAllPicked(): Boolean = products.count() == products.count { it.isPicked }
+    fun updateAll(cartProducts: List<CartProduct>) {
+        _products = cartProducts.toMutableList()
+    }
 
     fun setAllPicked(picked: Boolean) = _products.map { it.isPicked = picked }
 
