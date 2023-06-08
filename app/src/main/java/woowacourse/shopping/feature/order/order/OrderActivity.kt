@@ -86,13 +86,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     override fun succeedInOrder(orderId: Long) {
-        Toast.makeText(this, "주문이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.order_success), Toast.LENGTH_SHORT).show()
         val orderDetailIntent = OrderDetailActivity.getIntent(this, orderId)
         startActivity(orderDetailIntent)
     }
 
     override fun failToOrder() {
-        Toast.makeText(this, "주문에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.order_fail), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

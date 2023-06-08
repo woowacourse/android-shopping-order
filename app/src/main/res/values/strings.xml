@@ -36,4 +36,6 @@
     <string name="order_id">주문 번호 %d</string>
     <string name="go_order_detail"><![CDATA[주문 상세 보기 >]]></string>
     <string name="order_main_product_name_more_than_one">%s 외 %d 종</string>
+    <string name="order_success">주문이 완료되었습니다!</string>
+    <string name="order_fail">주문에 실패하였습니다.</string>
 </resources>

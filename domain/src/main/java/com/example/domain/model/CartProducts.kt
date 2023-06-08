@@ -1,7 +1,7 @@
 package com.example.domain.model
 
 class CartProducts(
-    private val list: List<CartProduct>
+    private val list: List<CartProduct>,
 ) {
     val all: List<CartProduct>
         get() = list.map { it.copy() }
@@ -41,8 +41,11 @@ class CartProducts(
 
     fun changeAllChecked(cartIds: List<Long>, checked: Boolean): CartProducts {
         val newList = all.map {
-            if (it.cartId in cartIds) it.copy(checked = checked)
-            else it
+            if (it.cartId in cartIds) {
+                it.copy(checked = checked)
+            } else {
+                it
+            }
         }
         return CartProducts(newList)
     }

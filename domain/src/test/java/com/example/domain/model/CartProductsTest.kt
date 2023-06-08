@@ -15,7 +15,7 @@ internal class CartProductsTest {
     fun `constructor_0개 담딘 상품이 섞여있다_예외 발생`() {
         // given
         val carts = listOf(
-            CartProduct(1, productsDatasource[0], 0, false)
+            CartProduct(1, productsDatasource[0], 0, false),
         )
 
         // then
@@ -26,7 +26,7 @@ internal class CartProductsTest {
     fun `constructor_0개 담딘 상품이 없다_예외 발생 안함`() {
         // given
         val carts = listOf(
-            CartProduct(1, productsDatasource[0], 1, false)
+            CartProduct(1, productsDatasource[0], 1, false),
         )
 
         // then
