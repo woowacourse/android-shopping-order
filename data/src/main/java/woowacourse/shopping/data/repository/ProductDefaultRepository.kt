@@ -36,10 +36,6 @@ class ProductDefaultRepository(
         }
     }
 
-    override fun insert(product: Product): Result<Int> {
-        return remoteDataSource.insert(product)
-    }
-
     override fun findById(id: Int): Result<Product> {
         return when (localDataSource.isCached()) {
             true -> localDataSource.findById(id)
