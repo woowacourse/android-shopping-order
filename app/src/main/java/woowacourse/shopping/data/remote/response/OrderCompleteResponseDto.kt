@@ -7,14 +7,14 @@ data class OrderCompleteResponseDto(
     val couponName: String?,
     val discountPrice: Int,
     val id: Int,
-    val orderProducts: List<OrderProduct>,
+    val orderProductDto: List<OrderProductDto>,
     val originPrice: Int,
     val timestamp: String,
     val totalPrice: Int,
 ) {
 
     @Serializable
-    data class OrderProduct(
+    data class OrderProductDto(
         val productResponse: ProductResponseDto,
         val quantity: Int,
     )

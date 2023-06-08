@@ -76,7 +76,7 @@ class OrderRepositoryImpl(
         orderCompleteDataSource.getReceipt(
             orderId,
             onSuccess = { orderCompleteResponseDto ->
-                // onSuccess.invoke(orderCompleteResponseDto.toDomain())
+                onSuccess.invoke(orderCompleteResponseDto.toDomain())
             },
             onFailure = { onFailure.invoke(it) },
         )

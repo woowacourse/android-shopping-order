@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.ordercomplete.presenter
 
-import com.example.domain.model.Receipt
+import woowacourse.shopping.ui.ordercomplete.uimodel.Bill
 
 interface OrderCompleteContract {
     interface View {
-        fun setReceipt(receipt: Receipt)
+        fun setReceipt(bill: Bill)
     }
 
     interface Presenter {

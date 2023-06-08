@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.order.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,6 @@ class OrderViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(productUIModel: CartProductUIModel) {
-        Log.d("123123", productUIModel.toString())
         binding.product = productUIModel
     }
 
