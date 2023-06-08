@@ -3,13 +3,13 @@ package woowacourse.shopping.data.remote
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor : Interceptor {
+class AuthInterceptor(private val token: String?) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val headerRequest = originalRequest.newBuilder()
             .header(
                 "Authorization",
-                "Basic Yml4eEBiaXh4LmNvbToxMjM0",
+                token ?: return chain.proceed(chain.request()),
             )
             .build()
         return chain.proceed(headerRequest)

@@ -3,16 +3,18 @@ package woowacourse.shopping.data.remote
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.WoowaApplication
+import woowacourse.shopping.data.local.WoowaSharedPreference
 
 object ServicePool {
+    private val authStorage = WoowaSharedPreference(WoowaApplication.applicationContext)
     private val client by lazy {
         OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor())
+            .addInterceptor(AuthInterceptor(authStorage.userToken))
             .build()
     }
     var server: UrlPool = UrlPool.LOGEON
         private set
-
     val retrofitService: ShoppingOrderService get() = server.service
 
     fun init(tag: UrlPool) {
