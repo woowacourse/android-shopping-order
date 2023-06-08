@@ -11,9 +11,6 @@ import woowacourse.shopping.domain.model.Point
 class PointRemoteDataSource(
     private val pointService: RetrofitPointService,
 ) : PointDataSource {
-    // private val baseUrl: String = ShoppingApplication.pref.getBaseUrl().toString()
-    // private val pointService = RetrofitUtil.getPointByRetrofit(baseUrl)
-
     override fun requestPoints(
         token: String,
         onSuccess: (Point) -> Unit,
