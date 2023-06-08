@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.util.okhttp
+package woowacourse.shopping.data.util
 
 import okhttp3.MediaType.Companion.toMediaType
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.retrofit
+package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.mapper.toDto

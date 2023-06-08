@@ -16,18 +16,17 @@ class OrderRemoteDataSource(
     private val orderService: RetrofitOrderService,
 ) : OrderDataSource {
     override fun orderProducts(
-        token: String,
         orderRequest: OrderRequest,
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = orderService.orderProducts(token, orderRequest.toDto())
+        val call = orderService.orderProducts(orderRequest.toDto())
         call.enqueue(object : retrofit2.Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) {
                     onSuccess()
                 } else {
-                    Log.d("test", "retrofit 실패 ${response.code()}, token: $token")
+                    Log.d("test", "retrofit 실패 ${response.code()}")
                 }
             }
 
@@ -38,12 +37,11 @@ class OrderRemoteDataSource(
     }
 
     override fun requestOrders(
-        token: String,
         page: Page,
         onSuccess: (List<OrderResponse>) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = orderService.requestOrders(token, page.value, page.sizePerPage)
+        val call = orderService.requestOrders(page.value, page.sizePerPage)
         call.enqueue(object : retrofit2.Callback<OrderResponsesDto> {
             override fun onResponse(
                 call: Call<OrderResponsesDto>,
@@ -67,12 +65,11 @@ class OrderRemoteDataSource(
     }
 
     override fun requestSpecificOrder(
-        token: String,
         orderId: String,
         onSuccess: (OrderResponse) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = orderService.requestSpecificOrder(token, orderId)
+        val call = orderService.requestSpecificOrder(orderId)
         call.enqueue(object : retrofit2.Callback<OrderResponseDto> {
             override fun onResponse(call: Call<OrderResponseDto>, response: Response<OrderResponseDto>) {
                 if (response.isSuccessful) {

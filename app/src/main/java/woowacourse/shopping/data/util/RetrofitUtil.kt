@@ -1,11 +1,13 @@
-package woowacourse.shopping.data.util.retrofit
+package woowacourse.shopping.data.util
 
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.service.cart.RetrofitCartProductService
 import woowacourse.shopping.data.service.order.RetrofitOrderService
 import woowacourse.shopping.data.service.order.RetrofitPointService
@@ -23,6 +25,25 @@ object RetrofitUtil {
             .build()
     }
 
+    private val okHttpAuthClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                },
+            ).addInterceptor(createdAuthInterceptor())
+            .build()
+    }
+
+    private fun createdAuthInterceptor(): Interceptor = Interceptor { chain ->
+        with(chain) {
+            val modifiedRequest = request().newBuilder()
+                .header("Authorization", ShoppingApplication.pref.getToken().toString())
+                .build()
+            proceed(modifiedRequest)
+        }
+    }
+
     fun getProductByRetrofit(baseUrl: String): RetrofitProductService {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -38,7 +59,7 @@ object RetrofitUtil {
             .baseUrl(baseUrl)
             .addConverterFactory(NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(okHttpAuthClient)
             .build()
             .create(RetrofitCartProductService::class.java)
     }
@@ -48,7 +69,7 @@ object RetrofitUtil {
             .baseUrl(baseUrl)
             .addConverterFactory(NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(okHttpAuthClient)
             .build()
             .create(RetrofitOrderService::class.java)
     }
@@ -58,7 +79,7 @@ object RetrofitUtil {
             .baseUrl(baseUrl)
             .addConverterFactory(NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(okHttpAuthClient)
             .build()
             .create(RetrofitPointService::class.java)
     }

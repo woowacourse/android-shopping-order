@@ -12,11 +12,10 @@ class PointRemoteDataSource(
     private val pointService: RetrofitPointService,
 ) : PointDataSource {
     override fun requestPoints(
-        token: String,
         onSuccess: (Point) -> Unit,
         onFailure: (String) -> Unit,
     ) {
-        val call = pointService.requestPoints(token)
+        val call = pointService.requestPoints()
         call.enqueue(object : retrofit2.Callback<PointDto> {
             override fun onResponse(call: Call<PointDto>, response: Response<PointDto>) {
                 if (response.isSuccessful) {

@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.repository.retrofit
+package woowacourse.shopping.data.repository.remote
 
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.datasource.cart.CartProductDataSource
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.ProductCount
@@ -11,15 +10,11 @@ import woowacourse.shopping.domain.repository.ProductId
 class CartProductRemoteRepository(
     private val cartProductDataSource: CartProductDataSource,
 ) : CartRepository {
-    private val token: String?
-        get() = ShoppingApplication.pref.getToken()
-
     override fun getAllCartProducts(
         onSuccess: (List<CartProduct>) -> Unit,
         onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.requestCartProducts(
-            token!!,
             onSuccess = onSuccess,
             onFailure = onFailure,
         )
@@ -31,7 +26,6 @@ class CartProductRemoteRepository(
         onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.addCartProductByProductId(
-            token = token!!,
             productId = productId.toString(),
             onSuccess = onSuccess,
             onFailure = onFailure,
@@ -45,7 +39,6 @@ class CartProductRemoteRepository(
         onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.updateCartProductCountById(
-            token = token!!,
             cartItemId = cartProductId.toString(),
             quantity = count.value,
             onSuccess = onSuccess,
@@ -59,7 +52,6 @@ class CartProductRemoteRepository(
         onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.deleteCartProductById(
-            token = token!!,
             cartItemId = cartProductId.toString(),
             onSuccess = onSuccess,
             onFailure = onFailure,
@@ -72,7 +64,6 @@ class CartProductRemoteRepository(
         onFailure: (String) -> Unit,
     ) {
         cartProductDataSource.requestCartProductByProductId(
-            token = token!!,
             productId = productId,
             onSuccess = { cartProduct ->
                 onSuccess(cartProduct)
