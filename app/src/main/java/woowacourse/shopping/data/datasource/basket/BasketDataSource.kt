@@ -37,6 +37,6 @@ interface BasketDataSource {
 
         fun update(basketProduct: DataBasketProduct)
 
-        fun remove(basketProduct: DataBasketProduct)
+        fun delete(basketProduct: DataBasketProduct)
     }
 }

@@ -282,4 +282,25 @@ class BasketTest {
         // then
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `장바구니에서 체크된 항목만 꺼내올수 있다(1,2,3 번중 체크된 1,2 만 꺼내온다)`() {
+        // given
+        val basketProducts = listOf<BasketProduct>(
+            BasketProduct(1, Count(3), Product(1, "새상품", Price(500), "url"), true),
+            BasketProduct(2, Count(5), Product(3, "새상품", Price(1000), "url"), true),
+            BasketProduct(3, Count(2), Product(4, "새상품", Price(700), "url"), false)
+        )
+        val basket = Basket(basketProducts)
+
+        // when
+        val expected = listOf<BasketProduct>(
+            BasketProduct(1, Count(3), Product(1, "새상품", Price(500), "url"), true),
+            BasketProduct(2, Count(5), Product(3, "새상품", Price(1000), "url"), true)
+        )
+        val actual = basket.getCheckedBasketProducts()
+
+        // then
+        assertThat(actual).isEqualTo(expected)
+    }
 }

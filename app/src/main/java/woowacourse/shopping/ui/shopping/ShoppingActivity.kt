@@ -21,9 +21,12 @@ import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
+import woowacourse.shopping.support.framework.presentation.turnOffSupportChangeAnimation
 import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.UiProduct
 import woowacourse.shopping.ui.model.UiRecentProduct
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.ShoppingViewType.MORE_BUTTON
 import woowacourse.shopping.ui.shopping.ShoppingViewType.PRODUCT
@@ -33,8 +36,6 @@ import woowacourse.shopping.ui.shopping.product.ProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductWrapperAdapter
 import woowacourse.shopping.ui.shopping.skeleton.SkeletonProductAdapter
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
-import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 
@@ -69,6 +70,7 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         initRecentProductsData()
         initButtonBasketClickListener()
         initShoppingRecyclerViewScrollListener()
+        initButtonOrderHistoryClickListener()
     }
 
     override fun onResume() {
@@ -195,6 +197,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private fun initButtonBasketClickListener() {
         binding.ivBasket.setThrottleFirstOnClickListener {
             activityResultLauncher.launch(BasketActivity.getIntent(this))
+        }
+    }
+
+    private fun initButtonOrderHistoryClickListener() {
+        binding.ivOrderHistory.setThrottleFirstOnClickListener {
+            startActivity(OrderHistoryActivity.getIntent(this))
         }
     }
 

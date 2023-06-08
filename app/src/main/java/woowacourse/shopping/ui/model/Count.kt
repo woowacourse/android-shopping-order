@@ -6,6 +6,6 @@ import kotlinx.parcelize.Parcelize
 typealias UiCount = Count
 
 @Parcelize
-class Count(
+data class Count(
     val value: Int
 ) : Parcelable

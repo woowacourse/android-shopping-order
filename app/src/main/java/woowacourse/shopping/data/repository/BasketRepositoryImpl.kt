@@ -28,6 +28,6 @@ class BasketRepositoryImpl(
     }
 
     override fun remove(basketProduct: BasketProduct) {
-        remoteBasketDataSource.remove(basketProduct.toData())
+        remoteBasketDataSource.delete(basketProduct.toData())
     }
 }

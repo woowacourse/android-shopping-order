@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="orderItem"
+            type="woowacourse.shopping.ui.model.OrderItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="153dp"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_woowa_light_gray_line_1_rect">
+
+        <TextView
+            android:id="@+id/tv_individual_order_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="18dp"
+            android:ellipsize="end"
+            android:text="@{orderItem.product.name}"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="[든든] 동원 스위트콘" />
+
+        <ImageView
+            android:id="@+id/iv_individual_order_product"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            app:image="@{orderItem.product.imageUrl}"
+            android:layout_marginBottom="18dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="136:72"
+            app:layout_constraintStart_toStartOf="@id/tv_individual_order_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_individual_order_name"
+            tools:srcCompat="@tools:sample/avatars" />
+
+
+        <TextView
+            android:id="@+id/tv_individual_order_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_individual_order_price_title"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            android:layout_marginEnd="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_individual_order_price"
+            app:layout_constraintEnd_toStartOf="@+id/tv_individual_order_price"
+            app:layout_constraintTop_toTopOf="@+id/tv_individual_order_price" />
+
+        <TextView
+            android:id="@+id/tv_individual_order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            android:text="@{@string/price_format(orderItem.product.price.value)}"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="99,800원" />
+
+
+        <TextView
+            android:id="@+id/tv_individual_order_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/woowa_text_black"
+            android:textSize="16sp"
+            android:text="@{@string/tv_individual_order_count(orderItem.count.value)}"
+            app:layout_constraintBottom_toTopOf="@+id/tv_individual_order_price"
+            app:layout_constraintEnd_toEndOf="@+id/tv_individual_order_price"
+            tools:text="수량: 5개"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

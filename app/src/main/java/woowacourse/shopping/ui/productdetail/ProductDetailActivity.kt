@@ -15,12 +15,12 @@ import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogProductDetailBinding
+import woowacourse.shopping.support.framework.presentation.getParcelableExtraCompat
+import woowacourse.shopping.support.framework.presentation.intentDataNullProcess
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.UiProduct
 import woowacourse.shopping.ui.shopping.ShoppingActivity
-import woowacourse.shopping.util.getParcelableExtraCompat
-import woowacourse.shopping.util.intentDataNullProcess
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="userPointInfo"
+            type="woowacourse.shopping.ui.model.UserPointInfo" />
+
+        <variable
+            name="preOrderInfo"
+            type="woowacourse.shopping.ui.model.preorderinfo.PreOrderInfo" />
+
+        <variable
+            name="usingPoint"
+            type="Integer" />
+
+        <variable
+            name="actualPayment"
+            type="Integer" />
+
+        <variable
+            name="applyPointMessageCode"
+            type="woowacourse.shopping.ui.paymentconfirm.ApplyPointMessageCode" />
+
+        <variable
+            name="pointApplyClickListener"
+            type="kotlin.jvm.functions.Function1" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.paymentconfirm.PaymentConfirmActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tb_payment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/woowa_toolbar_gray"
+            android:minHeight="?attr/actionBarSize"
+            android:paddingStart="20dp"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/tb_payment"
+            app:titleTextColor="@color/white">
+
+            <ImageView
+                android:id="@+id/iv_payment_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="26dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tb_payment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tb_payment"
+                app:srcCompat="@drawable/ic_close" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+        <ImageView
+            android:id="@+id/iv_payment_product"
+            android:layout_width="136dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            app:image="@{preOrderInfo.representativeImageUrl}"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tb_payment"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tv_payment_on_image_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:visibility="@{preOrderInfo.representativeExceptCount > 0 ? View.VISIBLE :View.GONE}"
+            android:text="@{@string/tv_payment_on_image_count(preOrderInfo.representativeExceptCount)}"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_payment_product"
+            app:layout_constraintEnd_toEndOf="@+id/iv_payment_product"
+            app:layout_constraintStart_toStartOf="@+id/iv_payment_product"
+            app:layout_constraintTop_toTopOf="@+id/iv_payment_product"
+            tools:text="+3" />
+
+        <TextView
+            android:id="@+id/tv_payment_product_name_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:productNameCount="@{preOrderInfo}"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_payment_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_payment_product"
+            app:layout_constraintTop_toTopOf="@+id/iv_payment_product"
+            tools:text="[든든] 동원콘 외 3개" />
+
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="30dp"
+            android:background="@color/woowa_light_gray"
+            app:layout_constraintTop_toBottomOf="@+id/iv_payment_product"
+            tools:layout_editor_absoluteX="30dp" />
+
+        <TextView
+            android:id="@+id/tv_payment_holding_point_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="50dp"
+            android:text="@string/tv_holding_point_title"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view" />
+
+        <TextView
+            android:id="@+id/tv_payment_holding_point"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:text="@{@string/price_format(userPointInfo.point.value)}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_payment_holding_point_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_payment_holding_point_title"
+            app:layout_constraintTop_toTopOf="@+id/tv_payment_holding_point_title"
+            tools:text="80,000" />
+
+        <EditText
+            android:id="@+id/et_payment_using_point"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:hint="@string/et_using_point_hint"
+            android:inputType="number"
+            app:layout_constraintEnd_toStartOf="@id/btn_payment_use_point"
+            app:layout_constraintStart_toStartOf="@+id/tv_payment_holding_point_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_holding_point_title"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_payment_use_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/shape_payment"
+            android:text="@string/btn_use_point"
+            android:onClick="@{()->pointApplyClickListener.invoke(etPaymentUsingPoint.getText())}"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/et_payment_using_point"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/et_payment_using_point"
+            app:layout_constraintTop_toTopOf="@+id/et_payment_using_point" />
+
+        <TextView
+            android:id="@+id/tv_payment_point_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            app:applyPointMessageCode="@{applyPointMessageCode}"
+            app:layout_constraintEnd_toEndOf="@+id/btn_payment_use_point"
+            app:layout_constraintStart_toStartOf="@+id/et_payment_using_point"
+            app:layout_constraintTop_toBottomOf="@+id/et_payment_using_point"
+            tools:text="보유 포인트 이상을 사용하셨습니다."
+            tools:textColor="@color/woowa_button" />
+
+        <TextView
+            android:id="@+id/tv_payment_using_point_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/tv_payment_using_point_title"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tv_payment_using_point"
+            app:layout_constraintStart_toStartOf="@+id/tv_payment_holding_point_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_point_message"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tv_payment_using_point"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:text="@{@string/price_format(usingPoint)}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_payment_using_point_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_payment_using_point_title"
+            app:layout_constraintTop_toTopOf="@+id/tv_payment_using_point_title"
+            tools:text="10,000" />
+
+        <TextView
+            android:id="@+id/tv_payment_earning_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="@{@string/tv_payment_earning_rate(userPointInfo.earnRate.value)}"
+            android:textColor="@color/woowa_light_gray"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_payment_using_point"
+            app:layout_constraintStart_toStartOf="@+id/tv_payment_using_point_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_using_point_title"
+            tools:text="고객님의 적립율은 5%입니다." />
+
+        <TextView
+            android:id="@+id/tv_payment_total_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/tv_payment_total_price_title"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_payment_actual_amount_title"
+            app:layout_constraintEnd_toStartOf="@+id/tv_payment_total_price"
+            app:layout_constraintStart_toStartOf="@+id/tv_payment_actual_amount_title"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tv_payment_total_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:text="@{@string/price_format(preOrderInfo.OrderTotalPrice)}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_payment_total_price_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_payment_total_price_title"
+            app:layout_constraintTop_toTopOf="@+id/tv_payment_total_price_title"
+            tools:text="30,000" />
+
+        <TextView
+            android:id="@+id/tv_payment_actual_amount_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="30dp"
+            android:text="@string/tv_payment_actual_amount_title"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/btn_payment_final_order"
+            app:layout_constraintEnd_toStartOf="@+id/tv_payment_actual_amount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tv_payment_actual_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:text="@{@string/price_format(actualPayment)}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_payment_actual_amount_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_payment_actual_amount_title"
+            app:layout_constraintTop_toTopOf="@+id/tv_payment_actual_amount_title"
+            tools:text="20,000" />
+
+
+        <TextView
+            android:id="@+id/btn_payment_final_order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/woowa_button"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="@string/btn_final_order"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

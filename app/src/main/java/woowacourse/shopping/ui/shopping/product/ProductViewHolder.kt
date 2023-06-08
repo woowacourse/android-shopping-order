@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemProductBinding
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 import woowacourse.shopping.ui.model.UiProduct
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class ProductViewHolder(
     parent: ViewGroup,

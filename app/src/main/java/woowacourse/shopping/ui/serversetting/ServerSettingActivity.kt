@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.remote.OkHttpModule
+import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 import woowacourse.shopping.ui.shopping.ShoppingActivity
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class ServerSettingActivity : AppCompatActivity() {
 
@@ -34,7 +34,7 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun startMain(baseUrl: String) {
-        OkHttpModule.BASE_URL = baseUrl
+        RetrofitModule.setRetrofit(baseUrl)
         val intent = Intent(this, ShoppingActivity::class.java)
         startActivity(intent)
         finish()
