@@ -35,14 +35,10 @@ class CartDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setWidth()
         getData()
         setCounter()
         clickPut()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setWidth()
     }
 
     private fun setWidth() {
