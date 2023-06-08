@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.os.Handler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,6 +13,7 @@ import woowacourse.shopping.async
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.order.DiscountPolicy
 import woowacourse.shopping.domain.order.Payment
+import woowacourse.shopping.fakeMainLooperHandler
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
@@ -24,6 +26,7 @@ class CartPresenterTest {
     private lateinit var cartItemRepository: CartItemRepository
     private lateinit var orderRepository: OrderRepository
     private lateinit var userRepository: UserRepository
+    private lateinit var mainLooperHandler: Handler
     private val cartItems = listOf(
         CartItem(
             id = 0,
@@ -47,6 +50,7 @@ class CartPresenterTest {
         cartItemRepository = mockk()
         orderRepository = mockk()
         userRepository = mockk()
+        mainLooperHandler = fakeMainLooperHandler()
 
         every { userRepository.findCurrent() } returns async(User())
     }
@@ -58,17 +62,17 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(cartItems)
 
-        every { cartItemRepository.countAll(any()) } returns async(2)
+        every { cartItemRepository.countAll() } returns async(2)
 
         // when
         presenter.loadCartItemsOfNextPage()
@@ -94,17 +98,17 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 2
+            currentPage = 2,
+            mainLooperHandler
         )
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(cartItems)
 
-        every { cartItemRepository.countAll(any()) } returns async(2)
+        every { cartItemRepository.countAll() } returns async(2)
 
         // when
         presenter.loadCartItemsOfPreviousPage()
@@ -127,16 +131,16 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 2
+            currentPage = 2,
+            mainLooperHandler
         )
 
-        every { cartItemRepository.countAll(any()) } returns async(2)
+        every { cartItemRepository.countAll() } returns async(2)
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(cartItems)
 
         // when
@@ -160,15 +164,15 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
-        every { cartItemRepository.deleteById(any(), any()) } returns async(Unit)
+        every { cartItemRepository.deleteById(any()) } returns async(Unit)
 
-        every { cartItemRepository.countAll(any()) } returns async(1)
+        every { cartItemRepository.countAll() } returns async(1)
 
         // when
         presenter.deleteCartItem(0)
@@ -187,14 +191,14 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         every {
-            cartItemRepository.findById(any(), any())
+            cartItemRepository.findById(any())
         } returns async(
             CartItem(
                 id = 1,
@@ -204,7 +208,7 @@ class CartPresenterTest {
         )
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(cartItems)
 
         // when
@@ -224,14 +228,14 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(cartItems)
 
         // when
@@ -249,10 +253,10 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         val plusCartItems = listOf(
@@ -273,15 +277,15 @@ class CartPresenterTest {
         )
 
         every {
-            cartItemRepository.findById(any(), any())
+            cartItemRepository.findById(any())
         } returns async(cartItems[0])
 
         every {
-            cartItemRepository.updateCountById(any(), any(), any())
+            cartItemRepository.updateCountById(any(), any())
         } returns async(Unit)
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(plusCartItems)
 
         // when
@@ -298,10 +302,10 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         val minusCartItems = listOf(
@@ -322,15 +326,15 @@ class CartPresenterTest {
         )
 
         every {
-            cartItemRepository.findById(any(), any())
+            cartItemRepository.findById(any())
         } returns async(cartItems[0])
 
         every {
-            cartItemRepository.updateCountById(any(), any(), any())
+            cartItemRepository.updateCountById(any(), any())
         } returns async(Unit)
 
         every {
-            cartItemRepository.findAllOrderByAddedTime(any(), any(), any())
+            cartItemRepository.findAllOrderByAddedTime(any(), any())
         } returns async(minusCartItems)
 
         // when
@@ -347,10 +351,10 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         val payment = Payment(
@@ -362,7 +366,7 @@ class CartPresenterTest {
         )
 
         every {
-            orderRepository.findDiscountPolicy(any(), any())
+            orderRepository.findDiscountPolicy(any())
         } returns async(payment)
 
         // when
@@ -379,14 +383,14 @@ class CartPresenterTest {
             view,
             cartItemRepository,
             orderRepository,
-            userRepository,
             pageSize = 1,
             selectedCart = Cart(cartItems.toSet()),
-            currentPage = 1
+            currentPage = 1,
+            mainLooperHandler
         )
 
         every {
-            orderRepository.save(any(), any())
+            orderRepository.save(any())
         } returns async(0)
 
         // when

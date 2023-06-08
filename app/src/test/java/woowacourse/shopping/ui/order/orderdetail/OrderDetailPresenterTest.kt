@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.orderdetail
 
+import android.os.Handler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -10,6 +11,7 @@ import woowacourse.shopping.User
 import woowacourse.shopping.async
 import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.order.Payment
+import woowacourse.shopping.fakeMainLooperHandler
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.order.uistate.OrderUIState
@@ -20,13 +22,15 @@ class OrderDetailPresenterTest {
     private lateinit var presenter: OrderDetailPresenter
     private lateinit var orderRepository: OrderRepository
     private lateinit var userRepository: UserRepository
+    private lateinit var mainLooperHandler: Handler
 
     @Before
     fun setUp() {
         view = mockk(relaxed = true)
         orderRepository = mockk()
         userRepository = mockk()
-        presenter = OrderDetailPresenter(view, orderRepository, userRepository)
+        mainLooperHandler = fakeMainLooperHandler()
+        presenter = OrderDetailPresenter(view, orderRepository, mainLooperHandler)
     }
 
     @Test
@@ -36,8 +40,8 @@ class OrderDetailPresenterTest {
         val payment = Payment(emptyList())
 
         every { userRepository.findCurrent() } returns async(User())
-        every { orderRepository.findById(any(), any()) } returns async(order)
-        every { orderRepository.findDiscountPolicy(any(), any()) } returns async(payment)
+        every { orderRepository.findById(any()) } returns async(order)
+        every { orderRepository.findDiscountPolicy(any()) } returns async(payment)
 
         // when
         presenter.loadOrder(0)

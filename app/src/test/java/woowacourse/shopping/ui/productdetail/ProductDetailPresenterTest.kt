@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
+import android.os.Handler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -10,6 +11,7 @@ import woowacourse.shopping.Product
 import woowacourse.shopping.RecentlyViewedProduct
 import woowacourse.shopping.User
 import woowacourse.shopping.async
+import woowacourse.shopping.fakeMainLooperHandler
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
@@ -24,6 +26,7 @@ class ProductDetailPresenterTest {
     private lateinit var cartItemRepository: CartItemRepository
     private lateinit var userRepository: UserRepository
     private lateinit var recentlyViewedProductRepository: RecentlyViewedProductRepository
+    private lateinit var mainLooperHandler: Handler
 
     @Before
     fun setUp() {
@@ -32,6 +35,7 @@ class ProductDetailPresenterTest {
         cartItemRepository = mockk()
         userRepository = mockk()
         recentlyViewedProductRepository = mockk()
+        mainLooperHandler = fakeMainLooperHandler()
 
         every { userRepository.findCurrent() } returns async(User())
 
@@ -39,8 +43,8 @@ class ProductDetailPresenterTest {
             view,
             productRepository,
             cartItemRepository,
-            userRepository,
-            recentlyViewedProductRepository
+            recentlyViewedProductRepository,
+            mainLooperHandler
         )
     }
 
@@ -50,7 +54,7 @@ class ProductDetailPresenterTest {
         val product = Product()
         val recentlyViewedProduct = RecentlyViewedProduct()
         every { productRepository.findById(any()) } returns async(product)
-        every { cartItemRepository.existByProductId(any(), any()) } returns async(true)
+        every { cartItemRepository.existByProductId(any()) } returns async(true)
         every { recentlyViewedProductRepository.save(any(), any()) } returns async(
             recentlyViewedProduct
         )
@@ -70,8 +74,8 @@ class ProductDetailPresenterTest {
         val savedCartItem = CartItem()
 
         every { productRepository.findById(any()) } returns async(product)
-        every { cartItemRepository.save(any(), any()) } returns async(savedCartItem)
-        every { cartItemRepository.updateCountById(any(), any(), any()) } returns async(Unit)
+        every { cartItemRepository.save(any()) } returns async(savedCartItem)
+        every { cartItemRepository.updateCountById(any(), any()) } returns async(Unit)
 
         // when
         presenter.addProductToCart(0, 1)

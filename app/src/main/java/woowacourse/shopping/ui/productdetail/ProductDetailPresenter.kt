@@ -15,9 +15,9 @@ class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository,
-    private val recentlyViewedProductRepository: RecentlyViewedProductRepository
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val mainLooperHandler: Handler = Handler(Looper.getMainLooper())
 ) : ProductDetailContract.Presenter {
-    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadProduct(productId: Long) {
         productRepository.findById(productId).thenAccept {

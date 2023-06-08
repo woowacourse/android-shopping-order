@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
+import android.os.Handler
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -12,6 +13,7 @@ import woowacourse.shopping.Product
 import woowacourse.shopping.RecentlyViewedProduct
 import woowacourse.shopping.User
 import woowacourse.shopping.async
+import woowacourse.shopping.fakeMainLooperHandler
 import woowacourse.shopping.repository.CartItemRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentlyViewedProductRepository
@@ -26,6 +28,7 @@ class ShoppingPresenterTest {
     private lateinit var productRepository: ProductRepository
     private lateinit var cartItemRepository: CartItemRepository
     private lateinit var userRepository: UserRepository
+    private lateinit var mainLooperHandler: Handler
     private val pageSize = 20
 
     @Before
@@ -35,6 +38,7 @@ class ShoppingPresenterTest {
         productRepository = mockk()
         cartItemRepository = mockk()
         userRepository = mockk()
+        mainLooperHandler = fakeMainLooperHandler()
 
         every { userRepository.findAll() } returns async(listOf(User()))
 
@@ -44,7 +48,8 @@ class ShoppingPresenterTest {
             productRepository,
             cartItemRepository,
             userRepository,
-            pageSize = pageSize
+            pageSize = pageSize,
+            mainLooperHandler
         )
     }
 
@@ -80,7 +85,7 @@ class ShoppingPresenterTest {
             productRepository.findAll(any(), any())
         } returns async(products)
         every {
-            cartItemRepository.findAll(any())
+            cartItemRepository.findAll()
         } returns async(cartItems)
         every {
             view.addProducts(any())
@@ -95,7 +100,7 @@ class ShoppingPresenterTest {
         // then
         val expect = listOf(CartItem(id = 0, product = Product(0)))
         verify { productRepository.findAll(pageSize, 20) }
-        verify { cartItemRepository.findAll(any()) }
+        verify { cartItemRepository.findAll() }
         verify { view.addProducts(expect.map { it.toUIState() }) }
 
         verify { productRepository.countAll() }
@@ -110,7 +115,7 @@ class ShoppingPresenterTest {
             productRepository.findAll(any(), any())
         } returns async(products)
         every {
-            cartItemRepository.findAll(any())
+            cartItemRepository.findAll()
         } returns async(listOf(CartItem(0, product = products[0])))
         every { view.setProducts(any()) } just runs
         every { view.setCanLoadMore(any()) } just runs
@@ -124,7 +129,7 @@ class ShoppingPresenterTest {
         // then
         val expect = CartItem(0, product = Product(0)).toUIState()
         verify { productRepository.findAll(20, 0) }
-        verify { cartItemRepository.findAll(any()) }
+        verify { cartItemRepository.findAll() }
         verify { view.setProducts(listOf(expect)) }
 
         verify { productRepository.countAll() }
@@ -137,11 +142,11 @@ class ShoppingPresenterTest {
         val product = Product(id = 0)
         every { productRepository.findById(any()) } returns async(product)
         every {
-            cartItemRepository.save(any(), any())
+            cartItemRepository.save(any())
         } returns async(CartItem(id = 0, quantity = 1, product = product))
         every { view.changeProduct(any()) } just runs
 
-        every { cartItemRepository.countAll(any()) } returns async(0)
+        every { cartItemRepository.countAll() } returns async(0)
         every { view.setCartItemCount(any()) } just runs
 
         // when
@@ -149,10 +154,10 @@ class ShoppingPresenterTest {
 
         // then
         verify { productRepository.findById(0) }
-        verify { cartItemRepository.save(CartItem(-1, 1, product), any()) }
+        verify { cartItemRepository.save(CartItem(-1, 1, product)) }
         verify { view.changeProduct(CartItem(0, 1, product).toUIState()) }
 
-        verify { cartItemRepository.countAll(any()) }
+        verify { cartItemRepository.countAll() }
         verify { view.setCartItemCount(0) }
     }
 
@@ -160,8 +165,8 @@ class ShoppingPresenterTest {
     fun 장바구니에서_수량을_더하면_수량이_1_증가하고_표시한다() {
         // given
         val cartItem = CartItem(0, 1, Product())
-        every { cartItemRepository.findById(any(), any()) } returns async(cartItem)
-        every { cartItemRepository.updateCountById(any(), any(), any()) } returns async(Unit)
+        every { cartItemRepository.findById(any()) } returns async(cartItem)
+        every { cartItemRepository.updateCountById(any(), any()) } returns async(Unit)
         every { view.changeProduct(any()) } just runs
 
         // when
@@ -169,8 +174,8 @@ class ShoppingPresenterTest {
 
         // then
         val plusCartItem = CartItem(0, 2, Product())
-        verify { cartItemRepository.findById(0, any()) }
-        verify { cartItemRepository.updateCountById(0, 2, any()) }
+        verify { cartItemRepository.findById(0) }
+        verify { cartItemRepository.updateCountById(0, 2) }
         verify { view.changeProduct(plusCartItem.toUIState()) }
     }
 
@@ -178,8 +183,8 @@ class ShoppingPresenterTest {
     fun 장바구니에서_수량을_빼면_수량이_1_감소하고_표시한다() {
         // given
         val cartItem = CartItem(0, 2, Product())
-        every { cartItemRepository.findById(any(), any()) } returns async(cartItem)
-        every { cartItemRepository.updateCountById(any(), any(), any()) } returns async(Unit)
+        every { cartItemRepository.findById(any()) } returns async(cartItem)
+        every { cartItemRepository.updateCountById(any(), any()) } returns async(Unit)
         every { view.changeProduct(any()) } just runs
 
         // when
@@ -187,8 +192,8 @@ class ShoppingPresenterTest {
 
         // then
         val plusCartItem = CartItem(0, 1, Product())
-        verify { cartItemRepository.findById(0, any()) }
-        verify { cartItemRepository.updateCountById(0, 1, any()) }
+        verify { cartItemRepository.findById(0) }
+        verify { cartItemRepository.updateCountById(0, 1) }
         verify { view.changeProduct(plusCartItem.toUIState()) }
     }
 
@@ -196,8 +201,8 @@ class ShoppingPresenterTest {
     fun 장바구니에서_수량을_뺄_때_0이_되면_장바구니에서_제거하고_표시한다() {
         // given
         val cartItem = CartItem(0, 1, Product())
-        every { cartItemRepository.findById(any(), any()) } returns async(cartItem)
-        every { cartItemRepository.deleteById(any(), any()) } returns async(Unit)
+        every { cartItemRepository.findById(any()) } returns async(cartItem)
+        every { cartItemRepository.deleteById(any()) } returns async(Unit)
         every { view.changeProduct(any()) } just runs
 
         // when
@@ -205,22 +210,22 @@ class ShoppingPresenterTest {
 
         // then
         val minusCartItem = CartItem(-1, 0, Product())
-        verify { cartItemRepository.findById(0, any()) }
-        verify { cartItemRepository.deleteById(0, any()) }
+        verify { cartItemRepository.findById(0) }
+        verify { cartItemRepository.deleteById(0) }
         verify { view.changeProduct(minusCartItem.toUIState()) }
     }
 
     @Test
     fun 장바구니_아이템_개수를_불러오고_표시한다() {
         // given
-        every { cartItemRepository.countAll(any()) } returns async(0)
+        every { cartItemRepository.countAll() } returns async(0)
         every { view.setCartItemCount(any()) } just runs
 
         // when
         presenter.loadCartItemCount()
 
         // then
-        every { cartItemRepository.countAll(any()) }
+        every { cartItemRepository.countAll() }
         every { view.setCartItemCount(0) }
     }
 
@@ -250,7 +255,7 @@ class ShoppingPresenterTest {
             productRepository.findAll(any(), any())
         } returns async(products)
         every {
-            cartItemRepository.findAll(any())
+            cartItemRepository.findAll()
         } returns async(listOf(CartItem(0, product = products[0])))
         every { view.setProducts(any()) } just runs
         every { view.setCanLoadMore(any()) } just runs
@@ -258,7 +263,7 @@ class ShoppingPresenterTest {
         every { productRepository.countAll() } returns async(1)
         every { view.setCanLoadMore(any()) }
 
-        every { cartItemRepository.countAll(any()) } returns async(0)
+        every { cartItemRepository.countAll() } returns async(0)
         every { view.setCartItemCount(any()) } just runs
 
         // when

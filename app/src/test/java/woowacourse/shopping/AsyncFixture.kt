@@ -1,5 +1,8 @@
 package woowacourse.shopping
 
+import android.os.Handler
+import io.mockk.every
+import io.mockk.mockk
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
@@ -42,3 +45,14 @@ fun RecentlyViewedProduct(
     product: Product = Product(),
     viewedTime: LocalDateTime = LocalDateTime.now()
 ): RecentlyViewedProduct = RecentlyViewedProduct(id, product, viewedTime)
+
+fun fakeMainLooperHandler(): Handler {
+    val mock = mockk<Handler>() {
+        every { post(any()) } answers {
+            val runnable = invocation.args[0] as Runnable?
+            runnable?.run()
+            true
+        }
+    }
+    return mock
+}

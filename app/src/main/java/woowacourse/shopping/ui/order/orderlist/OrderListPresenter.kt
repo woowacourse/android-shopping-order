@@ -8,9 +8,9 @@ import woowacourse.shopping.utils.ErrorHandler.handle
 
 class OrderListPresenter(
     private val view: OrderListContract.View,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val mainLooperHandler: Handler = Handler(Looper.getMainLooper())
 ) : OrderListContract.Presenter {
-    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadOrders() {
         orderRepository.findAll().thenAccept { ordersResult ->

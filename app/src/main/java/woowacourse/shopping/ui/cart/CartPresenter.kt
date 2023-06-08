@@ -17,9 +17,9 @@ class CartPresenter(
     private val orderRepository: OrderRepository,
     private val pageSize: Int,
     private var selectedCart: Cart = Cart(emptySet()),
-    private var currentPage: Int = 0
+    private var currentPage: Int = 0,
+    private val mainLooperHandler: Handler = Handler(Looper.getMainLooper())
 ) : CartContract.Presenter {
-    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadCartItemsOfNextPage() {
         currentPage++

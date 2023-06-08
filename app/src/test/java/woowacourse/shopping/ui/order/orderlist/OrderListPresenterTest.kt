@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order.orderlist
 
+import android.os.Handler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -9,6 +10,7 @@ import woowacourse.shopping.Cart
 import woowacourse.shopping.User
 import woowacourse.shopping.async
 import woowacourse.shopping.domain.order.Order
+import woowacourse.shopping.fakeMainLooperHandler
 import woowacourse.shopping.repository.OrderRepository
 import woowacourse.shopping.repository.UserRepository
 import woowacourse.shopping.ui.order.uistate.OrderUIState
@@ -18,13 +20,15 @@ class OrderListPresenterTest {
     private lateinit var presenter: OrderListPresenter
     private lateinit var orderRepository: OrderRepository
     private lateinit var userRepository: UserRepository
+    private lateinit var mainLooperHandler: Handler
 
     @Before
     fun setUp() {
         view = mockk(relaxed = true)
         orderRepository = mockk()
         userRepository = mockk()
-        presenter = OrderListPresenter(view, orderRepository, userRepository)
+        mainLooperHandler = fakeMainLooperHandler()
+        presenter = OrderListPresenter(view, orderRepository, mainLooperHandler)
     }
 
     @Test
@@ -33,7 +37,7 @@ class OrderListPresenterTest {
         val orders = listOf(Order(0, Cart(), 0))
 
         every { userRepository.findCurrent() } returns async(User())
-        every { orderRepository.findAll(any()) } returns async(orders)
+        every { orderRepository.findAll() } returns async(orders)
 
         // when
         presenter.loadOrders()

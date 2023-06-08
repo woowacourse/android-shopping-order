@@ -20,10 +20,10 @@ class ShoppingPresenter(
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository,
     private val userRepository: UserRepository,
-    private val pageSize: Int
+    private val pageSize: Int,
+    private val mainLooperHandler: Handler = Handler(Looper.getMainLooper())
 ) : ShoppingContract.Presenter {
     private var currentPage = 1
-    private val mainLooperHandler = Handler(Looper.getMainLooper())
 
     override fun loadRecentlyViewedProducts(limit: Int) {
         recentlyViewedProductRepository.findLimitedOrderByViewedTimeDesc(limit)
