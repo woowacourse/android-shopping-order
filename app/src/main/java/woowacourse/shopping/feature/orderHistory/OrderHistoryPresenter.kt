@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.orderHistory
 
+import com.example.domain.model.OrderHistoryInfo
 import com.example.domain.repository.OrderRepository
 import woowacourse.shopping.mapper.toPresentation
 
@@ -15,18 +16,26 @@ class OrderHistoryPresenter(
         orderRepository.getOrderHistory(
             currentPage, callback = {
                 it.onSuccess { orderHistoryInfo ->
-                    view.addOrderHistory(orderHistoryInfo.info.map { it.toPresentation() })
-                    totalPage = orderHistoryInfo.totalPages
-                    ++currentPage
+                    onSuccess(orderHistoryInfo)
                 }.onFailure { throwable ->
-                    if (currentPage > totalPage) {
-                        view.showErrorMessage(Throwable(LAST_PAGE_MESSAGE))
-                    } else {
-                        view.showErrorMessage(throwable)
-                    }
+                    onFailure(throwable)
                 }
             }
         )
+    }
+
+    private fun onSuccess(orderHistoryInfo: OrderHistoryInfo) {
+        view.addOrderHistory(orderHistoryInfo.info.map { it.toPresentation() })
+        totalPage = orderHistoryInfo.totalPages
+        ++currentPage
+    }
+
+    private fun onFailure(throwable: Throwable) {
+        if (currentPage > totalPage) {
+            view.showErrorMessage(Throwable(LAST_PAGE_MESSAGE))
+        } else {
+            view.showErrorMessage(throwable)
+        }
     }
 
     companion object {

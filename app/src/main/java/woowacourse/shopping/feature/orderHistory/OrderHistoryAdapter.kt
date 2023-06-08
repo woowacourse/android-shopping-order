@@ -9,20 +9,20 @@ class OrderHistoryAdapter(
     private val clickListener: (Int) -> Unit
 ) : RecyclerView.Adapter<OrderHistoryViewHolder>() {
 
-    private val _products = products.toMutableList()
+    private val products = products.toMutableList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderHistoryViewHolder {
         return OrderHistoryViewHolder.from(parent)
     }
 
-    override fun getItemCount(): Int = _products.size
+    override fun getItemCount(): Int = products.size
 
     override fun onBindViewHolder(holder: OrderHistoryViewHolder, position: Int) {
-        holder.bind(_products[position], clickListener)
+        holder.bind(products[position], clickListener)
     }
 
     fun addItems(products: List<OrderHistoryProductUiModel>) {
-        _products.addAll(products)
+        this.products.addAll(products)
         notifyItemRangeInserted(itemCount, products.size)
     }
 }
