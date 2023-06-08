@@ -1,4 +1,4 @@
-package woowacourse.shopping.cart
+package woowacourse.shopping.ui.cart
 
 import io.mockk.every
 import io.mockk.just
@@ -10,8 +10,6 @@ import org.junit.Test
 import woowacourse.shopping.createCartProduct
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.ui.cart.CartContract
-import woowacourse.shopping.ui.cart.CartPresenter
 
 class CartPresenterTest {
     private lateinit var presenter: CartPresenter

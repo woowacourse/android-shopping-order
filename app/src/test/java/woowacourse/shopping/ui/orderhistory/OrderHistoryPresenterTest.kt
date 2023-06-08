@@ -1,4 +1,4 @@
-package woowacourse.shopping.orderhistory
+package woowacourse.shopping.ui.orderhistory
 
 import io.mockk.every
 import io.mockk.just
@@ -12,8 +12,6 @@ import woowacourse.shopping.createOrderHistoryModel
 import woowacourse.shopping.domain.OrderHistory
 import woowacourse.shopping.domain.repository.MemberRepository
 import woowacourse.shopping.ui.model.OrderHistoryModel
-import woowacourse.shopping.ui.orderhistory.OrderHistoryContract
-import woowacourse.shopping.ui.orderhistory.OrderHistoryPresenter
 
 class OrderHistoryPresenterTest {
     private val view: OrderHistoryContract.View = mockk()

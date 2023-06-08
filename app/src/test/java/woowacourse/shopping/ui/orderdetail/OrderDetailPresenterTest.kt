@@ -1,4 +1,4 @@
-package woowacourse.shopping.orderdetail
+package woowacourse.shopping.ui.orderdetail
 
 import io.mockk.every
 import io.mockk.just
@@ -11,8 +11,6 @@ import woowacourse.shopping.createOrder
 import woowacourse.shopping.createOrderModel
 import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.repository.MemberRepository
-import woowacourse.shopping.ui.orderdetail.OrderDetailContract
-import woowacourse.shopping.ui.orderdetail.OrderDetailPresenter
 
 class OrderDetailPresenterTest {
     private val view: OrderDetailContract.View = mockk()

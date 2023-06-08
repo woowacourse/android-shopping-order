@@ -1,4 +1,4 @@
-package woowacourse.shopping.shopping
+package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
 import io.mockk.just
@@ -11,8 +11,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.MemberRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.shopping.ShoppingContract
-import woowacourse.shopping.ui.shopping.ShoppingPresenter
 
 class ShoppingPresenterTest {
     private lateinit var presenter: ShoppingPresenter
