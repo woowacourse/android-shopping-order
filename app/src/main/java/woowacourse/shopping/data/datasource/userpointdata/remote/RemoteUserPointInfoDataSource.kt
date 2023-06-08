@@ -1,11 +1,10 @@
 package woowacourse.shopping.data.datasource.userpointdata.remote
 
 import android.util.Log
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.userpointdata.UserPointInfoDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
+import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.httpclient.mapper.toDataModel
 import woowacourse.shopping.data.httpclient.response.UserPointInfoResponse
 import woowacourse.shopping.data.model.DataUserPointInfo
@@ -13,25 +12,23 @@ import woowacourse.shopping.data.model.DataUserPointInfo
 class RemoteUserPointInfoDataSource : UserPointInfoDataSource.Remote {
     override fun getUserPointInfo(onReceived: (DataUserPointInfo) -> Unit) {
         RetrofitModule.userPointInfoService.getUserPointInfo().enqueue(
-            object : Callback<UserPointInfoResponse> {
-                override fun onResponse(
-                    call: Call<UserPointInfoResponse>,
-                    response: Response<UserPointInfoResponse>
-                ) {
-                    val body = response.body()
-                    if (body != null) {
-                        onReceived(body.toDataModel())
-                    } else {
-                        Log.i(
-                            this@RemoteUserPointInfoDataSource.javaClass.name,
-                            NULL_USER_POINT_DATA
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<UserPointInfoResponse>, t: Throwable) {}
-            }
+            getRetrofitCallback<UserPointInfoResponse>(
+                failureLogTag = this::class.java.name,
+                onResponse = { _, response -> getUserPointInfoOnResponse(response, onReceived) }
+            )
         )
+    }
+
+    private fun getUserPointInfoOnResponse(
+        response: Response<UserPointInfoResponse>,
+        onReceived: (DataUserPointInfo) -> Unit
+    ) {
+        val body = response.body()
+        if (body != null) {
+            onReceived(body.toDataModel())
+        } else {
+            Log.i(this.javaClass.name, NULL_USER_POINT_DATA)
+        }
     }
 
     companion object {
