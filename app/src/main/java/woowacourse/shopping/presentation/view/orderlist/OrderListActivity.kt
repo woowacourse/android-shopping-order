@@ -10,9 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.RetrofitBuilder
-import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
-import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityOrderListBinding
 import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
@@ -56,11 +54,10 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private fun setPresenter() {
-        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
-        val orderRemoteDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
         presenter = OrderListPresenter(
             this,
-            orderRepository = OrderRepositoryImpl(orderRemoteDataSource),
+            orderRepository = repositoryFactory.orderRepository
         )
     }
 

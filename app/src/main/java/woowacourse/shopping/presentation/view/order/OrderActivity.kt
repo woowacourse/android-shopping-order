@@ -11,14 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.RetrofitBuilder
-import woowacourse.shopping.data.respository.card.CardDAO
-import woowacourse.shopping.data.respository.card.CardRepositoryImpl
-import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
-import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.model.CardModel
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -67,16 +60,13 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     }
 
     private fun setPresenter() {
-        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
-        val orderRemoteDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
 
         presenter = OrderPresenter(
             this,
-            cardRepository = CardRepositoryImpl(CardDAO),
-            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            orderRepository = OrderRepositoryImpl(orderRemoteDataSource),
+            cardRepository = repositoryFactory.cardRepository,
+            cartRepository = repositoryFactory.cartRepository,
+            orderRepository = repositoryFactory.orderRepository
         )
     }
 

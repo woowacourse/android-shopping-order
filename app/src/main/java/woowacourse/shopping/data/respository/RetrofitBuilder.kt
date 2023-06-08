@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.respository
 
 import android.content.Context
-import android.util.Log
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
@@ -23,7 +22,6 @@ class RetrofitBuilder private constructor(
     private val user: UserPreference = UserPreference.getInstance(context)
 
     init {
-        Log.d("test", "token : ${user.token}")
         val token = user.token
 
         val client = OkHttpClient.Builder().apply {

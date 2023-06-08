@@ -13,14 +13,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.RetrofitBuilder
-import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
-import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
 import woowacourse.shopping.presentation.model.CartProductModel
@@ -134,20 +127,13 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun setPresenter() {
-        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
 
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofitBuilder.createProductService())
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
-        val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, url)
         presenter = ProductListPresenter(
             this,
-            productRepository = ProductRepositoryImpl(productRemoteDataSource),
-            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(
-                productRemoteDataSource,
-                recentProductLocalDataSource
-            ),
+            productRepository = repositoryFactory.productRepository,
+            cartRepository = repositoryFactory.cartRepository,
+            recentProductRepository = repositoryFactory.recentProductRepository
         )
     }
 

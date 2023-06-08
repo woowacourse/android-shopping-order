@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.RetrofitBuilder
-import woowacourse.shopping.data.respository.order.OrderRepositoryImpl
-import woowacourse.shopping.data.respository.order.source.remote.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
@@ -57,11 +55,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun setPresenter() {
-        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
-        val orderDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
         presenter = OrderDetailPresenter(
             this,
-            orderRepository = OrderRepositoryImpl(orderDataSource)
+            orderRepository = repositoryFactory.orderRepository
         )
     }
 
