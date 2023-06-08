@@ -12,6 +12,6 @@ class ProductRetrofitDataSource : ProductRemoteDataSource {
 
     override fun findById(id: Int): Result<Product> = runCatching {
         RetrofitClient.getInstance().retrofitProductService
-            .getProduct(id).execute().body()!![0].toDomain()
+            .getProduct(id).execute().body()!!.toDomain()
     }
 }

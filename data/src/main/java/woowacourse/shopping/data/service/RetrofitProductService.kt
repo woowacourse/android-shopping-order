@@ -12,5 +12,5 @@ interface RetrofitProductService {
     @GET("products/{productId}")
     fun getProduct(
         @Path("productId") productId: Int
-    ): Call<List<ProductDto>>
+    ): Call<ProductDto>
 }
