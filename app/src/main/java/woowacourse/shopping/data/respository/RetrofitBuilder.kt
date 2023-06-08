@@ -62,6 +62,7 @@ class RetrofitBuilder private constructor(
         private const val WRITE_TIMEOUT = 15L
         private const val READ_TIMEOUT = 15L
 
+        @Volatile
         private var instance: RetrofitBuilder? = null
         fun getInstance(url: Server.Url, token: Server.Token): RetrofitBuilder {
             synchronized(this) {
