@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.myPage
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -34,11 +35,16 @@ class MyPageActivity : AppCompatActivity(), MyPageContract.View {
         presenter.recharge(binding.editMyPageRechargeValue.text.toString().toInt())
     }
 
-    override fun showError() {
+    override fun showError(message: String) {
         Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
     }
 
     private fun showOrders() {
         startActivity(Intent(this, OrderActivity::class.java))
+    }
+
+    companion object {
+        const val TAG = "MyPageActivity"
     }
 }

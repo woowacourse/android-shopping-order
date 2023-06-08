@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Order
 interface OrderContract {
     interface View {
         fun showOrders(orders: List<Order>)
-        fun showUnexpectedError()
+        fun showError(message: String)
         fun showOrderDetail(orderId: Long)
     }
 

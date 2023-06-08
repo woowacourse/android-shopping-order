@@ -13,7 +13,7 @@ interface HomeContract {
         fun appendProductItems(startPosition: Int, size: Int)
         fun appendShowMoreItem(position: Int)
         fun removeShowMoreItem(position: Int)
-        fun showUnexpectedError()
+        fun showError(message: String)
         fun updateProductQuantity(position: Int)
         fun updateTotalQuantity(size: Int)
         fun notifyLoadingFinished()

@@ -1,13 +1,12 @@
 package woowacourse.shopping.data.defaultRepository
 
 import woowacourse.shopping.data.dataSource.RecentlyViewedDataSource
+import woowacourse.shopping.data.error.WoowaException
 import woowacourse.shopping.data.local.recentlyViewed.RecentlyViewedEntity
 import woowacourse.shopping.data.mapper.RecentlyViewedMapper.toDomainModel
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.domain.repository.RecentlyViewedRepository
-import woowacourse.shopping.domain.util.Error
-import woowacourse.shopping.domain.util.WoowaResult
 
 class DefaultRecentlyViewedRepository(
     private val recentlyViewedDataSource: RecentlyViewedDataSource,
@@ -16,11 +15,11 @@ class DefaultRecentlyViewedRepository(
         return recentlyViewedDataSource.getRecentlyViewedProducts(unit).map { it.toDomainModel() }
     }
 
-    override fun getLastViewedProduct(): WoowaResult<RecentlyViewedProduct> {
+    override fun getLastViewedProduct(): Result<RecentlyViewedProduct> {
         val recentlyViewedEntity: RecentlyViewedEntity =
             recentlyViewedDataSource.getLastViewedProduct()
-                ?: return WoowaResult.FAIL(Error.DataBaseError)
-        return WoowaResult.SUCCESS<RecentlyViewedProduct>(recentlyViewedEntity.toDomainModel())
+                ?: return Result.failure(WoowaException.DatabaseError())
+        return Result.success(recentlyViewedEntity.toDomainModel())
     }
 
     override fun addRecentlyViewedProduct(product: Product): Long {

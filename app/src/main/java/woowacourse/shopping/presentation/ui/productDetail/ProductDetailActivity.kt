@@ -3,14 +3,13 @@ package woowacourse.shopping.presentation.ui.productDetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
 import woowacourse.shopping.data.defaultRepository.DefaultRecentlyViewedRepository
-import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.local.recentlyViewed.RecentlyViewedDao
-import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
-import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
@@ -22,9 +21,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         return ProductDetailPresenter(
             this,
             productId,
-            DefaultProductRepository(ProductRemoteDataSource()),
+            DefaultProductRepository(),
             DefaultRecentlyViewedRepository(RecentlyViewedDao(this)),
-            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
         )
     }
 
@@ -42,8 +40,15 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding.lastViewedProduct = lastViewedProduct
     }
 
-    override fun handleNoSuchProductError() {
+    override fun showNoSuchProductError(message: String) {
         Toast.makeText(this, "상품을 찾을 수 없습니다", Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
+        finish()
+    }
+
+    override fun showUnexpectedError(message: String) {
+        Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
         finish()
     }
 
@@ -73,6 +78,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     companion object {
+        const val TAG = "ProductDetailActivity"
         private const val DEFAULT_ID: Long = 0
         private const val PRODUCT_ID = "productId"
         fun getIntent(context: Context, productId: Long): Intent {

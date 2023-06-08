@@ -10,21 +10,18 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
 import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
-import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
-import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.DialogCartBinding
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.util.WoowaResult
 import woowacourse.shopping.presentation.ui.shoppingCart.ShoppingCartActivity
 
 class CartDialog : DialogFragment() {
     private lateinit var binding: DialogCartBinding
     private val productRepository: ProductRepository by lazy {
-        DefaultProductRepository(ProductRemoteDataSource())
+        DefaultProductRepository()
     }
     private val shoppingCartRepository: ShoppingCartRepository by lazy {
-        DefaultShoppingCartRepository(ShoppingCartRemoteDataSource())
+        DefaultShoppingCartRepository()
     }
 
     override fun onCreateView(
@@ -63,12 +60,9 @@ class CartDialog : DialogFragment() {
         binding.buttonOrderDialogPut.setOnClickListener {
             shoppingCartRepository.insert(
                 callback = { result ->
-                    when (result) {
-                        is WoowaResult.SUCCESS -> {
-                            startActivity(ShoppingCartActivity.getIntent(requireContext()))
-                            requireActivity().finish()
-                        }
-                        is WoowaResult.FAIL -> Unit
+                    result.onSuccess {
+                        startActivity(ShoppingCartActivity.getIntent(requireContext()))
+                        requireActivity().finish()
                     }
                     dismiss()
                 },
@@ -97,10 +91,9 @@ class CartDialog : DialogFragment() {
         val productId: Long = arguments?.getLong(PRODUCT_ID) ?: return dismiss()
         productRepository.fetchProduct(
             callback = { result ->
-                when (result) {
-                    is WoowaResult.SUCCESS -> binding.product = result.data.product
-                    is WoowaResult.FAIL -> dismiss()
-                }
+                result
+                    .onSuccess { binding.product = it.product }
+                    .onFailure { dismiss() }
             },
             id = productId,
         )

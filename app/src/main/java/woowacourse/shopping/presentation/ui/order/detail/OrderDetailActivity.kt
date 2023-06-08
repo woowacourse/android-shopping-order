@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -52,11 +53,13 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
         adapter.submitList(orderDetail)
     }
 
-    override fun showUnexpectedError() {
+    override fun showError(message: String) {
         Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
     }
 
     companion object {
+        const val TAG = "OrderDetailActivity"
         private const val ORDER_ID = "ORDER_ID"
 
         fun getIntent(context: Context, orderId: Long): Intent {

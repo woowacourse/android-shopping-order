@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.util.WoowaResult
 import woowacourse.shopping.presentation.model.HomeData
 import woowacourse.shopping.presentation.model.HomeMapper.toProductItem
 import woowacourse.shopping.presentation.model.ProductItem
@@ -37,7 +36,7 @@ class HomePresenter(
         view.updateRecentlyViewedProducts(recentlyViewedItem.toList())
     }
 
-    private fun fetchProducts(callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit) {
+    private fun fetchProducts(callback: (Result<List<CartProduct>>, Boolean) -> Unit) {
         productRepository.fetchPagedProducts(
             pageItemCount = UNIT,
             lastId = lastProductId,
@@ -46,18 +45,17 @@ class HomePresenter(
     }
 
     private fun fetchFirstProducts() {
-        val callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    val products = result.data.map { it.toProductItem() }
+        val callback: (Result<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
+            result
+                .onSuccess {
+                    val products = it.map { it.toProductItem() }
                     lastProductId = products.lastOrNull()?.productId ?: lastProductId
                     homeData.addAll(products)
                     view.setHomeData(homeData)
                     checkIsLastProduct(isLast)
                     view.notifyLoadingFinished()
                 }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
         fetchProducts(callback)
     }
@@ -65,20 +63,17 @@ class HomePresenter(
     override fun fetchMoreProducts() {
         deleteShowMoreItem()
         val startPosition = homeData.size
-        val callback: (WoowaResult<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    val products = result.data.map { it.toProductItem() }
+        val callback: (Result<List<CartProduct>>, Boolean) -> Unit = { result, isLast ->
+            result
+                .onSuccess {
+                    val products = it.map { it.toProductItem() }
                     lastProductId = products.lastOrNull()?.productId ?: lastProductId
                     homeData.addAll(products)
                     view.appendProductItems(startPosition, products.size)
                     checkIsLastProduct(isLast)
                     view.notifyLoadingFinished()
                 }
-                is WoowaResult.FAIL -> {
-                    view.showUnexpectedError()
-                }
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
         fetchProducts(callback)
     }
@@ -121,22 +116,21 @@ class HomePresenter(
 
     private fun updatedQuantity(position: Int, operator: Operator): CartProduct? {
         if (homeData[position].viewType != PRODUCT) {
-            view.showUnexpectedError()
+            view.showError("viewType이 맞지 않음")
             return null
         }
         return operator.operate((homeData[position] as ProductItem).cartProduct)
     }
 
     private fun putProductInCart(position: Int, cartProduct: CartProduct) {
-        val callback: (WoowaResult<Long>) -> Unit = { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    val cartItem = cartProduct.cartItem.copy(id = result.data)
+        val callback: (Result<Long>) -> Unit = { result ->
+            result
+                .onSuccess {
+                    val cartItem = cartProduct.cartItem.copy(id = it)
                     homeData[position] = ProductItem(cartProduct.copy(cartItem = cartItem))
                     view.updateProductQuantity(position)
                 }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
 
         shoppingCartRepository.insert(
@@ -147,14 +141,13 @@ class HomePresenter(
     }
 
     private fun updateProductItem(position: Int, cartProduct: CartProduct) {
-        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
+        val callback: (Result<Boolean>) -> Unit = { result ->
+            result
+                .onSuccess {
                     homeData[position] = ProductItem(cartProduct)
                     view.updateProductQuantity(position)
                 }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
 
         shoppingCartRepository.update(
@@ -165,18 +158,17 @@ class HomePresenter(
     }
 
     private fun deleteProductInCart(position: Int, cartProduct: CartProduct) {
-        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
-            when (result) {
-                is WoowaResult.SUCCESS<Boolean> -> {
-                    if (result.data) {
+        val callback: (Result<Boolean>) -> Unit = { result ->
+            result
+                .onSuccess {
+                    if (it) {
                         homeData[position] = ProductItem(cartProduct)
                         view.updateProductQuantity(position)
                     } else {
-                        view.showUnexpectedError()
+                        view.showError("서버통신에 성공했지만 오류가 발생했습니다.")
                     }
                 }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
         shoppingCartRepository.delete(
             id = (homeData[position] as ProductItem).cartId,
@@ -186,12 +178,9 @@ class HomePresenter(
 
     override fun fetchTotalQuantity() {
         shoppingCartRepository.fetchAll { result ->
-            when (result) {
-                is WoowaResult.SUCCESS<List<CartProduct>> -> {
-                    view.updateTotalQuantity(result.data.size)
-                }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+            result
+                .onSuccess { view.updateTotalQuantity(it.size) }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
     }
 

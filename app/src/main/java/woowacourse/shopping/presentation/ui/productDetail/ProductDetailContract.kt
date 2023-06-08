@@ -6,11 +6,10 @@ import woowacourse.shopping.domain.model.RecentlyViewedProduct
 interface ProductDetailContract {
     interface View {
         val presenter: Presenter
-        fun handleNoSuchProductError()
+        fun showNoSuchProductError(message: String)
+        fun showUnexpectedError(message: String)
         fun setBindingData(product: Product, lastViewedProduct: RecentlyViewedProduct)
     }
 
-    interface Presenter {
-        fun addProductInCart()
-    }
+    interface Presenter
 }

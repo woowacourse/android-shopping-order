@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.ui.order.detail
 
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.util.WoowaResult
 
 class OrderDetailPresenter(
     private val view: OrderDetailContract.View,
@@ -9,13 +8,12 @@ class OrderDetailPresenter(
 ) : OrderDetailContract.Presenter {
     override fun fetchOrderDetail(orderId: Long) {
         orderRepository.fetchOrder(orderId) { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    view.showOrderDateTime(result.data.orderedDateTime)
-                    view.showOrderDetail(result.data.products)
+            result
+                .onSuccess {
+                    view.showOrderDateTime(it.orderedDateTime)
+                    view.showOrderDetail(it.products)
                 }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
     }
 }

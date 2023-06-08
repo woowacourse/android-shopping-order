@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.order
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -45,11 +46,16 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         adapter.submitList(orders)
     }
 
-    override fun showUnexpectedError() {
+    override fun showError(message: String) {
         Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
     }
 
     override fun showOrderDetail(orderId: Long) {
         startActivity(OrderDetailActivity.getIntent(this, orderId))
+    }
+
+    companion object {
+        const val TAG = "OrderActivity"
     }
 }

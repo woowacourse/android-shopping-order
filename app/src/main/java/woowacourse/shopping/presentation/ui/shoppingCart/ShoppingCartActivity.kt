@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shoppingCart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.defaultRepository.DefaultChargeRepository
 import woowacourse.shopping.data.defaultRepository.DefaultOrderRepository
 import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
-import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.presentation.ui.order.detail.OrderDetailActivity
@@ -45,7 +45,7 @@ class ShoppingCartActivity :
     private fun initPresenter(): ShoppingCartPresenter {
         return ShoppingCartPresenter(
             this,
-            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
+            DefaultShoppingCartRepository(),
             DefaultChargeRepository(),
             DefaultOrderRepository(),
         )
@@ -105,8 +105,9 @@ class ShoppingCartActivity :
         binding.textShoppingCartPayment.text = getString(R.string.detailPriceFormat, payment)
     }
 
-    override fun showUnExpectedError() {
+    override fun showError(message: String) {
         Toast.makeText(this, getString(R.string.unexpected_error), Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
     }
 
     private fun checkAllProduct() {
@@ -133,6 +134,7 @@ class ShoppingCartActivity :
     }
 
     companion object {
+        const val TAG = "ShoppingCartActivity"
         fun getIntent(context: Context): Intent {
             return Intent(context, ShoppingCartActivity::class.java)
         }

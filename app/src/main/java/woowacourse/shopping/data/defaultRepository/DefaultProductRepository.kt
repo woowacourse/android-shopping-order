@@ -1,35 +1,28 @@
 package woowacourse.shopping.data.defaultRepository
 
-import woowacourse.shopping.data.dataSource.ProductDataSource
 import woowacourse.shopping.data.mapper.ProductMapper.toCartProduct
 import woowacourse.shopping.data.mapper.ProductMapper.toCartProducts
+import woowacourse.shopping.data.remote.ServicePool
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.util.WoowaResult
+import woowacourse.shopping.util.fetchResponseBody
 
-class DefaultProductRepository(
-    private val productDataSource: ProductDataSource,
-) : ProductRepository {
-    override fun fetchProduct(callback: (WoowaResult<CartProduct>) -> Unit, id: Long) {
-        productDataSource.fetchProduct(id) { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> callback(WoowaResult.SUCCESS(result.data.toCartProduct()))
-                is WoowaResult.FAIL -> callback(result)
-            }
-        }
+class DefaultProductRepository : ProductRepository {
+    override fun fetchProduct(callback: (Result<CartProduct>) -> Unit, id: Long) {
+        ServicePool.retrofitService.getProduct(id).fetchResponseBody(
+            onSuccess = { callback(Result.success(it.toCartProduct())) },
+            onFailure = { callback(Result.failure(it)) },
+        )
     }
 
     override fun fetchPagedProducts(
-        callback: (products: WoowaResult<List<CartProduct>>, isLast: Boolean) -> Unit,
+        callback: (products: Result<List<CartProduct>>, isLast: Boolean) -> Unit,
         pageItemCount: Int,
         lastId: Long,
     ) {
-        productDataSource.fetchPagedProducts(pageItemCount, lastId) { result ->
-            when (result) {
-                is WoowaResult.SUCCESS ->
-                    callback(WoowaResult.SUCCESS(result.data.toCartProducts()), result.data.last)
-                is WoowaResult.FAIL -> callback(result, false)
-            }
-        }
+        ServicePool.retrofitService.getPagedProducts(lastId, pageItemCount).fetchResponseBody(
+            onSuccess = { callback(Result.success(it.toCartProducts()), it.last) },
+            onFailure = { callback(Result.failure(it), false) },
+        )
     }
 }

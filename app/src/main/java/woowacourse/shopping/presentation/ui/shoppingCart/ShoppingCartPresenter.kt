@@ -1,12 +1,10 @@
 package woowacourse.shopping.presentation.ui.shoppingCart
 
-import android.util.Log
 import woowacourse.shopping.domain.model.CartPagination
 import woowacourse.shopping.domain.model.Operator
 import woowacourse.shopping.domain.repository.ChargeRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.util.WoowaResult
 
 class ShoppingCartPresenter(
     private val view: ShoppingCartContract.View,
@@ -19,9 +17,9 @@ class ShoppingCartPresenter(
 
     init {
         shoppingCartRepository.fetchAll { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    cartPagination = CartPagination(result.data)
+            result
+                .onSuccess {
+                    cartPagination = CartPagination(it)
                     fetchShoppingCart()
                     setPageNumber()
                     checkPageMovement()
@@ -29,8 +27,7 @@ class ShoppingCartPresenter(
                     setPayment()
                     setAllCheck()
                 }
-                is WoowaResult.FAIL -> view.showUnExpectedError()
-            }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
         fetchChange()
     }
@@ -70,14 +67,13 @@ class ShoppingCartPresenter(
     override fun deleteProductInCart(index: Int) {
         shoppingCartRepository.delete(
             callback = { result ->
-                when (result) {
-                    is WoowaResult.SUCCESS -> {
+                result
+                    .onSuccess {
                         cartPagination.removeFromCurrentPage(index)
                         checkPageEmpty()
                         updateView()
                     }
-                    is WoowaResult.FAIL -> view.showUnExpectedError()
-                }
+                    .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
             },
             id = cartPagination[index].cartItem.id,
         )
@@ -102,11 +98,10 @@ class ShoppingCartPresenter(
     }
 
     override fun applyQuantityChanged(index: Int) {
-        val callback: (WoowaResult<Boolean>) -> Unit = { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> updateView()
-                is WoowaResult.FAIL -> view.showUnExpectedError()
-            }
+        val callback: (Result<Boolean>) -> Unit = { result ->
+            result
+                .onSuccess { updateView() }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
         shoppingCartRepository.update(
             id = cartPagination[index].cartItem.id,
@@ -142,7 +137,6 @@ class ShoppingCartPresenter(
     override fun requestOrder() {
         val orderAmount = cartPagination.getPayment()
         val lack = change - orderAmount
-        Log.d("asdf", "orderAmount: ${cartPagination.getPayment()}, change: $change, lack: $lack")
         if (lack < 0) {
             view.showChangeLack(lack * -1)
             return
@@ -152,19 +146,17 @@ class ShoppingCartPresenter(
 
     private fun order() {
         orderRepository.order(cartPagination.getCheckedItem()) { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> view.showOrderComplete(result.data)
-                is WoowaResult.FAIL -> view.showUnExpectedError()
-            }
+            result
+                .onSuccess { view.showOrderComplete(it) }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
     }
 
     override fun fetchChange() {
         chargeRepository.fetchCharge { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> change = result.data
-                is WoowaResult.FAIL -> view.showUnExpectedError()
-            }
+            result
+                .onSuccess { change = it }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
     }
 }

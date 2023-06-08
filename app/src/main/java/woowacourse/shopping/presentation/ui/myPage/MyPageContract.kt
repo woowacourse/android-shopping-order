@@ -4,7 +4,7 @@ interface MyPageContract {
     interface View {
         fun showCharge(amount: Int)
         fun requestRecharge()
-        fun showError()
+        fun showError(message: String)
     }
 
     interface Presenter {

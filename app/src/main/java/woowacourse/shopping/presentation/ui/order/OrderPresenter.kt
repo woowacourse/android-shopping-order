@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.order
 
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.util.WoowaResult
 
 class OrderPresenter(
     private val view: OrderContract.View,
@@ -12,13 +11,9 @@ class OrderPresenter(
 
     override fun fetchOrders() {
         orderRepository.fetchOrders { result ->
-            when (result) {
-                is WoowaResult.SUCCESS -> {
-                    orders = result.data
-                    view.showOrders(orders)
-                }
-                is WoowaResult.FAIL -> view.showUnexpectedError()
-            }
+            result
+                .onSuccess { view.showOrders(it) }
+                .onFailure { view.showError(it.message ?: "에러 메시지가 없습니다.") }
         }
     }
 

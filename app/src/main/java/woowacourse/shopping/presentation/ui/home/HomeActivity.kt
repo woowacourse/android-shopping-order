@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -13,8 +14,6 @@ import woowacourse.shopping.data.defaultRepository.DefaultProductRepository
 import woowacourse.shopping.data.defaultRepository.DefaultRecentlyViewedRepository
 import woowacourse.shopping.data.defaultRepository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.local.recentlyViewed.RecentlyViewedDao
-import woowacourse.shopping.data.remote.product.ProductRemoteDataSource
-import woowacourse.shopping.data.remote.shoppingCart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.domain.model.RecentlyViewedProduct
 import woowacourse.shopping.presentation.model.HomeData
@@ -44,9 +43,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
     private fun initPresenter(): HomePresenter {
         return HomePresenter(
             this,
-            DefaultProductRepository(ProductRemoteDataSource()),
+            DefaultProductRepository(),
             DefaultRecentlyViewedRepository(RecentlyViewedDao(this)),
-            DefaultShoppingCartRepository(ShoppingCartRemoteDataSource()),
+            DefaultShoppingCartRepository(),
         )
     }
 
@@ -126,8 +125,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         presenter.fetchMoreProducts()
     }
 
-    override fun showUnexpectedError() {
+    override fun showError(message: String) {
         Toast.makeText(this, getString(R.string.unexpected_error), Toast.LENGTH_SHORT).show()
+        Log.e(TAG, message)
     }
 
     override fun updateProductQuantity(position: Int) {
@@ -145,5 +145,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, ProductClickListene
         binding.buttonHomeMyPage.setOnClickListener {
             startActivity(Intent(this, MyPageActivity::class.java))
         }
+    }
+
+    companion object {
+        const val TAG = "HomeActivity"
     }
 }

@@ -6,7 +6,7 @@ interface OrderDetailContract {
     interface View {
         fun showOrderDateTime(dateTime: String)
         fun showOrderDetail(orderDetail: List<Order.OrderedProduct>)
-        fun showUnexpectedError()
+        fun showError(message: String)
     }
 
     interface Presenter {

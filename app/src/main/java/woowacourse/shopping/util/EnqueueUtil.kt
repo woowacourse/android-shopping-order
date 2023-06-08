@@ -1,16 +1,13 @@
 package woowacourse.shopping.util
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.domain.util.Error
-
-private val TAG = "ENQUEUE_UTIL"
+import woowacourse.shopping.data.error.WoowaException
 
 fun <T> Call<T>.fetchResponseBody(
     onSuccess: (T) -> Unit,
-    onFailure: (Error) -> Unit,
+    onFailure: (WoowaException) -> Unit,
 ) {
     enqueue(object : Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -20,30 +17,21 @@ fun <T> Call<T>.fetchResponseBody(
                     onSuccess(data)
                     return
                 }
-                onFailure(Error.ResponseBodyNull)
-                Log.e(
-                    TAG,
-                    "Response Body is null / code: ${response.code()}, messsage: ${response.message()}",
-                )
+                onFailure(WoowaException.ResponseBodyNull("Response Body is null / code: ${response.code()}, messsage: ${response.message()}"))
                 return
             }
-            onFailure(Error.ResponseFailure)
-            Log.e(
-                TAG,
-                "Response Failure / code: ${response.code()}, messsage: ${response.message()}",
-            )
+            onFailure(WoowaException.ResponseFailure("Response Failure / code: ${response.code()}, messsage: ${response.message()}"))
         }
 
         override fun onFailure(call: Call<T>, t: Throwable) {
-            onFailure(Error.ServerConnectError)
-            Log.e(TAG, "throwable: ${t.cause}")
+            onFailure(WoowaException.ServerConnectError("throwable: ${t.cause}"))
         }
     })
 }
 
 fun <T> Call<T>.fetchHeaderId(
     onSuccess: (Long) -> Unit,
-    onFailure: (Error) -> Unit,
+    onFailure: (WoowaException) -> Unit,
 ) {
     enqueue(object :
         Callback<T> {
@@ -56,17 +44,14 @@ fun <T> Call<T>.fetchHeaderId(
                     onSuccess(id)
                     return
                 }
-                onFailure(Error.ResponseBodyNull)
-                Log.e(TAG, "code: ${response.code()}, messsage: ${response.message()}")
+                onFailure(WoowaException.ResponseBodyNull("code: ${response.code()}, messsage: ${response.message()}"))
                 return
             }
-            onFailure(Error.ResponseFailure)
-            Log.e(TAG, "code: ${response.code()}, messsage: ${response.message()}")
+            onFailure(WoowaException.ResponseFailure("code: ${response.code()}, messsage: ${response.message()}"))
         }
 
         override fun onFailure(call: Call<T>, t: Throwable) {
-            onFailure(Error.ServerConnectError)
-            Log.e(TAG, "throwable: ${t.cause}")
+            onFailure(WoowaException.ServerConnectError("throwable: ${t.cause}"))
         }
     })
 }

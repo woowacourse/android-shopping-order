@@ -15,7 +15,7 @@ interface ShoppingCartContract {
         fun updateOrder(orderCount: Int)
         fun updatePayment(payment: Int)
         fun updateAllCheck(isChecked: Boolean)
-        fun showUnExpectedError()
+        fun showError(message: String)
         fun goProductDetailActivity(cartProduct: CartProduct)
         fun showOrderComplete(orderId: Long)
         fun showChangeLack(lackAmount: Int)
