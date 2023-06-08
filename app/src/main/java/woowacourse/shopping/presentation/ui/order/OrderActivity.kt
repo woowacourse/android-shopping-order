@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.defaultRepository.DefaultOrderRepository
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.presentation.model.OrderUiModel
 import woowacourse.shopping.presentation.ui.order.detail.OrderDetailActivity
 
 class OrderActivity : AppCompatActivity(), OrderContract.View {
@@ -42,7 +42,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
         })
     }
 
-    override fun showOrders(orders: List<Order>) {
+    override fun showOrders(orders: List<OrderUiModel>) {
         adapter.submitList(orders)
     }
 

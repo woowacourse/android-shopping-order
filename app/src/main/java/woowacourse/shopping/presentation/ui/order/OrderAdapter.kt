@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemOrderBinding
-import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.presentation.model.OrderUiModel
 
 class OrderAdapter(
     private val onClick: (position: Int) -> Unit,
-) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderComparator) {
+) : ListAdapter<OrderUiModel, OrderAdapter.OrderViewHolder>(OrderComparator) {
 
     class OrderViewHolder(
         val binding: ItemOrderBinding,
@@ -22,34 +22,32 @@ class OrderAdapter(
             binding.root.setOnClickListener { onClick(absoluteAdapterPosition) }
         }
 
-        fun bind(data: Order) {
-            if (data.products.isEmpty()) return
-            Glide.with(binding.imageOrderList).load(data.products.first().product.imageUrl)
-                .into(binding.imageOrderList)
+        fun bind(data: OrderUiModel) {
+            Glide.with(binding.imageOrderList).load(data.image).into(binding.imageOrderList)
             binding.textOrderListName.text = getOrderName(data)
-            binding.textOrderListDateTime.text = data.orderedDateTime
-            binding.textOrderListTotalPrice.text = data.totalPrice.toString()
+            binding.textOrderListDateTime.text = data.dateTime
+            binding.textOrderListTotalPrice.text = data.price.toString()
         }
 
-        private fun getOrderName(data: Order): String {
-            return if (data.products.size > 1) {
+        private fun getOrderName(data: OrderUiModel): String {
+            return if (data.otherCount > 0) {
                 binding.root.context.getString(
                     R.string.severalProducts,
-                    data.products.first().product.name,
-                    data.products.size - 1,
+                    data.name,
+                    data.otherCount,
                 )
             } else {
-                data.products.first().product.name
+                data.name
             }
         }
     }
 
-    object OrderComparator : DiffUtil.ItemCallback<Order>() {
-        override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean {
-            return oldItem.orderId == newItem.orderId
+    object OrderComparator : DiffUtil.ItemCallback<OrderUiModel>() {
+        override fun areItemsTheSame(oldItem: OrderUiModel, newItem: OrderUiModel): Boolean {
+            return oldItem.name == newItem.name
         }
 
-        override fun areContentsTheSame(oldItem: Order, newItem: Order): Boolean {
+        override fun areContentsTheSame(oldItem: OrderUiModel, newItem: OrderUiModel): Boolean {
             return oldItem == newItem
         }
     }
