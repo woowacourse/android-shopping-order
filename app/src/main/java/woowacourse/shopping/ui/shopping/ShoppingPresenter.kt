@@ -21,7 +21,6 @@ import woowacourse.shopping.model.UiProductCount
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
-import woowacourse.shopping.util.collection.DistinctList
 
 class ShoppingPresenter(
     view: View,
@@ -34,7 +33,7 @@ class ShoppingPresenter(
 ) : Presenter(view) {
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
-    private val products: DistinctList<Product> = DistinctList()
+    private val products: MutableList<Product> = mutableListOf()
 
     private val cartProductCount: UiProductCount
         get() = UiProductCount(cart.productCountInCart)
@@ -108,6 +107,7 @@ class ShoppingPresenter(
             page = page.getPageForCheckHasNext(),
             onSuccess = {
                 products.addAll(it)
+                products.distinct()
                 Log.d("botto", "${products.size}")
                 loadCartProducts { fetchedCartProducts ->
                     updateCart(transformCartProducts(products, fetchedCartProducts))
