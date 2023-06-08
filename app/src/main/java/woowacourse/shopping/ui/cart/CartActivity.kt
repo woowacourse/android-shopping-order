@@ -89,7 +89,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun observeAllCheck() {
         presenter.allCheck.observe(this) {
-            binding.cartBottom.cbCheckAll.isChecked = it
+            runOnUiThread {
+                binding.cartBottom.cbCheckAll.isChecked = it
+            }
         }
     }
 

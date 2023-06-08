@@ -25,7 +25,7 @@ class CartPresenter(
     private var isCheckChanging = false
 
     init {
-        cartRepository.getAll()
+        CompletableFuture.supplyAsync { cartRepository.getAll() }.get()
         setUpAllButton()
     }
 
@@ -113,7 +113,9 @@ class CartPresenter(
     }
 
     private fun setUpAllButton() {
-        cartRepository.getPage(index * STEP, STEP)
+        _allCheck.value = cartRepository.getPage(index * STEP, STEP)
+            .getOrNull()
+            ?.all { it.checked } ?: false
     }
 
     companion object {
