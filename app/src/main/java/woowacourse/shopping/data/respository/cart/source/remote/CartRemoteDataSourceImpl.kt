@@ -59,7 +59,7 @@ class CartRemoteDataSourceImpl(
     override fun requestPostCartItem(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (Long) -> Unit,
+        onSuccess: (cartId: Long) -> Unit,
     ) {
         cartService.requestPostCartProduct(productId)
             .enqueue(object : retrofit2.Callback<Unit> {

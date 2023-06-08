@@ -16,7 +16,7 @@ class CartRepositoryImpl(
     override fun addCartProduct(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: (Long) -> Unit,
+        onSuccess: (cartId: Long) -> Unit,
     ) {
         cartRemoteDataSource.requestPostCartItem(productId, onFailure, onSuccess)
     }
