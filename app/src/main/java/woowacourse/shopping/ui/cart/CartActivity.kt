@@ -133,7 +133,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun showError(message: String) {
+    override fun showError(message: Int) {
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }

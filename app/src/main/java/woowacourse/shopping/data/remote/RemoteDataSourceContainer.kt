@@ -1,14 +1,9 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.remote
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import woowacourse.shopping.data.remote.CartItemRemoteSource
-import woowacourse.shopping.data.remote.OrderRemoteSource
-import woowacourse.shopping.data.remote.ProductRemoteSource
-import woowacourse.shopping.data.remote.ServerConfiguration
-import woowacourse.shopping.data.remote.UserRemoteRemoteSource
 import woowacourse.shopping.data.remote.retrofit.CartItemRetrofitService
 import woowacourse.shopping.data.remote.retrofit.OrderRetrofitService
 import woowacourse.shopping.data.remote.retrofit.ProductRetrofitService
@@ -31,7 +26,7 @@ class RemoteDataSourceContainer {
     }
 
     val user by lazy {
-        UserRemoteRemoteSource(retrofit.create(UserRetrofitService::class.java))
+        DefaultUserRemoteSource(retrofit.create(UserRetrofitService::class.java))
     }
 
     val order by lazy {

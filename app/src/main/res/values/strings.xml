@@ -28,4 +28,13 @@
     <string name="order_detail_total_price_header">총 결제 금액</string>
     <string name="cart_dialog_payment_positive">결제</string>
     <string name="cart_dialog_payment_negative">취소</string>
+
+    <string name="error_user">사용자 정보를 찾지 못했습니다.</string>
+    <string name="error_cart_save">장바구니 상품 저장을 실패했습니다.</string>
+    <string name="error_cart_find">장바구니 상품을 찾지 못했습니다.</string>
+    <string name="error_cart_update">장바구니 상품을 갱신하지 못했습니다.</string>
+    <string name="error_cart_delete">장바구니 상품을 삭제하지 못했습니다.</string>
+    <string name="error_order_save">주문을 실패했습니다.</string>
+    <string name="error_order_find">주문 정보를 찾지 못했습니다.</string>
+    <string name="error_product_find">상품 정보를 찾지 못했습니다.</string>
 </resources>

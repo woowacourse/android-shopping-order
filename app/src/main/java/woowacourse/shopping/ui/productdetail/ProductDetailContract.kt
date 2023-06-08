@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
-import woowacourse.shopping.ui.ErrorView
+import woowacourse.shopping.error.ErrorView
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 
@@ -17,6 +17,6 @@ interface ProductDetailContract {
         fun setLastViewedProduct(product: LastViewedProductUIState?)
         fun openCartCounter(product: ProductDetailUIState)
         fun showCartView()
-        override fun showError(message: String)
+        override fun showError(message: Int)
     }
 }
