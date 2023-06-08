@@ -1,20 +1,18 @@
 package woowacourse.shopping.data.local
 
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.CartProductPage
 
 interface CartLocalDataSource {
     fun getAll(): Result<List<CartProduct>>
-    fun getPage(offset: Int, size: Int): Result<List<CartProduct>>
-    fun getCurrentPage(): Int
-    fun getCurrentPageChecked(): Int
+    fun getPage(offset: Int, size: Int): Result<CartProductPage>
     fun getChecked(): Result<List<CartProduct>>
     fun getTotalQuantity(): Int
     fun getTotalCheckedQuantity(): Int
     fun getTotalCheckedPrice(): Int
-    fun hasNextPage(): Boolean
-    fun hasPrevPage(): Boolean
-    fun updateCurrentPageChecked(checked: Boolean)
-    fun updateChecked(id: Int, checked: Boolean)
+    fun getCheckCount(ids: List<Int>): Int
     fun replaceAll(cartProducts: List<CartProduct>)
     fun getByProductId(productId: Int): Result<CartProduct>
+    fun updateChecked(id: Int, checked: Boolean)
+    fun updateChecked(ids: List<Int>, checked: Boolean)
 }

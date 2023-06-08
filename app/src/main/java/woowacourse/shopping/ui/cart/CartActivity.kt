@@ -13,7 +13,6 @@ import woowacourse.shopping.data.remote.CartRetrofitDataSource
 import woowacourse.shopping.data.repository.CartDefaultRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
@@ -70,9 +69,18 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun initObserve() {
+        observePage()
         observeCheckedCount()
         observeTotalPrice()
         observeAllCheck()
+    }
+
+    private fun observePage() {
+        presenter.page.observe(this) {
+            binding.rvProducts.isVisible = true
+            binding.skeletonLayout.isVisible = false
+            adapter.submitList(it.cartProducts, it.pageUIModel)
+        }
     }
 
     private fun observeCheckedCount() {
@@ -123,14 +131,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
         override fun onItemCheckChanged(productId: Int, checked: Boolean) {
             presenter.updateItemCheck(productId, checked)
-        }
-    }
-
-    override fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel) {
-        runOnUiThread {
-            binding.rvProducts.isVisible = true
-            binding.skeletonLayout.isVisible = false
-            adapter.submitList(page, pageUIModel)
         }
     }
 

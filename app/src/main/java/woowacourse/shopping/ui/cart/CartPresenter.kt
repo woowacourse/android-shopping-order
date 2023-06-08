@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import java.util.concurrent.CompletableFuture
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.PageUIModel
+import woowacourse.shopping.model.CartProductPageUIModel
 import woowacourse.shopping.utils.LogUtil
 
 class CartPresenter(
@@ -13,6 +13,9 @@ class CartPresenter(
     private val cartRepository: CartRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
+    private val _page = MutableLiveData<CartProductPageUIModel>()
+    override val page: LiveData<CartProductPageUIModel> get() = _page
+
     private val _totalPrice = MutableLiveData<Int>(0)
     override val totalPrice: LiveData<Int> get() = _totalPrice
 
@@ -29,19 +32,12 @@ class CartPresenter(
         setUpAllButton()
     }
 
-    private val pageUIModel
-        get() = PageUIModel(
-            cartRepository.hasNextPage(),
-            cartRepository.hasPrevPage(),
-            cartRepository.getCurrentPage()
-        )
-
     override fun fetchCartProducts() {
         CompletableFuture.supplyAsync {
             cartRepository.getPage(index * STEP, STEP)
         }.thenAccept { result ->
             result.onSuccess {
-                view.setPage(it.map { it.toUIModel() }, pageUIModel)
+                setUpPage(it.toUIModel())
                 setUPTotalPrice()
                 setUpCheckedCount()
                 setUpAllButton()
@@ -72,7 +68,8 @@ class CartPresenter(
 
     override fun updateItemsCheck(checked: Boolean) {
         if (isCheckChanging) return
-        cartRepository.updateCurrentPageChecked(checked)
+        page.value?.cartProducts?.map { it.id }
+            ?.let { cartRepository.updateChecked(it, checked) }
         fetchCartProducts()
     }
 
@@ -104,6 +101,10 @@ class CartPresenter(
         }
     }
 
+    private fun setUpPage(cartProductPage: CartProductPageUIModel) {
+        _page.postValue(cartProductPage)
+    }
+
     private fun setUPTotalPrice() {
         _totalPrice.postValue(cartRepository.getTotalCheckedPrice())
     }
@@ -114,7 +115,7 @@ class CartPresenter(
 
     private fun setUpAllButton() {
         _allCheck.value = cartRepository.getPage(index * STEP, STEP)
-            .getOrNull()
+            .getOrNull()?.cartProducts
             ?.all { it.checked } ?: false
     }
 

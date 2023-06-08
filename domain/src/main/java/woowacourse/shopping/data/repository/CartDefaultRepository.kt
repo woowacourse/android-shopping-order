@@ -4,6 +4,7 @@ import woowacourse.shopping.data.local.CartLocalDataSource
 import woowacourse.shopping.data.remote.CartRemoteDataSource
 import woowacourse.shopping.dto.toDomain
 import woowacourse.shopping.model.CartProduct
+import woowacourse.shopping.model.CartProductPage
 
 class CartDefaultRepository(
     private val localDataSource: CartLocalDataSource,
@@ -19,20 +20,16 @@ class CartDefaultRepository(
         return Result.failure(Throwable("Failed to get all"))
     }
 
-    override fun getPage(offset: Int, size: Int): Result<List<CartProduct>> {
+    override fun getPage(offset: Int, size: Int): Result<CartProductPage> {
         return localDataSource.getPage(offset, size)
-    }
-
-    override fun getCurrentPage(): Int {
-        return localDataSource.getCurrentPage()
-    }
-
-    override fun getCurrentPageChecked(): Int {
-        return localDataSource.getCurrentPageChecked()
     }
 
     override fun getChecked(): Result<List<CartProduct>> {
         return localDataSource.getChecked()
+    }
+
+    override fun getCheckCount(ids: List<Int>): Int {
+        return localDataSource.getCheckCount(ids)
     }
 
     override fun getTotalQuantity(): Int {
@@ -45,14 +42,6 @@ class CartDefaultRepository(
 
     override fun getTotalCheckedPrice(): Int {
         return localDataSource.getTotalCheckedPrice()
-    }
-
-    override fun hasNextPage(): Boolean {
-        return localDataSource.hasNextPage()
-    }
-
-    override fun hasPrevPage(): Boolean {
-        return localDataSource.hasPrevPage()
     }
 
     override fun updateCountWithProductId(productId: Int, count: Int): Result<Int> {
@@ -78,7 +67,7 @@ class CartDefaultRepository(
         localDataSource.updateChecked(id, checked)
     }
 
-    override fun updateCurrentPageChecked(checked: Boolean) {
-        localDataSource.updateCurrentPageChecked(checked)
+    override fun updateChecked(ids: List<Int>, checked: Boolean) {
+        localDataSource.updateChecked(ids, checked)
     }
 }
