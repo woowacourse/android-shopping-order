@@ -5,23 +5,17 @@ import com.example.domain.product.Product
 import com.example.domain.product.ProductRepository
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import woowacourse.shopping.data.cart.model.toDomain
 import woowacourse.shopping.data.product.model.dto.ProductDto
 import woowacourse.shopping.data.product.model.dto.response.ProductsResponse
 import woowacourse.shopping.data.product.model.toDomain
 
 class ProductRemoteRepository(
-    url: String,
-    port: String = "8080",
+    retrofit: Retrofit
 ) : ProductRepository {
 
-    private val baseUrl = "$url:$port"
-    private val retrofitProductService: RetrofitProductService = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitProductService::class.java)
+    private val retrofitProductService: RetrofitProductService = retrofit.create()
 
     override fun requestFetchProductsUnit(
         unitSize: Int,

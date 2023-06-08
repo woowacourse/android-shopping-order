@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.data.util
 
 enum class ServerType(val url: String) {
     SUBAN_MOCK_SERVER("http://localhost"),

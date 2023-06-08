@@ -9,8 +9,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.cart.CartRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.cart.CartRemoteRepository
+import woowacourse.shopping.data.util.RetrofitManager
+import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -30,7 +31,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         val recentProduct: RecentProductState? by lazy {
             intent.getParcelableExtra(RECENT_PRODUCT_KEY)
         }
-        val cartRepository: CartRepository = CartRemoteRepository(url = serverUrl)
+        val cartRepository: CartRepository =
+            CartRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
         ProductDetailPresenter(this, product, recentProduct, cartRepository)
     }
 

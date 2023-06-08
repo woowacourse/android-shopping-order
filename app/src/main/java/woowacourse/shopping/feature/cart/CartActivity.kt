@@ -9,8 +9,9 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.cart.CartRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.cart.CartRemoteRepository
+import woowacourse.shopping.data.util.RetrofitManager
+import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.order.OrderActivity
 import woowacourse.shopping.model.CartProductState
@@ -24,7 +25,8 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: CartContract.Presenter by lazy {
-        val cartRepo: CartRepository = CartRemoteRepository(url = url)
+        val cartRepo: CartRepository =
+            CartRemoteRepository(RetrofitManager.getInstance(url).retrofit)
         CartPresenter(this, cartRepo)
     }
     private val adapter: CartProductListAdapter by lazy {

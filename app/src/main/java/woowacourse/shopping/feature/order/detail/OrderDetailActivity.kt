@@ -7,8 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.order.OrderProduct
 import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.order.OrderRemoteRepository
+import woowacourse.shopping.data.util.RetrofitManager
+import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.order.OrderState
 import woowacourse.shopping.util.extension.showToast
@@ -24,7 +25,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private val presenter: OrderDetailContract.Presenter by lazy {
         val orderId: Long = intent.getLongExtra(ORDER_ID_KEY, 0L)
         val serverUrl: String = intent.getStringExtra(ServerType.INTENT_KEY)!!
-        val orderRepository: OrderRepository = OrderRemoteRepository(url = serverUrl)
+        val orderRepository: OrderRepository = OrderRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
         OrderDetailPresenter(this, orderId, orderRepository)
     }
 

@@ -14,11 +14,12 @@ import com.example.domain.product.Product
 import com.example.domain.product.ProductRepository
 import com.example.domain.product.recent.RecentProduct
 import com.example.domain.product.recent.RecentProductRepository
-import woowacourse.shopping.ServerType
 import woowacourse.shopping.common.adapter.LoadMoreAdapter
 import woowacourse.shopping.data.cart.CartRemoteRepository
 import woowacourse.shopping.data.product.ProductRemoteRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.util.RetrofitManager
+import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.product.detail.ProductDetailActivity
@@ -38,8 +39,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val serverUrl by lazy { intent.getStringExtra(ServerType.INTENT_KEY) ?: "" }
     private val presenter: MainContract.Presenter by lazy {
-        val cartRepository: CartRepository = CartRemoteRepository(url = serverUrl)
-        val productRepository: ProductRepository = ProductRemoteRepository(serverUrl)
+        val cartRepository: CartRepository =
+            CartRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
+        val productRepository: ProductRepository =
+            ProductRemoteRepository(RetrofitManager.getInstance(serverUrl).retrofit)
         val recentProductRepository: RecentProductRepository =
             RecentProductRepositoryImpl(this, serverUrl)
         MainPresenter(

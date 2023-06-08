@@ -4,44 +4,21 @@ import com.example.domain.FixedDiscountPolicy
 import com.example.domain.order.Order
 import com.example.domain.order.OrderRepository
 import com.example.domain.order.OrderSummary
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import woowacourse.shopping.data.order.model.dto.request.OrderRequest
 import woowacourse.shopping.data.order.model.dto.response.FixedDiscountPolicyResponse
 import woowacourse.shopping.data.order.model.dto.response.OrderSummaryResponse
 import woowacourse.shopping.data.order.model.toDomain
-import woowacourse.shopping.util.BANDAL
 
 class OrderRemoteRepository(
-    private val user: String = BANDAL,
-    url: String,
-    port: String = "8080",
+    retrofit: Retrofit
 ) : OrderRepository {
 
-    private val authorizationHttpClient = OkHttpClient.Builder().apply {
-        addInterceptor { chain ->
-            val interceptedRequest = chain.request()
-            val headerAddedRequest =
-                interceptedRequest.newBuilder().header("Authorization", "Basic $user")
-                    .build()
-            chain.proceed(headerAddedRequest)
-        }
-//        val loggingInterceptor = HttpLoggingInterceptor()
-//        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-//        addInterceptor(loggingInterceptor)
-    }.build()
-
-    private val baseUrl = "$url:$port"
-    private val retrofitOrderService: RetrofitOrderService = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .client(authorizationHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitOrderService::class.java)
+    private val retrofitOrderService: RetrofitOrderService = retrofit.create()
 
     override fun requestFetchAllOrders(
         onSuccess: (List<OrderSummary>) -> Unit,

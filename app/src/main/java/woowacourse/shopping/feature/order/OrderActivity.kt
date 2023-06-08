@@ -10,8 +10,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.domain.order.OrderRepository
 import woowacourse.shopping.R
-import woowacourse.shopping.ServerType
 import woowacourse.shopping.data.order.OrderRemoteRepository
+import woowacourse.shopping.data.util.RetrofitManager
+import woowacourse.shopping.data.util.ServerType
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.order.detail.OrderDetailActivity
 import woowacourse.shopping.model.CartState
@@ -21,7 +22,8 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
     private val url by lazy { intent.getStringExtra(ServerType.INTENT_KEY)!! }
     private val presenter: OrderContract.Presenter by lazy {
         val orderPendingCart: CartState by lazy { intent.getParcelableExtra(ORDER_PRODUCTS_KEY)!! }
-        val orderRepository: OrderRepository = OrderRemoteRepository(url = url)
+        val orderRepository: OrderRepository =
+            OrderRemoteRepository(RetrofitManager.getInstance(url).retrofit)
         OrderPresenter(
             view = this,
             orderPendingCart = orderPendingCart.toDomain(),

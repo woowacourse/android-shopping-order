@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.ServerType.JOY_SERVER
-import woowacourse.shopping.ServerType.MINT_SERVER
+import woowacourse.shopping.data.util.ServerType.JOY_SERVER
+import woowacourse.shopping.data.util.ServerType.MINT_SERVER
 import woowacourse.shopping.databinding.ActivityServerSettingBinding
 import woowacourse.shopping.feature.product.MainActivity
 
