@@ -1,4 +1,4 @@
-package woowacourse.shopping.util
+package woowacourse.shopping.support.framework.presentation
 
 fun <T> Iterable<T>.secondOrNull(predicate: ((T) -> Boolean)? = null): T? {
     var count = 0

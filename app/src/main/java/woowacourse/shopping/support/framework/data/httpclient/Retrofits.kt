@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.httpclient
+package woowacourse.shopping.support.framework.data.httpclient
 
 import android.util.Log
 import retrofit2.Call

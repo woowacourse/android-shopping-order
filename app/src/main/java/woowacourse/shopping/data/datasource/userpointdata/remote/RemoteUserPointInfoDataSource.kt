@@ -4,10 +4,10 @@ import android.util.Log
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.userpointdata.UserPointInfoDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
-import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.httpclient.mapper.toDataModel
 import woowacourse.shopping.data.httpclient.response.UserPointInfoResponse
 import woowacourse.shopping.data.model.DataUserPointInfo
+import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 
 class RemoteUserPointInfoDataSource : UserPointInfoDataSource.Remote {
     override fun getUserPointInfo(onReceived: (DataUserPointInfo) -> Unit) {

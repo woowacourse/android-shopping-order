@@ -21,6 +21,8 @@ import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
+import woowacourse.shopping.support.framework.presentation.turnOffSupportChangeAnimation
 import woowacourse.shopping.ui.basket.BasketActivity
 import woowacourse.shopping.ui.model.UiProduct
 import woowacourse.shopping.ui.model.UiRecentProduct
@@ -34,8 +36,6 @@ import woowacourse.shopping.ui.shopping.product.ProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductAdapter
 import woowacourse.shopping.ui.shopping.recentproduct.RecentProductWrapperAdapter
 import woowacourse.shopping.ui.shopping.skeleton.SkeletonProductAdapter
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
-import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
 

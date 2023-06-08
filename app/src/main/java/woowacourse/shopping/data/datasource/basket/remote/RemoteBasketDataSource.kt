@@ -2,11 +2,11 @@ package woowacourse.shopping.data.datasource.basket.remote
 
 import woowacourse.shopping.data.datasource.basket.BasketDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
-import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.httpclient.request.BasketAddRequest
 import woowacourse.shopping.data.httpclient.request.BasketUpdateRequest
 import woowacourse.shopping.data.model.DataBasketProduct
 import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 
 class RemoteBasketDataSource : BasketDataSource.Remote {
     override fun getAll(onReceived: (List<DataBasketProduct>) -> Unit) {

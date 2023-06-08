@@ -7,11 +7,11 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.BasketRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.support.framework.presentation.secondOrNull
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.mapper.toUi
 import woowacourse.shopping.ui.model.UiProduct
 import woowacourse.shopping.ui.model.UiRecentProduct
-import woowacourse.shopping.util.secondOrNull
 import kotlin.concurrent.thread
 
 class ShoppingPresenter(

@@ -2,13 +2,13 @@ package woowacourse.shopping.data.datasource.order.remote
 
 import woowacourse.shopping.data.datasource.order.OrderDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
-import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.httpclient.mapper.toData
 import woowacourse.shopping.data.httpclient.request.AddOrderRequest
 import woowacourse.shopping.data.httpclient.response.order.Individualorder.IndividualOrderResponse
 import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderErrorBody
 import woowacourse.shopping.data.httpclient.response.order.addorder.AddOrderFailureException
 import woowacourse.shopping.data.model.DataOrder
+import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 
 class RemoteOrderDataSource : OrderDataSource.Remote {
     override fun addOrder(

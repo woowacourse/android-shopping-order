@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemButtonMoreBinding
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 
 class MoreButtonViewHolder(parent: ViewGroup, onItemClick: () -> Unit) :
     RecyclerView.ViewHolder(

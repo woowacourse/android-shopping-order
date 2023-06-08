@@ -13,6 +13,10 @@ import woowacourse.shopping.data.datasource.userpointdata.remote.RemoteUserPoint
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.PointRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentConfirmBinding
+import woowacourse.shopping.support.framework.presentation.editTextFocusOutProcess
+import woowacourse.shopping.support.framework.presentation.getParcelableArrayListExtraCompat
+import woowacourse.shopping.support.framework.presentation.intentDataNullProcess
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 import woowacourse.shopping.ui.mapper.toDomain
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.model.UiOrder
@@ -20,10 +24,6 @@ import woowacourse.shopping.ui.model.UiUserPointInfo
 import woowacourse.shopping.ui.model.preorderinfo.UiPreOrderInfo
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialogFragmentFactory
-import woowacourse.shopping.util.editTextFocusOutProcess
-import woowacourse.shopping.util.getParcelableArrayListExtraCompat
-import woowacourse.shopping.util.intentDataNullProcess
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class PaymentConfirmActivity : AppCompatActivity(), PaymentConfirmContract.View {
 

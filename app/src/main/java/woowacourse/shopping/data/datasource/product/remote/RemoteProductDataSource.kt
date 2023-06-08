@@ -2,8 +2,8 @@ package woowacourse.shopping.data.datasource.product.remote
 
 import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.httpclient.RetrofitModule
-import woowacourse.shopping.data.httpclient.getRetrofitCallback
 import woowacourse.shopping.data.model.DataProduct
+import woowacourse.shopping.support.framework.data.httpclient.getRetrofitCallback
 import java.lang.Integer.min
 
 class RemoteProductDataSource() : ProductDataSource.Remote {

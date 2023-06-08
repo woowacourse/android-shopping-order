@@ -13,12 +13,12 @@ import woowacourse.shopping.data.datasource.basket.local.LocalBasketDataSource
 import woowacourse.shopping.data.datasource.basket.remote.RemoteBasketDataSource
 import woowacourse.shopping.data.repository.BasketRepositoryImpl
 import woowacourse.shopping.databinding.ActivityBasketBinding
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
+import woowacourse.shopping.support.framework.presentation.turnOffSupportChangeAnimation
 import woowacourse.shopping.ui.basket.skeleton.SkeletonBasketProductAdapter
 import woowacourse.shopping.ui.model.UiBasketProduct
 import woowacourse.shopping.ui.paymentconfirm.PaymentConfirmActivity
 import woowacourse.shopping.ui.shopping.ShoppingActivity
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
-import woowacourse.shopping.util.turnOffSupportChangeAnimation
 
 class BasketActivity : AppCompatActivity(), BasketContract.View {
     private lateinit var presenter: BasketContract.Presenter

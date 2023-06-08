@@ -9,10 +9,10 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.order.remote.RemoteOrderDataSource
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
+import woowacourse.shopping.support.framework.presentation.setThrottleFirstOnClickListener
 import woowacourse.shopping.ui.model.UiOrder
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialog
 import woowacourse.shopping.ui.orderdetail.OrderDetailDialogFragmentFactory
-import woowacourse.shopping.util.setThrottleFirstOnClickListener
 
 class OrderHistoryActivity : AppCompatActivity(), OrderHistoryContract.View {
 

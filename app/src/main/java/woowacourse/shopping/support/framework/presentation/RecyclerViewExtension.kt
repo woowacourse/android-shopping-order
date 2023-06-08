@@ -1,4 +1,4 @@
-package woowacourse.shopping.util
+package woowacourse.shopping.support.framework.presentation
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
