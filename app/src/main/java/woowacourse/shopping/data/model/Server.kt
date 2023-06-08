@@ -6,9 +6,4 @@ sealed class Server {
         BASE_URL_JENNA("http://3.34.126.146:8080"),
         BASE_URL_POI("http://3.39.194.150:8080"),
     }
-
-    enum class Token(val value: String) {
-        KRRONG("a2FuZ3NqOTY2NUBnbWFpbC5jb206MTIzNA=="),
-        SUNNY("eWlzMDkyNTIxQGdtYWlsLmNvbToxMjM0"),
-    }
 }

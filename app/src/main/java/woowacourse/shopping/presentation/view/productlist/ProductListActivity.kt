@@ -41,9 +41,6 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private lateinit var toolbarCartBinding: LayoutToolbarCartBinding
 
     private lateinit var url: Server.Url
-    private lateinit var token: Server.Token
-
-    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var presenter: ProductContract.Presenter
 
@@ -107,8 +104,6 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         toolbarCartBinding = LayoutToolbarCartBinding.inflate(layoutInflater)
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
-        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         binding.rvProductList.itemAnimator = null
 
@@ -132,13 +127,15 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_order_list -> {
-                startActivity(OrderListActivity.createIntent(this, url, token))
+                startActivity(OrderListActivity.createIntent(this, url))
             }
         }
         return true
     }
 
     private fun setPresenter() {
+        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
+
         val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofitBuilder.createProductService())
         val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
@@ -221,12 +218,12 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         presenter.saveRecentProduct(productId)
 
         val intent =
-            ProductDetailActivity.createIntent(this, productId, recentProduct, url, token)
+            ProductDetailActivity.createIntent(this, productId, recentProduct, url)
         recentProductResultLauncher.launch(intent)
     }
 
     override fun moveToCartView() {
-        cartResultLauncher.launch(CartActivity.createIntent(this, url, token))
+        cartResultLauncher.launch(CartActivity.createIntent(this, url))
     }
 
     override fun handleErrorView(messageId: Int) {
@@ -252,12 +249,10 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
         internal const val KEY_SERVER_SERVER = "KEY_SERVER_SERVER"
-        internal const val KEY_SERVER_TOKEN = "KEY_SERVER_TOKEN"
 
-        fun createIntent(context: Context, server: Server.Url, token: Server.Token): Intent {
+        fun createIntent(context: Context, server: Server.Url): Intent {
             val intent = Intent(context, ProductListActivity::class.java)
             intent.putExtra(KEY_SERVER_SERVER, server)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
             return intent
         }
     }

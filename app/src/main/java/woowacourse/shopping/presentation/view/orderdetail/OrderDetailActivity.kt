@@ -15,7 +15,6 @@ import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.order.adapter.OrderProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -23,9 +22,6 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     private lateinit var binding: ActivityOrderDetailBinding
 
     private lateinit var url: Server.Url
-    private lateinit var token: Server.Token
-
-    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var presenter: OrderDetailContract.Presenter
 
@@ -39,8 +35,6 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
 
         if (orderId == -1L) return finish()
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
-        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setToolbar()
         setPresenter()
@@ -63,6 +57,7 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
     }
 
     private fun setPresenter() {
+        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
         val orderDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
         presenter = OrderDetailPresenter(
             this,
@@ -110,12 +105,10 @@ class OrderDetailActivity : AppCompatActivity(), OrderDetailContract.View {
             context: Context,
             orderId: Long,
             url: Server.Url,
-            token: Server.Token
         ): Intent {
             val intent = Intent(context, OrderDetailActivity::class.java)
             intent.putExtra(KEY_ORDER_ID, orderId)
             intent.putExtra(KEY_SERVER_SERVER, url)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
             return intent
         }
     }

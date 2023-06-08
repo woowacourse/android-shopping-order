@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
+import woowacourse.shopping.data.preference.UserPreference
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var token: Server.Token
+    private val user: UserPreference by lazy {
+        UserPreference.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,11 +28,11 @@ class MainActivity : AppCompatActivity() {
         binding.rdogMainUser.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 binding.rdobtMainKrrong.id -> {
-                    token = Server.Token.KRRONG
+                    user.token = KRRONG
                     setEnableButton(true)
                 }
                 binding.rdobtMainSunny.id -> {
-                    token = Server.Token.SUNNY
+                    user.token = SUNNY
                     setEnableButton(true)
                 }
                 else -> {
@@ -60,7 +63,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun moveToProductListView(url: Server.Url) {
-        val intent = ProductListActivity.createIntent(this, url, token)
+        val intent = ProductListActivity.createIntent(this, url)
         startActivity(intent)
+    }
+
+    companion object {
+        private const val KRRONG = "a2FuZ3NqOTY2NUBnbWFpbC5jb206MTIzNA=="
+        private const val SUNNY = "eWlzMDkyNTIxQGdtYWlsLmNvbToxMjM0"
     }
 }

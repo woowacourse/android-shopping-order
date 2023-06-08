@@ -18,7 +18,6 @@ import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.orderlist.adapter.OrderListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -26,9 +25,6 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     private lateinit var binding: ActivityOrderListBinding
 
     private lateinit var url: Server.Url
-    private lateinit var token: Server.Token
-
-    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var presenter: OrderListContract.Presenter
 
@@ -37,8 +33,6 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order_list)
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
-        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setToolbar()
         setPresenter()
@@ -62,6 +56,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private fun setPresenter() {
+        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
         val orderRemoteDataSource = OrderRemoteDataSourceImpl(retrofitBuilder.createOrderService())
         presenter = OrderListPresenter(
             this,
@@ -80,7 +75,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     private fun onOrderItemClick(orderId: Long) {
-        val intent = OrderDetailActivity.createIntent(this, orderId, url, token)
+        val intent = OrderDetailActivity.createIntent(this, orderId, url)
         startActivity(intent)
     }
 
@@ -91,10 +86,9 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
     }
 
     companion object {
-        fun createIntent(context: Context, url: Server.Url, token: Server.Token): Intent {
+        fun createIntent(context: Context, url: Server.Url): Intent {
             val intent = Intent(context, OrderListActivity::class.java)
             intent.putExtra(KEY_SERVER_SERVER, url)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
 
             return intent
         }

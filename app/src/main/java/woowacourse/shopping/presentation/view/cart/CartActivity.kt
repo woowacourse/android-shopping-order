@@ -19,7 +19,6 @@ import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
-import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_TOKEN
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -27,9 +26,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
     private lateinit var url: Server.Url
-    private lateinit var token: Server.Token
-
-    private lateinit var retrofitBuilder: RetrofitBuilder
 
     private lateinit var cartAdapter: CartAdapter
 
@@ -56,8 +52,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
 
         url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        token = intent.getSerializableCompat(KEY_SERVER_TOKEN) ?: return finish()
-        retrofitBuilder = RetrofitBuilder.getInstance(url, token)
 
         setPresenter()
         setSupportActionBar()
@@ -70,6 +64,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     private fun setPresenter() {
+        val retrofitBuilder = RetrofitBuilder.getInstance(this, url)
         val cartLocalDataSource = CartLocalDataSourceImpl(this, url)
         val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(retrofitBuilder.createCartService())
         presenter = CartPresenter(
@@ -151,7 +146,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     override fun showOrderView(cartIds: ArrayList<Long>) {
-        val intent = OrderActivity.createIntent(this, cartIds, url, token)
+        val intent = OrderActivity.createIntent(this, cartIds, url)
         startActivity(intent)
         finish()
     }
@@ -199,10 +194,9 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     }
 
     companion object {
-        fun createIntent(context: Context, url: Server.Url, token: Server.Token): Intent {
+        fun createIntent(context: Context, url: Server.Url): Intent {
             val intent = Intent(context, CartActivity::class.java)
             intent.putExtra(KEY_SERVER_SERVER, url)
-            intent.putExtra(KEY_SERVER_TOKEN, token)
             return intent
         }
     }
