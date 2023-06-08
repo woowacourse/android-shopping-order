@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.order.viewholder.OrderProductViewHolder
-import woowacourse.shopping.presentation.view.productlist.adpater.ViewType
 
 class OrderProductAdapter : ListAdapter<CartModel, OrderProductViewHolder>(productDiffUtil) {
 
@@ -18,8 +17,6 @@ class OrderProductAdapter : ListAdapter<CartModel, OrderProductViewHolder>(produ
     }
 
     override fun getItemId(position: Int): Long = getItem(position).id
-
-    override fun getItemViewType(position: Int): Int = ViewType.PRODUCT_LIST.ordinal
 
     fun setItems(newItems: List<CartModel>) {
         submitList(newItems)
