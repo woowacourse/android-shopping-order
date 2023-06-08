@@ -37,4 +37,9 @@ interface OrderRepository {
         onSuccess: (Receipt) -> Unit,
         onFailure: (CustomResult<Error>) -> Unit,
     )
+
+    fun getOrderHistory(
+        onSuccess: (List<Receipt>) -> Unit,
+        onFailure: (CustomResult<Error>) -> Unit,
+    )
 }

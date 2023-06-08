@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistoryDataSourceImpl
 import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderCompleteBinding
@@ -14,6 +15,7 @@ import woowacourse.shopping.ui.order.adapter.OrderAdapter
 import woowacourse.shopping.ui.ordercomplete.presenter.OrderCompleteContract
 import woowacourse.shopping.ui.ordercomplete.presenter.OrderCompletePresenter
 import woowacourse.shopping.ui.ordercomplete.uimodel.Bill
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 
 class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
     private lateinit var binding: ActivityOrderCompleteBinding
@@ -32,8 +34,11 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
                     ServiceFactory.orderCompleteService,
                     AuthInfoDataSourceImpl.getInstance(this),
                 ),
+                OrderHistoryDataSourceImpl(
+                    ServiceFactory.orderHistoryService,
+                    AuthInfoDataSourceImpl.getInstance(this),
+                ),
             ),
-
         )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +46,19 @@ class OrderCompleteActivity : AppCompatActivity(), OrderCompleteContract.View {
         binding = ActivityOrderCompleteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        navigateToOrderHistoryView()
+        initView()
+    }
+
+    private fun initView() {
         presenter.getReceipt(intent.getIntExtra(ORDER_ID, 0))
+    }
+
+    private fun navigateToOrderHistoryView() {
+        binding.tvOrderCompleteHistoryBtn.setOnClickListener {
+            startActivity(OrderHistoryActivity.from(this))
+            finish()
+        }
     }
 
     override fun setReceipt(bill: Bill) {

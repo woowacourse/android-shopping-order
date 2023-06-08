@@ -14,6 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.local.AuthInfoDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.order.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ordercomplete.OrderCompleteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.orderhistory.OrderHistoryDataSourceImpl
 import woowacourse.shopping.data.remote.ServiceFactory
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -39,6 +40,10 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
                 ),
                 OrderCompleteDataSourceImpl(
                     ServiceFactory.orderCompleteService,
+                    AuthInfoDataSourceImpl.getInstance(this),
+                ),
+                OrderHistoryDataSourceImpl(
+                    ServiceFactory.orderHistoryService,
                     AuthInfoDataSourceImpl.getInstance(this),
                 ),
             ),

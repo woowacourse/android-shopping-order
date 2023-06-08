@@ -28,4 +28,6 @@
 
     <string name="quantity_format">수량: %d개</string>
     <string name="history_order">주문목록</string>
+    <string name="tv_order_number">주문번호 : %d</string>
+    <string name="total_format">총 %d개</string>
 </resources>
