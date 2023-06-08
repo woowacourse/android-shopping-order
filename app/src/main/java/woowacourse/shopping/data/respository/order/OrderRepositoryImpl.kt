@@ -1,12 +1,10 @@
 package woowacourse.shopping.data.respository.order
 
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.data.model.OrderDetailEntity
 import woowacourse.shopping.data.model.OrderPostEntity
-import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.order.service.OrderService
 
 class OrderRepositoryImpl(
@@ -19,7 +17,7 @@ class OrderRepositoryImpl(
         onFailure: () -> Unit,
         onSuccess: (orderId: Long) -> Unit,
     ) {
-        orderService.requestPostOrder("Basic ${Server.TOKEN}", orderPostEntity)
+        orderService.requestPostOrder(orderPostEntity)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.isSuccessful) {
@@ -40,8 +38,8 @@ class OrderRepositoryImpl(
         onFailure: () -> Unit,
         onSuccess: (orderDetailEntity: OrderDetailEntity) -> Unit,
     ) {
-        orderService.requestOrderById("Basic ${Server.TOKEN}", orderId)
-            .enqueue(object : Callback<OrderDetailEntity> {
+        orderService.requestOrderById(orderId)
+            .enqueue(object : retrofit2.Callback<OrderDetailEntity> {
                 override fun onResponse(
                     call: Call<OrderDetailEntity>,
                     response: Response<OrderDetailEntity>,
@@ -62,8 +60,8 @@ class OrderRepositoryImpl(
         onFailure: () -> Unit,
         onSuccess: (orderDetailEntities: List<OrderDetailEntity>) -> Unit,
     ) {
-        orderService.requestOrders("Basic ${Server.TOKEN}")
-            .enqueue(object : Callback<List<OrderDetailEntity>> {
+        orderService.requestOrders()
+            .enqueue(object : retrofit2.Callback<List<OrderDetailEntity>> {
                 override fun onResponse(
                     call: Call<List<OrderDetailEntity>>,
                     response: Response<List<OrderDetailEntity>>,

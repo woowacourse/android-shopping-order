@@ -12,7 +12,7 @@ import woowacourse.shopping.presentation.model.OrderDetailModel
 import woowacourse.shopping.presentation.view.orderdetail.OrderDetailActivity
 import woowacourse.shopping.presentation.view.orderlist.adapter.OrderListAdapter
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
-import woowacourse.shopping.presentation.view.util.createRetrofit
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -34,7 +34,7 @@ class OrderListActivity : AppCompatActivity(), OrderListContract.View {
 
     private fun setPresenter() {
         server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
-        val retrofit = createRetrofit(server)
+        val retrofit = RetrofitUtil(server).createRetrofit()
         val orderRepository = OrderRepositoryImpl(retrofit)
         presenter = OrderListPresenter(this, orderRepository)
     }

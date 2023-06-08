@@ -2,7 +2,6 @@ package woowacourse.shopping.data.respository.cart.source.remote
 
 import retrofit2.Retrofit
 import woowacourse.shopping.data.model.CartRemoteEntity
-import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.cart.source.remote.service.CartService
 
 class CartRemoteDataSourceImpl(
@@ -14,7 +13,7 @@ class CartRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (products: List<CartRemoteEntity>) -> Unit,
     ) {
-        cartService.requestCartProducts("Basic ${Server.TOKEN}")
+        cartService.requestCartProducts()
             .enqueue(object : retrofit2.Callback<List<CartRemoteEntity>> {
                 override fun onResponse(
                     call: retrofit2.Call<List<CartRemoteEntity>>,
@@ -38,7 +37,6 @@ class CartRemoteDataSourceImpl(
         onSuccess: () -> Unit,
     ) {
         cartService.requestPatchCartProduct(
-            "Basic ${Server.TOKEN}",
             cartEntity.id,
             cartEntity.quantity,
         )
@@ -63,7 +61,7 @@ class CartRemoteDataSourceImpl(
         onFailure: () -> Unit,
         onSuccess: (Long) -> Unit,
     ) {
-        cartService.requestPostCartProduct("Basic ${Server.TOKEN}", productId)
+        cartService.requestPostCartProduct(productId)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(
                     call: retrofit2.Call<Unit>,
@@ -83,7 +81,7 @@ class CartRemoteDataSourceImpl(
     }
 
     override fun requestDeleteCartItem(cartId: Long) {
-        cartService.requestDeleteCartProduct("Basic ${Server.TOKEN}", cartId)
+        cartService.requestDeleteCartProduct(cartId)
             .enqueue(object : retrofit2.Callback<Unit> {
                 override fun onResponse(
                     call: retrofit2.Call<Unit>,

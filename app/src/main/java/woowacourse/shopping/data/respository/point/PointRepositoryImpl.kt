@@ -5,7 +5,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.data.model.PointEntity
 import woowacourse.shopping.data.model.SavingPointEntity
-import woowacourse.shopping.data.model.Server
 import woowacourse.shopping.data.respository.point.service.PointService
 
 class PointRepositoryImpl(
@@ -18,7 +17,7 @@ class PointRepositoryImpl(
         onFailure: () -> Unit,
         onSuccess: (pointEntity: PointEntity) -> Unit,
     ) {
-        pointRetrofit.requestReservedPoint("Basic ${Server.TOKEN}")
+        pointRetrofit.requestReservedPoint()
             .enqueue(object : retrofit2.Callback<PointEntity> {
                 override fun onResponse(call: Call<PointEntity>, response: Response<PointEntity>) {
                     if (response.isSuccessful) {

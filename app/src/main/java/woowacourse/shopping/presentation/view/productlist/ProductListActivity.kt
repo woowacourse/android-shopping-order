@@ -32,7 +32,7 @@ import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAda
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductWrapperAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ViewType
-import woowacourse.shopping.presentation.view.util.createRetrofit
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -130,7 +130,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     }
 
     private fun setPresenter() {
-        val retrofit = createRetrofit(server)
+        val retrofit = RetrofitUtil(server).createRetrofit()
         val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofit)
 
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)

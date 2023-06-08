@@ -20,7 +20,7 @@ import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
-import woowacourse.shopping.presentation.view.util.createRetrofit
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -71,7 +71,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
 
-        val retrofit = createRetrofit(server)
+        val retrofit = RetrofitUtil(server).createRetrofit()
         val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         presenter = CartPresenter(
             this,
