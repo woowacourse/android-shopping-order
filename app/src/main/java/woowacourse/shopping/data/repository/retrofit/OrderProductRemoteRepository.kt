@@ -1,15 +1,16 @@
 package woowacourse.shopping.data.repository.retrofit
 
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderDataSource
 import woowacourse.shopping.data.mapper.toData
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 import woowacourse.shopping.domain.model.page.Page
 import woowacourse.shopping.domain.repository.OrderProductRepository
 
-class OrderProductRemoteRepository : OrderProductRepository {
-    private val orderProductDataSource = OrderRemoteDataSource()
+class OrderProductRemoteRepository(
+    private val orderProductDataSource: OrderDataSource,
+) : OrderProductRepository {
     private val token: String?
         get() = ShoppingApplication.pref.getToken()
 

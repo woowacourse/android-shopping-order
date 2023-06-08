@@ -2,12 +2,19 @@ package woowacourse.shopping.util.inject
 
 import android.content.Context
 import woowacourse.shopping.data.dao.recentproduct.RecentProductDaoImpl
+import woowacourse.shopping.data.datasource.cart.CartProductRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.point.PointRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.repository.RecentProductLocalRepository
 import woowacourse.shopping.data.repository.retrofit.CartProductRemoteRepository
 import woowacourse.shopping.data.repository.retrofit.OrderProductRemoteRepository
 import woowacourse.shopping.data.repository.retrofit.PointRemoteRepository
 import woowacourse.shopping.data.repository.retrofit.ProductRemoteRepository
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getCartProductByRetrofit
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getOrderProductByRetrofit
+import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
 import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.ui.cart.CartContract
@@ -29,14 +36,23 @@ import woowacourse.shopping.util.preference.BasePreference
 fun inject(
     view: ShoppingContract.View,
     context: Context,
+    baseUrl: String,
 ): ShoppingContract.Presenter {
     return ShoppingPresenter(
         view = view,
-        productRepository = ProductRemoteRepository(ProductRemoteDataSource()),
+        productRepository = ProductRemoteRepository(
+            ProductRemoteDataSource(
+                getProductByRetrofit(baseUrl),
+            ),
+        ),
         recentProductRepository = RecentProductLocalRepository(
             dao = RecentProductDaoImpl(createShoppingDatabase(context)),
         ),
-        cartRepository = CartProductRemoteRepository(),
+        cartRepository = CartProductRemoteRepository(
+            CartProductRemoteDataSource(
+                getCartProductByRetrofit(baseUrl),
+            ),
+        ),
     )
 }
 
@@ -56,10 +72,15 @@ fun inject(
 
 fun injectCartPresenter(
     view: CartContract.View,
+    baseUrl: String,
 ): CartPresenter {
     return CartPresenter(
         view = view,
-        cartRepository = CartProductRemoteRepository(),
+        cartRepository = CartProductRemoteRepository(
+            CartProductRemoteDataSource(
+                getCartProductByRetrofit(baseUrl),
+            ),
+        ),
     )
 }
 
@@ -74,25 +95,44 @@ fun inject(
 fun injectOrderPresenter(
     view: OrderContract.View,
     cartProducts: CartProducts,
+    baseUrl: String,
 ): OrderContract.Presenter = OrderPresenter(
     view = view,
     cartProducts = cartProducts.items,
-    orderProductRepository = OrderProductRemoteRepository(),
-    pointRepository = PointRemoteRepository(),
+    orderProductRepository = OrderProductRemoteRepository(
+        OrderRemoteDataSource(
+            getOrderProductByRetrofit(baseUrl),
+        ),
+    ),
+    pointRepository = PointRemoteRepository(
+        PointRemoteDataSource(
+            RetrofitUtil.getPointByRetrofit(baseUrl),
+        ),
+    ),
 )
 
 fun injectOrderHistoryPresenter(
     view: OrderHistoryContract.View,
+    baseUrl: String,
 ): OrderHistoryContract.Presenter = OrderHistoryPresenter(
     view = view,
-    orderProductRepository = OrderProductRemoteRepository(),
+    orderProductRepository = OrderProductRemoteRepository(
+        OrderRemoteDataSource(
+            getOrderProductByRetrofit(baseUrl),
+        ),
+    ),
 )
 
 fun injectOrderDetailPresenter(
     view: OrderDetailContract.View,
     orderId: Int,
+    baseUrl: String,
 ): OrderDetailContract.Presenter = OrderDetailPresenter(
     view = view,
     orderId = orderId,
-    orderProductRepository = OrderProductRemoteRepository(),
+    orderProductRepository = OrderProductRemoteRepository(
+        OrderRemoteDataSource(
+            getOrderProductByRetrofit(baseUrl),
+        ),
+    ),
 )

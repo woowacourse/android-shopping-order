@@ -9,6 +9,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.model.Point
 import woowacourse.shopping.model.UiCartProduct
@@ -30,6 +31,7 @@ class OrderActivity : AppCompatActivity(), View {
         injectOrderPresenter(
             view = this,
             cartProducts = intent.getParcelableExtraCompat(CART_PRODUCTS_KEY)!!,
+            baseUrl = pref.getBaseUrl().toString(),
         )
     }
 

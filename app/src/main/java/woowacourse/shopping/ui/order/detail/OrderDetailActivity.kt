@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityOrderDetailBinding
 import woowacourse.shopping.model.UiOrderedProduct
 import woowacourse.shopping.model.UiPayment
@@ -21,6 +22,7 @@ class OrderDetailActivity : AppCompatActivity(), View {
         injectOrderDetailPresenter(
             view = this,
             orderId = intent.getIntExtra(ORDER_DETAIL_KEY, 0),
+            baseUrl = pref.getBaseUrl().toString(),
         )
     }
 

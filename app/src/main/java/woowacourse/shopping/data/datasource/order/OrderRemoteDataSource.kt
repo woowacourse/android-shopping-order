@@ -3,20 +3,18 @@ package woowacourse.shopping.data.datasource.order
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.OrderResponseDto
 import woowacourse.shopping.data.dto.OrderResponsesDto
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toDto
 import woowacourse.shopping.data.model.Page
-import woowacourse.shopping.data.util.retrofit.RetrofitUtil
+import woowacourse.shopping.data.service.order.RetrofitOrderService
 import woowacourse.shopping.domain.model.OrderRequest
 import woowacourse.shopping.domain.model.OrderResponse
 
-class OrderRemoteDataSource : OrderDataSource {
-    private val baseUrl: String = pref.getBaseUrl().toString()
-    private val orderService = RetrofitUtil.getOrderProductByRetrofit(baseUrl)
-
+class OrderRemoteDataSource(
+    private val orderService: RetrofitOrderService,
+) : OrderDataSource {
     override fun orderProducts(
         token: String,
         orderRequest: OrderRequest,

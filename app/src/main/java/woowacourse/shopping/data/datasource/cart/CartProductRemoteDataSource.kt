@@ -3,16 +3,14 @@ package woowacourse.shopping.data.datasource.cart
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.CartProductDto
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getCartProductByRetrofit
+import woowacourse.shopping.data.service.cart.RetrofitCartProductService
 import woowacourse.shopping.domain.model.CartProduct
 
-class CartProductRemoteDataSource : CartProductDataSource {
-    private val baseUrl: String = pref.getBaseUrl().toString()
-    private val cartProductService = getCartProductByRetrofit(baseUrl)
-
+class CartProductRemoteDataSource(
+    private val cartProductService: RetrofitCartProductService,
+) : CartProductDataSource {
     override fun requestCartProducts(
         token: String,
         onSuccess: (List<CartProduct>) -> Unit,

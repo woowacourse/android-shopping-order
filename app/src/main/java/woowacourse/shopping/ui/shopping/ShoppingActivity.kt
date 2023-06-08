@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductCount
 import woowacourse.shopping.model.UiCartProduct
@@ -36,7 +37,7 @@ class ShoppingActivity :
     SkeletonCounterView.OnCountChangedListener,
     CartProductClickListener {
     private lateinit var binding: ActivityShoppingBinding
-    private val presenter: Presenter by lazy { inject(this, this) }
+    private val presenter: Presenter by lazy { inject(this, this, pref.getBaseUrl().toString()) }
 
     private val recentProductAdapter = RecentProductAdapter(presenter::inquiryRecentProductDetail)
     private val recentProductWrapperAdapter = RecentProductWrapperAdapter(recentProductAdapter)

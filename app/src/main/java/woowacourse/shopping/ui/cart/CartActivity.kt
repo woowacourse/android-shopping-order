@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.mapper.toUi
@@ -19,7 +20,9 @@ import woowacourse.shopping.util.extension.showToast
 import woowacourse.shopping.util.inject.injectCartPresenter
 
 class CartActivity : AppCompatActivity(), View, CartClickListener {
-    private val presenter: CartPresenter by lazy { injectCartPresenter(this) }
+    private val presenter: CartPresenter by lazy {
+        injectCartPresenter(this, pref.getBaseUrl().toString())
+    }
     private lateinit var binding: ActivityCartBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

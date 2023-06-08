@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityOrderHistoryBinding
 import woowacourse.shopping.model.UiOrderResponse
 import woowacourse.shopping.ui.order.detail.OrderDetailActivity
@@ -21,7 +22,7 @@ class OrderHistoryActivity : AppCompatActivity(), View {
     private lateinit var binding: ActivityOrderHistoryBinding
     private lateinit var adapter: HistoryAdapter
     private val presenter: Presenter by lazy {
-        injectOrderHistoryPresenter(view = this)
+        injectOrderHistoryPresenter(view = this, baseUrl = pref.getBaseUrl().toString())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -3,16 +3,15 @@ package woowacourse.shopping.data.datasource.product
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Response
-import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.dto.ProductsDto
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.data.util.retrofit.RetrofitUtil.getProductByRetrofit
+import woowacourse.shopping.data.service.product.RetrofitProductService
 import woowacourse.shopping.domain.model.Product
 
-class ProductRemoteDataSource : ProductDataSource {
-    private val baseUrl: String = pref.getBaseUrl().toString()
-    private val productService = getProductByRetrofit(baseUrl)
+class ProductRemoteDataSource(
+    private val productService: RetrofitProductService,
+) : ProductDataSource {
 
     override fun requestProducts(
         page: Int,
