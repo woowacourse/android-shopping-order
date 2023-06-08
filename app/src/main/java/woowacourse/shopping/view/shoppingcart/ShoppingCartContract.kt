@@ -18,6 +18,7 @@ interface ShoppingCartContract {
         fun updateTotalPrice(totalPrice: Int)
         fun updateTotalCount(totalCount: Int)
         fun showPaymentPage(cartIds: Array<Long>)
+        fun hideSkeleton()
     }
 
     interface Presenter {

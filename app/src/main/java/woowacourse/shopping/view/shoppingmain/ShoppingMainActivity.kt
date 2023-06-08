@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
@@ -146,6 +147,12 @@ class ShoppingMainActivity : AppCompatActivity(), ShoppingMainContract.View {
                 }
             }
         })
+    }
+
+    override fun hideSkeleton() {
+        binding.rvProductCatalogue.visibility = VISIBLE
+        binding.btnLoadMore.visibility = VISIBLE
+        binding.skeletonShoppingProductList.visibility = GONE
     }
 
     override fun showMoreProducts(products: List<ProductUIModel>) {

@@ -13,4 +13,7 @@
     <color name="boarder_color">#AAAAAA</color>
     <color name="load_more_button_color">#00FFFFFF</color>
     <color name="deactivate_counter_button">#D6D6D6</color>
+
+    <color name="skeleton_inner">#E2E2E2</color>
+    <color name="skeleton_outer">#F3F3F3</color>
 </resources>

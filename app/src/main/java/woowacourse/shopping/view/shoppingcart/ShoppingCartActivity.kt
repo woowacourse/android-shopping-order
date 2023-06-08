@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -131,6 +134,12 @@ class ShoppingCartActivity : AppCompatActivity(), ShoppingCartContract.View {
         binding.tvOrderButton.setOnClickListener {
             presenter.getCheckedCartItems()
         }
+    }
+
+    override fun hideSkeleton() {
+        binding.skeletonCartProductList.visibility = GONE
+        binding.loPageCount.visibility = VISIBLE
+        binding.rvCartList.visibility = VISIBLE
     }
 
     override fun showPaymentPage(cartIds: Array<Long>) {

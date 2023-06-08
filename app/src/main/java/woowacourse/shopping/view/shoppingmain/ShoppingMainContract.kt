@@ -11,6 +11,7 @@ interface ShoppingMainContract {
         fun deactivateButton()
         fun activateButton()
         fun updateCartBadgeCount(count: Int)
+        fun hideSkeleton()
     }
 
     interface Presenter {

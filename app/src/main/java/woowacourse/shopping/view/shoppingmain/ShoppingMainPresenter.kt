@@ -29,7 +29,7 @@ class ShoppingMainPresenter(
                     view.deactivateButton()
                     _isPossibleLoad = IMPOSSIBLE_LOAD
                 }
-
+                view.hideSkeleton()
                 view.showMoreProducts(products.toUIModel())
             },
             onFailure = { }

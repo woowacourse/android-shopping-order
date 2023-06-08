@@ -20,6 +20,7 @@ class ShoppingCartPresenter(
                 paging = Paging(it)
                 view.updateCartProduct(loadCartProducts())
                 setButtonViews()
+                view.hideSkeleton()
             },
             onFailure = { throw IllegalStateException("장바구니 상품을 불러오는데 실패하였습니다.") }
         )
