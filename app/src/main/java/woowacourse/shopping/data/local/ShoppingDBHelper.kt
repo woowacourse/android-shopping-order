@@ -1,10 +1,10 @@
-package woowacourse.shopping.database
+package woowacourse.shopping.data.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import woowacourse.shopping.database.product.ProductConstant
-import woowacourse.shopping.database.recentProduct.RecentProductConstant
+import woowacourse.shopping.data.local.product.ProductConstant
+import woowacourse.shopping.data.local.recentProduct.RecentProductConstant
 
 class ShoppingDBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {

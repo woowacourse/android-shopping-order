@@ -1,8 +1,8 @@
-package woowacourse.shopping.database.recentProduct
+package woowacourse.shopping.data.local.recentProduct
 
 import android.content.Context
 import woowacourse.shopping.data.local.RecentLocalDataSource
-import woowacourse.shopping.database.ShoppingDBHelper
+import woowacourse.shopping.data.local.ShoppingDBHelper
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
 

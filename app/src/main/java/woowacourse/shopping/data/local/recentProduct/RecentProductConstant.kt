@@ -1,4 +1,4 @@
-package woowacourse.shopping.database.recentProduct
+package woowacourse.shopping.data.local.recentProduct
 
 import android.database.Cursor
 import android.provider.BaseColumns

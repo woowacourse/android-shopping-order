@@ -1,14 +1,15 @@
 package woowacourse.shopping.data.remote
 
 import woowacourse.shopping.data.client.RetrofitClient
-import woowacourse.shopping.dto.CartProductDto
 import woowacourse.shopping.dto.ProductIdDto
 import woowacourse.shopping.dto.QuantityDto
+import woowacourse.shopping.dto.toDomain
+import woowacourse.shopping.model.CartProduct
 
 class CartRetrofitDataSource : CartRemoteDataSource {
-    override fun getAll(): Result<List<CartProductDto>> = runCatching {
+    override fun getAll(): Result<List<CartProduct>> = runCatching {
         RetrofitClient.getInstance().retrofitCartService
-            .getCarts().execute().body()!!
+            .getCarts().execute().body()!!.toDomain()
     }
 
     override fun postItem(itemId: Int): Result<Int> = runCatching {

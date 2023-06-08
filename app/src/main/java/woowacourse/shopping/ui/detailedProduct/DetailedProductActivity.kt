@@ -10,13 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.local.CartDefaultLocalDataSource
+import woowacourse.shopping.data.local.product.ProductSqliteDataSource
+import woowacourse.shopping.data.local.recentProduct.RecentSqliteProductDataSource
 import woowacourse.shopping.data.remote.CartRetrofitDataSource
 import woowacourse.shopping.data.remote.ProductRetrofitDataSource
 import woowacourse.shopping.data.repository.CartDefaultRepository
 import woowacourse.shopping.data.repository.ProductDefaultRepository
 import woowacourse.shopping.data.repository.RecentDefaultRepository
-import woowacourse.shopping.database.product.ProductSqliteDataSource
-import woowacourse.shopping.database.recentProduct.RecentSqliteProductDataSource
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity

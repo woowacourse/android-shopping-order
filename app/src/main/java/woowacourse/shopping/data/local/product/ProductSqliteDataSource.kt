@@ -1,8 +1,8 @@
-package woowacourse.shopping.database.product
+package woowacourse.shopping.data.local.product
 
 import android.content.Context
 import woowacourse.shopping.data.local.ProductLocalDataSource
-import woowacourse.shopping.database.ShoppingDBHelper
+import woowacourse.shopping.data.local.ShoppingDBHelper
 import woowacourse.shopping.model.Product
 
 class ProductSqliteDataSource(context: Context) : ProductLocalDataSource {

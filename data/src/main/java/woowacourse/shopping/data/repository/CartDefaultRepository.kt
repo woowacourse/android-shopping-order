@@ -2,7 +2,6 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.local.CartLocalDataSource
 import woowacourse.shopping.data.remote.CartRemoteDataSource
-import woowacourse.shopping.dto.toDomain
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.model.CartProductPage
 
@@ -14,7 +13,7 @@ class CartDefaultRepository(
     override fun getAll(): Result<List<CartProduct>> {
         remoteDataSource.getAll()
             .onSuccess {
-                localDataSource.replaceAll(it.toDomain())
+                localDataSource.replaceAll(it)
                 return localDataSource.getAll()
             }
         return Result.failure(Throwable("Failed to get all"))

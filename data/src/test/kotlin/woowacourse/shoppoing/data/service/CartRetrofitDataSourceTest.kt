@@ -5,7 +5,6 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.configure.ApplicationConfigure
 import woowacourse.shopping.data.remote.CartRetrofitDataSource
-import woowacourse.shopping.dto.toDomain
 import woowacourse.shopping.model.CartProduct
 import woowacourse.shopping.utils.mockWebServer.CartMockWeb
 
@@ -26,7 +25,7 @@ class CartRetrofitDataSourceTest {
         // when
         var cartProducts: List<CartProduct> = emptyList()
         remoteCartDataSource.getAll()
-            .onSuccess { cartProducts = it.toDomain() }
+            .onSuccess { cartProducts = it }
             .onFailure { e -> throw e }
 
         // then
