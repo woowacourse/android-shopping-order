@@ -60,11 +60,7 @@ class OrderActivity : AppCompatActivity(), OrderContract.View {
 
     private fun initView() {
         binding.rvOrders.adapter = adapter
-        binding.confirmOrder = {
-            presenter.processToOrderConfirmation(
-                binding.etUsedPoint.text.toString().toIntOrNull() ?: 0
-            )
-        }
+        binding.presenter = presenter
         presenter.fetchOrder()
     }
 

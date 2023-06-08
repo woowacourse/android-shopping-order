@@ -14,8 +14,8 @@
             type="int" />
 
         <variable
-            name="confirmOrder"
-            type="kotlin.jvm.functions.Function1" />
+            name="presenter"
+            type="woowacourse.shopping.ui.order.OrderContract.Presenter"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -213,7 +213,7 @@
             android:layout_height="50dp"
             android:background="@color/blue_green_04c09e"
             android:gravity="center"
-            android:onClick="@{() -> confirmOrder.invoke(order)}"
+            android:onClick="@{() -> presenter.processToOrderConfirmation(discountPrice)}"
             android:text="@string/order_confirm_btn"
             android:textColor="@color/white"
             android:textSize="20sp"
