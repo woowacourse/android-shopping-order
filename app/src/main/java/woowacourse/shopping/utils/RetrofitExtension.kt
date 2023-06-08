@@ -6,20 +6,20 @@ import retrofit2.Response
 
 fun <ResponseType> Call<ResponseType>.enqueueUtil(
     onSuccess: (ResponseType) -> Unit,
-    onFailure: ((stateMessage: String) -> Unit)? = null,
-    onError: ((throwMessage: Throwable) -> Unit)? = null,
+    onFailCallResponse: ((stateMessage: String) -> Unit)? = null,
+    onFailInitNetwork: ((throwMessage: Throwable) -> Unit)? = null,
 ) {
     this.enqueue(object : Callback<ResponseType> {
         override fun onResponse(call: Call<ResponseType>, response: Response<ResponseType>) {
             if (response.isSuccessful) {
                 onSuccess.invoke(response.body() ?: return)
             } else {
-                onFailure?.invoke(response.message())
+                onFailCallResponse?.invoke(response.message())
             }
         }
 
         override fun onFailure(call: Call<ResponseType>, t: Throwable) {
-            onError?.invoke(t)
+            onFailInitNetwork?.invoke(t)
         }
     })
 }

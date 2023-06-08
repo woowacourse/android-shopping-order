@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.remote.order
 import android.util.Log
 import com.example.domain.util.CustomResult
 import com.example.domain.util.CustomResult.FAIL
-import com.example.domain.util.Error.Disconnect
+import com.example.domain.util.Error.DisabledDataCall
 import woowacourse.shopping.data.remote.api.OrderService
 import woowacourse.shopping.data.remote.request.OrderWithCouponRequestDto
 import woowacourse.shopping.data.remote.request.OrderWithoutCouponRequestDto
@@ -21,8 +21,8 @@ class OrderDataSourceImpl(
     ) {
         orderService.getCoupons().enqueueUtil(
             onSuccess = { onSuccess.invoke(it) },
-            onFailure = { onFailure.invoke(FAIL(Disconnect(it))) },
-            onError = { Log.d("NETWORK_ERROR", it.toString()) },
+            onFailCallResponse = { onFailure.invoke(FAIL(DisabledDataCall(it))) },
+            onFailInitNetwork = { Log.d("NETWORK_ERROR", it.toString()) },
         )
     }
 
@@ -39,8 +39,8 @@ class OrderDataSourceImpl(
             ),
         ).enqueueUtil(
             onSuccess = { onSuccess.invoke(it) },
-            onFailure = { onFailure.invoke(FAIL(Disconnect(it))) },
-            onError = { Log.d("NETWORK_ERROR", it.toString()) },
+            onFailCallResponse = { onFailure.invoke(FAIL(DisabledDataCall(it))) },
+            onFailInitNetwork = { Log.d("NETWORK_ERROR", it.toString()) },
         )
     }
 
@@ -55,8 +55,8 @@ class OrderDataSourceImpl(
             ),
         ).enqueueUtil(
             onSuccess = { onSuccess.invoke(it) },
-            onFailure = { onFailure.invoke(FAIL(Disconnect(it))) },
-            onError = { Log.d("NETWORK_ERROR", it.toString()) },
+            onFailCallResponse = { onFailure.invoke(FAIL(DisabledDataCall(it))) },
+            onFailInitNetwork = { Log.d("NETWORK_ERROR", it.toString()) },
         )
     }
 
@@ -68,8 +68,8 @@ class OrderDataSourceImpl(
     ) {
         orderService.getAppliedPrice(totalPrice, couponId).enqueueUtil(
             onSuccess = { onSuccess.invoke(it) },
-            onFailure = { onFailure.invoke(FAIL(Disconnect(it))) },
-            onError = { Log.d("NETWORK_ERROR", it.toString()) },
+            onFailCallResponse = { onFailure.invoke(FAIL(DisabledDataCall(it))) },
+            onFailInitNetwork = { Log.d("NETWORK_ERROR", it.toString()) },
         )
     }
 }

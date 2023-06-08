@@ -6,6 +6,6 @@ sealed class CustomResult<out T : Any> {
 }
 
 sealed class Error(val errorMessage: String) {
-    data class Disconnect(val error: String) : Error(error)
+    data class DisabledDataCall(val error: String) : Error(error)
     object NoSuchId : Error("해당 ID가 없습니다")
 }
