@@ -16,6 +16,10 @@ class Pagination(
 
     override fun hasNext(cart: Cart): Boolean = cart.items.size > sizePerPage * value
 
+    override fun getPageForCheckHasNext(): Page {
+        return Pagination(value, sizePerPage + 1)
+    }
+
     override fun next(): Page = Pagination(value + 1, sizePerPage)
 
     override fun update(value: Int): Page = Pagination(value, sizePerPage)
@@ -25,7 +29,6 @@ class Pagination(
 
     override fun getCheckedProductSize(cart: Cart): Int =
         takeItems(cart).count { item -> item.isChecked }
-
 
     companion object {
         private const val FIRST_PAGE = 1

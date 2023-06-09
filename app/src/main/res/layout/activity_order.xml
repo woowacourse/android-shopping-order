@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="presenter"
+            type="woowacourse.shopping.ui.order.main.OrderPresenter" />
+
+        <variable
+            name="point"
+            type="woowacourse.shopping.domain.model.Point" />
+
+        <variable
+            name="originalPrice"
+            type="woowacourse.shopping.model.Price" />
+
+        <variable
+            name="finalPrice"
+            type="woowacourse.shopping.model.Price" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.order.main.OrderActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/order_tool_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@color/woowa_dark_gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/tv_order"
+            app:titleTextColor="@color/white" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/order_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/order_tool_bar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/order_product"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/order_detail_title"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/order_recycler_view"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="18dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/order_product" />
+
+                    <View
+                        android:id="@+id/point_above_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="7dp"
+                        android:layout_marginTop="24dp"
+                        android:background="@color/woowa_divider"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/order_recycler_view" />
+
+                    <TextView
+                        android:id="@+id/point_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/point_text"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/point_above_view" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/point_divider"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="18dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/point_title" />
+
+                    <TextView
+                        android:id="@+id/available_point_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="18dp"
+                        android:text="@string/available_point_description"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/point_divider" />
+
+                    <woowacourse.shopping.widget.SkeletonTextView
+                        android:id="@+id/available_point"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginEnd="20dp"
+                        bind:point="@{point}"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/point_divider"
+                        tools:text="10000 p" />
+
+                    <TextView
+                        android:id="@+id/used_point_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/use_to_point_description"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/available_point_text" />
+
+
+                    <EditText
+                        android:id="@+id/point_edit_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:autofillHints="1000"
+                        android:background="@drawable/shape_woowa_light_gray_line_1_rect"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"
+                        android:padding="4dp"
+                        android:hint="@string/hint_discount_payment"
+                        android:textColor="@color/woowa_emerald"
+                        android:tooltipText="0"
+                        app:layout_constraintBottom_toTopOf="@+id/point_under_view"
+                        app:layout_constraintEnd_toStartOf="@+id/used_point"
+                        tools:text="01089" />
+
+                    <TextView
+                        android:id="@+id/used_point"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="18dp"
+                        android:textColor="@color/woowa_emerald"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/available_point"
+                        tools:text="p" />
+
+                    <View
+                        android:id="@+id/point_under_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="7dp"
+                        android:layout_marginTop="22dp"
+                        android:background="@color/woowa_divider"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/used_point_text" />
+
+
+                    <TextView
+                        android:id="@+id/payment_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/payment_title"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/point_under_view" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/payment_divider"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginTop="13dp"
+                        android:layout_marginEnd="18dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/payment_title" />
+
+                    <TextView
+                        android:id="@+id/order_payment_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="14dp"
+                        android:text="@string/payment_title"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/payment_divider" />
+
+                    <woowacourse.shopping.widget.SkeletonTextView
+                        android:id="@+id/order_payment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="18dp"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        bind:price="@{originalPrice}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/payment_divider"
+                        tools:text="84,000원" />
+
+                    <TextView
+                        android:id="@+id/discount_payment_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="30dp"
+                        android:text="@string/discount_description"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/order_payment_text" />
+
+                    <TextView
+                        android:id="@+id/discount_payment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="18dp"
+                        android:textColor="@color/woowa_text_black"
+                        android:textSize="16sp"
+                        android:text="@string/default_discount_value"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/order_payment"
+                        tools:text="- 0원" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/woowa_order_total_payment"
+            app:layout_constraintBottom_toTopOf="@+id/order_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/final_payment_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="13dp"
+                android:text="@string/final_description"
+                android:textColor="@color/woowa_text_black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/final_payment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/woowa_text_black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="@string/default_final_payment"
+                bind:price="@{finalPrice}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="89,200원" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/order_btn"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:background="@color/woowa_emerald"
+            android:text="@string/order_btn_text"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

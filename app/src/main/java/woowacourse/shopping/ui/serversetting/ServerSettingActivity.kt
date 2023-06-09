@@ -9,7 +9,6 @@ import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.preference.ShoppingPreference
 
-
 class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
     private lateinit var binding: ActivityServerSettingBinding
     private val presenter: Presenter by lazy { inject(this, ShoppingPreference(this)) }
@@ -18,6 +17,9 @@ class ServerSettingActivity : AppCompatActivity(), ServerSettingContract.View {
         super.onCreate(savedInstanceState)
         binding = ActivityServerSettingBinding.inflate(layoutInflater).setContentView(this)
         binding.presenter = presenter
+
+        val token = "Basic aGoyNzcyMEBnbWFpbC5jb206MTIzNA=="
+        ShoppingPreference(this).setToken(token)
     }
 
     override fun navigateToShopping(serverUrl: String) {

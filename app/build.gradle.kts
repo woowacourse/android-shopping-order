@@ -24,7 +24,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    // 프로젝트내 의존성
+    // 프로젝트 내 의존성
     implementation(project(":domain"))
 
     implementation("androidx.core:core-ktx:1.9.0")
@@ -68,4 +68,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

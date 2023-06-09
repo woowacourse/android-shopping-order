@@ -12,9 +12,11 @@ interface ShoppingContract {
         fun updateRecentProducts(recentProducts: List<UiRecentProduct>)
         fun navigateToProductDetail(product: UiProduct)
         fun navigateToCart()
+        fun navigateToOrderHistory()
         fun showLoadMoreButton()
         fun hideLoadMoreButton()
         fun updateCartBadge(count: ProductCount)
+        fun showLoadFailed(error: String)
     }
 
     abstract class Presenter(protected val view: View) {
@@ -23,7 +25,8 @@ interface ShoppingContract {
         abstract fun loadMoreProducts()
         abstract fun inquiryProductDetail(cartProduct: UiCartProduct)
         abstract fun inquiryRecentProductDetail(recentProduct: UiRecentProduct)
-        abstract fun navigateToCart()
+        abstract fun inquiryCart()
+        abstract fun inquiryOrderHistory()
         abstract fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int)
         abstract fun addCartProduct(product: UiProduct, addCount: Int = 1)
         abstract fun increaseCartCount(product: UiProduct, addCount: Int)

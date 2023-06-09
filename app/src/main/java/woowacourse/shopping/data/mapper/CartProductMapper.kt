@@ -1,8 +1,10 @@
 package woowacourse.shopping.data.mapper
 
+import woowacourse.shopping.data.dto.CartProductDto
 import woowacourse.shopping.data.model.DataCartProduct
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.DomainCartProduct
+import woowacourse.shopping.domain.model.ProductCount
 
 fun DataCartProduct.toDomain(): CartProduct = CartProduct(
     id = id,
@@ -19,3 +21,10 @@ fun CartProduct.toData(): DataCartProduct = DataCartProduct(
 )
 
 fun List<DomainCartProduct>.toData(): List<DataCartProduct> = map { it.toData() }
+
+fun CartProductDto.toDomain(): CartProduct = CartProduct(
+    id = id,
+    product = product.toDomain(),
+    selectedCount = ProductCount(quantity),
+    isChecked = true,
+)

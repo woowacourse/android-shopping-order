@@ -46,8 +46,10 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
     override fun addRecentProduct(item: DataRecentProduct) {
         val contentValues = ContentValues().apply {
             put(RecentProductContract.COLUMN_NAME, item.product.name)
+            put(RecentProductContract.COLUMN_PRODUCT_ID, item.product.id)
             put(RecentProductContract.COLUMN_PRICE, item.product.price.value)
             put(RecentProductContract.COLUMN_IMAGE_URL, item.product.imageUrl)
+            // put(URL, pref.getBaseUrl())
         }
 
         database.writableDatabase.insert(RecentProductContract.TABLE_NAME, null, contentValues)
@@ -64,7 +66,7 @@ class RecentProductDaoImpl(private val database: SQLiteOpenHelper) : RecentProdu
         """.trimIndent()
 
         private val GET_PARTIALLY_QUERY = """
-            SELECT * FROM ${RecentProductContract.TABLE_NAME} ORDER BY ${BaseColumns._ID} DESC LIMIT ?        
+            SELECT * FROM ${RecentProductContract.TABLE_NAME} ORDER BY ${BaseColumns._ID} DESC LIMIT ?
         """.trimIndent()
 
         private val REMOVE_LAST_QUERY = """

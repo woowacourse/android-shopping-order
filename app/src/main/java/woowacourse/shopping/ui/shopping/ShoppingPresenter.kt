@@ -1,8 +1,10 @@
 package woowacourse.shopping.ui.shopping
 
+import android.util.Log
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.DomainCartProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductCount
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.RecentProducts
@@ -31,11 +33,13 @@ class ShoppingPresenter(
 ) : Presenter(view) {
     private var cart = Cart()
     private var currentPage: Page = LoadMore(sizePerPage = sizePerPage)
+    private val products: MutableList<Product> = mutableListOf()
+
     private val cartProductCount: UiProductCount
         get() = UiProductCount(cart.productCountInCart)
 
     override fun fetchAll() {
-        updateCart(newCartProducts = loadAllCartProducts())
+        loadProducts(currentPage)
         fetchRecentProducts()
     }
 
@@ -45,6 +49,7 @@ class ShoppingPresenter(
 
     override fun loadMoreProducts() {
         currentPage = currentPage.next()
+        loadProducts(currentPage)
         updateCartView()
     }
 
@@ -58,35 +63,82 @@ class ShoppingPresenter(
         view.navigateToProductDetail(recentProduct.product)
     }
 
-    override fun navigateToCart() {
+    override fun inquiryCart() {
         view.navigateToCart()
     }
 
+    override fun inquiryOrderHistory() {
+        view.navigateToOrderHistory()
+    }
+
     override fun addCartProduct(product: UiProduct, addCount: Int) {
-        cartRepository.addCartProductByProductId(product.toDomain().id)
-        updateCart(newCartProducts = loadAllCartProducts())
+        cartRepository.addCartProductByProductId(
+            product.toDomain().id,
+            onSuccess = {
+                loadProducts(currentPage)
+            },
+            onFailure = { view.showLoadFailed(it) },
+        )
     }
 
     override fun updateCartCount(cartProduct: UiCartProduct, changedCount: Int) {
-        cartRepository.updateProductCountById(cartProduct.toDomain().id, ProductCount(changedCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+        cartRepository.updateProductCountById(
+            cartProduct.toDomain().id,
+            ProductCount(changedCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailure = { view.showLoadFailed(it) },
+        )
     }
 
     override fun increaseCartCount(product: UiProduct, addCount: Int) {
-        cartRepository.increaseProductCountByProductId(product.id, ProductCount(addCount))
-        updateCart(newCartProducts = loadAllCartProducts())
+        cartRepository.increaseProductCountByProductId(
+            product.id,
+            ProductCount(addCount),
+            onSuccess = { loadProducts(currentPage) },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
+        )
     }
 
-    private fun loadAllCartProducts(): List<CartProduct> {
-        val products = productRepository.getAllProducts()
-        val cartProducts = cartRepository.getAllCartProducts()
+    private fun loadProducts(page: Page) {
+        productRepository.getAllProducts(
+            page = page.getPageForCheckHasNext(),
+            onSuccess = {
+                products.addAll(it)
+                products.distinct()
+                Log.d("botto", "${products.size}")
+                loadCartProducts { fetchedCartProducts ->
+                    updateCart(transformCartProducts(products, fetchedCartProducts))
+                }
+                Log.d("test", "page value: ${page.value}")
+            },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
+        )
+    }
 
-        return products.map { product ->
-            cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
-                product = product,
-                selectedCount = ProductCount(0)
-            )
-        }
+    private fun transformCartProducts(
+        products: List<Product>,
+        cartProducts: List<CartProduct>,
+    ): List<CartProduct> = products.map { product ->
+        cartProducts.find { it.productId == product.id } ?: DomainCartProduct(
+            product = product,
+            selectedCount = ProductCount(0),
+        )
+    }
+
+    private fun loadCartProducts(onLoaded: (List<CartProduct>) -> Unit) {
+        cartRepository.getAllCartProducts(
+            onSuccess = { cartProducts -> onLoaded(cartProducts) },
+            onFailure = { errorMessage ->
+                Log.d("error", "[ERROR] 데이터를 불러오는 데에 실패했습니다. : $errorMessage")
+                view.showLoadFailed(errorMessage)
+            },
+        )
     }
 
     private fun updateCart(newCartProducts: List<CartProduct>) {
@@ -101,7 +153,11 @@ class ShoppingPresenter(
     }
 
     private fun View.updateLoadMoreVisible() {
-        if (currentPage.hasNext(cart)) showLoadMoreButton() else hideLoadMoreButton()
+        if (currentPage.hasNext(cart)) {
+            showLoadMoreButton()
+        } else {
+            hideLoadMoreButton()
+        }
     }
 
     private fun updateRecentProducts(newRecentProducts: RecentProducts) {

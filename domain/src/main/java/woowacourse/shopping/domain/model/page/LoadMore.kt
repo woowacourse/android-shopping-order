@@ -16,6 +16,10 @@ class LoadMore(
 
     override fun hasNext(cart: Cart): Boolean = cart.items.size >= value * sizePerPage
 
+    override fun getPageForCheckHasNext(): Page {
+        return LoadMore(value, sizePerPage + CHECK_FOR_HAS_NEXT)
+    }
+
     override fun next(): Page = LoadMore(value + 1, sizePerPage)
 
     override fun update(value: Int): Page = LoadMore(value, sizePerPage)
@@ -26,4 +30,8 @@ class LoadMore(
     override fun getCheckedProductSize(cart: Cart): Int = cart.items
         .safeSubList(0, value * sizePerPage)
         .count { item -> item.isChecked }
+
+    companion object {
+        private const val CHECK_FOR_HAS_NEXT = 1
+    }
 }

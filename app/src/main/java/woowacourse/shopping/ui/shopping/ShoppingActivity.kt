@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication.Companion.pref
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductCount
 import woowacourse.shopping.model.UiCartProduct
@@ -13,6 +14,7 @@ import woowacourse.shopping.model.UiProduct
 import woowacourse.shopping.model.UiRecentProduct
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
+import woowacourse.shopping.ui.order.history.OrderHistoryActivity
 import woowacourse.shopping.ui.shopping.ShoppingContract.Presenter
 import woowacourse.shopping.ui.shopping.ShoppingContract.View
 import woowacourse.shopping.ui.shopping.recyclerview.adapter.loadmore.LoadMoreAdapter
@@ -27,12 +29,16 @@ import woowacourse.shopping.util.extension.getParcelableExtraCompat
 import woowacourse.shopping.util.extension.setContentView
 import woowacourse.shopping.util.inject.inject
 import woowacourse.shopping.util.listener.CartProductClickListener
+import woowacourse.shopping.util.toast.Toaster
 import woowacourse.shopping.widget.SkeletonCounterView
 
-class ShoppingActivity : AppCompatActivity(), View,
-    SkeletonCounterView.OnCountChangedListener, CartProductClickListener {
+class ShoppingActivity :
+    AppCompatActivity(),
+    View,
+    SkeletonCounterView.OnCountChangedListener,
+    CartProductClickListener {
     private lateinit var binding: ActivityShoppingBinding
-    private val presenter: Presenter by lazy { inject(this, this) }
+    private val presenter: Presenter by lazy { inject(this, this, pref.getBaseUrl().toString()) }
 
     private val recentProductAdapter = RecentProductAdapter(presenter::inquiryRecentProductDetail)
     private val recentProductWrapperAdapter = RecentProductWrapperAdapter(recentProductAdapter)
@@ -57,7 +63,12 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     private fun initMenuClickListener() {
         val cartItemView = binding.shoppingToolBar.findItemActionView(R.id.cart)
-        cartItemView?.setOnClickListener { presenter.navigateToCart() }
+        cartItemView?.setOnClickListener { presenter.inquiryCart() }
+
+        binding.shoppingToolBar.setOnMenuItemClickListener { item ->
+            if (item?.itemId == R.id.order_history) presenter.inquiryOrderHistory()
+            true
+        }
     }
 
     private fun initRecyclerView() {
@@ -82,6 +93,11 @@ class ShoppingActivity : AppCompatActivity(), View,
 
     override fun navigateToCart() {
         cartActivityLauncher.launch(CartActivity.getIntent(this))
+    }
+
+    override fun navigateToOrderHistory() {
+        val intent = OrderHistoryActivity.getIntent(this)
+        startActivity(intent)
     }
 
     override fun showLoadMoreButton() {
@@ -112,6 +128,10 @@ class ShoppingActivity : AppCompatActivity(), View,
         presenter.updateCartCount(cartProduct, changedCount)
     }
 
+    override fun showLoadFailed(error: String) {
+        Toaster.showToast(this, LOAD_ERROR_MESSAGE.format(error))
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val product = intent?.getParcelableExtraCompat<UiProduct>(CART_PRODUCT_KEY) ?: return
@@ -123,6 +143,7 @@ class ShoppingActivity : AppCompatActivity(), View,
         private const val CART_PRODUCT_KEY = "product_key"
         private const val COUNT_KEY = "count_key"
         private const val SERVER_URL_KEY = "server_url_key"
+        private const val LOAD_ERROR_MESSAGE = "[ERROR] 데이터를 불러오는 데에 실패했습니다. : %s"
 
         fun getIntent(context: Context, product: UiProduct, count: Int): Intent =
             Intent(context, ShoppingActivity::class.java)

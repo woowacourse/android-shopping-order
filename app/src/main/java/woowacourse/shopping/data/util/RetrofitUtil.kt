@@ -1,0 +1,102 @@
+package woowacourse.shopping.data.util
+
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Converter
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.service.cart.RetrofitCartProductService
+import woowacourse.shopping.data.service.order.RetrofitOrderService
+import woowacourse.shopping.data.service.order.RetrofitPointService
+import woowacourse.shopping.data.service.product.RetrofitProductService
+import java.lang.reflect.Type
+
+object RetrofitUtil {
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                },
+            )
+            .build()
+    }
+
+    private val okHttpAuthClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                },
+            ).addInterceptor(createdAuthInterceptor())
+            .build()
+    }
+
+    private fun createdAuthInterceptor(): Interceptor = Interceptor { chain ->
+        with(chain) {
+            val modifiedRequest = request().newBuilder()
+                .header("Authorization", ShoppingApplication.pref.getToken().toString())
+                .build()
+            proceed(modifiedRequest)
+        }
+    }
+
+    fun getProductByRetrofit(baseUrl: String): RetrofitProductService {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(NullOnEmptyConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(RetrofitProductService::class.java)
+    }
+
+    fun getCartProductByRetrofit(baseUrl: String): RetrofitCartProductService {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(NullOnEmptyConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpAuthClient)
+            .build()
+            .create(RetrofitCartProductService::class.java)
+    }
+
+    fun getOrderProductByRetrofit(baseUrl: String): RetrofitOrderService {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(NullOnEmptyConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpAuthClient)
+            .build()
+            .create(RetrofitOrderService::class.java)
+    }
+
+    fun getPointByRetrofit(baseUrl: String): RetrofitPointService {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(NullOnEmptyConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpAuthClient)
+            .build()
+            .create(RetrofitPointService::class.java)
+    }
+
+    class NullOnEmptyConverterFactory : Converter.Factory() {
+        override fun responseBodyConverter(
+            type: Type,
+            annotations: Array<out Annotation>,
+            retrofit: Retrofit,
+        ): Converter<ResponseBody, *> {
+            val delegate = retrofit.nextResponseBodyConverter<Any>(this, type, annotations)
+            return Converter<ResponseBody, Any> {
+                if (it.contentLength() == 0L) return@Converter EmptyResponse()
+                delegate.convert(it)
+            }
+        }
+    }
+
+    class EmptyResponse()
+}
