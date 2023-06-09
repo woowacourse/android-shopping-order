@@ -13,19 +13,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Shopping"
         android:usesCleartextTraffic="true"
-        android:name=".MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".shopping.ShoppingActivity"
+            android:name=".view.payment.PaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".cart.CartActivity"
+            android:name=".view.orderdetail.OrderDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".productdetail.ProductDetailActivity"
+            android:name=".view.mypage.MyPageActivity"
             android:exported="false" />
         <activity
-            android:name=".serverselect.SeverSelectActivity"
+            android:name=".view.orderhistory.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.serverselect.ServerSelectActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +35,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.shoppingcart.ShoppingCartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.productdetail.ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.shoppingmain.ShoppingMainActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
