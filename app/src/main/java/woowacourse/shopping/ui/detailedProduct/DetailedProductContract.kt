@@ -5,17 +5,17 @@ import woowacourse.shopping.model.ProductUIModel
 interface DetailedProductContract {
     interface View {
         fun setProductDetail(product: ProductUIModel, lastProduct: ProductUIModel?)
+        fun showCartDialog(product: ProductUIModel)
         fun navigateToCart()
-        fun navigateToDetailedProduct(product: ProductUIModel)
-        fun navigateToAddToCartDialog(product: ProductUIModel)
+        fun navigateToDetailedProduct(productId: Int)
     }
 
     interface Presenter {
-        fun setUpLastProduct()
-        fun setUpProductDetail()
+        fun fetchLastProduct()
+        fun fetchProductDetail()
         fun addProductToCart(count: Int)
         fun addProductToRecent()
-        fun navigateToDetailedProduct()
-        fun navigateToAddToCartDialog()
+        fun processToCart()
+        fun processToDetailedProduct()
     }
 }

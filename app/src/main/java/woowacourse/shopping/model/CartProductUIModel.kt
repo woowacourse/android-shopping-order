@@ -10,11 +10,4 @@ data class CartProductUIModel(
     val price: Int,
     val imageUrl: String,
     val productId: Int
-) : Serializable {
-    fun toProduct() = Product(
-        id = productId,
-        name = name,
-        price = price,
-        imageUrl = imageUrl
-    )
-}
+) : Serializable

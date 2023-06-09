@@ -1,19 +1,18 @@
 package woowacourse.shopping.ui.shopping
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.CartProducts
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.RecentProduct
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.RecentRepository
 
 class ShoppingPresenterTest {
 
@@ -27,29 +26,25 @@ class ShoppingPresenterTest {
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeRecentProduct: RecentProduct = RecentProduct(
         1,
         "[사미헌] 갈비탕",
         12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeCartProduct: CartProduct = CartProduct(
         1,
-        "[사미헌] 갈비탕",
         1,
-        true,
-        12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
-        1
+        fakeProduct
     )
 
     private val fakeProducts = List(10) { fakeProduct }
     private val fakeRecentProducts = List(10) { fakeRecentProduct }
-    private val fakeCartProducts = CartProducts(List(10) { fakeCartProduct })
+    private val fakeCartProducts = MutableList(10) { fakeCartProduct }
 
     private val fakeCartCounts = fakeCartProducts.toUIModel()
         .associateBy { it.id }
@@ -58,114 +53,79 @@ class ShoppingPresenterTest {
     @Before
     fun setUp() {
         view = mockk()
-        productRepository = mockk()
-        recentRepository = mockk()
-        cartRepository = mockk()
+        productRepository = mockk(relaxed = true)
+        recentRepository = mockk(relaxed = true)
+        cartRepository = mockk(relaxed = true)
         presenter = ShoppingPresenter(view, productRepository, recentRepository, cartRepository)
-    }
-
-    @Test
-    fun `초기 상품들을 세팅한다`() {
-        // given
-        every { productRepository.getNext(any()) } returns fakeProducts
-        every { recentRepository.getRecent(10) } returns fakeRecentProducts
-        every { cartRepository.getAll() } returns fakeCartProducts
-
-        every { view.setRecentProducts(any()) } returns Unit
-        every { view.addMoreProducts(any()) } returns Unit
-        every { view.setCartProducts(any()) } returns Unit
-
-        // when
-        presenter.setUpProducts()
-
-        // then
-        verify(exactly = 1) {
-            view.setRecentProducts(fakeRecentProducts.map { it.toUIModel() })
-        }
-        verify(exactly = 1) {
-            view.addMoreProducts(fakeProducts.map { it.toUIModel() })
-        }
-        verify(exactly = 1) {
-            view.setCartProducts(fakeCartCounts)
-        }
     }
 
     @Test
     fun `상품들을 추가로 전달한다`() {
         // given
-        every { productRepository.getNext(any()) } returns fakeProducts
-        every { view.addMoreProducts(any()) } returns Unit
+        every { productRepository.getNext(any()) } answers { Result.success(fakeProducts) }
+        justRun { view.setMoreProducts(any()) }
 
         // when
-        presenter.setUpNextProducts()
+        presenter.fetchNextProducts()
 
         // then
-        verify(exactly = 1) { view.addMoreProducts(fakeProducts.map { it.toUIModel() }) }
+        verify(exactly = 1) { view.setMoreProducts(fakeProducts.map { it.toUIModel() }) }
     }
 
     @Test
-    fun `상품들에 장바구니 숫자를 반영한다`() {
+    fun `최근 본 상품들을 전달한다`() {
         // given
-        every { cartRepository.getAll() } returns fakeCartProducts
-        every { view.setCartProducts(any()) } returns Unit
+        every { recentRepository.getRecent(10) } returns fakeRecentProducts
+        justRun { view.setRecentProducts(any()) }
 
         // when
-        presenter.setUpCartCounts()
+        presenter.fetchRecentProducts()
 
         // then
-        verify(exactly = 1) {
-            view.setCartProducts(fakeCartCounts)
-        }
+        verify(exactly = 1) { view.setRecentProducts(fakeRecentProducts.toUIModel()) }
+    }
+
+    @Test
+    fun `상품들에 장바구니 숫자를 반영하고 툴바를 설정한다`() {
+        // given
+        every { cartRepository.getAll() } returns Result.success(fakeCartProducts)
+        justRun { view.setCartProducts(any()) }
+        justRun { view.setToolbar(any()) }
+
+        // when
+        presenter.fetchCartCounts()
+
+        // then
+        verify(exactly = 1) { view.setCartProducts(fakeCartCounts) }
+
+        // and
+        verify(exactly = 1) { view.setToolbar(0) }
     }
 
     @Test
     fun `상품의 개수를 장바구니 저장한다`() {
         // given
-        every { productRepository.getNext(any()) } returns fakeProducts
-        every { recentRepository.getRecent(10) } returns fakeRecentProducts
-        every { cartRepository.getAll() } returns fakeCartProducts
-
-        every { view.setRecentProducts(any()) } returns Unit
-        every { view.addMoreProducts(any()) } returns Unit
-        every { view.setCartProducts(any()) } returns Unit
-
-        every { cartRepository.insert(any()) } returns Unit
-        every { cartRepository.updateCount(1, 10) } returns 10
-        every { productRepository.findById(1) } returns fakeProduct
-        // when
-        presenter.setUpProducts()
-        val count = presenter.updateItemCount(1, 10)
-
-        // then
-        assertEquals(10, count)
-    }
-
-    @Test
-    fun `총 장바구니 상품 개수를 반영한다`() {
-        // given
-        every { cartRepository.getAll() } returns fakeCartProducts
-        every { view.setCartProducts(any()) } returns Unit
-        every { view.setToolbar(any()) } returns Unit
+        justRun { cartRepository.updateCountWithProductId(any(), any()) }
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
+        every { cartRepository.getAll() } returns Result.success(fakeCartProducts)
+        justRun { view.setToolbar(any()) }
 
         // when
-        presenter.setUpCartCounts()
+        presenter.updateItemCount(1, 10)
 
         // then
-        verify(exactly = 1) {
-            view.setCartProducts(fakeCartCounts)
-        }
+        verify(exactly = 1) { view.setToolbar(10) }
     }
 
     @Test
     fun `선택한 상품의 상세페이지로 이동한다`() {
         // given
-        every { productRepository.findById(any()) } returns fakeProduct
-        every { view.navigateToProductDetail(any()) } returns Unit
+        justRun { view.navigateToProductDetail(any()) }
 
         // when
-        presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
+        presenter.processToItemDetail(fakeProduct.toUIModel().id)
 
         // then
-        verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel()) }
+        verify(exactly = 1) { view.navigateToProductDetail(fakeProduct.toUIModel().id) }
     }
 }

@@ -3,6 +3,7 @@
     <string name="menu_cart_title">cart</string>
     <string name="product_price_prefix">금액</string>
     <string name="product_price">%,d원</string>
+    <string name="product_quantity">%,d개</string>
     <string name="exit">exit</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
@@ -14,9 +15,11 @@
     <string name="cart_select_all_of_page">전체</string>
     <string name="cart_item_product_remove_btn_description">지우기 버튼</string>
     <string name="cart_item_product_image_description">장바구니 상품</string>
+    <string name="cart_dialog_btn">담기</string>
 
     <!-- Strings related to product detail -->
     <string name="product_detail_add_to_cart_btn">장바구니 담기</string>
+    <string name="detailed_product_last_item">마지막으로 본 상품</string>
 
     <!-- Strings related to shopping page -->
     <string name="shopping_toolbar_title">Shopping</string>
@@ -26,9 +29,30 @@
     <!-- Strings related to recent recent product -->
     <string name="recent_product_text">최근 본 상품</string>
     <string name="recent_product_item_product_image_description">최근 본 상품</string>
-    <string name="detailed_product_last_item">마지막으로 본 상품</string>
-    <string name="cart_dialog_btn">담기</string>
+
+    <!-- Strings related to server setting -->
     <string name="server_setting_io_server">이오 서버</string>
     <string name="server_setting_jito_server">지토 서버</string>
+
+    <!-- Strings related to order -->
+    <string name="order_order_list_title">주문 목록</string>
+    <string name="order_discount_title">할인</string>
+    <string name="order_point_prefix">포인트 사용</string>
+    <string name="order_point_suffix">원</string>
+    <string name="order_available_points">보유 포인트 %,d원</string>
+    <string name="order_order_price_prefix">주문 금액</string>
+    <string name="order_discount_price_prefix">할인 금액</string>
+    <string name="order_total_price_prefix">총 결제 금액</string>
+    <string name="order_confirm_btn">주문 하기</string>
+
+    <string name="order_history_navigate_to_detail">주문 상세</string>
+    <string name="order_page_point_hint">0</string>
+    <string name="order_total_price_title">총 결제 금액</string>
+
+    <!-- Strings related to order history -->
+    <string name="order_history_title">주문 내역</string>
+    <string name="order_history_detail">주문 상세</string>
+    <string name="order_history_data_date">주문 일자</string>
+    <string name="shopping_bottom_order_history">주문 목록</string>
 
 </resources>

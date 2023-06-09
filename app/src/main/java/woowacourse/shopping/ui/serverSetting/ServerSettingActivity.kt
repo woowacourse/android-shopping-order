@@ -1,9 +1,12 @@
 package woowacourse.shopping.ui.serverSetting
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.configure.ApplicationConfigure
+import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSettingActivity : AppCompatActivity() {
@@ -16,18 +19,26 @@ class ServerSettingActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
-        val buttonJames = findViewById<Button>(R.id.btn_james_server)
-        val buttonLeah = findViewById<Button>(R.id.btn_leah_server)
-        buttonJames.setOnClickListener {
-            startMain(SERVER_IO)
+        val buttonIo = findViewById<Button>(R.id.btn_io_server)
+        val buttonJito = findViewById<Button>(R.id.btn_jito_server)
+        buttonIo.setOnClickListener {
+            ApplicationConfigure.BASE_URL = SERVER_IO
+            RetrofitClient.getInstance("Basic YUBhLmNvbToxMjM0")
+            startMain()
         }
-        buttonLeah.setOnClickListener {
-            startMain(SERVER_JITO)
+        buttonJito.setOnClickListener {
+            ApplicationConfigure.BASE_URL = SERVER_JITO
+            RetrofitClient.getInstance("Basic YUBhLmNvbToxMjM0")
+            startMain()
         }
     }
 
-    private fun startMain(server: String) {
-        startActivity(ShoppingActivity.getIntent(this, server))
+    private fun startMain() {
+        startActivity(
+            ShoppingActivity.getIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+        )
         finish()
     }
 

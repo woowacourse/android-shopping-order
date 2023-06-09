@@ -10,7 +10,7 @@ sealed class CartItemType {
             is Navigation -> TYPE_FOOTER
         }
 
-    data class Cart(val product: CartProductUIModel) : CartItemType()
+    data class Cart(val cartProduct: CartProductUIModel) : CartItemType()
 
     data class Navigation(val cart: PageUIModel) : CartItemType()
 

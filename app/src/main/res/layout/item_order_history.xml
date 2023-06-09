@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center">
+
+    <data>
+
+        <variable
+            name="onProductClick"
+            type="kotlin.jvm.functions.Function1" />
+
+        <variable
+            name="orderItem"
+            type="woowacourse.shopping.model.OrderHistoryItemUIModel" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="324dp"
+        android:layout_height="118dp"
+        android:onClick="@{() -> onProductClick.invoke(orderItem.productId)}">
+
+        <TextView
+            android:id="@+id/tv_product_title"
+            android:layout_width="266dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="13dp"
+            android:gravity="center_vertical"
+            android:text="@{orderItem.name}"
+            android:textAppearance="@style/cart_item_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="PET보틀-정사각(370ml)" />
+
+        <ImageView
+            android:id="@+id/iv_product_image"
+            android:layout_width="136dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="13dp"
+            android:layout_marginTop="37dp"
+            android:contentDescription="@string/cart_item_product_image_description"
+            app:imageUrl="@{orderItem.imageUrl}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="26dp"
+            android:text="@{@string/product_price(orderItem.price)}"
+            android:textColor="@color/gray_333333"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="99000원" />
+
+        <TextView
+            android:id="@+id/tv_product_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="9dp"
+            android:text="@{@string/product_quantity(orderItem.quantity)}"
+            android:textColor="@color/gray_333333"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="4개" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

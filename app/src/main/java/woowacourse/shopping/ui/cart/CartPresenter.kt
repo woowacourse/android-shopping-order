@@ -1,157 +1,122 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import java.util.concurrent.CompletableFuture
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.utils.NonNullLiveData
-import woowacourse.shopping.utils.NonNullMutableLiveData
+import woowacourse.shopping.model.CartProductPageUIModel
+import woowacourse.shopping.utils.LogUtil
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
     private var index: Int = 0
 ) : CartContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
+    private val _page = MutableLiveData<CartProductPageUIModel>()
+    override val page: LiveData<CartProductPageUIModel> get() = _page
 
-    private val _totalPrice = NonNullMutableLiveData<Int>(0)
-    override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
+    private val _totalPrice = MutableLiveData<Int>(0)
+    override val totalPrice: LiveData<Int> get() = _totalPrice
 
-    private val _checkedCount = NonNullMutableLiveData<Int>(0)
-    override val checkedCount: NonNullLiveData<Int> get() = _checkedCount
+    private val _checkedCount = MutableLiveData<Int>(0)
+    override val checkedCount: LiveData<Int> get() = _checkedCount
 
-    private val _allCheck = NonNullMutableLiveData<Boolean>(false)
-    override val allCheck: NonNullLiveData<Boolean> get() = _allCheck
+    private val _allCheck = MutableLiveData<Boolean>(false)
+    override val allCheck: LiveData<Boolean> get() = _allCheck
 
-    private val currentPage = mutableListOf<CartProductUIModel>()
+    private var isCheckChanging = false
 
-    private val pageUIModel get() = PageUIModel(
-        cartRepository.hasNextPage(index, STEP),
-        cartRepository.hasPrevPage(index, STEP),
-        index + 1
-    )
-
-    private var isChangingItemCheck = false
-
-    private fun fetchCartProducts() {
-        currentPage.clear()
-        currentPage.addAll(cartRepository.getPage(index, STEP).toUIModel())
+    init {
+        CompletableFuture.supplyAsync { cartRepository.getAll() }.get()
+        setUpAllButton()
     }
 
-    private fun setUpCarts() {
-        view.setPage(currentPage, pageUIModel)
-    }
-
-    private fun setUPTotalPrice() {
-        _totalPrice.value = cartRepository.getTotalPrice()
-    }
-
-    private fun setUpCheckedCount() {
-        _checkedCount.value = cartRepository.getTotalSelectedCount()
-    }
-
-    private fun setUpAllButton() {
-        _allCheck.value = currentPage.all { it.checked }
-    }
-
-    override fun setUpView() {
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
+    override fun fetchCartProducts() {
+        CompletableFuture.supplyAsync {
+            cartRepository.getPage(index * STEP, STEP)
+        }.thenAccept { result ->
+            result.onSuccess {
+                setUpPage(it.toUIModel())
                 setUPTotalPrice()
                 setUpCheckedCount()
                 setUpAllButton()
-            }
-        }.start()
-    }
-
-    override fun setUpProductsCheck(checked: Boolean) {
-        if (isChangingItemCheck) { return }
-        currentPage.replaceAll {
-            cartRepository.updateChecked(it.id, checked)
-            it.copy(checked = checked)
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
         }
-        setUpCarts()
     }
 
     override fun moveToPageNext() {
         index += 1
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
-                setUpAllButton()
-            }
-        }.start()
+        cartRepository.getPage(index * STEP, STEP)
+        fetchCartProducts()
     }
 
     override fun moveToPagePrev() {
         index -= 1
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
-                setUpAllButton()
-            }
-        }.start()
+        cartRepository.getPage(index * STEP, STEP)
+        fetchCartProducts()
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        Thread {
-            cartRepository.updateCount(productId, count)
-            handler.post {
-                currentPage.indexOfFirst { it.id == productId }
-                    .takeIf { it != -1 }
-                    ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-            }
-        }.start()
+        CompletableFuture.supplyAsync {
+            cartRepository.updateCountWithProductId(productId, count)
+        }.thenAccept { result ->
+            result.onSuccess { fetchCartProducts() }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
+        }
+    }
+
+    override fun updateItemsCheck(checked: Boolean) {
+        if (isCheckChanging) return
+        page.value?.cartProducts?.map { it.id }
+            ?.let { cartRepository.updateChecked(it, checked) }
+        fetchCartProducts()
     }
 
     override fun updateItemCheck(productId: Int, checked: Boolean) {
-        Thread {
-            isChangingItemCheck = true
-            cartRepository.updateChecked(productId, checked)
-            handler.post {
-                currentPage.indexOfFirst { it.id == productId }
-                    .takeIf { it != -1 }
-                    ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-                setUpAllButton()
-                isChangingItemCheck = false
-            }
-        }.start()
-    }
-
-    override fun removeItem(productId: Int) {
-        cartRepository.remove(productId)
-        currentPage.removeIf { it.id == productId }
-        if (currentPage.isEmpty() && index > 0) {
-            moveToPagePrev()
-        } else {
-            Thread {
-                fetchCartProducts()
-                handler.post {
-                    setUpCarts()
-                    setUpCheckedCount()
-                    setUPTotalPrice()
-                }
-            }.start()
-        }
+        cartRepository.updateChecked(productId, checked)
+        if (isCheckChanging) return
+        isCheckChanging = true
+        setUPTotalPrice()
+        setUpCheckedCount()
+        setUpAllButton()
+        isCheckChanging = false
     }
 
     override fun getPageIndex(): Int {
         return index
     }
 
-    override fun navigateToItemDetail(productId: Int) {
-        cartRepository.getAll().all().first { it.productId == productId }.toUIModel().toProduct()
-            .let { view.navigateToItemDetail(it.toUIModel()) }
+    override fun processToItemDetail(productId: Int) {
+        view.navigateToItemDetail(productId)
+    }
+
+    override fun processToOrderCheckout() {
+        CompletableFuture.supplyAsync {
+            cartRepository.getChecked()
+        }.thenAccept { result ->
+            result.onSuccess { cartProducts ->
+                view.navigateToOrderCheckout(cartProducts.map { it.id })
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
+        }
+    }
+
+    private fun setUpPage(cartProductPage: CartProductPageUIModel) {
+        _page.postValue(cartProductPage)
+    }
+
+    private fun setUPTotalPrice() {
+        _totalPrice.postValue(cartRepository.getTotalCheckedPrice())
+    }
+
+    private fun setUpCheckedCount() {
+        _checkedCount.postValue(cartRepository.getTotalCheckedQuantity())
+    }
+
+    private fun setUpAllButton() {
+        _allCheck.value = cartRepository.getPage(index * STEP, STEP)
+            .getOrNull()?.cartProducts
+            ?.all { it.checked } ?: false
     }
 
     companion object {

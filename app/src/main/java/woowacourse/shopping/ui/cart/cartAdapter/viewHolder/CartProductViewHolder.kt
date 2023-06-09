@@ -13,9 +13,10 @@ class CartProductViewHolder private constructor(
     init {
         binding.listener = cartListener
     }
-    override fun bind(data: CartItemType) {
+
+    fun bind(data: CartItemType) {
         if (data !is CartItemType.Cart) return
-        binding.product = data.product
+        binding.cartProduct = data.cartProduct
     }
 
     companion object {

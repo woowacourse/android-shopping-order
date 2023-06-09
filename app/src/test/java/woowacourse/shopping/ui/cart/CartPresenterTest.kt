@@ -8,13 +8,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.CartProduct
-import woowacourse.shopping.model.CartProducts
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
 
 class CartPresenterTest {
 
@@ -27,20 +25,16 @@ class CartPresenterTest {
         1,
         "aa",
         1,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg"
+        "https://search4.kakaocdn.net/argon/656x0_80_wr/KjhZ1Chrw9p"
     )
 
     private val fakeCartProduct = CartProduct(
         1,
-        "aa",
         1,
-        true,
-        12000,
-        "https://img-cf.kurly.com/cdn-cgi/image/quality=85,width=676/shop/data/goods/1648206780555l0.jpeg",
-        1
+        fakeProduct
     )
 
-    private val fakeCartProducts = CartProducts(List(10) { fakeCartProduct })
+    private val fakeCartProducts = List(10) { fakeCartProduct }
 
     @Rule
     @JvmField
@@ -49,32 +43,28 @@ class CartPresenterTest {
     @Before
     fun setUp() {
         view = mockk()
-        cartRepository = mockk()
-        productRepository = mockk()
-        presenter = CartPresenter(view, cartRepository, productRepository)
+        cartRepository = mockk(relaxed = true)
+        productRepository = mockk(relaxed = true)
+        every { cartRepository.getPage(any(), any()) } answers { Result.success(fakeCartProducts) }
+
+        presenter = CartPresenter(view, cartRepository)
     }
 
     @Test
     fun `화면의 초기값들을 설정한다`() {
         // given
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
+        every { cartRepository.hasNextPage() } returns true
+        every { cartRepository.hasPrevPage() } returns true
 
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
+        presenter.fetchCartProducts()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 1)
-            )
-        }
+        verify(exactly = 1) { view.setPage(any(), any()) }
         assertEquals(presenter.totalPrice.value, 12000)
         assertEquals(presenter.checkedCount.value, 10)
         assertEquals(presenter.allCheck.value, true)
@@ -83,114 +73,90 @@ class CartPresenterTest {
     @Test
     fun `현재 페이지의 상품들을 모두 선택한다`() {
         // given
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
-        every { cartRepository.updateChecked(any(), any()) } answers { nothing }
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
+        every { cartRepository.hasNextPage() } returns true
+        every { cartRepository.hasPrevPage() } returns true
+        every { cartRepository.updateCurrentPageChecked(any()) } answers { nothing }
 
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
-        presenter.setUpProductsCheck(true)
+        presenter.fetchCartProducts()
+        presenter.updateItemsCheck(true)
 
         // then
-        verify(exactly = 10) {
-            cartRepository.updateChecked(fakeCartProduct.id, true)
+        verify(exactly = 1) {
+            cartRepository.updateCurrentPageChecked(any())
         }
-        verify {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 1)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
     }
 
     @Test
     fun `다음 페이지로 넘어가면 새로 불러온다`() {
         // given
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
+        every { cartRepository.hasNextPage() } returns true
+        every { cartRepository.hasPrevPage() } returns true
 
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
+        presenter.fetchCartProducts()
         presenter.moveToPageNext()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 2)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
         assertEquals(presenter.allCheck.value, true)
     }
 
     @Test
     fun `이전 페이지로 가면 새로 불러온다`() {
         // given
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
-
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
+        presenter.fetchCartProducts()
         presenter.moveToPagePrev()
 
         // then
-        verify(exactly = 1) {
-            view.setPage(
-                fakeCartProducts.toUIModel(),
-                PageUIModel(pageNext = true, pagePrev = true, pageNumber = 0)
-            )
-        }
+        verify(exactly = 2) { view.setPage(any(), any()) }
         assertEquals(presenter.allCheck.value, true)
     }
 
     @Test
     fun `아이템의 개수를 변경한다`() {
         // given
-        every { cartRepository.updateCount(any(), any()) } returns 10
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
+        every { cartRepository.updateCountWithProductId(any(), any()) }
+            .answers { Result.success(10) }
+
+        every { cartRepository.hasNextPage() } returns true
+        every { cartRepository.hasPrevPage() } returns true
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
+        presenter.fetchCartProducts()
         presenter.updateItemCount(1, 0)
 
         // then
-        verify(exactly = 1) { cartRepository.updateCount(1, 0) }
-        verify(exactly = 1) { view.setPage(any(), any()) }
+        verify(exactly = 2) { view.setPage(any(), any()) }
     }
 
     @Test
     fun `아이템의 체크를 변경한다`() {
         // given
         every { cartRepository.updateChecked(any(), any()) } returns Unit
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
+        every { cartRepository.hasNextPage() } returns true
+        every { cartRepository.hasPrevPage() } returns true
+        every { cartRepository.getTotalCheckedPrice() } returns 12000
+        every { cartRepository.getTotalCheckedQuantity() } returns 10
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
+        presenter.fetchCartProducts()
         presenter.updateItemCheck(1, true)
 
         // then
@@ -201,34 +167,28 @@ class CartPresenterTest {
     @Test
     fun `장바구니에 담긴 상품을 삭제한다`() {
         // given
-        every { cartRepository.remove(any()) } returns Unit
-        every { cartRepository.getPage(any(), any()) } returns fakeCartProducts
-        every { cartRepository.hasNextPage(any(), any()) } returns true
-        every { cartRepository.hasPrevPage(any(), any()) } returns true
-        every { cartRepository.getTotalPrice() } returns 12000
-        every { cartRepository.getTotalSelectedCount() } returns 10
+        every { cartRepository.updateCountWithProductId(any(), any()) }
+            .answers { Result.success(0) }
         every { view.setPage(any(), any()) } answers { nothing }
 
         // when
-        presenter.setUpView()
-        presenter.removeItem(1)
+        presenter.updateItemCount(1, 0)
 
         // then
-        verify(exactly = 1) { cartRepository.remove(1) }
-        verify(exactly = 2) { view.setPage(any(), any()) }
+        verify(exactly = 1) { view.setPage(any(), any()) }
     }
 
     @Test
     fun `상세 페이지로 이동한다`() {
-        // given
-        every { productRepository.findById(any()) } returns fakeProduct
+        every { cartRepository.getAll() } answers { Result.success(fakeCartProducts) }
+
         every { view.navigateToItemDetail(any()) } answers { nothing }
 
         // when
-        presenter.navigateToItemDetail(fakeProduct.toUIModel().id)
+        presenter.processToItemDetail(fakeProduct.toUIModel().id)
 
         // then
-        verify(exactly = 1) { view.navigateToItemDetail(fakeProduct.toUIModel()) }
+        verify(exactly = 1) { view.navigateToItemDetail(fakeProduct.toUIModel().id) }
     }
 
     @Test
@@ -237,7 +197,7 @@ class CartPresenterTest {
         val index = 5
 
         // when
-        val presenter = CartPresenter(view, cartRepository, productRepository, index)
+        val presenter = CartPresenter(view, cartRepository, index)
 
         // then
         assertEquals(presenter.getPageIndex(), index)

@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.shopping
 
-import android.os.Handler
-import android.os.Looper
+import java.util.concurrent.CompletableFuture
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.RecentRepository
+import woowacourse.shopping.utils.LogUtil
 
 class ShoppingPresenter(
     private val view: ShoppingContract.View,
@@ -13,66 +13,59 @@ class ShoppingPresenter(
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository
 ) : ShoppingContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
-
-    override fun setUpProducts() {
-        setUpCartCounts()
-        setUpNextProducts()
-        setUpRecentProducts()
+    override fun fetchCartCounts() {
+        CompletableFuture.supplyAsync {
+            cartRepository.getAll()
+        }.thenAccept { result ->
+            result.onSuccess { carts ->
+                val cartCounts = carts.toList().associateBy({ it.product.id }, { it.quantity })
+                view.setCartProducts(cartCounts)
+                fetchTotalCount()
+            }.onFailure { throwable -> LogUtil.logError(throwable) }
+        }
     }
 
-    override fun setUpCartCounts() {
-        Thread {
-            val cartProducts = cartRepository.getAll().all()
-                .associateBy { it.productId }
-                .mapValues { it.value.count }
-            handler.post {
-                view.setCartProducts(cartProducts)
-            }
-        }.start()
+    override fun fetchNextProducts() {
+        CompletableFuture.supplyAsync {
+            productRepository.getNext(PRODUCT_PAGE_SIZE)
+        }.thenAccept { result ->
+            result.onSuccess { products -> view.setMoreProducts(products.map { it.toUIModel() }) }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
+        }
     }
 
-    override fun setUpNextProducts() {
-        Thread {
-            val products = productRepository.getNext(PRODUCT_COUNT).map { it.toUIModel() }
-            handler.post {
-                view.addMoreProducts(products)
-            }
-        }.start()
+    override fun fetchRecentProducts() {
+        val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
+            .map { it.toUIModel() }
+        view.setRecentProducts(recentProducts)
     }
 
-    override fun setUpRecentProducts() {
-        Thread {
-            val recentProducts = recentRepository.getRecent(RECENT_PRODUCT_COUNT)
-                .map { it.toUIModel() }
-            handler.post {
-                view.setRecentProducts(recentProducts)
-            }
-        }.start()
-    }
-
-    override fun setUpTotalCount() {
-        Thread {
-            val totalSelectedCount = cartRepository.getTotalSelectedCount()
-            handler.post {
-                view.setToolbar(totalSelectedCount)
-            }
-        }.start()
-    }
-
-    override fun updateItemCount(productId: Int, count: Int) {
-        cartRepository.insert(productId)
-        cartRepository.updateCount(productId, count)
-    }
-
-    override fun navigateToItemDetail(productId: Int) {
-        view.navigateToProductDetail(
-            productRepository.findById(productId).toUIModel()
+    override fun fetchTotalCount() {
+        view.setToolbar(
+            cartRepository.getTotalCheckedQuantity()
         )
     }
 
+    override fun updateItemCount(productId: Int, count: Int) {
+        CompletableFuture.supplyAsync {
+            cartRepository.updateCountWithProductId(productId, count)
+            cartRepository.getAll()
+        }.thenAccept { result ->
+            result.onSuccess { fetchTotalCount() }
+                .onFailure { throwable -> LogUtil.logError(throwable) }
+        }
+    }
+
+    override fun processToItemDetail(productId: Int) {
+        view.navigateToProductDetail(productId)
+    }
+
+    override fun processToOrderHistories() {
+        view.navigateToOrderHistories()
+    }
+
     companion object {
+        private const val PRODUCT_PAGE_SIZE = 10
         private const val RECENT_PRODUCT_COUNT = 10
-        private const val PRODUCT_COUNT = 20
     }
 }

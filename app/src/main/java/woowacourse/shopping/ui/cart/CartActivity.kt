@@ -8,16 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.local.CartDefaultLocalDataSource
+import woowacourse.shopping.data.remote.CartRetrofitDataSource
+import woowacourse.shopping.data.repository.CartDefaultRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
-import woowacourse.shopping.utils.ServerURL
+import woowacourse.shopping.ui.order.OrderActivity
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -31,6 +30,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         initToolbar()
         initPresenter(savedInstanceState)
         initObserve()
+        initView()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -50,8 +50,6 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        binding.rvProducts.adapter = adapter
-        binding.rvProducts.itemAnimator = null
     }
 
     private fun initToolbar() {
@@ -62,18 +60,27 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
+            cartRepository = CartDefaultRepository(
+                localDataSource = CartDefaultLocalDataSource(),
+                remoteDataSource = CartRetrofitDataSource()
+            ),
             savedInstanceState?.getInt(KEY_OFFSET) ?: 0
         )
-        presenter.setUpView()
-
-        binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
     }
 
     private fun initObserve() {
+        observePage()
         observeCheckedCount()
         observeTotalPrice()
         observeAllCheck()
+    }
+
+    private fun observePage() {
+        presenter.page.observe(this) {
+            binding.rvProducts.isVisible = true
+            binding.skeletonLayout.isVisible = false
+            adapter.submitList(it.cartProducts, it.pageUIModel)
+        }
     }
 
     private fun observeCheckedCount() {
@@ -90,8 +97,20 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     private fun observeAllCheck() {
         presenter.allCheck.observe(this) {
-            binding.cartBottom.cbCheckAll.isChecked = it
+            runOnUiThread {
+                binding.cartBottom.cbCheckAll.isChecked = it
+            }
         }
+    }
+
+    private fun initView() {
+        binding.rvProducts.adapter = adapter
+        binding.rvProducts.itemAnimator = null
+
+        binding.cartBottom.onAllCheckClick = presenter::updateItemsCheck
+        binding.cartBottom.tvOrderProduct.setOnClickListener { presenter.processToOrderCheckout() }
+
+        presenter.fetchCartProducts()
     }
 
     private fun getCartListener() = object : CartListener {
@@ -102,10 +121,10 @@ class CartActivity : AppCompatActivity(), CartContract.View {
             presenter.moveToPagePrev()
         }
         override fun onItemRemove(productId: Int) {
-            presenter.removeItem(productId)
+            presenter.updateItemCount(productId, 0)
         }
         override fun onItemClick(product: CartProductUIModel) {
-            presenter.navigateToItemDetail(product.productId)
+            presenter.processToItemDetail(product.productId)
         }
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
@@ -115,14 +134,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel) {
-        binding.rvProducts.isVisible = true
-        binding.skeletonLayout.isVisible = false
-        adapter.submitList(page, pageUIModel)
+    override fun navigateToItemDetail(productId: Int) {
+        startActivity(DetailedProductActivity.getIntent(this, productId))
     }
 
-    override fun navigateToItemDetail(product: ProductUIModel) {
-        startActivity(DetailedProductActivity.getIntent(this, product))
+    override fun navigateToOrderCheckout(cartIds: List<Int>) {
+        startActivity(OrderActivity.getIntent(this, cartIds))
     }
 
     companion object {
