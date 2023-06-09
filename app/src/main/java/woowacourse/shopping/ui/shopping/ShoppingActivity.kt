@@ -1,35 +1,34 @@
 package woowacourse.shopping.ui.shopping
 
-import android.graphics.Rect
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.datasource.remote.product.ProductDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.shoppingcart.ShoppingCartDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.database.cart.CartDBHelper
-import woowacourse.shopping.database.cart.CartDatabase
 import woowacourse.shopping.database.recentProduct.RecentProductDatabase
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.orderhistory.OrderHistoryActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.shopping.contract.ShoppingContract
 import woowacourse.shopping.ui.shopping.contract.presenter.ShoppingPresenter
 import woowacourse.shopping.ui.shopping.viewHolder.ProductsOnClickListener
-import woowacourse.shopping.utils.CustomViewOnClickListener
 
 class ShoppingActivity :
     AppCompatActivity(),
     ShoppingContract.View,
-    ProductsOnClickListener,
-    CustomViewOnClickListener {
+    ProductsOnClickListener {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var presenter: ShoppingContract.Presenter
 
@@ -37,17 +36,19 @@ class ShoppingActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_shopping)
+        binding = ActivityShoppingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                ProductDataSourceImpl(),
+                ProductRemoteDataSourceImpl(),
+                ShoppingCartDataSourceImpl(),
             ),
             RecentProductDatabase(this),
-            CartDatabase(
-                CartDBHelper(this).writableDatabase,
+            CartRepositoryImpl(
+                ShoppingCartDataSourceImpl(),
             ),
         )
 
@@ -61,18 +62,24 @@ class ShoppingActivity :
         actionView?.findViewById<ImageView>(R.id.cartBtn)?.setOnClickListener { navigateToCart() }
         actionView?.findViewById<TextView>(R.id.cartSize)?.let { cartSize = it }
         presenter.updateCountSize()
+        actionView?.findViewById<ImageView>(R.id.historyBtn)
+            ?.setOnClickListener { navigateToHistory() }
         return true
+    }
+
+    private fun navigateToHistory() {
+        startActivity(OrderHistoryActivity.from(this))
     }
 
     override fun onResume() {
         super.onResume()
+        presenter.initProducts()
         presenter.updateProducts()
         presenter.updateCountSize()
     }
 
     private fun initLayoutManager() {
         val layoutManager = GridLayoutManager(this@ShoppingActivity, 2)
-        val spacing = resources.getDimensionPixelSize(R.dimen.item_spacing)
         val spanCount = 2
 
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -84,23 +91,22 @@ class ShoppingActivity :
                 }
             }
         }
-
         binding.productRecyclerview.addItemDecoration(object : RecyclerView.ItemDecoration() {
             override fun getItemOffsets(
-                outRect: Rect,
+                outRect: android.graphics.Rect,
                 view: View,
                 parent: RecyclerView,
                 state: RecyclerView.State,
-            ) { // 1부터 시작
+            ) {
                 val position = parent.getChildAdapterPosition(view)
-                val spanSize = layoutManager.spanSizeLookup.getSpanSize(position)
-
-                if (spanSize != spanCount) {
-                    outRect.left = spacing
-                    outRect.right = spacing
+                val column = position % spanCount + 1
+                val space = 20
+                if (column == spanCount) {
+                    outRect.right = space
                 }
-
-                outRect.top = spacing
+                outRect.top = space
+                outRect.left = space
+                outRect.bottom = space
             }
         })
         binding.productRecyclerview.layoutManager = layoutManager
@@ -108,18 +114,14 @@ class ShoppingActivity :
 
     override fun setProducts(data: List<ProductsItemType>) {
         binding.productRecyclerview.adapter = ProductsAdapter(
-            data,
-            CartDatabase(CartDBHelper(this).writableDatabase),
+            data.toMutableList(),
             this,
             presenter::fetchMoreProducts,
         )
-
-        binding.productRecyclerview.visibility = View.VISIBLE
-        binding.includeShoppingSkeleton.root.visibility = View.GONE
     }
 
-    override fun navigateToProductDetail(product: ProductUIModel, latestProduct: ProductUIModel?) {
-        startActivity(ProductDetailActivity.from(this, product, latestProduct))
+    override fun navigateToProductDetail(id: Long, latestProduct: ProductUIModel?) {
+        startActivity(ProductDetailActivity.from(this, id, latestProduct))
     }
 
     override fun addProducts(data: List<ProductsItemType>) {
@@ -151,12 +153,7 @@ class ShoppingActivity :
     }
 
     override fun onAddCart(id: Long, count: Int) {
-        binding.productRecyclerview.adapter?.let {
-            if (it is ProductsAdapter) {
-                it.updateItemCount(id, count)
-            }
-        }
-        presenter.updateItemCount(id, count)
+        presenter.insertItem(id, count)
     }
 
     override fun increaseCount(id: Long) {
@@ -165,5 +162,11 @@ class ShoppingActivity :
 
     override fun decreaseCount(id: Long) {
         presenter.decreaseCount(id)
+    }
+
+    companion object {
+        fun from(context: Context): Intent {
+            return Intent(context, ShoppingActivity::class.java)
+        }
     }
 }

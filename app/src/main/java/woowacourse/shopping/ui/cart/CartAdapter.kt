@@ -3,12 +3,12 @@ package woowacourse.shopping.ui.cart
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.model.CartProductUIModel
+import woowacourse.shopping.ui.cart.viewHolder.CartClickListener
 import woowacourse.shopping.ui.cart.viewHolder.CartViewHolder
-import woowacourse.shopping.ui.cart.viewHolder.OnCartClickListener
 
 class CartAdapter(
     cartItems: List<CartProductUIModel>,
-    private val onCartClickListener: OnCartClickListener,
+    private val onCartClickListener: CartClickListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
 
     private var cartItems: MutableList<CartProductUIModel> = cartItems.toMutableList()
@@ -34,7 +34,7 @@ class CartAdapter(
 
     fun updateItem(id: Long, count: Int) {
         val index = cartItems.indexOfFirst { it.product.id == id }
-        cartItems[index] = cartItems[index].copy(count = count)
+        cartItems[index] = cartItems[index].copy(quantity = count)
         notifyDataSetChanged()
     }
 

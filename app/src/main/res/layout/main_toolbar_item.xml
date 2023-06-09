@@ -5,16 +5,15 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+
     <ImageView
         android:id="@+id/cartBtn"
         android:layout_width="22dp"
         android:layout_height="17dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_cart"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginEnd="19dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/cartSize"
@@ -25,9 +24,21 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cartBtn"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="4" />
+
+    <ImageView
+        android:id="@+id/historyBtn"
+        android:layout_width="22dp"
+        android:layout_height="17dp"
+        android:layout_marginStart="8dp"
+        android:scaleType="fitXY"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/history"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cartSize"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,30 +3,27 @@ package com.example.domain.repository
 import com.example.domain.model.CartProduct
 
 interface CartRepository {
-    fun getAllProductInCart(
-        onSuccess: (List<CartProduct>) -> Unit,
-        onFailure: (Exception) -> Unit,
-    )
+    fun getAllProductInCart(callback: (List<CartProduct>) -> Unit)
 
     fun insert(
-        cartProduct: CartProduct,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit,
-    )
-
-    fun remove(
         id: Long,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit,
+        quantity: Int,
+        callback: (Unit) -> Unit,
     )
 
     fun updateCount(
         id: Long,
         count: Int,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit,
+        callback: (Unit) -> Unit,
     )
 
-    fun findById(id: Long): CartProduct?
-    fun getSubList(offset: Int, step: Int): List<CartProduct>
+    fun remove(
+        id: Long,
+        callback: (Unit) -> Unit,
+    )
+
+    fun findById(id: Long, callback: (CartProduct?) -> Unit)
+
+    fun findByProductId(productId: Long, callback: (CartProduct?) -> Unit)
+    fun getSubList(offset: Int, step: Int, callback: (List<CartProduct>) -> Unit)
 }

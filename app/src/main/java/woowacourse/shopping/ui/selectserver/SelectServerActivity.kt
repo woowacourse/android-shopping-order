@@ -2,11 +2,16 @@ package woowacourse.shopping.ui.selectserver
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.data.datasource.local.AuthInfoLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.retrofit.RetrofitClient
 import woowacourse.shopping.databinding.ActivitySelectServerBinding
-import woowacourse.shopping.ui.login.LoginActivity
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class SelectServerActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySelectServerBinding
+    private val authInfoLocalDataSourceImpl: AuthInfoLocalDataSourceImpl by lazy {
+        AuthInfoLocalDataSourceImpl.getInstance(this)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySelectServerBinding.inflate(layoutInflater)
@@ -18,24 +23,26 @@ class SelectServerActivity : AppCompatActivity() {
 
     private fun setClickEventOnHongsil() {
         binding.btnSelectServerHongsil.setOnClickListener {
-            navigateToLogin(HONGSIL_SERVER)
+            authInfoLocalDataSourceImpl.getAuthInfo()
+                ?.let { it -> RetrofitClient.getInstance(HONGSIL_SERVER, it) }
+            navigateToShopping()
         }
     }
 
     private fun setClickEventOnMatthew() {
         binding.btnSelectServerMatthew.setOnClickListener {
-            navigateToLogin(MATTHEW_SERVER)
+            authInfoLocalDataSourceImpl.getAuthInfo()
+                ?.let { it -> RetrofitClient.getInstance(MATTHEW_SERVER, it) }
+            navigateToShopping()
         }
     }
 
-    private fun navigateToLogin(serverKey: Int) {
-        val intent = LoginActivity.getIntent(this, serverKey)
-        startActivity(intent)
-        finish()
+    private fun navigateToShopping() {
+        startActivity(ShoppingActivity.from(this))
     }
 
     companion object {
-        private const val HONGSIL_SERVER = 0
-        private const val MATTHEW_SERVER = 1
+        private const val HONGSIL_SERVER = "http://3.36.66.250:8080/"
+        private const val MATTHEW_SERVER = "http://3.36.66.250:8080/"
     }
 }
