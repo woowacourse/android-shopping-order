@@ -15,38 +15,29 @@ class ProductCountView @JvmOverloads constructor(
     private val binding =
         LayoutProductCountViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private val defaultClickListener = object : CountView.OnCountStateChangeListener {
-        override fun onCountChanged(countView: CountView?, count: Int) {
-            updateCountViewVisibility(count)
-        }
+    private val defaultClickListener: (Int) -> Unit = {
+        updateCountViewVisibility(it)
     }
 
-    var countStateChangeListener: CountView.OnCountStateChangeListener = defaultClickListener
+    var countStateChangeListener: (Int) -> Unit = defaultClickListener
         set(value) {
-            binding.countViewProductCount.countStateChangeListener =
-                object : CountView.OnCountStateChangeListener {
-                    override fun onCountChanged(
-                        countView: CountView?,
-                        count: Int,
-                    ) {
-                        updateCountViewVisibility(count)
-
-                        value.onCountChanged(countView, count)
-                    }
-                }
+            binding.countViewProductCount.countStateChangeListener = {
+                updateCountViewVisibility(it)
+                this.countStateChangeListener(it)
+            }
             field = value
         }
 
     init {
         binding.fabProductCount.setOnClickListener {
             binding.countViewProductCount.updateCount(DEFAULT_COUNT)
-            countStateChangeListener.onCountChanged(binding.countViewProductCount, DEFAULT_COUNT)
+            countStateChangeListener(DEFAULT_COUNT)
             updateCountViewVisibility(DEFAULT_COUNT)
         }
         binding.countViewProductCount.visibility = View.GONE
     }
 
-    fun updateCountViewVisibility(count: Int) {
+    private fun updateCountViewVisibility(count: Int) {
         if (count == 0) {
             binding.fabProductCount.visibility = View.VISIBLE
             binding.countViewProductCount.visibility = View.GONE
@@ -54,14 +45,6 @@ class ProductCountView @JvmOverloads constructor(
             binding.fabProductCount.visibility = View.GONE
             binding.countViewProductCount.visibility = View.VISIBLE
         }
-    }
-
-    fun setMinCount(minCount: Int) {
-        binding.countViewProductCount.setMinCount(minCount)
-    }
-
-    fun setMaxCount(maxCount: Int) {
-        binding.countViewProductCount.setMaxCount(maxCount)
     }
 
     fun setCount(count: Int) {

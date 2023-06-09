@@ -9,5 +9,4 @@ data class ProductModel(
     val title: String,
     val price: Int,
     val imageUrl: String,
-    var count: Int = 0,
 ) : Parcelable

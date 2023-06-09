@@ -17,5 +17,9 @@
     <color name="skeleton_background_color">#E2E2E2</color>
     <color name="skeleton_background_cart_color">#F3F3F3</color>
 
+    <color name="order_text_color">#555555</color>
+
+    <color name="button_disabled_color">#AAAAAA</color>
+
     <color name="main_color">#04C09E</color>
 </resources>

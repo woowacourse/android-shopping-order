@@ -1,27 +1,34 @@
 package woowacourse.shopping.presentation.view.cart
 
-import woowacourse.shopping.data.mapper.toEntity
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.presentation.model.CartModel
+import okio.IOException
+import retrofit2.HttpException
+import woowacourse.shopping.R
+import woowacourse.shopping.presentation.mapper.toModel
+import woowacourse.shopping.presentation.mapper.toUIModel
+import woowacourse.shopping.presentation.model.CartProductModel
+import woowacourse.shopping.presentation.model.CartProductsModel
+import woowacouse.shopping.data.repository.cart.CartRepository
+import woowacouse.shopping.model.page.PageNation
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private var currentPage: Int = 1,
 ) : CartContract.Presenter {
-    private val carts = mutableListOf<CartModel>()
+    private lateinit var pageNation: PageNation
 
-    private fun onFailure() {
-        view.handleErrorView()
+    private fun onFailure(throwable: Throwable) {
+        val messageId = when (throwable) {
+            is IOException -> { R.string.toast_message_network_error }
+            is HttpException -> { R.string.toast_message_http_error }
+            else -> { R.string.toast_message_system_error }
+        }
+        view.handleErrorView(messageId)
     }
-
-    private val startPosition: Int
-        get() = (currentPage - 1) * DISPLAY_CART_COUNT_CONDITION
 
     override fun initCartItems() {
         cartRepository.loadAllCarts(::onFailure) {
-            carts.addAll(it.map { cartEntity2 -> cartEntity2.toUIModel() })
+            setPageNation(it.map { cartRemoteEntity -> cartRemoteEntity.toUIModel() }, 1)
+            setEnabledOrder()
             loadLocalCartItemChecked()
             loadCartItems()
             calculateTotalPrice()
@@ -29,97 +36,88 @@ class CartPresenter(
         }
     }
 
-    override fun loadCartItems() {
-        view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)
-        view.setEnableRightButton(carts.size > startPosition + DISPLAY_CART_COUNT_CONDITION)
+    private fun setEnabledOrder() {
+        view.setEnableOrderButton(pageNation.currentItems.isNotEmpty())
+    }
 
-        val newCarts = getCurrentPageCarts()
-        view.setCartItemsView(newCarts)
-        view.setAllCartChecked(isAllChecked())
+    override fun setPageNation(cartProducts: List<CartProductModel>, currentPage: Int) {
+        pageNation = PageNation(
+            CartProductsModel(cartProducts).toModel(),
+            currentPage
+        )
+    }
+
+    override fun loadCartItems() {
+        view.setEnableLeftButton(pageNation.hasPreviousPage())
+        view.setEnableRightButton(pageNation.hasNextPage())
+
+        val newCarts = pageNation.currentItems.map { it.toUIModel() }
+        view.showCartItemsView(newCarts)
+        view.setAllCartChecked(pageNation.isAllChecked)
     }
 
     private fun loadLocalCartItemChecked() {
-        cartRepository.getAllLocalCart().forEach { cart ->
-            val target = carts.find { it.id == cart.id } ?: return@forEach
-            target.checked = cart.checked == 1
+        cartRepository.loadAllCartChecked().forEach { cart ->
+            pageNation = pageNation.updateCartCheckedByCartId(cart.id, cart.checked)
         }
     }
 
-    private fun getCurrentPageCarts(): List<CartModel> {
-        return carts.subList(startPosition, getCurrentPageCartLastIndex())
+    override fun deleteCartItem(cartId: Long) {
+        pageNation = pageNation.deleteCartByCartId(cartId)
+
+        cartRepository.deleteCart(cartId)
+
+        setEnabledOrder()
+        calculateTotalPrice()
+
+        view.setEnableLeftButton(pageNation.hasPreviousPage())
+        view.setEnableRightButton(pageNation.hasNextPage())
+
+        view.showChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 
-    private fun getCurrentPageCartLastIndex(): Int =
-        if (carts.size > startPosition + DISPLAY_CART_COUNT_CONDITION) {
-            startPosition + DISPLAY_CART_COUNT_CONDITION
-        } else {
-            carts.size
-        }
-
-    override fun deleteCartItem(itemId: Long) {
-        carts.removeIf { it.id == itemId }
-        cartRepository.deleteLocalCart(itemId)
-        cartRepository.deleteCart(itemId)
-
-        view.setEnableLeftButton(currentPage != FIRST_PAGE_NUMBER)
-        view.setEnableRightButton(carts.size > startPosition + DISPLAY_CART_COUNT_CONDITION)
-
-        view.setChangedCartItemsView(carts.subList(startPosition, getCurrentPageCartLastIndex()))
+    override fun setPreviousPage() {
+        pageNation = pageNation.previousPage()
+        view.showPageCountView(pageNation.currentPage)
     }
 
-    override fun calculatePreviousPage() {
-        view.setPageCountView(--currentPage)
-    }
-
-    override fun calculateNextPage() {
-        view.setPageCountView(++currentPage)
+    override fun setNextPage() {
+        pageNation = pageNation.nextPage()
+        view.showPageCountView(pageNation.currentPage)
     }
 
     override fun calculateTotalPrice() {
-        val totalPrice = carts.sumOf {
-            if (it.checked) {
-                (it.product.price * it.product.count)
-            } else {
-                0
-            }
-        }
-        view.setTotalPriceView(totalPrice)
+        view.showTotalPriceView(pageNation.totalPrice)
     }
 
     override fun updateProductCount(cartId: Long, count: Int) {
-        val cartModel = carts.find { it.id == cartId } ?: return
-        carts.find { it.id == cartId }?.apply { product.count = count }
-        val cartEntity = cartModel.toEntity()
+        pageNation = pageNation.updateCartCountByCartId(cartId, count)
 
-        cartRepository.updateCartCount(cartEntity, ::onFailure) {
-            if (count == 0) {
-                deleteCartItem(cartId)
+        pageNation.getCartByCartId(cartId)?.let {
+            cartRepository.updateCartCount(it, ::onFailure) {
+                if (count == 0) {
+                    deleteCartItem(cartId)
+                }
+                calculateTotalPrice()
             }
         }
     }
 
     override fun updateProductChecked(cartId: Long, isChecked: Boolean) {
-        carts.find { it.id == cartId }?.run {
-            if (checked == isChecked) return@run
-            checked = isChecked
-            cartRepository.updateLocalCartChecked(id, checked)
-            view.setAllCartChecked(isAllChecked())
-        }
-    }
+        pageNation = pageNation.updateCartCheckedByCartId(cartId, isChecked)
 
-    private fun isAllChecked(): Boolean {
-        return getCurrentPageCarts().all { it.checked }
+        cartRepository.updateCartChecked(cartId, isChecked)
+        calculateTotalPrice()
+        view.setAllCartChecked(pageNation.isAllChecked)
     }
 
     override fun updateCurrentPageAllProductChecked(isChecked: Boolean) {
-        for (index in startPosition until getCurrentPageCartLastIndex()) {
-            updateProductChecked(carts[index].id, isChecked)
-        }
-        view.updateAllChecking(0, DISPLAY_CART_COUNT_CONDITION)
+        pageNation = pageNation.updateAllCartsChecked(isChecked)
+        calculateTotalPrice()
+        view.showChangedCartItemsView(pageNation.currentItems.map { it.toUIModel() })
     }
 
-    companion object {
-        private const val FIRST_PAGE_NUMBER = 1
-        private const val DISPLAY_CART_COUNT_CONDITION = 3
+    override fun showOrder() {
+        view.showOrderView(pageNation.getAllCheckedCartIds())
     }
 }

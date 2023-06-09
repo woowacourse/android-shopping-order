@@ -1,15 +1,16 @@
 package woowacourse.shopping.data.respository.product.source.remote
 
-import woowacourse.shopping.data.model.ProductEntity
+import woowacourse.shopping.data.model.dto.response.ProductResponse
 
 interface ProductRemoteDataSource {
     fun requestDatas(
-        onFailure: () -> Unit,
-        onSuccess: (products: List<ProductEntity>) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
+        onSuccess: (products: List<ProductResponse>) -> Unit,
     )
+
     fun requestData(
         productId: Long,
-        onFailure: () -> Unit,
-        onSuccess: (products: ProductEntity) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
+        onSuccess: (products: ProductResponse) -> Unit,
     )
 }

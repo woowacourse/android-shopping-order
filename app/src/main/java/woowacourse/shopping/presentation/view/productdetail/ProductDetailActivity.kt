@@ -10,11 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
-import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
@@ -34,7 +30,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         intent.getParcelableCompat(KEY_RECENT_PRODUCT)
     }
 
-    private lateinit var server: Server
+    private lateinit var url: Server.Url
 
     private lateinit var presenter: ProductDetailContract.Presenter
 
@@ -45,10 +41,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
         supportActionBar?.title = ACTION_BAR_TITLE
 
-        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
 
         setPresenter()
-
+        presenter.setProduct(productId)
         presenter.loadLastRecentProductInfo(recentProduct)
         setAddCart()
         setLastRecentProduct()
@@ -69,34 +65,31 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
         presenter = ProductDetailPresenter(
             this,
-            productId = productId,
-            productRepository = ProductRepositoryImpl(productRemoteDataSource),
-            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
+            productRepository = repositoryFactory.productRepository,
+            cartRepository = repositoryFactory.cartRepository
         )
     }
 
-    override fun setVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel) {
+    override fun showVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel) {
         binding.recentProduct = recentProduct
 
         binding.clLastProductInfo.visibility = View.VISIBLE
     }
 
-    override fun setGoneOfLastRecentProductInfoView() {
+    override fun hideLastRecentProductInfoView() {
         binding.clLastProductInfo.visibility = View.GONE
     }
 
-    override fun setProductInfoView(productModel: ProductModel) {
+    override fun showProductInfoView(productModel: ProductModel) {
         binding.product = productModel
     }
 
     private fun setLastRecentProduct() {
         binding.clLastProductInfo.setOnClickListener {
-            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, server)
+            val intent = createIntent(this, recentProduct?.product?.id ?: -1, null, url)
             startActivity(intent)
             finish()
         }
@@ -110,7 +103,7 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
     override fun showCountView(productModel: ProductModel) {
         CartInsertionDialog(this, productModel) { count ->
-            presenter.addCart(count)
+            presenter.addCart(productModel.id, count)
         }
     }
 
@@ -120,9 +113,9 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(messageId: Int) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(getString(messageId))
         }
     }
 
@@ -139,11 +132,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
             context: Context,
             id: Long,
             recentProduct: RecentProductModel?,
-            server: Server,
+            url: Server.Url
         ): Intent {
             val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra(KEY_PRODUCT_ID, id)
-            intent.putExtra(KEY_SERVER_SERVER, server)
+            intent.putExtra(KEY_SERVER_SERVER, url)
 
             recentProduct?.let { intent.putExtra(KEY_RECENT_PRODUCT, it) }
 

@@ -1,30 +1,33 @@
 package woowacourse.shopping.presentation.view.cart
 
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 
 interface CartContract {
     interface View {
-        fun setCartItemsView(carts: List<CartModel>)
-        fun setChangedCartItemsView(carts: List<CartModel>)
         fun setEnableLeftButton(isEnabled: Boolean)
         fun setEnableRightButton(isEnabled: Boolean)
+        fun setEnableOrderButton(isEnabled: Boolean)
         fun setAllCartChecked(isChecked: Boolean)
-        fun setPageCountView(page: Int)
-        fun setTotalPriceView(totalPrice: Int)
-        fun updateAllChecking(startPosition: Int, count: Int)
         fun setLayoutVisibility()
-        fun handleErrorView()
+        fun showCartItemsView(carts: List<CartProductModel>)
+        fun showChangedCartItemsView(carts: List<CartProductModel>)
+        fun showPageCountView(page: Int)
+        fun showTotalPriceView(totalPrice: Int)
+        fun showOrderView(cartIds: ArrayList<Long>)
+        fun handleErrorView(messageId: Int)
     }
 
     interface Presenter {
         fun initCartItems()
+        fun setPageNation(cartProducts: List<CartProductModel>, currentPage: Int)
         fun loadCartItems()
-        fun deleteCartItem(itemId: Long)
-        fun calculatePreviousPage()
-        fun calculateNextPage()
+        fun deleteCartItem(cartId: Long)
+        fun setPreviousPage()
+        fun setNextPage()
         fun calculateTotalPrice()
         fun updateProductCount(cartId: Long, count: Int)
         fun updateProductChecked(cartId: Long, isChecked: Boolean)
         fun updateCurrentPageAllProductChecked(isChecked: Boolean)
+        fun showOrder()
     }
 }

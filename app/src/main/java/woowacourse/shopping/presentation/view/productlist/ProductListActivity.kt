@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -12,18 +13,13 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
-import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
-import woowacourse.shopping.data.respository.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.cart.CartActivity
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.view.productlist.adpater.MoreProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAdapter
@@ -37,7 +33,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
     private lateinit var binding: ActivityProductListBinding
     private lateinit var toolbarCartBinding: LayoutToolbarCartBinding
 
-    private lateinit var server: Server
+    private lateinit var url: Server.Url
 
     private lateinit var presenter: ProductContract.Presenter
 
@@ -100,7 +96,9 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product_list)
         toolbarCartBinding = LayoutToolbarCartBinding.inflate(layoutInflater)
 
-        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+
+        binding.rvProductList.itemAnimator = null
 
         setPresenter()
         initLayoutManager()
@@ -119,16 +117,23 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_order_list -> {
+                startActivity(OrderListActivity.createIntent(this, url))
+            }
+        }
+        return true
+    }
+
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
-        val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, server)
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
+
         presenter = ProductListPresenter(
             this,
-            productRepository = ProductRepositoryImpl(productRemoteDataSource),
-            cartRepository = CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductLocalDataSource),
+            productRepository = repositoryFactory.productRepository,
+            cartRepository = repositoryFactory.cartRepository,
+            recentProductRepository = repositoryFactory.recentProductRepository
         )
     }
 
@@ -144,7 +149,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         }
     }
 
-    override fun setGoneToolbarCartCountView() {
+    override fun hideGoneToolbarCartCountView() {
         toolbarCartBinding.tvToolbarCartCount.post {
             toolbarCartBinding.tvToolbarCartCount.visibility = View.GONE
         }
@@ -178,14 +183,16 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding.rvProductList.layoutManager = layoutManager
     }
 
-    override fun setProductItemsView(products: List<ProductModel>) {
+    override fun showProductItemsView(cartProducts: List<CartProductModel>) {
         binding.rvProductList.post {
-            productListAdapter.setItems(products)
+            productListAdapter.setItems(cartProducts)
         }
     }
 
-    override fun setRecentProductItemsView(recentProducts: List<RecentProductModel>) {
-        recentProductListAdapter.setItems(recentProducts)
+    override fun showRecentProductItemsView(recentProducts: List<RecentProductModel>) {
+        binding.rvProductList.post {
+            recentProductListAdapter.setItems(recentProducts)
+        }
     }
 
     private fun setConcatAdapter() {
@@ -196,17 +203,18 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         val recentProduct = presenter.getLastRecentProductItem(0)
         presenter.saveRecentProduct(productId)
 
-        val intent = ProductDetailActivity.createIntent(this, productId, recentProduct, server)
+        val intent =
+            ProductDetailActivity.createIntent(this, productId, recentProduct, url)
         recentProductResultLauncher.launch(intent)
     }
 
     override fun moveToCartView() {
-        cartResultLauncher.launch(CartActivity.createIntent(this, server))
+        cartResultLauncher.launch(CartActivity.createIntent(this, url))
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(messageId: Int) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(getString(messageId))
         }
     }
 
@@ -228,7 +236,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         private const val KEY_STATE_LAST_SCROLL = "KEY_STATE_LAST_SCROLL"
         internal const val KEY_SERVER_SERVER = "KEY_SERVER_SERVER"
 
-        fun createIntent(context: Context, server: Server): Intent {
+        fun createIntent(context: Context, server: Server.Url): Intent {
             val intent = Intent(context, ProductListActivity::class.java)
             intent.putExtra(KEY_SERVER_SERVER, server)
             return intent

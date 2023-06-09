@@ -4,6 +4,7 @@
     <string name="product_detail_button_text">장바구니 담기</string>
     <string name="product_list_recent_product_title">최근 본 상품</string>
 
+    <string name="main_radio_button_text_krrong">크롱 로그인</string>
     <string name="main_button_text_tori">토리 서버</string>
     <string name="main_button_text_jenna">제나 서버</string>
     <string name="main_button_text_poi">포이 서버</string>
@@ -12,19 +13,52 @@
     <string name="cart_default_page_text">1</string>
     <string name="cart_button_order_text">주문하기</string>
 
+    <string name="order_product_title_info_text">상품 목록</string>
+    <string name="order_point_title_info_text">포인트 사용</string>
+    <string name="order_available_point_title_info_text">가용 포인트</string>
+    <string name="order_use_point_title_info_text">사용</string>
+    <string name="order_payment_title_info_text">결제 방법</string>
+    <string name="order_payment_detail_title_info_text">결제 상세</string>
+    <string name="order_payment_detail_order_price_title_info_text">주문 금액</string>
+    <string name="order_payment_detail_use_point_title_info_text">포인트 사용</string>
+    <string name="order_payment_detail_total_price_title_info_text">총 결제 금액</string>
+    <string name="order_point_benefit_title_info_text">포인트 혜택</string>
+    <string name="order_point_save_title_info_text">적립 포인트</string>
+    <string name="order_pay_button_text">결제하기</string>
+
+    <string name="order_detail_date_title_info_text">주문 날짜</string>
+    <string name="order_detail_product_list_title_info_text">상품 목록</string>
+    <string name="order_detail_payment_title_info_text">결제 상세</string>
+    <string name="order_detail_payment_order_price_title_info_text">주문 금액</string>
+    <string name="order_detail_payment_use_point_title_info_text">포인트 사용</string>
+    <string name="order_detail_payment_save_point_title_info_text">포인트 적립</string>
+    <string name="order_detail_payment_total_price_title_info_text">결제 금액</string>
+
+    <string name="order_list_item_order_detail_text">주문 상세</string>
+
     <string name="layout_count_view_minus_text">－</string>
     <string name="layout_count_view_plus_text">＋</string>
 
     <string name="layout_cart_dialog_button_text">담기</string>
 
     <string name="product_price_format">%,d원</string>
+    <string name="product_count_format">%d개</string>
 
+    <string name="toolbar_item_order_list">주문 내역</string>
     <string name="toolbar_item_cart">장바구니</string>
     <string name="toolbar_item_close">닫기</string>
     <string name="toolbar_title_cart">Cart</string>
+    <string name="toolbar_title_order">Order</string>
+    <string name="toolbar_title_order_detail">Order Detail</string>
+    <string name="toolbar_title_order_list">Order List</string>
 
     <string name="toast_message_success_add_cart">장바구니에 담았습니다.</string>
+    <string name="toast_message_wrong_approach">잘못된 접근입니다. 다시 시도 해주세요.</string>
     <string name="toast_message_system_error">시스템 오류가 발생했습니다. 다시 시도 해주세요.</string>
+    <string name="toast_message_network_error">네트워크 상태를 확인해주세요.</string>
+    <string name="toast_message_http_error">통신에 실패했습니다. 다시 시도 해주세요.</string>
+
     <string name="product_detail_price_info">금액</string>
     <string name="item_product_list_more_text">더보기</string>
+    <string name="main_radio_button_text_sunny">써니 로그인</string>
 </resources>

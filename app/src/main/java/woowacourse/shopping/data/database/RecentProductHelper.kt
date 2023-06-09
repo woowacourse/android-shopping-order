@@ -11,13 +11,13 @@ class RecentProductHelper(
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        Server.values().forEach { server ->
+        Server.Url.values().forEach { server ->
             db.execSQL(RecentProductContract.getCreateSQL(server))
         }
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        Server.values().forEach { server ->
+        Server.Url.values().forEach { server ->
             db.execSQL(RecentProductContract.getDropSQL(server))
         }
         onCreate(db)

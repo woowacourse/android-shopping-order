@@ -5,18 +5,18 @@ import woowacourse.shopping.presentation.model.RecentProductModel
 
 interface ProductDetailContract {
     interface View {
-        fun setVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel)
-        fun setGoneOfLastRecentProductInfoView()
-        fun setProductInfoView(productModel: ProductModel)
+        fun showVisibleOfLastRecentProductInfoView(recentProduct: RecentProductModel)
+        fun showProductInfoView(productModel: ProductModel)
         fun showCountView(productModel: ProductModel)
-        fun handleErrorView()
+        fun hideLastRecentProductInfoView()
+        fun handleErrorView(messageId: Int)
         fun addCartSuccessView()
         fun exitProductDetailView()
     }
     interface Presenter {
+        fun setProduct(productId: Long)
         fun loadLastRecentProductInfo(recentProduct: RecentProductModel?)
-        fun loadProductInfo()
-        fun addCart(count: Int)
+        fun addCart(productId: Long, count: Int)
         fun showCount()
     }
 }

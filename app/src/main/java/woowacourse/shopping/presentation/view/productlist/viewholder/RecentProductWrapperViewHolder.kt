@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemRecentProductWrapperBinding
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductListAdapter
@@ -19,6 +20,7 @@ class RecentProductWrapperViewHolder(
     private val binding = ItemRecentProductWrapperBinding.bind(itemView)
 
     init {
+        setRecyclerViewAnimator()
         binding.rvRecentProductList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 onScrolled(recyclerView.computeHorizontalScrollOffset())
@@ -30,6 +32,13 @@ class RecentProductWrapperViewHolder(
     fun bind(lastScrollX: Int) {
         binding.rvRecentProductList.doOnLayout {
             binding.rvRecentProductList.scrollBy(lastScrollX, 0)
+        }
+    }
+
+    private fun setRecyclerViewAnimator() {
+        val animator = binding.rvRecentProductList.itemAnimator
+        if (animator is SimpleItemAnimator) {
+            animator.supportsChangeAnimations = false
         }
     }
 }

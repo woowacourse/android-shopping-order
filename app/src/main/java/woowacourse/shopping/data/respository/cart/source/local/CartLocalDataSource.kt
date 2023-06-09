@@ -1,10 +1,11 @@
 package woowacourse.shopping.data.respository.cart.source.local
 
-import woowacourse.shopping.data.model.CartLocalEntity
+import woowacouse.shopping.model.cart.CartProduct
 
 interface CartLocalDataSource {
     fun insertCart(cartId: Long)
     fun deleteCart(cartId: Long)
+    fun deleteCarts(cartIds: List<Long>)
     fun updateCartChecked(cartId: Long, isChecked: Boolean)
-    fun selectAllCarts(): List<CartLocalEntity>
+    fun selectAllCarts(): List<CartProduct>
 }

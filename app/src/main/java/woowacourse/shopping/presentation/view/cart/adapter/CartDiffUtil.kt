@@ -1,11 +1,11 @@
 package woowacourse.shopping.presentation.view.cart.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 
 class CartDiffUtil(
-    private val oldItems: List<CartModel>,
-    private val newItems: List<CartModel>,
+    private val oldItems: List<CartProductModel>,
+    private val newItems: List<CartProductModel>,
 ) : DiffUtil.Callback() {
     override fun getOldListSize(): Int = oldItems.size
 

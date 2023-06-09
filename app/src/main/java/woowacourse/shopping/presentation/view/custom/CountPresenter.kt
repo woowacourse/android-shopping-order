@@ -14,24 +14,24 @@ class CountPresenter(private val view: CountContract.View) : CountContract.Prese
     init {
         view.setMinusButton()
         view.setPlusButton()
-        view.setCountTextView(count)
+        view.showCountTextView(count)
     }
 
     override fun updateCount(count: Int) {
         this.count = count
-        view.setCountTextView(count)
+        view.showCountTextView(count)
     }
 
     override fun getCount(): Int = count
 
     override fun updateMinusCount() {
         count = count.dec().coerceAtLeast(minCountValue)
-        view.setCountTextView(count)
+        view.showCountTextView(count)
     }
 
     override fun updatePlusCount() {
         count = count.inc().coerceAtMost(maxCountValue)
-        view.setCountTextView(count)
+        view.showCountTextView(count)
     }
 
     companion object {

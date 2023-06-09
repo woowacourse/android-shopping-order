@@ -1,23 +1,24 @@
 package woowacourse.shopping.data.respository.cart.source.remote
 
-import woowacourse.shopping.data.model.CartRemoteEntity
+import woowacourse.shopping.data.model.dto.response.CartResponse
+import woowacouse.shopping.model.cart.CartProduct
 
 interface CartRemoteDataSource {
     fun requestDatas(
-        onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
+        onSuccess: (products: List<CartResponse>) -> Unit,
     )
 
     fun requestPatchCartItem(
-        cartEntity: CartRemoteEntity,
-        onFailure: () -> Unit,
+        cartProduct: CartProduct,
+        onFailure: (throwable: Throwable) -> Unit,
         onSuccess: () -> Unit,
     )
 
     fun requestPostCartItem(
         productId: Long,
-        onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onFailure: (throwable: Throwable) -> Unit,
+        onSuccess: (Long) -> Unit,
     )
 
     fun requestDeleteCartItem(cartId: Long)

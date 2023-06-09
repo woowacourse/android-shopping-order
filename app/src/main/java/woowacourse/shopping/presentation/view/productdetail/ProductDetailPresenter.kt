@@ -1,82 +1,79 @@
 package woowacourse.shopping.presentation.view.productdetail
 
-import woowacourse.shopping.data.mapper.toUIModel
-import woowacourse.shopping.data.respository.cart.CartRepository
-import woowacourse.shopping.data.respository.product.ProductRepository
+import okio.IOException
+import retrofit2.HttpException
+import woowacourse.shopping.R
+import woowacourse.shopping.presentation.mapper.toUIModel
 import woowacourse.shopping.presentation.model.ProductModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacouse.shopping.data.repository.cart.CartRepository
+import woowacouse.shopping.data.repository.product.ProductRepository
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
-    productId: Long,
-    productRepository: ProductRepository,
+    private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
     private lateinit var product: ProductModel
 
-    init {
-        productRepository.loadDataById(productId, ::onFailure) { productEntity ->
-            product = productEntity.toUIModel()
+    override fun setProduct(productId: Long) {
+        productRepository.loadDataById(productId, ::onFailure) { product ->
+            this.product = product.toUIModel()
             loadProductInfo()
         }
     }
 
-    private fun onFailure() {
-        view.handleErrorView()
+    private fun onFailure(throwable: Throwable) {
+        val messageId = when (throwable) {
+            is IOException -> { R.string.toast_message_network_error }
+            is HttpException -> { R.string.toast_message_http_error }
+            else -> { R.string.toast_message_system_error }
+        }
+        view.handleErrorView(messageId)
+    }
+
+    private fun loadProductInfo() {
+        if (product.id == UNABLE_ID) {
+            view.handleErrorView(R.string.toast_message_wrong_approach)
+            view.exitProductDetailView()
+            return
+        }
+        view.showProductInfoView(product)
     }
 
     override fun loadLastRecentProductInfo(recentProduct: RecentProductModel?) {
         if (recentProduct == null || recentProduct.id == UNABLE_ID) {
-            view.setGoneOfLastRecentProductInfoView()
+            view.hideLastRecentProductInfoView()
             return
         }
-        view.setVisibleOfLastRecentProductInfoView(recentProduct)
+        view.showVisibleOfLastRecentProductInfoView(recentProduct)
     }
 
-    override fun loadProductInfo() {
-        if (product.id == UNABLE_ID) {
-            view.handleErrorView()
-            view.exitProductDetailView()
-            return
-        }
-        view.setProductInfoView(product)
-    }
-
-    override fun addCart(count: Int) {
+    override fun addCart(productId: Long, count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
+            val cartProduct = carts.find { cartProduct -> cartProduct.product.id == productId }
             if (cartProduct == null) {
-                cartRepository.addCartProduct(product.id, ::onFailure) {
-                    if (count == UPDATE_COUNT_CONDITION) {
+                cartRepository.addCartProduct(productId, ::onFailure) { cartId ->
+
+                    view.addCartSuccessView()
+                    view.exitProductDetailView()
+
+                    if (count > UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
-                            val reCartProduct =
-                                reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
-                                    ?: return@loadAllCarts
-
-                            cartRepository.addLocalCart(reCartProduct.id)
-                        }
-
-                        view.addCartSuccessView()
-                        view.exitProductDetailView()
-                        return@addCartProduct
-                    }
-
-                    cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
-                        val reCartProduct =
-                            reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
-                                ?: return@loadAllCarts
-
-                        val newCartProduct = reCartProduct.copy(quantity = count)
-                        cartRepository.updateCartCount(newCartProduct, ::onFailure) {
-                            view.addCartSuccessView()
-                            view.exitProductDetailView()
+                            reLoadCarts.find { cartProduct -> cartProduct.id == cartId }?.let {
+                                val newCartProduct = it.copy(count = count)
+                                cartRepository.updateCartCount(newCartProduct, ::onFailure) {
+                                    view.addCartSuccessView()
+                                    view.exitProductDetailView()
+                                }
+                            }
                         }
                     }
                 }
             }
 
             cartProduct?.let { cart ->
-                val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
+                val newCartProduct = cart.updateCount(cart.count + count)
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()

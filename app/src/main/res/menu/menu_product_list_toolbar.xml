@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_order_list"
+        android:title="@string/toolbar_item_order_list"
+        android:icon="@drawable/ic_order_list"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/action_cart"
         android:title="@string/toolbar_item_cart"

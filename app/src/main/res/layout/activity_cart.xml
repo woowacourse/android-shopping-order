@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="totalPrice"
             type="java.lang.Integer" />
@@ -16,9 +17,9 @@
 
         <include
             android:id="@+id/layout_skeleton_cart_list"
+            layout="@layout/layout_skeleton_cart_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            layout="@layout/layout_skeleton_cart_list" />
+            android:layout_height="match_parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
@@ -36,9 +37,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="25dp"
-            android:visibility="gone"
             android:gravity="center"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/cl_cart_bottom_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -67,12 +68,12 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:visibility="gone"
-
             android:id="@+id/cl_cart_bottom_container"
+
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/cart_bottom_container_color"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -96,6 +97,7 @@
 
             <TextView
                 android:id="@+id/tv_cart_list_total_price"
+                setPrice="@{totalPrice}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="12dp"
@@ -103,7 +105,6 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                setPrice="@{totalPrice}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/bt_cart_order"
                 app:layout_constraintStart_toEndOf="@id/cb_cart_all"
@@ -114,7 +115,7 @@
                 android:id="@+id/bt_cart_order"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/main_color"
+                android:background="@drawable/drawable_button_enabled"
                 android:text="@string/cart_button_order_text"
                 android:textColor="@color/white"
                 android:textSize="18sp"

@@ -10,12 +10,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.SimpleItemAnimator
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Server
-import woowacourse.shopping.data.respository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.respository.RepositoryFactory
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.model.CartModel
+import woowacourse.shopping.presentation.model.CartProductModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -23,7 +22,7 @@ import woowacourse.shopping.presentation.view.util.showToast
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
 
-    private lateinit var server: Server
+    private lateinit var url: Server.Url
 
     private lateinit var cartAdapter: CartAdapter
 
@@ -32,17 +31,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private val cartProductListener = object : CartProductListener {
         override fun onCheckChanged(cartId: Long, checked: Boolean) {
             presenter.updateProductChecked(cartId, checked)
-            presenter.calculateTotalPrice()
         }
 
         override fun onCountClick(cartId: Long, count: Int) {
             presenter.updateProductCount(cartId, count)
-            presenter.calculateTotalPrice()
         }
 
         override fun onDeleteClick(cartId: Long) {
             presenter.deleteCartItem(cartId)
-            presenter.calculateTotalPrice()
         }
     }
 
@@ -52,7 +48,7 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
 
-        server = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
+        url = intent.getSerializableCompat(KEY_SERVER_SERVER) ?: return finish()
 
         setPresenter()
         setSupportActionBar()
@@ -60,15 +56,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
-        setAllProduceCheckedClick()
+        setOrderButtonClick()
+        setAllProductCheckedClick()
     }
 
     private fun setPresenter() {
-        val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(server)
+        val repositoryFactory = RepositoryFactory.getInstance(this, url)
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSourceImpl),
+            repositoryFactory.cartRepository
         )
     }
 
@@ -93,14 +89,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun setCartItemsView(carts: List<CartModel>) {
+    override fun showCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter = CartAdapter(carts, cartProductListener)
             binding.rvCart.adapter = cartAdapter
         }
     }
 
-    override fun setChangedCartItemsView(carts: List<CartModel>) {
+    override fun showChangedCartItemsView(carts: List<CartProductModel>) {
         binding.rvCart.post {
             cartAdapter.updateList(carts)
         }
@@ -118,44 +114,56 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    override fun setEnableOrderButton(isEnabled: Boolean) {
+        binding.btCartListPageRight.post {
+            binding.btCartOrder.isEnabled = isEnabled
+        }
+    }
+
     private fun setLeftButtonClick() {
         binding.btCartListPageLeft.setOnClickListener {
-            presenter.calculatePreviousPage()
+            presenter.setPreviousPage()
             presenter.loadCartItems()
         }
     }
 
     private fun setRightButtonClick() {
         binding.btCartListPageRight.setOnClickListener {
-            presenter.calculateNextPage()
+            presenter.setNextPage()
             presenter.loadCartItems()
         }
     }
 
-    private fun setAllProduceCheckedClick() {
-        binding.cbCartAll.setOnCheckedChangeListener { _, isChecked ->
-            presenter.updateCurrentPageAllProductChecked(isChecked)
-            presenter.calculateTotalPrice()
+    private fun setOrderButtonClick() {
+        binding.btCartOrder.setOnClickListener {
+            presenter.showOrder()
         }
     }
 
-    override fun updateAllChecking(startPosition: Int, count: Int) {
-        cartAdapter.updateAllChecking(startPosition, count)
+    override fun showOrderView(cartIds: ArrayList<Long>) {
+        val intent = OrderActivity.createIntent(this, cartIds, url)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun setAllProductCheckedClick() {
+        binding.cbCartAll.setOnCheckedChangeListener { view, isChecked ->
+            if (view.isPressed.not()) return@setOnCheckedChangeListener
+            presenter.updateCurrentPageAllProductChecked(isChecked)
+        }
     }
 
     override fun setAllCartChecked(isChecked: Boolean) {
         binding.cbCartAll.post {
-            binding.cbCartAll.setOnCheckedChangeListener { _, _ -> }
             binding.cbCartAll.isChecked = isChecked
-            setAllProduceCheckedClick()
         }
     }
 
-    override fun setPageCountView(page: Int) {
+    override fun showPageCountView(page: Int) {
         binding.tvCartListPageCount.text = page.toString()
     }
 
-    override fun setTotalPriceView(totalPrice: Int) {
+    override fun showTotalPriceView(totalPrice: Int) {
         binding.totalPrice = totalPrice
     }
 
@@ -174,16 +182,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
-    override fun handleErrorView() {
+    override fun handleErrorView(messageId: Int) {
         binding.root.post {
-            showToast(getString(R.string.toast_message_system_error))
+            showToast(getString(messageId))
         }
     }
 
     companion object {
-        fun createIntent(context: Context, server: Server): Intent {
+        fun createIntent(context: Context, url: Server.Url): Intent {
             val intent = Intent(context, CartActivity::class.java)
-            intent.putExtra(KEY_SERVER_SERVER, server)
+            intent.putExtra(KEY_SERVER_SERVER, url)
             return intent
         }
     }

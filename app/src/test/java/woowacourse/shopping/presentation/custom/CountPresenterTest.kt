@@ -27,7 +27,7 @@ class CountPresenterTest {
         presenter.updateCount(count)
 
         val slot = slot<Int> ()
-        justRun { view.setCountTextView(capture(slot)) }
+        justRun { view.showCountTextView(capture(slot)) }
 
         // when
         presenter.updateMinusCount()
@@ -36,7 +36,7 @@ class CountPresenterTest {
         val actual = slot.captured
         val expected = 1
         assertEquals(expected, actual)
-        verify { view.setCountTextView(actual) }
+        verify { view.showCountTextView(actual) }
     }
 
     @Test
@@ -46,7 +46,7 @@ class CountPresenterTest {
         presenter.updateCount(count)
 
         val slot = slot<Int> ()
-        justRun { view.setCountTextView(capture(slot)) }
+        justRun { view.showCountTextView(capture(slot)) }
 
         // when
         presenter.updateMinusCount()
@@ -55,7 +55,7 @@ class CountPresenterTest {
         val actual = slot.captured
         val expected = 0
         assertEquals(expected, actual)
-        verify { view.setCountTextView(actual) }
+        verify { view.showCountTextView(actual) }
     }
 
     @Test
@@ -65,7 +65,7 @@ class CountPresenterTest {
         presenter.updateCount(count)
 
         val slot = slot<Int> ()
-        justRun { view.setCountTextView(capture(slot)) }
+        justRun { view.showCountTextView(capture(slot)) }
 
         // when
         presenter.updatePlusCount()
@@ -74,7 +74,7 @@ class CountPresenterTest {
         val actual = slot.captured
         val expected = 2
         assertEquals(expected, actual)
-        verify { view.setCountTextView(actual) }
+        verify { view.showCountTextView(actual) }
     }
 
     @Test
@@ -84,7 +84,7 @@ class CountPresenterTest {
         presenter.updateCount(count)
 
         val slot = slot<Int> ()
-        justRun { view.setCountTextView(capture(slot)) }
+        justRun { view.showCountTextView(capture(slot)) }
 
         // when
         presenter.updatePlusCount()
@@ -93,6 +93,6 @@ class CountPresenterTest {
         val actual = slot.captured
         val expected = 99
         assertEquals(expected, actual)
-        verify { view.setCountTextView(actual) }
+        verify { view.showCountTextView(actual) }
     }
 }
