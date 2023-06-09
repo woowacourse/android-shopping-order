@@ -1,11 +1,11 @@
 package woowacourse.shopping.presentation.view.productlist
 
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
 interface ProductContract {
     interface View {
-        fun setProductItemsView(products: List<ProductModel>)
+        fun setProductItemsView(products: List<CartModel>)
         fun setRecentProductItemsView(recentProducts: List<RecentProductModel>)
         fun setVisibleToolbarCartCountView()
         fun setGoneToolbarCartCountView()

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -21,15 +22,17 @@ import woowacourse.shopping.data.respository.recentproduct.RecentProductReposito
 import woowacourse.shopping.data.respository.recentproduct.source.local.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.databinding.LayoutToolbarCartBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 import woowacourse.shopping.presentation.view.cart.CartActivity
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productdetail.ProductDetailActivity
 import woowacourse.shopping.presentation.view.productlist.adpater.MoreProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductListAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.RecentProductWrapperAdapter
 import woowacourse.shopping.presentation.view.productlist.adpater.ViewType
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -119,10 +122,19 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_order -> moveToOrderListView()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val retrofit = RetrofitUtil(server).createRetrofit()
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofit)
+
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         val recentProductLocalDataSource = RecentProductLocalDataSourceImpl(this, server)
         presenter = ProductListPresenter(
             this,
@@ -178,7 +190,7 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
         binding.rvProductList.layoutManager = layoutManager
     }
 
-    override fun setProductItemsView(products: List<ProductModel>) {
+    override fun setProductItemsView(products: List<CartModel>) {
         binding.rvProductList.post {
             productListAdapter.setItems(products)
         }
@@ -202,6 +214,11 @@ class ProductListActivity : AppCompatActivity(), ProductContract.View {
 
     override fun moveToCartView() {
         cartResultLauncher.launch(CartActivity.createIntent(this, server))
+    }
+
+    private fun moveToOrderListView() {
+        val intent = OrderListActivity.createIntent(this, server)
+        startActivity(intent)
     }
 
     override fun handleErrorView() {

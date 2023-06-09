@@ -17,7 +17,7 @@ interface CartRemoteDataSource {
     fun requestPostCartItem(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (cartId: Long) -> Unit,
     )
 
     fun requestDeleteCartItem(cartId: Long)

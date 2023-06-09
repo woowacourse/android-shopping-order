@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,10 @@ import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSo
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.order.OrderActivity
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
 
@@ -60,15 +64,18 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         presenter.initCartItems()
         setLeftButtonClick()
         setRightButtonClick()
+        setOrderButtonClick()
         setAllProduceCheckedClick()
     }
 
     private fun setPresenter() {
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSourceImpl = CartRemoteDataSourceImpl(server)
+
+        val retrofit = RetrofitUtil(server).createRetrofit()
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSourceImpl),
+            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource),
         )
     }
 
@@ -77,11 +84,15 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         supportActionBar?.title = getString(R.string.toolbar_title_cart)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_product_list_toolbar, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-            }
+            android.R.id.home -> finish()
+            R.id.action_order -> moveToOrderListView()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -132,6 +143,12 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         }
     }
 
+    private fun setOrderButtonClick() {
+        binding.btCartOrder.setOnClickListener {
+            presenter.order()
+        }
+    }
+
     private fun setAllProduceCheckedClick() {
         binding.cbCartAll.setOnCheckedChangeListener { _, isChecked ->
             presenter.updateCurrentPageAllProductChecked(isChecked)
@@ -172,6 +189,16 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         binding.clCartBottomContainer.post {
             binding.clCartBottomContainer.visibility = View.VISIBLE
         }
+    }
+
+    override fun moveToOrderView(cartItems: List<CartModel>) {
+        val intent = OrderActivity.createIntent(this, cartItems, server)
+        startActivity(intent)
+    }
+
+    private fun moveToOrderListView() {
+        val intent = OrderListActivity.createIntent(this, server)
+        startActivity(intent)
     }
 
     override fun handleErrorView() {

@@ -18,6 +18,7 @@
     <string name="layout_cart_dialog_button_text">담기</string>
 
     <string name="product_price_format">%,d원</string>
+    <string name="product_count_format">%,d개</string>
 
     <string name="toolbar_item_cart">장바구니</string>
     <string name="toolbar_item_close">닫기</string>
@@ -25,6 +26,31 @@
 
     <string name="toast_message_success_add_cart">장바구니에 담았습니다.</string>
     <string name="toast_message_system_error">시스템 오류가 발생했습니다. 다시 시도 해주세요.</string>
+    <string name="toast_message_point_error">사용가능한 포인트를 초과했습니다.</string>
+
     <string name="product_detail_price_info">금액</string>
     <string name="item_product_list_more_text">더보기</string>
+    <string name="toolbar_item_order">주문목록</string>
+    <string name="order_detail">주문상세</string>
+    <string name="order_product_title_info_text">주문상품</string>
+    <string name="order_available_point_info_text">보유</string>
+    <string name="order_use_point_title_info_text">사용</string>
+    <string name="order_payment_title_info_text">결제수단</string>
+    <string name="order_payment_detail_title_info_text">주문금액</string>
+    <string name="order_payment_detail_order_price_title_info_text">총 금액</string>
+    <string name="order_payment_detail_total_price_title_info_text">최종 금액</string>
+    <string name="order_point_benefit_title_info_text">포인트</string>
+    <string name="order_point_save_title_info_text">예상 적립 포인트</string>
+    <string name="order_pay_button_text">주문하기</string>
+    <string name="order_payment_detail_use_point_title_info_text">사용 포인트</string>
+
+    <string name="point_format">%d포인트</string>
+    <string name="order_detail_date_title_info_text">주문날짜</string>
+    <string name="order_detail_product_list_title_info_text">상품목록</string>
+    <string name="order_detail_price_detail_title_info_text">결제상세</string>
+    <string name="order_detail_order_used_point_info_text">포인트 사용</string>
+    <string name="order_detail_order_saved_point_info_text">포인트 적립</string>
+    <string name="order_detail_total_price_info_text">결제금액</string>
+    <string name="point_suffix_text">포인트</string>
+    <string name="price_text_suffix">원</string>
 </resources>

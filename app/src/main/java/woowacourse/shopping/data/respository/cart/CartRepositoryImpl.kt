@@ -1,7 +1,10 @@
 package woowacourse.shopping.data.respository.cart
 
+import com.example.domain.cart.CartProduct
+import com.example.domain.cart.CartProducts
+import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.model.CartLocalEntity
-import woowacourse.shopping.data.model.CartRemoteEntity
 import woowacourse.shopping.data.respository.cart.source.local.CartLocalDataSource
 import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSource
 
@@ -13,24 +16,26 @@ class CartRepositoryImpl(
     override fun addCartProduct(
         productId: Long,
         onFailure: () -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (cartId: Long) -> Unit,
     ) {
         cartRemoteDataSource.requestPostCartItem(productId, onFailure, onSuccess)
     }
 
     override fun loadAllCarts(
         onFailure: () -> Unit,
-        onSuccess: (products: List<CartRemoteEntity>) -> Unit,
+        onSuccess: (products: CartProducts) -> Unit,
     ) {
-        cartRemoteDataSource.requestDatas(onFailure, onSuccess)
+        cartRemoteDataSource.requestDatas(onFailure) { cartRemoteEntities ->
+            onSuccess(CartProducts(cartRemoteEntities.map { it.toDomain() }))
+        }
     }
 
     override fun updateCartCount(
-        cartEntity: CartRemoteEntity,
+        cartProduct: CartProduct,
         onFailure: () -> Unit,
         onSuccess: () -> Unit,
     ) {
-        cartRemoteDataSource.requestPatchCartItem(cartEntity, onFailure, onSuccess)
+        cartRemoteDataSource.requestPatchCartItem(cartProduct.toEntity(), onFailure, onSuccess)
     }
 
     override fun addLocalCart(cartId: Long) {

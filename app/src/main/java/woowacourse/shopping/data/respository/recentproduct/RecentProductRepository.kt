@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.respository.recentproduct
 
-import woowacourse.shopping.data.model.RecentProductEntity
+import com.example.domain.RecentProduct
 
 interface RecentProductRepository {
-    fun getRecentProducts(limit: Int): List<RecentProductEntity>
+    fun getRecentProducts(limit: Int): List<RecentProduct>
     fun deleteNotTodayRecentProducts(today: String)
     fun addCart(productId: Long)
 }

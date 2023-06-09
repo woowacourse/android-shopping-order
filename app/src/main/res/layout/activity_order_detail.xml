@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="orderDetail"
+            type="woowacourse.shopping.data.model.OrderDetailEntity" />
+
+    </data>
+
+    <ScrollView
+        android:id="@+id/layout_order_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tv_order_detail_date_title_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/order_detail_date_title_info_text"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@{orderDetail.orderedAt}"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date_title_info"
+                tools:text="2023-06-03T05:47:36" />
+
+            <View
+                android:id="@+id/view_line_order_detail1"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/product_view_line_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_date" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_product_list_title_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/order_detail_product_list_title_info_text"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_line_order_detail1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_order_detail_product_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fadeScrollbars="false"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingBottom="15dp"
+                android:scrollbarStyle="outsideInset"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_product_list_title_info"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_order_product_list" />
+
+            <View
+                android:id="@+id/view_line_order_detail2"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/product_view_line_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_order_detail_product_list" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_price_detail_title_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/order_detail_price_detail_title_info_text"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_line_order_detail2" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_price_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/order_payment_detail_title_info_text"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_price_detail_title_info" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="middle"
+                android:gravity="end"
+                android:maxLines="1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_order_detail_order_price_info"
+                app:layout_constraintTop_toTopOf="@id/tv_order_detail_order_price_info"
+                tools:text="30,000원" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_used_point_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/order_detail_order_used_point_info_text"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_order_price" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_used_point"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="middle"
+                android:gravity="end"
+                android:maxLines="1"
+                android:text="@{@string/point_format(orderDetail.usedPoint)}"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_order_detail_order_used_point_info"
+                app:layout_constraintTop_toTopOf="@id/tv_order_detail_order_used_point_info"
+                tools:text="1,000포인트" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_saved_point_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/order_detail_order_saved_point_info_text"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_order_used_point" />
+
+            <TextView
+                android:id="@+id/tv_order_detail_order_saved_point"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="middle"
+                android:gravity="end"
+                android:maxLines="1"
+                android:text="@{@string/point_format(orderDetail.savedPoint)}"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_order_detail_order_saved_point_info"
+                app:layout_constraintTop_toTopOf="@id/tv_order_detail_order_saved_point_info"
+                tools:text="3,000포인트" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_detail_total_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/main_color"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_detail_order_saved_point">
+
+                <TextView
+                    android:id="@+id/tv_order_detail_total_price_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/order_detail_total_price_info_text"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_order_detail_total_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:ellipsize="middle"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="9,000원" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</layout>

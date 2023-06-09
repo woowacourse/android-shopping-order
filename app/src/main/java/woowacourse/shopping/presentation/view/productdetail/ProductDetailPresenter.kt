@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.view.productdetail
 
-import woowacourse.shopping.data.mapper.toUIModel
+import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.respository.cart.CartRepository
 import woowacourse.shopping.data.respository.product.ProductRepository
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
 
 class ProductDetailPresenter(
@@ -12,11 +12,11 @@ class ProductDetailPresenter(
     productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ProductDetailContract.Presenter {
-    private lateinit var product: ProductModel
+    private lateinit var product: CartModel
 
     init {
-        productRepository.loadDataById(productId, ::onFailure) { productEntity ->
-            product = productEntity.toUIModel()
+        productRepository.loadDataById(productId, ::onFailure) { remoteProduct ->
+            product = remoteProduct.toUiModel()
             loadProductInfo()
         }
     }
@@ -44,13 +44,14 @@ class ProductDetailPresenter(
 
     override fun addCart(count: Int) {
         cartRepository.loadAllCarts(::onFailure) { carts ->
-            val cartProduct = carts.find { cartProduct -> cartProduct.product.id == product.id }
+            val cartProduct = carts.all.find { cartProduct -> cartProduct.product.id == product.product.id }
+
             if (cartProduct == null) {
-                cartRepository.addCartProduct(product.id, ::onFailure) {
+                cartRepository.addCartProduct(product.product.id, ::onFailure) {
                     if (count == UPDATE_COUNT_CONDITION) {
                         cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                             val reCartProduct =
-                                reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
+                                reLoadCarts.all.find { product -> product.product.id == this.product.id }
                                     ?: return@loadAllCarts
 
                             cartRepository.addLocalCart(reCartProduct.id)
@@ -63,10 +64,10 @@ class ProductDetailPresenter(
 
                     cartRepository.loadAllCarts(::onFailure) { reLoadCarts ->
                         val reCartProduct =
-                            reLoadCarts.find { cartProduct -> cartProduct.product.id == product.id }
+                            reLoadCarts.all.find { product -> product.product.id == this.product.id }
                                 ?: return@loadAllCarts
 
-                        val newCartProduct = reCartProduct.copy(quantity = count)
+                        val newCartProduct = reCartProduct.copy(count = count)
                         cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                             view.addCartSuccessView()
                             view.exitProductDetailView()
@@ -76,7 +77,7 @@ class ProductDetailPresenter(
             }
 
             cartProduct?.let { cart ->
-                val newCartProduct = cartProduct.copy(quantity = cart.quantity + count)
+                val newCartProduct = cartProduct.copy(count = cart.count + count)
                 cartRepository.updateCartCount(newCartProduct, ::onFailure) {
                     view.addCartSuccessView()
                     view.exitProductDetailView()

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="product"
-            type="woowacourse.shopping.presentation.model.ProductModel" />
+            type="woowacourse.shopping.presentation.model.CartModel" />
 
         <variable
             name="recentProduct"
@@ -19,7 +19,7 @@
 
         <ImageView
             android:id="@+id/iv_product_detail_thumbnail"
-            setImageUrl="@{product.imageUrl}"
+            setImageUrl="@{product.product.imageUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -30,7 +30,7 @@
 
         <TextView
             android:id="@+id/tv_product_detail_title"
-            setText="@{product.title}"
+            setText="@{product.product.title}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
@@ -69,7 +69,7 @@
 
         <TextView
             android:id="@+id/tv_product_detail_price"
-            setPrice="@{product.price}"
+            setPrice="@{product.product.price}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

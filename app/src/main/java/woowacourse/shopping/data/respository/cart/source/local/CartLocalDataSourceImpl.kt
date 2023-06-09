@@ -17,6 +17,8 @@ class CartLocalDataSourceImpl(
     private val tableName = getTableName(server)
 
     override fun insertCart(cartId: Long) {
+        if (haveCartId(cartId)) return
+
         val value = ContentValues().apply {
             put(CartContract.Cart.ID, cartId)
             put(CartContract.Cart.CHECKED, 1)
@@ -30,6 +32,16 @@ class CartLocalDataSourceImpl(
             "${CartContract.Cart.ID} = ?",
             arrayOf(cartId.toString()),
         )
+    }
+
+    private fun haveCartId(id: Long): Boolean {
+        val cursor = db.rawQuery(
+            "SELECT * FROM $tableName WHERE id = $id",
+            null,
+        )
+
+        if (cursor.moveToFirst().not()) return false
+        return true
     }
 
     override fun updateCartChecked(cartId: Long, isChecked: Boolean) {

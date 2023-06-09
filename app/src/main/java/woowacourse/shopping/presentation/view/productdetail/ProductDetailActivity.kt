@@ -16,9 +16,11 @@ import woowacourse.shopping.data.respository.cart.source.remote.CartRemoteDataSo
 import woowacourse.shopping.data.respository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.respository.product.source.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.presentation.model.ProductModel
+import woowacourse.shopping.presentation.model.CartModel
 import woowacourse.shopping.presentation.model.RecentProductModel
+import woowacourse.shopping.presentation.view.orderlist.OrderListActivity
 import woowacourse.shopping.presentation.view.productlist.ProductListActivity.Companion.KEY_SERVER_SERVER
+import woowacourse.shopping.presentation.view.util.RetrofitUtil
 import woowacourse.shopping.presentation.view.util.getParcelableCompat
 import woowacourse.shopping.presentation.view.util.getSerializableCompat
 import woowacourse.shopping.presentation.view.util.showToast
@@ -63,15 +65,18 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_close -> exitProductDetailView()
+            R.id.action_order -> moveToOrderListView()
         }
 
         return super.onOptionsItemSelected(item)
     }
 
     private fun setPresenter() {
-        val productRemoteDataSource = ProductRemoteDataSourceImpl(server)
+        val retrofit = RetrofitUtil(server).createRetrofit()
+        val productRemoteDataSource = ProductRemoteDataSourceImpl(retrofit)
         val cartLocalDataSource = CartLocalDataSourceImpl(this, server)
-        val cartRemoteDataSource = CartRemoteDataSourceImpl(server)
+
+        val cartRemoteDataSource = CartRemoteDataSourceImpl(retrofit)
         presenter = ProductDetailPresenter(
             this,
             productId = productId,
@@ -90,8 +95,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding.clLastProductInfo.visibility = View.GONE
     }
 
-    override fun setProductInfoView(productModel: ProductModel) {
-        binding.product = productModel
+    override fun setProductInfoView(cartModel: CartModel) {
+        binding.product = cartModel
     }
 
     private fun setLastRecentProduct() {
@@ -108,8 +113,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         }
     }
 
-    override fun showCountView(productModel: ProductModel) {
-        CartInsertionDialog(this, productModel) { count ->
+    override fun showCountView(cartModel: CartModel) {
+        CartInsertionDialog(this, cartModel) { count ->
             presenter.addCart(count)
         }
     }
@@ -124,6 +129,11 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         binding.root.post {
             showToast(getString(R.string.toast_message_system_error))
         }
+    }
+
+    private fun moveToOrderListView() {
+        val intent = OrderListActivity.createIntent(this, server)
+        startActivity(intent)
     }
 
     override fun exitProductDetailView() {
