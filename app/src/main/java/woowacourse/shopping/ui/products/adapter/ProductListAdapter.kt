@@ -25,10 +25,9 @@ class ProductListAdapter(
         holder.bind(products[position])
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun addItems(newProducts: List<ProductUIState>) {
         products.addAll(newProducts)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(products.size, newProducts.size)
     }
 
     fun replaceItem(newProduct: ProductUIState) {

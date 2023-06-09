@@ -1,136 +1,57 @@
 package woowacourse.shopping.data.cart
 
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
-import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.utils.RemoteHost
-import woowacourse.shopping.utils.UserData
-import java.io.IOException
-import java.time.LocalDateTime
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Path
+import woowacourse.shopping.utils.ServerConfiguration
 
-class CartItemRemoteService(private val host: RemoteHost) : CartItemDataSource {
-    private val client = OkHttpClient()
-    override fun save(cartItem: CartItem, onFinish: (CartItem) -> Unit) {
-        val path = "/cart-items"
-        val jsonObject = JSONObject().apply {
-            put("productId", cartItem.product.id)
-        }
-        val body = jsonObject.toString().toRequestBody()
-        val request = Request.Builder().url(host.url + path).post(body)
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
+interface CartItemRemoteService {
 
-            override fun onResponse(call: Call, response: Response) {
-                val id =
-                    response.header("Location")?.removePrefix("/cart-items/")?.toLong() ?: return
-                val savedCartItem = CartItem(
-                    id, cartItem.product, cartItem.addedTime, cartItem.count
-                )
-                onFinish(savedCartItem)
-            }
-        })
-    }
+    @Headers("Content-Type: application/json")
+    @POST("cart-items")
+    fun requestToSave(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: CartItemSaveRequestBody
+    ): Call<Unit>
 
-    override fun findAll(onFinish: (List<CartItem>) -> Unit) {
-        val path = "/cart-items"
-        val request =
-            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
+    @GET("cart-items")
+    fun requestCartItems(@Header("Authorization") authorization: String): Call<List<CartItemDto>>
+
+    @Headers("Content-Type: application/json")
+    @PATCH("cart-items/{cartItemId}")
+    fun requestToUpdateCount(
+        @Path("cartItemId") cartItemId: Long,
+        @Header("Authorization") authorization: String,
+        @Body requestBody: CartItemQuantityUpdateRequestBody
+    ): Call<Unit>
+
+    @DELETE("cart-items/{cartItemId}")
+    fun requestToDelete(
+        @Path("cartItemId") cartItemId: Long,
+        @Header("Authorization") authorization: String
+    ): Call<Unit>
+
+    companion object {
+        private val INSTANCE by lazy {
+            Retrofit.Builder()
+                .baseUrl(ServerConfiguration.host.url)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code != 200) return
-                val body = response.body?.string()
-                val jsonArray = JSONArray(body)
-                val cartItems = (0 until jsonArray.length()).map {
-                    val jsonObject = jsonArray.getJSONObject(it)
-                    parseToCartItem(jsonObject)
-                }
-                onFinish(cartItems)
-            }
-        })
-    }
-
-    override fun findAll(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit) {
-        val path = "/cart-items"
-        val request =
-            Request.Builder().url(host.url + path).addHeader("Authorization", "Basic ${UserData.credential}")
-                .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code != 200) return
-                val body = response.body?.string()
-                val jsonArray = JSONArray(body)
-                val cartItems = (0 until jsonArray.length()).map {
-                    val jsonObject = jsonArray.getJSONObject(it)
-                    parseToCartItem(jsonObject)
-                }
-                onFinish(cartItems.slice(offset until cartItems.size).take(limit))
-            }
-        })
-    }
-
-    override fun updateCountById(id: Long, count: Int, onFinish: () -> Unit) {
-        val path = "/cart-items/$id"
-        val jsonObject = JSONObject().apply {
-            put("quantity", count)
+                .create(CartItemRemoteService::class.java)
         }
-        val body = jsonObject.toString().toRequestBody()
-        val request = Request.Builder().url(host.url + path).patch(body)
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code == 200) onFinish()
-            }
-        })
-    }
-
-    override fun deleteById(id: Long, onFinish: () -> Unit) {
-        val path = "/cart-items/$id"
-        val request = Request.Builder().url(host.url + path).delete()
-            .addHeader("Authorization", "Basic ${UserData.credential}").build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.code == 204) onFinish()
-            }
-        })
-    }
-
-    private fun parseToCartItem(jsonObject: JSONObject): CartItem {
-        val id = jsonObject.getLong("id")
-        val quantity = jsonObject.getInt("quantity")
-        val jsonObject1 = jsonObject.getJSONObject("product")
-        val product = parseToProduct(jsonObject1)
-        return CartItem(id, product, LocalDateTime.now(), quantity)
-    }
-
-    private fun parseToProduct(jsonObject: JSONObject): Product {
-        val id = jsonObject.getLong("id")
-        val name = jsonObject.getString("name")
-        val price = jsonObject.getInt("price")
-        val imageUrl = jsonObject.getString("imageUrl")
-        return Product(id, imageUrl, name, price)
+        fun getInstance(): CartItemRemoteService = INSTANCE
     }
 }
+
+data class CartItemSaveRequestBody(val productId: Long)
+
+data class CartItemQuantityUpdateRequestBody(val quantity: Int)

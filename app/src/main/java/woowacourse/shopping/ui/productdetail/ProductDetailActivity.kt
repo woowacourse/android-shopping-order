@@ -8,19 +8,15 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.product.ProductRemoteRepository
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRemoteRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 import woowacourse.shopping.utils.PRICE_FORMAT
-import woowacourse.shopping.utils.RemoteHost
 import woowacourse.shopping.utils.customview.AddToCartDialog
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
@@ -29,16 +25,10 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
     private val presenter: ProductDetailContract.Presenter by lazy {
         ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
-            CartItemRepositoryImpl(
-                CartItemRemoteService(RemoteHost.GABI)
-            ),
-            RecentlyViewedProductRepositoryImpl(
-                RecentlyViewedProductMemoryDao(
-                    DbHelper.getDbInstance(this)
-                ),
-                ProductRemoteService(RemoteHost.GABI)
-            )
+            this,
+            ProductRemoteRepository(),
+            CartItemRemoteRepository(),
+            RecentlyViewedProductRemoteRepository(DbHelper.getDbInstance(this))
         )
     }
     private val lastViewedProductViewHolder: LastViewedProductViewHolder by lazy {
@@ -87,8 +77,13 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
 
             binding.tvProductDetailName.text = product.name
             binding.tvProductDetailPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
-            binding.btnProductDetailAdd.isEnabled = product.isInCart.not()
+                getString(R.string.format_price).format(PRICE_FORMAT.format(product.price))
+
+            if (product.isInCart) {
+                binding.btnProductDetailAdd.isEnabled = false
+                binding.btnProductDetailAdd.setBackgroundColor(getColor(R.color.grey_aaa))
+            }
+
             binding.btnProductDetailAdd.setOnClickListener {
                 AddToCartDialog(product) { productId, count ->
                     presenter.onAddProductToCart(productId, count)

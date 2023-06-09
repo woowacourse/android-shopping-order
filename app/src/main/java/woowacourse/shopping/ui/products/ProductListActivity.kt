@@ -8,21 +8,19 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
+import woowacourse.shopping.data.cart.CartItemMemoryCache
+import woowacourse.shopping.data.cart.CartItemRemoteRepository
 import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.product.ProductRemoteRepository
+import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRemoteRepository
 import woowacourse.shopping.databinding.ActivityProductListBinding
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.mypage.MyPageActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductListAdapter
 import woowacourse.shopping.ui.products.adapter.RecentlyViewedProductListAdapter
 import woowacourse.shopping.ui.products.uistate.ProductUIState
 import woowacourse.shopping.ui.products.uistate.RecentlyViewedProductUIState
-import woowacourse.shopping.utils.ServerConfiguration
 import woowacourse.shopping.utils.customview.CountBadge
 
 class ProductListActivity : AppCompatActivity(), ProductListContract.View {
@@ -31,21 +29,12 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         ActivityProductListBinding.inflate(layoutInflater)
     }
 
-    private val presenter: ProductListContract.Presenter by lazy { createPresenter() }
-
-    private fun createPresenter(): ProductListPresenter {
-        val productRemoteService = ProductRemoteService(ServerConfiguration.host)
-        val dbHelper = DbHelper.getDbInstance(this)
-        val recentlyViewedProductMemoryDao = RecentlyViewedProductMemoryDao(dbHelper)
-        val recentlyViewedProductRepositoryImpl = RecentlyViewedProductRepositoryImpl(
-            recentlyViewedProductMemoryDao, productRemoteService
-        )
-        val cartItemRepositoryImpl = CartItemRepositoryImpl(
-            CartItemRemoteService(ServerConfiguration.host)
-        )
-        val productRepositoryImpl = ProductRepositoryImpl(productRemoteService)
-        return ProductListPresenter(
-            this, recentlyViewedProductRepositoryImpl, productRepositoryImpl, cartItemRepositoryImpl
+    private val presenter: ProductListContract.Presenter by lazy {
+        ProductListPresenter(
+            this,
+            RecentlyViewedProductRemoteRepository(DbHelper.getDbInstance(this)),
+            ProductRemoteRepository(),
+            CartItemRemoteRepository()
         )
     }
 
@@ -68,9 +57,6 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
         initProductList()
         initLoadingButton()
-        if (savedInstanceState != null) {
-            presenter.restoreCurrentPage(savedInstanceState.getInt(CURRENT_PAGE))
-        }
     }
 
     override fun onStart() {
@@ -99,9 +85,18 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
                 CartActivity.startActivity(this)
                 true
             }
+            R.id.my_page -> {
+                MyPageActivity.startActivity(this)
+                true
+            }
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPause() {
+        CartItemMemoryCache.clear()
+        super.onPause()
     }
 
     private fun setActionBar() {
@@ -111,6 +106,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
 
     private fun initProductList() {
         binding.recyclerViewMainProduct.adapter = productListAdapter
+        binding.recyclerViewMainProduct.itemAnimator = null
     }
 
     private fun initLoadingButton() {
@@ -179,14 +175,7 @@ class ProductListActivity : AppCompatActivity(), ProductListContract.View {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURRENT_PAGE, presenter.getCurrentPage())
-        super.onSaveInstanceState(outState)
-    }
-
     companion object {
-        private const val CURRENT_PAGE = "CURRENT_PAGE"
-
         fun startActivity(context: Context) {
             val intent = Intent(context, ProductListActivity::class.java).apply {}
             context.startActivity(intent)

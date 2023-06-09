@@ -19,7 +19,7 @@ class LastViewedProductViewHolder(
         binding.layoutLastViewedProduct.isVisible = true
         binding.tvLastViewedProductName.text = product.name
         binding.tvLastViewedProductPrice.text =
-            binding.root.resources.getString(R.string.product_price).format(
+            binding.root.resources.getString(R.string.format_price).format(
                 PRICE_FORMAT.format(product.price)
             )
         binding.layoutLastViewedProduct.setOnClickListener { onClick(product.id) }

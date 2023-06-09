@@ -1,23 +1,19 @@
 package woowacourse.shopping.ui.cart
 
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
+import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
 
 interface CartContract {
 
     interface Presenter {
-        val currentPage: Int
 
-        val selectedCartItemIds: List<Long>
+        fun onLoadCartItemsOfFirstPage()
 
-        fun restoreCurrentPage(currentPage: Int)
-
-        fun restoreSelectedCartItems(cartItemIds: List<Long>)
-
-        fun onLoadCartItemsOfNextPage()
+        fun onLoadCartItemsOfLastPage()
 
         fun onLoadCartItemsOfPreviousPage()
 
-        fun onLoadCartItemsOfLastPage()
+        fun onLoadCartItemsOfNextPage()
 
         fun onDeleteCartItem(cartItemId: Long)
 
@@ -28,6 +24,10 @@ interface CartContract {
         fun onPlusCount(cartItemId: Long)
 
         fun onMinusCount(cartItemId: Long)
+
+        fun onOrderSelectedCartItems()
+
+        fun onLoadOrderPriceInfo()
     }
 
     interface View {
@@ -35,7 +35,7 @@ interface CartContract {
 
         fun setStateThatCanRequestNextPage(canRequest: Boolean)
 
-        fun setStateThatCanRequestPage(canRequest: Boolean)
+        fun setPageUIVisibility(isVisible: Boolean)
 
         fun setPage(page: Int)
 
@@ -46,5 +46,17 @@ interface CartContract {
         fun setOrderPrice(price: Int)
 
         fun setOrderCount(count: Int)
+
+        fun setCanOrder(canOrder: Boolean)
+
+        fun showOrderResult(orderId: Long)
+
+        fun setCanSeeOrderPriceInfo(canSeeOrderPriceInfo: Boolean)
+
+        fun showOrderPriceInfo(orderPriceInfo: OrderPriceInfoUIState)
+
+        fun showMessage(message: String)
+
+        fun refresh()
     }
 }

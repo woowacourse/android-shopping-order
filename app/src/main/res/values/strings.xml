@@ -2,7 +2,7 @@
     <string name="app_name">Shopping</string>
 
     <!-- 상품 -->
-    <string name="product_price">%s원</string>
+    <string name="format_price">%s원</string>
     <string name="recently_viewed_products">최근 본 상품</string>
 
     <!-- 상품 상세 -->
@@ -13,6 +13,7 @@
     <string name="app_bar_title_product_list">Shopping</string>
     <string name="app_bar_title_cart">Cart</string>
     <string name="button_load_more">더보기</string>
+
     <string name="order_with_count">주문하기(%d)</string>
     <string name="order">주문하기</string>
     <string name="all_of_them">전체</string>
@@ -20,4 +21,15 @@
     <string name="plus_sign">+</string>
     <string name="last_viewed_product">마지막으로 본 상품</string>
     <string name="put">담기</string>
+    <string name="app_bar_title_order_result">Order Result</string>
+    <string name="order_result">주문 결과</string>
+    <string name="order_price_label">주문 금액:</string>
+    <string name="format_quantity">%s개</string>
+    <string name="app_bar_title_my_page">My Page</string>
+    <string name="user_id_label">아이디:</string>
+    <string name="order_list">주문 목록</string>
+    <string name="orders">Orders</string>
+    <string name="label_order_number">주문 번호:</string>
+    <string name="label_order_price">주문 금액:</string>
+    <string name="label_order_description">주문 설명:</string>
 </resources>
