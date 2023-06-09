@@ -1,12 +1,16 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.RecentlyViewedProduct
+import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.recentlyviewedproduct.RecentlyViewedProduct
 import java.time.LocalDateTime
+import java.util.concurrent.CompletableFuture
 
 interface RecentlyViewedProductRepository {
 
-    fun save(product: Product, viewedTime: LocalDateTime, onFinish: (RecentlyViewedProduct) -> Unit)
+    fun save(
+        product: Product,
+        viewedTime: LocalDateTime
+    ): CompletableFuture<Result<RecentlyViewedProduct>>
 
-    fun findFirst10OrderByViewedTimeDesc(onFinish: (List<RecentlyViewedProduct>) -> Unit)
+    fun findLimitedOrderByViewedTimeDesc(limit: Int): CompletableFuture<Result<List<RecentlyViewedProduct>>>
 }

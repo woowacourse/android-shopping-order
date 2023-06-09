@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,13 +25,19 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.order.orderlist.OrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.order.orderdetail.OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.cart.CartActivity"
             android:exported="false" />
         <activity
             android:name=".ui.productdetail.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.products.ProductListActivity"
+            android:name=".ui.shopping.ShoppingActivity"
             android:exported="false" />
     </application>
 

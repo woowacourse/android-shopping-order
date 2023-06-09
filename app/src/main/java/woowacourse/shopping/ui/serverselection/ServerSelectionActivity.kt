@@ -6,31 +6,23 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.products.ProductListActivity
-import woowacourse.shopping.utils.UserData
+import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.View {
 
-    private lateinit var presenter: ServerSelectionPresenter
+    private val presenter: ServerSelectionContract.Presenter by lazy {
+        ServerSelectionPresenterProvider.create(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_selection)
 
-        saveUserInfo("YUBhLmNvbToxMjM0")
         initServerButton()
-        initPresenter()
     }
 
     override fun showProductListView() {
-        ProductListActivity.startActivity(this)
-    }
-
-    private fun saveUserInfo(credential: String) {
-        UserData.credential = credential
-        val preferences = getSharedPreferences("shopping", MODE_PRIVATE)
-        preferences.edit().putString("user", credential)
-            .apply()
+        ShoppingActivity.startActivity(this)
     }
 
     private fun initServerButton() {
@@ -40,9 +32,5 @@ class ServerSelectionActivity : AppCompatActivity(), ServerSelectionContract.Vie
                     presenter.selectServer(index)
                 }
             }
-    }
-
-    private fun initPresenter() {
-        presenter = ServerSelectionPresenter(this)
     }
 }

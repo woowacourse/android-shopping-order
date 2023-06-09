@@ -1,16 +1,17 @@
 package woowacourse.shopping.ui.productdetail.uistate
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.product.Product
 
 data class ProductDetailUIState(
+    val id: Long,
     val imageUrl: String,
     val name: String,
     val price: Int,
-    val id: Long,
     val isInCart: Boolean
 ) {
     companion object {
-        fun create(product: Product, isInCart: Boolean): ProductDetailUIState =
-            ProductDetailUIState(product.imageUrl, product.name, product.price, product.id, isInCart)
+        fun Product.toUIState(isInCart: Boolean): ProductDetailUIState = ProductDetailUIState(
+            id = id, imageUrl = imageUrl, name = name, price = price, isInCart = isInCart
+        )
     }
 }

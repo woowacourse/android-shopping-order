@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="recentlyViewedProduct"
+            type="woowacourse.shopping.ui.shopping.uistate.RecentlyViewedProductUIState" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="100dp"
         android:layout_height="match_parent"
@@ -16,6 +23,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:urlSrc="@{recentlyViewedProduct.imageUrl}"
             tools:src="@mipmap/ic_launcher_round" />
 
         <TextView
@@ -25,6 +33,7 @@
             android:layout_marginTop="7dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{recentlyViewedProduct.name}"
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@id/iv_recently_viewed"

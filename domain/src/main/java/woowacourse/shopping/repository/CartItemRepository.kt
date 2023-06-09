@@ -1,26 +1,30 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.cart.CartItem
+import java.util.concurrent.CompletableFuture
 
 interface CartItemRepository {
 
-    fun save(cartItem: CartItem, onFinish: (CartItem) -> Unit)
+    fun save(cartItem: CartItem): CompletableFuture<Result<CartItem>>
 
-    fun findAll(onFinish: (List<CartItem>) -> Unit)
+    fun findAll(): CompletableFuture<Result<List<CartItem>>>
 
-    fun findAllByIds(ids: List<Long>, onFinish: (List<CartItem>) -> Unit)
+    fun findAllByIds(ids: List<Long>): CompletableFuture<Result<List<CartItem>>>
 
-    fun findAllOrderByAddedTime(limit: Int, offset: Int, onFinish: (List<CartItem>) -> Unit)
+    fun findAllOrderByAddedTime(
+        limit: Int,
+        offset: Int
+    ): CompletableFuture<Result<List<CartItem>>>
 
-    fun findById(id: Long, onFinish: (CartItem) -> Unit)
+    fun findById(id: Long): CompletableFuture<Result<CartItem>>
 
-    fun findByProductId(productId: Long, onFinish: (CartItem?) -> Unit)
+    fun findByProductId(productId: Long): CompletableFuture<Result<CartItem>>
 
-    fun countAll(onFinish: (Int) -> Unit)
+    fun countAll(): CompletableFuture<Result<Int>>
 
-    fun existByProductId(productId: Long, onFinish: (Boolean) -> Unit)
+    fun existByProductId(productId: Long): CompletableFuture<Result<Boolean>>
 
-    fun updateCountById(id: Long, count: Int, onFinish: () -> Unit)
+    fun updateCountById(id: Long, count: Int): CompletableFuture<Result<Unit>>
 
-    fun deleteById(id: Long, onFinish: () -> Unit)
+    fun deleteById(id: Long): CompletableFuture<Result<Unit>>
 }

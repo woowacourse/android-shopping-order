@@ -5,44 +5,28 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+import androidx.core.view.isVisible
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartItemRemoteService
-import woowacourse.shopping.data.cart.CartItemRepositoryImpl
-import woowacourse.shopping.data.database.DbHelper
-import woowacourse.shopping.data.product.ProductRemoteService
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductMemoryDao
-import woowacourse.shopping.data.recentlyviewedproduct.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
-import woowacourse.shopping.utils.PRICE_FORMAT
-import woowacourse.shopping.utils.RemoteHost
-import woowacourse.shopping.utils.customview.AddToCartDialog
 
 class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     private val binding: ActivityProductDetailBinding by lazy {
         ActivityProductDetailBinding.inflate(layoutInflater)
     }
+
     private val presenter: ProductDetailContract.Presenter by lazy {
-        ProductDetailPresenter(
-            this, ProductRepositoryImpl(ProductRemoteService(RemoteHost.GABI)),
-            CartItemRepositoryImpl(
-                CartItemRemoteService(RemoteHost.GABI)
-            ),
-            RecentlyViewedProductRepositoryImpl(
-                RecentlyViewedProductMemoryDao(
-                    DbHelper.getDbInstance(this)
-                ),
-                ProductRemoteService(RemoteHost.GABI)
-            )
-        )
+        ProductDetailPresenterProvider.create(this, applicationContext)
     }
+
     private val lastViewedProductViewHolder: LastViewedProductViewHolder by lazy {
-        LastViewedProductViewHolder(binding) { startActivityFromProductDetailActivity(this, it) }
+        LastViewedProductViewHolder(binding) {
+            startActivityFromProductDetailActivity(this, it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +34,8 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         setContentView(binding.root)
         setActionBar()
 
-        presenter.onLoadProduct(intent.getLongExtra(PRODUCT_ID, -1))
-        if (intent.getBooleanExtra(FROM_PRODUCT_DETAIL_ACTIVITY, false).not()) {
-            initLastViewedProduct()
-        }
+        initProduct()
+        initLastViewedProduct()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,45 +44,29 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_close -> {
-                finish()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.action_close -> finish()
+            else -> return super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun setActionBar() {
-        setSupportActionBar(binding.toolbarProductDetail)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-    }
-
-    private fun initLastViewedProduct() {
-        presenter.onLoadLastViewedProduct()
+        return true
     }
 
     override fun setProduct(product: ProductDetailUIState) {
-        runOnUiThread {
-            Glide.with(this).load(product.imageUrl).into(binding.ivProductDetail)
-
-            binding.tvProductDetailName.text = product.name
-            binding.tvProductDetailPrice.text =
-                getString(R.string.product_price).format(PRICE_FORMAT.format(product.price))
-            binding.btnProductDetailAdd.isEnabled = product.isInCart.not()
-            binding.btnProductDetailAdd.setOnClickListener {
-                AddToCartDialog(product) { productId, count ->
-                    presenter.onAddProductToCart(productId, count)
-                }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
-            }
+        binding.btnProductDetailAdd.isVisible = !product.isInCart
+        binding.product = product
+        binding.btnProductDetailAdd.setOnClickListener {
+            presenter.showCartCounter(product.id)
         }
     }
 
     override fun setLastViewedProduct(product: LastViewedProductUIState?) {
-        runOnUiThread {
-            lastViewedProductViewHolder.bind(product)
-        }
+        lastViewedProductViewHolder.bind(product)
+    }
+
+    override fun openCartCounter(product: ProductDetailUIState) {
+        AddToCartDialog(product) { productId, count ->
+            presenter.addProductToCart(productId, count)
+        }.show(supportFragmentManager, TAG_ADD_TO_CART_DIALOG)
     }
 
     override fun showCartView() {
@@ -108,10 +74,30 @@ class ProductDetailActivity : AppCompatActivity(), ProductDetailContract.View {
         CartActivity.startActivity(this, true)
     }
 
+    override fun showError(message: Int) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setActionBar() {
+        setSupportActionBar(binding.toolbarProductDetail)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+    }
+
+    private fun initProduct() {
+        presenter.loadProduct(intent.getLongExtra(PRODUCT_ID, -1))
+    }
+
+    private fun initLastViewedProduct() {
+        if (!intent.getBooleanExtra(FROM_PRODUCT_DETAIL_ACTIVITY, false)) {
+            presenter.loadLastViewedProduct(RECENT_PRODUCT_LIMIT_COUNT)
+        }
+    }
+
     companion object {
         private const val PRODUCT_ID = "PRODUCT_ID"
         private const val FROM_PRODUCT_DETAIL_ACTIVITY = "FROM_PRODUCT_DETAIL_ACTIVITY"
         private const val TAG_ADD_TO_CART_DIALOG = "TAG_ADD_TO_CART_DIALOG"
+        private const val RECENT_PRODUCT_LIMIT_COUNT = 10
 
         fun startActivity(context: Context, productId: Long) {
             val intent = Intent(context, ProductDetailActivity::class.java).apply {

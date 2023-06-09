@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="cartListEvent"
+            type="woowacourse.shopping.ui.cart.CartListEvent" />
+
+        <variable
+            name="cartItem"
+            type="woowacourse.shopping.ui.cart.uistate.CartItemUIState" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,6 +26,8 @@
             android:id="@+id/cb_cart_item_selected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="@{cartItem.selected}"
+            android:onCheckedChanged="@{(_, isChecked) -> cartListEvent.onClickCheckBox(cartItem.id, isChecked)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,12 +35,13 @@
             android:id="@+id/tv_cart_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{cartItem.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/cb_cart_item_selected"
             app:layout_constraintStart_toEndOf="@id/cb_cart_item_selected"
             app:layout_constraintTop_toTopOf="@id/cb_cart_item_selected"
-            app:layout_constraintBottom_toBottomOf="@id/cb_cart_item_selected"
             tools:text="Product Name" />
 
         <ImageView
@@ -39,33 +53,37 @@
             app:layout_constraintDimensionRatio="1.7"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cb_cart_item_selected"
+            app:urlSrc="@{cartItem.imageUrl}"
             tools:src="@mipmap/ic_launcher_round" />
-
 
         <ImageButton
             android:id="@+id/btn_cart_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:onClick="@{() -> cartListEvent.onClickCloseButton(cartItem.id)}"
             android:src="@drawable/icon_close_grey"
+            app:layout_constraintBottom_toBottomOf="@id/tv_cart_name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_cart_name"
-            app:layout_constraintBottom_toBottomOf="@id/tv_cart_name"/>
+            app:layout_constraintTop_toTopOf="@id/tv_cart_name" />
 
         <TextView
             android:id="@+id/tv_cart_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/product_price(cartItem.price)}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/counter"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="10,000원" />
 
-        <woowacourse.shopping.utils.customview.Counter
+        <woowacourse.shopping.ui.customview.Counter
             android:id="@+id/counter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:count="@{cartItem.quantity}"
+            app:id="@{cartItem.id}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

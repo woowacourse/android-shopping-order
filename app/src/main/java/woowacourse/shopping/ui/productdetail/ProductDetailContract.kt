@@ -1,18 +1,22 @@
 package woowacourse.shopping.ui.productdetail
 
+import woowacourse.shopping.error.ErrorView
 import woowacourse.shopping.ui.productdetail.uistate.LastViewedProductUIState
 import woowacourse.shopping.ui.productdetail.uistate.ProductDetailUIState
 
 interface ProductDetailContract {
     interface Presenter {
-        fun onLoadProduct(productId: Long)
-        fun onAddProductToCart(productId: Long, count: Int)
-        fun onLoadLastViewedProduct()
+        fun loadProduct(productId: Long)
+        fun addProductToCart(productId: Long, count: Int)
+        fun showCartCounter(productId: Long)
+        fun loadLastViewedProduct(limit: Int)
     }
 
-    interface View {
+    interface View : ErrorView {
         fun setProduct(product: ProductDetailUIState)
         fun setLastViewedProduct(product: LastViewedProductUIState?)
+        fun openCartCounter(product: ProductDetailUIState)
         fun showCartView()
+        override fun showError(message: Int)
     }
 }

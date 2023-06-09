@@ -1,26 +1,26 @@
 package woowacourse.shopping.ui.cart.uistate
 
-import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.cart.CartItem
 
 data class CartItemUIState(
+    val id: Long,
+    val productId: Long,
     val isSelected: Boolean,
     val imageUrl: String,
     val name: String,
     val price: Int,
-    val count: Int,
-    val id: Long
+    val quantity: Int
 ) {
     companion object {
-        fun create(cartItem: CartItem, isSelected: Boolean): CartItemUIState {
-            val product = cartItem.product
+        fun CartItem.toUIState(isSelected: Boolean): CartItemUIState {
             return CartItemUIState(
-                isSelected,
-                product.imageUrl,
-                product.name,
-                product.price,
-                cartItem.count,
-                cartItem.id
-                    ?: throw IllegalArgumentException("아이디가 부여되지 않은 장바구니 아이템은 UI 상태가 될 수 없습니다.")
+                id = id,
+                productId = product.id,
+                isSelected = isSelected,
+                imageUrl = product.imageUrl,
+                name = product.name,
+                price = product.price,
+                quantity = quantity,
             )
         }
     }
