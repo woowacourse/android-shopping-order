@@ -4,12 +4,17 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import com.example.domain.Product
-import com.example.domain.RecentProduct
+import com.example.domain.product.Product
+import com.example.domain.product.recent.RecentProduct
+import woowacourse.shopping.util.BANDAL
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class RecentProductDao(context: Context) {
+class RecentProductDao(
+    context: Context,
+    private val url: String,
+    private val user: String = BANDAL
+) {
     private val recentDb: SQLiteDatabase = RecentProductDbHelper(context).writableDatabase
 
     private fun getCursor(selection: String? = ""): Cursor {
@@ -17,10 +22,12 @@ class RecentProductDao(context: Context) {
             RecentProductContract.TABLE_NAME,
             arrayOf(
                 RecentProductContract.TABLE_COLUMN_PRODUCT_ID,
+                RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME,
+                RecentProductContract.TABLE_COLUMN_SERVER_URL,
+                RecentProductContract.TABLE_COLUMN_USER,
                 RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL,
                 RecentProductContract.TABLE_COLUMN_PRODUCT_NAME,
-                RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE,
-                RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME
+                RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE
             ),
             selection, arrayOf(), null, null, ""
         )
@@ -37,25 +44,13 @@ class RecentProductDao(context: Context) {
 
         with(cursor) {
             while (moveToNext()) {
-                val productId =
-                    getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_ID))
-                val productImageUrl =
-                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL))
-                val productName =
-                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_NAME))
-                val productPrice =
-                    getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE))
-                val viewedDateTime =
-                    getLong(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME))
-                recentProduct = RecentProduct(
-                    productId = productId, productImageUrl = productImageUrl,
-                    productName = productName, productPrice = productPrice,
-                    viewedDateTime = LocalDateTime.ofEpochSecond(
-                        viewedDateTime,
-                        0,
-                        ZoneOffset.UTC
-                    )
-                )
+                val serverUrl =
+                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_SERVER_URL))
+                val dbUser =
+                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_USER))
+
+                if (url == serverUrl && user == dbUser)
+                    recentProduct = getRecentProduct(this)
             }
         }
         cursor.close()
@@ -68,30 +63,13 @@ class RecentProductDao(context: Context) {
 
         with(cursor) {
             while (moveToNext()) {
-                val productId =
-                    getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_ID))
-                val productImageUrl =
-                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL))
-                val productName =
-                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_NAME))
-                val productPrice =
-                    getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE))
-                val viewedDateTime =
-                    getLong(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME))
+                val serverUrl =
+                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_SERVER_URL))
+                val dbUser =
+                    getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_USER))
 
-                recentProducts.add(
-                    RecentProduct(
-                        productId = productId,
-                        productImageUrl = productImageUrl,
-                        productName = productName,
-                        productPrice = productPrice,
-                        viewedDateTime = LocalDateTime.ofEpochSecond(
-                            viewedDateTime,
-                            0,
-                            ZoneOffset.UTC
-                        )
-                    )
-                )
+                if (url == serverUrl && user == dbUser)
+                    recentProducts.add(getRecentProduct(this))
             }
         }
 
@@ -112,14 +90,16 @@ class RecentProductDao(context: Context) {
         recentDb.execSQL(deleteQuery)
 
         val values = ContentValues().apply {
-            put(RecentProductContract.TABLE_COLUMN_PRODUCT_ID, product.id)
-            put(RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL, product.imageUrl)
-            put(RecentProductContract.TABLE_COLUMN_PRODUCT_NAME, product.name)
-            put(RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE, product.price)
             put(
                 RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME,
                 viewedDateTime.toEpochSecond(ZoneOffset.UTC)
             )
+            put(RecentProductContract.TABLE_COLUMN_SERVER_URL, url)
+            put(RecentProductContract.TABLE_COLUMN_USER, user)
+            put(RecentProductContract.TABLE_COLUMN_PRODUCT_ID, product.id)
+            put(RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL, product.imageUrl)
+            put(RecentProductContract.TABLE_COLUMN_PRODUCT_NAME, product.name)
+            put(RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE, product.price)
         }
         recentDb.insert(RecentProductContract.TABLE_NAME, null, values)
     }
@@ -135,11 +115,13 @@ class RecentProductDao(context: Context) {
         recentDb.execSQL(
             """
                 CREATE TABLE ${RecentProductContract.TABLE_NAME} (
+                    ${RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME} LONG,
+                    ${RecentProductContract.TABLE_COLUMN_SERVER_URL} STRING,
+                    ${RecentProductContract.TABLE_COLUMN_USER} STRING,
                     ${RecentProductContract.TABLE_COLUMN_PRODUCT_ID} INTEGER,
                     ${RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL} TEXT,
                     ${RecentProductContract.TABLE_COLUMN_PRODUCT_NAME} TEXT,
-                    ${RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE} INTEGER,
-                    ${RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME} LONG
+                    ${RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE} INTEGER
                 )
             """.trimIndent()
         )
@@ -151,6 +133,31 @@ class RecentProductDao(context: Context) {
                 DROP TABLE IF EXISTS ${RecentProductContract.TABLE_NAME};
             """.trimIndent()
         )
+    }
+
+    private fun getRecentProduct(cursor: Cursor): RecentProduct {
+        with(cursor) {
+            val productId =
+                getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_ID))
+            val productImageUrl =
+                getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_IMAGE_URL))
+            val productName =
+                getString(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_NAME))
+            val productPrice =
+                getInt(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_PRODUCT_PRICE))
+            val viewedDateTime =
+                getLong(getColumnIndexOrThrow(RecentProductContract.TABLE_COLUMN_VIEWED_DATE_TIME))
+
+            return RecentProduct(
+                productId = productId.toLong(),
+                productImageUrl = productImageUrl,
+                productName = productName,
+                productPrice = productPrice,
+                viewedDateTime = LocalDateTime.ofEpochSecond(
+                    viewedDateTime, 0, ZoneOffset.UTC
+                )
+            )
+        }
     }
 
     companion object {

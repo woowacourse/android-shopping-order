@@ -1,10 +1,12 @@
 package woowacourse.shopping.feature.product
 
-import android.util.Log
-import com.example.domain.Product
-import com.example.domain.repository.CartRepository
-import com.example.domain.repository.ProductRepository
-import com.example.domain.repository.RecentProductRepository
+import com.example.domain.Pagination
+import com.example.domain.cart.Cart
+import com.example.domain.cart.CartProduct
+import com.example.domain.product.Product
+import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
 import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
@@ -22,42 +24,52 @@ class MainPresenter(
 ) : MainContract.Presenter {
 
     private val loadItemCountUnit = 20
-    private var loadItemFromIndex = 0
+    private var currentPage: Int = 1
 
     override fun loadMoreProducts() {
-        productRepository.getAll(
-            onFailure = {
+        productRepository.requestFetchProductsUnit(
+            failure = {
                 view.showEmptyProducts()
                 view.setProducts(listOf())
             },
-            onSuccess = {
-                view.addProductItems(it.map(Product::toUi))
-            }
+            success = { products, pagination ->
+                view.addProductItems(products.map(Product::toUi))
+                loadCartProductsQuantity()
+                view.showProducts()
+                currentPage = pagination.currentPage + 1
+            }, unitSize = loadItemCountUnit, page = currentPage
         )
-        loadItemFromIndex += loadItemCountUnit
     }
 
     override fun loadRecentProducts() {
         view.setRecentProducts(recentProductRepository.getAll())
     }
 
-    override fun loadCartProductCountBadge() {
+    override fun loadCartSizeBadge() {
         view.showCartProductCountBadge()
-        cartRepository.getAll(onFailure = {}, onSuccess = {
-            if (it.size >= MIN_COUNT_VALUE) view.setCartProductCountBadge(it.size)
-            else view.hideCartProductCount()
-        })
+        cartRepository.requestFetchCartProductsUnit(
+            unitSize = 0, page = 0, failure = {},
+            success = { cartProducts: List<CartProduct>, pagination: Pagination ->
+                if (MIN_COUNT_VALUE <= pagination.total) view.setCartProductCountBadge(pagination.total)
+            }
+        )
     }
 
-    override fun loadCartProductCounts() {
-        cartRepository.getAll(onFailure = {}, onSuccess = {
-            view.setCartProductCounts(it)
-        })
+    override fun loadCartProductsQuantity() {
+        cartRepository.requestFetchCartProductsUnit(
+            unitSize = Cart.MAX_SIZE, page = 1, failure = {},
+            success = { cartProducts: List<CartProduct>, pagination: Pagination ->
+                view.setCartProductCounts(cartProducts)
+                currentPage = pagination.currentPage + 1
+            }
+        )
     }
 
     override fun addRecentProduct(product: Product) {
         val nowDateTime: LocalDateTime = LocalDateTime.now()
-        storeRecentProduct(product.id, nowDateTime)
+        recentProductRepository.addRecentProduct(product, nowDateTime)
+
+        storeRecentProduct(product, nowDateTime)
         view.setRecentProducts(recentProductRepository.getAll())
     }
 
@@ -70,28 +82,32 @@ class MainPresenter(
 
     override fun storeCartProduct(productState: ProductState) {
         cartRepository.addCartProduct(productState.id, { }, { })
-        loadCartProductCounts()
-        loadCartProductCountBadge()
+        loadCartProductsQuantity()
+        loadCartSizeBadge()
     }
 
-    override fun minusCartProductCount(cartProductState: CartProductState) {
+    override fun minusCartProductQuantity(cartProductState: CartProductState) {
         cartProductState.quantity = (--cartProductState.quantity).coerceAtLeast(MIN_COUNT_VALUE)
+        if (cartProductState.quantity - 1 == 0) {
+            cartRepository.deleteCartProduct(
+                id = cartProductState.id, success = {}, failure = {}
+            )
+        }
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = { loadCartProductCountBadge() }
+            failure = {}, success = { loadCartSizeBadge() }
         )
     }
 
-    override fun plusCartProductCount(cartProductState: CartProductState) {
-        Log.d("otter66", "plusCartProductCount")
+    override fun plusCartProductQuantity(cartProductState: CartProductState) {
         cartProductState.quantity = (++cartProductState.quantity).coerceAtMost(MAX_COUNT_VALUE)
         cartRepository.updateCartProductQuantity(
             id = cartProductState.id, quantity = cartProductState.quantity,
-            onFailure = {}, onSuccess = {}
+            failure = {}, success = {}
         )
     }
 
-    private fun storeRecentProduct(productId: Int, viewedDateTime: LocalDateTime) {
-        recentProductRepository.addRecentProduct(productId, viewedDateTime)
+    private fun storeRecentProduct(product: Product, viewedDateTime: LocalDateTime) {
+        recentProductRepository.addRecentProduct(product, viewedDateTime)
     }
 }

@@ -1,191 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".feature.product.MainActivity">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/product_rv"
-            android:visibility="gone"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_tb"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
+            android:background="#555555"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:title="Shopping"
+            app:titleTextColor="@color/white">
+
+            <TextView
+                android:id="@+id/cart_count_tv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_cart_product_count_circle_"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="51" />
+
+            <ImageView
+                android:id="@+id/cart_iv"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="end"
+                android:src="@drawable/icon_cart" />
+        </androidx.appcompat.widget.Toolbar>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/product_rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_tb"
             tools:listitem="@layout/item_product" />
 
-        <GridLayout
-            android:id="@+id/skeleton_gl"
-            android:visibility="visible"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:rowCount="3"
-            android:columnCount="2"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <View
-                    android:layout_width="154dp"
-                    android:layout_height="154dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="140dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-                <View
-                    android:layout_width="118dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/light_gray" />
-
-            </LinearLayout>
-
-
-        </GridLayout>
+        <include
+            android:id="@+id/skeleton_layout"
+            layout="@layout/skeleton_main"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

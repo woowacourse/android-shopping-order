@@ -1,8 +1,8 @@
 package woowacourse.shopping.feature.product
 
-import com.example.domain.CartProduct
-import com.example.domain.Product
-import com.example.domain.RecentProduct
+import com.example.domain.cart.CartProduct
+import com.example.domain.product.Product
+import com.example.domain.product.recent.RecentProduct
 import woowacourse.shopping.model.CartProductState
 import woowacourse.shopping.model.ProductState
 import woowacourse.shopping.model.RecentProductState
@@ -25,12 +25,12 @@ interface MainContract {
     interface Presenter {
         fun loadRecentProducts()
         fun loadMoreProducts()
-        fun loadCartProductCountBadge()
-        fun loadCartProductCounts()
+        fun loadCartSizeBadge()
+        fun loadCartProductsQuantity()
         fun addRecentProduct(product: Product)
         fun showProductDetail(productState: ProductState)
         fun storeCartProduct(productState: ProductState)
-        fun minusCartProductCount(cartProductState: CartProductState)
-        fun plusCartProductCount(cartProductState: CartProductState)
+        fun minusCartProductQuantity(cartProductState: CartProductState)
+        fun plusCartProductQuantity(cartProductState: CartProductState)
     }
 }

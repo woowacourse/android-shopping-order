@@ -5,8 +5,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CartProductState(
-    val id: Int,
-    val productId: Int,
+    val id: Long,
+    val productId: Long,
     val productImageUrl: String,
     val productName: String,
     val productPrice: Int,

@@ -1,6 +1,6 @@
 package woowacourse.shopping.feature.product.detail
 
-import com.example.domain.repository.CartRepository
+import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.databinding.DialogSelectCountBinding
 import woowacourse.shopping.model.CartProductState.Companion.MAX_COUNT_VALUE
 import woowacourse.shopping.model.CartProductState.Companion.MIN_COUNT_VALUE
@@ -39,8 +39,8 @@ class ProductDetailPresenter(
         product!!
 
         cartRepository.addCartProduct(
-            product.id, onFailure = { },
-            onSuccess = { cartRepository.updateCartProductQuantity(it, quantity, {}, {}) }
+            product.id, failure = { },
+            success = { cartRepository.updateCartProductQuantity(it, quantity, {}, {}) }
         )
 
         view.showCart()

@@ -11,4 +11,6 @@
     <color name="super_light_gray">#F3F3F3</color>
     <color name="light_gray">#D6D6D6</color>
     <color name="dark_gray">#606060</color>
+
+    <color name="button_primary_color">#04C09E</color>
 </resources>
