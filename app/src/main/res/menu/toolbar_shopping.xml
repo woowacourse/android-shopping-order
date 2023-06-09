@@ -3,9 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/member_points"
+        android:title=""
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/order_history_action"
+        android:enabled="true"
+        android:title="주문 내역"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_order_history" />
+
+    <item
         android:id="@+id/shopping_cart_action"
         android:enabled="true"
-        android:title="cart"
+        android:title="shopping_actions"
         app:actionLayout="@layout/item_shopping_cart"
         app:showAsAction="always" />
 </menu>

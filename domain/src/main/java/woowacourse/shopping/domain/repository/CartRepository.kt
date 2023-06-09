@@ -1,28 +1,18 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.ShoppingProduct
 
 interface CartRepository {
-    fun addCartProduct(product: Product, onSuccess: (Int) -> Unit, onFailure: () -> Unit)
+    fun getAll(onSuccess: (List<CartProduct>) -> Unit, onFailure: (String) -> Unit)
 
-    fun getAllCount(onSuccess: (Int) -> Unit, onFailure: () -> Unit)
+    fun addCartProduct(productId: Int, quantity: Int, onSuccess: (Int) -> Unit, onFailure: (String) -> Unit)
 
-    fun getAll(onSuccess: (List<CartProduct>) -> Unit, onFailure: () -> Unit)
+    fun deleteCartProduct(cartProduct: CartProduct, onSuccess: () -> Unit, onFailure: (String) -> Unit)
 
-    fun deleteCartProduct(cartProduct: CartProduct)
+    fun deleteCartProduct(shoppingProduct: ShoppingProduct, onSuccess: () -> Unit, onFailure: (String) -> Unit)
 
-    fun getTotalAmount(): Int
+    fun updateCartProductQuantity(cartProduct: CartProduct, onSuccess: () -> Unit, onFailure: (String) -> Unit)
 
-    fun getCartProductByProduct(product: Product): CartProduct?
-
-    fun modifyCartProduct(cartProduct: CartProduct)
-
-    fun getTotalPrice(): Int
-
-    fun replaceCartProduct(prev: CartProduct, new: CartProduct)
-
-    fun isAllCheckedInPage(page: Int, sizePerPage: Int): Boolean
-
-    fun findId(productId: Int, onSuccess: (Int?) -> Unit, onFailure: () -> Unit)
+    fun findByProductId(productId: Int, onSuccess: (CartProduct?) -> Unit, onFailure: (String) -> Unit)
 }

@@ -3,23 +3,21 @@ package woowacourse.shopping.data.database.dao
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import woowacourse.shopping.Storage
-import woowacourse.shopping.data.database.entity.RecentProductEntity
 import woowacourse.shopping.data.database.table.SqlRecentProduct
+import woowacourse.shopping.data.dto.RecentProductEntity
 import java.time.LocalDateTime
 
-class RecentProductDao(private val db: SQLiteDatabase) {
+class RecentProductDao(private val database: SQLiteDatabase, private val server: String) {
     fun insertRecentProduct(recentProduct: RecentProductEntity) {
         val row = ContentValues()
         row.put(SqlRecentProduct.PRODUCT_ID, recentProduct.id)
-        row.put(SqlRecentProduct.SERVER_NAME, Storage.server)
+        row.put(SqlRecentProduct.SERVER_NAME, server)
         row.put(SqlRecentProduct.TIME, recentProduct.time.toString())
-        db.insert(SqlRecentProduct.name, null, row)
+        database.insert(SqlRecentProduct.name, null, row)
     }
 
     fun selectAll(): List<RecentProductEntity> {
-        val server = Storage.server
-        val cursor = db.rawQuery(
+        val cursor = database.rawQuery(
             """
                 |SELECT * FROM ${SqlRecentProduct.name} 
                 |WHERE ${SqlRecentProduct.SERVER_NAME} = ?
@@ -41,8 +39,7 @@ class RecentProductDao(private val db: SQLiteDatabase) {
     }
 
     fun selectProduct(id: Int): RecentProductEntity? {
-        val server = Storage.server
-        val cursor = db.rawQuery(
+        val cursor = database.rawQuery(
             """
                 |SELECT * FROM ${SqlRecentProduct.name} 
                 |WHERE ${SqlRecentProduct.PRODUCT_ID} = ? AND ${SqlRecentProduct.SERVER_NAME} = ?
@@ -65,17 +62,16 @@ class RecentProductDao(private val db: SQLiteDatabase) {
         row.put(SqlRecentProduct.PRODUCT_ID, recentProduct.id)
         row.put(SqlRecentProduct.TIME, recentProduct.time.toString())
 
-        db.update(
+        database.update(
             SqlRecentProduct.name,
             row,
             "${SqlRecentProduct.PRODUCT_ID} = ? AND ${SqlRecentProduct.SERVER_NAME} = ?",
-            arrayOf(recentProduct.id.toString(), Storage.server)
+            arrayOf(recentProduct.id.toString(), server)
         )
     }
 
     fun selectLatestRecentProduct(): RecentProductEntity? {
-        val server = Storage.server
-        val cursor = db.rawQuery(
+        val cursor = database.rawQuery(
             """
                 |SELECT * FROM ${SqlRecentProduct.name}
                 |WHERE ${SqlRecentProduct.SERVER_NAME} = ?

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.Products
+import woowacourse.shopping.domain.ShoppingProducts
 
 interface ProductRepository {
-    fun getProductsInSize(startIndex: Int, size: Int, onSuccess: (Products) -> Unit, onFailure: () -> Unit)
+    fun getProducts(onSuccess: (ShoppingProducts) -> Unit, onFailure: (String) -> Unit)
 }
