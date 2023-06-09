@@ -1,245 +1,378 @@
 package woowacourse.shopping.ui.cart
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.discount.DiscountInfoDto
-import woowacourse.shopping.data.discount.DiscountRemoteService
-import woowacourse.shopping.data.order.OrderRemoteService
-import woowacourse.shopping.data.order.OrderRequestBody
-import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.TotalPriceCalculator
-import woowacourse.shopping.repository.CartItemRepository
+import woowacourse.shopping.data.cart.CartItem
+import woowacourse.shopping.data.cart.CartItemRepository
+import woowacourse.shopping.data.discount.DiscountInfoRepository
+import woowacourse.shopping.data.discount.DiscountResult
+import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.ui.cart.uistate.CartItemUIState
 import woowacourse.shopping.ui.cart.uistate.OrderPriceInfoUIState
-import woowacourse.shopping.utils.UserData
-import java.lang.Integer.max
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartItemRepository: CartItemRepository,
-    private val orderRemoteService: OrderRemoteService,
-    private val discountRemoteService: DiscountRemoteService
+    private val orderRepository: OrderRepository,
+    private val discountInfoRepository: DiscountInfoRepository,
+    private var currentPage: Int = 1,
+    private var selectedCartItems: Set<CartItem> = emptySet()
 ) : CartContract.Presenter {
 
-    private var currentPage: Int = 0
-    private var selectedCartItems: Set<CartItem> = setOf()
-
-    override fun onLoadCartItemsOfNextPage() {
-        currentPage++
-        showOrderUI(selectedCartItems)
-        showCartItems(currentPage, selectedCartItems, true)
-        showPageUI(currentPage)
-        showAllSelectionUI(currentPage, selectedCartItems)
+    init {
+        require(currentPage >= 1) { "장바구니 아이템 화면의 페이지는 1 이상이어야 합니다." }
     }
 
-    override fun onLoadCartItemsOfPreviousPage() {
-        currentPage--
-        showCartItems(currentPage, selectedCartItems, true)
-        showPageUI(currentPage)
-        showAllSelectionUI(currentPage, selectedCartItems)
+    override fun onLoadCartItemsOfFirstPage() {
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                currentPage = 1
+                setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, true)
+                setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+            }
+        }
     }
 
     override fun onLoadCartItemsOfLastPage() {
-        cartItemRepository.countAll { count ->
-            currentPage = (count - 1) / PAGE_SIZE + 1
-            showCartItems(currentPage, selectedCartItems, true)
-            showPageUI(currentPage)
-            showAllSelectionUI(currentPage, selectedCartItems)
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val lastPage = calculateLastPage(cartItems.size, PAGE_SIZE)
+                currentPage = lastPage
+                setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, true)
+                setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+            }
+        }
+    }
+
+    override fun onLoadCartItemsOfPreviousPage() {
+        if (currentPage <= 1) {
+            view.showMessage("현재 페이지가 1페이지라서 이전 페이지를 요청할 수 없습니다.")
+            return
+        }
+
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                currentPage--
+                setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, true)
+                setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+            }
+        }
+    }
+
+    override fun onLoadCartItemsOfNextPage() {
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val lastPage = calculateLastPage(cartItems.size, PAGE_SIZE)
+                currentPage = if (lastPage > currentPage) currentPage + 1 else lastPage
+                setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, true)
+                setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+            }
         }
     }
 
     override fun onDeleteCartItem(cartItemId: Long) {
-        cartItemRepository.deleteById(cartItemId) {
-            selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
-            view.setCanOrder(selectedCartItems.isNotEmpty())
-            getCartItemsOf(currentPage) { cartItems ->
-                if (cartItems.isEmpty() && currentPage > 1) currentPage--
-                showPageUI(currentPage)
-                updateCartUI()
+        cartItemRepository.deleteCartItem(cartItemId).thenAccept { result ->
+            result.onSuccess {
+                cartItemRepository.getCartItems().thenAccept { result ->
+                    result.onSuccess { cartItems ->
+                        val cartItemsOfCurrentPage = cartItems.of(currentPage, PAGE_SIZE)
+                        if (cartItemsOfCurrentPage.isEmpty() && currentPage > 1) currentPage--
+                        setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, false)
+                        setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                        setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+                        if (selectedCartItems.any { it.id == cartItemId }) {
+                            selectedCartItems =
+                                selectedCartItems.filter { it.id != cartItemId }.toSet()
+                            view.setCanSeeOrderPriceInfo(
+                                cartItems.of(currentPage, PAGE_SIZE).any { it in selectedCartItems }
+                            )
+                            view.setOrderCount(selectedCartItems.size)
+                            view.setCanOrder(selectedCartItems.isNotEmpty())
+                            val totalPrice = selectedCartItems.sumOf { it.price }
+                            discountInfoRepository.getDiscountInfo(totalPrice)
+                                .thenAccept { result ->
+                                    result.onSuccess { discountInfo ->
+                                        val discountedPrice = discountInfo.discountResults
+                                            .map(DiscountResult::discountPrice)
+                                            .fold(totalPrice) { total, discountPrice ->
+                                                total - discountPrice
+                                            }.takeIf { it > 0 } ?: 0
+                                        view.setOrderPrice(discountedPrice)
+                                    }.onFailure {
+                                        view.showMessage("주문 금액을 계산할 수 없습니다.")
+                                        view.setOrderPrice(-1)
+                                    }
+                                }
+                        }
+                    }.onFailure {
+                        view.showMessage("장바구니 아이템을 삭제했지만 갱신된 장바구니 아이템들을 불러오는 데 실패했습니다.")
+                    }
+                }
+            }.onFailure {
+                view.showMessage("해당 장바구니 아이템을 삭제하는 데 실패했습니다.")
             }
         }
     }
 
     override fun onChangeSelectionOfCartItem(cartItemId: Long, isSelected: Boolean) {
-        cartItemRepository.findById(cartItemId) { cartItem ->
-            selectedCartItems = if (isSelected) {
-                selectedCartItems + cartItem
-            } else {
-                selectedCartItems - cartItem
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val cartItem = cartItems.find { it.id == cartItemId }
+                if (cartItem == null) {
+                    selectedCartItems = selectedCartItems.filter { it.id != cartItemId }.toSet()
+                    view.showMessage("해당 장바구니 아이템은 사라졌습니다.")
+                    view.refresh()
+                    return@thenAccept
+                }
+                selectedCartItems = if (isSelected) {
+                    selectedCartItems + cartItem
+                } else {
+                    selectedCartItems - cartItem
+                }
+                setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+                view.setOrderCount(selectedCartItems.size)
+                view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
+                view.setCanOrder(selectedCartItems.isNotEmpty())
+                val totalPrice = selectedCartItems.sumOf { it.price }
+                discountInfoRepository.getDiscountInfo(totalPrice).thenAccept { result ->
+                    result.onSuccess { discountInfo ->
+                        val discountedPrice = discountInfo.discountResults
+                            .map(DiscountResult::discountPrice)
+                            .fold(totalPrice) { total, discountPrice ->
+                                total - discountPrice
+                            }.takeIf { it > 0 } ?: 0
+                        view.setOrderPrice(discountedPrice)
+                    }.onFailure {
+                        view.showMessage("주문 금액을 계산할 수 없습니다.")
+                        view.setOrderPrice(-1)
+                    }
+                }
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
             }
-            showAllSelectionUI(currentPage, selectedCartItems)
-            showOrderUI(selectedCartItems)
-            view.setCanOrder(selectedCartItems.isNotEmpty())
-            view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
-            showCartItems(currentPage, selectedCartItems, false)
         }
     }
 
     override fun onChangeSelectionOfAllCartItems(isSelected: Boolean) {
-        val offset = (currentPage - 1) * PAGE_SIZE
-        cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset) { cartItemsOfCurrentPage ->
-            if (isSelected) {
-                selectedCartItems = selectedCartItems + cartItemsOfCurrentPage
-                updateCartUI()
-            } else if (cartItemsOfCurrentPage.all { it in selectedCartItems }) {
-                selectedCartItems = selectedCartItems - cartItemsOfCurrentPage.toSet()
-                updateCartUI()
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val cartItemsOfCurrentPage = cartItems.of(currentPage, PAGE_SIZE)
+                selectedCartItems = if (isSelected) {
+                    selectedCartItems + cartItemsOfCurrentPage
+                } else {
+                    selectedCartItems - cartItemsOfCurrentPage.toSet()
+                }
+                val cartItemUIStates = cartItemsOfCurrentPage.map {
+                    CartItemUIState.create(it, it in selectedCartItems)
+                }
+                view.setCartItems(cartItemUIStates, false)
+                view.setOrderCount(selectedCartItems.size)
+                view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
+                view.setCanOrder(selectedCartItems.isNotEmpty())
+                val totalPrice = selectedCartItems.sumOf { it.price }
+                discountInfoRepository.getDiscountInfo(totalPrice).thenAccept { result ->
+                    result.onSuccess { discountInfo ->
+                        val discountedPrice = discountInfo.calculateDiscountedPrice(totalPrice)
+                        view.setOrderPrice(discountedPrice)
+                    }.onFailure {
+                        view.showMessage("주문 금액을 계산할 수 없습니다.")
+                        view.setOrderPrice(-1)
+                    }
+                }
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
             }
-            view.setCanOrder(selectedCartItems.isNotEmpty())
-            view.setCanSeeOrderPriceInfo(selectedCartItems.isNotEmpty())
         }
     }
 
-    private fun updateCartUI() {
-        showAllSelectionUI(currentPage, selectedCartItems)
-        showOrderUI(selectedCartItems)
-        showCartItems(currentPage, selectedCartItems, false)
-    }
-
     override fun onPlusCount(cartItemId: Long) {
-        cartItemRepository.findById(cartItemId) { cartItem ->
-            cartItem.plusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
-                if (cartItem in selectedCartItems) {
-                    selectedCartItems = selectedCartItems - cartItem + cartItem
-                    showAllSelectionUI(currentPage, selectedCartItems)
-                    showOrderUI(selectedCartItems)
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val cartItem = cartItems.find { it.id == cartItemId }
+                if (cartItem == null) {
+                    view.showMessage("수량을 증가하려는 장바구니 아이템이 존재하지 않습니다.")
+                    view.refresh()
+                    return@thenAccept
                 }
-                showCartItems(currentPage, selectedCartItems, false)
+                cartItemRepository.updateCartItemQuantity(cartItem.id, cartItem.quantity + 1)
+                    .thenAccept { result ->
+                        result.onSuccess {
+                            cartItemRepository.getCartItems().thenAccept { result ->
+                                result.onSuccess { cartItems ->
+                                    val cartItem = cartItems.find { it.id == cartItemId }
+                                    if (cartItem == null) {
+                                        view.showMessage("수량을 증가한 장바구니 아이템이 사라졌습니다.")
+                                        view.refresh()
+                                        return@thenAccept
+                                    }
+                                    selectedCartItems = selectedCartItems.replaced(cartItem)
+                                    setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, false)
+                                    val totalPrice = selectedCartItems.sumOf { it.price }
+                                    discountInfoRepository.getDiscountInfo(totalPrice)
+                                        .thenAccept { result ->
+                                            result.onSuccess { discountInfo ->
+                                                val discountedPrice =
+                                                    discountInfo.calculateDiscountedPrice(totalPrice)
+                                                view.setOrderPrice(discountedPrice)
+                                            }.onFailure {
+                                                view.showMessage("주문 금액을 계산할 수 없습니다.")
+                                                view.setOrderPrice(-1)
+                                            }
+                                        }
+                                }.onFailure {
+                                    view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+                                }
+                            }
+                        }.onFailure {
+                            view.showMessage("해당 장바구니 아이템의 수량을 증가하는 데 실패했습니다.")
+                        }
+                    }
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
             }
         }
     }
 
     override fun onMinusCount(cartItemId: Long) {
-        cartItemRepository.findById(cartItemId) { cartItem ->
-            cartItem.minusCount()
-            cartItemRepository.updateCountById(cartItemId, cartItem.count) {
-                if (cartItem in selectedCartItems) {
-                    selectedCartItems = selectedCartItems - cartItem + cartItem
-                    showAllSelectionUI(currentPage, selectedCartItems)
-                    showOrderUI(selectedCartItems)
+        cartItemRepository.getCartItems().thenAccept { result ->
+            result.onSuccess { cartItems ->
+                val cartItem = cartItems.find { it.id == cartItemId }
+                if (cartItem == null) {
+                    view.showMessage("수량을 증가하려는 장바구니 아이템이 존재하지 않습니다.")
+                    view.refresh()
+                    return@thenAccept
                 }
-                showCartItems(currentPage, selectedCartItems, false)
+                if (cartItem.quantity <= 1) {
+                    return@thenAccept
+                }
+                cartItemRepository.updateCartItemQuantity(cartItem.id, cartItem.quantity - 1)
+                    .thenAccept { result ->
+                        result.onSuccess {
+                            cartItemRepository.getCartItems().thenAccept { result ->
+                                result.onSuccess { cartItems ->
+                                    val cartItem = cartItems.find { it.id == cartItemId }
+                                    if (cartItem == null) {
+                                        view.showMessage("수량을 감소한 장바구니 아이템이 사라졌습니다.")
+                                        view.refresh()
+                                        return@thenAccept
+                                    }
+                                    selectedCartItems = selectedCartItems.replaced(cartItem)
+                                    setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, false)
+                                    val totalPrice = selectedCartItems.sumOf { it.price }
+                                    discountInfoRepository.getDiscountInfo(totalPrice)
+                                        .thenAccept { result ->
+                                            result.onSuccess { discountInfo ->
+                                                val discountedPrice =
+                                                    discountInfo.calculateDiscountedPrice(totalPrice)
+                                                view.setOrderPrice(discountedPrice)
+                                            }.onFailure {
+                                                view.showMessage("주문 금액을 계산할 수 없습니다.")
+                                                view.setOrderPrice(-1)
+                                            }
+                                        }
+                                }.onFailure {
+                                    view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
+                                }
+                            }
+                        }.onFailure {
+                            view.showMessage("해당 장바구니 아이템의 수량을 감소하는 데 실패했습니다.")
+                        }
+                    }
+            }.onFailure {
+                view.showMessage("장바구니 아이템을 불러오는 데 실패했습니다.")
             }
         }
     }
 
     override fun onOrderSelectedCartItems() {
-        orderRemoteService.requestToPostOrder(
-            "Basic ${UserData.credential}",
-            OrderRequestBody(selectedCartItems.map { it.id })
-        ).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful.not()) return
-                val orderId = response.headers()["Location"]
-                    ?.removePrefix("/orders/")
-                    ?.toLong()
-                    ?: return
+        orderRepository.createOrder(selectedCartItems.toList()).thenAccept { result ->
+            result.onSuccess { orderId ->
                 view.showOrderResult(orderId)
+                currentPage = 1
+                selectedCartItems = emptySet()
+                view.setCanSeeOrderPriceInfo(false)
+                view.setCanOrder(false)
+                view.setOrderPrice(0)
+                view.setOrderCount(0)
+                cartItemRepository.getCartItems().thenAccept { result ->
+                    result.onSuccess { cartItems ->
+                        setCartItemsOnView(cartItems, currentPage, PAGE_SIZE, true)
+                        setPageUiOnView(cartItems.size, currentPage, PAGE_SIZE)
+                        setAllSelectionUiOnView(cartItems, currentPage, PAGE_SIZE)
+                    }.onFailure {
+                        view.showMessage("장바구니 아이템을 새로고침하는 데 실패했습니다.")
+                    }
+                }
+            }.onFailure {
+                view.showMessage("선택한 장바구니 아이템을 주문하는 데 실패했습니다.")
             }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-            }
-        })
-    }
-
-    override fun onRefresh() {
-        cartItemRepository.findAll { cartItems ->
-            selectedCartItems = selectedCartItems.filter { it in cartItems }.toSet()
-            showCartItems(currentPage, selectedCartItems, true)
-            showPageUI(currentPage)
-            showAllSelectionUI(currentPage, selectedCartItems)
-            showOrderUI(selectedCartItems)
         }
     }
 
     override fun onLoadOrderPriceInfo() {
-        val orderPrice =
-            TotalPriceCalculator.calculate(selectedCartItems)
-        discountRemoteService.requestDiscountInfo(orderPrice, UserData.grade)
-            .enqueue(object : Callback<DiscountInfoDto> {
-                override fun onResponse(
-                    call: Call<DiscountInfoDto>,
-                    response: Response<DiscountInfoDto>
-                ) {
-                    if (response.isSuccessful.not()) return
-                    val orderPriceInfo = response.body()?.toDomain() ?: return
-                    val orderPriceInfoUIState = OrderPriceInfoUIState.create(
-                        orderPriceInfo,
-                        TotalPriceCalculator.calculate(selectedCartItems)
-                    )
-                    view.showOrderPriceInfo(orderPriceInfoUIState)
-                }
-
-                override fun onFailure(call: Call<DiscountInfoDto>, t: Throwable) {
-                }
-            })
-    }
-
-    private fun showCartItems(page: Int, selectedCartItems: Set<CartItem>, initScroll: Boolean) {
-        getCartItemsOf(page) { cartItems ->
-            val cartItemUIStates =
-                cartItems.map { CartItemUIState.create(it, it in selectedCartItems) }
-            view.setCartItems(cartItemUIStates, initScroll)
+        val totalPrice = selectedCartItems.sumOf(CartItem::price)
+        discountInfoRepository.getDiscountInfo(totalPrice).thenAccept { result ->
+            result.onSuccess { discountInfo ->
+                val orderPriceInfoUIState = OrderPriceInfoUIState.create(discountInfo, totalPrice)
+                view.showOrderPriceInfo(orderPriceInfoUIState)
+            }.onFailure {
+                view.showMessage("주문 금액 정보를 불러오는 데 실패했습니다.")
+            }
         }
     }
 
-    private fun getCartItemsOf(page: Int, onFinish: (List<CartItem>) -> Unit) {
-        val offset = (page - 1) * PAGE_SIZE
-        return cartItemRepository.findAllOrderByAddedTime(PAGE_SIZE, offset, onFinish)
-    }
-
-    private fun showAllSelectionUI(currentPage: Int, selectedCartItems: Set<CartItem>) {
-        getCartItemsOf(currentPage) { cartItems ->
-            view.setStateOfAllSelection(cartItems.all { it in selectedCartItems } && cartItems.isNotEmpty())
+    private fun setCartItemsOnView(
+        cartItems: List<CartItem>,
+        page: Int,
+        pageSize: Int,
+        initScroll: Boolean
+    ) {
+        val cartItemsOfCurrentPage = cartItems.of(page, pageSize)
+        val cartItemUIStates = cartItemsOfCurrentPage.map {
+            CartItemUIState.create(it, it in selectedCartItems)
         }
+        view.setCartItems(cartItemUIStates, initScroll)
     }
 
-    private fun showOrderUI(selectedCartItems: Set<CartItem>) {
-        val totalPrice =
-            TotalPriceCalculator.calculate(selectedCartItems)
-        discountRemoteService.requestDiscountInfo(totalPrice, UserData.grade)
-            .enqueue(object : Callback<DiscountInfoDto> {
-                override fun onResponse(
-                    call: Call<DiscountInfoDto>,
-                    response: Response<DiscountInfoDto>
-                ) {
-                    if (response.isSuccessful.not()) return
-                    val orderPriceInfo = response.body()?.toDomain() ?: return
-                    val orderPrice = orderPriceInfo.discountResults
-                        .map { it.discountPrice }
-                        .fold(totalPrice) { total, discountPrice ->
-                            total - discountPrice
-                        }
-                    view.setOrderPrice(max(0, orderPrice))
-                }
-
-                override fun onFailure(call: Call<DiscountInfoDto>, t: Throwable) {
-                }
-            })
-        view.setOrderPrice(TotalPriceCalculator.calculate(selectedCartItems))
-        view.setOrderCount(selectedCartItems.size)
-        view.setCanOrder(selectedCartItems.isNotEmpty())
+    private fun List<CartItem>.of(page: Int, pageSize: Int): List<CartItem> {
+        val offset = (page - 1) * pageSize
+        return this.slice(offset until this.size).take(pageSize)
     }
 
-    private fun showPageUI(currentPage: Int) {
-        refreshStateThatCanRequestPage(currentPage)
-        view.setPage(currentPage)
+    private fun setPageUiOnView(cartItemsSize: Int, page: Int, pageSize: Int) {
+        val lastPage = calculateLastPage(cartItemsSize, pageSize)
+        view.setPageUIVisibility(lastPage > 1)
+        view.setPage(page)
+        view.setStateThatCanRequestPreviousPage(page > 1)
+        view.setStateThatCanRequestNextPage(page < lastPage)
     }
 
-    private fun refreshStateThatCanRequestPage(currentPage: Int) {
-        view.setStateThatCanRequestPreviousPage(currentPage > 1)
-        getMaxPage { maxPage ->
-            view.setStateThatCanRequestNextPage(currentPage < maxPage)
-            view.setPageUIVisibility(maxPage > 1)
+    private fun setAllSelectionUiOnView(cartItems: List<CartItem>, page: Int, pageSize: Int) {
+        val cartItemsOfCurrentPage = cartItems.of(page, pageSize)
+        view.setStateOfAllSelection(
+            cartItemsOfCurrentPage.all { it in selectedCartItems } && cartItemsOfCurrentPage.isNotEmpty()
+        )
+    }
+
+    private fun calculateLastPage(cartItemsSize: Int, pageSize: Int): Int =
+        (cartItemsSize - 1) / pageSize + 1
+
+    private fun Set<CartItem>.replaced(cartItem: CartItem): Set<CartItem> {
+        if (cartItem in this) {
+            val result = this - cartItem
+            return result + cartItem
         }
-    }
-
-    private fun getMaxPage(onFinish: (Int) -> Unit) {
-        cartItemRepository.countAll { count ->
-            onFinish((count - 1) / PAGE_SIZE + 1)
-        }
+        return this
     }
 
     companion object {

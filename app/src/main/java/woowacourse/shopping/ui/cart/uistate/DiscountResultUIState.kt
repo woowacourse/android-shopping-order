@@ -15,5 +15,13 @@ data class DiscountResultUIState(
                 discountResult.discountPrice
             )
         }
+
+        fun from(discountResult: woowacourse.shopping.data.discount.DiscountResult): DiscountResultUIState {
+            return DiscountResultUIState(
+                discountResult.discountPolicy.toString(),
+                discountResult.discountRate,
+                discountResult.discountPrice
+            )
+        }
     }
 }

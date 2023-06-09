@@ -7,11 +7,13 @@ interface CartContract {
 
     interface Presenter {
 
-        fun onLoadCartItemsOfNextPage()
+        fun onLoadCartItemsOfFirstPage()
+
+        fun onLoadCartItemsOfLastPage()
 
         fun onLoadCartItemsOfPreviousPage()
 
-        fun onLoadCartItemsOfLastPage()
+        fun onLoadCartItemsOfNextPage()
 
         fun onDeleteCartItem(cartItemId: Long)
 
@@ -24,8 +26,6 @@ interface CartContract {
         fun onMinusCount(cartItemId: Long)
 
         fun onOrderSelectedCartItems()
-
-        fun onRefresh()
 
         fun onLoadOrderPriceInfo()
     }
@@ -54,5 +54,9 @@ interface CartContract {
         fun setCanSeeOrderPriceInfo(canSeeOrderPriceInfo: Boolean)
 
         fun showOrderPriceInfo(orderPriceInfo: OrderPriceInfoUIState)
+
+        fun showMessage(message: String)
+
+        fun refresh()
     }
 }
