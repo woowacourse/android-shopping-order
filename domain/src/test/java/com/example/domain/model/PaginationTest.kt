@@ -20,7 +20,7 @@ internal class PaginationTest {
             CartProduct(2, productsDatasource[1], 1, false),
             CartProduct(3, productsDatasource[2], 2, true),
             CartProduct(4, productsDatasource[2], 2, true),
-            CartProduct(5, productsDatasource[2], 2, true)
+            CartProduct(5, productsDatasource[2], 2, true),
         )
         assertEquals(expected, actual)
     }
@@ -39,7 +39,7 @@ internal class PaginationTest {
             CartProduct(7, productsDatasource[2], 2, true),
             CartProduct(8, productsDatasource[2], 2, true),
             CartProduct(9, productsDatasource[2], 2, true),
-            CartProduct(10, productsDatasource[2], 2, true)
+            CartProduct(10, productsDatasource[2], 2, true),
         )
         assertEquals(expected, actual)
     }
@@ -54,7 +54,7 @@ internal class PaginationTest {
 
         // then
         val expected = listOf(
-            CartProduct(11, productsDatasource[2], 2, true)
+            CartProduct(11, productsDatasource[2], 2, true),
         )
         assertEquals(expected, actual)
     }
@@ -108,7 +108,7 @@ internal class PaginationTest {
                 // then
                 val expected = true
                 assertEquals(expected, actual)
-            }
+            },
         )
     }
 
@@ -130,7 +130,7 @@ internal class PaginationTest {
                     CartProduct(7, productsDatasource[2], 2, true),
                     CartProduct(8, productsDatasource[2], 2, true),
                     CartProduct(9, productsDatasource[2], 2, true),
-                    CartProduct(10, productsDatasource[2], 2, true)
+                    CartProduct(10, productsDatasource[2], 2, true),
                 )
                 assertEquals(expected, actual)
             },
@@ -143,7 +143,7 @@ internal class PaginationTest {
                 val actual = nextPagination.hasPreviousPage()
                 val expected = true
                 assertEquals(expected, actual)
-            }
+            },
         )
     }
 
@@ -165,7 +165,7 @@ internal class PaginationTest {
                     CartProduct(2, productsDatasource[1], 1, false),
                     CartProduct(3, productsDatasource[2], 2, true),
                     CartProduct(4, productsDatasource[2], 2, true),
-                    CartProduct(5, productsDatasource[2], 2, true)
+                    CartProduct(5, productsDatasource[2], 2, true),
                 )
                 assertEquals(expected, actual)
             },
@@ -178,7 +178,7 @@ internal class PaginationTest {
                 val actual = previousPagination.hasPreviousPage()
                 val expected = false
                 assertEquals(expected, actual)
-            }
+            },
         )
     }
 

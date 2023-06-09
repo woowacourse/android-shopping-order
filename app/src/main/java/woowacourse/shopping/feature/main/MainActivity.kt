@@ -13,11 +13,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.common_ui.CartCounterBadge
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
-import woowacourse.shopping.data.service.ProductRemoteService
+import woowacourse.shopping.data.service.cart.CartRemoteService
+import woowacourse.shopping.data.service.product.ProductRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -28,6 +28,7 @@ import woowacourse.shopping.feature.main.product.ProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentAdapter
 import woowacourse.shopping.feature.main.recent.RecentProductClickListener
 import woowacourse.shopping.feature.main.recent.RecentWrapperAdapter
+import woowacourse.shopping.feature.order.list.OrderListActivity
 
 class MainActivity : AppCompatActivity(), MainContract.View {
     lateinit var binding: ActivityMainBinding
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private val recentProductClickListener: RecentProductClickListener =
         object : RecentProductClickListener {
             override fun onClick(productId: Long) {
-                presenter.showRecentProductDetail(productId)
+                presenter.showProductDetail(productId)
             }
         }
 
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         mainProductAdapter = MainProductAdapter(productClickListener)
         recentAdapter = RecentAdapter(recentProductClickListener)
         recentWrapperAdapter = RecentWrapperAdapter(recentAdapter)
-        loadAdapter = LoadAdapter { presenter.loadMoreProduct() }
+        loadAdapter = LoadAdapter { presenter.loadMoreProducts() }
     }
 
     private fun initLayoutManager() {
@@ -97,11 +98,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initPresenter() {
-        val productRemoteService = ProductRemoteService()
-        val cartProductRemoteService = CartProductRemoteService()
         presenter = MainPresenter(
-            ProductRepositoryImpl(productRemoteService),
-            CartRepositoryImpl(cartProductRemoteService),
+            this,
+            ProductRepositoryImpl(ProductRemoteService()),
+            CartRepositoryImpl(CartRemoteService()),
             RecentProductRepositoryImpl(RecentDao(this)),
         )
     }
@@ -119,14 +119,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 startActivity(CartActivity.getIntent(this))
             }
             is MainContract.View.MainScreenEvent.ShowProductDetailScreen -> {
-                startActivity(DetailActivity.getIntent(this, event.product, event.recentProduct))
-            }
-            is MainContract.View.MainScreenEvent.HideLoadMore -> {
-                hideLoadMore()
+                startActivity(DetailActivity.getIntent(this, event.product.id, event.recentProduct))
             }
             is MainContract.View.MainScreenEvent.ShowLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.VISIBLE
                 binding.productRecyclerView.visibility = View.GONE
+            }
+            is MainContract.View.MainScreenEvent.HideLoadMore -> {
+                hideLoadMore()
             }
             is MainContract.View.MainScreenEvent.HideLoading -> {
                 binding.skeletonMainLoadingLayout.visibility = View.GONE
@@ -142,7 +142,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onStart() {
         super.onStart()
-        presenter.initLoadData()
+        presenter.initLoadProducts()
+        presenter.loadRecentProducts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -151,12 +152,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         cartCountBadge =
             menu.findItem(R.id.cart_count_badge).actionView?.findViewById(R.id.badge)
 
-        // presenter.loadCartCountSize()
+        presenter.showCartCount()
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.order_list -> {
+                startActivity(OrderListActivity.getIntent(this))
+                true
+            }
+
             R.id.cart_action -> {
                 presenter.moveToCart()
                 true
@@ -184,11 +190,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     companion object {
-        fun getIntent(context: Context): Intent {
-            return Intent(context, MainActivity::class.java)
-        }
+        fun getIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
 
         private const val TOTAL_SPAN = 2
         private const val HALF_SPAN = TOTAL_SPAN / 2
+    }
+
+    override fun failToLoadProduct(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

@@ -7,13 +7,16 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.local.CartRepositoryImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.CartProductRemoteService
+import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
+import woowacourse.shopping.data.service.cart.CartRemoteService
+import woowacourse.shopping.data.service.product.ProductRemoteService
 import woowacourse.shopping.data.sql.recent.RecentDao
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.feature.cart.CartActivity
@@ -21,7 +24,6 @@ import woowacourse.shopping.feature.detail.dialog.CounterDialog
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 import woowacourse.shopping.util.getParcelableCompat
-import woowacourse.shopping.util.keyError
 
 class DetailActivity : AppCompatActivity(), DetailContract.View {
 
@@ -37,27 +39,29 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
-        val product = intent.getParcelableCompat<ProductUiModel>(PRODUCT_KEY)
-            ?: return keyError(PRODUCT_KEY)
+        binding.lifecycleOwner = this
 
-        val recentProduct = intent.getParcelableCompat<RecentProductUiModel>(RECENT_PRODUCT_KEY)
+        val productId = intent.getLongExtra(PRODUCT_KEY, -1)
+        val recentProductUiModel =
+            intent.getParcelableCompat<RecentProductUiModel>(RECENT_PRODUCT_KEY)
 
-        initPresenter(product, recentProduct)
+        initPresenter(productId, recentProductUiModel)
 
         onBackPressedDispatcher.addCallback(this, callback)
         setFragmentResultListener()
     }
 
-    private fun initPresenter(product: ProductUiModel, recentProduct: RecentProductUiModel?) {
+    private fun initPresenter(productId: Long, recentProductUiModel: RecentProductUiModel?) {
         presenter = DetailPresenter(
             this,
+            ProductRepositoryImpl(ProductRemoteService()),
             RecentProductRepositoryImpl(RecentDao(this)),
-            CartRepositoryImpl(CartProductRemoteService()),
-            product,
-            recentProduct,
+            CartRepositoryImpl(CartRemoteService()),
+            productId,
+            recentProductUiModel,
         )
         binding.presenter = presenter
-        presenter.initScreen()
+        presenter.initPresenter()
     }
 
     private fun setFragmentResultListener() {
@@ -66,8 +70,17 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
             this,
         ) { _, bundle ->
             val changeCount = bundle.getInt(CounterDialog.COUNT_KEY, -1)
-            if (changeCount < 0) return@setFragmentResultListener
             presenter.updateProductCount(changeCount)
+        }
+    }
+
+    override fun failedLoadProductInfo() {
+        runOnUiThread {
+            Toast.makeText(
+                this,
+                getString(R.string.failed_load_product_detail_info),
+                Toast.LENGTH_SHORT,
+            ).show()
         }
     }
 
@@ -85,13 +98,15 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         startActivity(
             getIntent(
                 this,
-                recentProductUiModel.product,
+                recentProductUiModel.product.id,
                 recentProductUiModel,
             ).apply { addFlags(FLAG_ACTIVITY_CLEAR_TOP) },
         )
     }
 
-    override fun exitDetailScreen() = finish()
+    override fun exitDetailScreen() {
+        runOnUiThread { finish() }
+    }
 
     override fun showSelectCartProductCountScreen(product: ProductUiModel, cartId: Long?) {
         val counterDialog = CounterDialog.newInstance(product, cartId)
@@ -121,11 +136,11 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
 
         fun getIntent(
             context: Context,
-            product: ProductUiModel,
+            productId: Long,
             recentProductUiModel: RecentProductUiModel?,
         ): Intent {
             return Intent(context, DetailActivity::class.java).apply {
-                putExtra(PRODUCT_KEY, product)
+                putExtra(PRODUCT_KEY, productId)
                 recentProductUiModel?.let { putExtra(RECENT_PRODUCT_KEY, it) }
             }
         }

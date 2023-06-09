@@ -96,9 +96,12 @@ class CartPresenter(
         _page = page.toDomain().setCurrentPageAllChecked(checked).toPresentation()
     }
 
-    override fun processOrderClick() {
+    override fun requestOrder() {
         if (page.cartBottomNavigationUiModel.isAnyChecked.not()) return
+        val cartIds: List<Long> =
+            page.toDomain().getCheckedCartIds()
         _page = page.toDomain().removeAllChecked().toPresentation()
+        view.navigateToOrder(cartIds)
     }
 
     override fun exit() {

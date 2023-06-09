@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.common_ui.CounterView
 import woowacourse.shopping.databinding.ItemMainProductBinding
-import woowacourse.shopping.model.ProductUiModel
+import woowacourse.shopping.model.CartProductUiModel
 
 class MainProductViewHolder private constructor(
     private val binding: ItemMainProductBinding,
@@ -22,9 +22,9 @@ class MainProductViewHolder private constructor(
             }
     }
 
-    fun bind(product: ProductUiModel) {
-        binding.product = product
-        binding.counterView.setCountState(product.count, false)
+    fun bind(cartProduct: CartProductUiModel) {
+        binding.product = cartProduct.productUiModel
+        binding.counterView.setCountState(cartProduct.productUiModel.count, false)
     }
 
     companion object {

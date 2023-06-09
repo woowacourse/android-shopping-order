@@ -1,10 +1,12 @@
 package woowacourse.shopping.feature.detail
 
+import androidx.lifecycle.LiveData
 import woowacourse.shopping.model.ProductUiModel
 import woowacourse.shopping.model.RecentProductUiModel
 
 interface DetailContract {
     interface View {
+        fun failedLoadProductInfo()
         fun showCartScreen()
         fun hideRecentScreen()
         fun setRecentScreen(title: String, money: String)
@@ -14,10 +16,8 @@ interface DetailContract {
     }
 
     interface Presenter {
-        val product: ProductUiModel
-        val recentProduct: RecentProductUiModel?
-        val isRecentProduct: Boolean
-        fun initScreen()
+        val product: LiveData<ProductUiModel>
+        fun initPresenter()
         fun updateProductCount(count: Int)
         fun navigateRecentProductDetail()
         fun handleAddCartClick()

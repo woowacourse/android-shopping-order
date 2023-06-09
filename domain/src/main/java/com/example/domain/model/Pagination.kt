@@ -2,7 +2,7 @@ package com.example.domain.model
 
 data class Pagination(
     private val cartProducts: CartProducts,
-    val currentPage: Int
+    val currentPage: Int,
 ) {
     val allSize: Int
         get() = cartProducts.size
@@ -91,6 +91,10 @@ data class Pagination(
     private fun calculateTotalPageCount(size: Int): Int {
         if (size == 0) return 1
         return kotlin.math.ceil((size.toDouble() / PAGE_LOAD_SIZE)).toInt()
+    }
+
+    fun getCheckedCartIds(): List<Long> {
+        return allList.filter { it.checked }.map { it.cartId }
     }
 
     companion object {

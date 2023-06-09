@@ -10,6 +10,7 @@ interface CartContract {
         fun exitCartScreen()
         fun hideLoadingView()
         fun showLoadingView()
+        fun navigateToOrder(cartId: List<Long>)
     }
 
     interface Presenter {
@@ -21,7 +22,7 @@ interface CartContract {
         fun handleCartProductCartCountChange(cartId: Long, count: Int)
         fun handlePurchaseSelectedCheckedChange(cartId: Long, checked: Boolean)
         fun handleCurrentPageAllCheckedChange(checked: Boolean)
-        fun processOrderClick()
+        fun requestOrder()
         fun loadPreviousPage()
         fun loadNextPage()
         fun exit()

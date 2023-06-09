@@ -16,4 +16,26 @@
     <string name="success_add_cart">장바구니에 담았습니다</string>
     <string name="cart_count_badge">장바구니 갯수</string>
     <string name="cart_order">주문하기</string>
+    <string name="failed_load_product_detail_info">상품 정보를 불러오는데 실패했습니다</string>
+    <string name="ordered_products">주문 상품</string>
+    <string name="order">Order</string>
+    <string name="discount">할인</string>
+    <string name="order_price">주문 금액</string>
+    <string name="discount_price">할인 금액</string>
+    <string name="final_price">최종 결제 금액</string>
+    <string name="discount_condition">%s원 이상 구매 시</string>
+    <string name="discount_amount">%s원 할인</string>
+    <string name="discount_price_format">-%s 원</string>
+    <string name="cart_count">%s 개</string>
+    <string name="payment_price">결제 금액</string>
+    <string name="no_discount">적용 가능한 할인이 없습니다.</string>
+    <string name="order_detail">주문 상세</string>
+    <string name="order_info">주문 내역</string>
+    <string name="payment_info">결제 정보</string>
+    <string name="order_list">주문 목록</string>
+    <string name="order_id">주문 번호 %d</string>
+    <string name="go_order_detail"><![CDATA[주문 상세 보기 >]]></string>
+    <string name="order_main_product_name_more_than_one">%s 외 %d 종</string>
+    <string name="order_success">주문이 완료되었습니다!</string>
+    <string name="order_fail">주문에 실패하였습니다.</string>
 </resources>
