@@ -1,21 +1,18 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 import woowacourse.shopping.utils.NonNullLiveData
 import woowacourse.shopping.utils.NonNullMutableLiveData
 
 class CartPresenter(
     private val view: CartContract.View,
     private val cartRepository: CartRepository,
-    private var index: Int = 0
+    private var index: Int = 0,
 ) : CartContract.Presenter {
-    private val handler = Handler(Looper.getMainLooper())
-
     private val _totalPrice = NonNullMutableLiveData<Int>(0)
     override val totalPrice: NonNullLiveData<Int> get() = _totalPrice
 
@@ -27,17 +24,26 @@ class CartPresenter(
 
     private val currentPage = mutableListOf<CartProductUIModel>()
 
-    private val pageUIModel get() = PageUIModel(
-        cartRepository.hasNextPage(index, STEP),
-        cartRepository.hasPrevPage(index, STEP),
-        index + 1
-    )
+    private val pageUIModel
+        get() = PageUIModel(
+            cartRepository.hasNextPage(index, STEP),
+            cartRepository.hasPrevPage(index, STEP),
+            index + 1,
+        )
 
     private var isChangingItemCheck = false
 
-    private fun fetchCartProducts() {
-        currentPage.clear()
-        currentPage.addAll(cartRepository.getPage(index, STEP).toUIModel())
+    private fun fetchCartProducts(callback: () -> Unit) {
+        cartRepository.getPage(
+            index,
+            STEP,
+            {
+                currentPage.clear()
+                currentPage.addAll(it.toUIModel())
+                callback()
+            },
+            { showErrorMessage(it.message) },
+        )
     }
 
     private fun setUpCarts() {
@@ -57,19 +63,19 @@ class CartPresenter(
     }
 
     override fun setUpView() {
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
-                setUPTotalPrice()
-                setUpCheckedCount()
-                setUpAllButton()
-            }
-        }.start()
+        fetchCartProducts {
+            setUpCarts()
+            setUPTotalPrice()
+            setUpCheckedCount()
+            setUpAllButton()
+        }
     }
 
     override fun setUpProductsCheck(checked: Boolean) {
-        if (isChangingItemCheck) { return }
+        if (isChangingItemCheck) {
+            return
+        }
+
         currentPage.replaceAll {
             cartRepository.updateChecked(it.id, checked)
             it.copy(checked = checked)
@@ -79,70 +85,67 @@ class CartPresenter(
 
     override fun moveToPageNext() {
         index += 1
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
-                setUpAllButton()
-            }
-        }.start()
+        fetchCartProducts {
+            setUpCarts()
+            setUpAllButton()
+        }
     }
 
     override fun moveToPagePrev() {
         index -= 1
-        Thread {
-            fetchCartProducts()
-            handler.post {
-                setUpCarts()
-                setUpAllButton()
-            }
-        }.start()
+        fetchCartProducts {
+            setUpCarts()
+            setUpAllButton()
+        }
     }
 
     override fun updateItemCount(productId: Int, count: Int) {
-        Thread {
-            cartRepository.updateCount(productId, count)
-            handler.post {
+        cartRepository.updateCount(
+            productId,
+            count,
+            {
                 currentPage.indexOfFirst { it.id == productId }
                     .takeIf { it != -1 }
                     ?.let { currentPage[it] = currentPage[it].copy(count = count) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-            }
-        }.start()
-    }
 
-    override fun updateItemCheck(productId: Int, checked: Boolean) {
-        Thread {
-            isChangingItemCheck = true
-            cartRepository.updateChecked(productId, checked)
-            handler.post {
-                currentPage.indexOfFirst { it.id == productId }
-                    .takeIf { it != -1 }
-                    ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
-                setUpCheckedCount()
-                setUPTotalPrice()
-                setUpAllButton()
-                isChangingItemCheck = false
-            }
-        }.start()
-    }
-
-    override fun removeItem(productId: Int) {
-        cartRepository.remove(productId)
-        currentPage.removeIf { it.id == productId }
-        if (currentPage.isEmpty() && index > 0) {
-            moveToPagePrev()
-        } else {
-            Thread {
-                fetchCartProducts()
-                handler.post {
-                    setUpCarts()
+                fetchCartProducts {
                     setUpCheckedCount()
                     setUPTotalPrice()
                 }
-            }.start()
-        }
+            },
+            { showErrorMessage(it.message) },
+        )
+    }
+
+    override fun updateItemCheck(productId: Int, checked: Boolean) {
+        isChangingItemCheck = true
+        cartRepository.updateChecked(productId, checked)
+        currentPage.indexOfFirst { it.id == productId }
+            .takeIf { it != -1 }
+            ?.let { currentPage[it] = currentPage[it].copy(checked = checked) }
+        setUpCheckedCount()
+        setUPTotalPrice()
+        setUpAllButton()
+        isChangingItemCheck = false
+    }
+
+    override fun removeItem(productId: Int) {
+        cartRepository.remove(
+            productId,
+            {
+                currentPage.removeIf { it.id == productId }
+                if (currentPage.isEmpty() && index > 0) {
+                    moveToPagePrev()
+                } else {
+                    fetchCartProducts {
+                        setUpCarts()
+                        setUpCheckedCount()
+                        setUPTotalPrice()
+                    }
+                }
+            },
+            { showErrorMessage(it.message) },
+        )
     }
 
     override fun getPageIndex(): Int {
@@ -150,11 +153,28 @@ class CartPresenter(
     }
 
     override fun navigateToItemDetail(productId: Int) {
-        cartRepository.getAll().all().first { it.productId == productId }.toUIModel().toProduct()
-            .let { view.navigateToItemDetail(it.toUIModel()) }
+        cartRepository.getAll(
+            { cartProducts ->
+                cartProducts.all()
+                    .first { it.product.id == productId }
+                    .toUIModel(true)
+                    .toProduct()
+                    .let { view.navigateToItemDetail(it.toUIModel()) }
+            },
+            { showErrorMessage(it.message) },
+        )
+    }
+
+    override fun navigateToOrder() {
+        val ids = cartRepository.getCheckedIds()
+        if (ids.isEmpty()) {
+            view.showEmptyOrderMessage()
+            return
+        }
+        view.navigateToOrder(ids)
     }
 
     companion object {
-        private const val STEP = 5
+        private const val STEP: Int = 5
     }
 }

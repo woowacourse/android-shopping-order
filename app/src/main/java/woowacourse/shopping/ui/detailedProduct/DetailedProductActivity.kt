@@ -9,16 +9,16 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.dataSource.RemoteProductDataSource
+import woowacourse.shopping.data.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailedProductBinding
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
-import woowacourse.shopping.service.RemoteProductService
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.cartDialog.CartDialog
+import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.utils.ActivityUtils
-import woowacourse.shopping.utils.ServerURL
 import woowacourse.shopping.utils.SharedPreferenceUtils
 import woowacourse.shopping.utils.getSerializableExtraCompat
 
@@ -47,9 +47,9 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
             intent.getSerializableExtraCompat(KEY_PRODUCT)
                 ?: return ActivityUtils.keyError(this, KEY_PRODUCT),
             SharedPreferenceUtils(this),
-            RemoteProductService(ServerURL.url),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
-            RecentProductDatabase(this)
+            ProductRepositoryImpl(RemoteProductDataSource()),
+            CartRepositoryImpl(RemoteCartDataSource()),
+            RecentProductDatabase(this),
         )
         binding.presenter = presenter
         presenter.setUpLastProduct()
@@ -83,7 +83,7 @@ class DetailedProductActivity : AppCompatActivity(), DetailedProductContract.Vie
         startActivity(
             getIntent(this, product).apply {
                 flags = FLAG_ACTIVITY_CLEAR_TOP
-            }
+            },
         )
     }
 

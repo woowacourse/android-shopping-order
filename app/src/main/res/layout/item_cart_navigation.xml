@@ -9,7 +9,7 @@
 
         <variable
             name="cart"
-            type="woowacourse.shopping.model.PageUIModel" />
+            type="woowacourse.shopping.uimodel.PageUIModel" />
 
         <variable
             name="listener"

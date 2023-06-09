@@ -11,7 +11,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.model.RecentProductUIModel" />
+            type="woowacourse.shopping.uimodel.RecentProductUIModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,7 +29,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_launcher_background"/>
+            tools:src="@drawable/ic_launcher_background" />
 
         <TextView
             android:id="@+id/tv_product_name"

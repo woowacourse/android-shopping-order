@@ -2,10 +2,11 @@ package woowacourse.shopping.ui.detailedProduct
 
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentRepository
+import woowacourse.shopping.uimodel.ProductUIModel
+import woowacourse.shopping.utils.ActivityUtils.showErrorMessage
 import woowacourse.shopping.utils.SharedPreferenceUtils
 
 class DetailedProductPresenter(
@@ -14,14 +15,22 @@ class DetailedProductPresenter(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentRepository: RecentRepository
+    private val recentRepository: RecentRepository,
 ) : DetailedProductContract.Presenter {
     private var lastProduct: ProductUIModel? = null
 
     override fun setUpLastProduct() {
         sharedPreferenceUtils.getLastProductId()
             .takeIf { it != product.id && it != -1 }
-            ?.let { runCatching { lastProduct = productRepository.findById(it).toUIModel() } }
+            ?.let {
+                productRepository.findById(
+                    it,
+                    { product ->
+                        lastProduct = product.toUIModel()
+                    },
+                    { showErrorMessage(it.message) },
+                )
+            }
         sharedPreferenceUtils.setLastProductId(product.id)
     }
 
@@ -31,8 +40,12 @@ class DetailedProductPresenter(
 
     override fun addProductToCart(count: Int) {
         cartRepository.insert(product.id)
-        cartRepository.updateCount(product.id, count)
-        view.navigateToCart()
+        cartRepository.updateCount(
+            product.id,
+            count,
+            { view.navigateToCart() },
+            { showErrorMessage(it.message) },
+        )
     }
 
     override fun addProductToRecent() {

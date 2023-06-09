@@ -15,6 +15,10 @@
         <variable
             name="onAllCheckClick"
             type="kotlin.jvm.functions.Function1" />
+
+        <variable
+            name="onOrderClick"
+            type="kotlin.jvm.functions.Function0" />
     </data>
 
     <LinearLayout
@@ -34,12 +38,13 @@
                 android:id="@+id/cb_check_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onCheckedChanged="@{(compoundButton, checked) -> onAllCheckClick.invoke(checked)}" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cart_select_all_of_page" />
+                android:button="@null"
+                android:drawableTop="@drawable/selector_checkbox_cart_total"
+                android:onCheckedChanged="@{(compoundButton, checked) -> onAllCheckClick.invoke(checked)}"
+                android:text="@string/cart_select_all_of_page"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <View
@@ -63,6 +68,7 @@
             android:layout_height="match_parent"
             android:background="@color/blue_green_04c09e"
             android:gravity="center"
+            android:onClick="@{() -> onOrderClick.invoke()}"
             android:text="@{@string/cart_order_btn(totalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"

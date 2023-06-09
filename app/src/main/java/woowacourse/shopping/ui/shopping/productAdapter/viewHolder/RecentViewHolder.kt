@@ -10,13 +10,14 @@ import woowacourse.shopping.ui.shopping.recentProductAdapter.RecentProductsAdapt
 
 class RecentViewHolder(
     binding: ItemProductRecentBinding,
-    listener: ProductsListener
+    listener: ProductsListener,
 ) : ShoppingViewHolder(binding.root) {
     private val adapter = RecentProductsAdapter(mutableListOf(), listener::onClickItem)
 
     init {
         binding.rvProducts.adapter = adapter
     }
+
     override fun bind(productItemType: ProductsItemType) {
         (productItemType as ProductsItemType.RecentProducts).let { recentProducts ->
             adapter.submitList(recentProducts.product.map { RecentProductItem(it) })

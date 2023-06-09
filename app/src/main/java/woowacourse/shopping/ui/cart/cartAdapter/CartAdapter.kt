@@ -3,11 +3,11 @@ package woowacourse.shopping.ui.cart.cartAdapter
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
 import woowacourse.shopping.ui.cart.cartAdapter.viewHolder.CartProductViewHolder
 import woowacourse.shopping.ui.cart.cartAdapter.viewHolder.CartViewHolder
 import woowacourse.shopping.ui.cart.cartAdapter.viewHolder.NavigationViewHolder
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
 
 class CartAdapter(private val cartListener: CartListener) : RecyclerView.Adapter<CartViewHolder>() {
     private val cartItems = mutableListOf<CartItemType>()

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="orderItem"
+            type="woowacourse.shopping.uimodel.CartProductUIModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp">
+
+        <ImageView
+            android:id="@+id/iv_order_item"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            app:imageUrl="@{orderItem.imageUrl}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toStartOf="@id/tv_order_item_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@mipmap/ic_launcher_round" />
+
+        <TextView
+            android:id="@+id/tv_order_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:layout_marginStart="15dp"
+            android:text="@{orderItem.name}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/iv_order_item"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="상품 이름" />
+
+        <TextView
+            android:id="@+id/tv_order_item_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/product_price(orderItem.price)}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_order_item_count"
+            app:layout_constraintStart_toStartOf="@id/tv_order_item_name"
+            tools:text="10,000원" />
+
+        <TextView
+            android:id="@+id/tv_order_item_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@{@string/order_item_quantity(orderItem.count)}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tv_order_item_name"
+            tools:text="2개" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

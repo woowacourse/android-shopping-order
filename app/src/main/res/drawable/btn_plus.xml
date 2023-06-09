@@ -10,14 +10,14 @@
         android:pathData="M 24 0 C 37.2548339959 0 48 10.7451660041 48 24 C 48 37.2548339959 37.2548339959 48 24 48 C 10.7451660041 48 0 37.2548339959 0 24 C 0 10.7451660041 10.7451660041 0 24 0 Z" />
     <path
         android:fillColor="#000000"
-        android:strokeColor="#555555"
+        android:pathData="M24 14V34"
         android:strokeWidth="3"
-        android:strokeLineCap="round"
-        android:pathData="M24 14V34" />
+        android:strokeColor="#555555"
+        android:strokeLineCap="round" />
     <path
         android:fillColor="#000000"
-        android:strokeColor="#555555"
+        android:pathData="M34 24L14 24"
         android:strokeWidth="3"
-        android:strokeLineCap="round"
-        android:pathData="M34 24L14 24" />
+        android:strokeColor="#555555"
+        android:strokeLineCap="round" />
 </vector>

@@ -7,7 +7,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.model.CartProductUIModel" />
+            type="woowacourse.shopping.uimodel.CartProductUIModel" />
 
         <variable
             name="listener"
@@ -91,10 +91,10 @@
             android:layout_marginEnd="13dp"
             android:layout_marginBottom="18dp"
             app:count="@{product.count}"
-            app:productId="@{product.id}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:minCount="@{1}" />
+            app:minCount="@{1}"
+            app:productId="@{product.productId}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

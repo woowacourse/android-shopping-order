@@ -4,20 +4,23 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
 import woowacourse.shopping.ui.cart.cartAdapter.CartAdapter
 import woowacourse.shopping.ui.cart.cartAdapter.CartListener
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
-import woowacourse.shopping.utils.ServerURL
+import woowacourse.shopping.ui.order.OrderActivity
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
+import woowacourse.shopping.uimodel.ProductUIModel
 
 class CartActivity : AppCompatActivity(), CartContract.View {
     private lateinit var binding: ActivityCartBinding
@@ -57,17 +60,24 @@ class CartActivity : AppCompatActivity(), CartContract.View {
     private fun initToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val navigationIcon = binding.toolbar.navigationIcon?.mutate()
+        DrawableCompat.setTint(
+            navigationIcon!!,
+            ContextCompat.getColor(this, android.R.color.white),
+        )
+        binding.toolbar.navigationIcon = navigationIcon
     }
 
     private fun initPresenter(savedInstanceState: Bundle?) {
         presenter = CartPresenter(
             this,
-            CartRepositoryImpl(RemoteCartService(ServerURL.url)),
-            savedInstanceState?.getInt(KEY_OFFSET) ?: 0
+            CartRepositoryImpl(RemoteCartDataSource()),
+            savedInstanceState?.getInt(KEY_OFFSET) ?: 0,
         )
         presenter.setUpView()
 
         binding.cartBottom.onAllCheckClick = presenter::setUpProductsCheck
+        binding.cartBottom.onOrderClick = presenter::navigateToOrder
     }
 
     private fun initObserve() {
@@ -98,18 +108,23 @@ class CartActivity : AppCompatActivity(), CartContract.View {
         override fun onPageNext() {
             presenter.moveToPageNext()
         }
+
         override fun onPagePrev() {
             presenter.moveToPagePrev()
         }
+
         override fun onItemRemove(productId: Int) {
             presenter.removeItem(productId)
         }
+
         override fun onItemClick(product: CartProductUIModel) {
             presenter.navigateToItemDetail(product.productId)
         }
+
         override fun onItemUpdate(productId: Int, count: Int) {
             presenter.updateItemCount(productId, count)
         }
+
         override fun onItemCheckChanged(productId: Int, checked: Boolean) {
             presenter.updateItemCheck(productId, checked)
         }
@@ -123,6 +138,14 @@ class CartActivity : AppCompatActivity(), CartContract.View {
 
     override fun navigateToItemDetail(product: ProductUIModel) {
         startActivity(DetailedProductActivity.getIntent(this, product))
+    }
+
+    override fun navigateToOrder(checkedIds: List<Int>) {
+        startActivity(OrderActivity.getIntent(this, checkedIds.toMutableList() as ArrayList<Int>))
+    }
+
+    override fun showEmptyOrderMessage() {
+        Toast.makeText(this, R.string.cart_empty_order_message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

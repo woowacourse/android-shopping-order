@@ -4,28 +4,28 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.database.product.ProductDatabase
-import woowacourse.shopping.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.dataSource.RemoteCartDataSource
+import woowacourse.shopping.data.dataSource.RemoteProductDataSource
+import woowacourse.shopping.data.database.recentProduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
-import woowacourse.shopping.model.ProductUIModel
-import woowacourse.shopping.model.RecentProductUIModel
-import woowacourse.shopping.repositoryImpl.CartRepositoryImpl
-import woowacourse.shopping.repositoryImpl.ProductRepositoryImpl
-import woowacourse.shopping.service.RemoteCartService
-import woowacourse.shopping.service.RemoteProductService
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detailedProduct.DetailedProductActivity
+import woowacourse.shopping.ui.orderlist.OrderListActivity
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapter
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getItemDecoration
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsAdapterDecoration.getSpanSizeLookup
 import woowacourse.shopping.ui.shopping.productAdapter.ProductsListener
-import woowacourse.shopping.utils.ServerURL
+import woowacourse.shopping.uimodel.ProductUIModel
+import woowacourse.shopping.uimodel.RecentProductUIModel
 
 class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     private lateinit var binding: ActivityShoppingBinding
@@ -49,13 +49,24 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.cart_menu, menu)
+        menuInflater.inflate(R.menu.shopping_menu, menu)
         menu?.findItem(R.id.cart)?.actionView?.let { view ->
             view.setOnClickListener { navigateToCart() }
             view.findViewById<TextView>(R.id.tv_counter)?.let { tvCount = it }
         }
         presenter.setUpTotalCount()
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.order -> {
+                navigateToOrderList()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun initBinding() {
@@ -72,11 +83,10 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         presenter = ShoppingPresenter(
             this,
             ProductRepositoryImpl(
-                ProductDatabase(this),
-                RemoteProductService(ServerURL.url)
+                RemoteProductDataSource(),
             ),
             RecentProductDatabase(this),
-            CartRepositoryImpl(RemoteCartService(ServerURL.url))
+            CartRepositoryImpl(RemoteCartDataSource()),
         )
         presenter.setUpRecentProducts()
         presenter.setUpNextProducts()
@@ -93,11 +103,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         override fun onClickItem(productId: Int) {
             presenter.navigateToItemDetail(productId)
         }
+
         override fun onReadMoreClick() {
             presenter.setUpNextProducts()
         }
+
         override fun onAddCartOrUpdateCount(productId: Int, count: Int) {
-            adapter.updateItemCount(productId, count)
             presenter.updateItemCount(productId, count)
             presenter.setUpTotalCount()
         }
@@ -129,9 +140,12 @@ class ShoppingActivity : AppCompatActivity(), ShoppingContract.View {
         startActivity(CartActivity.getIntent(this))
     }
 
+    private fun navigateToOrderList() {
+        startActivity(OrderListActivity.getIntent(this))
+    }
+
     companion object {
-        fun getIntent(context: Context, server: String): Intent {
-            ServerURL.url = server
+        fun getIntent(context: Context): Intent {
             return Intent(context, ShoppingActivity::class.java)
         }
     }

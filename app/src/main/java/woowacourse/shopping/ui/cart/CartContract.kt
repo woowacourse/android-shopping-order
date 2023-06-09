@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.CartProductUIModel
-import woowacourse.shopping.model.PageUIModel
-import woowacourse.shopping.model.ProductUIModel
+import woowacourse.shopping.uimodel.CartProductUIModel
+import woowacourse.shopping.uimodel.PageUIModel
+import woowacourse.shopping.uimodel.ProductUIModel
 import woowacourse.shopping.utils.NonNullLiveData
 
 interface CartContract {
@@ -10,6 +10,8 @@ interface CartContract {
     interface View {
         fun setPage(page: List<CartProductUIModel>, pageUIModel: PageUIModel)
         fun navigateToItemDetail(product: ProductUIModel)
+        fun navigateToOrder(checkedIds: List<Int>)
+        fun showEmptyOrderMessage()
     }
 
     interface Presenter {
@@ -25,5 +27,6 @@ interface CartContract {
         fun removeItem(productId: Int)
         fun getPageIndex(): Int
         fun navigateToItemDetail(productId: Int)
+        fun navigateToOrder()
     }
 }

@@ -12,11 +12,11 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.model.ProductUIModel" />
+            type="woowacourse.shopping.uimodel.ProductUIModel" />
 
         <variable
             name="lastProduct"
-            type="woowacourse.shopping.model.ProductUIModel" />
+            type="woowacourse.shopping.uimodel.ProductUIModel" />
     </data>
 
     <LinearLayout

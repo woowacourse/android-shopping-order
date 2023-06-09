@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Shopping</string>
     <string name="menu_cart_title">cart</string>
+    <string name="menu_order_title">order</string>
     <string name="product_price_prefix">금액</string>
     <string name="product_price">%,d원</string>
     <string name="exit">exit</string>
@@ -23,12 +24,40 @@
     <string name="shopping_read_more_text">더보기</string>
     <string name="shopping_item_product_image_description">상품</string>
 
-    <!-- Strings related to recent recent product -->
+    <!-- Strings related to recent product -->
     <string name="recent_product_text">최근 본 상품</string>
     <string name="recent_product_item_product_image_description">최근 본 상품</string>
     <string name="detailed_product_last_item">마지막으로 본 상품</string>
     <string name="cart_dialog_btn">담기</string>
+
+    <!-- Strings related to server list -->
     <string name="server_setting_io_server">이오 서버</string>
     <string name="server_setting_jito_server">지토 서버</string>
+
+    <!-- Strings related to order -->
+    <string name="cart_empty_order_message">주문할 상품이 선택되지 않았습니다.</string>
+    <string name="order_item_quantity">%d개</string>
+    <string name="order_remain_point">보유 포인트 %,d원</string>
+    <string name="order_available_point">사용 가능 포인트 %,d원</string>
+    <string name="order_earned_point">적립 예정 포인트 %,d원</string>
+    <string name="order_title_list">주문 목록</string>
+    <string name="order_title_discount">할인</string>
+    <string name="order_title_point">포인트 사용</string>
+    <string name="price_unit">원</string>
+    <string name="order_title_purchase">총 결제 금액</string>
+    <string name="order_price_all">주문 금액</string>
+    <string name="order_price_discount">할인 금액</string>
+    <string name="order_price_total">총 결제 금액</string>
+    <string name="order_btn_order">주문하기</string>
+    <string name="order_invalid_point">올바른 금액을 입력해주세요</string>
+    <string name="order_unavailable_point">사용 가능한 포인트를 초과했어요</string>
+    <string name="order_success">주문이 완료되었습니다!</string>
+    <string name="order_initial_point">0</string>
+
+    <!-- Strings related to order detailed -->
+    <string name="order_detail_title_history">주문 내역</string>
+    <string name="order_detail_title_detail">주문 상세</string>
+    <string name="order_title_date">주문일자</string>
+    <string name="order_btn_detail">주문 상세</string>
 
 </resources>
