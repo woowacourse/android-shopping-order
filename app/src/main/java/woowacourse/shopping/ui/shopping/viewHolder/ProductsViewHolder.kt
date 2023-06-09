@@ -1,11 +1,8 @@
 package woowacourse.shopping.ui.shopping.viewHolder
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import com.example.domain.repository.CartRepository
 import woowacourse.shopping.databinding.ProductItemBinding
-import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.ui.shopping.ProductItem
 import woowacourse.shopping.ui.shopping.ProductsItemType
 
@@ -15,15 +12,16 @@ class ProductsViewHolder private constructor(
 ) :
     ItemViewHolder(binding.root) {
 
-    fun bind(productItemType: ProductsItemType, cartRepository: CartRepository) {
+    fun bind(productItemType: ProductsItemType) {
         val productItem = productItemType as? ProductItem ?: return
         binding.product = productItem.product
-        binding.cartProduct = cartRepository.findById(productItem.product.id)?.toUIModel()
+        binding.count = productItem.count
         binding.listener = onClickListener
 
         binding.addCartBtn.setOnClickListener {
             onClickListener.onAddCart(productItem.product.id, 1)
-            binding.addCartBtn.visibility = View.GONE
+            binding.count = binding.count + 1
+            binding.executePendingBindings()
         }
     }
 
@@ -37,7 +35,6 @@ class ProductsViewHolder private constructor(
                 .inflate(LayoutInflater.from(parent.context), parent, false)
             return ProductsViewHolder(
                 binding,
-
                 onClickListener,
             )
         }

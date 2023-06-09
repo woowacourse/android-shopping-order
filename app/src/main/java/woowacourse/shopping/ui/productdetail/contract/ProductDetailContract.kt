@@ -9,7 +9,8 @@ interface ProductDetailContract {
 
         fun showLatestProduct(product: ProductUIModel)
 
-        fun navigateToDetail(product: ProductUIModel)
+        fun navigateToDetail(id: Long)
+        fun setProductCount(count: Int)
     }
 
     interface Presenter {

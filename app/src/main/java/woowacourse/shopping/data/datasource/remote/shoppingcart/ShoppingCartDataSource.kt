@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import okhttp3.Call
+import woowacourse.shopping.data.remote.response.CartProductDto
 
 interface ShoppingCartDataSource {
-    fun getAllProductInCart(): Call
-    fun postProductToCart(productId: Long): Call
-    fun patchProductCount(productId: Long, quantity: Int): Call
-    fun deleteProductInCart(productId: Long): Call
+    fun getAllProductInCart(): Result<List<CartProductDto>>
+    fun postProductToCart(productId: Long, quantity: Int): Result<Unit>
+    fun patchProductCount(cartItemId: Long, quantity: Int): Result<Unit>
+    fun deleteProductInCart(productId: Long): Result<Unit>
 }

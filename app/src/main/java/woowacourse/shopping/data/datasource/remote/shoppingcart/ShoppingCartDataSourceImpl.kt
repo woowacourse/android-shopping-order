@@ -1,38 +1,72 @@
 package woowacourse.shopping.data.datasource.remote.shoppingcart
 
-import okhttp3.Call
-import okhttp3.FormBody
-import okhttp3.RequestBody
-import woowacourse.shopping.data.remote.NetworkModule
+import woowacourse.shopping.data.remote.ServiceFactory
+import woowacourse.shopping.data.remote.request.CartItemRequest
+import woowacourse.shopping.data.remote.response.CartProductDto
+import java.util.concurrent.Executors
 
-class ShoppingCartDataSourceImpl : ShoppingCartDataSource {
+class ShoppingCartDataSourceImpl :
+    ShoppingCartDataSource {
 
-    override fun getAllProductInCart(): Call {
-        return NetworkModule.getService(CART_PATH)
+    override fun getAllProductInCart(): Result<List<CartProductDto>> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<List<CartProductDto>>> {
+            val response = ServiceFactory.shoppingCartService.getAllProductInCart().execute()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun postProductToCart(productId: Long): Call {
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("productId", "$productId")
-            .build()
-
-        return NetworkModule.postService(POST_PRODUCT_TO_CART, requestBody)
+    override fun postProductToCart(productId: Long, quantity: Int): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServiceFactory.shoppingCartService.postProductToCart(
+                    CartItemRequest(productId, quantity),
+                ).execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun patchProductCount(productId: Long, quantity: Int): Call {
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("quantity", "$quantity")
-            .build()
-
-        return NetworkModule.patchService("$CART_PATH/$productId", requestBody)
+    override fun patchProductCount(cartItemId: Long, quantity: Int): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServiceFactory.shoppingCartService.patchProductCount(cartItemId, quantity)
+                    .execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 
-    override fun deleteProductInCart(productId: Long): Call {
-        return NetworkModule.deleteService("$CART_PATH/$productId")
-    }
-
-    companion object {
-        private const val CART_PATH = "/cart-items"
-        private const val POST_PRODUCT_TO_CART = "/cart-items"
+    override fun deleteProductInCart(productId: Long): Result<Unit> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<Unit>> {
+            val response =
+                ServiceFactory.shoppingCartService.deleteProductInCart(productId).execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 }

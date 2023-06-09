@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart.contract
 
+import woowacourse.shopping.model.CartItemsUIModel
 import woowacourse.shopping.model.CartProductUIModel
 import woowacourse.shopping.model.CartUIModel
 import woowacourse.shopping.model.ProductUIModel
@@ -14,6 +15,7 @@ interface CartContract {
         fun setAllOrderCount(count: Int)
         fun updateItem(id: Long, count: Int)
         fun updateChecked(id: Long, checked: Boolean)
+        fun navigateToOrder(cartItems: CartItemsUIModel)
     }
 
     interface Presenter {
@@ -35,5 +37,6 @@ interface CartContract {
         fun setAllOrderCount()
         fun increaseCount(id: Long)
         fun decreaseCount(id: Long)
+        fun navigateToOrder()
     }
 }

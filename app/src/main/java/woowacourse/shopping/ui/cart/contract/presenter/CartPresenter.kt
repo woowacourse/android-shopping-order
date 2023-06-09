@@ -1,8 +1,9 @@
 package woowacourse.shopping.ui.cart.contract.presenter
 
+import com.example.domain.model.CartItems
+import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
 import woowacourse.shopping.mapper.toUIModel
-import woowacourse.shopping.model.CartItemsUIModel
 import woowacourse.shopping.model.CartUIModel
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.cart.CartOffset
@@ -13,19 +14,26 @@ class CartPresenter(
     val view: CartContract.View,
     offset: Int = 0,
 ) : CartContract.Presenter {
-    private val cartItems = CartItemsUIModel()
+    private val cartItems = CartItems()
     private var cartOffset = CartOffset(offset, repository)
+    private var cachedCartProducts = mutableListOf<CartProduct>()
 
     override fun setUpCarts() {
-        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
+        repository.getAllProductInCart().getOrNull()?.let { cartProducts ->
+            cachedCartProducts.clear()
+            cachedCartProducts.addAll(cartProducts)
+            cartItems.updateItem(cachedCartProducts)
+        }
+        val cartProducts = repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()
         view.setCarts(
-            repository.getSubList(cartOffset.getOffset(), STEP).map { it.toUIModel() },
+            cartProducts?.map { it.toUIModel() } ?: emptyList(),
             CartUIModel(
-                cartOffset.getOffset() + 5 < repository.getAllProductInCart().size,
+                cartOffset.getOffset() + STEP < cachedCartProducts.size,
                 0 < cartOffset.getOffset(),
-                cartOffset.getOffset() / 5 + 1,
+                cartOffset.getOffset() / STEP + 1,
             ),
         )
+        updateCartItems()
     }
 
     override fun pageUp() {
@@ -39,20 +47,22 @@ class CartPresenter(
     }
 
     override fun removeItem(id: Long) {
-        repository.remove(id)
-        if (cartOffset.getOffset() == repository.getAllProductInCart().size) {
-            cartOffset = cartOffset.minus(STEP)
+        repository.remove(id).getOrNull()?.let {
+            if (cartOffset.getOffset() == cachedCartProducts.size) {
+                cartOffset = cartOffset.minus(STEP)
+            }
         }
         setUpCarts()
+        updateCartItems()
     }
 
     override fun navigateToItemDetail(id: Long) {
-        val product = repository.findById(id)?.product
+        /*val product = repository.findById(id)?.product
         product.let {
             if (it != null) {
                 view.navigateToItemDetail(it.toUIModel())
             }
-        }
+        }*/
     }
 
     override fun saveOffsetState(outState: MutableMap<String, Int>) {
@@ -65,14 +75,11 @@ class CartPresenter(
     }
 
     override fun onCheckChanged(id: Long, isChecked: Boolean) {
-        val cartProduct = repository.findById(id)?.toUIModel()
-        if (isChecked) {
-            cartProduct?.let { cartItems.insert(it) }
-        } else {
-            cartProduct?.product?.id?.let {
-                cartItems.remove(
-                    it,
-                )
+        cachedCartProducts.find { it.product.id == id }?.let {
+            if (isChecked) {
+                cartItems.insert(it)
+            } else {
+                cartItems.remove(it.product.id)
             }
         }
         updateCartItems()
@@ -84,18 +91,19 @@ class CartPresenter(
     }
 
     override fun onAllCheckboxClick(isChecked: Boolean) {
-        repository.getSubList(cartOffset.getOffset(), STEP).map { it.toUIModel() }
-            .forEach {
+        repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()?.let { cartProducts ->
+            cartProducts.map { it.toUIModel() }.forEach {
                 onCheckChanged(it.product.id, isChecked)
                 view.updateChecked(it.product.id, isChecked)
             }
+        }
     }
 
     override fun setAllCheckbox() {
-        val pageItems = repository.getSubList(cartOffset.getOffset(), STEP).map { it.toUIModel() }
-        val allChecked = pageItems.all { cartItems.isContain(it.product.id) }
-
-        view.setAllCheckbox(allChecked)
+        repository.getSubList(cartOffset.getOffset(), STEP).getOrNull()?.let {
+            val allChecked = it.map { it.toUIModel() }.all { cartItems.isContain(it.product.id) }
+            view.setAllCheckbox(allChecked)
+        }
     }
 
     override fun setAllOrderCount() {
@@ -103,25 +111,39 @@ class CartPresenter(
     }
 
     override fun increaseCount(id: Long) {
-        repository.updateCount(id, getCount(id) + 1)
-        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
-        view.updateItem(id, getCount(id))
-        if (cartItems.isContain(id)) {
-            updateCartItems()
+        val cartProduct = cachedCartProducts.find { it.product.id == id }
+        cartProduct?.id?.let {
+            repository.updateCount(it, getCount(id) + 1).getOrNull().let {
+                cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) + 1
+                cartItems.updateItem(cachedCartProducts)
+            }
+            view.updateItem(id, getCount(id))
+            if (cartItems.isContain(id)) {
+                updateCartItems()
+            }
         }
     }
 
     override fun decreaseCount(id: Long) {
-        repository.updateCount(id, getCount(id) - 1)
-        cartItems.updateItems(repository.getAllProductInCart().map { it.toUIModel() })
-        view.updateItem(id, getCount(id))
-        if (cartItems.isContain(id)) {
-            updateCartItems()
+        val cartProduct = cachedCartProducts.find { it.product.id == id }
+        cartProduct?.id?.let {
+            repository.updateCount(it, getCount(id) - 1).getOrNull().let {
+                cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) - 1
+                cartItems.updateItem(cachedCartProducts)
+            }
+            view.updateItem(id, getCount(id))
+            if (cartItems.isContain(id)) {
+                updateCartItems()
+            }
         }
     }
 
+    override fun navigateToOrder() {
+        view.navigateToOrder(cartItems.toUIModel())
+    }
+
     private fun getCount(id: Long): Int {
-        return repository.findById(id)?.count ?: 0
+        return cachedCartProducts.find { it.product.id == id }?.quantity ?: 0
     }
 
     private fun updateCartItems() {

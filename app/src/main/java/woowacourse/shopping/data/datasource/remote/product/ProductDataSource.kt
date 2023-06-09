@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.datasource.remote.product
 
-import okhttp3.Call
+import woowacourse.shopping.data.remote.response.ProductResponseDto
 
 interface ProductDataSource {
 
-    fun getAllProducts(): Call
+    fun getSubListProducts(limit: Int, scrollCount: Int): Result<List<ProductResponseDto>>
 }

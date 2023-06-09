@@ -1,23 +1,20 @@
 package woowacourse.shopping.ui.productdetail.contract.presenter
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
+import com.example.domain.repository.ProductDetailRepository
 import com.example.domain.repository.RecentRepository
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUIModel
 import woowacourse.shopping.model.ProductUIModel
 import woowacourse.shopping.ui.productdetail.contract.ProductDetailContract
 
 class ProductDetailPresenter(
     private val view: ProductDetailContract.View,
-    private val product: ProductUIModel,
+    private val id: Long,
+    private val repository: ProductDetailRepository,
     private val cartRepository: CartRepository,
     private val recentRepository: RecentRepository,
 ) : ProductDetailContract.Presenter {
-    private val _count: MutableLiveData<Int> = MutableLiveData(1)
-    val count: LiveData<Int> get() = _count
+    private var count = 1
 
     private var latestProduct: ProductUIModel? = null
 
@@ -28,26 +25,36 @@ class ProductDetailPresenter(
     }
 
     override fun setUpProductDetail() {
-        view.setProductDetail(product)
+        repository.getById(id).getOrNull().let {
+            if (it != null) {
+                view.setProductDetail(it.toUIModel())
+            }
+        }
     }
 
     override fun addProductToCart() {
-        count.value?.let {
-            CartProduct(product.toDomain(), it, true)
-        }?.let {
-            cartRepository.insert(it)
+        cartRepository.findById(id).getOrNull().let {
+            if (it != null) {
+                cartRepository.updateCount(it.id, count)
+            } else {
+                cartRepository.insert(id, count)
+            }
         }
     }
 
     override fun addProductToRecent() {
-        recentRepository.findById(product.id)?.let {
+        recentRepository.findById(id)?.let {
             recentRepository.delete(it.id)
         }
-        recentRepository.insert(product.toDomain())
+        repository.getById(id).getOrNull()?.let {
+            recentRepository.insert(it)
+        }
     }
 
     override fun setProductCountDialog() {
-        view.showProductCountDialog(product)
+        repository.getById(id).getOrNull()?.let {
+            view.showProductCountDialog(it.toUIModel())
+        }
     }
 
     override fun setLatestProduct() {
@@ -58,14 +65,16 @@ class ProductDetailPresenter(
     }
 
     override fun clickLatestProduct() {
-        latestProduct?.let { view.navigateToDetail(it) }
+        latestProduct?.let { view.navigateToDetail(it.id) }
     }
 
     override fun addProductCount(id: Long) {
-        _count.value = _count.value?.plus(1)
+        count++
+        view.setProductCount(count)
     }
 
     override fun subtractProductCount(id: Long) {
-        _count.value = _count.value?.minus(1)
+        count--
+        view.setProductCount(count)
     }
 }

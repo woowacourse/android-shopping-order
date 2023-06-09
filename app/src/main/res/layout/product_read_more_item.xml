@@ -4,7 +4,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="46dp"
-        android:layout_margin="20dp"
+        android:layout_marginVertical="20dp"
         android:background="@drawable/layout_border_radius"
         android:minWidth="50dp">
 

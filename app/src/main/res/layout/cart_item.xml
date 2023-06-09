@@ -11,13 +11,13 @@
 
         <variable
             name="listener"
-            type="woowacourse.shopping.ui.cart.viewHolder.OnCartClickListener" />
+            type="woowacourse.shopping.ui.cart.viewHolder.CartClickListener" />
 
     </data>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="324dp"
+        android:layout_width="wrap_content"
         android:layout_height="153dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/layout_border_radius"
@@ -28,7 +28,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginStart="16dp"
-            android:checked="@{product.isChecked}"
+            android:checked="true"
             app:layout_constraintBottom_toBottomOf="@+id/product_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/product_title" />
@@ -65,7 +65,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:onClick="@{() -> listener.onRemove(product.product.id)}"
+            android:onClick="@{() -> listener.onRemove(product.id)}"
             android:src="@drawable/ic_cart_close_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:layout_marginEnd="13dp"
-            android:text="@{@string/product_price(product.count * product.product.price)}"
+            android:text="@{@string/product_price(product.quantity * product.product.price)}"
             android:textColor="@color/price_text_color"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -89,7 +89,7 @@
             layout="@layout/order_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:count="@{product.count}"
+            app:count="@{product.quantity}"
             app:layout_constraintEnd_toEndOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/textView"
             app:listener="@{listener}"

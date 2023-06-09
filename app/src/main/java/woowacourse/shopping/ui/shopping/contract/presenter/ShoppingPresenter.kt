@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.shopping.contract.presenter
 
-import android.util.Log
-import com.example.domain.model.Product
+import com.example.domain.model.CartProduct
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentRepository
@@ -17,23 +16,30 @@ class ShoppingPresenter(
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository,
+    offset: Int = 0,
 ) : ShoppingContract.Presenter {
     private var productsData: MutableList<ProductsItemType> = mutableListOf()
     private var productSize: Int = 0
+    private var productOffset = ProductsOffset(offset, productRepository)
+    private val cachedCartProducts = mutableListOf<CartProduct>()
 
     override fun initProducts() {
-        productRepository.getAllProducts(
-            onSuccess = { Log.d("123123", "123123") },
-            onFailure = { Log.d("123123", "444444") },
-        )
-        val nextProduct = productRepository.getMoreProducts(PRODUCT_COUNT, productSize)
-        productSize += nextProduct.size
-
-        productsData += nextProduct.map { product ->
-            ProductItem(product.toUIModel(), getCount(product.id))
+        cartRepository.getAllProductInCart().getOrNull()?.let { cartProducts ->
+            cachedCartProducts.clear()
+            cachedCartProducts.addAll(cartProducts)
         }
-
-        view.setProducts(productsData.plus(ProductReadMore))
+        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()).getOrNull()
+            ?.let { products ->
+                productSize += products.size
+                productsData.removeIf { it is ProductItem }
+                productsData += products.map { product ->
+                    ProductItem(
+                        product.toUIModel(),
+                        cachedCartProducts.find { it.product.id == product.id }?.quantity ?: 0,
+                    )
+                }
+                view.setProducts(productsData.plus(ProductReadMore))
+            }
     }
 
     override fun updateProducts() {
@@ -61,53 +67,57 @@ class ShoppingPresenter(
     }
 
     override fun fetchMoreProducts() {
-        val nextProduct = productRepository.getMoreProducts(PRODUCT_COUNT, productSize)
-        productSize += nextProduct.size
-
-        productsData += nextProduct.map { product: Product ->
-            ProductItem(product.toUIModel(), getCount(product.id))
-        }
-
-        view.addProducts(productsData.plus(ProductReadMore))
+        productOffset = productOffset.plus(1)
+        productRepository.getMoreProducts(PRODUCT_COUNT, productOffset.getOffset()).getOrNull()
+            .let { products ->
+                productSize += products?.size ?: 0
+                productsData.removeIf { it is ProductItem }
+                productsData += products?.map { product ->
+                    ProductItem(
+                        product.toUIModel(),
+                        cachedCartProducts.find { it.product.id == product.id }?.quantity ?: 0,
+                    )
+                } ?: emptyList()
+                view.addProducts(productsData.plus(ProductReadMore))
+            }
     }
 
     override fun navigateToItemDetail(id: Long) {
-//        val latestProduct = recentRepository.getRecent(1).firstOrNull()?.toUIModel()
-//        productRepository.findById(id, onSuccess = {
-//            view.navigateToProductDetail(it.toUIModel(), latestProduct)
-//        }, onFailure = {
-//            // Handle failure case
-//        })
+        val latestProduct = recentRepository.getRecent(1).firstOrNull()?.toUIModel()
+        view.navigateToProductDetail(id, latestProduct)
     }
 
-    override fun updateItemCount(id: Long, count: Int) {
-//        productRepository.findById(id, onSuccess = {
-//            cartRepository.insert(CartProduct(it, count, true))
-//        }, onFailure = {
-//            // Handle failure case
-//        })
-//        updateCountSize()
+    override fun insertItem(id: Long, count: Int) {
+        cartRepository.insert(id, count).getOrNull().let {
+            view.updateItem(id, count)
+        }
+        updateCountSize()
     }
 
     override fun increaseCount(id: Long) {
-//        cartRepository.updateCount(id, getCount(id) + 1)
+        val cartProduct = cachedCartProducts.find { it.product.id == id }
+        cartProduct?.id?.let { cartRepository.updateCount(it, getCount(id) + 1) }
+        cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) + 1
         view.updateItem(id, getCount(id))
     }
 
     override fun decreaseCount(id: Long) {
-//        cartRepository.updateCount(id, getCount(id) - 1)
+        val cartProduct = cachedCartProducts.find { it.product.id == id }
+        cartProduct?.id?.let { cartRepository.updateCount(it, getCount(id) - 1) }
+        cachedCartProducts.find { it.product.id == id }?.quantity = getCount(id) - 1
         view.updateItem(id, getCount(id))
     }
 
     override fun updateCountSize() {
-//        view.showCountSize(cartRepository.getAll().size)
+        cartRepository.getAllProductInCart().getOrNull()?.let { cartProducts ->
+            cachedCartProducts.clear()
+            cachedCartProducts.addAll(cartProducts)
+            view.showCountSize(cachedCartProducts.size)
+        }
     }
 
     private fun getCount(id: Long): Int {
-//        cartRepository.findById(id)?.let {
-//            return it.count
-//        }
-        return 0
+        return cachedCartProducts.find { it.product.id == id }?.quantity ?: 0
     }
 
     companion object {

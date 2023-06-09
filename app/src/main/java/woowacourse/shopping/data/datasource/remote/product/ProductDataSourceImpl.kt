@@ -1,17 +1,25 @@
 package woowacourse.shopping.data.datasource.remote.product
 
-import okhttp3.Call
-import woowacourse.shopping.data.remote.NetworkModule
+import woowacourse.shopping.data.remote.ServiceFactory
+import woowacourse.shopping.data.remote.response.ProductResponseDto
+import java.util.concurrent.Executors
 
 class ProductDataSourceImpl : ProductDataSource {
 
-    override fun getAllProducts(): Call {
-        // val request = Request.Builder().url("http://3.34.134.115:8080/products").build()
-
-        return NetworkModule.getService(GET_PRODUCT_PATH)
-    }
-
-    companion object {
-        private const val GET_PRODUCT_PATH = "/products"
+    override fun getSubListProducts(
+        limit: Int,
+        scrollCount: Int,
+    ): Result<List<ProductResponseDto>> {
+        val executor = Executors.newSingleThreadExecutor()
+        val result = executor.submit<Result<List<ProductResponseDto>>> {
+            val response = ServiceFactory.shoppingService.getProducts(limit, scrollCount).execute()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
+            } else {
+                Result.failure(Throwable(response.message()))
+            }
+        }.get()
+        executor.shutdown()
+        return result
     }
 }
