@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".error.WoowaShoppingApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +16,16 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".view.ServerSettingActivity"
+            android:name=".presentation.ui.order.OrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.ui.order.detail.OrderDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.ui.myPage.MyPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.ui.serverChoice.ServerChoiceActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,15 +34,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.productdetail.ProductDetailActivity"
+            android:name=".error.ErrorActivity"
             android:exported="false" />
         <activity
-            android:name=".view.cart.CartActivity"
-            android:exported="false"
-            android:label="@string/label_cart" />
+            android:name=".presentation.ui.shoppingCart.ShoppingCartActivity"
+            android:exported="false" />
         <activity
-            android:name=".view.productlist.ProductListActivity"
-            android:exported="true" />
+            android:name=".presentation.ui.productDetail.ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.ui.home.HomeActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -5,144 +5,165 @@
 
     <data>
 
-        <import type="woowacourse.shopping.util.PriceFormatter" />
+        <variable
+            name="product"
+            type="woowacourse.shopping.domain.model.Product" />
+
+        <variable
+            name="lastViewedProduct"
+            type="woowacourse.shopping.domain.model.RecentlyViewedProduct" />
 
         <import type="android.view.View" />
 
-        <variable
-            name="product"
-            type="woowacourse.shopping.model.ProductModel" />
-
-        <variable
-            name="last_viewed_product"
-            type="woowacourse.shopping.model.ProductModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.productdetail.ProductDetailActivity">
+        tools:context=".presentation.ui.productDetail.ProductDetailActivity">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutDetailToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/woowa_dealer_blue_400"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/buttonProductDetailClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="14dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/icon_close"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/img_product"
+            android:id="@+id/imageProductDetailProduct"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            app:glideSrc="@{product.imageUrl}"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/cart" />
+            app:layout_constraintTop_toBottomOf="@+id/layoutDetailToolbar"
+            tools:src="@drawable/ic_launcher_foreground" />
+
 
         <TextView
-            android:id="@+id/text_product_name"
+            android:id="@+id/textProductDetailTitle"
+            style="@style/woowaPro24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
             android:text="@{product.name}"
-            android:textColor="@color/black"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:textColor="@color/woowa_dealer_black_400"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/img_product"
-            tools:text="동원참치" />
-
-        <View
-            android:id="@+id/line_gray"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="13dp"
-            android:background="@color/gray_700"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_product_name" />
+            app:layout_constraintTop_toBottomOf="@+id/imageProductDetailProduct"
+            tools:text="람보르기니 우루스 S" />
 
         <TextView
-            android:id="@+id/text_price_label"
+            android:id="@+id/textProductDetailPrice"
+            style="@style/woowaAir20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
             android:text="@string/price"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textColor="@color/woowa_dealer_black_400"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/line_gray" />
+            app:layout_constraintTop_toBottomOf="@+id/lineProductDetailDivider" />
 
         <TextView
-            android:id="@+id/text_price"
+            android:id="@+id/textProductDetailAmount"
+            style="@style/woowaAir20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="18dp"
-            android:text="@{@string/korean_won2(product.price)}"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            android:text="@{String.format(@string/detailPriceFormat, product.price)}"
+            android:textColor="@color/woowa_dealer_black_400"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/text_price_label"
-            tools:text="99,800원" />
+            app:layout_constraintTop_toTopOf="@+id/textProductDetailPrice"
+            tools:text="20,000원" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_last_viewed"
+            android:id="@+id/layoutLastViewedProudct"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
-            android:layout_marginVertical="29dp"
-            android:background="@drawable/back_rounded"
-            android:padding="18dp"
-            android:visibility="@{product.id == last_viewed_product.id || last_viewed_product == null ? View.INVISIBLE : View.VISIBLE}"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rectanlge_radius_4_border_gray"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            android:visibility="@{(product.id == lastViewedProduct.id) ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_price_label">
+            app:layout_constraintTop_toBottomOf="@id/textProductDetailPrice">
 
             <TextView
-                android:id="@+id/text_viewed_last"
+                android:id="@+id/textLastViewedTitle"
+                style="@style/woowaPro16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/product_viewed_last"
-                android:textColor="@color/mint"
-                android:textSize="12sp"
-                android:textStyle="bold"
+                android:text="@string/lastViewedProduct"
+                android:textColor="@color/woowa_dealer_green_400"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/text_product_name_viewed_last"
+                android:id="@+id/textLastViewedProductName"
+                style="@style/woowaAir20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@{last_viewed_product.name}"
+                android:layout_marginTop="4dp"
+                android:text="@{lastViewedProduct.name}"
                 android:textColor="@color/black"
-                android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_viewed_last"
-                tools:text="[든든] 동원 스위트콘" />
+                app:layout_constraintTop_toBottomOf="@id/textLastViewedTitle"
+                tools:text="람보르기니 우루스 S" />
 
             <TextView
-                android:id="@+id/text_price_viewed_last"
+                android:id="@+id/textLastViewedPrice"
+                style="@style/woowaAir20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{@string/korean_won2(last_viewed_product.price)}"
+                android:text="@{String.format(@string/detailPriceFormat, lastViewedProduct.price)}"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/text_product_name_viewed_last"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/text_product_name_viewed_last"
-                tools:text="10,000원" />
-
-
+                tools:text="12,000만원" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:id="@+id/lineProductDetailDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/woowa_dealer_gray_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textProductDetailTitle" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_put_in_cart"
+        <TextView
+            android:id="@+id/buttonProductDetailPutInShoppingCart"
+            style="@style/woowaPro24"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/mint"
-            android:text="@string/put_in_cart"
+            android:background="@color/woowa_dealer_blue_600"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/putInShoppingCart"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

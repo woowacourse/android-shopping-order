@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
-        <variable
-            name="onItemClick"
-            type="woowacourse.shopping.view.productlist.ProductListAdapter.OnItemClick" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_show_more"
+        <TextView
+            android:id="@+id/buttonShowMore"
+            style="@style/woowaAir20"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/back_rounded_bold"
-            android:onClick="@{() -> onItemClick.onShowMoreClick()}"
-            android:text="@string/show_more"
-            android:textSize="16sp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="36dp"
+            android:background="@drawable/recatangle_radius_4dp_home"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/itemMore"
+            android:textColor="@color/woowa_dealer_black_400"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

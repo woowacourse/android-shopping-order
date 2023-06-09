@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/woowa_dealer_gray_200"
+        tools:context=".presentation.ui.order.detail.OrderDetailActivity">
+
+        <TextView
+            android:id="@+id/textOrderDateTime"
+            style="@style/woowaPro24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:paddingVertical="8dp"
+            android:paddingStart="20dp"
+            android:text="@string/orderedDateTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textOrderDateTimeValue"
+            style="@style/woowaPro16"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:gravity="center_vertical|end"
+            android:paddingEnd="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/textOrderDateTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/textOrderDateTime"
+            app:layout_constraintTop_toTopOf="@id/textOrderDateTime"
+            tools:text="2023-05-31 13:30:00" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerOrderOrder"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textOrderDateTime"
+            tools:listitem="@layout/item_ordered_product" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
