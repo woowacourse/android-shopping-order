@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.retrofit.Content
-import woowacourse.shopping.data.retrofit.Pageable
-import woowacourse.shopping.data.retrofit.ProductResponse
-import woowacourse.shopping.data.retrofit.Sort
-import woowacourse.shopping.data.retrofit.toProduct
+import woowacourse.shopping.data.product.remote.retrofit.Content
+import woowacourse.shopping.data.product.remote.retrofit.Pageable
+import woowacourse.shopping.data.product.remote.retrofit.ProductResponse
+import woowacourse.shopping.data.product.remote.retrofit.Sort
+import woowacourse.shopping.data.product.remote.retrofit.toProduct
 import woowacourse.shopping.domain.model.PagingProduct
 
 val dummyFoodContents =
@@ -50,18 +50,3 @@ val dummyPagingProduct =
         dummyProductResponse.last,
         dummyProductResponse.empty,
     )
-/*
-data class ProductResponse(
-    val content: List<Content>,
-    val empty: Boolean,
-    val first: Boolean,
-    val last: Boolean,
-    val number: Int,
-    val numberOfElements: Int,
-    val pageable: Pageable,
-    val size: Int,
-    val sort: Sort,
-    val totalElements: Int,
-    val totalPages: Int
-)
- */

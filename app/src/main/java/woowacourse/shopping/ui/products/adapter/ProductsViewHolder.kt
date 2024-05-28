@@ -54,4 +54,4 @@ sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 }
 
-typealias OnClickProductItem = (productId: Long) -> Unit
+typealias OnClickProductItem = (productId: Int) -> Unit

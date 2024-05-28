@@ -1,13 +1,13 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.product.entity.Product
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.math.min
 
 class FakeProductRepository(savedProducts: List<Product> = emptyList()) : ProductRepository {
-    private val products: MutableMap<Long, Product> = savedProducts.associateBy { it.id }.toMutableMap()
+    private val products: MutableMap<Int, Product> = savedProducts.associateBy { it.id }.toMutableMap()
 
-    override fun find(id: Long): Product {
+    override fun find(id: Int): Product {
         return products[id] ?: throw IllegalArgumentException()
     }
 

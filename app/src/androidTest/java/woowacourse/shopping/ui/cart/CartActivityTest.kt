@@ -19,9 +19,9 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.FakeCartRepository
-import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.firstProduct
 import woowacourse.shopping.hasSizeRecyclerView
 

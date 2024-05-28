@@ -14,4 +14,4 @@ class RecentProductViewHolder(private val binding: ItemRecentProductBinding) :
     }
 }
 
-typealias OnClickRecentProductItem = (productId: Long) -> Unit
+typealias OnClickRecentProductItem = (productId: Int) -> Unit

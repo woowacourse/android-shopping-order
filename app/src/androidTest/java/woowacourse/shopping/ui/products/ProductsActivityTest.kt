@@ -18,7 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.recent.FakeRecentProductRepository
-import woowacourse.shopping.data.recent.RecentProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.firstProduct
 import woowacourse.shopping.ui.products.adapter.ProductsViewHolder
 

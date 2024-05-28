@@ -9,9 +9,10 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.ShoppingCartDataBase
-import woowacourse.shopping.data.cart.entity.CartItem
-import woowacourse.shopping.model.Quantity
+import woowacourse.shopping.data.cart.local.dao.CartDao
+import woowacourse.shopping.data.cart.local.entity.CartItemEntity
+import woowacourse.shopping.data.local.ShoppingCartDataBase
+import woowacourse.shopping.domain.model.Quantity
 import java.lang.IllegalArgumentException
 
 @RunWith(AndroidJUnit4::class)
@@ -40,10 +41,10 @@ class CartDaoTest {
     @Test
     fun `카트_아이템을_저장한다`() {
         // given
-        val cartItem = CartItem(productId = 0L, quantity = Quantity(10))
+        val cartItemEntity = CartItemEntity(productId = 0L, quantity = Quantity(10))
 
         // when
-        cartDao.insert(cartItem)
+        cartDao.insert(cartItemEntity)
 
         // then
         val actual = cartDao.find(productId = 0L)
@@ -54,8 +55,8 @@ class CartDaoTest {
     @Test
     fun `카트_아이템의_수량을_변경한다`() {
         // given
-        val cartItem = CartItem(productId = 0L, quantity = Quantity(10))
-        cartDao.insert(cartItem)
+        val cartItemEntity = CartItemEntity(productId = 0L, quantity = Quantity(10))
+        cartDao.insert(cartItemEntity)
 
         // when
         cartDao.changeQuantity(productId = 0L, quantity = Quantity(1))
@@ -68,8 +69,8 @@ class CartDaoTest {
     @Test
     fun `카트_아이템을_삭제한다`() {
         // given
-        val cartItem = CartItem(productId = 0L, quantity = Quantity(10))
-        cartDao.insert(cartItem)
+        val cartItemEntity = CartItemEntity(productId = 0L, quantity = Quantity(10))
+        cartDao.insert(cartItemEntity)
 
         // when
         cartDao.delete(productId = 0L)
@@ -83,8 +84,8 @@ class CartDaoTest {
     @Test
     fun `상품_아이디에_맞는_카트_아이템을_찾는다`() {
         // given
-        val cartItem = CartItem(productId = 0L, quantity = Quantity(10))
-        val cartItemId = cartDao.insert(cartItem)
+        val cartItemEntity = CartItemEntity(productId = 0L, quantity = Quantity(10))
+        val cartItemId = cartDao.insert(cartItemEntity)
 
         // when
         val actual = cartDao.find(productId = 0L)
@@ -98,8 +99,8 @@ class CartDaoTest {
     @Test
     fun `카트_아이템이_15개_저장되어_있고_첫_페이지를_불러오면_5개가_반환된다`() {
         // given
-        val cartItems = List(10) { CartItem(productId = 0L, quantity = Quantity(10)) }
-        cartDao.insertAllCartItem(cartItems)
+        val cartItemEntities = List(10) { CartItemEntity(productId = 0L, quantity = Quantity(10)) }
+        cartDao.insertAllCartItem(cartItemEntities)
 
         // when
         val actual = cartDao.findRange(0, 5)
@@ -111,8 +112,8 @@ class CartDaoTest {
     @Test
     fun `카트_아이템이_3개_저장되어_있고_첫_페이지를_불러오면_3개가_반환된다`() {
         // given
-        val cartItems = List(3) { CartItem(productId = 0L, quantity = Quantity(10)) }
-        cartDao.insertAllCartItem(cartItems)
+        val cartItemEntities = List(3) { CartItemEntity(productId = 0L, quantity = Quantity(10)) }
+        cartDao.insertAllCartItem(cartItemEntities)
 
         // when
         val actual = cartDao.findRange(0, 5)
@@ -124,8 +125,8 @@ class CartDaoTest {
     @Test
     fun `카트_아이템의_총_개수를_반환한다`() {
         // given
-        val cartItems = List(22) { CartItem(productId = 0L, quantity = Quantity(10)) }
-        cartDao.insertAllCartItem(cartItems)
+        val cartItemEntities = List(22) { CartItemEntity(productId = 0L, quantity = Quantity(10)) }
+        cartDao.insertAllCartItem(cartItemEntities)
 
         // when
         val actual = cartDao.totalCount()
@@ -134,8 +135,8 @@ class CartDaoTest {
         assertThat(actual).isEqualTo(22)
     }
 
-    private fun CartDao.insertAllCartItem(cartItems: List<CartItem>) {
-        cartItems.forEach {
+    private fun CartDao.insertAllCartItem(cartItemEntities: List<CartItemEntity>) {
+        cartItemEntities.forEach {
             insert(it)
         }
     }

@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recent.RecentProductRepository
 import woowacourse.shopping.databinding.ActivityProductsBinding
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductsAdapter
@@ -46,7 +46,7 @@ class ProductsActivity : AppCompatActivity() {
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val changedProductId =
-                    result.data?.getLongExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
+                    result.data?.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
                         ?: return@registerForActivityResult
                 viewModel.loadProduct(changedProductId)
                 viewModel.loadRecentProducts()
@@ -107,7 +107,7 @@ class ProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToProductDetailView(productId: Long) {
+    private fun navigateToProductDetailView(productId: Int) {
         val intent = ProductDetailActivity.newIntent(this, productId)
         productDetailActivityResultLauncher.launch(intent)
     }
@@ -143,6 +143,6 @@ class ProductsActivity : AppCompatActivity() {
         private const val PRODUCT_LIST_SPAN_SIZE = 2
 
         const val PRODUCT_ID_KEY = "changed_product_id_key"
-        private const val PRODUCT_ID_DEFAULT_VALUE = -1L
+        private const val PRODUCT_ID_DEFAULT_VALUE = -1
     }
 }

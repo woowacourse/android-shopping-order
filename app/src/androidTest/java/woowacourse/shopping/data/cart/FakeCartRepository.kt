@@ -1,18 +1,19 @@
 package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.data.cart.entity.CartItem
-import woowacourse.shopping.model.Quantity
+import woowacourse.shopping.data.cart.local.entity.CartItemEntity
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
 import java.lang.IllegalArgumentException
 import kotlin.math.min
 
-class FakeCartRepository(savedCartItems: List<CartItem> = emptyList()) : CartRepository {
-    private val cart: MutableList<CartItem> = savedCartItems.toMutableList()
-    private var id: Long = 0L
+class FakeCartRepository(savedCartItemEntities: List<CartItemEntity> = emptyList()) : CartRepository {
+    private val cart: MutableList<CartItemEntity> = savedCartItemEntities.toMutableList()
+    private var id: Int = 0
 
-    override fun increaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Int) {
         val oldCartItem = cart.find { it.productId == productId }
         if (oldCartItem == null) {
-            cart.add(CartItem(id++, productId, Quantity(1)))
+            cart.add(CartItemEntity(id++, productId, Quantity(1)))
             return
         }
         cart.remove(oldCartItem)
@@ -20,7 +21,7 @@ class FakeCartRepository(savedCartItems: List<CartItem> = emptyList()) : CartRep
         cart.add(oldCartItem.copy(quantity = ++quantity))
     }
 
-    override fun decreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Int) {
         val oldCartItem = cart.find { it.productId == productId }
         oldCartItem ?: throw IllegalArgumentException()
 
@@ -33,32 +34,32 @@ class FakeCartRepository(savedCartItems: List<CartItem> = emptyList()) : CartRep
     }
 
     override fun changeQuantity(
-        productId: Long,
+        productId: Int,
         quantity: Quantity,
     ) {
         val oldCartItem = cart.find { it.productId == productId }
         if (oldCartItem == null) {
-            cart.add(CartItem(id++, productId, quantity))
+            cart.add(CartItemEntity(id++, productId, quantity))
             return
         }
         cart.remove(oldCartItem)
         cart.add(oldCartItem.copy(quantity = quantity))
     }
 
-    override fun deleteCartItem(productId: Long) {
+    override fun deleteCartItem(productId: Int) {
         val deleteCartItem =
             cart.find { it.productId == productId } ?: throw IllegalArgumentException()
         cart.remove(deleteCartItem)
     }
 
-    override fun find(productId: Long): CartItem {
+    override fun find(productId: Int): CartItemEntity {
         return cart.find { it.productId == productId } ?: throw IllegalArgumentException()
     }
 
     override fun findRange(
         page: Int,
         pageSize: Int,
-    ): List<CartItem> {
+    ): List<CartItemEntity> {
         val fromIndex = page * pageSize
         val toIndex = min(fromIndex + pageSize, cart.size)
         return cart.subList(fromIndex, toIndex)

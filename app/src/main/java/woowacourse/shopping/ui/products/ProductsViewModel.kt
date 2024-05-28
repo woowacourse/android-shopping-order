@@ -7,11 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.product.entity.Product
-import woowacourse.shopping.data.recent.RecentProductRepository
-import woowacourse.shopping.data.recent.entity.RecentProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import kotlin.math.ceil
@@ -81,7 +81,7 @@ class ProductsViewModel(
         }
     }
 
-    fun loadProduct(productId: Long) {
+    fun loadProduct(productId: Int) {
         updateProductUiModels(productId)
     }
 
@@ -108,7 +108,7 @@ class ProductsViewModel(
         val recentProductsUiModels =
             map {
                 val product = productRepository.find(it.productId)
-                RecentProductUiModel(product.id, product.imageUrl, product.title)
+                RecentProductUiModel(product.id, product.imageUrl, product.name)
             }
         return recentProductsUiModels.ifEmpty { null }
     }
@@ -117,17 +117,17 @@ class ProductsViewModel(
         _showLoadMore.value = (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels()?.size && page < maxPage
     }
 
-    fun decreaseQuantity(productId: Long) {
+    fun decreaseQuantity(productId: Int) {
         cartRepository.decreaseQuantity(productId)
         updateProductUiModels(productId)
     }
 
-    fun increaseQuantity(productId: Long) {
+    fun increaseQuantity(productId: Int) {
         cartRepository.increaseQuantity(productId)
         updateProductUiModels(productId)
     }
 
-    private fun updateProductUiModels(productId: Long) {
+    private fun updateProductUiModels(productId: Int) {
         val productUiModels = productUiModels()?.toMutableList() ?: return
         val newProductUiModel = productRepository.find(productId).toProductUiModel()
         val position = productUiModels.indexOfFirst { it.productId == productId }

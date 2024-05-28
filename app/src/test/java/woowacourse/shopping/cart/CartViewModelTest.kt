@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.cart
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -9,16 +9,17 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItem
 import woowacourse.shopping.cartItems
 import woowacourse.shopping.convertProductUiModel
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.MockWebServerProductRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.product.entity.Product
-import woowacourse.shopping.data.product.server.MockWebProductServer
-import woowacourse.shopping.data.product.server.MockWebProductServerDispatcher
+import woowacourse.shopping.data.product.remote.mock.MockWebProductServer
+import woowacourse.shopping.data.product.remote.mock.MockWebProductServerDispatcher
+import woowacourse.shopping.data.product.remote.mock.MockWebServerProductRepository
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.product
 import woowacourse.shopping.products
+import woowacourse.shopping.ui.cart.CartViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartViewModelTest {
@@ -46,7 +47,7 @@ class CartViewModelTest {
         viewModel.deleteCartItem(cartItems.first().productId)
 
         // then
-        assertThat(viewModel.productUiModels.getOrAwaitValue()).hasSize(0)
+        assertThat(viewModel.cartUiState.getOrAwaitValue()).hasSize(0)
     }
 
     @Test
@@ -61,7 +62,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.cartUiState.getOrAwaitValue()
         assertThat(actual).hasSize(5)
         assertThat(actual).isEqualTo(convertProductUiModel(cartItems, products).take(5))
     }
@@ -78,7 +79,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.cartUiState.getOrAwaitValue()
         assertThat(actual).hasSize(3)
         assertThat(actual).isEqualTo(convertProductUiModel(cartItems, products).take(3))
     }
@@ -110,7 +111,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.cartUiState.getOrAwaitValue()
         assertThat(actual).hasSize(5)
         assertThat(actual).isEqualTo(convertProductUiModel(cartItems, products).take(5))
     }
@@ -190,7 +191,7 @@ class CartViewModelTest {
         viewModel.moveNextPage()
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.cartUiState.getOrAwaitValue()
         assertThat(actual).hasSize(1)
         assertThat(actual).isEqualTo(convertProductUiModel(cartItems, products).slice(5..5))
     }
@@ -209,7 +210,7 @@ class CartViewModelTest {
         viewModel.movePreviousPage()
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.cartUiState.getOrAwaitValue()
         assertThat(actual).hasSize(5)
         assertThat(actual).isEqualTo(convertProductUiModel(cartItems, products).take(5))
     }
@@ -224,7 +225,7 @@ class CartViewModelTest {
         viewModel.moveNextPage()
 
         // when
-        val lastOneCartItem = viewModel.productUiModels.getOrAwaitValue().first()
+        val lastOneCartItem = viewModel.cartUiState.getOrAwaitValue().first()
         viewModel.deleteCartItem(lastOneCartItem.productId)
 
         // then
@@ -241,7 +242,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // when
-        val cartItem = viewModel.productUiModels.getOrAwaitValue().first()
+        val cartItem = viewModel.cartUiState.getOrAwaitValue().first()
         viewModel.deleteCartItem(cartItem.productId)
 
         // then
@@ -252,48 +253,48 @@ class CartViewModelTest {
     @Test
     fun `장바구니에 담겨있는 상품의 개수를 2개에서 3개로 증가시킨다`() {
         // given
-        val cartItem = cartItem(0L, Quantity(2))
-        val product = product(0L)
+        val cartItem = cartItem(0, Quantity(2))
+        val product = product(0)
         setUpProductRepository(listOf(product))
         cartRepository = FakeCartRepository(listOf(cartItem))
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // when
-        viewModel.increaseQuantity(0L)
+        viewModel.increaseQuantity(0)
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue().first()
+        val actual = viewModel.cartUiState.getOrAwaitValue().first()
         assertThat(actual.quantity).isEqualTo(Quantity(3))
     }
 
     @Test
     fun `장바구니에 담겨있는 상품의 개수를 3개에서 2개로 감소시킨다`() {
         // given
-        val cartItem = cartItem(0L, Quantity(3))
-        val product = product(0L)
+        val cartItem = cartItem(0, Quantity(3))
+        val product = product(0)
         setUpProductRepository(listOf(product))
         cartRepository = FakeCartRepository(listOf(cartItem))
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // when
-        viewModel.decreaseQuantity(0L)
+        viewModel.decreaseQuantity(0)
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue().first()
+        val actual = viewModel.cartUiState.getOrAwaitValue().first()
         assertThat(actual.quantity).isEqualTo(Quantity(2))
     }
 
     @Test
     fun `장바구니에 담겨있는 상품의 개수를 1개에서 0개로 감소시키는 경우 장바구니에서 상품이 삭제된다`() {
         // given
-        val cartItem = cartItem(0L, Quantity(1))
-        val product = product(0L)
+        val cartItem = cartItem(0, Quantity(1))
+        val product = product(0)
         setUpProductRepository(listOf(product))
         cartRepository = FakeCartRepository(listOf(cartItem))
         viewModel = CartViewModel(productRepository, cartRepository)
 
         // when
-        viewModel.decreaseQuantity(0L)
+        viewModel.decreaseQuantity(0)
 
         // then
         val actual = viewModel.isEmptyCart.getOrAwaitValue()

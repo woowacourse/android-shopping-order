@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.products
+package woowacourse.shopping.products
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -11,16 +11,17 @@ import woowacourse.shopping.FakeRecentProductRepository
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItem
 import woowacourse.shopping.convertProductUiModel
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.MockWebServerProductRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.product.entity.Product
-import woowacourse.shopping.data.product.server.MockWebProductServer
-import woowacourse.shopping.data.product.server.MockWebProductServerDispatcher
-import woowacourse.shopping.data.recent.RecentProductRepository
+import woowacourse.shopping.data.product.remote.mock.MockWebProductServer
+import woowacourse.shopping.data.product.remote.mock.MockWebProductServerDispatcher
+import woowacourse.shopping.data.product.remote.mock.MockWebServerProductRepository
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.products
+import woowacourse.shopping.ui.products.ProductsViewModel
 import java.lang.IllegalArgumentException
 
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -147,10 +148,10 @@ class ProductsViewModelTest {
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
         // when
-        viewModel.increaseQuantity(0L)
+        viewModel.increaseQuantity(0)
 
         // then
-        val actual = cartRepository.find(0L)
+        val actual = cartRepository.find(0)
         assertThat(actual.quantity).isEqualTo(Quantity(1))
         assertThat(viewModel.cartTotalCount.getOrAwaitValue()).isEqualTo(1)
     }
@@ -160,14 +161,14 @@ class ProductsViewModelTest {
         // given
         val products = products(10)
         setUpProductRepository(products)
-        cartRepository = FakeCartRepository(listOf(cartItem(0L, Quantity(3))))
+        cartRepository = FakeCartRepository(listOf(cartItem(0, Quantity(3))))
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
         // when
-        viewModel.increaseQuantity(0L)
+        viewModel.increaseQuantity(0)
 
         // then
-        val actual = cartRepository.find(0L)
+        val actual = cartRepository.find(0)
         assertThat(actual.quantity).isEqualTo(Quantity(4))
         assertThat(viewModel.cartTotalCount.getOrAwaitValue()).isEqualTo(4)
     }
@@ -177,14 +178,14 @@ class ProductsViewModelTest {
         // given
         val products = products(10)
         setUpProductRepository(products)
-        cartRepository = FakeCartRepository(listOf(cartItem(0L, Quantity(1))))
+        cartRepository = FakeCartRepository(listOf(cartItem(0, Quantity(1))))
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
         // when
-        viewModel.decreaseQuantity(0L)
+        viewModel.decreaseQuantity(0)
 
         // then
-        assertThrows<IllegalArgumentException> { cartRepository.find(0L) }
+        assertThrows<IllegalArgumentException> { cartRepository.find(0) }
         assertThat(viewModel.cartTotalCount.getOrAwaitValue()).isEqualTo(0)
     }
 
@@ -193,14 +194,14 @@ class ProductsViewModelTest {
         // given
         val products = products(10)
         setUpProductRepository(products)
-        cartRepository = FakeCartRepository(listOf(cartItem(0L, Quantity(6))))
+        cartRepository = FakeCartRepository(listOf(cartItem(0, Quantity(6))))
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
         // when
-        viewModel.decreaseQuantity(0L)
+        viewModel.decreaseQuantity(0)
 
         // then
-        val actual = cartRepository.find(0L)
+        val actual = cartRepository.find(0)
         assertThat(actual.quantity).isEqualTo(Quantity(5))
         assertThat(viewModel.cartTotalCount.getOrAwaitValue()).isEqualTo(5)
     }

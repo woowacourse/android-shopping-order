@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.ViewInteraction
 import org.assertj.core.api.Assertions
-import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
 val firstProduct = ProductRepository.getInstance().findRange(0, 1).first()
 

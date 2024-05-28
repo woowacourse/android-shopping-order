@@ -1,30 +1,31 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.cart.entity.CartItem
-import woowacourse.shopping.data.product.entity.Product
-import woowacourse.shopping.model.Quantity
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 val imageUrl = "https://www.naver.com/"
-val title = "올리브"
+val name = "올리브"
 val price = 1500
+val category = "food"
 
-fun product(id: Long) = Product(id, imageUrl, title, price)
+fun product(id: Int) = Product(id = id, imageUrl = imageUrl, name = name, price = price, category = category)
 
 fun products(size: Int): List<Product> {
-    return List(size) { product(it.toLong()) }
+    return List(size) { product(it) }
 }
 
 fun cartItem(
-    id: Long,
+    id: Int,
     quantity: Quantity = Quantity(),
 ): CartItem {
     return CartItem(id, id, quantity)
 }
 
 fun cartItems(size: Int): List<CartItem> {
-    return List(size) { cartItem(it.toLong()) }
+    return List(size) { cartItem(it) }
 }
 
 fun convertProductUiModel(
@@ -42,10 +43,10 @@ fun convertProductUiModel(
 }
 
 fun convertProductUiModel(
-    products: List<Product>,
+    productEntities: List<Product>,
     cartRepository: CartRepository,
 ): List<ProductUiModel> {
-    return products.map { product ->
+    return productEntities.map { product ->
         runCatching { cartRepository.find(product.id) }
             .map { ProductUiModel.from(product, it.quantity) }
             .getOrElse { ProductUiModel.from(product) }

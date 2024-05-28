@@ -10,10 +10,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recent.RecentProductRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.products.ProductsActivity
 
@@ -112,7 +112,7 @@ class ProductDetailActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun productId(): Long = intent.getLongExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
+    private fun productId(): Int = intent.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
 
     private fun isNavigatedFromDetailView(): Boolean {
         return intent.getBooleanExtra(
@@ -128,13 +128,13 @@ class ProductDetailActivity : AppCompatActivity() {
 
     companion object {
         private const val PRODUCT_ID_KEY = "product_id_key"
-        private const val PRODUCT_ID_DEFAULT_VALUE = -1L
+        private const val PRODUCT_ID_DEFAULT_VALUE = -1
         private const val LAST_SEEN_PRODUCT_VISIBLE_KEY = "last_seen_product_visible"
         private const val LAST_SEEN_PRODUCT_VISIBLE_DEFAULT_VALUE = false
 
         fun newIntent(
             context: Context,
-            productId: Long,
+            productId: Int,
             lastSeenProductVisible: Boolean = false,
         ): Intent {
             return Intent(context, ProductDetailActivity::class.java)

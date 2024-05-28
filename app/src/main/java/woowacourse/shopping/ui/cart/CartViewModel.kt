@@ -7,9 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.cart.entity.CartItem
-import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class CartViewModel(
@@ -59,7 +59,7 @@ class CartViewModel(
         maxPage.value = (totalCartCount - 1) / PAGE_SIZE
     }
 
-    override fun deleteCartItem(productId: Long) {
+    override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         cartRepository.deleteCartItem(productId)
         updateDeletedCart()
@@ -101,13 +101,13 @@ class CartViewModel(
         return page
     }
 
-    override fun increaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         cartRepository.increaseQuantity(productId)
         loadCart(_page.value ?: INITIALIZE_PAGE)
     }
 
-    override fun decreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         cartRepository.decreaseQuantity(productId)
         runCatching {

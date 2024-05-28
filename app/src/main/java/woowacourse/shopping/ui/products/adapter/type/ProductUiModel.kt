@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.products.adapter.type
 
-import woowacourse.shopping.data.product.entity.Product
-import woowacourse.shopping.model.Quantity
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Quantity
 
 data class ProductUiModel(
-    val productId: Long,
+    val productId: Int,
     val imageUrl: String,
     val title: String,
     val price: Int,
@@ -19,7 +19,7 @@ data class ProductUiModel(
             product: Product,
             quantity: Quantity = Quantity(),
         ): ProductUiModel {
-            return ProductUiModel(product.id, product.imageUrl, product.title, product.price, quantity)
+            return ProductUiModel(product.id, product.imageUrl, product.name, product.price, quantity)
         }
     }
 }
