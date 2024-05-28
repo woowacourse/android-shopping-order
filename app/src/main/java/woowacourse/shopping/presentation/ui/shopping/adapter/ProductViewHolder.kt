@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderRecentProductsBinding
 import woowacourse.shopping.databinding.ItemLoadBinding
 import woowacourse.shopping.databinding.ItemShoppingProductBinding
+import woowacourse.shopping.databinding.ItemSkelletonBinding
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.ui.shopping.ShoppingHandler
 
@@ -28,6 +29,10 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             binding.shoppingHandler = shoppingHandler
         }
     }
+
+    class ShoppingProductLoadingViewHolder(
+        binding: ItemSkelletonBinding,
+    ) : ProductViewHolder(binding.root)
 
     class LoadViewHolder(
         private val binding: ItemLoadBinding,

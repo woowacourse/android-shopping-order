@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +16,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.util.Event
+import kotlin.concurrent.thread
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository = DummyProductRepository(),
@@ -50,8 +53,11 @@ class ShoppingViewModel(
 
     fun loadInitialShoppingItems() {
         if (shoppingProducts.value !is UiState.Success<List<ProductListItem.ShoppingProductItem>>) {
+            val handler = Handler(Looper.getMainLooper())
             fetchInitialRecentProducts()
-            fetchInitialCartProducts()
+            handler.postDelayed({
+                fetchInitialCartProducts()
+            }, 2000)
         }
     }
 
@@ -120,8 +126,13 @@ class ShoppingViewModel(
         carts: List<Cart>,
     ) {
         val newShoppingProducts = fromProductsAndCarts(products, carts)
-        shoppingProductItems.addAll(newShoppingProducts)
-        _shoppingProducts.value = UiState.Success(shoppingProductItems)
+        thread {
+            repeat(100) {
+                println("아 개짜증")
+            }
+            shoppingProductItems.addAll(newShoppingProducts)
+            _shoppingProducts.postValue(UiState.Success(shoppingProductItems))
+        }
     }
 
     private fun updateCartItemQuantity(
