@@ -55,7 +55,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private fun observeLastProductUpdates() {
         viewModel.lastProduct.observe(this) {
             when (it) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> binding.lastProduct = it.data
             }
         }
@@ -71,7 +71,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private fun observeProductsUpdates() {
         viewModel.shoppingProduct.observe(this) { state ->
             when (state) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> binding.product = state.data
             }
         }

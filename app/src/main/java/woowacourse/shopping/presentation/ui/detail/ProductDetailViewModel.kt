@@ -21,7 +21,7 @@ class ProductDetailViewModel(
     private val recentRepository: RecentRepository,
 ) : ViewModel(), DetailHandler {
     private val _shoppingProduct =
-        MutableLiveData<UiState<ProductListItem.ShoppingProductItem>>(UiState.None)
+        MutableLiveData<UiState<ProductListItem.ShoppingProductItem>>(UiState.Loading)
     val shoppingProduct: LiveData<UiState<ProductListItem.ShoppingProductItem>> get() = _shoppingProduct
 
     private val _lastProduct = MutableLiveData<UiState<RecentProductItem>>()

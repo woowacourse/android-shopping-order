@@ -25,19 +25,19 @@ class ShoppingViewModel(
 ) : ViewModel(), ShoppingHandler {
     private var currentPage: Int = 0
 
-    private val _cartProducts = MutableLiveData<UiState<List<Cart>>>(UiState.None)
+    private val _cartProducts = MutableLiveData<UiState<List<Cart>>>(UiState.Loading)
 
     val cartProducts: LiveData<UiState<List<Cart>>> get() = _cartProducts
 
     private val _cartItemQuantity = MutableLiveData<Int>()
     val cartItemQuantity: LiveData<Int> get() = _cartItemQuantity
 
-    private val _recentProducts = MutableLiveData<UiState<List<RecentProductItem>>>(UiState.None)
+    private val _recentProducts = MutableLiveData<UiState<List<RecentProductItem>>>(UiState.Loading)
 
     val recentProducts: LiveData<UiState<List<RecentProductItem>>> get() = _recentProducts
 
     private val _shoppingProducts =
-        MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.None)
+        MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.Loading)
 
     val shoppingProducts: LiveData<UiState<List<ProductListItem.ShoppingProductItem>>> get() = _shoppingProducts
 
@@ -128,7 +128,7 @@ class ShoppingViewModel(
         val newShoppingProducts = fromProductsAndCarts(products, carts)
         thread {
             repeat(100) {
-                println("아 개짜증")
+                println("기다려")
             }
             shoppingProductItems.addAll(newShoppingProducts)
             _shoppingProducts.postValue(UiState.Success(shoppingProductItems))

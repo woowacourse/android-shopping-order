@@ -101,7 +101,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                         ProductListItem.RecentProductItems(state.data),
                     )
 
-                UiState.None -> {}
+                UiState.Loading -> {}
             }
         }
     }
@@ -110,7 +110,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.shoppingProducts.observe(this) { state ->
             when (state) {
                 is UiState.Success -> adapter.updateProductItems(state.data)
-                UiState.None -> adapter.showSkeleton()
+                UiState.Loading -> adapter.showSkeleton()
             }
         }
     }

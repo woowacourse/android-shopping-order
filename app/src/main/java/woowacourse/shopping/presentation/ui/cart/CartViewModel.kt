@@ -31,7 +31,7 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel() {
     val error: LiveData<Event<CartError>> = _error
 
     private val _shoppingProducts =
-        MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.None)
+        MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.Loading)
 
     val shoppingProducts: LiveData<UiState<List<ProductListItem.ShoppingProductItem>>> get() = _shoppingProducts
 

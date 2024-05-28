@@ -59,7 +59,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>(), CartHandler {
     private fun observeCartUpdates() {
         viewModel.shoppingProducts.observe(this) {
             when (it) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> handleSuccessState(it.data)
             }
         }
