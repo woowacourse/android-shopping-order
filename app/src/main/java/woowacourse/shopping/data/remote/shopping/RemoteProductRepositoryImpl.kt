@@ -8,7 +8,7 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class RemoteProductRepositoryImpl(private val productApiService: ProductApiService = RetrofitProductApiService()) :
+class RemoteProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSourceImpl()) :
     ProductRepository {
     override fun load(
         startPage: Int,
@@ -16,7 +16,7 @@ class RemoteProductRepositoryImpl(private val productApiService: ProductApiServi
         onSuccess: (List<Product>) -> Unit,
         onFailure: () -> Unit,
     ) {
-        productApiService.load(startPage, pageSize).enqueue(
+        remoteProductDataSource.load(startPage, pageSize).enqueue(
             object : Callback<ProductResponse> {
                 override fun onResponse(
                     call: Call<ProductResponse>,
@@ -44,7 +44,7 @@ class RemoteProductRepositoryImpl(private val productApiService: ProductApiServi
         onSuccess: (Product) -> Unit,
         onFailure: () -> Unit,
     ) {
-        productApiService.loadById(id).enqueue(
+        remoteProductDataSource.loadById(id).enqueue(
             object : Callback<ProductDto> {
                 override fun onResponse(
                     call: Call<ProductDto>,
