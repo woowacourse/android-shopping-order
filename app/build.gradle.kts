@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
 }
 
@@ -16,7 +17,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
+    }
+
+    dataBinding {
+        enable = true
     }
 
     buildTypes {
@@ -52,12 +58,29 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testImplementation("org.assertj:assertj-core:3.25.3")
     testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.mockk:mockk:1.13.10")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     androidTestImplementation("org.assertj:assertj-core:3.25.3")
     androidTestImplementation("io.kotest:kotest-runner-junit5:5.8.0")
     androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.3.0")
+
+    // glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // room
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // okhttp
+    implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
+    // gson
+    implementation("com.google.code.gson:gson:2.10.1")
 }
