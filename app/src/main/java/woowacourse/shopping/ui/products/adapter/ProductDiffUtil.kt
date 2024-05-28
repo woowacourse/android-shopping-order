@@ -1,19 +1,19 @@
 package woowacourse.shopping.ui.products.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.ui.products.ProductUiModel
 
-object ProductDiffUtil : DiffUtil.ItemCallback<ProductWithQuantity>() {
+object ProductDiffUtil : DiffUtil.ItemCallback<ProductUiModel>() {
     override fun areItemsTheSame(
-        oldItem: ProductWithQuantity,
-        newItem: ProductWithQuantity,
+        oldItem: ProductUiModel,
+        newItem: ProductUiModel,
     ): Boolean {
-        return oldItem.product.id == newItem.product.id
+        return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: ProductWithQuantity,
-        newItem: ProductWithQuantity,
+        oldItem: ProductUiModel,
+        newItem: ProductUiModel,
     ): Boolean {
         return oldItem == newItem
     }
