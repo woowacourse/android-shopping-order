@@ -6,7 +6,10 @@ import woowacourse.shopping.local.cart.ShoppingCartDao
 class LocalShoppingCartProductIdDataSource(private val dao: ShoppingCartDao) : ShoppingCartProductIdDataSource {
     override fun findByProductId(productId: Long): ProductIdsCountData? = dao.findById(productId)
 
-    override fun loadPaged(page: Int): List<ProductIdsCountData> = dao.findPaged(page)
+    override fun loadPaged(page: Int): List<ProductIdsCountData> {
+        val offset = (page - 1) * 5
+        return dao.findPaged(offset)
+    }
 
     override fun loadAll(): List<ProductIdsCountData> = dao.findAll()
 
