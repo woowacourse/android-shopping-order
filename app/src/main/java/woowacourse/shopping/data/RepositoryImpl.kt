@@ -78,6 +78,10 @@ class RepositoryImpl(private val localDataSource: LocalDataSource, private val r
             localDataSource.saveRecent(recent.toEntity())
         }
 
+    override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> = runCatching {
+        localDataSource.saveRecentProduct(recentProduct.toEntity())
+    }
+
     override fun deleteCart(id: Long): Result<Long> =
         runCatching {
             localDataSource.deleteCart(id)

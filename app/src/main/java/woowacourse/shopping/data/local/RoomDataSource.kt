@@ -52,4 +52,9 @@ class RoomDataSource(private val cartProductDao: CartProductDao, private val rec
     override fun getMaxCartCount(): Int {
         return cartProductDao.getMaxCartCount()
     }
+
+    override fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long {
+        recentProductDao.saveRecentProduct(recentProductEntity)
+        return recentProductEntity.productId
+    }
 }

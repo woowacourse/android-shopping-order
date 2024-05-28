@@ -12,3 +12,9 @@ fun RecentProductEntity.toDomain(): RecentProduct {
         createdAt,
     )
 }
+
+fun RecentProduct.toEntity(): RecentProductEntity {
+    return RecentProductEntity(
+        productId, name, imgUrl, price, createdAt
+    )
+}

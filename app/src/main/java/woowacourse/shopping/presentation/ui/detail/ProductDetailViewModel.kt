@@ -112,9 +112,12 @@ class ProductDetailViewModel(
 
     fun saveRecentProduct(cartProduct: CartProduct) {
         thread {
-            repository.saveRecent(
-                Recent(
+            repository.saveRecentProduct(
+                RecentProduct(
                     cartProduct.productId,
+                    cartProduct.name,
+                    cartProduct.imgUrl,
+                    cartProduct.price,
                     System.currentTimeMillis(),
                 ),
             ).onSuccess {

@@ -41,6 +41,8 @@ interface Repository {
     fun saveCart(cart: Cart): Result<Long>
 
     fun saveRecent(recent: Recent): Result<Long>
+    fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
+
 
     fun deleteCart(id: Long): Result<Long>
 

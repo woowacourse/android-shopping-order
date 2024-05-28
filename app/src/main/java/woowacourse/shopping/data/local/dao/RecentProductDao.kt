@@ -12,17 +12,20 @@ interface RecentProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveRecent(recentEntity: RecentEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveRecentProduct(recentProductEntity: RecentProductEntity)
+
     @Query(
-        "SELECT productentity.id AS productId, productentity.name, productentity.imgUrl, productentity.price, recententity.createdAt " +
-            "FROM recententity LEFT JOIN productentity ON productentity.id = recententity.productId " +
-            "ORDER BY recententity.createdAt DESC LIMIT :limit",
+        "SELECT productId, name, imgUrl, price, createdAt " +
+                "FROM recentproductentity " +
+                "ORDER BY createdAt DESC LIMIT :limit",
     )
     fun findByLimit(limit: Int): List<RecentProductEntity>
 
     @Query(
-        "SELECT productentity.id AS productId, productentity.name, productentity.imgUrl, productentity.price, recententity.createdAt " +
-            "FROM recententity LEFT JOIN productentity ON productentity.id = recententity.productId " +
-            "ORDER BY recententity.createdAt DESC",
+        "SELECT productId, name, imgUrl, price, createdAt " +
+            "FROM recentproductentity " +
+            "ORDER BY createdAt DESC",
     )
     fun findOne(): RecentProductEntity?
 }
