@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.cart
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,8 +16,8 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), CartListener {
-    private val _productUiModels = MutableLiveData<List<ProductUiModel>>(emptyList())
-    val productUiModels: LiveData<List<ProductUiModel>> = _productUiModels
+    private val _cartUiState = MutableLiveData<Event<CartUiState>>()
+    val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
 
     private val totalCartCount = MutableLiveData<Int>(INITIALIZE_CART_SIZE)
 
@@ -27,21 +29,20 @@ class CartViewModel(
     val hasPage: LiveData<Boolean> = totalCartCount.map { it > PAGE_SIZE }
     val hasPreviousPage: LiveData<Boolean> = _page.map { it > INITIALIZE_PAGE }
     val hasNextPage: LiveData<Boolean> = _page.map { it < (maxPage.value ?: INITIALIZE_PAGE) }
-    val isEmptyCart: LiveData<Boolean> = _productUiModels.map { it.isEmpty() }
 
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    private val _pageLoadError = MutableLiveData<Event<Unit>>()
-    val pageLoadError: LiveData<Event<Unit>> get() = _pageLoadError
-
     init {
-        loadCart(_page.value ?: INITIALIZE_PAGE)
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({ loadCart() }, 1000)
     }
 
-    private fun loadCart(page: Int) {
-        val cart = cartRepository.findRange(page, PAGE_SIZE)
-        _productUiModels.value = cart.toProductUiModels()
+    private fun loadCart(page: Int = INITIALIZE_PAGE) {
+        _cartUiState.value = Event(CartUiState.Loading)
+        runCatching { cartRepository.findRange(page, PAGE_SIZE) }
+            .onSuccess { _cartUiState.value = Event(CartUiState.Success(it.toProductUiModels())) }
+            .onFailure { _cartUiState.value = Event(CartUiState.Failure) }
         loadTotalCartCount()
     }
 
@@ -61,18 +62,15 @@ class CartViewModel(
     override fun deleteCartItem(productId: Long) {
         _changedCartEvent.value = Event(Unit)
         cartRepository.deleteCartItem(productId)
-        updateDeletedCart(productId)
+        updateDeletedCart()
     }
 
-    private fun updateDeletedCart(productId: Long) {
+    private fun updateDeletedCart() {
         if (isEmptyLastPage()) {
             movePreviousPage()
             return
         }
-        val products = _productUiModels.value ?: return
-        val deletedProduct = products.find { productId == it.productId } ?: return
-        _productUiModels.value = products - deletedProduct
-        loadTotalCartCount()
+        loadCart(_page.value ?: INITIALIZE_PAGE)
     }
 
     private fun isEmptyLastPage(): Boolean {
@@ -88,7 +86,7 @@ class CartViewModel(
     private fun nextPage(page: Int): Int {
         runCatching { loadCart(page + 1) }
             .onSuccess { return page + 1 }
-            .onFailure { _pageLoadError.value = Event(Unit) }
+            .onFailure { _cartUiState.value = Event(CartUiState.Failure) }
         return page
     }
 
@@ -99,19 +97,14 @@ class CartViewModel(
     private fun previousPage(page: Int): Int {
         runCatching { loadCart(page - 1) }
             .onSuccess { return page - 1 }
-            .onFailure { _pageLoadError.value = Event(Unit) }
+            .onFailure { _cartUiState.value = Event(CartUiState.Failure) }
         return page
     }
 
     override fun increaseQuantity(productId: Long) {
         _changedCartEvent.value = Event(Unit)
         cartRepository.increaseQuantity(productId)
-        val position = findProductUiModelsPosition(productId) ?: return
-        val productUiModels = _productUiModels.value?.toMutableList() ?: return
-        var changedQuantity = productUiModels[position].quantity
-        productUiModels[position] = productUiModels[position].copy(quantity = ++changedQuantity)
-        _productUiModels.value = productUiModels
-        loadTotalCartCount()
+        loadCart(_page.value ?: INITIALIZE_PAGE)
     }
 
     override fun decreaseQuantity(productId: Long) {
@@ -120,18 +113,10 @@ class CartViewModel(
         runCatching {
             cartRepository.find(productId)
         }.onSuccess {
-            val position = findProductUiModelsPosition(productId) ?: return
-            val productUiModels = _productUiModels.value?.toMutableList() ?: return
-            var changedQuantity = productUiModels[position].quantity
-            productUiModels[position] = productUiModels[position].copy(quantity = --changedQuantity)
-            _productUiModels.value = productUiModels
+            loadCart(_page.value ?: INITIALIZE_PAGE)
         }.onFailure {
-            updateDeletedCart(productId)
+            updateDeletedCart()
         }
-    }
-
-    private fun findProductUiModelsPosition(productId: Long): Int? {
-        return _productUiModels.value?.indexOfFirst { it.productId == productId }
     }
 
     companion object {

@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,9 +20,7 @@ class CartActivity : AppCompatActivity() {
             CartRepository.getInstance(),
         )
     }
-    private val adapter by lazy {
-        CartAdapter(viewModel)
-    }
+    private val adapter by lazy { CartAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +34,10 @@ class CartActivity : AppCompatActivity() {
     private fun initializeView() {
         initializeToolbar()
         initializeCartAdapter()
-        initializeCartObserveEvent()
+        viewModel.changedCartEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            setResult(Activity.RESULT_OK)
+        }
     }
 
     private fun initializeToolbar() {
@@ -48,20 +50,30 @@ class CartActivity : AppCompatActivity() {
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
 
-        viewModel.productUiModels.observe(this) {
-            adapter.submitList(it)
-        }
-    }
+        viewModel.cartUiState.observe(this) {
+            val cartUiState = it.getContentIfNotHandled() ?: return@observe
+            when (cartUiState) {
+                CartUiState.Failure -> {
+                    Toast.makeText(
+                        this,
+                        R.string.load_page_error,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
 
-    private fun initializeCartObserveEvent() {
-        viewModel.changedCartEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            setResult(Activity.RESULT_OK)
-        }
+                CartUiState.Loading -> {
+                    binding.shimmerCart.startShimmer()
+                    binding.shimmerCart.visibility = View.VISIBLE
+                    binding.rvCart.visibility = View.GONE
+                }
 
-        viewModel.pageLoadError.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
+                is CartUiState.Success -> {
+                    binding.shimmerCart.stopShimmer()
+                    binding.shimmerCart.visibility = View.GONE
+                    binding.rvCart.visibility = View.VISIBLE
+                    adapter.submitList(cartUiState.productUiModels)
+                }
+            }
         }
     }
 }
