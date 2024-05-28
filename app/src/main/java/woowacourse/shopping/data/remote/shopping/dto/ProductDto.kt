@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.dto
+package woowacourse.shopping.data.remote.shopping.dto
 
 import woowacourse.shopping.domain.Product
 

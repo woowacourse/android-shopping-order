@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.db.AppDatabase
 import woowacourse.shopping.data.db.cart.RoomCartRepository
 import woowacourse.shopping.data.db.recent.LocalRecentProductRepository
-import woowacourse.shopping.data.remote.RemoteProductRepositoryImpl
+import woowacourse.shopping.data.remote.shopping.RemoteProductRepositoryImpl
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
