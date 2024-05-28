@@ -85,4 +85,6 @@ dependencies {
 
     // mockwebserver testimplementation
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
 }
