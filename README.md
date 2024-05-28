@@ -11,7 +11,9 @@
 - 쇼핑 장바구니
 - 상품 상세
 
-issue: item_product_skeleton 에서 이미지 부분 사이에 마진을 안 줄 수 없을까?
+- issue:
+  - item_product_skeleton 에서 이미지 부분 사이에 마진을 안 줄 수 없을까? 
+
 
 
 ### 프로그래밍 요구 사항
