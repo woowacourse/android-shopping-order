@@ -37,14 +37,17 @@ class ProductListFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.productDetailList.adapter = productsAdapter
         binding.productLatestList.adapter = historyAdapter
-
-        showLoadMoreButton()
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.loadAll()
+    }
+
+    private fun showSkeletonUi() {
+        binding.shimmerProductList.visibility = View.VISIBLE
+        binding.productDetailList.visibility = View.GONE
     }
 
     private fun showLoadMoreButton() {
@@ -84,8 +87,10 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeNavigationShoppingCart()
-        observeLoadedProducts()
         observeDetailProductDestination()
+        showSkeletonUi()
+        observeLoadedProducts()
+        showLoadMoreButton()
         viewModel.productsHistory.observe(viewLifecycleOwner) {
             historyAdapter.update(it)
         }
@@ -99,7 +104,12 @@ class ProductListFragment : Fragment() {
 
     private fun observeLoadedProducts() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
-            productsAdapter.updateAllLoadedProducts(products)
+            if (products.isNotEmpty()) {
+                productsAdapter.updateAllLoadedProducts(products)
+                binding.shimmerProductList.stopShimmer()
+                binding.shimmerProductList.visibility = View.GONE
+                binding.productDetailList.visibility = View.VISIBLE
+            }
         }
     }
 
