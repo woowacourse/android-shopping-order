@@ -1,33 +1,71 @@
 package woowacourse.shopping.data.remote
 
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import woowacourse.shopping.data.remote.dto.ProductDto
+import woowacourse.shopping.data.remote.dto.ProductResponse
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.concurrent.thread
 
-class RemoteProductRepositoryImpl(private val productApiService: ProductApiService = MockProductApiService()) :
+class RemoteProductRepositoryImpl(private val productApiService: ProductApiService = RetrofitProductApiService()) :
     ProductRepository {
     override fun load(
         startPage: Int,
         pageSize: Int,
-    ): Result<List<Product>> {
-        var result: Result<List<Product>>? = null
-        thread {
-            result =
-                runCatching {
-                    productApiService.load(startPage, pageSize)
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        productApiService.load(startPage, pageSize).enqueue(
+            object : Callback<ProductResponse> {
+                override fun onResponse(
+                    call: Call<ProductResponse>,
+                    response: Response<ProductResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it.content.map { it.toProduct() })
+                        } ?: onSuccess(emptyList())
+                    }
                 }
-        }.join()
-        return result ?: throw NoSuchElementException()
+
+                override fun onFailure(
+                    call: Call<ProductResponse>,
+                    t: Throwable,
+                ) {
+                    onFailure()
+                }
+            },
+        )
     }
 
-    override fun loadById(id: Long): Result<Product> {
-        var result: Result<Product>? = null
-        thread {
-            result =
-                runCatching {
-                    productApiService.loadById(id)
+    override fun loadById(
+        id: Long,
+        onSuccess: (Product) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        productApiService.loadById(id).enqueue(
+            object : Callback<ProductDto> {
+                override fun onResponse(
+                    call: Call<ProductDto>,
+                    response: Response<ProductDto>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it.toProduct())
+                        }
+                    } else {
+                        onFailure()
+                    }
                 }
-        }.join()
-        return result ?: throw NoSuchElementException()
+
+                override fun onFailure(
+                    call: Call<ProductDto>,
+                    t: Throwable,
+                ) {
+                    onFailure()
+                }
+            },
+        )
     }
 }

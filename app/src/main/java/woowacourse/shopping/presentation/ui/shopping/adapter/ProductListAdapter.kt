@@ -61,8 +61,11 @@ class ProductListAdapter(
     }
 
     override fun getItemCount(): Int =
-        if (isLoadingState) SKELETON_COUNT
-        else items.size + LOAD_MORE_COUNT
+        if (isLoadingState) {
+            SKELETON_COUNT
+        } else {
+            items.size + LOAD_MORE_COUNT
+        }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,

@@ -40,13 +40,17 @@ class ProductDetailViewModel(
     }
 
     private fun fetchProductById(productId: Long) {
-        productRepository.loadById(productId).onSuccess {
-            loadCartProductById(it)
-            addRecentProduct(it)
-        }.onFailure {
-            _error.value =
-                Event(DetailError.ProductItemsNotFound)
-        }
+        productRepository.loadById(
+            productId,
+            onSuccess = {
+                loadCartProductById(it)
+                addRecentProduct(it)
+            },
+            onFailure = {
+                _error.value =
+                    Event(DetailError.ProductItemsNotFound)
+            },
+        )
     }
 
     fun loadLastProduct() {

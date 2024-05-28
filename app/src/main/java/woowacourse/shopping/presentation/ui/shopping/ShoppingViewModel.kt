@@ -5,7 +5,7 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.dummy.DummyProductRepository
+import woowacourse.shopping.data.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductListItem
@@ -19,7 +19,7 @@ import woowacourse.shopping.presentation.util.Event
 import kotlin.concurrent.thread
 
 class ShoppingViewModel(
-    private val productRepository: ProductRepository = DummyProductRepository(),
+    private val productRepository: ProductRepository = RemoteProductRepositoryImpl(),
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), ShoppingHandler {
@@ -57,7 +57,7 @@ class ShoppingViewModel(
             fetchInitialRecentProducts()
             handler.postDelayed({
                 fetchInitialCartProducts()
-            }, 2000)
+            }, 1000)
         }
     }
 
@@ -101,24 +101,29 @@ class ShoppingViewModel(
     }
 
     private fun fetchInitialProducts(carts: List<Cart>) {
-        productRepository.load(currentPage, PAGE_SIZE).onSuccess { products ->
-            currentPage++
-            addShoppingProducts(products, carts)
-        }.onFailure {
-            _error.value = Event(ShoppingError.ProductItemsNotFound)
-        }
+        productRepository.load(
+            currentPage,
+            PAGE_SIZE,
+            onSuccess = { products ->
+                currentPage++
+                addShoppingProducts(products, carts)
+            },
+            onFailure = {
+                _error.value = Event(ShoppingError.ProductItemsNotFound)
+            },
+        )
     }
 
     fun fetchProductForNewPage() {
-        productRepository.load(currentPage, PAGE_SIZE).onSuccess { products ->
+        productRepository.load(currentPage, PAGE_SIZE, onSuccess = { products ->
             currentPage++
             if (_cartProducts.value is UiState.Success<List<Cart>>) {
                 val carts = (_cartProducts.value as UiState.Success<List<Cart>>).data.map { it }
                 addShoppingProducts(products, carts)
             }
-        }.onFailure {
+        }, onFailure = {
             _error.value = Event(ShoppingError.AllProductsLoaded)
-        }
+        })
     }
 
     private fun addShoppingProducts(

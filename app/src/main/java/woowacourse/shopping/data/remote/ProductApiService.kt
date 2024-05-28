@@ -1,12 +1,14 @@
 package woowacourse.shopping.data.remote
 
-import woowacourse.shopping.domain.Product
+import retrofit2.Call
+import woowacourse.shopping.data.remote.dto.ProductDto
+import woowacourse.shopping.data.remote.dto.ProductResponse
 
 interface ProductApiService {
-    fun loadById(productId: Long): Product
+    fun loadById(productId: Long): Call<ProductDto>
 
     fun load(
         startPage: Int,
         pageSize: Int,
-    ): List<Product>
+    ): Call<ProductResponse>
 }

@@ -6,7 +6,13 @@ interface ProductRepository {
     fun load(
         startPage: Int,
         pageSize: Int,
-    ): Result<List<Product>>
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    )
 
-    fun loadById(id: Long): Result<Product>
+    fun loadById(
+        id: Long,
+        onSuccess: (Product) -> Unit,
+        onFailure: () -> Unit,
+    )
 }
