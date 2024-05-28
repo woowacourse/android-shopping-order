@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.model.remote.ProductDto
+import woowacourse.shopping.data.model.remote.ProductsDto
 
 interface ProductDataSource {
     fun findProductById(id: Long): Result<ProductDto>
@@ -8,7 +9,5 @@ interface ProductDataSource {
     fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<List<ProductDto>>
-
-    fun shutdown(): Result<Unit>
+    ): Result<ProductsDto>
 }

@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 
 interface ProductRepository {
     fun findProductById(id: Long): Result<Product>
@@ -8,7 +9,5 @@ interface ProductRepository {
     fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<List<Product>>
-
-    fun shutdown(): Result<Unit>
+    ): Result<Products>
 }

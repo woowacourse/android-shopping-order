@@ -12,6 +12,7 @@ fun CartProductDto.toDomain(): Product {
         price = this.price,
         quantity = this.quantity,
         imageUrl = this.imageUrl,
+        category = "", // TODO 임시
     )
 }
 
@@ -20,8 +21,9 @@ fun ProductDto.toDomain(): Product {
         id = this.id,
         name = this.name,
         price = this.price,
-        quantity = this.quantity,
+        quantity = 0,
         imageUrl = this.imageUrl,
+        category = this.category,
     )
 }
 
@@ -31,5 +33,6 @@ fun ProductHistoryDto.toDomain(): Product {
         name = this.name,
         price = this.price,
         imageUrl = this.imageUrl,
+        category = "", // TODO 임시
     )
 }

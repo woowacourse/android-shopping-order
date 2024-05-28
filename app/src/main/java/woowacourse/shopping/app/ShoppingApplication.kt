@@ -32,7 +32,7 @@ class ShoppingApplication : Application() {
         ProductHistoryRepositoryImpl(productHistoryDataSource)
     }
 
-    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(NetworkModule()) }
+    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(NetworkModule.retrofitService) }
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
             productDataSource,
@@ -44,8 +44,7 @@ class ShoppingApplication : Application() {
         super.onCreate()
     }
 
-    override fun onTerminate() {
-        super.onTerminate()
-        productRepository.shutdown()
+    companion object {
+        const val BASE_URL = "http://54.180.95.212:8080"
     }
 }

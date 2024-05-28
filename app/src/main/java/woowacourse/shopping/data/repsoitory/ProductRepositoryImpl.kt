@@ -4,6 +4,7 @@ import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
@@ -19,11 +20,9 @@ class ProductRepositoryImpl(
     override fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<List<Product>> =
+    ): Result<Products> =
         productDataSource.getPagingProduct(page, pageSize)
-            .mapCatching { result -> result.map { it.toDomain() } }
-
-    override fun shutdown(): Result<Unit> = productDataSource.shutdown()
+            .mapCatching { result -> result.toDomain() }
 
     companion object {
         const val INIT_QUANTITY = 1

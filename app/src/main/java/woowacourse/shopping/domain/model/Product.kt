@@ -4,8 +4,9 @@ data class Product(
     val id: Long,
     val name: String,
     val price: Int,
-    val quantity: Int = INIT_QUANTITY_NUM,
+    val category: String,
     val imageUrl: String,
+    val quantity: Int = INIT_QUANTITY_NUM,
 ) {
     val totalPrice: Int
         get() = price * quantity
