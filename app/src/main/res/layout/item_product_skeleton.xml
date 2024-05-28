@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <View
+            android:id="@+id/view_product_skeleton_image_column_1"
+            android:layout_width="154dp"
+            android:layout_height="154dp"
+            android:background="@color/skeleton_background"
+            app:layout_constraintEnd_toStartOf="@id/view_product_skeleton_image_column_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/view_product_skeleton_title_column_1"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/skeleton_background"
+            app:layout_constraintBottom_toTopOf="@id/view_product_skeleton_price_column_1"
+            app:layout_constraintStart_toStartOf="@id/view_product_skeleton_image_column_1"
+            app:layout_constraintTop_toBottomOf="@id/view_product_skeleton_image_column_1" />
+
+        <TextView
+            android:id="@+id/view_product_skeleton_price_column_1"
+            android:layout_width="118dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/skeleton_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/view_product_skeleton_image_column_1"
+            app:layout_constraintTop_toBottomOf="@id/view_product_skeleton_title_column_1" />
+
+
+        <View
+            android:id="@+id/view_product_skeleton_image_column_2"
+            android:layout_width="154dp"
+            android:layout_height="154dp"
+            android:background="@color/skeleton_background"
+            android:importantForAccessibility="no"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/view_product_skeleton_image_column_1"
+            app:layout_constraintTop_toTopOf="@id/view_product_skeleton_image_column_1" />
+
+        <TextView
+            android:id="@+id/view_product_skeleton_title_column_2"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/skeleton_background"
+            app:layout_constraintBottom_toTopOf="@id/view_product_skeleton_price_column_2"
+            app:layout_constraintStart_toStartOf="@id/view_product_skeleton_image_column_2"
+            app:layout_constraintTop_toBottomOf="@id/view_product_skeleton_image_column_1" />
+
+        <TextView
+            android:id="@+id/view_product_skeleton_price_column_2"
+            android:layout_width="118dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/skeleton_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/view_product_skeleton_image_column_2"
+            app:layout_constraintTop_toBottomOf="@id/view_product_skeleton_title_column_2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
