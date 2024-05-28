@@ -1,6 +1,11 @@
 package woowacourse.shopping.domain
 
+import retrofit2.Call
 import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Path
+import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
 
 interface Repository {
@@ -18,6 +23,9 @@ interface Repository {
         page: Int, size: Int
     ): Result<List<CartProduct>?>
 
+    fun getProductById(
+        id: Int
+    ): Result<CartProduct?>
 
     fun findCartByPaging(
         offset: Int,

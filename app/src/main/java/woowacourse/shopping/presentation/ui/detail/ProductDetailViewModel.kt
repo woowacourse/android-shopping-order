@@ -35,7 +35,7 @@ class ProductDetailViewModel(
 
     fun findCartProductById(id: Long) {
         thread {
-            repository.findProductById(id).onSuccess {
+            repository.getProductById(id.toInt()).onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
                 } else {
