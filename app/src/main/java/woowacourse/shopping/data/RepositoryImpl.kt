@@ -29,6 +29,14 @@ class RepositoryImpl(private val localDataSource: LocalDataSource, private val r
         return Result.failure(Throwable())
     }
 
+    override fun getCartItems(page: Int, size: Int): Result<List<CartProduct>?> {
+        val response = remoteDataSource.getCartItems(page, size)
+        if(response.isSuccessful) {
+            return Result.success(response.body()?.content?.map { it.toDomain() })
+        }
+        return Result.failure(Throwable())
+    }
+
     override fun findCartByPaging(
         offset: Int,
         pageSize: Int,

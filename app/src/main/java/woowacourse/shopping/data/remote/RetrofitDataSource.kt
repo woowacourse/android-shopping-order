@@ -5,6 +5,7 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.ProductRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.CartResponse
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
@@ -33,7 +34,7 @@ class RetrofitDataSource(
         return productApi.deleteProductById(id = id).execute()
     }
 
-    override fun getCartItems(page: Int, size: Int): Response<ProductResponse> {
+    override fun getCartItems(page: Int, size: Int): Response<CartResponse> {
         return cartItemApi.getCartItems(page = page, size = size).execute()
     }
 

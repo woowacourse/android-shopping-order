@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
+import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 import kotlin.concurrent.thread
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
@@ -33,8 +34,12 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     fun findProductByOffset() {
         thread {
-            repository.findCartByPaging(offSet, PAGE_SIZE).onSuccess {
-                _carts.postValue(UiState.Success(it))
+            repository.getCartItems(offSet, PAGE_SIZE).onSuccess {
+                if(it == null) {
+                    _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
+                } else {
+                    _carts.postValue(UiState.Success(it))
+                }
             }.onFailure {
                 _errorHandler.value = EventState(CART_LOAD_ERROR)
             }

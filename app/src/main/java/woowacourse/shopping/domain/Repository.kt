@@ -14,6 +14,11 @@ interface Repository {
         size: Int = 20,
     ): Result<List<CartProduct>?>
 
+    fun getCartItems(
+        page: Int, size: Int
+    ): Result<List<CartProduct>?>
+
+
     fun findCartByPaging(
         offset: Int,
         pageSize: Int,

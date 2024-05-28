@@ -11,6 +11,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.CartResponse
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
@@ -20,7 +21,7 @@ interface CartItemApi {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
-    ): Call<ProductResponse>
+    ): Call<CartResponse>
 
     @POST("/cart-items")
     fun postCartItem(
