@@ -78,7 +78,12 @@ class ProductContentsActivity : AppCompatActivity() {
 
     private fun observeProductItems() {
         viewModel.productWithQuantity.observe(this) {
-            productAdapter.submitList(it)
+            if (it.isLoading) {
+                val items = productAdapter.currentList.isLoading()
+                productAdapter.submitList(items)
+                return@observe
+            }
+            productAdapter.submitList(it.productWithQuantities)
         }
     }
 
@@ -94,6 +99,8 @@ class ProductContentsActivity : AppCompatActivity() {
         }
     }
 }
+
+fun List<ProductUiModel>.isLoading() = this + LoadingUiModel + LoadingUiModel
 
 @BindingAdapter("imageUrl")
 fun ImageView.bindUrlToImage(imageUrl: String?) {

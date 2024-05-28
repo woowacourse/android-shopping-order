@@ -1,8 +1,9 @@
 package woowacourse.shopping.ui.products.adapter
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 
 class ProductViewHolder(
@@ -10,7 +11,7 @@ class ProductViewHolder(
     private val viewModel: ProductContentsViewModel,
 ) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(productWithQuantity: ProductWithQuantity) {
+    fun bind(productWithQuantity: ProductWithQuantityUiModel) {
         binding.productWithQuantity = productWithQuantity
         binding.vm = viewModel
     }

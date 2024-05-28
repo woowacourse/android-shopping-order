@@ -3,28 +3,58 @@ package woowacourse.shopping.ui.products.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.databinding.ItemProductSkeletonBinding
+import woowacourse.shopping.ui.products.LoadingUiModel
+import woowacourse.shopping.ui.products.ProductUiModel
+import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 
 class ProductAdapter(
     private val viewModel: ProductContentsViewModel,
-) : ListAdapter<ProductWithQuantity, ProductViewHolder>(ProductDiffUtil) {
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): ProductViewHolder {
-        val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ProductViewHolder(
-            binding,
-            viewModel,
-        )
+    ): RecyclerView.ViewHolder {
+        val itemProductBinding =
+            ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        val itemProductSkeletonBinding =
+            ItemProductSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        return when (ProductViewType.valueOfType(viewType)) {
+            ProductViewType.PRODUCT -> ProductViewHolder(itemProductBinding, viewModel)
+            ProductViewType.SKELETON -> ProductSkeletonViewHolder(itemProductSkeletonBinding)
+        }
     }
 
     override fun onBindViewHolder(
-        holder: ProductViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        holder.bind(getItem(position))
+        if (getItemViewType(position) == ProductViewType.PRODUCT.value) {
+            (holder as ProductViewHolder).bind(
+                getItem(position) as ProductWithQuantityUiModel,
+            )
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is LoadingUiModel -> ProductViewType.SKELETON.value
+            else -> ProductViewType.PRODUCT.value
+        }
+    }
+}
+
+enum class ProductViewType(val value: Int) {
+    PRODUCT(0),
+    SKELETON(1),
+    ;
+
+    companion object {
+        fun valueOfType(value: Int): ProductViewType = if (value == 0) PRODUCT else SKELETON
     }
 }

@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.products.viewmodel
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +17,8 @@ import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.ProductItemClickListener
+import woowacourse.shopping.ui.products.ProductWithQuantityUiState
+import woowacourse.shopping.ui.products.toProductUiModel
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 
@@ -29,7 +33,7 @@ class ProductContentsViewModel(
 
     private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
 
-    val productWithQuantity: MediatorLiveData<List<ProductWithQuantity>> = MediatorLiveData()
+    val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
 
     val isCartEmpty: LiveData<Boolean> =
         cart.map {
@@ -75,8 +79,15 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        items.addAll(productRepository.getProducts())
-        products.value = items
+        val handler = Handler(Looper.getMainLooper())
+        runCatching {
+            items.addAll(productRepository.getProducts())
+            products.value = items
+        }.onSuccess {
+            handler.postDelayed({
+                productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
+            }, 2000)
+        }
     }
 
     fun loadCartItems() {
@@ -93,7 +104,8 @@ class ProductContentsViewModel(
             currentProducts.map { product ->
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
-        productWithQuantity.value = updatedList
+        productWithQuantity.value =
+            ProductWithQuantityUiState(productWithQuantities = updatedList.map { it.toProductUiModel() })
     }
 
     private fun getQuantity(productId: Long): Quantity {
