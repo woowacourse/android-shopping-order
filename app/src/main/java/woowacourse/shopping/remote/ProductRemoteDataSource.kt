@@ -6,7 +6,7 @@ import woowacourse.shopping.data.source.ProductDataSource
 class ProductRemoteDataSource(private val productsApiService: ProductsApiService) : ProductDataSource {
     override fun findByPaged(page: Int): List<ProductData> {
         val response =
-            productsApiService.requestProducts("fashion", page).execute().body()?.content
+            productsApiService.requestProducts(page = page).execute().body()?.content
                 ?: throw NoSuchElementException("there is no product with page: $page")
         return response.map {
             ProductData(
@@ -31,10 +31,19 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
     }
 
     override fun isFinalPage(page: Int): Boolean {
-        return true
+        val response =
+            productsApiService.requestProducts(page = page + 1).execute().body()?.content
+                ?: throw NoSuchElementException("there is no product with page: ${page + 1}")
+
+        return response.isEmpty()
     }
 
     override fun shutDown(): Boolean {
+        // TODO: 연결 끊기
         return false
+    }
+
+    companion object {
+        private const val TAG = "ProductRemoteDataSource"
     }
 }
