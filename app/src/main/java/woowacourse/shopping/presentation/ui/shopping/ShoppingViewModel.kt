@@ -33,13 +33,17 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun loadProductByOffset() {
         thread {
-            repository.findProductByPagingWithMock(offSet, PAGE_SIZE).onSuccess {
-                if (_products.value is UiState.None) {
-                    _products.postValue(UiState.Success(it))
+            repository.getProducts(offSet, PAGE_SIZE).onSuccess {
+                if(it == null) {
+                    _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {
-                    _products.postValue(
-                        UiState.Success((_products.value as UiState.Success).data + it),
-                    )
+                    if (_products.value is UiState.None) {
+                        _products.postValue(UiState.Success(it))
+                    } else {
+                        _products.postValue(
+                            UiState.Success((_products.value as UiState.Success).data + it),
+                        )
+                    }
                 }
                 offSet++
             }.onFailure {

@@ -1,8 +1,11 @@
-package woowacourse.shopping.data.local
+package woowacourse.shopping.data
 
+import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.data.remote.RemoteDataSource
+import woowacourse.shopping.data.remote.dto.mapper.toDomain
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -18,13 +21,13 @@ class RepositoryImpl(private val localDataSource: LocalDataSource, private val r
             localDataSource.findProductByPaging(offset, pageSize).map { it.toDomain() }
         }
 
-    override fun findProductByPagingWithMock(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            remoteDataSource.findProductByPagingWithMock(offset, pageSize).map { it.toDomain() }
+    override fun getProducts(page: Int, size: Int): Result<List<CartProduct>?> = runCatching {
+        val response = remoteDataSource.getProducts(page, size)
+        if(response.isSuccessful) {
+            return Result.success(response.body()?.content?.map { it.toDomain() })
         }
+        return Result.failure(Throwable())
+    }
 
     override fun findCartByPaging(
         offset: Int,

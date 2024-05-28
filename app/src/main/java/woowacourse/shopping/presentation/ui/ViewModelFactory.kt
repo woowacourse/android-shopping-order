@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.data.local.RepositoryInjector
+import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel

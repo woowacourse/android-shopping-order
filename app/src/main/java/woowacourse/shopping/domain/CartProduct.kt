@@ -10,6 +10,7 @@ data class CartProduct(
     val imgUrl: String,
     val price: Long,
     var quantity: Int,
+    val category: String = "fashion"
 ) : Parcelable {
     fun plusQuantity() {
         quantity = quantity.plus(1)

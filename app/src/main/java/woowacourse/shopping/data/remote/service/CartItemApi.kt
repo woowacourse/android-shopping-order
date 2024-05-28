@@ -15,7 +15,6 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface CartItemApi {
-
     @GET("/cart-items")
     fun getCartItems(
         @Header("accept") accept: String = "*/*",

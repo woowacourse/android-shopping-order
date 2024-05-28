@@ -43,21 +43,6 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         initData()
         initObserver()
         initLauncher()
-
-        RetrofitModule.productApi.getProducts().enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(
-                call: Call<ProductResponse>,
-                response: Response<ProductResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("DATATA", "body : $body")
-                }
-            }
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                println("error : $t")
-            }
-        })
     }
 
     private fun initTitle() {

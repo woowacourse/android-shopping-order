@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.local.RepositoryInjector
+import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.presentation.ui.fakeRepository
 

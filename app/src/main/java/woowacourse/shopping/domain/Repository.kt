@@ -1,15 +1,18 @@
 package woowacourse.shopping.domain
 
+import retrofit2.Response
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
+
 interface Repository {
     fun findProductByPaging(
         offset: Int,
         pageSize: Int,
     ): Result<List<CartProduct>>
 
-    fun findProductByPagingWithMock(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>>
+    fun getProducts(
+        page: Int = 0,
+        size: Int = 20,
+    ): Result<List<CartProduct>?>
 
     fun findCartByPaging(
         offset: Int,
