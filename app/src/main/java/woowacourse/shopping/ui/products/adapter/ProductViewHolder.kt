@@ -12,7 +12,6 @@ class ProductViewHolder(
 ) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(productWithQuantity: ProductWithQuantityUiModel) {
-        Log.e("test", "22")
         binding.productWithQuantity = productWithQuantity
         binding.vm = viewModel
     }
