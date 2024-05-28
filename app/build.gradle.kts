@@ -83,7 +83,4 @@ dependencies {
 
     // gson
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // shimmer
-    implementation("com.facebook.shimmer:shimmer:0.5.0")
 }

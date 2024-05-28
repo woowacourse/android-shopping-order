@@ -62,14 +62,12 @@ class CartActivity : AppCompatActivity() {
                 }
 
                 CartUiState.Loading -> {
-                    binding.shimmerCart.startShimmer()
-                    binding.shimmerCart.visibility = View.VISIBLE
+                    binding.layoutCartSkeleton.visibility = View.VISIBLE
                     binding.rvCart.visibility = View.GONE
                 }
 
                 is CartUiState.Success -> {
-                    binding.shimmerCart.stopShimmer()
-                    binding.shimmerCart.visibility = View.GONE
+                    binding.layoutCartSkeleton.visibility = View.GONE
                     binding.rvCart.visibility = View.VISIBLE
                     adapter.submitList(cartUiState.productUiModels)
                 }
