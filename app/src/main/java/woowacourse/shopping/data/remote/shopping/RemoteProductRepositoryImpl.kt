@@ -3,8 +3,8 @@ package woowacourse.shopping.data.remote.shopping
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.remote.shopping.dto.ProductDto
-import woowacourse.shopping.data.remote.shopping.dto.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.ProductDto
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 

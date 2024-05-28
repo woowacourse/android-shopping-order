@@ -5,8 +5,8 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.remote.shopping.dto.ProductDto
-import woowacourse.shopping.data.remote.shopping.dto.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.ProductDto
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
 
 interface RetrofitProductService {
     @GET("/products")

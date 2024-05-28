@@ -2,8 +2,8 @@ package woowacourse.shopping.data.remote.shopping
 
 import retrofit2.Call
 import woowacourse.shopping.data.remote.ApiClient
-import woowacourse.shopping.data.remote.shopping.dto.ProductDto
-import woowacourse.shopping.data.remote.shopping.dto.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.ProductDto
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
 
 class RetrofitProductApiService : ProductApiService {
     private val retrofitProductService: RetrofitProductService =
