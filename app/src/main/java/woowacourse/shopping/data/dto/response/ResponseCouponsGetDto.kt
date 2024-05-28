@@ -8,12 +8,12 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-
 @Serializable
 sealed class Coupon {
     abstract val id: Long
     abstract val code: String
     abstract val description: String
+
     @Serializable(with = LocalDateSerializer::class)
     abstract val expirationDate: LocalDate
     abstract val discountType: String
@@ -29,7 +29,7 @@ data class FixedDiscountCoupon(
     override val expirationDate: LocalDate,
     val discount: Int,
     val minimumAmount: Int,
-    override val discountType: String = "fixed"
+    override val discountType: String = "fixed",
 ) : Coupon()
 
 @Serializable
@@ -42,7 +42,7 @@ data class BuyXGetYCoupon(
     override val expirationDate: LocalDate,
     val buyQuantity: Int,
     val getQuantity: Int,
-    override val discountType: String = "buyXgetY"
+    override val discountType: String = "buyXgetY",
 ) : Coupon()
 
 @Serializable
@@ -54,7 +54,7 @@ data class FreeShippingCoupon(
     @Serializable(with = LocalDateSerializer::class)
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-    override val discountType: String = "freeShipping"
+    override val discountType: String = "freeShipping",
 ) : Coupon()
 
 @Serializable
@@ -67,19 +67,23 @@ data class PercentageDiscountCoupon(
     override val expirationDate: LocalDate,
     val discount: Int,
     val availableTime: AvailableTime,
-    override val discountType: String = "percentage"
+    override val discountType: String = "percentage",
 ) : Coupon()
 
 @Serializable
 data class AvailableTime(
     val start: String,
-    val end: String
+    val end: String,
 )
 
 @Serializer(forClass = LocalDate::class)
 object LocalDateSerializer : KSerializer<LocalDate> {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    override fun serialize(output: Encoder, obj: LocalDate) {
+
+    override fun serialize(
+        output: Encoder,
+        obj: LocalDate,
+    ) {
         val string = obj.format(formatter)
         output.encodeString(string)
     }

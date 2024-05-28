@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.products.adapter
 
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel

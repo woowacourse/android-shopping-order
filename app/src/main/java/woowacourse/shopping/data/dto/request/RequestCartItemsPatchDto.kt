@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RequestCartItemsPatchDto(
-    val quantity:Int
+    val quantity: Int,
 )

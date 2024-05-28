@@ -3,7 +3,7 @@ package woowacourse.shopping.data.dto.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RequestProductsGetDto(
+data class ResponseProductsGetDto(
     val totalPages: Int,
     val totalElements: Int,
     val sort: Sort,
@@ -14,5 +14,5 @@ data class RequestProductsGetDto(
     val numberOfElements: Int,
     val size: Int,
     val content: List<Content>,
-    val empty: Boolean
+    val empty: Boolean,
 )

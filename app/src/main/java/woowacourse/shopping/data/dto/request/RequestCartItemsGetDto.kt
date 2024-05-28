@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RequestCartItemsGetDto(
-    val productId:Int,
-    val quantity:Int
+    val productId: Int,
+    val quantity: Int,
 )

@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RequestCartItemsPostDto(
-    val cartItemIds:List<Int>
+    val cartItemIds: List<Int>,
 )

@@ -14,14 +14,14 @@ data class ResponseCartItemDto(
     val numberOfElements: Int,
     val size: Int,
     val content: List<Content>,
-    val empty: Boolean
+    val empty: Boolean,
 )
 
 @Serializable
 data class Sort(
     val sorted: Boolean,
     val unsorted: Boolean,
-    val empty: Boolean
+    val empty: Boolean,
 )
 
 @Serializable
@@ -31,7 +31,7 @@ data class Pageable(
     val pageSize: Int,
     val paged: Boolean,
     val unpaged: Boolean,
-    val offset: Int
+    val offset: Int,
 )
 
 @Serializable
@@ -40,12 +40,12 @@ data class Product(
     val name: String,
     val price: Int,
     val imageUrl: String,
-    val category: String
+    val category: String,
 )
 
 @Serializable
 data class Content(
     val id: Int,
     val quantity: Int,
-    val product: Product
+    val product: Product,
 )
