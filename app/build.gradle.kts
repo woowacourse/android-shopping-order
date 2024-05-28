@@ -87,4 +87,8 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
 
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }
