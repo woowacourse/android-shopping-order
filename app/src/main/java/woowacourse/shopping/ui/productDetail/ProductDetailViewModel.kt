@@ -41,7 +41,6 @@ class ProductDetailViewModel(
     fun loadAll() {
         thread {
             val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
-            Log.d(TAG, "loadAll: $currentProduct")
             val latestProduct =
                 try {
                     productHistoryRepository.loadLatestProduct()
