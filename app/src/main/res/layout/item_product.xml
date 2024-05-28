@@ -16,7 +16,7 @@
 
         <variable
             name="productWithQuantity"
-            type="woowacourse.shopping.model.ProductWithQuantity" />
+            type="woowacourse.shopping.ui.products.ProductWithQuantityUiModel" />
 
     </data>
 
@@ -45,10 +45,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_marginBottom="8dp"
-            app:isVisible="@{productWithQuantity.quantity.value != 0}"
+            app:isVisible="@{productWithQuantity.quantity != 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
             app:layout_constraintStart_toStartOf="@id/iv_product_image"
-            bind:count="@{String.valueOf(productWithQuantity.quantity.value)}"
+            bind:count="@{String.valueOf(productWithQuantity.quantity)}"
             bind:productId = "@{productWithQuantity.product.id}"
             bind:countButtonClickListener="@{vm}" />
 
@@ -61,7 +61,7 @@
             android:background="@drawable/start_add_product"
             android:onClick="@{() -> vm.plusCount(productWithQuantity.product.id)}"
             android:src="@drawable/ic_plus"
-            app:isVisible="@{productWithQuantity.quantity.value == 0}"
+            app:isVisible="@{productWithQuantity.quantity == 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
             app:layout_constraintEnd_toEndOf="@id/iv_product_image" />
 
