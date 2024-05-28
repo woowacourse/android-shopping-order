@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +13,11 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
 
+    val properties =
+        Properties().apply {
+            load(FileInputStream(rootProject.file("local.properties")))
+        }
+
     defaultConfig {
         applicationId = "woowacourse.shopping"
         minSdk = 26
@@ -20,10 +28,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "BASE_URL", properties["base_url"] as String)
+        buildConfigField("String", "TOKEN", properties["token"] as String)
     }
 
     dataBinding {
         enable = true
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -92,5 +107,4 @@ dependencies {
 
     // serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-
 }
