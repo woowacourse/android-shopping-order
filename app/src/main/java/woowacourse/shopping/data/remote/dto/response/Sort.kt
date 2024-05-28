@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.dto
+package woowacourse.shopping.data.remote.dto.response
 
 data class Sort(
     val sorted: Boolean,

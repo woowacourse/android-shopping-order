@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.remote.dto
+package woowacourse.shopping.data.remote.dto.request
 
-data class Product(
-    val id: Int,
+
+data class ProductRequest(
     val name: String,
     val price: Int,
     val imageUrl: String,
