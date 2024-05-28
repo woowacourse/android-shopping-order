@@ -26,7 +26,7 @@ class HomeViewModelTest {
         productRepository = FakeProductRepositoryImpl()
         viewModel = HomeViewModel(productRepository, cartRepository, recentProductRepository)
 
-        assertThat(viewModel.shoppingUiState.value is UIState.Empty).isTrue()
+        assertThat(viewModel.shoppingUiState.value is UIState.Loading).isTrue()
         assertEquals(false, viewModel.canLoadMore.value)
     }
 

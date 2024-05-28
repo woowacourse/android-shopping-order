@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.cart
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +17,7 @@ class CartViewModel(private val cartRepository: CartRepository) :
     QuantityClickListener {
     private var lastPage: Int = DEFAULT_PAGE
 
-    private val _cartUiState = MutableLiveData<UIState<List<CartItem>>>(UIState.Empty)
+    private val _cartUiState = MutableLiveData<UIState<List<CartItem>>>(UIState.Loading)
     val cartUiState: LiveData<UIState<List<CartItem>>>
         get() = _cartUiState
 
@@ -80,11 +82,7 @@ class CartViewModel(private val cartRepository: CartRepository) :
         try {
             val cartItems =
                 cartRepository.findAllPagedItems(currentPage.value ?: DEFAULT_PAGE, PAGE_SIZE)
-            if (cartItems.isEmpty()) {
-                _cartUiState.value = UIState.Empty
-            } else {
-                _cartUiState.value = UIState.Success(cartItems)
-            }
+            _cartUiState.value = UIState.Success(cartItems)
         } catch (e: Exception) {
             _cartUiState.value = UIState.Error(e)
         }

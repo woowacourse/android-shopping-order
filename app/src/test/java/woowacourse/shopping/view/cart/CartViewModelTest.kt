@@ -32,7 +32,7 @@ class CartViewModelTest {
         val state = viewModel.cartUiState.getOrAwaitValue()
 
         // then
-        assertThat(state).isEqualTo(UIState.Empty)
+        assertThat(state).isEqualTo(UIState.Loading)
     }
 
     @Test
@@ -140,7 +140,7 @@ class CartViewModelTest {
 
         // then
         val state = viewModel.cartUiState.getOrAwaitValue()
-        assertThat(state).isEqualTo(UIState.Empty)
+        assertThat(state).isEqualTo(UIState.Loading)
     }
 
     @Test
@@ -236,7 +236,7 @@ class CartViewModelTest {
         // then
         val state = viewModel.cartUiState.getOrAwaitValue()
         val event = viewModel.notifyDeletion.getOrAwaitValue()
-        assertThat(state).isEqualTo(UIState.Empty)
+        assertThat(state).isEqualTo(UIState.Loading)
         assertThat(event.getContentIfNotHandled()).isEqualTo(true)
     }
 

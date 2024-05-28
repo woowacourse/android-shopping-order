@@ -57,12 +57,13 @@
             android:textColor="@color/gray_500"
             android:textSize="100dp"
             android:textStyle="bold"
-            android:visibility="gone"
+            app:isEmpty="@{viewModel.isEmpty}"
+            app:state="@{viewModel.cartUiState}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_cart"
-            app:viewVisibility="@{viewModel.isEmpty}" />
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
@@ -70,12 +71,13 @@
             android:layout_height="0dp"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
+            app:isEmpty="@{viewModel.isEmpty}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/page_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_cart"
-            app:viewVisibility="@{!viewModel.isEmpty}"
+            app:state="@{viewModel.cartUiState}"
             tools:itemCount="5"
             tools:listitem="@layout/item_cart" />
 

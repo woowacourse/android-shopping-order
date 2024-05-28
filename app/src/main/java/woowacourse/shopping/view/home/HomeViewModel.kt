@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.home
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +13,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
-import woowacourse.shopping.view.home.adapter.product.ShoppingItem.ProductItem
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.state.UIState
 
 class HomeViewModel(
@@ -19,8 +21,8 @@ class HomeViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), HomeClickListener, QuantityClickListener {
-    private val _shoppingUiState = MutableLiveData<UIState<List<ProductItem>>>(UIState.Empty)
-    val shoppingUiState: LiveData<UIState<List<ProductItem>>>
+    private val _shoppingUiState = MutableLiveData<UIState<List<ProductViewItem>>>(UIState.Loading)
+    val shoppingUiState: LiveData<UIState<List<ProductViewItem>>>
         get() = _shoppingUiState
 
     private val _recentProducts = MutableLiveData<List<RecentProduct>>()
@@ -40,8 +42,8 @@ class HomeViewModel(
     val totalQuantity: LiveData<Int>
         get() = _totalQuantity
 
-    private val _updatedProductItem = MutableLiveData<ProductItem>()
-    val updatedProductItem: LiveData<ProductItem>
+    private val _updatedProductItem = MutableLiveData<ProductViewItem>()
+    val updatedProductItem: LiveData<ProductViewItem>
         get() = _updatedProductItem
 
     private val _navigateToDetail = MutableLiveData<Event<Long>>()
@@ -52,8 +54,8 @@ class HomeViewModel(
     val navigateToCart: LiveData<Event<Boolean>>
         get() = _navigateToCart
 
-    private val _loadedProductItems = MutableLiveData<List<ProductItem>>(emptyList())
-    val loadedProductItems: LiveData<List<ProductItem>>
+    private val _loadedProductItems = MutableLiveData<List<ProductViewItem>>(emptyList())
+    val loadedProductItems: LiveData<List<ProductViewItem>>
         get() = _loadedProductItems
 
     init {
@@ -69,19 +71,15 @@ class HomeViewModel(
     private fun loadProducts() {
         try {
             val products = productRepository.findProductsByPage()
-            if (products.isEmpty()) {
-                _shoppingUiState.value = UIState.Empty
-            } else {
-                val productItems =
-                    products.map { product ->
-                        val quantity = cartRepository.productQuantity(product.id)
-                        ProductItem(product, quantity)
-                    }
-                _canLoadMore.value = productRepository.canLoadMore()
-                _shoppingUiState.value =
-                    UIState.Success(loadedProductItems.value?.plus(productItems) ?: emptyList())
-                _loadedProductItems.value = loadedProductItems.value?.plus(productItems)
-            }
+            val productItems =
+                products.map { product ->
+                    val quantity = cartRepository.productQuantity(product.id)
+                    ProductViewItem(product, quantity)
+                }
+            _canLoadMore.value = productRepository.canLoadMore()
+            _shoppingUiState.value =
+                UIState.Success(loadedProductItems.value?.plus(productItems) ?: emptyList())
+            _loadedProductItems.value = loadedProductItems.value?.plus(productItems)
         } catch (e: Exception) {
             _shoppingUiState.value = UIState.Error(e)
         }
@@ -97,12 +95,12 @@ class HomeViewModel(
             cartItems.map { cartItem ->
                 val product = productRepository.findProductById(cartItem.productId) ?: return
                 val quantity = cartRepository.productQuantity(product.id)
-                ProductItem(product, quantity)
+                ProductViewItem(product, quantity)
             }
 
         loadedProductItems.value?.forEachIndexed { index, loadedItem ->
             if (loadedItem.quantity > 0 && cartItems.firstOrNull { it.productId == loadedItem.product.id } == null) {
-                val productItem = ProductItem(loadedItem.product, 0)
+                val productItem = ProductViewItem(loadedItem.product, 0)
                 (loadedProductItems.value as MutableList)[index] = productItem
             }
         }
@@ -143,7 +141,7 @@ class HomeViewModel(
         product: Product,
         quantity: Int,
     ) {
-        val productItem = ProductItem(product, quantity)
+        val productItem = ProductViewItem(product, quantity)
         _updatedProductItem.value = productItem
 
         val position = _loadedProductItems.value?.indexOfFirst { it.product.id == product.id }

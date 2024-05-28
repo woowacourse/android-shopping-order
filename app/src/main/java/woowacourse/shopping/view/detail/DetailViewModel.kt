@@ -20,7 +20,7 @@ class DetailViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val productId: Long,
 ) : ViewModel(), DetailClickListener, QuantityClickListener {
-    private val _detailUiState = MutableLiveData<UIState<Product>>(UIState.Empty)
+    private val _detailUiState = MutableLiveData<UIState<Product>>(UIState.Loading)
     val detailUiState: LiveData<UIState<Product>>
         get() = _detailUiState
 

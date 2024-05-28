@@ -15,7 +15,7 @@
 
         <variable
             name="productItem"
-            type="woowacourse.shopping.view.home.adapter.product.ShoppingItem.ProductItem" />
+            type="woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

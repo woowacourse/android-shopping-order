@@ -48,7 +48,7 @@ class CartActivity : AppCompatActivity() {
         viewModel.cartUiState.observe(this) { state ->
             when (state) {
                 is UIState.Success -> showData(state.data)
-                is UIState.Empty -> showData(emptyList())
+                is UIState.Loading -> return@observe
                 is UIState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),

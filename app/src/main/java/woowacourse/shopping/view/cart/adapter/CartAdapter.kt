@@ -4,38 +4,64 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
+import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.view.cart.CartItemClickListener
 import woowacourse.shopping.view.cart.CartViewModel.Companion.PAGE_SIZE
 import woowacourse.shopping.view.cart.QuantityClickListener
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
 
 class CartAdapter(
     private val cartItemClickListener: CartItemClickListener,
     private val quantityClickListener: QuantityClickListener,
-) : RecyclerView.Adapter<CartViewHolder>() {
-    private var cartItems: List<CartItem> = emptyList()
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var cartItems: List<ShoppingCartViewItem> =
+        List(5) { ShoppingCartViewItem.CartPlaceHolderViewItem() }
+
+    override fun getItemViewType(position: Int): Int {
+        return cartItems[position].viewType
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CartViewHolder {
-        val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CartViewHolder(binding)
+    ): RecyclerView.ViewHolder {
+        if (viewType == ShoppingCartViewItem.CART_VIEW_TYPE) {
+            return CartViewHolder(
+                ItemCartBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+        return CartPlaceholderViewHolder(
+            ItemCartPlaceholderBinding.inflate(
+                LayoutInflater.from(
+                    parent.context
+                ), parent, false
+            )
+        )
     }
 
     override fun onBindViewHolder(
-        holder: CartViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        val cartItem = cartItems[position]
-        return holder.bind(cartItem, cartItemClickListener, quantityClickListener)
+        val cartViewItem = cartItems[position]
+        if (holder is CartViewHolder) holder.bind(
+            (cartViewItem as CartViewItem).cartItem,
+            cartItemClickListener,
+            quantityClickListener
+        )
     }
 
     override fun getItemCount(): Int {
         return cartItems.size
     }
 
-    fun loadData(newCartItems: List<CartItem>) {
+    fun loadData(cartItems: List<CartItem>) {
+        val newCartItems = cartItems.map { CartViewItem(it) }
         val oldCartItems = this.cartItems
         this.cartItems = newCartItems
 
@@ -57,10 +83,15 @@ class CartAdapter(
     }
 
     fun updateCartItemQuantity(cartItem: CartItem) {
-        val position = cartItems.indexOfFirst { it.id == cartItem.id }
-        if (position != -1) {
-            (cartItems as MutableList)[position] = cartItem
-            notifyItemChanged(position)
+        if (!isFirstLoad()) {
+            val position = cartItems.indexOfFirst { (it as CartViewItem).cartItem.id == cartItem.id }
+            if (position != -1) {
+                cartItems.toMutableList()[position] = CartViewItem(cartItem)
+                notifyItemChanged(position)
+            }
         }
     }
+
+    private fun isFirstLoad() =
+        cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
 }

@@ -19,7 +19,6 @@ class ProductRepositoryImpl : ProductRepository {
             offset = Integer.min(offset + HomeViewModel.PAGE_SIZE, size)
             pageProducts = productMockWebServer.findPageProducts(start, offset)
         }
-
         return pageProducts
     }
 

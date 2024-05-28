@@ -1,12 +1,15 @@
 package woowacourse.shopping.data.adapter
 
+import android.opengl.Visibility
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.view.state.UIState
 
 @BindingAdapter("app:imageUrl")
 fun loadImage(
@@ -52,4 +55,25 @@ fun setTotalQuantityVisibility(
     totalQuantity: Int,
 ) {
     textView.visibility = if (totalQuantity > 0) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
+fun <T> setEmptyCartVisibility(
+    textView: TextView,
+    isEmpty: Boolean,
+    state: UIState<T>
+) {
+    textView.visibility =
+        if (state is UIState.Success && isEmpty) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
+fun <T> setCartVisibility(
+    view: RecyclerView,
+    isEmpty: Boolean,
+    state: UIState<T>
+) {
+    view.visibility =
+        if (state is UIState.Success && !isEmpty || state is UIState.Loading) View.VISIBLE
+        else View.GONE
 }

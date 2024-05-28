@@ -15,8 +15,8 @@ import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.home.adapter.product.ProductAdapter
-import woowacourse.shopping.view.home.adapter.product.ShoppingItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
-import woowacourse.shopping.view.home.adapter.product.ShoppingItem.ProductItem
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
 import woowacourse.shopping.view.state.UIState
 
@@ -73,7 +73,7 @@ class HomeActivity : AppCompatActivity() {
         viewModel.shoppingUiState.observe(this) { state ->
             when (state) {
                 is UIState.Success -> showData(state.data)
-                is UIState.Empty -> showData(emptyList())
+                is UIState.Loading -> return@observe
                 is UIState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
@@ -106,7 +106,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(data: List<ProductItem>) {
+    private fun showData(data: List<ProductViewItem>) {
         productAdapter.loadData(data, viewModel.canLoadMore.value ?: false)
     }
 

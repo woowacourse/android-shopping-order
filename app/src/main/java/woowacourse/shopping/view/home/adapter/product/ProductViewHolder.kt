@@ -8,7 +8,7 @@ import woowacourse.shopping.view.home.HomeClickListener
 class ProductViewHolder(private val binding: ItemProductBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
-        productItem: ShoppingItem.ProductItem,
+        productItem: HomeViewItem.ProductViewItem,
         homeClickListener: HomeClickListener,
         quantityClickListener: QuantityClickListener,
     ) {
