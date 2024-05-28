@@ -7,7 +7,7 @@ import retrofit2.http.Query
 import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.remote.model.response.ProductsResponse
 
-interface ApiService {
+interface ProductService {
     @GET(ApiClient.Product.GET_PRODUCTS)
     fun getProducts(
         @Query("page") page: Int = 0,

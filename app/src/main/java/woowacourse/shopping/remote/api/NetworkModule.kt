@@ -12,11 +12,19 @@ object NetworkModule {
             .addInterceptor(HttpExceptionInterceptor())
             .build()
 
-    val retrofitService: ApiService =
+    val productService =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-            .create(ApiService::class.java)
+            .create(ProductService::class.java)
+
+    val cartService =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(CartService::class.java)
 }

@@ -6,4 +6,4 @@ data class ProductResponse(
     val price: Int,
     val category: String,
     val imageUrl: String,
-) 
+)

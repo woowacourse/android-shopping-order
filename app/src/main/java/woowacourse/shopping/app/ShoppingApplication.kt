@@ -32,7 +32,7 @@ class ShoppingApplication : Application() {
         ProductHistoryRepositoryImpl(productHistoryDataSource)
     }
 
-    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(NetworkModule.retrofitService) }
+    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(NetworkModule.productService) }
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
             productDataSource,

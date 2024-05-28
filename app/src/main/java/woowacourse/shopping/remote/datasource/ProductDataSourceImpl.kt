@@ -3,13 +3,13 @@ package woowacourse.shopping.remote.datasource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
 import woowacourse.shopping.data.model.remote.ProductDto
 import woowacourse.shopping.data.model.remote.ProductsDto
-import woowacourse.shopping.remote.api.ApiService
+import woowacourse.shopping.remote.api.ProductService
 import woowacourse.shopping.remote.mapper.toData
 
-class ProductDataSourceImpl(private val apiService: ApiService) : ProductDataSource {
+class ProductDataSourceImpl(private val productService: ProductService) : ProductDataSource {
     override fun findProductById(id: Long): Result<ProductDto> =
         runCatching {
-            apiService.getProductsById(id = id.toInt()).execute().body()?.toData()
+            productService.getProductsById(id = id.toInt()).execute().body()?.toData()
                 ?: throw IllegalArgumentException()
         }
 
@@ -18,7 +18,7 @@ class ProductDataSourceImpl(private val apiService: ApiService) : ProductDataSou
         pageSize: Int,
     ): Result<ProductsDto> =
         runCatching {
-            apiService.getProducts(page = page, size = pageSize).execute().body()?.toData()
+            productService.getProducts(page = page, size = pageSize).execute().body()?.toData()
                 ?: throw IllegalArgumentException()
         }
 }
