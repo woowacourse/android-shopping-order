@@ -51,12 +51,15 @@
             tools:listitem="@layout/holder_cart" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_cart_list"
+
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="@id/cart_list"
             app:layout_constraintEnd_toEndOf="@id/cart_list"
             app:layout_constraintStart_toStartOf="@id/cart_list"
             app:layout_constraintTop_toTopOf="@id/cart_list"
+            app:shimmer_auto_start="true"
             app:shimmer_base_alpha="0.5">
 
             <LinearLayout

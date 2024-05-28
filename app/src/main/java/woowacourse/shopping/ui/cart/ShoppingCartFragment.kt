@@ -44,6 +44,7 @@ class ShoppingCartFragment : Fragment() {
         binding.lifecycleOwner = this
 
         initNavigation()
+        showSkeletonUi()
         observeDeletedItem()
         observeItemsInCurrentPage()
     }
@@ -51,6 +52,11 @@ class ShoppingCartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.loadAll()
+    }
+
+    private fun showSkeletonUi() {
+        binding.shimmerCartList.visibility = View.VISIBLE
+        binding.cartList.visibility = View.GONE
     }
 
     private fun initNavigation() {
@@ -67,6 +73,9 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeItemsInCurrentPage() {
         viewModel.itemsInCurrentPage.observe(viewLifecycleOwner) { products ->
+            binding.shimmerCartList.stopShimmer()
+            binding.shimmerCartList.visibility = View.GONE
+            binding.cartList.visibility = View.VISIBLE
             adapter.updateData(products)
         }
     }
