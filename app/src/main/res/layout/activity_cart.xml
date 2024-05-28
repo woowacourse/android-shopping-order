@@ -31,15 +31,24 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <include
+            isVisible="@{true}"
+            layout="@layout/layout_cart_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
+            isVisible="@{false}"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"
             android:paddingBottom="60dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
             app:layout_constraintBottom_toTopOf="@id/btn_previous"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
             tools:listitem="@layout/item_cart" />
 
         <Button
@@ -50,8 +59,8 @@
             android:background="@drawable/selector_left_button"
             android:clickable="@{vm.canMovePreviousPage}"
             android:enabled="@{vm.canMovePreviousPage}"
-            android:text="@string/previous_page"
             android:onClick="@{() -> vm.minusPageNum()}"
+            android:text="@string/previous_page"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -80,11 +89,11 @@
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:background="@drawable/selector_right_button"
-            android:text="@string/next_page"
-            android:textColor="@color/white"
             android:clickable="@{vm.canMoveNextPage}"
             android:enabled="@{vm.canMoveNextPage}"
             android:onClick="@{() -> vm.plusPageNum()}"
+            android:text="@string/next_page"
+            android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
