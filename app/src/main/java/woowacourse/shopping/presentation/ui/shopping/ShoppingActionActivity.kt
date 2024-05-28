@@ -1,12 +1,18 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.R
+import woowacourse.shopping.data.remote.RetrofitModule
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
@@ -37,6 +43,21 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         initData()
         initObserver()
         initLauncher()
+
+        RetrofitModule.productApi.getProducts().enqueue(object : Callback<ProductResponse> {
+            override fun onResponse(
+                call: Call<ProductResponse>,
+                response: Response<ProductResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    Log.d("DATATA", "body : $body")
+                }
+            }
+            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                println("error : $t")
+            }
+        })
     }
 
     private fun initTitle() {

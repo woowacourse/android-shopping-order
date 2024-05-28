@@ -1,5 +1,9 @@
 package woowacourse.shopping.data.remote.dto.response
 
+import kotlinx.serialization.Serializable
+
+@Serializable
+
 data class ProductResponse(
     val content: List<Product>,
     val pageable: Pageable,
