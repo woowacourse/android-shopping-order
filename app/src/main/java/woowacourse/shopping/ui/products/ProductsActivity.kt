@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.products
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -74,9 +75,23 @@ class ProductsActivity : AppCompatActivity() {
         initializeProductAdapter()
         initializeToolbar()
         initializePage()
-        viewModel.pageLoadError.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
+        viewModel.productsUiState.observe(this) {
+            val productsUiState = it.getContentIfNotHandled() ?: return@observe
+            if (productsUiState.isLoading) {
+                binding.layoutProductsSkeleton.visibility = View.VISIBLE
+                binding.rvProducts.visibility = View.GONE
+                return@observe
+            }
+            if (productsUiState.productUiModels != null) {
+                binding.layoutProductsSkeleton.visibility = View.GONE
+                binding.rvProducts.visibility = View.VISIBLE
+                adapter.updateProducts(productsUiState.productUiModels)
+                return@observe
+            }
+            if (productsUiState.isError) {
+                Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
+                return@observe
+            }
         }
     }
 
@@ -87,10 +102,6 @@ class ProductsActivity : AppCompatActivity() {
                 spanSizeLookup = ProductsSpanSizeLookUp(adapter)
             }
         binding.rvProducts.adapter = adapter
-
-        viewModel.productUiModels.observe(this) {
-            adapter.updateProducts(it)
-        }
         viewModel.recentProductUiModels.observe(this) {
             adapter.updateRecentProducts(it ?: return@observe)
         }

@@ -50,7 +50,7 @@ class ProductsViewModelTest {
         setUpProductRepository(products)
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.productsUiState.getOrAwaitValue()
         assertThat(actual).hasSize(20)
         assertThat(actual).isEqualTo(convertProductUiModel(products, cartRepository).take(20))
     }
@@ -61,7 +61,7 @@ class ProductsViewModelTest {
         setUpProductRepository(products)
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.productsUiState.getOrAwaitValue()
         assertThat(actual).hasSize(20)
         assertThat(actual).isEqualTo(convertProductUiModel(products, cartRepository).take(20))
     }
@@ -72,7 +72,7 @@ class ProductsViewModelTest {
         setUpProductRepository(products)
         viewModel = ProductsViewModel(productRepository, recentProductRepository, cartRepository)
 
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.productsUiState.getOrAwaitValue()
         assertThat(actual).hasSize(5)
         assertThat(actual).isEqualTo(convertProductUiModel(products, cartRepository).take(5))
     }
@@ -118,7 +118,7 @@ class ProductsViewModelTest {
         viewModel.loadPage()
 
         // then
-        val actual = viewModel.productUiModels.getOrAwaitValue()
+        val actual = viewModel.productsUiState.getOrAwaitValue()
         assertThat(actual).hasSize(25)
         assertThat(actual).isEqualTo(convertProductUiModel(products, cartRepository).take(25))
     }

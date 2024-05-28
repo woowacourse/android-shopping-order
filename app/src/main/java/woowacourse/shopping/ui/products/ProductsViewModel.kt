@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.products
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,8 +21,8 @@ class ProductsViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _productUiModels = MutableLiveData<List<ProductUiModel>>(emptyList())
-    val productUiModels: LiveData<List<ProductUiModel>> = _productUiModels
+    private val _productsUiState = MutableLiveData<Event<ProductsUiState>>(Event(ProductsUiState()))
+    val productsUiState: LiveData<Event<ProductsUiState>> = _productsUiState
 
     private val _showLoadMore = MutableLiveData<Boolean>(false)
     val showLoadMore: LiveData<Boolean> get() = _showLoadMore
@@ -29,16 +31,17 @@ class ProductsViewModel(
     private var maxPage: Int = INITIALIZE_PAGE
 
     val cartTotalCount: LiveData<Int> =
-        _productUiModels.map { it.fold(0) { acc, productUiModel -> acc + productUiModel.quantity.count } }
+        _productsUiState.map {
+            val productsUiModels = productUiModels() ?: return@map 0
+            productsUiModels.fold(0) { acc, productUiModel -> acc + productUiModel.quantity.count }
+        }
 
     private val _recentProductUiModels = MutableLiveData<List<RecentProductUiModel>?>()
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
 
-    private val _pageLoadError = MutableLiveData<Event<Unit>>()
-    val pageLoadError: LiveData<Event<Unit>> get() = _pageLoadError
-
     init {
-        loadPage()
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({ loadPage() }, 1000)
         loadMaxPage()
         loadRecentProducts()
     }
@@ -48,29 +51,38 @@ class ProductsViewModel(
     }
 
     private fun nextPage(page: Int): Int {
-        val productUiModels = _productUiModels.value ?: emptyList()
+        val productsUiState = _productsUiState.value?.peekContent() ?: return page
+        _productsUiState.value = Event(productsUiState.copy(isLoading = true))
+
         runCatching {
             productRepository.findRange(page, PAGE_SIZE)
         }.onSuccess { products ->
-            _productUiModels.value = (productUiModels + products.toProductUiModels())
+            val newProductUiModels = (productUiModels() ?: emptyList()) + products.toProductUiModels()
+            _productsUiState.value = Event(ProductsUiState(productUiModels = newProductUiModels))
             _showLoadMore.value = false
             return page + 1
         }.onFailure {
-            _pageLoadError.value = Event(Unit)
+            _productsUiState.value = Event(ProductsUiState(isError = true))
         }
         return page
     }
 
     fun loadProducts() {
-        val products =
-            _productUiModels.value?.map { productRepository.find(it.productId) } ?: return
-        _productUiModels.value = products.toProductUiModels()
+        val productsUiState = _productsUiState.value?.peekContent() ?: return
+        _productsUiState.value = Event(productsUiState.copy(isLoading = true))
+
+        runCatching {
+            val productUiModels = productUiModels() ?: return
+            productUiModels.map { productRepository.find(it.productId) }.toProductUiModels()
+        }.onSuccess {
+            _productsUiState.value = Event(ProductsUiState(productUiModels = it))
+        }.onFailure {
+            _productsUiState.value = Event(ProductsUiState(isError = true))
+        }
     }
 
     fun loadProduct(productId: Long) {
-        val product = productRepository.find(productId)
-        val productUiModel = product.toProductUiModel()
-        updateProductUiModels(productId, productUiModel)
+        updateProductUiModels(productId)
     }
 
     private fun List<Product>.toProductUiModels(): List<ProductUiModel> {
@@ -89,8 +101,7 @@ class ProductsViewModel(
     }
 
     fun loadRecentProducts() {
-        _recentProductUiModels.value =
-            recentProductRepository.findRecentProducts().toRecentProductUiModels()
+        _recentProductUiModels.value = recentProductRepository.findRecentProducts().toRecentProductUiModels()
     }
 
     private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
@@ -103,41 +114,28 @@ class ProductsViewModel(
     }
 
     fun changeSeeMoreVisibility(lastPosition: Int) {
-        _showLoadMore.value =
-            (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == _productUiModels.value?.size && page < maxPage
+        _showLoadMore.value = (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels()?.size && page < maxPage
     }
 
     fun decreaseQuantity(productId: Long) {
-        val productUiModel = findProductUiModel(productId) ?: return
         cartRepository.decreaseQuantity(productId)
-
-        var oldQuantity = productUiModel.quantity
-        val newProductUiModel = productUiModel.copy(quantity = --oldQuantity)
-        updateProductUiModels(productId, newProductUiModel)
+        updateProductUiModels(productId)
     }
 
     fun increaseQuantity(productId: Long) {
-        val productUiModel = findProductUiModel(productId) ?: return
         cartRepository.increaseQuantity(productId)
-
-        var oldQuantity = productUiModel.quantity
-        val newProductUiModel = productUiModel.copy(quantity = ++oldQuantity)
-        updateProductUiModels(productId, newProductUiModel)
+        updateProductUiModels(productId)
     }
 
-    private fun findProductUiModel(productId: Long): ProductUiModel? {
-        return _productUiModels.value?.find { it.productId == productId }
-    }
-
-    private fun updateProductUiModels(
-        productId: Long,
-        newProductUiModel: ProductUiModel,
-    ) {
-        val productUiModels = _productUiModels.value?.toMutableList() ?: return
+    private fun updateProductUiModels(productId: Long) {
+        val productUiModels = productUiModels()?.toMutableList() ?: return
+        val newProductUiModel = productRepository.find(productId).toProductUiModel()
         val position = productUiModels.indexOfFirst { it.productId == productId }
         productUiModels[position] = newProductUiModel
-        _productUiModels.value = productUiModels
+        _productsUiState.value = Event(ProductsUiState(productUiModels))
     }
+
+    private fun productUiModels(): List<ProductUiModel>? = _productsUiState.value?.peekContent()?.productUiModels
 
     companion object {
         private const val INITIALIZE_PAGE = 0

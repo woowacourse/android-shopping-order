@@ -103,6 +103,7 @@ class ProductsAdapter(
     }
 
     private fun isExistedRecentProducts(): Boolean {
+        if (productsViews.isEmpty()) return false
         return ProductsViewType.from(getItemViewType(RECENT_PRODUCTS_INDEX)) == ProductsViewType.RECENT_PRODUCTS
     }
 

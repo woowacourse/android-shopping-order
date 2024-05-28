@@ -85,6 +85,52 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar_products"
             tools:listitem="@layout/item_product" />
 
+        <TableLayout
+            android:id="@+id/layout_products_skeleton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="14dp"
+            android:stretchColumns="*"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_products">
+
+            <TableRow android:padding="6dp">
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+            </TableRow>
+
+            <TableRow android:padding="6dp">
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+            </TableRow>
+
+            <TableRow android:padding="6dp">
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+            </TableRow>
+
+            <TableRow android:padding="6dp">
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+            </TableRow>
+
+        </TableLayout>
+
         <Button
             android:id="@+id/btn_products_load_more"
             android:layout_width="match_parent"
