@@ -1,18 +1,30 @@
 package woowacourse.shopping.remote.service
 
-import woowacourse.shopping.remote.model.ProductPageResponse
-import woowacourse.shopping.remote.model.ProductResponse
+import retrofit2.Call
+import retrofit2.create
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+import woowacourse.shopping.remote.dto.response.ProductsResponse
 
 interface ProductService {
+
+    @GET
     fun fetchProducts(
-        currentPage: Int,
-        size: Int,
-    ): ProductPageResponse
+//        @Query("category") category: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<ProductsResponse>
 
-    fun fetchProductById(id: Long): ProductResponse
+    @GET
+    fun fetchDetailProduct(@Path("id") id: Long): Call<ProductsResponse>
 
-    fun canLoadMore(
-        page: Int,
-        size: Int,
-    ): Boolean
+    companion object {
+        private var Instance: ProductService? = null
+        fun instance(): ProductService = Instance ?: synchronized(this) {
+            Instance ?: RetrofitModule.retrofit().create<ProductService>().also {
+                Instance = it
+            }
+        }
+    }
 }

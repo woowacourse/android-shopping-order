@@ -24,14 +24,14 @@ class DefaultShoppingRepository(
         return productDataSource.products(currentPage, size)
             .mapCatching {
                 pageData = it
-                cachedProducts[currentPage] = it.content
-                it.content
+                cachedProducts[currentPage] = it.products
+                it.products
             }
     }
 
     override fun productById(id: Long): Result<Product> {
         if (pageData != null) {
-            val product = pageData?.content?.find { it.id == id }
+            val product = pageData?.products?.find { it.id == id }
             if (product != null) return Result.success(product)
         }
         return productDataSource.productById(id)
@@ -41,7 +41,7 @@ class DefaultShoppingRepository(
         page: Int,
         size: Int,
     ): Result<Boolean> {
-        val totalPages = pageData?.totalPages
+        val totalPages = pageData?.totalPageSize
         if (totalPages != null) {
             val canLoadMore = totalPages > page
             return Result.success(canLoadMore)

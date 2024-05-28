@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.shopping.product
 
-import woowacourse.shopping.remote.service.DefaultShoppingProductService
+import woowacourse.shopping.remote.service.ProductService
 
 object ProductDataSourceInjector {
     @Volatile
@@ -8,7 +8,7 @@ object ProductDataSourceInjector {
 
     fun productDataSource(): ProductDataSource =
         instance ?: synchronized(this) {
-            instance ?: DefaultProductDataSource(DefaultShoppingProductService.instance()).also {
+            instance ?: DefaultProductDataSource(ProductService.instance()).also {
                 instance = it
             }
         }

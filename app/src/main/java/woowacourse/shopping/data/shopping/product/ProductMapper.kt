@@ -1,8 +1,9 @@
 package woowacourse.shopping.data.shopping.product
 
 import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.remote.model.ProductPageResponse
-import woowacourse.shopping.remote.model.ProductResponse
+import woowacourse.shopping.remote.dto.response.PageConfigResponse
+import woowacourse.shopping.remote.dto.response.ProductResponse
+import woowacourse.shopping.remote.dto.response.ProductsResponse
 
 fun ProductResponse.toProduct(): Product {
     return Product(
@@ -13,12 +14,13 @@ fun ProductResponse.toProduct(): Product {
     )
 }
 
-fun ProductPageResponse.toDataModel(): ProductPageData {
+fun ProductsResponse.toDataModel(): ProductPageData {
+    val pageConfig: PageConfigResponse = pageConfig
     return ProductPageData(
-        pageNumber = pageNumber,
-        content = content.map { it.toProduct() },
-        totalPages = totalPages,
-        pageSize = pageSize,
-        totalElements = totalElements,
+        products = products.map { it.toProduct() },
+        pageSize = pageConfig.pageSize,
+        pageNumber = pageConfig.pageNumber,
+        totalPageSize = totalPageSize,
+        totalProductSize = totalProductSize,
     )
 }

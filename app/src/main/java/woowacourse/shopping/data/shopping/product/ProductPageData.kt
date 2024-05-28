@@ -4,8 +4,8 @@ import woowacourse.shopping.domain.entity.Product
 
 data class ProductPageData(
     val pageNumber: Int,
-    val content: List<Product>,
-    val totalPages: Int,
+    val products: List<Product>,
+    val totalPageSize: Int,
     val pageSize: Int,
-    val totalElements: Int,
+    val totalProductSize: Int,
 )
