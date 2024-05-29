@@ -1,29 +1,41 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.domain.Product
 
 interface CartRepository {
-    fun modifyQuantity(
-        product: Product,
-        quantityDelta: Int,
-    ): Result<Long>
-
-    fun setQuantity(
-        product: Product,
-        newQuantityValue: Int,
-    ): Result<Long>
-
-    fun deleteProduct(product: Product): Result<Long>
-
-    fun find(product: Product): Result<Cart>
-
     fun load(
         startPage: Int,
         pageSize: Int,
-    ): Result<List<Cart>>
+        onSuccess: (List<Cart>, Int) -> Unit,
+        onFailure: () -> Unit,
+    )
 
-    fun loadAll(): Result<List<Cart>>
+    fun updateIncrementQuantity(
+        cartId: Long,
+        productId: Long,
+        incrementAmount: Int,
+        quantity: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    )
 
-    fun getMaxPage(pageSize: Int): Result<Int>
+    fun updateDecrementQuantity(
+        cartId: Long,
+        productId: Long,
+        decrementAmount: Int,
+        quantity: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun getCount(
+        onSuccess: (Int) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun deleteExistCartItem(
+        cartId: Long,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    )
 }
