@@ -31,7 +31,7 @@ data class Pageable(
     val pageSize: Int,
     val paged: Boolean,
     val unpaged: Boolean,
-    val offset: Int,
+    val offset: Long,
 )
 
 @Serializable

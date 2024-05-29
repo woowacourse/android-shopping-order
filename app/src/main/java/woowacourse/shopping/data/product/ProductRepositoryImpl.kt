@@ -1,43 +1,30 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.api.ProductServerApi
+import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
+import woowacourse.shopping.data.service.ApiFactory
 import woowacourse.shopping.model.Product
 import kotlin.concurrent.thread
 
-class ProductRepositoryImpl(private val productServerApi: ProductServerApi) : ProductRepository {
-    override fun start() {
-        thread {
-            productServerApi.start()
-        }.join()
+class ProductRepositoryImpl : ProductRepository {
+    override fun getProducts(
+        page: Int,
+        size: Int,
+        success: (List<Product>) -> Unit,
+    ) {
+        ApiFactory.getProductsByOffset(page, size, success)
     }
 
     override fun find(id: Long): Product {
-        lateinit var product: Product
+        var productDto: ResponseProductIdGetDto? = null
         thread {
-            product = productServerApi.find(id)
+            productDto = ApiFactory.getProductsById(id)
         }.join()
-        return product
-    }
-
-    override fun findAll(): List<Product> {
-        var products = emptyList<Product>()
-        thread {
-            products = productServerApi.findAll()
-        }.join()
-        return products
-    }
-
-    override fun getProducts(): List<Product> {
-        var products = emptyList<Product>()
-        thread {
-            products = productServerApi.getProducts()
-        }.join()
-        return products
-    }
-
-    override fun shutdown() {
-        thread {
-            productServerApi.shutdown()
-        }.join()
+        val product = productDto ?: error("$id 에 해당하는 productId가 없습니다")
+        return Product(
+            id = product.id,
+            imageUrl = product.imageUrl,
+            name = product.name,
+            price = product.price,
+        )
     }
 }

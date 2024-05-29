@@ -3,13 +3,11 @@ package woowacourse.shopping.data.product
 import woowacourse.shopping.model.Product
 
 interface ProductRepository {
-    fun start()
+    fun getProducts(
+        page: Int,
+        size: Int,
+        success: (List<Product>) -> Unit,
+    )
 
     fun find(id: Long): Product
-
-    fun findAll(): List<Product>
-
-    fun getProducts(): List<Product>
-
-    fun shutdown()
 }

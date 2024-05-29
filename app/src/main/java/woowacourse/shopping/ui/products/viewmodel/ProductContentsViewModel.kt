@@ -58,6 +58,8 @@ class ProductContentsViewModel(
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
+    private var currentOffset = 0
+
     init {
         productWithQuantity.addSource(products) { updateProductWithQuantity() }
         productWithQuantity.addSource(cart) { updateProductWithQuantity() }
@@ -81,8 +83,10 @@ class ProductContentsViewModel(
     fun loadProducts() {
         val handler = Handler(Looper.getMainLooper())
         runCatching {
-            items.addAll(productRepository.getProducts())
-            products.value = items
+            productRepository.getProducts(currentOffset++, 20) {
+                items.addAll(it)
+                products.value = items
+            }
         }.onSuccess {
             handler.postDelayed({
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)

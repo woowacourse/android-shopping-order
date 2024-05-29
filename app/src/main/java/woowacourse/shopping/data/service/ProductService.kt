@@ -13,7 +13,7 @@ import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 
 interface ProductService {
-    @GET("/products?page={page}&size={size}")
+    @GET("/products")
     fun getProductsByOffset(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
@@ -23,6 +23,8 @@ interface ProductService {
     @GET("/products")
     fun getProducts(
         @Header("accept") accept: String = "*/*",
+        @Header("Username") userName: String = "namyunsuk",
+        @Header("Password") password: String = "password",
     ): Call<ResponseProductsGetDto>
 
     @POST("/products")
@@ -34,7 +36,7 @@ interface ProductService {
     @GET("/products/{id}")
     fun getProductsById(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
     ): Call<ResponseProductIdGetDto>
 
     @Delete
