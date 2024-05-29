@@ -14,7 +14,7 @@ fun ProductResponse.toProduct(): Product {
     )
 }
 
-fun ProductsResponse.toDataModel(): ProductPageData {
+fun ProductsResponse.toData(): ProductPageData {
     val pageConfig: PageConfigResponse = pageConfig
     return ProductPageData(
         products = products.map { it.toProduct() },

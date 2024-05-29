@@ -14,18 +14,19 @@ import retrofit2.Response
  *
  * @return Result<T>
  */
-fun <T> Call<T>.executeAsResult(): Result<T> {
+inline fun <reified T> Call<T>.executeAsResult(): Result<T> {
     return try {
         val response: Response<T> = execute()
 
         if (response.isSuccessful) {
-            val responseBody =
-                response.body()
-                    ?: return Result.failure(IllegalStateException("Response body is null"))
-            Result.success(responseBody)
-        } else {
-            Result.failure(HttpException(response))
+            if (T::class == Unit::class) {
+                @Suppress("UNCHECKED_CAST")
+                return Result.success(Unit as T)
+            }
+            val response = response.body() ?: return Result.failure(NullPointerException())
+            return Result.success(response)
         }
+        return Result.failure(HttpException(response))
     } catch (e: Exception) {
         when (e) {
             is HttpException -> {

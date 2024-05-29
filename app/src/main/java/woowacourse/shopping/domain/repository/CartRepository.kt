@@ -8,14 +8,16 @@ interface CartRepository {
         pageSize: Int,
     ): Result<List<CartProduct>>
 
-    fun filterCartProducts(ids: List<Long>): Result<List<CartProduct>>
+    fun totalCartProducts(): Result<List<CartProduct>>
+
+    fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>>
 
     fun updateCartProduct(
         productId: Long,
         count: Int,
-    ): Result<Long>
+    ): Result<Unit>
 
-    fun deleteCartProduct(productId: Long): Result<Long>
+    fun deleteCartProduct(productId: Long): Result<Unit>
 
     fun canLoadMoreCartProducts(
         currentPage: Int,

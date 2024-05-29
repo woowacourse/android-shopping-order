@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -97,7 +98,7 @@ class CartViewModel(
     }
 
     private fun loadCartProducts(page: Int) {
-        cartRepository.cartProducts(page, PAGE_SIZE).onSuccess { carts ->
+        cartRepository.cartProducts(page - 1, PAGE_SIZE).onSuccess { carts ->
             val newProducts = carts.map { it.toUiModel() }
             updateUiState(products = newProducts, currentPage = page)
         }.onFailure {
@@ -111,7 +112,7 @@ class CartViewModel(
     }
 
     private fun canLoadMoreCartProducts(page: Int): Boolean {
-        cartRepository.canLoadMoreCartProducts(page, PAGE_SIZE).onSuccess {
+        cartRepository.canLoadMoreCartProducts(page - 1, PAGE_SIZE).onSuccess {
             return it
         }.onFailure {
             _errorEvent.setValue(CartErrorEvent.CanLoadMoreCartProducts)

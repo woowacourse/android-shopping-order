@@ -1,18 +1,18 @@
 package woowacourse.shopping.data.cart
 
-import android.content.Context
 import androidx.annotation.VisibleForTesting
-import woowacourse.shopping.data.shopping.product.ProductDataSourceInjector
+import woowacourse.shopping.data.cart.datasource.CartDataSourceInjector
+import woowacourse.shopping.data.shopping.product.datasource.ProductDataSourceInjector
 import woowacourse.shopping.domain.repository.CartRepository
 
 object CartRepositoryInjector {
     @Volatile
     private var instance: CartRepository? = null
 
-    fun cartRepository(context: Context): CartRepository =
+    fun cartRepository(): CartRepository =
         instance ?: synchronized(this) {
             instance ?: DefaultCartRepository(
-                CartDataSourceInjector.cartDataSource(context),
+                CartDataSourceInjector.cartDataSource(),
                 ProductDataSourceInjector.productDataSource(),
             ).also { instance = it }
         }

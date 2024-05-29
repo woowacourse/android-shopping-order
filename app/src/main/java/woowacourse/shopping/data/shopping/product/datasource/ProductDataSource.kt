@@ -1,5 +1,6 @@
-package woowacourse.shopping.data.shopping.product
+package woowacourse.shopping.data.shopping.product.datasource
 
+import woowacourse.shopping.data.shopping.product.ProductPageData
 import woowacourse.shopping.domain.entity.Product
 
 interface ProductDataSource {

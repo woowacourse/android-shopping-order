@@ -36,7 +36,7 @@ class ProductListViewModel(
     override fun loadProducts() {
         val uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
-        shoppingRepository.products(currentPage, PAGE_SIZE)
+        shoppingRepository.products(currentPage - 1, PAGE_SIZE)
             .onSuccess {
                 val newProducts = it.map(Product::toShoppingUiModel)
                 _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
@@ -97,7 +97,7 @@ class ProductListViewModel(
     }
 
     private fun getLoadMore(page: Int): List<ShoppingUiModel.LoadMore> {
-        return if (shoppingRepository.canLoadMore(page, PAGE_SIZE).getOrNull() == true) {
+        return if (shoppingRepository.canLoadMore(page - 1, PAGE_SIZE).getOrNull() == true) {
             listOf(ShoppingUiModel.LoadMore)
         } else {
             emptyList()
@@ -143,12 +143,12 @@ data class ProductListUiState(
     fun updateCartProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
         return copy(
             totalProducts =
-                products.map { originalProduct ->
-                    val newProduct =
-                        newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
-                            ?: return@map originalProduct.copy(count = 0)
-                    originalProduct.copy(count = newProduct.count)
-                } + loadMoreModels,
+            products.map { originalProduct ->
+                val newProduct =
+                    newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
+                        ?: return@map originalProduct.copy(count = 0)
+                originalProduct.copy(count = newProduct.count)
+            } + loadMoreModels,
         )
     }
 
@@ -158,13 +158,13 @@ data class ProductListUiState(
     ): ProductListUiState =
         copy(
             totalProducts =
-                totalProducts.map {
-                    if (it is ShoppingUiModel.Product && it.id == productId) {
-                        it.copy(count = it.count + amount)
-                    } else {
-                        it
-                    }
-                },
+            totalProducts.map {
+                if (it is ShoppingUiModel.Product && it.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
         )
 
     fun decreaseProductCount(

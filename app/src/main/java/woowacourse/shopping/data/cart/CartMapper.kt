@@ -1,18 +1,38 @@
 package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.data.cart.model.CartData
+import woowacourse.shopping.data.cart.model.CartItemData
+import woowacourse.shopping.data.cart.model.CartPageData
+import woowacourse.shopping.data.shopping.product.toProduct
 import woowacourse.shopping.domain.entity.CartProduct
-import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.local.entity.CartEntity
+import woowacourse.shopping.remote.dto.response.CartItemResponse
+import woowacourse.shopping.remote.dto.response.CartItemsResponse
 
-fun CartData.toEntity(product: Product): CartProduct {
-    return CartProduct(product, count)
+fun CartItemResponse.toData(): CartItemData {
+    return CartItemData(
+        cartId = id,
+        count = count,
+        product = product.toProduct(),
+    )
 }
 
-fun CartProduct.toEntity(): CartEntity {
-    return CartEntity(product.id, count)
+fun CartItemsResponse.toData(): CartPageData {
+    return CartPageData(
+        cartItems = cartItems.map { it.toData() },
+        pageNumber = pageConfig.pageNumber,
+        totalPageSize = totalPageSize,
+        pageSize = pageConfig.pageSize,
+        totalProductSize = totalProductSize,
+    )
 }
 
-fun CartEntity.toData(): CartData {
-    return CartData(id, count)
+fun CartPageData.toDomain(): List<CartProduct> {
+    return cartItems.map { it.toDomain() }
+}
+
+fun CartItemData.toDomain(): CartProduct {
+    return CartProduct(
+        id = cartId,
+        product = product,
+        count = count
+    )
 }

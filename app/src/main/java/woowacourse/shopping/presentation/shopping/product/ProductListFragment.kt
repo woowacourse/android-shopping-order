@@ -30,7 +30,7 @@ class ProductListFragment :
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
         val cartRepository =
-            CartRepositoryInjector.cartRepository(requireContext().applicationContext)
+            CartRepositoryInjector.cartRepository()
         ProductListViewModel.factory(shoppingRepository, cartRepository)
     }
 

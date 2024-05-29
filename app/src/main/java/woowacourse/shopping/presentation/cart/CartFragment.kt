@@ -22,7 +22,7 @@ class CartFragment :
     private lateinit var adapter: CartAdapter
     private val viewModel by viewModels<CartViewModel> {
         val cartRepository =
-            CartRepositoryInjector.cartRepository(requireContext().applicationContext)
+            CartRepositoryInjector.cartRepository()
         CartViewModel.factory(cartRepository)
     }
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()

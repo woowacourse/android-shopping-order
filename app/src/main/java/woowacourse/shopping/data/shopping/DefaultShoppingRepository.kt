@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.shopping
 
-import woowacourse.shopping.data.shopping.product.ProductDataSource
+import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
 import woowacourse.shopping.data.shopping.product.ProductPageData
 import woowacourse.shopping.data.shopping.recent.RecentProductData
 import woowacourse.shopping.data.shopping.recent.RecentProductDataSource

@@ -1,17 +1,16 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.cart.datasource
 
-import android.content.Context
 import woowacourse.shopping.data.common.ioExecutor
-import woowacourse.shopping.local.ShoppingDatabase
+import woowacourse.shopping.remote.service.CartService
 
 object CartDataSourceInjector {
     private var instance: CartDataSource? = null
 
-    fun cartDataSource(context: Context): CartDataSource =
+    fun cartDataSource(): CartDataSource =
         instance ?: synchronized(this) {
             instance ?: DefaultCartDataSource(
                 ioExecutor,
-                ShoppingDatabase.instance(context).cartDao(),
+                CartService.instance()
             )
         }.also { instance = it }
 }

@@ -4,11 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartItemResponse(
-    @SerialName("id")
-    val id: Long,
+data class CartCountResponse(
     @SerialName("quantity")
-    val count: Int,
-    @SerialName("product")
-    val product: ProductResponse,
+    val quantity: Int
 )

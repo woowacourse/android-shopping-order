@@ -1,4 +1,4 @@
-package woowacourse.shopping.remote.service
+package woowacourse.shopping.remote
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -9,7 +9,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.remote.AuthInterceptor
 import java.util.concurrent.TimeUnit
 
 object RetrofitModule {

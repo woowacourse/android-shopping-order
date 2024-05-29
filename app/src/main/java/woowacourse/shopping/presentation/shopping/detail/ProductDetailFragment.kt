@@ -25,7 +25,7 @@ class ProductDetailFragment :
     private val viewModel by viewModels<ProductDetailViewModel> {
         eventBusViewModel.sendUpdateRecentProductEvent()
         val cartRepository =
-            CartRepositoryInjector.cartRepository(requireContext().applicationContext)
+            CartRepositoryInjector.cartRepository()
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
         ProductDetailViewModel.factory(

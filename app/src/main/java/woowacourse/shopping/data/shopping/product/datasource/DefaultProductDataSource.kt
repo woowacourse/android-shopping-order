@@ -1,5 +1,8 @@
-package woowacourse.shopping.data.shopping.product
+package woowacourse.shopping.data.shopping.product.datasource
 
+import woowacourse.shopping.data.shopping.product.ProductPageData
+import woowacourse.shopping.data.shopping.product.toData
+import woowacourse.shopping.data.shopping.product.toProduct
 import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.remote.service.ProductService
@@ -17,7 +20,7 @@ class DefaultProductDataSource(
         return ioExecutor.submit(Callable {
             productService.fetchProducts(currentPage, size)
                 .executeAsResult()
-                .mapCatching { it.toDataModel() }
+                .mapCatching { it.toData() }
         }).get()
     }
 

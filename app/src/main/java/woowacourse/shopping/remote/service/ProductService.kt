@@ -5,6 +5,7 @@ import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.remote.RetrofitModule
 import woowacourse.shopping.remote.dto.response.ProductResponse
 import woowacourse.shopping.remote.dto.response.ProductsResponse
 

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CartItemsResponse(
     @SerialName("content")
-    val products: List<CartItemResponse>,
+    val cartItems: List<CartItemResponse>,
     @SerialName("pageable")
     val pageConfig: PageConfigResponse,
     @SerialName("numberOfElements")

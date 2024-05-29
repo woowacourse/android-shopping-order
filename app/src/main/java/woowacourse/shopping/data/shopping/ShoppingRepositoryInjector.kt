@@ -2,7 +2,7 @@ package woowacourse.shopping.data.shopping
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import woowacourse.shopping.data.shopping.product.ProductDataSourceInjector
+import woowacourse.shopping.data.shopping.product.datasource.ProductDataSourceInjector
 import woowacourse.shopping.data.shopping.recent.RecentProductDataSourceInjector
 import woowacourse.shopping.domain.repository.ShoppingRepository
 
