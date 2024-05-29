@@ -42,6 +42,8 @@ class ProductListViewModel(
 
     private fun initLoad() {
         thread {
+            showLoading()
+            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             productListPagingSource.load().mapCatching { pagingProduct ->
                 val productHistories =
                     productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
@@ -59,6 +61,9 @@ class ProductListViewModel(
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
+
+            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
+            hideLoading()
         }
     }
 

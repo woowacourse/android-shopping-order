@@ -47,7 +47,7 @@ class ProductListAdapter(
         }
     }
 
-    override fun getItemCount(): Int = currentList.size + 1
+    override fun getItemCount(): Int = if (currentList.size == 0) 0 else currentList.size + 1
 
     override fun onBindViewHolder(
         holder: ProductListViewHolder,

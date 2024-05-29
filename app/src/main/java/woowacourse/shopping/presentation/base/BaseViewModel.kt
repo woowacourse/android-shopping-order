@@ -15,6 +15,9 @@ abstract class BaseViewModel : ViewModel() {
     private val _error: MutableLiveData<ErrorState?> = MutableLiveData(null)
     val error: LiveData<ErrorState?> get() = _error
 
+    private val _loading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val loading: LiveData<Boolean> get() = _loading
+
     abstract fun retry()
 
     fun showMessage(messageProvider: MessageProvider) {
@@ -57,5 +60,13 @@ abstract class BaseViewModel : ViewModel() {
 
     fun hideError() {
         _error.postValue(null)
+    }
+
+    fun showLoading() {
+        _loading.postValue(true)
+    }
+
+    fun hideLoading() {
+        _loading.postValue(false)
     }
 }

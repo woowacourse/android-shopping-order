@@ -145,6 +145,10 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <include
+                layout="@layout/include_skeleton_product_list"
+                android:visibility="@{vm.loading ? View.VISIBLE : View.GONE}" />
+
 
             <include
                 layout="@layout/include_error_view"
