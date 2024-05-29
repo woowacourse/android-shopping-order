@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDatabase
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
@@ -30,7 +29,7 @@ class ProductContentsActivity : AppCompatActivity() {
         ProductContentsViewModelFactory(
             ProductRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            CartRepositoryImpl.get(CartDatabase.database().cartDao()),
+            CartRepositoryImpl(),
         )
     }
 

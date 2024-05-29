@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.cart.CartRepositoryTestImpl
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
@@ -68,7 +67,7 @@ class ProductContentsViewModel(
     }
 
     override fun plusCount(productId: Long) {
-        CartRepositoryTestImpl.patchCartItem(
+        cartRepository.patchCartItem(
             findCartItemByProductId(productId),
             findCartItemQuantityByProductId(productId).inc().value,
         )
@@ -78,9 +77,9 @@ class ProductContentsViewModel(
     override fun minusCount(productId: Long) {
         val currentCount = findCartItemQuantityByProductId(productId).dec().value
         if (currentCount == 0) {
-            CartRepositoryTestImpl.deleteCartItem(findCartItemByProductId(productId))
+            cartRepository.deleteCartItem(findCartItemByProductId(productId))
         } else {
-            CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId), currentCount)
+            cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
         }
         loadCartItems()
     }
@@ -90,7 +89,7 @@ class ProductContentsViewModel(
     }
 
     override fun addCart(productId: Long) {
-        CartRepositoryTestImpl.postCartItems(productId, 1)
+        cartRepository.postCartItems(productId, 1)
         loadCartItems()
     }
 
@@ -108,7 +107,7 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        cart.value = CartRepositoryTestImpl.getAllCartItems()
+        cart.value = cartRepository.getAllCartItems()
     }
 
     fun loadRecentProducts() {

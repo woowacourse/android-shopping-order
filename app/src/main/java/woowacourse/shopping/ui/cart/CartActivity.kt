@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartDatabase
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -21,7 +20,7 @@ class CartActivity : AppCompatActivity() {
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
             ProductRepositoryImpl(),
-            CartRepositoryImpl.get(CartDatabase.database().cartDao()),
+            CartRepositoryImpl(),
         )
     }
 
