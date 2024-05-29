@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.shoppingcart
+package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import android.view.View
 import android.widget.TextView

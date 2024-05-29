@@ -17,7 +17,7 @@
 
         <variable
             name="actionHandler"
-            type="woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartActionHandler" />
+            type="woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartSelectActionHandler" />
 
         <variable
             name="productCountHandler"

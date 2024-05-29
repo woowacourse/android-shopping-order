@@ -1,8 +1,8 @@
-package woowacourse.shopping.presentation.ui.shoppingcart
+package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import woowacourse.shopping.domain.model.Cart
 
-data class ShoppingCartUiState(
+data class CartSelectUiState(
     val pagingCartProduct: PagingCartProduct = PagingCartProduct(),
     val cartIdList: List<Int> = emptyList(),
 )

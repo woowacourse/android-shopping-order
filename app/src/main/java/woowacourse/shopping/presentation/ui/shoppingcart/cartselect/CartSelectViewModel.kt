@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.shoppingcart
+package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,19 +11,19 @@ import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.common.ProductCountHandler
-import woowacourse.shopping.presentation.ui.shoppingcart.adapter.ShoppingCartPagingSource
+import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.ShoppingCartPagingSource
 import kotlin.concurrent.thread
 
-class ShoppingCartViewModel(
+class CartSelectViewModel(
     private val shoppingRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) :
     BaseViewModel(),
-        ShoppingCartActionHandler,
+        CartSelectActionHandler,
         ProductCountHandler {
-    private val _uiState: MutableLiveData<ShoppingCartUiState> =
-        MutableLiveData(ShoppingCartUiState())
-    val uiState: LiveData<ShoppingCartUiState> get() = _uiState
+    private val _uiState: MutableLiveData<CartSelectUiState> =
+        MutableLiveData(CartSelectUiState())
+    val uiState: LiveData<CartSelectUiState> get() = _uiState
 
     private val shoppingCartPagingSource = ShoppingCartPagingSource(shoppingRepository)
 
@@ -190,7 +190,7 @@ class ShoppingCartViewModel(
             orderRepository: OrderRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                ShoppingCartViewModel(
+                CartSelectViewModel(
                     shoppingCartRepository,
                     orderRepository,
                 )

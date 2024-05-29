@@ -1,7 +1,7 @@
-package woowacourse.shopping.presentation.ui.shoppingcart.adapter
+package woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter
 
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.presentation.ui.shoppingcart.PagingCartProduct
+import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.PagingCartProduct
 
 class ShoppingCartPagingSource(private val repository: ShoppingCartRepository) {
     fun load(page: Int): Result<PagingCartProduct> {

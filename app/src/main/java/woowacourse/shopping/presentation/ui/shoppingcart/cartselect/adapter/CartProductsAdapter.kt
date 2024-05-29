@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.shoppingcart.adapter
+package woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCartProductBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.common.ProductCountHandler
-import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartActionHandler
+import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartSelectActionHandler
 
 class CartProductsAdapter(
-    private val actionHandler: ShoppingCartActionHandler,
+    private val actionHandler: CartSelectActionHandler,
     private val productCountHandler: ProductCountHandler,
 ) : ListAdapter<Cart, CartProductsAdapter.CartProductViewHolder>(CartDiffCallback) {
     override fun onCreateViewHolder(
@@ -36,7 +36,7 @@ class CartProductsAdapter(
 
     class CartProductViewHolder(
         private val binding: HolderCartProductBinding,
-        private val actionHandler: ShoppingCartActionHandler,
+        private val actionHandler: CartSelectActionHandler,
         private val productCountHandler: ProductCountHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
