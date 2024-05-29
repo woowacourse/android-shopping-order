@@ -1,9 +1,11 @@
 package woowacourse.shopping.app
 
 import android.app.Application
+import androidx.preference.PreferenceManager
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
 import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
+import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
@@ -12,13 +14,20 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
+import woowacourse.shopping.local.provider.AuthProviderImpl
 import woowacourse.shopping.remote.api.NetworkModule
 import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
 import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
 
 class ShoppingApplication : Application() {
+    private val authProvider: AuthProvider by lazy {
+        AuthProviderImpl(PreferenceManager.getDefaultSharedPreferences(applicationContext))
+    }
+
+    private val networkModule by lazy { NetworkModule(authProvider = authProvider) }
+
     private val shoppingCartDataSource: ShoppingCartDataSource by lazy {
-        ShoppingCartDataSourceImpl(NetworkModule.cartService)
+        ShoppingCartDataSourceImpl(networkModule.cartService)
     }
     val shoppingCartRepository: ShoppingCartRepository by lazy {
         ShoppingCartRepositoryImpl(shoppingCartDataSource)
@@ -31,12 +40,20 @@ class ShoppingApplication : Application() {
         ProductHistoryRepositoryImpl(productHistoryDataSource)
     }
 
-    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(NetworkModule.productService) }
+    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(networkModule.productService) }
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
             productDataSource,
             shoppingCartDataSource,
         )
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        authProvider.apply {
+            name = "junjange"
+            password = "password"
+        }
     }
 
     companion object {

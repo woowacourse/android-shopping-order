@@ -4,14 +4,15 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.app.ShoppingApplication.Companion.BASE_URL
+import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.remote.interceptor.AuthorizationInterceptor
 import woowacourse.shopping.remote.interceptor.HttpExceptionInterceptor
 
-object NetworkModule {
+class NetworkModule(authProvider: AuthProvider) {
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
-            .addInterceptor(AuthorizationInterceptor())
+            .addInterceptor(AuthorizationInterceptor(authProvider = authProvider))
             .addInterceptor(HttpExceptionInterceptor())
             .build()
 

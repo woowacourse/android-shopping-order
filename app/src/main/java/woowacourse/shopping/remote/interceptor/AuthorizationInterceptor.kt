@@ -4,10 +4,16 @@ import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import woowacourse.shopping.data.provider.AuthProvider
 
-class AuthorizationInterceptor : Interceptor {
+class AuthorizationInterceptor(
+    private val authProvider: AuthProvider,
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val credentials: String = Credentials.basic("junjange", "password")
+        val name = authProvider.name
+        val password = authProvider.password
+
+        val credentials: String = Credentials.basic(name, password)
         val request = from(chain.request(), credentials)
         return chain.proceed(request)
     }
