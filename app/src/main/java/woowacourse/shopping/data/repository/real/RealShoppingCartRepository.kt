@@ -133,5 +133,6 @@ class RealShoppingCartRepository(
 
     companion object{
         private const val ERROR_QUANTITY_SIZE = -1
+        private const val MAX_CART_ITEM_SIZE = 50
     }
 }

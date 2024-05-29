@@ -21,7 +21,7 @@ class ProductDataSourceImpl(
     override fun loadCategoryProducts(
         page: Int,
         size: Int,
-        category: String
+        category: String,
     ): Call<ProductResponse> {
         return productApiService.requestCategoryProducts(
             page = page,

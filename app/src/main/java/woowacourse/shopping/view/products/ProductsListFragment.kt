@@ -66,7 +66,6 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
     }
 
     private fun initView() {
-        loadPagingData()
         binding.vm = productListViewModel
         binding.onClickProduct = this
         binding.lifecycleOwner = viewLifecycleOwner
@@ -75,7 +74,9 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
                 onClickProducts = this,
                 onClickCartItemCounter = this,
             )
+        productAdapter.setShowSkeleton(true)
         binding.rvProducts.adapter = productAdapter
+        loadPagingData()
         recentlyAdapter =
             RecentlyAdapter(
                 onClickProducts = this,
@@ -87,9 +88,15 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
         productListViewModel.recentlyProducts.observe(viewLifecycleOwner) { recentlyData ->
             recentlyAdapter.updateProducts(recentlyData)
         }
-
         productListViewModel.products.observe(viewLifecycleOwner) { products ->
             productAdapter.updateProducts(addedProducts = products)
+        }
+        productListViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
+            when (loadingState) {
+                is ProductListEvent.LoadProductEvent.Loading ->
+                    productAdapter.setShowSkeleton(true)
+                else -> productAdapter.setShowSkeleton(false)
+            }
         }
         productListViewModel.productListEvent.observe(viewLifecycleOwner) { productListEvent ->
             when (productListEvent) {
@@ -103,14 +110,21 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
                 is ProductListEvent.UpdateProductEvent.Success -> {
                     productAdapter.updateProduct(productListEvent.productId)
                 }
+
+                ProductListEvent.LoadProductEvent.Success -> {
+                    productAdapter.setShowSkeleton(false)
+                }
             }
         }
         productListViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             when (errorState) {
-                ProductListEvent.LoadProductEvent.Fail ->
+                ProductListEvent.LoadProductEvent.Fail -> {
                     requireContext().makeToast(
                         getString(R.string.max_paging_data),
                     )
+                    binding.btnMoreProduct.visibility = View.GONE
+                    productAdapter.setShowSkeleton(false)
+                }
 
                 ProductListEvent.ErrorEvent.NotKnownError ->
                     requireContext().makeToast(
@@ -154,6 +168,7 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
     }
 
     override fun clickLoadPagingData() {
+        productAdapter.setShowSkeleton(true)
         loadPagingData()
     }
 

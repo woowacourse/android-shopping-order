@@ -5,44 +5,30 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
+import woowacourse.shopping.databinding.ItemSkeletonBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.products.OnClickProducts
+import woowacourse.shopping.view.products.ShoppingItem
 import woowacourse.shopping.view.products.adapter.viewholder.ProductViewHolder
+import woowacourse.shopping.view.products.adapter.viewholder.SkeletonViewHolder
 
 class ProductAdapter(
     private val onClickProducts: OnClickProducts,
     private val onClickCartItemCounter: OnClickCartItemCounter,
-) : RecyclerView.Adapter<ProductViewHolder>() {
-    private var products: List<Product> = emptyList()
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var products: MutableList<ShoppingItem> = mutableListOf()
+    private var showSkeleton: Boolean = true
     private val productPosition: HashMap<Long, Int> = hashMapOf()
-
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int,
-    ): ProductViewHolder {
-        val view = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ProductViewHolder(view, onClickCartItemCounter, onClickProducts)
-    }
-
-    override fun getItemCount(): Int {
-        return products.size
-    }
-
-    override fun onBindViewHolder(
-        holder: ProductViewHolder,
-        position: Int,
-    ) {
-        val item = products[position]
-        holder.bind(item)
-        productPosition[item.id] = position
-    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateProducts(addedProducts: List<Product>) {
-        val startPosition = products.size
-        products = products + addedProducts
-        notifyItemRangeInserted(startPosition, addedProducts.size)
+        products.clear()
+        products.addAll(addedProducts.map { ShoppingItem.ProductItem(it) })
+        if (showSkeleton) {
+            products.addAll(List(SKELETON_COUNT) { ShoppingItem.SkeletonItem })
+        }
+        notifyDataSetChanged()
     }
 
     fun updateProduct(productId: Long) {
@@ -50,5 +36,63 @@ class ProductAdapter(
         if (position != null) {
             notifyItemChanged(position)
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (products[position]) {
+            is ShoppingItem.ProductItem -> VIEW_TYPE_PRODUCT
+            else -> VIEW_TYPE_SKELETON
+        }
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_PRODUCT -> {
+                val view =
+                    ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ProductViewHolder(view, onClickCartItemCounter, onClickProducts)
+            }
+
+            else -> {
+                val view =
+                    ItemSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                SkeletonViewHolder(view)
+            }
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return products.size
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
+        if (holder is ProductViewHolder && position < products.size) {
+            val item = (products[position] as ShoppingItem.ProductItem).product
+            holder.bind(item)
+            productPosition[item.id] = position
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setShowSkeleton(show: Boolean) {
+        showSkeleton = show
+        if (showSkeleton) {
+            products.addAll(List(SKELETON_COUNT) { ShoppingItem.SkeletonItem })
+        } else {
+            products = products.filter { it !is ShoppingItem.SkeletonItem }.toMutableList()
+        }
+        notifyDataSetChanged()
+    }
+
+    companion object {
+        private const val VIEW_TYPE_PRODUCT = 0
+        private const val VIEW_TYPE_SKELETON = 1
+        private const val SKELETON_COUNT = 10
     }
 }

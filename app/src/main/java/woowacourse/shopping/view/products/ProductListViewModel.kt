@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.products
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,6 +36,9 @@ class ProductListViewModel(
     private val _productListEvent: MutableSingleLiveData<ProductListEvent.SuccessEvent> =
         MutableSingleLiveData()
     val productListEvent: SingleLiveData<ProductListEvent.SuccessEvent> get() = _productListEvent
+    private val _loadingEvent: MutableSingleLiveData<ProductListEvent.LoadProductEvent> =
+        MutableSingleLiveData()
+    val loadingEvent: SingleLiveData<ProductListEvent.LoadProductEvent> get() = _loadingEvent
     private val _errorEvent: MutableSingleLiveData<ProductListEvent.ErrorEvent> =
         MutableSingleLiveData()
     val errorEvent: SingleLiveData<ProductListEvent.ErrorEvent> get() = _errorEvent
@@ -44,20 +49,22 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        try {
-            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-            val pagingData = productRepository.loadPagingProducts(itemSize)
-            _products.value = _products.value?.plus(pagingData)
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductListEvent.LoadProductEvent.Fail,
-                    )
+        _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
 
-                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+                val pagingData = productRepository.loadPagingProducts(itemSize)
+                _products.value = _products.value?.plus(pagingData)
+                _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+                _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+            } catch (e: Exception) {
+                when (e) {
+                    is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
+                    else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+                }
             }
-        }
+        }, 1000)
     }
 
     fun loadPagingRecentlyProduct() {

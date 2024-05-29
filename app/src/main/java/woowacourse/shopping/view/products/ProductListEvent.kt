@@ -8,7 +8,9 @@ sealed interface ProductListEvent {
     sealed interface SuccessEvent : ProductListEvent
 
     sealed interface LoadProductEvent : ProductListEvent {
-        data object Success : LoadProductEvent
+        data object Success : LoadProductEvent, SuccessEvent
+
+        data object Loading : LoadProductEvent
 
         data object Fail : LoadProductEvent, ErrorEvent
     }
