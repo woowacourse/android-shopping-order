@@ -78,7 +78,7 @@
             last="@{vm.uiState.pagingCartProduct.last}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="62dp"
+            android:layout_marginBottom="100dp"
             android:text="@{String.valueOf(vm.uiState.pagingCartProduct.currentPage + 1)}"
             android:textColor="@color/gray5"
             android:textSize="22dp"
@@ -108,6 +108,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/tv_page"
             app:layout_constraintStart_toEndOf="@+id/tv_page"
             app:layout_constraintTop_toTopOf="@+id/tv_page" />
+
+        <Button
+            android:id="@+id/tv_add_to_cart"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="@color/green"
+            android:gravity="center"
+            android:text="장바구니 담기"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

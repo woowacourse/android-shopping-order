@@ -8,6 +8,7 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.CartProductsAdapter
+import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendFragment
 
 class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
     override val layoutResourceId: Int get() = R.layout.fragment_cart_select
@@ -25,6 +26,17 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
         initDataBinding()
         initAdapter()
         initObserve()
+
+        binding.tvAddToCart.setOnClickListener {
+            this.parentFragmentManager
+                .beginTransaction()
+                .replace(
+                    R.id.fragment_container_view_main,
+                    OrderRecommendFragment(),
+                    OrderRecommendFragment.TAG,
+                )
+                .commit()
+        }
     }
 
     private fun initDataBinding() {

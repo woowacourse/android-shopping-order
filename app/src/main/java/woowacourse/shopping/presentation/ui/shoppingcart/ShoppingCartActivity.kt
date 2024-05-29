@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.ui.shoppingcart
 import android.content.Context
 import android.content.Intent
 import android.view.MenuItem
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
@@ -14,9 +13,8 @@ class ShoppingCartActivity : BaseActivity<ActivityShoppingCartBinding>() {
     override val layoutResourceId: Int get() = R.layout.activity_shopping_cart
 
     override fun initCreateView() {
-        replaceFragment(CartSelectFragment(), CartSelectFragment.TAG)
-        setupBottomNavigationView()
         initActionBar()
+        initFragment()
     }
 
     private fun initActionBar() {
@@ -26,37 +24,12 @@ class ShoppingCartActivity : BaseActivity<ActivityShoppingCartBinding>() {
         }
     }
 
-    private fun setupBottomNavigationView() {
-//        binding.bottomNavigationViewMain.setOnItemSelectedListener { item ->
-//            when (item.itemId) {
-//                R.id.fragment_home -> replaceFragment(HomeFragment(), HomeFragment.TAG)
-//                R.id.fragment_setting -> replaceFragment(SettingFragment(), SettingFragment.TAG)
-//                R.id.fragment_reservation_history ->
-//                    replaceFragment(
-//                        ReservationHistoryFragment(),
-//                        ReservationHistoryFragment.TAG,
-//                    )
-//
-//                else -> false
-//            }
-//        }
-    }
-
-    private fun replaceFragment(
-        fragment: Fragment,
-        tag: String,
-    ): Boolean {
-        val newFragment = supportFragmentManager.findFragmentByTag(tag)
-        if (newFragment != null) {
-            supportFragmentManager.popBackStack(tag, 0)
-        } else {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_view_main, fragment, tag)
-                addToBackStack(tag)
-            }
+    private fun initFragment() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.fragment_container_view_main, CartSelectFragment(), CartSelectFragment.TAG)
+            addToBackStack(CartSelectFragment.TAG)
         }
-        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
