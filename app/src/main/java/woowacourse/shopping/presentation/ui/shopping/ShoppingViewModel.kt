@@ -78,7 +78,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun loadProductByOffset() {
         thread {
-            repository.getProducts(offSet, PAGE_SIZE).onSuccess {
+            repository.getProductsByPaging().onSuccess {
                 if(it == null) {
                     _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {

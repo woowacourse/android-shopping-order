@@ -22,9 +22,7 @@ class RepositoryImpl(
     private val localDataSource: LocalDataSource,
     private val remoteDataSource: RemoteDataSource
 ) : Repository {
-
     val productPagingSource = ProductPagingSource(remoteDataSource)
-
 
     override fun findProductByPaging(
         offset: Int,
