@@ -10,8 +10,8 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.Mapper.toCartItem
-import woowacourse.shopping.utils.Mapper.toCartItemEntity
+import woowacourse.shopping.utils.EntityMapper.toCartItem
+import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 import kotlin.concurrent.thread
