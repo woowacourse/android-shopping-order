@@ -46,10 +46,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                 is UiState.Loading -> {
                 }
                 is UiState.Success -> {
-
-                    var data = state.data
-                    if(data.quantity == 0) data = data.copy(quantity = 1)
-                    binding.cartProduct = data
+                    binding.detailCartProduct = state.data
                 }
             }
         }

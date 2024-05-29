@@ -14,11 +14,7 @@ class ShoppingAdapter(
     private val shoppingActionHandler: ShoppingActionHandler,
 ) : ListAdapter<CartProduct, ShoppingViewHolder>(DIFF_CALLBACK) {
     override fun getItemViewType(position: Int): Int {
-        return if(position == currentList.size) {
-            ShoppingViewType.LoadMore.value
-        } else {
-            ShoppingViewType.Product.value
-        }
+        return if (position == itemCount - LOADING_OFFSET) ShoppingViewType.LoadMore.value else ShoppingViewType.Product.value
     }
 
     override fun onCreateViewHolder(
@@ -43,11 +39,13 @@ class ShoppingAdapter(
         holder: ShoppingViewHolder,
         position: Int,
     ) {
+        Log.d("LLLLLLLLL", "{$position}")
         when (holder) {
             is ShoppingViewHolder.ProductViewHolder -> {
                 holder.bind(getItem(position))
             }
             is ShoppingViewHolder.LoadViewHolder -> {
+                Log.d("XXXX", "IN")
                 holder.bind()
             }
         }

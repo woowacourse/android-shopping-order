@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
@@ -17,8 +18,8 @@ import kotlin.concurrent.thread
 class ProductDetailViewModel(
     private val repository: Repository,
 ) : ViewModel(), DetailActionHandler {
-    private val _product = MutableLiveData<UiState<CartProduct>>(UiState.Loading)
-    val product: LiveData<UiState<CartProduct>> get() = _product
+    private val _product = MutableLiveData<UiState<DetailCartProduct>>(UiState.Loading)
+    val product: LiveData<UiState<DetailCartProduct>> get() = _product
 
     private val _recentProduct = MutableLiveData<UiState<RecentProduct>>(UiState.Loading)
     val recentProduct: LiveData<UiState<RecentProduct>> get() = _recentProduct
@@ -51,7 +52,13 @@ class ProductDetailViewModel(
 
     fun setCartProduct(cartProduct: CartProduct?) {
         if(cartProduct != null) {
-            _product.value = UiState.Success(cartProduct)
+            val detailCartProduct = DetailCartProduct(
+                isNew = cartProduct.quantity == 0,
+                cartProduct = cartProduct.copy(
+                    quantity = if(cartProduct.quantity == 0) 1 else cartProduct.quantity
+                )
+            )
+            _product.value = UiState.Success(detailCartProduct)
         }
     }
 
@@ -69,22 +76,35 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onAddToCart(cartProduct: CartProduct) {
+    override fun onAddToCart(detailCartProduct: DetailCartProduct) {
         thread {
-            updateUiModel.add(cartProduct.productId, cartProduct)
+            updateUiModel.add(detailCartProduct.cartProduct.productId, detailCartProduct.cartProduct)
 
-            Log.d("LLA", "${cartProduct.quantity}")
-                repository.patchCartItem(
-                    id = cartProduct.cartId.toInt(),
-                    quantityRequest = QuantityRequest(
-                        cartProduct.quantity
+            if(detailCartProduct.isNew) {
+                repository.postCartItem(
+                    CartItemRequest(
+                        productId = detailCartProduct.cartProduct.productId.toInt(),
+                        quantity = detailCartProduct.cartProduct.quantity
                     )
                 ).onSuccess {
-                    _product.postValue(UiState.Success(cartProduct))
+                    _product.postValue(UiState.Success(detailCartProduct))
+                }.onFailure {
+                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                }
+            } else {
+
+                repository.patchCartItem(
+                    id = detailCartProduct.cartProduct.cartId.toInt(),
+                    quantityRequest = QuantityRequest(
+                        detailCartProduct.cartProduct.quantity
+                    )
+                ).onSuccess {
+                    _product.postValue(UiState.Success(detailCartProduct))
                 }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
                     }
+            }
 
             _cartHandler.postValue(EventState(updateUiModel))
         }
@@ -97,14 +117,18 @@ class ProductDetailViewModel(
     override fun onPlus(cartProduct: CartProduct) {
         thread {
             cartProduct.plusQuantity()
-            _product.postValue(UiState.Success(cartProduct))
+            _product.postValue(UiState.Success(
+                (_product.value as UiState.Success).data.copy(cartProduct = cartProduct)
+            ))
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
         thread {
             cartProduct.minusQuantity()
-            _product.postValue(UiState.Success(cartProduct))
+            _product.postValue(UiState.Success(
+                (_product.value as UiState.Success).data.copy(cartProduct = cartProduct)
+            ))
         }
     }
 
