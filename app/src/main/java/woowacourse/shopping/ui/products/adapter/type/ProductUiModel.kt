@@ -9,6 +9,7 @@ data class ProductUiModel(
     val title: String,
     val price: Int,
     val quantity: Quantity,
+    val cardItemId: Int = 0,
 ) : ProductsView {
     override val viewType: ProductsViewType = ProductsViewType.PRODUCTS_UI_MODEL
 
@@ -19,7 +20,13 @@ data class ProductUiModel(
             product: Product,
             quantity: Quantity = Quantity(),
         ): ProductUiModel {
-            return ProductUiModel(product.id, product.imageUrl, product.name, product.price, quantity)
+            return ProductUiModel(
+                product.id,
+                product.imageUrl,
+                product.name,
+                product.price,
+                quantity,
+            )
         }
     }
 }

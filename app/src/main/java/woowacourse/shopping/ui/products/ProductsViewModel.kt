@@ -5,13 +5,13 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
+import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch
 class ProductsViewModel(
     private val productRepository: RemoteProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
+    private val cartRepository: RemoteCartRepository,
 ) : ViewModel() {
     private val _productsUiState = MutableLiveData<Event<ProductsUiState>>(Event(ProductsUiState()))
     val productsUiState: LiveData<Event<ProductsUiState>> = _productsUiState
@@ -32,11 +32,8 @@ class ProductsViewModel(
 
     private var page: Int = INITIALIZE_PAGE
 
-    val cartTotalCount: LiveData<Int> =
-        _productsUiState.map {
-            val productsUiModels = productUiModels() ?: return@map 0
-            productsUiModels.fold(0) { acc, productUiModel -> acc + productUiModel.quantity.count }
-        }
+    private val _cartTotalCount: MutableLiveData<Int> = MutableLiveData()
+    val cartTotalCount: LiveData<Int> get() = _cartTotalCount
 
     private val _recentProductUiModels = MutableLiveData<List<RecentProductUiModel>?>()
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
@@ -90,22 +87,46 @@ class ProductsViewModel(
     fun loadProducts() {
         val productsUiState = _productsUiState.value?.peekContent() ?: return
         _productsUiState.value = Event(productsUiState.copy(isLoading = true))
-        runCatching {
-            cartRepository.findAll()
-        }.onSuccess { cartItems ->
-            val productUiModels = productUiModels()?.toMutableList() ?: return
-            cartItems.forEach { cartItem ->
-                val productId = cartItem.productId
-                val index =
-                    productUiModels.indexOfFirst { productUiModel ->
-                        productId == productUiModel.productId
+
+        val latch = CountDownLatch(1)
+
+        cartRepository.getCartQuantityCount(
+            object : DataCallback<Int> {
+                override fun onSuccess(result: Int) {
+                    _cartTotalCount.postValue(result)
+                    latch.countDown()
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                    latch.countDown()
+                }
+            },
+        )
+        latch.await()
+        cartRepository.getAllCartItem(
+            cartTotalCount.value ?: 0,
+            object : DataCallback<List<CartItem>> {
+                override fun onSuccess(result: List<CartItem>) {
+                    val productUiModels = productUiModels()?.toMutableList() ?: return
+                    result.forEach { cartItem ->
+                        val productId = cartItem.productId
+                        val index =
+                            productUiModels.indexOfFirst { productUiModel ->
+                                productId == productUiModel.productId
+                            }
+                        productUiModels[index] =
+                            productUiModels[index].copy(quantity = cartItem.quantity)
                     }
-                productUiModels[index] = productUiModels[index].copy(quantity = cartItem.quantity)
-            }
-            _productsUiState.value = Event(ProductsUiState(productUiModels = productUiModels))
-        }.onFailure {
-            _productsUiState.value = Event(ProductsUiState(isError = true))
-        }
+                    _productsUiState.value =
+                        Event(ProductsUiState(productUiModels = productUiModels))
+                }
+
+                override fun onFailure(t: Throwable) {
+                    _productsUiState.value = Event(ProductsUiState(isError = true))
+                }
+            },
+        )
     }
 
     fun loadProduct(productId: Int) {
@@ -117,9 +138,29 @@ class ProductsViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        return runCatching { cartRepository.find(id) }
-            .map { ProductUiModel.from(this, it.quantity) }
-            .getOrElse { ProductUiModel.from(this) }
+        var productUiModel: ProductUiModel = ProductUiModel.from(this)
+        val latch = CountDownLatch(1)
+        cartRepository.findByProductId(
+            id,
+            cartTotalCount.value!!,
+            object : DataCallback<CartItem?> {
+                override fun onSuccess(result: CartItem?) {
+                    productUiModel =
+                        if (result == null) {
+                            ProductUiModel.from(this@toProductUiModel)
+                        } else {
+                            ProductUiModel.from(this@toProductUiModel, result.quantity)
+                        }
+                    latch.countDown()
+                }
+
+                override fun onFailure(t: Throwable) {
+                    latch.countDown()
+                }
+            },
+        )
+        latch.await()
+        return productUiModel
     }
 
     fun loadRecentProducts() {
@@ -162,12 +203,24 @@ class ProductsViewModel(
     }
 
     fun decreaseQuantity(productId: Int) {
-        cartRepository.decreaseQuantity(productId)
+        val productUiModel =
+            productUiModels()?.find {
+                it.productId == productId
+            } ?: return
+        val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.dec())
+        updateCartQuantity(newProductUiModel)
+        updateTotalCount()
         updateProductUiModel(productId)
     }
 
     fun increaseQuantity(productId: Int) {
-        cartRepository.increaseQuantity(productId)
+        val productUiModel =
+            productUiModels()?.find {
+                it.productId == productId
+            } ?: return
+        val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.inc())
+        updateCartQuantity(newProductUiModel)
+        updateTotalCount()
         updateProductUiModel(productId)
     }
 
@@ -181,6 +234,36 @@ class ProductsViewModel(
                     val position = productUiModels.indexOfFirst { it.productId == productId }
                     productUiModels[position] = newProductUiModel
                     _productsUiState.postValue(Event(ProductsUiState(productUiModels)))
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                }
+            },
+        )
+    }
+
+    private fun updateTotalCount() {
+        cartRepository.getCartQuantityCount(
+            object : DataCallback<Int> {
+                override fun onSuccess(result: Int) {
+                    _cartTotalCount.postValue(result)
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                }
+            },
+        )
+    }
+
+    private fun updateCartQuantity(productUiModel: ProductUiModel) {
+        cartRepository.setCartItemQuantity(
+            productUiModel.cardItemId,
+            productUiModel.quantity,
+            object : DataCallback<Unit> {
+                override fun onSuccess(result: Unit) {
+                    updateProductUiModel(productUiModel.productId)
                 }
 
                 override fun onFailure(t: Throwable) {
