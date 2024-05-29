@@ -1,10 +1,14 @@
 package woowacourse.shopping.data.db.shopping
 
 import woowacourse.shopping.data.db.product.ProductMockWebServer
-import woowacourse.shopping.data.db.product.ProductRepository
 import woowacourse.shopping.data.db.product.ProductService
+import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.remote.RemoteProductDataSource
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.view.home.HomeViewModel
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository2
+import kotlin.concurrent.thread
 
 class ProductRepositoryImpl : ProductRepository {
     private val productMockWebServer: ProductService = ProductMockWebServer()
@@ -16,13 +20,13 @@ class ProductRepositoryImpl : ProductRepository {
         threadAction {
             val size = productMockWebServer.getSize()
             val start = offset
-            offset = Integer.min(offset + HomeViewModel.PAGE_SIZE, size)
+            offset = Integer.min(offset + 20, size)
             pageProducts = productMockWebServer.findPageProducts(start, offset)
         }
         return pageProducts
     }
 
-    override fun findProductById(id: Long): Product? {
+    override fun findProductById(id: Int): Product? {
         var product: Product? = null
         threadAction {
             product = productMockWebServer.findProductById(id)
@@ -37,12 +41,53 @@ class ProductRepositoryImpl : ProductRepository {
             size = productMockWebServer.getSize()
         }
 
-        return !(size < HomeViewModel.PAGE_SIZE || offset == size)
+        return !(size < 20 || offset == size)
     }
 
     private fun threadAction(action: () -> Unit) {
         val thread = Thread(action)
         thread.start()
         thread.join()
+    }
+}
+
+class ProductRepositoryImpl2(
+    private val remoteProductDataSource: RemoteProductDataSource,
+) : ProductRepository2 {
+    override fun getProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+        sort: String,
+    ): Result<ProductResponse> {
+        var result: Result<ProductResponse>? = null
+        thread {
+            result =
+                runCatching {
+                    val response = remoteProductDataSource.getProducts(category, page, size, sort).execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+        return result ?: throw Exception()
+    }
+
+    override fun getProductById(id: Int): Result<woowacourse.shopping.data.model.Product2> {
+        var result: Result<Product2>? = null
+        thread {
+            result =
+                runCatching {
+                    val response = remoteProductDataSource.getProductById(id).execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+        return result ?: throw Exception()
     }
 }

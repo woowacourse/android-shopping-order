@@ -1,7 +1,7 @@
 package woowacourse.shopping.helper
 
-import woowacourse.shopping.data.db.product.ProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.home.HomeViewModel
 
 class FakeProductRepositoryImpl(
@@ -16,7 +16,7 @@ class FakeProductRepositoryImpl(
         return products.subList(start, offset)
     }
 
-    override fun findProductById(id: Long): Product? {
+    override fun findProductById(id: Int): Product? {
         return products.firstOrNull { it.id == id }
     }
 

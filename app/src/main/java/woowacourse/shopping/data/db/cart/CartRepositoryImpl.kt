@@ -1,8 +1,15 @@
 package woowacourse.shopping.data.db.cart
 
+import woowacourse.shopping.data.model.CartItemRequestBody
+import woowacourse.shopping.data.model.CartQuantity
+import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.remote.RemoteCartDataSource
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.toCartItemEntity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CartRepository2
+import kotlin.concurrent.thread
 
 class CartRepositoryImpl(database: CartDatabase) : CartRepository {
     private val dao = database.cartDao()
@@ -21,7 +28,7 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
     }
 
     override fun update(
-        productId: Long,
+        productId: Int,
         quantity: Int,
     ) {
         threadAction {
@@ -37,7 +44,7 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
         return itemSize
     }
 
-    override fun productQuantity(productId: Long): Int {
+    override fun productQuantity(productId: Int): Int {
         var productQuantity = 0
         threadAction {
             productQuantity = dao.productQuantity(productId)
@@ -45,7 +52,7 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
         return productQuantity
     }
 
-    override fun findOrNullByProductId(productId: Long): CartItem? {
+    override fun findOrNullByProductId(productId: Int): CartItem? {
         var cartItemEntity: CartItemEntity? = null
         threadAction {
             cartItemEntity = dao.findByProductId(productId)
@@ -54,7 +61,7 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
         return cartItemEntity?.toCartItem()
     }
 
-    override fun find(cartItemId: Long): CartItem {
+    override fun find(cartItemId: Int): CartItem {
         var cartItemEntity: CartItemEntity? = null
         threadAction {
             cartItemEntity = dao.find(cartItemId)
@@ -87,7 +94,7 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
         return cartItems
     }
 
-    override fun delete(cartItemId: Long) {
+    override fun delete(cartItemId: Int) {
         threadAction {
             dao.delete(cartItemId)
         }
@@ -103,5 +110,115 @@ class CartRepositoryImpl(database: CartDatabase) : CartRepository {
         val thread = Thread(action)
         thread.start()
         thread.join()
+    }
+}
+
+class CartRepositoryImpl2(
+    private val remoteCartDataSource: RemoteCartDataSource,
+) : CartRepository2 {
+    override fun getCartItems(
+        page: Int,
+        size: Int,
+        sort: String,
+    ): Result<CartResponse> {
+        var result: Result<CartResponse>? = null
+        thread {
+            result =
+                runCatching {
+                    val response =
+                        remoteCartDataSource.getCartItems(page, size, sort)
+                            .execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+        return result ?: throw Exception()
+    }
+
+    override fun addCartItem(
+        productId: Int,
+        quantity: Int,
+    ): Result<Unit> {
+        var result: Result<Unit>? = null
+        thread {
+            result =
+                runCatching {
+                    val cartItemRequestBody = CartItemRequestBody(productId, quantity)
+                    val request =
+                        remoteCartDataSource.addCartItem(cartItemRequestBody)
+                    val response = request.execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+
+        return result ?: throw Exception()
+    }
+
+    override fun deleteCartItem(cartItemId: Int): Result<Unit> {
+        var result: Result<Unit>? = null
+        thread {
+            result =
+                runCatching {
+                    val response =
+                        remoteCartDataSource.deleteCartItem(cartItemId).execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+
+        return result ?: throw Exception()
+    }
+
+    override fun updateCartItem(
+        cartItemId: Int,
+        quantity: Int,
+    ): Result<Unit> {
+        var result: Result<Unit>? = null
+        thread {
+            result =
+                runCatching {
+                    val cartQuantity = CartQuantity(quantity)
+                    val response =
+                        remoteCartDataSource.updateCartItem(cartItemId, cartQuantity)
+                            .execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        println(response.code())
+                        println(response.errorBody())
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+
+        return result ?: throw Exception()
+    }
+
+    override fun getCartTotalQuantity(): Result<CartQuantity> {
+        var result: Result<CartQuantity>? = null
+        thread {
+            result =
+                runCatching {
+                    val response =
+                        remoteCartDataSource.getCartTotalQuantity().execute()
+                    if (response.isSuccessful) {
+                        response.body() ?: throw Exception("No data available")
+                    } else {
+                        throw Exception("Error fetching data")
+                    }
+                }
+        }.join()
+
+        return result ?: throw Exception()
     }
 }

@@ -1,26 +1,27 @@
 package woowacourse.shopping.view.home
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.db.cart.CartRepository
-import woowacourse.shopping.data.db.product.ProductRepository
-import woowacourse.shopping.data.db.recent.RecentProductRepository
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.model.CartItem2
+import woowacourse.shopping.data.model.Product2
 import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.CartRepository2
+import woowacourse.shopping.domain.repository.ProductRepository2
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.state.UIState
 
 class HomeViewModel(
-    private val productRepository: ProductRepository,
-    private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository2,
+    private val cartRepository: CartRepository2,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), HomeClickListener, QuantityClickListener {
+    private var pageNumber = 0
+
     private val _shoppingUiState = MutableLiveData<UIState<List<ProductViewItem>>>(UIState.Loading)
     val shoppingUiState: LiveData<UIState<List<ProductViewItem>>>
         get() = _shoppingUiState
@@ -46,8 +47,8 @@ class HomeViewModel(
     val updatedProductItem: LiveData<ProductViewItem>
         get() = _updatedProductItem
 
-    private val _navigateToDetail = MutableLiveData<Event<Long>>()
-    val navigateToDetail: LiveData<Event<Long>>
+    private val _navigateToDetail = MutableLiveData<Event<Int>>()
+    val navigateToDetail: LiveData<Event<Int>>
         get() = _navigateToDetail
 
     private val _navigateToCart = MutableLiveData<Event<Boolean>>()
@@ -57,6 +58,8 @@ class HomeViewModel(
     private val _loadedProductItems = MutableLiveData<List<ProductViewItem>>(emptyList())
     val loadedProductItems: LiveData<List<ProductViewItem>>
         get() = _loadedProductItems
+
+    private var currentCartItems: List<CartItem2> = emptyList()
 
     init {
         loadRecentProducts()
@@ -69,37 +72,48 @@ class HomeViewModel(
     }
 
     private fun loadProducts() {
-        try {
-            val products = productRepository.findProductsByPage()
-            val productItems =
-                products.map { product ->
-                    val quantity = cartRepository.productQuantity(product.id)
-                    ProductViewItem(product, quantity)
-                }
-            _canLoadMore.value = productRepository.canLoadMore()
-            _shoppingUiState.value =
-                UIState.Success(loadedProductItems.value?.plus(productItems) ?: emptyList())
-            _loadedProductItems.value = loadedProductItems.value?.plus(productItems)
-        } catch (e: Exception) {
-            _shoppingUiState.value = UIState.Error(e)
-        }
+        val productResponse =
+            productRepository.getProducts(
+                category = CATEGORY_UNDEFINED,
+                page = pageNumber++,
+                size = PAGE_SIZE,
+                sort = DEFAULT_SORT_ORDER,
+            )
+
+        val products = productResponse.getOrNull()?.products ?: emptyList()
+        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc")
+            .getOrNull()?.cartItems ?: emptyList()
+
+        val newItems =
+            products.map { product ->
+                val quantity =
+                    currentCartItems.firstOrNull { it.product.id == product.id }?.quantity ?: 0
+                ProductViewItem(product, quantity)
+            }
+        _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
+
+        _loadedProductItems.value = loadedProductItems.value?.plus(newItems)
+        _shoppingUiState.value = UIState.Success(loadedProductItems.value ?: emptyList())
     }
 
     fun updateData() {
         loadRecentProducts()
 
-        val cartItems = cartRepository.findAll()
-        _totalQuantity.value = cartItems.sumOf { cartItem -> cartItem.quantity }
+        currentCartItems =
+            cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
+                ?: emptyList()
+        _totalQuantity.value = currentCartItems.size
 
         val updatedProductItems =
-            cartItems.map { cartItem ->
-                val product = productRepository.findProductById(cartItem.productId) ?: return
-                val quantity = cartRepository.productQuantity(product.id)
+            currentCartItems.map { cartItem ->
+                val product =
+                    productRepository.getProductById(cartItem.product.id).getOrNull() ?: return
+                val quantity = cartItem.quantity
                 ProductViewItem(product, quantity)
             }
 
         loadedProductItems.value?.forEachIndexed { index, loadedItem ->
-            if (loadedItem.quantity > 0 && cartItems.firstOrNull { it.productId == loadedItem.product.id } == null) {
+            if (loadedItem.quantity > 0 && currentCartItems.firstOrNull { it.product.id == loadedItem.product.id } == null) {
                 val productItem = ProductViewItem(loadedItem.product, 0)
                 (loadedProductItems.value as MutableList)[index] = productItem
             }
@@ -118,7 +132,7 @@ class HomeViewModel(
     }
 
     private fun loadTotalQuantity() {
-        _totalQuantity.value = cartRepository.findAll().sumOf { cartItem -> cartItem.quantity }
+        _totalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
     }
 
     override fun onLoadMoreButtonClick() {
@@ -129,16 +143,17 @@ class HomeViewModel(
         _navigateToCart.value = Event(true)
     }
 
-    override fun onPlusButtonClick(product: Product) {
-        val quantity = cartRepository.productQuantity(product.id) + 1
+    override fun onPlusButtonClick(product: Product2) {
         _totalQuantity.value = totalQuantity.value?.plus(1)
-        cartRepository.save(product, quantity)
+        cartRepository.addCartItem(product.id, 1).getOrNull()
+        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
+            ?: emptyList()
 
-        updateLoadedProductQuantity(product, quantity)
+        updateLoadedProductQuantity(product, 1)
     }
 
     private fun updateLoadedProductQuantity(
-        product: Product,
+        product: Product2,
         quantity: Int,
     ) {
         val productItem = ProductViewItem(product, quantity)
@@ -146,39 +161,51 @@ class HomeViewModel(
 
         val position = _loadedProductItems.value?.indexOfFirst { it.product.id == product.id }
         if (position != null) {
-            (_loadedProductItems.value as MutableList)[position] = productItem
+            (loadedProductItems.value as MutableList)[position] = productItem
         }
     }
 
-    override fun onProductClick(productId: Long) {
+    override fun onProductClick(productId: Int) {
         _navigateToDetail.value = Event(productId)
     }
 
-    override fun onQuantityPlusButtonClick(productId: Long) {
-        val product = productRepository.findProductById(productId) ?: return
-        val quantity = cartRepository.productQuantity(product.id) + 1
+    override fun onQuantityPlusButtonClick(productId: Int) {
+        val product = productRepository.getProductById(productId).getOrNull() ?: return
+        val currentCartItem = currentCartItems.firstOrNull { it.product.id == product.id }
+        val quantity = currentCartItem?.quantity ?: 0
+        val cartItemId = currentCartItem?.cartItemId ?: return
         _totalQuantity.value = totalQuantity.value?.plus(1)
-        cartRepository.save(product, quantity)
+        cartRepository.updateCartItem(cartItemId, quantity + 1).getOrNull()
 
-        updateLoadedProductQuantity(product, quantity)
+        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
+            ?: emptyList()
+        updateLoadedProductQuantity(product, quantity + 1)
     }
 
-    override fun onQuqntityMinusButtonClick(productId: Long) {
-        val product = productRepository.findProductById(productId) ?: return
-        val cartItem = cartRepository.findOrNullByProductId(productId) ?: return
-        val quantity = cartItem.quantity - 1
+    override fun onQuantityMinusButtonClick(productId: Int) {
+        val product = productRepository.getProductById(productId).getOrNull() ?: return
+        val currentCartItem = currentCartItems.firstOrNull { it.product.id == product.id }
+        val quantity = currentCartItem?.quantity ?: 0
+        val cartItemId = currentCartItem?.cartItemId ?: return
+        val position = currentCartItems.indexOfFirst { it.cartItemId == cartItemId }
         _totalQuantity.value = totalQuantity.value?.minus(1)?.coerceAtLeast(0)
-        if (quantity == 0) {
-            cartRepository.delete(cartItem.id)
+        if (quantity == 1) {
+            val result = cartRepository.deleteCartItem(cartItemId).getOrNull()
+            currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
+                ?: emptyList()
         } else {
-            cartRepository.save(product, quantity)
+            cartRepository.updateCartItem(cartItemId, quantity - 1).getOrNull()
+            currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
+                ?: emptyList()
         }
 
-        updateLoadedProductQuantity(product, quantity)
+        updateLoadedProductQuantity(product, quantity - 1)
     }
 
     companion object {
-        const val PAGE_SIZE = 20
-        const val RECENT_PRODUCTS_LIMIT = 10
+        private val CATEGORY_UNDEFINED: String? = null
+        private const val DEFAULT_SORT_ORDER = "asc"
+        private const val PAGE_SIZE = 20
+        private const val RECENT_PRODUCTS_LIMIT = 10
     }
 }

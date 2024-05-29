@@ -3,6 +3,7 @@ package woowacourse.shopping.data.db.recent
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.toRecentProductEntity
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) :
@@ -19,13 +20,13 @@ class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) 
         }
     }
 
-    override fun update(productId: Long) {
+    override fun update(productId: Int) {
         threadAction {
             dao.update(productId, LocalDateTime.now().toString())
         }
     }
 
-    override fun findOrNullByProductId(productId: Long): RecentProduct? {
+    override fun findOrNullByProductId(productId: Int): RecentProduct? {
         var recentProductEntity: RecentProductEntity? = null
         threadAction {
             recentProductEntity = dao.findByProductId(productId)

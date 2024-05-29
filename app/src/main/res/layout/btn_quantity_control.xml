@@ -9,7 +9,7 @@
 
         <variable
             name="productId"
-            type="Long" />
+            type="Integer" />
 
         <variable
             name="quantity"
@@ -27,7 +27,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:backgroundTint="@android:color/transparent"
-            android:onClick="@{() -> clickListener.onQuqntityMinusButtonClick(productId)}"
+            android:onClick="@{() -> clickListener.onQuantityMinusButtonClick(productId)}"
             android:src="@drawable/ic_minus" />
 
         <TextView

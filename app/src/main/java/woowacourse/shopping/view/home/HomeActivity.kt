@@ -6,17 +6,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.cartDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.data.db.cart.CartRepositoryImpl
+import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
+import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
+import woowacourse.shopping.data.db.cart.CartRepositoryImpl2
 import woowacourse.shopping.data.db.recent.RecentProductRepositoryImpl
-import woowacourse.shopping.data.db.shopping.ProductRepositoryImpl
+import woowacourse.shopping.data.db.shopping.ProductRepositoryImpl2
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
-import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
+import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
 import woowacourse.shopping.view.state.UIState
 
@@ -26,8 +27,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: HomeViewModel by viewModels {
         HomeViewModelFactory(
-            ProductRepositoryImpl(),
-            CartRepositoryImpl(cartDatabase),
+            ProductRepositoryImpl2(remoteProductDataSource),
+            CartRepositoryImpl2(remoteCartDataSource),
             RecentProductRepositoryImpl(recentProductDatabase),
         )
     }
@@ -114,7 +115,7 @@ class HomeActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun navigateToDetail(productId: Long) {
+    private fun navigateToDetail(productId: Int) {
         startActivity(DetailActivity.createIntent(this, productId))
     }
 

@@ -10,5 +10,5 @@ interface ProductService {
         offset: Int,
     ): List<Product>
 
-    fun findProductById(id: Long): Product
+    fun findProductById(id: Int): Product
 }

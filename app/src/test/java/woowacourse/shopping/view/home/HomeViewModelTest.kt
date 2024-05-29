@@ -4,10 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.db.cart.CartRepository
-import woowacourse.shopping.data.db.product.ProductRepository
-import woowacourse.shopping.data.db.recent.RecentProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.helper.FakeCartRepositoryImpl
 import woowacourse.shopping.helper.FakeProductRepositoryImpl
 import woowacourse.shopping.helper.FakeRecentProductRepositoryImpl
@@ -35,7 +35,7 @@ class HomeViewModelTest {
         val products =
             List(20) {
                 Product(
-                    id = it.toLong(),
+                    id = it.toInt(),
                     name = "Product $it",
                     price = 1000,
                     imageUrl = "URL $it",
@@ -53,7 +53,7 @@ class HomeViewModelTest {
         val products =
             List(19) {
                 Product(
-                    id = it.toLong(),
+                    id = it.toInt(),
                     name = "Product $it",
                     price = 1000,
                     imageUrl = "URL $it",
@@ -70,7 +70,7 @@ class HomeViewModelTest {
         val products =
             List(21) {
                 Product(
-                    id = it.toLong(),
+                    id = it.toInt(),
                     name = "Product $it",
                     price = 1000,
                     imageUrl = "URL $it",

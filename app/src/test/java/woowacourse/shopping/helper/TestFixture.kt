@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Product
 
 val testProduct0 =
     Product(
-        id = 0L,
+        id = 0,
         name = "채채다",
         price = 1000,
         imageUrl = "https://image1.com",
@@ -13,7 +13,7 @@ val testProduct0 =
 
 val testProduct1 =
     Product(
-        id = 1L,
+        id = 1,
         name = "악어다",
         price = 1100,
         imageUrl = "https://image1.com",
@@ -21,7 +21,7 @@ val testProduct1 =
 
 val testProduct2 =
     Product(
-        id = 2L,
+        id = 2,
         name = "채드다",
         price = 1200,
         imageUrl = "https://image1.com",

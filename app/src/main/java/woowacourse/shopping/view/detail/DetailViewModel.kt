@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.db.cart.CartRepository
-import woowacourse.shopping.data.db.cart.CartRepository.Companion.DEFAULT_QUANTITY
-import woowacourse.shopping.data.db.product.ProductRepository
-import woowacourse.shopping.data.db.recent.RecentProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CartRepository.Companion.DEFAULT_QUANTITY
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
 import woowacourse.shopping.view.state.UIState
@@ -18,7 +18,7 @@ class DetailViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val productId: Long,
+    private val productId: Int,
 ) : ViewModel(), DetailClickListener, QuantityClickListener {
     private val _detailUiState = MutableLiveData<UIState<Product>>(UIState.Loading)
     val detailUiState: LiveData<UIState<Product>>
@@ -53,7 +53,7 @@ class DetailViewModel(
     val quantity: LiveData<Int>
         get() = _quantity
 
-    val totalPrice: LiveData<Long> =
+    val totalPrice: LiveData<Int> =
         quantity.map { quantityValue ->
             product.value?.price?.times(quantityValue) ?: 0
         }
@@ -109,11 +109,11 @@ class DetailViewModel(
         _navigateToRecentDetail.value = Event(true)
     }
 
-    override fun onQuantityPlusButtonClick(productId: Long) {
+    override fun onQuantityPlusButtonClick(productId: Int) {
         _quantity.value = quantity.value?.plus(1)
     }
 
-    override fun onQuqntityMinusButtonClick(productId: Long) {
+    override fun onQuantityMinusButtonClick(productId: Int) {
         _quantity.value = (quantity.value?.minus(1))?.coerceAtLeast(1)
     }
 

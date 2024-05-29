@@ -1,8 +1,8 @@
 package woowacourse.shopping.helper
 
-import woowacourse.shopping.data.db.recent.RecentProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
 import kotlin.math.min
 
@@ -20,10 +20,10 @@ class FakeRecentProductRepositoryImpl : RecentProductRepository {
         )
     }
 
-    override fun update(productId: Long) {
+    override fun update(productId: Int) {
     }
 
-    override fun findOrNullByProductId(productId: Long): RecentProduct? {
+    override fun findOrNullByProductId(productId: Int): RecentProduct? {
         return recentProducts.firstOrNull { it.productId == productId }
     }
 

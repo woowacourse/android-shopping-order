@@ -12,8 +12,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.data.db.recent.RecentProductRepository
 import woowacourse.shopping.data.db.recent.RecentProductRepositoryImpl
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.helper.testProduct0
 
 @RunWith(AndroidJUnit4::class)

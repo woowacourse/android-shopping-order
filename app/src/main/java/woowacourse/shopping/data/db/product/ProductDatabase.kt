@@ -6,18 +6,18 @@ object ProductDatabase {
     val products =
         listOf(
             Product(
-                id = 0L,
+                id = 0,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAyMjNfMjkg%2FMDAxNzA4NjE1NTg1ODg5.ZFPHZ3Q2HzH7GcYA1_Jl0lsIdvAnzUF2h6Qd6bgDLHkg." +
                         "_7ffkgE45HXRVgX2Bywc3B320_tuatBww5y1hS4xjWQg.JPEG%2FIMG_5278.jpg&type=sc960_832",
                 name = "1 대전 장인약과",
                 price = 10000,
             ),
             Product(
-                id = 1L,
+                id = 1,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAxMDVfNjYg%2FMDAxNzA0NDU0MTYwMTAx.4pxrLnIdvFp8KDGAnGkbl8zHo5Mcn0d-yD7pzToeiSsg.lF4rd6908c0" +
                         "j_7kfxBr_u4MSdjq73RkhzKfRk7Z6VUMg.JPEG." +
                         "rbxod123%2F1704454160034.jpg&type=sc960_832",
@@ -25,17 +25,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 2L,
+                id = 2,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20220419_195%2F1650332783362X5wqH_JPEG%2F51468679090044420_1417181296.jpg&type=sc960_832",
                 name = "1 청포도",
                 price = 10000,
             ),
             Product(
-                id = 3L,
+                id = 3,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjZfMTU4%2FMDAxNzE0MTI0NzA4ODY5.oeDm3aXfYKCwJBx6W5pvgeGbEnv9Pl9M7-KS8RSdES" +
                         "gg.---7jVzxMg2CyWfdaymPSlVDOf-VtgmZiU4bThZNDEsg." +
                         "JPEG%2F3.jpg&type=sc960_832",
@@ -43,9 +43,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 4L,
+                id = 4,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjhfMjA0%2FMDAxNzE0MjMyNDEwMjUy.oPmks3C6DLu9bbeU1ZAAbQsuDNU0STlZmESokn_L32I" +
                         "g.qNELX5_3ojNWAuh9ggXIx_YuLe7N9wqJDp6CsxwKp-0g.JPEG" +
                         "%2Fart_1455355748.jpg&type=sc960_832",
@@ -53,17 +53,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 5L,
+                id = 5,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
                         "%2Fimage%2F277%2F2013%2F11%2F10%2F2013111012173878553_1_59_20131110122101.jpg&type=sc960_832",
                 name = "1 논산 설향 딸기",
                 price = 10000,
             ),
             Product(
-                id = 6L,
+                id = 6,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyMzEwMjlfNCAg%2FMDAxNjk4NTY4MDU4MzI1.jbHZDZihchAU2omlt5kKT2Y-sIMLAeFmK-N124BfwSkg.5" +
                         "5nLXObBCS97UUPyExqsV1HEa_2HY6kS4MSlg0JJ12Eg.JPEG" +
                         ".sisia81%2FCK_pc0030942615.jpg&type=sc960_832",
@@ -71,17 +71,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 7L,
+                id = 7,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20240404_106%2F1712192530083b4K6O_JPEG%2F62268170973943746_107419204.jpg&type=sc960_832",
                 name = "1 녹두고물 꿀설기",
                 price = 10000,
             ),
             Product(
-                id = 8L,
+                id = 8,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTZfNzIg%2FMDAxNzEzMjQ1NzAxNTk3.J_U-og2VONyRLnh8GEOredJBlKa4G92kXJgRONPugHA" +
                         "g.3focus3kJUN7PMwiGQcRwfhhC9_uzMYlMd9DqNkvdtog.JPEG" +
                         "%2FNSC20240414%25A3%25DF223625.jpg&type=sc960_832",
@@ -89,9 +89,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 9L,
+                id = 9,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTRfMTI5%2FMDAxNzEzMDc2NjQ5Mzg2.-9IFzuLjUDDH7Tzx3Vjqvqe_mYRgjnfiCMSMV6NzI4Eg" +
                         ".krg2ZvGecdmZdz4xF4-7dUNveZOjkrUxRq8ag3qRPrcg.PNG" +
                         "%2F%25BD%25BA%25C5%25A9%25B8%25B0%25BC%25A6_2024-04-14_152851.png&type=sc960_832",
@@ -99,9 +99,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 10L,
+                id = 10,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjRfNjkg%2FMDAxNzEzOTI0OTY0MTAw.Z3BrwiQtHcm0wqcytLsgAGp9BL5FVkhpBn5QXLXugn4g." +
                         "79JGr9GD9AHbgKHi1WvCyRhmELbOSJ5EMOmRGJhYaecg.JPEG" +
                         "%2F10.jpg&type=sc960_832",
@@ -109,26 +109,26 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 11L,
+                id = 11,
                 imageUrl =
-                "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
+                    "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
                         "%2Fcdn4%2Fdeals%2F2024%2F02%2F28%2F25807373110%2Ffront_c9653_skjvr.jpg&type=sc960_832",
                 name = "1 하겐다즈 초콜릿 (쿼터) 946ml",
                 price = 10000,
             ),
             Product(
-                id = 12L,
+                id = 12,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAyMjNfMjkg%2FMDAxNzA4NjE1NTg1ODg5.ZFPHZ3Q2HzH7GcYA1_Jl0lsIdvAnzUF2h6Qd6bgDLHkg." +
                         "_7ffkgE45HXRVgX2Bywc3B320_tuatBww5y1hS4xjWQg.JPEG%2FIMG_5278.jpg&type=sc960_832",
                 name = "2 대전 장인약과",
                 price = 10000,
             ),
             Product(
-                id = 13L,
+                id = 13,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAxMDVfNjYg%2FMDAxNzA0NDU0MTYwMTAx.4pxrLnIdvFp8KDGAnGkbl8zHo5Mcn0d-yD7pzToeiSsg.lF4rd6908c0" +
                         "j_7kfxBr_u4MSdjq73RkhzKfRk7Z6VUMg.JPEG." +
                         "rbxod123%2F1704454160034.jpg&type=sc960_832",
@@ -136,17 +136,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 14L,
+                id = 14,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20220419_195%2F1650332783362X5wqH_JPEG%2F51468679090044420_1417181296.jpg&type=sc960_832",
                 name = "2 청포도",
                 price = 10000,
             ),
             Product(
-                id = 15L,
+                id = 15,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjZfMTU4%2FMDAxNzE0MTI0NzA4ODY5.oeDm3aXfYKCwJBx6W5pvgeGbEnv9Pl9M7-KS8RSdES" +
                         "gg.---7jVzxMg2CyWfdaymPSlVDOf-VtgmZiU4bThZNDEsg." +
                         "JPEG%2F3.jpg&type=sc960_832",
@@ -154,9 +154,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 16L,
+                id = 16,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjhfMjA0%2FMDAxNzE0MjMyNDEwMjUy.oPmks3C6DLu9bbeU1ZAAbQsuDNU0STlZmESokn_L32I" +
                         "g.qNELX5_3ojNWAuh9ggXIx_YuLe7N9wqJDp6CsxwKp-0g.JPEG" +
                         "%2Fart_1455355748.jpg&type=sc960_832",
@@ -164,17 +164,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 17L,
+                id = 17,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
                         "%2Fimage%2F277%2F2013%2F11%2F10%2F2013111012173878553_1_59_20131110122101.jpg&type=sc960_832",
                 name = "2 논산 설향 딸기",
                 price = 10000,
             ),
             Product(
-                id = 18L,
+                id = 18,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyMzEwMjlfNCAg%2FMDAxNjk4NTY4MDU4MzI1.jbHZDZihchAU2omlt5kKT2Y-sIMLAeFmK-N124BfwSkg.5" +
                         "5nLXObBCS97UUPyExqsV1HEa_2HY6kS4MSlg0JJ12Eg.JPEG" +
                         ".sisia81%2FCK_pc0030942615.jpg&type=sc960_832",
@@ -182,17 +182,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 19L,
+                id = 19,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20240404_106%2F1712192530083b4K6O_JPEG%2F62268170973943746_107419204.jpg&type=sc960_832",
                 name = "2 녹두고물 꿀설기",
                 price = 10000,
             ),
             Product(
-                id = 20L,
+                id = 20,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTZfNzIg%2FMDAxNzEzMjQ1NzAxNTk3.J_U-og2VONyRLnh8GEOredJBlKa4G92kXJgRONPugHA" +
                         "g.3focus3kJUN7PMwiGQcRwfhhC9_uzMYlMd9DqNkvdtog.JPEG" +
                         "%2FNSC20240414%25A3%25DF223625.jpg&type=sc960_832",
@@ -200,9 +200,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 21L,
+                id = 21,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTRfMTI5%2FMDAxNzEzMDc2NjQ5Mzg2.-9IFzuLjUDDH7Tzx3Vjqvqe_mYRgjnfiCMSMV6NzI4Eg" +
                         ".krg2ZvGecdmZdz4xF4-7dUNveZOjkrUxRq8ag3qRPrcg.PNG" +
                         "%2F%25BD%25BA%25C5%25A9%25B8%25B0%25BC%25A6_2024-04-14_152851.png&type=sc960_832",
@@ -210,9 +210,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 22L,
+                id = 22,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjRfNjkg%2FMDAxNzEzOTI0OTY0MTAw.Z3BrwiQtHcm0wqcytLsgAGp9BL5FVkhpBn5QXLXugn4g." +
                         "79JGr9GD9AHbgKHi1WvCyRhmELbOSJ5EMOmRGJhYaecg.JPEG" +
                         "%2F10.jpg&type=sc960_832",
@@ -220,26 +220,26 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 23L,
+                id = 23,
                 imageUrl =
-                "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
+                    "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
                         "%2Fcdn4%2Fdeals%2F2024%2F02%2F28%2F25807373110%2Ffront_c9653_skjvr.jpg&type=sc960_832",
                 name = "2 하겐다즈 초콜릿 (쿼터) 946ml",
                 price = 10000,
             ),
             Product(
-                id = 24L,
+                id = 24,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAyMjNfMjkg%2FMDAxNzA4NjE1NTg1ODg5.ZFPHZ3Q2HzH7GcYA1_Jl0lsIdvAnzUF2h6Qd6bgDLHkg." +
                         "_7ffkgE45HXRVgX2Bywc3B320_tuatBww5y1hS4xjWQg.JPEG%2FIMG_5278.jpg&type=sc960_832",
                 name = "3 대전 장인약과",
                 price = 10000,
             ),
             Product(
-                id = 25L,
+                id = 25,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAxMDVfNjYg%2FMDAxNzA0NDU0MTYwMTAx.4pxrLnIdvFp8KDGAnGkbl8zHo5Mcn0d-yD7pzToeiSsg.lF4rd6908c0" +
                         "j_7kfxBr_u4MSdjq73RkhzKfRk7Z6VUMg.JPEG." +
                         "rbxod123%2F1704454160034.jpg&type=sc960_832",
@@ -247,17 +247,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 26L,
+                id = 26,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20220419_195%2F1650332783362X5wqH_JPEG%2F51468679090044420_1417181296.jpg&type=sc960_832",
                 name = "3 청포도",
                 price = 10000,
             ),
             Product(
-                id = 27L,
+                id = 27,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjZfMTU4%2FMDAxNzE0MTI0NzA4ODY5.oeDm3aXfYKCwJBx6W5pvgeGbEnv9Pl9M7-KS8RSdES" +
                         "gg.---7jVzxMg2CyWfdaymPSlVDOf-VtgmZiU4bThZNDEsg." +
                         "JPEG%2F3.jpg&type=sc960_832",
@@ -265,9 +265,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 28L,
+                id = 28,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjhfMjA0%2FMDAxNzE0MjMyNDEwMjUy.oPmks3C6DLu9bbeU1ZAAbQsuDNU0STlZmESokn_L32I" +
                         "g.qNELX5_3ojNWAuh9ggXIx_YuLe7N9wqJDp6CsxwKp-0g.JPEG" +
                         "%2Fart_1455355748.jpg&type=sc960_832",
@@ -275,17 +275,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 29L,
+                id = 29,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net" +
                         "%2Fimage%2F277%2F2013%2F11%2F10%2F2013111012173878553_1_59_20131110122101.jpg&type=sc960_832",
                 name = "3 논산 설향 딸기",
                 price = 10000,
             ),
             Product(
-                id = 30L,
+                id = 30,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyMzEwMjlfNCAg%2FMDAxNjk4NTY4MDU4MzI1.jbHZDZihchAU2omlt5kKT2Y-sIMLAeFmK-N124BfwSkg.5" +
                         "5nLXObBCS97UUPyExqsV1HEa_2HY6kS4MSlg0JJ12Eg.JPEG" +
                         ".sisia81%2FCK_pc0030942615.jpg&type=sc960_832",
@@ -293,17 +293,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 31L,
+                id = 31,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20240404_106%2F1712192530083b4K6O_JPEG%2F62268170973943746_107419204.jpg&type=sc960_832",
                 name = "3 녹두고물 꿀설기",
                 price = 10000,
             ),
             Product(
-                id = 32L,
+                id = 32,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTZfNzIg%2FMDAxNzEzMjQ1NzAxNTk3.J_U-og2VONyRLnh8GEOredJBlKa4G92kXJgRONPugHA" +
                         "g.3focus3kJUN7PMwiGQcRwfhhC9_uzMYlMd9DqNkvdtog.JPEG" +
                         "%2FNSC20240414%25A3%25DF223625.jpg&type=sc960_832",
@@ -311,9 +311,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 33L,
+                id = 33,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MTRfMTI5%2FMDAxNzEzMDc2NjQ5Mzg2.-9IFzuLjUDDH7Tzx3Vjqvqe_mYRgjnfiCMSMV6NzI4Eg" +
                         ".krg2ZvGecdmZdz4xF4-7dUNveZOjkrUxRq8ag3qRPrcg.PNG" +
                         "%2F%25BD%25BA%25C5%25A9%25B8%25B0%25BC%25A6_2024-04-14_152851.png&type=sc960_832",
@@ -321,9 +321,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 34L,
+                id = 34,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjRfNjkg%2FMDAxNzEzOTI0OTY0MTAw.Z3BrwiQtHcm0wqcytLsgAGp9BL5FVkhpBn5QXLXugn4g." +
                         "79JGr9GD9AHbgKHi1WvCyRhmELbOSJ5EMOmRGJhYaecg.JPEG" +
                         "%2F10.jpg&type=sc960_832",
@@ -331,26 +331,26 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 35L,
+                id = 35,
                 imageUrl =
-                "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
+                    "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fimg1.tmon.kr" +
                         "%2Fcdn4%2Fdeals%2F2024%2F02%2F28%2F25807373110%2Ffront_c9653_skjvr.jpg&type=sc960_832",
                 name = "3 하겐다즈 초콜릿 (쿼터) 946ml",
                 price = 10000,
             ),
             Product(
-                id = 36L,
+                id = 36,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAyMjNfMjkg%2FMDAxNzA4NjE1NTg1ODg5.ZFPHZ3Q2HzH7GcYA1_Jl0lsIdvAnzUF2h6Qd6bgDLHkg." +
                         "_7ffkgE45HXRVgX2Bywc3B320_tuatBww5y1hS4xjWQg.JPEG%2FIMG_5278.jpg&type=sc960_832",
                 name = "4 대전 장인약과",
                 price = 10000,
             ),
             Product(
-                id = 37L,
+                id = 37,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDAxMDVfNjYg%2FMDAxNzA0NDU0MTYwMTAx.4pxrLnIdvFp8KDGAnGkbl8zHo5Mcn0d-yD7pzToeiSsg.lF4rd6908c0" +
                         "j_7kfxBr_u4MSdjq73RkhzKfRk7Z6VUMg.JPEG." +
                         "rbxod123%2F1704454160034.jpg&type=sc960_832",
@@ -358,17 +358,17 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 38L,
+                id = 38,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fshop1.phinf.naver.net" +
                         "%2F20220419_195%2F1650332783362X5wqH_JPEG%2F51468679090044420_1417181296.jpg&type=sc960_832",
                 name = "4 청포도",
                 price = 10000,
             ),
             Product(
-                id = 39L,
+                id = 39,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjZfMTU4%2FMDAxNzE0MTI0NzA4ODY5.oeDm3aXfYKCwJBx6W5pvgeGbEnv9Pl9M7-KS8RSdES" +
                         "gg.---7jVzxMg2CyWfdaymPSlVDOf-VtgmZiU4bThZNDEsg." +
                         "JPEG%2F3.jpg&type=sc960_832",
@@ -376,9 +376,9 @@ object ProductDatabase {
                 price = 10000,
             ),
             Product(
-                id = 40L,
+                id = 40,
                 imageUrl =
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
+                    "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net" +
                         "%2FMjAyNDA0MjhfMjA0%2FMDAxNzE0MjMyNDEwMjUy.oPmks3C6DLu9bbeU1ZAAbQsuDNU0STlZmESokn_L32I" +
                         "g.qNELX5_3ojNWAuh9ggXIx_YuLe7N9wqJDp6CsxwKp-0g.JPEG" +
                         "%2Fart_1455355748.jpg&type=sc960_832",

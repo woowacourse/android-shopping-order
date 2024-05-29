@@ -31,16 +31,18 @@ class CartAdapter(
                 ItemCartBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         }
         return CartPlaceholderViewHolder(
             ItemCartPlaceholderBinding.inflate(
                 LayoutInflater.from(
-                    parent.context
-                ), parent, false
-            )
+                    parent.context,
+                ),
+                parent,
+                false,
+            ),
         )
     }
 
@@ -49,11 +51,13 @@ class CartAdapter(
         position: Int,
     ) {
         val cartViewItem = cartItems[position]
-        if (holder is CartViewHolder) holder.bind(
-            (cartViewItem as CartViewItem).cartItem,
-            cartItemClickListener,
-            quantityClickListener
-        )
+        if (holder is CartViewHolder) {
+            holder.bind(
+                (cartViewItem as CartViewItem).cartItem,
+                cartItemClickListener,
+                quantityClickListener,
+            )
+        }
     }
 
     override fun getItemCount(): Int {
@@ -92,6 +96,5 @@ class CartAdapter(
         }
     }
 
-    private fun isFirstLoad() =
-        cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
+    private fun isFirstLoad() = cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
 }

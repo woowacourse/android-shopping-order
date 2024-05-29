@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.db.cart.CartRepository
-import woowacourse.shopping.data.db.product.ProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.helper.FakeCartRepositoryImpl
 import woowacourse.shopping.helper.FakeProductRepositoryImpl
 import woowacourse.shopping.helper.FakeRecentProductRepositoryImpl
@@ -21,7 +21,7 @@ class DetailViewModelTest {
 
     private val product =
         Product(
-            id = 0L,
+            id = 0,
             name = "1 대전 장인약과",
             price = 10000,
             imageUrl =
@@ -35,7 +35,7 @@ class DetailViewModelTest {
     fun setUp() {
         productRepository = FakeProductRepositoryImpl(listOf(product))
         viewModel =
-            DetailViewModel(cartRepository, productRepository, recentProductRepository, 0L)
+            DetailViewModel(cartRepository, productRepository, recentProductRepository, 0)
     }
 
     @Test
@@ -110,7 +110,7 @@ class DetailViewModelTest {
 
     @Test
     fun `수량 감소 버튼 클릭 시 수량이 감소한다`() {
-        viewModel.onQuqntityMinusButtonClick(product.id)
+        viewModel.onQuantityMinusButtonClick(product.id)
         val quantity = viewModel.quantity.value
 
         assertThat(quantity).isEqualTo(1)
@@ -118,8 +118,8 @@ class DetailViewModelTest {
 
     @Test
     fun `수량 감소 버튼 클릭 시 수량은 1 이하로 줄어들지 않는다`() {
-        viewModel.onQuqntityMinusButtonClick(product.id)
-        viewModel.onQuqntityMinusButtonClick(product.id)
+        viewModel.onQuantityMinusButtonClick(product.id)
+        viewModel.onQuantityMinusButtonClick(product.id)
         val quantity = viewModel.quantity.value
 
         assertThat(quantity).isEqualTo(1)

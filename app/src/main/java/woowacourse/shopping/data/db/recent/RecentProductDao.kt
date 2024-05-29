@@ -11,12 +11,12 @@ interface RecentProductDao {
 
     @Query("UPDATE recent_products SET dateTime = :dateTime WHERE productId = :productId")
     fun update(
-        productId: Long,
+        productId: Int,
         dateTime: String,
     )
 
     @Query("SELECT * FROM recent_products WHERE productId = :productId")
-    fun findByProductId(productId: Long): RecentProductEntity?
+    fun findByProductId(productId: Int): RecentProductEntity?
 
     @Query("SELECT * FROM recent_products ORDER BY dateTime DESC LIMIT 1")
     fun findMostRecentProduct(): RecentProductEntity?

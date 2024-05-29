@@ -1,13 +1,11 @@
 package woowacourse.shopping.view.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.db.cart.CartRepository
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.state.UIState
 
@@ -45,8 +43,8 @@ class CartViewModel(private val cartRepository: CartRepository) :
     private val _isPageControlButtonVisible = MutableLiveData(false)
     val isPageControlButtonVisible: LiveData<Boolean> = _isPageControlButtonVisible
 
-    private val _navigateToDetail = MutableLiveData<Event<Long>>()
-    val navigateToDetail: LiveData<Event<Long>>
+    private val _navigateToDetail = MutableLiveData<Event<Int>>()
+    val navigateToDetail: LiveData<Event<Int>>
         get() = _navigateToDetail
 
     private val _notifyDeletion = MutableLiveData<Event<Boolean>>()
@@ -98,16 +96,16 @@ class CartViewModel(private val cartRepository: CartRepository) :
         loadPage(prevPage)
     }
 
-    fun deleteItem(itemId: Long) {
+    fun deleteItem(itemId: Int) {
         cartRepository.delete(itemId)
         loadPage(currentPage.value ?: DEFAULT_PAGE)
     }
 
-    override fun onCartItemClick(productId: Long) {
+    override fun onCartItemClick(productId: Int) {
         _navigateToDetail.value = Event(productId)
     }
 
-    override fun onDeleteButtonClick(itemId: Long) {
+    override fun onDeleteButtonClick(itemId: Int) {
         deleteItem(itemId)
         cartRepository.delete(itemId)
         _notifyDeletion.value = Event(true)
@@ -117,14 +115,14 @@ class CartViewModel(private val cartRepository: CartRepository) :
         _isBackButtonClicked.value = Event(true)
     }
 
-    override fun onQuantityPlusButtonClick(productId: Long) {
+    override fun onQuantityPlusButtonClick(productId: Int) {
         var cartItem = cartRepository.findOrNullByProductId(productId) ?: return
         cartItem = cartItem.plusQuantity()
         cartRepository.update(productId, cartItem.quantity)
         _updatedCartItem.value = cartItem
     }
 
-    override fun onQuqntityMinusButtonClick(productId: Long) {
+    override fun onQuantityMinusButtonClick(productId: Int) {
         var cartItem = cartRepository.findOrNullByProductId(productId) ?: return
         cartItem = cartItem.minusQuantity()
         cartRepository.update(productId, cartItem.quantity)

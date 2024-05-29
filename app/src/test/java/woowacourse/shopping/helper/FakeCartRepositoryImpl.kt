@@ -1,8 +1,8 @@
 package woowacourse.shopping.helper
 
-import woowacourse.shopping.data.db.cart.CartRepository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.math.min
 
 class FakeCartRepositoryImpl : CartRepository {
@@ -25,7 +25,7 @@ class FakeCartRepositoryImpl : CartRepository {
     }
 
     override fun update(
-        productId: Long,
+        productId: Int,
         quantity: Int,
     ) {
     }
@@ -34,15 +34,15 @@ class FakeCartRepositoryImpl : CartRepository {
         return cartItems.size
     }
 
-    override fun productQuantity(productId: Long): Int {
+    override fun productQuantity(productId: Int): Int {
         return cartItems.firstOrNull { it.id == productId }?.quantity ?: 0
     }
 
-    override fun findOrNullByProductId(productId: Long): CartItem? {
+    override fun findOrNullByProductId(productId: Int): CartItem? {
         return cartItems.firstOrNull { it.productId == productId }
     }
 
-    override fun find(cartItemId: Long): CartItem {
+    override fun find(cartItemId: Int): CartItem {
         return cartItems.first { it.id == cartItemId }
     }
 
@@ -59,7 +59,7 @@ class FakeCartRepositoryImpl : CartRepository {
         return cartItems.subList(offset, min)
     }
 
-    override fun delete(cartItemId: Long) {
+    override fun delete(cartItemId: Int) {
         cartItems.removeIf { it.id == cartItemId }
     }
 

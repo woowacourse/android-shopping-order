@@ -12,6 +12,5 @@ sealed class ShoppingCartViewItem(open val viewType: Int) {
     companion object {
         const val CART_PLACEHOLDER_VIEW_TYPE = 0
         const val CART_VIEW_TYPE = 1
-
     }
 }

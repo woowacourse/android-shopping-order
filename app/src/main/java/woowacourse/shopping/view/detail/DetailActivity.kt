@@ -18,7 +18,7 @@ import woowacourse.shopping.view.state.UIState
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
-    private val productId: Long by lazy { intent.getLongExtra(PRODUCT_ID, INVALID_PRODUCT_ID) }
+    private val productId: Int by lazy { intent.getIntExtra(PRODUCT_ID, INVALID_PRODUCT_ID) }
     private val isMostRecentProductClicked: Boolean by lazy {
         intent.getBooleanExtra(
             IS_MOST_RECENT_PRODUCT_CLICKED,
@@ -104,13 +104,13 @@ class DetailActivity : AppCompatActivity() {
     companion object {
         private const val PUR_CART_MESSAGE = "장바구니에 상품이 추가되었습니다!"
         const val PRODUCT_ID = "product_id"
-        const val INVALID_PRODUCT_ID = -1L
+        const val INVALID_PRODUCT_ID = -1
         private const val IS_MOST_RECENT_PRODUCT_CLICKED = "is_most_recent_product_clicked"
         private const val DEFAULT_IS_MOST_RECENT_PRODUCT_CLICKED = false
 
         fun createIntent(
             context: Context,
-            productId: Long,
+            productId: Int,
             isMostRecentProductClicked: Boolean = DEFAULT_IS_MOST_RECENT_PRODUCT_CLICKED,
         ): Intent {
             return Intent(context, DetailActivity::class.java).apply {

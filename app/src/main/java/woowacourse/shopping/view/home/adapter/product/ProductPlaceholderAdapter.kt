@@ -8,7 +8,7 @@ import woowacourse.shopping.databinding.ItemProductPlaceholderBinding
 class ProductPlaceholderAdapter : RecyclerView.Adapter<ProductPlaceholderViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ProductPlaceholderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemProductPlaceholderBinding.inflate(layoutInflater)
@@ -17,8 +17,10 @@ class ProductPlaceholderAdapter : RecyclerView.Adapter<ProductPlaceholderViewHol
 
     override fun getItemCount(): Int = NUMBER_OF_PLACEHOLDERS
 
-    override fun onBindViewHolder(holder: ProductPlaceholderViewHolder, position: Int) {
-
+    override fun onBindViewHolder(
+        holder: ProductPlaceholderViewHolder,
+        position: Int,
+    ) {
     }
 
     companion object {

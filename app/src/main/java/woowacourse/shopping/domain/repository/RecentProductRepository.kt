@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.db.recent
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -6,9 +6,9 @@ import woowacourse.shopping.domain.model.RecentProduct
 interface RecentProductRepository {
     fun save(product: Product)
 
-    fun update(productId: Long)
+    fun update(productId: Int)
 
-    fun findOrNullByProductId(productId: Long): RecentProduct?
+    fun findOrNullByProductId(productId: Int): RecentProduct?
 
     fun findMostRecentProduct(): RecentProduct?
 

@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 
 @Entity(tableName = "recent_products")
 data class RecentProductEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val productId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val productId: Int,
     val productName: String,
     val imageUrl: String,
     val dateTime: String,

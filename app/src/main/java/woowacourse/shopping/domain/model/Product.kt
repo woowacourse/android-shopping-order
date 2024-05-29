@@ -5,9 +5,9 @@ import woowacourse.shopping.data.db.recent.RecentProductEntity
 import java.time.LocalDateTime
 
 data class Product(
-    val id: Long,
+    val id: Int,
     val name: String,
-    val price: Long,
+    val price: Int,
     val imageUrl: String,
 )
 

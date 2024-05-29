@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.db.cart.CartRepository
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.helper.FakeCartRepositoryImpl
 import woowacourse.shopping.helper.InstantTaskExecutorExtension
 import woowacourse.shopping.helper.getOrAwaitValue
@@ -280,7 +280,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(cartRepository)
 
         // when
-        viewModel.onQuqntityMinusButtonClick(testProduct0.id)
+        viewModel.onQuantityMinusButtonClick(testProduct0.id)
 
         // then
         val updatedItem = viewModel.updatedCartItem.getOrAwaitValue()
@@ -297,7 +297,7 @@ class CartViewModelTest {
         viewModel = CartViewModel(cartRepository)
 
         // when
-        viewModel.onQuqntityMinusButtonClick(testProduct0.id)
+        viewModel.onQuantityMinusButtonClick(testProduct0.id)
 
         // then
         val updatedItem = viewModel.updatedCartItem.getOrAwaitValue()

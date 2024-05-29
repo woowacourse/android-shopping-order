@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.adapter
 
-import android.opengl.Visibility
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -28,7 +27,7 @@ fun loadImage(
 @BindingAdapter("app:price")
 fun setPrice(
     view: TextView,
-    price: Long,
+    price: Int,
 ) {
     view.text = view.context.getString(R.string.price_format, price)
 }
@@ -61,7 +60,7 @@ fun setTotalQuantityVisibility(
 fun <T> setEmptyCartVisibility(
     textView: TextView,
     isEmpty: Boolean,
-    state: UIState<T>
+    state: UIState<T>,
 ) {
     textView.visibility =
         if (state is UIState.Success && isEmpty) View.VISIBLE else View.GONE
@@ -71,9 +70,12 @@ fun <T> setEmptyCartVisibility(
 fun <T> setCartVisibility(
     view: RecyclerView,
     isEmpty: Boolean,
-    state: UIState<T>
+    state: UIState<T>,
 ) {
     view.visibility =
-        if (state is UIState.Success && !isEmpty || state is UIState.Loading) View.VISIBLE
-        else View.GONE
+        if (state is UIState.Success && !isEmpty || state is UIState.Loading) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
 }

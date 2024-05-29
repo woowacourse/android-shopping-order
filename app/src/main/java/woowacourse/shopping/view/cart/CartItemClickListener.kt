@@ -1,9 +1,9 @@
 package woowacourse.shopping.view.cart
 
 interface CartItemClickListener {
-    fun onCartItemClick(productId: Long)
+    fun onCartItemClick(productId: Int)
 
-    fun onDeleteButtonClick(itemId: Long)
+    fun onDeleteButtonClick(itemId: Int)
 
     fun onBackButtonClick()
 }

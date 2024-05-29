@@ -36,8 +36,8 @@ class ProductAdapter(
                 ItemProductPlaceholderBinding.inflate(
                     inflater,
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         } else {
             LoadMoreButtonViewHolder(ItemLoadMoreButtonBinding.inflate(inflater, parent, false))
@@ -65,10 +65,13 @@ class ProductAdapter(
         productItems: List<ProductViewItem>,
         canLoadMore: Boolean,
     ) {
-        val currentSize = if (isFirstLoad()) {
-            homeViewItems.clear()
-            0
-        } else homeViewItems.size - 1
+        val currentSize =
+            if (isFirstLoad()) {
+                homeViewItems.clear()
+                0
+            } else {
+                homeViewItems.size - 1
+            }
         val items = productItems.subList(currentSize, productItems.size)
 
         homeViewItems.removeLastOrNull()
@@ -89,10 +92,10 @@ class ProductAdapter(
     }
 
     fun updateProductQuantity(updatedProductItem: ProductViewItem) {
-        if(!isFirstLoad()) {
+        if (!isFirstLoad()) {
             val position =
                 homeViewItems.indexOfFirst { item ->
-                    (item as ProductViewItem).product.id == updatedProductItem.product.id
+                    item is ProductViewItem && item.product.id == updatedProductItem.product.id
                 }
 
             if (position != -1) {

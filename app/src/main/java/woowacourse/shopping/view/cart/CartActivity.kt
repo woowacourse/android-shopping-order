@@ -87,7 +87,7 @@ class CartActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun navigateToDetail(productId: Long) {
+    private fun navigateToDetail(productId: Int) {
         startActivity(DetailActivity.createIntent(this, productId))
     }
 

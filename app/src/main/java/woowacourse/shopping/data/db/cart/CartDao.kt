@@ -11,7 +11,7 @@ interface CartDao {
 
     @Query("UPDATE cart_items SET quantity = :quantity WHERE productId = :productId")
     fun update(
-        productId: Long,
+        productId: Int,
         quantity: Int,
     )
 
@@ -19,13 +19,13 @@ interface CartDao {
     fun cartItemSize(): Int
 
     @Query("SELECT quantity FROM cart_items WHERE productId = :productId")
-    fun productQuantity(productId: Long): Int
+    fun productQuantity(productId: Int): Int
 
     @Query("SELECT * FROM cart_items WHERE productId = :productId")
-    fun findByProductId(productId: Long): CartItemEntity?
+    fun findByProductId(productId: Int): CartItemEntity?
 
     @Query("SELECT * FROM cart_items WHERE id = :id")
-    fun find(id: Long): CartItemEntity?
+    fun find(id: Int): CartItemEntity?
 
     @Query("SELECT * FROM cart_items")
     fun findAll(): List<CartItemEntity>
@@ -37,7 +37,7 @@ interface CartDao {
     ): List<CartItemEntity>
 
     @Query("DELETE FROM cart_items WHERE id = :id")
-    fun delete(id: Long)
+    fun delete(id: Int)
 
     @Query("DELETE FROM cart_items")
     fun deleteAll()
