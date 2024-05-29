@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain
 
 data class Cart(
+    val cartId: Long = -1L,
     val product: Product,
     val quantity: Int = DEFAULT_PURCHASE_COUNT,
 ) {

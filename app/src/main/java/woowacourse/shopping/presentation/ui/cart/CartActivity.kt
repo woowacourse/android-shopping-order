@@ -16,11 +16,11 @@ import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
 
-class CartActivity : BindingActivity<ActivityCartBinding>(), CartHandler {
+class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_cart
 
-    private val cartAdapter: CartAdapter = CartAdapter(this)
+    private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }
 
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
 
@@ -28,7 +28,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>(), CartHandler {
         if (savedInstanceState == null) {
             viewModel.loadProductByPage(0)
         }
-        binding.cartHandler = this
+        binding.cartHandler = viewModel
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         initActionBarTitle()
@@ -79,36 +79,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>(), CartHandler {
                     setResult(RESULT_OK, this)
                 }
             }
-        }
-    }
-
-    override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
-        viewModel.deleteProduct(product.toProduct())
-    }
-
-    override fun onNextPageClick() {
-        viewModel.turnNextPage()
-    }
-
-    override fun onBeforePageClick() {
-        viewModel.turnPreviousPage()
-    }
-
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let {
-            viewModel.updateCartItemQuantity(
-                item.toProduct(),
-                -1,
-            )
-        }
-    }
-
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let {
-            viewModel.updateCartItemQuantity(
-                item.toProduct(),
-                1,
-            )
         }
     }
 
