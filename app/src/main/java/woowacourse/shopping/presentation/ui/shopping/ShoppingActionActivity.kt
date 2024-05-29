@@ -48,14 +48,14 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     private fun initLauncher() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//                if (result.resultCode == RESULT_OK) {
-//                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
-//                        EXTRA_UPDATED_PRODUCT,
-//                    )
-//                        ?.let {
-//                            viewModel.updateCartProducts(it)
-//                        }
-//                }
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
+                        EXTRA_UPDATED_PRODUCT,
+                    )
+                        ?.let {
+                            viewModel.updateCartProducts(it)
+                        }
+                }
                 viewModel.findAllRecent()
             }
     }
@@ -83,8 +83,13 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                 }
             }
         }
-        viewModel.cartCount.observe(this) {
-            binding.tvCartCount.text = it.toString()
+        viewModel.carts.observe(this) {
+            when(it) {
+                is UiState.Loading -> {}
+                is UiState.Success -> {
+                    binding.tvCartCount.text = it.data.size.toString()
+                }
+            }
         }
         viewModel.recentProducts.observe(this) {
             when (it) {
@@ -108,7 +113,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                 when (it) {
                     is NavigateUiState.ToDetail -> {
                         resultLauncher.launch(
-                            ProductDetailActivity.createIntent(this, it.productId),
+                            ProductDetailActivity.createIntent(this, it.cartProduct),
                         )
                     }
                     is NavigateUiState.ToCart -> {

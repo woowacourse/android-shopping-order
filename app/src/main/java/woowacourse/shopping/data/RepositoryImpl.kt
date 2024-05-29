@@ -1,10 +1,15 @@
 package woowacourse.shopping.data
 
+import retrofit2.Response
 import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
+import woowacourse.shopping.data.remote.LoadResult
+import woowacourse.shopping.data.remote.ProductPagingSource
 import woowacourse.shopping.data.remote.RemoteDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
@@ -13,6 +18,10 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 
 class RepositoryImpl(private val localDataSource: LocalDataSource, private val remoteDataSource: RemoteDataSource) : Repository {
+
+    val productPagingSource = ProductPagingSource(remoteDataSource)
+
+
     override fun findProductByPaging(
         offset: Int,
         pageSize: Int,
@@ -29,6 +38,18 @@ class RepositoryImpl(private val localDataSource: LocalDataSource, private val r
         return Result.failure(Throwable())
     }
 
+    override fun getProductsByPaging(): Result<List<CartProduct>?> {
+        val data = productPagingSource.load()
+        return when(data) {
+            is LoadResult.Page -> {
+                Result.success(data.data)
+            }
+            is LoadResult.Error -> {
+                Result.failure(Throwable(data.message))
+            }
+        }
+    }
+
     override fun getCartItems(page: Int, size: Int): Result<List<CartProduct>?> = runCatching {
         val response = remoteDataSource.getCartItems(page, size)
         if(response.isSuccessful) {
@@ -41,6 +62,32 @@ class RepositoryImpl(private val localDataSource: LocalDataSource, private val r
         val response = remoteDataSource.getProductById(id = id)
         if(response.isSuccessful) {
             return Result.success(response.body()?.toDomain())
+        }
+        return Result.failure(Throwable())
+    }
+
+    override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>  = runCatching {
+        val response = remoteDataSource.postCartItem(cartItemRequest)
+        if(response.isSuccessful) {
+            return Result.success(
+                response.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0
+            )
+        }
+        return Result.failure(Throwable())
+    }
+
+    override fun patchCartItem(id: Int, quantityRequest: QuantityRequest): Result<Unit> = runCatching {
+        val response = remoteDataSource.patchCartItem(id, quantityRequest)
+        if(response.isSuccessful) {
+            return Result.success(Unit)
+        }
+        return Result.failure(Throwable())
+    }
+
+    override fun deleteCartItem(id: Int): Result<Unit> = runCatching {
+        val response = remoteDataSource.deleteCartItem(id)
+        if(response.isSuccessful) {
+            return Result.success(Unit)
         }
         return Result.failure(Throwable())
     }

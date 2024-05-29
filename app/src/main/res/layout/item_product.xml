@@ -11,13 +11,14 @@
 
         <variable
             name="shoppingActionHandler"
-            type="woowacourse.shopping.presentation.base.CartCountHandler" />
+            type="woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp">
+        android:layout_margin="5dp"
+        android:onClick="@{() -> shoppingActionHandler.onProductClick(cartProduct)}">
 
         <ImageView
             android:id="@+id/img_item"

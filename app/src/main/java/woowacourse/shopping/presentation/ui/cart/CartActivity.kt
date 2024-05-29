@@ -67,6 +67,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         Thread.sleep(500)
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
+
                             cartAdapter.submitList(it.data)
                             with(binding) {
                                 layoutPage.isVisible = viewModel.maxOffset > 0

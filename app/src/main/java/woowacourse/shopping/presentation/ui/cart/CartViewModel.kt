@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     var offSet: Int = 0
         private set
         get() = field.coerceAtMost(maxOffset)
-    private val _carts = MutableLiveData<UiState<List<CartProduct>>>(UiState.None)
+    private val _carts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
 
     val carts: LiveData<UiState<List<CartProduct>>> get() = _carts
 
@@ -32,7 +33,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         getItemCount()
     }
 
-    fun findProductByOffset() {
+    fun findCartByOffset() {
         thread {
             repository.getCartItems(offSet, PAGE_SIZE).onSuccess {
                 if(it == null) {
@@ -56,12 +57,13 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     override fun onDelete(cartProduct: CartProduct) {
         thread {
-            updateUiModel.add(cartProduct.productId, cartProduct.copy(quantity = 0))
-            repository.deleteCart(cartProduct.productId).onSuccess {
-                getItemCount()
-                findProductByOffset()
+            Log.d("AAFDF", "${cartProduct.cartId}")
+//            updateUiModel.add(cartProduct.productId, cartProduct.copy(quantity = 0))
+            repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+
+//                findProductByOffset()
             }.onFailure {
-                _errorHandler.value = EventState(CART_DELETE_ERROR)
+                _errorHandler.postValue(EventState(CART_DELETE_ERROR))
             }
         }
     }
@@ -69,13 +71,13 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     override fun onNext() {
         if (offSet == maxOffset) return
         offSet++
-        findProductByOffset()
+        findCartByOffset()
     }
 
     override fun onPrevious() {
         if (offSet == 0) return
         offSet--
-        findProductByOffset()
+        findCartByOffset()
     }
 
     override fun onPlus(cartProduct: CartProduct) {

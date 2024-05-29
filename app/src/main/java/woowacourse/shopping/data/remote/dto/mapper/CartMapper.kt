@@ -6,7 +6,8 @@ import woowacourse.shopping.domain.CartProduct
 
 fun Cart.toDomain(): CartProduct {
     return CartProduct(
-        productId = id.toLong(),
+        cartId = id.toLong(),
+        productId = product.id.toLong(),
         name = product.name,
         price = product.price.toLong(),
         imgUrl = product.imageUrl,

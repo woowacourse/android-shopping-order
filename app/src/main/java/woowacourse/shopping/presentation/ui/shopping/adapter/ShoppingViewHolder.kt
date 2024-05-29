@@ -13,18 +13,10 @@ sealed class ShoppingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val shoppingActionHandler: ShoppingActionHandler,
     ) :
         ShoppingViewHolder(binding.root) {
-        private var id: Long = -1
-
-        init {
-            binding.root.setOnClickListener {
-                shoppingActionHandler.onProductClick(id)
-            }
-        }
 
         fun bind(item: CartProduct) {
             binding.cartProduct = item
             binding.shoppingActionHandler = shoppingActionHandler
-            id = item.productId
         }
     }
 

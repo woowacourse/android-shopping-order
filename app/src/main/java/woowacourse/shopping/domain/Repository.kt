@@ -5,6 +5,8 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
 
@@ -19,6 +21,9 @@ interface Repository {
         size: Int = 20,
     ): Result<List<CartProduct>?>
 
+    fun getProductsByPaging(
+    ): Result<List<CartProduct>?>
+
     fun getCartItems(
         page: Int, size: Int
     ): Result<List<CartProduct>?>
@@ -26,6 +31,19 @@ interface Repository {
     fun getProductById(
         id: Int
     ): Result<CartProduct?>
+
+    fun postCartItem(
+        cartItemRequest: CartItemRequest
+    ): Result<Int>
+
+    fun patchCartItem(
+        id: Int,
+        quantityRequest: QuantityRequest
+    ): Result<Unit>
+
+    fun deleteCartItem(
+        id: Int
+    ): Result<Unit>
 
     fun findCartByPaging(
         offset: Int,

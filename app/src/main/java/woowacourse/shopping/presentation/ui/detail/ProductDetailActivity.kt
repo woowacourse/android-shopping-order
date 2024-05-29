@@ -10,11 +10,13 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity.Companion.EXTRA_UPDATED_PRODUCT
+import woowacourse.shopping.utils.getParcelableExtraCompat
 import kotlin.concurrent.thread
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
@@ -29,9 +31,8 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         binding.detailActionHandler = viewModel
         binding.lifecycleOwner = this
 
-        val id = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
-        if (id == -1L) finish()
-        initData(id)
+        val cartProduct = intent.getParcelableExtraCompat<CartProduct>(EXTRA_CART_PRODUCT)
+        initData(cartProduct)
         initObserver()
     }
 
@@ -46,17 +47,13 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                 }
                 is UiState.Success -> {
 
-                    thread {
-                     Thread.sleep(500)
-                     runOnUiThread {
-                         binding.layoutShimmer.root.isVisible = false
-                     }
-                    }
-
-                    binding.cartProduct = state.data
+                    var data = state.data
+                    if(data.quantity == 0) data = data.copy(quantity = 1)
+                    binding.cartProduct = data
                 }
             }
         }
+
         viewModel.recentProduct.observe(this) { state ->
             when (state) {
                 is UiState.Loading -> {
@@ -88,18 +85,19 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                 }
             },
         )
-        viewModel.navigateHandler.observe(
-            this,
-            EventObserver {
-                createIntent(this, it).apply {
-                    startActivity(this)
-                }
-            },
-        )
+//        viewModel.navigateHandler.observe(
+//            this,
+//            EventObserver {
+//                createIntent(this, it).apply {
+//                    startActivity(this)
+//                }
+//            },
+//        )
     }
 
-    private fun initData(id: Long) {
-        viewModel.findCartProductById(id)
+    private fun initData(cartProduct: CartProduct?) {
+        binding.layoutShimmer.root.isVisible = false
+        viewModel.setCartProduct(cartProduct)
         viewModel.findOneRecentProduct()
     }
 
@@ -115,15 +113,16 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
 
     companion object {
         const val EXTRA_PRODUCT_ID = "productId"
+        const val EXTRA_CART_PRODUCT ="cartProduct"
         const val EXTRA_OVERLAY = "overlay"
 
         fun createIntent(
             context: Context,
-            productId: Long,
+            cartProduct: CartProduct,
         ): Intent {
             return Intent(context, ProductDetailActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra(EXTRA_PRODUCT_ID, productId)
+                putExtra(EXTRA_CART_PRODUCT, cartProduct)
                 if (context is ProductDetailActivity) putExtra(EXTRA_OVERLAY, true)
             }
         }

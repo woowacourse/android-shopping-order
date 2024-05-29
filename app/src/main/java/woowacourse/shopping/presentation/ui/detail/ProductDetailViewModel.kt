@@ -1,11 +1,12 @@
 package woowacourse.shopping.presentation.ui.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Recent
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
@@ -16,10 +17,10 @@ import kotlin.concurrent.thread
 class ProductDetailViewModel(
     private val repository: Repository,
 ) : ViewModel(), DetailActionHandler {
-    private val _product = MutableLiveData<UiState<CartProduct>>(UiState.None)
+    private val _product = MutableLiveData<UiState<CartProduct>>(UiState.Loading)
     val product: LiveData<UiState<CartProduct>> get() = _product
 
-    private val _recentProduct = MutableLiveData<UiState<RecentProduct>>(UiState.None)
+    private val _recentProduct = MutableLiveData<UiState<RecentProduct>>(UiState.Loading)
     val recentProduct: LiveData<UiState<RecentProduct>> get() = _recentProduct
 
     private val _errorHandler = MutableLiveData<EventState<String>>()
@@ -33,18 +34,24 @@ class ProductDetailViewModel(
 
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    fun findCartProductById(id: Long) {
-        thread {
-            repository.getProductById(id.toInt()).onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
-                } else {
-                    _product.postValue(UiState.Success(it))
-                    saveRecentProduct(it)
-                }
-            }.onFailure {
-                _errorHandler.value = EventState(PRODUCT_NOT_FOUND)
-            }
+//    fun findCartProductById(id: Long) {
+//        thread {
+//            repository.getProductById(id.toInt()).onSuccess {
+//                if (it == null) {
+//                    _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
+//                } else {
+//                    _product.postValue(UiState.Success(it))
+//                    saveRecentProduct(it)
+//                }
+//            }.onFailure {
+//                _errorHandler.value = EventState(PRODUCT_NOT_FOUND)
+//            }
+//        }
+//    }
+
+    fun setCartProduct(cartProduct: CartProduct?) {
+        if(cartProduct != null) {
+            _product.value = UiState.Success(cartProduct)
         }
     }
 
@@ -52,7 +59,7 @@ class ProductDetailViewModel(
         thread {
             repository.findOne().onSuccess {
                 if (it == null) {
-                    _recentProduct.postValue(UiState.None)
+                    _recentProduct.postValue(UiState.Loading)
                 } else {
                     _recentProduct.postValue(UiState.Success(it))
                 }
@@ -66,28 +73,19 @@ class ProductDetailViewModel(
         thread {
             updateUiModel.add(cartProduct.productId, cartProduct)
 
-            if (cartProduct.quantity > 0) {
-                repository.saveCart(
-                    Cart(
-                        cartProduct.productId,
-                        cartProduct.quantity,
-                    ),
-                )
-                    .onSuccess {
-                        _product.postValue(UiState.Success(cartProduct))
-                    }
+            Log.d("LLA", "${cartProduct.quantity}")
+                repository.patchCartItem(
+                    id = cartProduct.cartId.toInt(),
+                    quantityRequest = QuantityRequest(
+                        cartProduct.quantity
+                    )
+                ).onSuccess {
+                    _product.postValue(UiState.Success(cartProduct))
+                }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
                     }
-            } else {
-                repository.deleteCart(
-                    cartProduct.productId,
-                ).onSuccess {
-                    _product.postValue(UiState.Success(cartProduct))
-                }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
-                }
-            }
+
             _cartHandler.postValue(EventState(updateUiModel))
         }
     }

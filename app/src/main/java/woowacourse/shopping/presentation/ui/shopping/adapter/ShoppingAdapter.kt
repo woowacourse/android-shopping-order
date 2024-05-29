@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shopping.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,13 +14,10 @@ class ShoppingAdapter(
     private val shoppingActionHandler: ShoppingActionHandler,
 ) : ListAdapter<CartProduct, ShoppingViewHolder>(DIFF_CALLBACK) {
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            itemCount - LOADING_OFFSET -> {
-                ShoppingViewType.LoadMore.value
-            }
-            else -> {
-                ShoppingViewType.Product.value
-            }
+        return if(position == currentList.size) {
+            ShoppingViewType.LoadMore.value
+        } else {
+            ShoppingViewType.Product.value
         }
     }
 
@@ -69,7 +67,6 @@ class ShoppingAdapter(
                 ): Boolean {
                     return oldItem.productId == newItem.productId
                 }
-
                 override fun areContentsTheSame(
                     oldItem: CartProduct,
                     newItem: CartProduct,
