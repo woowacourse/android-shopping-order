@@ -57,21 +57,23 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addProductToCart() {
+    fun addProductToCart(quantity: Int) {
         thread {
-            repeat(productCount.value!!) {
-                // TODO: 상품을 증가시킬 때 특정 수량만큼 추가할 수 있도록 변경해야 함
-                shoppingProductsRepository.increaseShoppingCartProduct(productId)
-                // TODO: "장바구니에 담겼습니다" 토스트 메시지 띄우기
-            }
+            shoppingProductsRepository.addShoppingCartProduct(productId)
         }
     }
 
-    override fun onIncrease(productId: Long) {
+    override fun onIncrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         _productCount.value = _productCount.value?.plus(1)
     }
 
-    override fun onDecrease(productId: Long) {
+    override fun onDecrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         val currentProductCount = _productCount.value
         if (currentProductCount == 1) {
             return

@@ -11,9 +11,15 @@ interface ProductIdsCountRepository {
 
     fun removedProductsId(productId: Long): Long
 
-    fun plusProductsIdCount(productId: Long)
+    fun plusProductsIdCount(
+        productId: Long,
+        quantity: Int,
+    )
 
-    fun minusProductsIdCount(productId: Long)
+    fun minusProductsIdCount(
+        productId: Long,
+        quantity: Int,
+    )
 
     fun clearAll()
 }

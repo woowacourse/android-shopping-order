@@ -99,9 +99,12 @@ class ShoppingCartViewModel(
         _deletedItemId.setValue(productId)
     }
 
-    override fun onIncrease(productId: Long) {
+    override fun onIncrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         thread {
-            shoppingProductsRepository.increaseShoppingCartProduct(productId)
+            shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
             val currentItems =
                 shoppingProductsRepository.loadProductsInCart(page = currentPage.value ?: currentPageIsNullException())
             uiHandler.post {
@@ -110,14 +113,12 @@ class ShoppingCartViewModel(
         }
     }
 
-    override fun onDecrease(productId: Long) {
+    override fun onDecrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         thread {
-            val product = shoppingProductsRepository.loadProduct(productId)
-            if (product.quantity == 1) {
-                return@thread
-            }
-
-            shoppingProductsRepository.decreaseShoppingCartProduct(productId)
+            shoppingProductsRepository.decreaseShoppingCartProduct(productId, quantity)
             val currentItems =
                 shoppingProductsRepository.loadProductsInCart(page = currentPage.value ?: currentPageIsNullException())
             uiHandler.post {

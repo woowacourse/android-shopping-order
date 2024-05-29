@@ -21,7 +21,8 @@ class DefaultShoppingProductRepository(
     override fun loadProductsInCart(page: Int): List<Product> {
         val allProductIdsInCart = cartSource.loadPaged(page)
         return allProductIdsInCart.map { productIdsCountData ->
-            productsSource.findById(productIdsCountData.productId).toDomain(productIdsCountData.quantity)
+            productsSource.findById(productIdsCountData.productId)
+                .toDomain(productIdsCountData.quantity)
         }
     }
 
@@ -41,24 +42,18 @@ class DefaultShoppingProductRepository(
         }
     }
 
-    override fun increaseShoppingCartProduct(id: Long) {
-        if (cartSource.findByProductId(id) == null) {
-            addShoppingCartProduct(id)
-            return
-        }
-
-        cartSource.plusProductsIdCount(id)
+    override fun increaseShoppingCartProduct(
+        id: Long,
+        quantity: Int,
+    ) {
+        cartSource.plusProductsIdCount(id, quantity)
     }
 
-    override fun decreaseShoppingCartProduct(id: Long) {
-        val data = cartSource.findByProductId(id) ?: return
-
-        if (data.quantity == 1) {
-            removeShoppingCartProduct(id)
-            return
-        }
-
-        cartSource.minusProductsIdCount(id)
+    override fun decreaseShoppingCartProduct(
+        id: Long,
+        quantity: Int,
+    ) {
+        cartSource.minusProductsIdCount(id, quantity)
     }
 
     override fun addShoppingCartProduct(id: Long) {

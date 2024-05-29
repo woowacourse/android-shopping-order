@@ -52,12 +52,25 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         return 10
     }
 
-    override fun plusProductsIdCount(productId: Long) {
-        TODO("Not yet implemented")
+    override fun plusProductsIdCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cartItem =
+            cartItemApiService.requestCartItems().execute().body()?.content?.find {
+                it.product.id == productId
+            } ?: throw NoSuchElementException()
+        cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 
-    override fun minusProductsIdCount(productId: Long) {
-        TODO("Not yet implemented")
+    override fun minusProductsIdCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val body = cartItemApiService.requestCartItems().execute().body()
+        Log.d("ProductList", body.toString())
+        val cartItem = body?.content?.find { it.product.id == productId } ?: throw NoSuchElementException()
+        cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 
     override fun clearAll() {
