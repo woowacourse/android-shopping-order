@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductListBinding
@@ -51,36 +49,6 @@ class ProductListFragment : Fragment() {
         binding.productDetailList.visibility = View.GONE
     }
 
-    private fun showLoadMoreButton() {
-        binding.productDetailList.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(
-                    recyclerView: RecyclerView,
-                    dx: Int,
-                    dy: Int,
-                ) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val totalItemCount = layoutManager.itemCount
-                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                    if (viewModel.isLastPage.value == false && hasMoreItems(totalItemCount, lastVisibleItem)) {
-                        binding.loadMoreButton.visibility = View.VISIBLE
-                        return
-                    }
-
-                    binding.loadMoreButton.visibility = View.GONE
-                }
-            },
-        )
-    }
-
-    private fun hasMoreItems(
-        totalItemCount: Int,
-        lastVisibleItem: Int,
-    ) = totalItemCount == lastVisibleItem + 1
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -91,7 +59,6 @@ class ProductListFragment : Fragment() {
         observeDetailProductDestination()
         showSkeletonUi()
         observeLoadedProducts()
-        showLoadMoreButton()
         viewModel.productsHistory.observe(viewLifecycleOwner) {
             historyAdapter.update(it)
         }

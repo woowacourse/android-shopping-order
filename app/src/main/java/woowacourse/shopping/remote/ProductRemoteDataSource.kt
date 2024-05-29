@@ -31,11 +31,8 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
     }
 
     override fun isFinalPage(page: Int): Boolean {
-        val response =
-            productsApiService.requestProducts(page = page + 1).execute().body()?.content
-                ?: throw NoSuchElementException("there is no product with page: ${page + 1}")
-
-        return response.isEmpty()
+        val totalPage = productsApiService.requestProducts(page = page).execute().body()?.totalPages
+        return (page + 1) == totalPage
     }
 
     override fun shutDown(): Boolean {

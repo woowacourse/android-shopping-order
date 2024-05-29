@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> vm.loadNextPageProducts()}"
                     android:text="@string/load_more_products"
-                    android:visibility="gone"
+                    android:visibility="@{vm.isLastPage == true ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/product_detail_list"
                     tools:visibility="visible" />
