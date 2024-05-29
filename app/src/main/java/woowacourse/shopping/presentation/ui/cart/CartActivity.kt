@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
+import kotlin.concurrent.thread
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
@@ -54,20 +55,26 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     private fun initData() {
-        viewModel.findProductByOffset()
+        viewModel.findCartByOffset()
     }
 
     private fun initObserver() {
         viewModel.carts.observe(this) {
             when (it) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> {
-                    cartAdapter.submitList(it.data)
-                    with(binding) {
-                        layoutPage.isVisible = viewModel.maxOffset > 0
-                        btnRight.isEnabled = viewModel.offSet < viewModel.maxOffset
-                        btnLeft.isEnabled = viewModel.offSet > 0
-                        tvPageCount.text = (viewModel.offSet + OFFSET_BASE).toString()
+                    thread {
+                        Thread.sleep(500)
+                        runOnUiThread {
+                            binding.layoutShimmer.isVisible = false
+                            cartAdapter.submitList(it.data)
+                            with(binding) {
+                                layoutPage.isVisible = viewModel.maxOffset > 0
+                                btnRight.isEnabled = viewModel.offSet < viewModel.maxOffset
+                                btnLeft.isEnabled = viewModel.offSet > 0
+                                tvPageCount.text = (viewModel.offSet + OFFSET_BASE).toString()
+                            }
+                        }
                     }
                 }
             }

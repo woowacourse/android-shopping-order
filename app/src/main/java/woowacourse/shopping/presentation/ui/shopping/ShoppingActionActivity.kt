@@ -1,18 +1,13 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.R
-import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
@@ -25,6 +20,7 @@ import woowacourse.shopping.presentation.ui.shopping.adapter.RecentAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.utils.getParcelableExtraCompat
+import kotlin.concurrent.thread
 
 class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
@@ -52,31 +48,38 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     private fun initLauncher() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
-                        EXTRA_UPDATED_PRODUCT,
-                    )
-                        ?.let {
-                            viewModel.updateCartProducts(it)
-                        }
-                }
+//                if (result.resultCode == RESULT_OK) {
+//                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
+//                        EXTRA_UPDATED_PRODUCT,
+//                    )
+//                        ?.let {
+//                            viewModel.updateCartProducts(it)
+//                        }
+//                }
                 viewModel.findAllRecent()
             }
     }
 
     private fun initData() {
         viewModel.loadProductByOffset()
+        viewModel.loadCartByOffset()
         viewModel.findAllRecent()
         viewModel.getItemCount()
     }
 
     private fun initObserver() {
         binding.shoppingActionHandler = viewModel
-        viewModel.products.observe(this) {
+        viewModel.cartProducts.observe(this) {
             when (it) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> {
-                    shoppingAdapter.submitList(it.data)
+                    thread {
+                        Thread.sleep(500)
+                        runOnUiThread {
+                            binding.layoutShimmer.isVisible = false
+                            shoppingAdapter.submitList(it.data)
+                        }
+                    }
                 }
             }
         }
@@ -85,7 +88,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         }
         viewModel.recentProducts.observe(this) {
             when (it) {
-                is UiState.None -> {}
+                is UiState.Loading -> {}
                 is UiState.Success -> {
                     recentAdapter.submitList(it.data) {
                         binding.rvRecents.scrollToPosition(0)

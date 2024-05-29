@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.detail
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -14,6 +15,7 @@ import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity.Companion.EXTRA_UPDATED_PRODUCT
+import kotlin.concurrent.thread
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
@@ -40,16 +42,24 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private fun initObserver() {
         viewModel.product.observe(this) { state ->
             when (state) {
-                is UiState.None -> {}
+                is UiState.Loading -> {
+                }
                 is UiState.Success -> {
+
+                    thread {
+                     Thread.sleep(500)
+                     runOnUiThread {
+                         binding.layoutShimmer.root.isVisible = false
+                     }
+                    }
+
                     binding.cartProduct = state.data
                 }
             }
         }
         viewModel.recentProduct.observe(this) { state ->
             when (state) {
-                is UiState.None -> {
-                    binding.layoutRecent.isVisible = false
+                is UiState.Loading -> {
                 }
 
                 is UiState.Success -> {

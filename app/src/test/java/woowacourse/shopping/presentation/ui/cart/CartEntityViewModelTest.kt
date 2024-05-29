@@ -36,7 +36,7 @@ class CartEntityViewModelTest {
             Result.success(
                 cartProducts,
             )
-        viewModel.findProductByOffset()
+        viewModel.findCartByOffset()
         Thread.sleep(1000)
         assertThat(viewModel.carts.getOrAwaitValue()).isEqualTo(UiState.Success(cartProducts))
     }
@@ -44,7 +44,7 @@ class CartEntityViewModelTest {
     @Test
     fun `카트 아이템을 불러오기 실패하면 Error 상태로 변화한다`() {
         every { productCartRepository.findCartByPaging(any(), any()) } returns Result.failure(Throwable())
-        viewModel.findProductByOffset()
+        viewModel.findCartByOffset()
         Thread.sleep(1000)
         assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(CART_LOAD_ERROR)
     }
