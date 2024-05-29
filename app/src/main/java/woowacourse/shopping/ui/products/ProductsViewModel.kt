@@ -28,6 +28,8 @@ class ProductsViewModel(
     private val _showLoadMore = MutableLiveData<Boolean>(false)
     val showLoadMore: LiveData<Boolean> get() = _showLoadMore
 
+    private val isLastPage = MutableLiveData<Boolean>()
+
     private var page: Int = INITIALIZE_PAGE
 
     val cartTotalCount: LiveData<Int> =
@@ -59,7 +61,23 @@ class ProductsViewModel(
                     _productsUiState.postValue(Event(ProductsUiState(productUiModels = newProductUiModels)))
                     _showLoadMore.value = false
                     page++
-                    // maxPage = body.totalPages
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                }
+            },
+        )
+        loadIsPageLast()
+    }
+
+    private fun loadIsPageLast() {
+        productRepository.getIsPageLast(
+            page,
+            PAGE_SIZE,
+            object : DataCallback<Boolean> {
+                override fun onSuccess(result: Boolean) {
+                    isLastPage.postValue(result)
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -116,12 +134,12 @@ class ProductsViewModel(
             productRepository.find(
                 it.productId,
                 object : DataCallback<Product> {
-                    override fun onSuccess(product: Product) {
+                    override fun onSuccess(result: Product) {
                         recentProductsUiModels.add(
                             RecentProductUiModel(
-                                product.id,
-                                product.imageUrl,
-                                product.name,
+                                result.id,
+                                result.imageUrl,
+                                result.name,
                             ),
                         )
                         latch.countDown()
@@ -140,7 +158,7 @@ class ProductsViewModel(
 
     fun changeSeeMoreVisibility(lastPosition: Int) {
         _showLoadMore.value =
-            (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels()?.size
+            (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels()?.size && isLastPage.value == false
     }
 
     fun decreaseQuantity(productId: Int) {
@@ -154,7 +172,6 @@ class ProductsViewModel(
     }
 
     private fun updateProductUiModel(productId: Int) {
-        // loading
         val productUiModels = productUiModels()?.toMutableList() ?: return
         productRepository.find(
             productId,
