@@ -6,6 +6,7 @@ sealed interface ProductListItem {
     data class RecentProductItems(val items: List<RecentProductItem>) : ProductListItem
 
     data class ShoppingProductItem(
+        val cartId: Long = -1,
         val id: Long,
         val name: String,
         val imgUrl: String,
@@ -27,6 +28,7 @@ sealed interface ProductListItem {
             ): List<ShoppingProductItem> {
                 return products.map { product ->
                     ShoppingProductItem(
+                        carts.firstOrNull { product == it.product }?.cartId ?: -1L,
                         product.id,
                         product.name,
                         product.imgUrl,
@@ -41,6 +43,7 @@ sealed interface ProductListItem {
                 cart: Cart,
             ): ShoppingProductItem =
                 ShoppingProductItem(
+                    cart.cartId,
                     product.id,
                     product.name,
                     product.imgUrl,

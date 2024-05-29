@@ -2,10 +2,12 @@ package woowacourse.shopping.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.data.db.AppDatabase
-import woowacourse.shopping.data.db.cart.RoomCartRepository
-import woowacourse.shopping.data.db.recent.LocalRecentProductRepository
-import woowacourse.shopping.data.remote.shopping.RemoteProductRepositoryImpl
+import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
+import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
+import woowacourse.shopping.data.local.AppDatabase
+import woowacourse.shopping.data.product.ProductRepositoryImpl
+import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
@@ -17,9 +19,12 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
                 val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ProductDetailViewModel(
-                    RemoteProductRepositoryImpl(),
-                    RoomCartRepository(cartDao),
-                    LocalRecentProductRepository(recentDao),
+                    ProductRepositoryImpl(),
+                    CartRepositoryImpl(
+                        localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                        remoteCartDataSource = RemoteCartDataSource(),
+                    ),
+                    RecentProductRepositoryImpl(recentDao),
                 ) as T
             }
 
@@ -27,15 +32,25 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
                 val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ShoppingViewModel(
-                    productRepository = RemoteProductRepositoryImpl(),
-                    recentRepository = LocalRecentProductRepository(recentDao),
-                    cartRepository = RoomCartRepository(cartDao),
+                    productRepository = ProductRepositoryImpl(),
+                    recentRepository = RecentProductRepositoryImpl(recentDao),
+                    cartRepository =
+                        CartRepositoryImpl(
+                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                            remoteCartDataSource = RemoteCartDataSource(),
+                        ),
                 ) as T
             }
 
             modelClass.isAssignableFrom(CartViewModel::class.java) -> {
                 val cartDao = AppDatabase.instanceOrNull.cartDao()
-                CartViewModel(cartRepository = RoomCartRepository(cartDao)) as T
+                CartViewModel(
+                    cartRepository =
+                        CartRepositoryImpl(
+                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                            remoteCartDataSource = RemoteCartDataSource(),
+                        ),
+                ) as T
             }
 
             else -> {

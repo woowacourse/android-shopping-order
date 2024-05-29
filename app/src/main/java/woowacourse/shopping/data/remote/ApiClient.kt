@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote
 
+import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -30,8 +31,7 @@ object ApiClient {
             with(chain) {
                 val newRequest =
                     request().newBuilder()
-                        .addHeader("username", "(header Value)")
-                        .addHeader("password", "(header Value)")
+                        .addHeader("Authorization", Credentials.basic("s6m1n", "password"))
                         .build()
                 proceed(newRequest)
             }

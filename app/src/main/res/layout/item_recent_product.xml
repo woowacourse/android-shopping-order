@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="recentProduct"
             type="woowacourse.shopping.domain.RecentProductItem" />
+
         <variable
             name="shoppingHandler"
             type="woowacourse.shopping.presentation.ui.shopping.ShoppingHandler" />
@@ -16,12 +18,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:onClick="@{()->shoppingHandler.onProductItemClick(recentProduct.productId)}"
-        >
+        android:onClick="@{()->shoppingHandler.onProductItemClick(recentProduct.productId)}">
 
         <ImageView
-            bindLoadImage="@{recentProduct.imgUrl}"
             android:id="@+id/iv_recent_product"
+            bindLoadImage="@{recentProduct.imgUrl}"
             android:layout_width="98dp"
             android:layout_height="121dp"
             android:scaleType="centerCrop"

@@ -109,7 +109,11 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     private fun observeProductUpdates() {
         viewModel.shoppingProducts.observe(this) { state ->
             when (state) {
-                is UiState.Success -> adapter.updateProductItems(state.data)
+                is UiState.Success -> {
+                    viewModel.fetchCartCount()
+                    adapter.updateProductItems(state.data)
+                }
+
                 UiState.Loading -> adapter.showSkeleton()
             }
         }
@@ -129,12 +133,15 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             this,
             EventObserver {
                 when (it) {
-                    is FromShoppingToScreen.ProductDetail ->
+                    is FromShoppingToScreen.ProductDetail -> {
                         ProductDetailActivity.startWithResultLauncher(
                             this,
                             activityResultLauncher,
                             it.productId,
+                            it.cartId,
+                            it.quantity,
                         )
+                    }
 
                     is FromShoppingToScreen.Cart ->
                         CartActivity.startWithResult(
@@ -149,7 +156,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.fetchInitialRecentProducts()
-        viewModel.fetchCartProducts()
+//        viewModel.fetchCartData()
     }
 
     companion object {
