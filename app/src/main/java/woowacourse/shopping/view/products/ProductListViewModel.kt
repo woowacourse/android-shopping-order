@@ -50,12 +50,12 @@ class ProductListViewModel(
 
     fun loadPagingProduct() {
         _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
-
         Handler(Looper.getMainLooper()).postDelayed({
             try {
                 val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
                 val pagingData = productRepository.loadPagingProducts(itemSize)
                 _products.value = _products.value?.plus(pagingData)
+
                 _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
                 _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
             } catch (e: Exception) {
@@ -118,6 +118,7 @@ class ProductListViewModel(
             when (e) {
                 is NoSuchDataException ->
                     _errorEvent.setValue(ProductListEvent.UpdateProductEvent.Fail)
+
                 else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
             }
         }
@@ -147,8 +148,12 @@ class ProductListViewModel(
     }
 
     private fun updateTotalCartItemCount() {
-        val totalItemCount = shoppingCartRepository.getTotalCartItemCount()
-        _cartItemCount.value = totalItemCount
+        try {
+            val totalItemCount = shoppingCartRepository.getTotalCartItemCount()
+            _cartItemCount.value = totalItemCount
+        } catch (e: Exception) {
+            _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+        }
     }
 
     private fun increaseTotalCartItemCount() {

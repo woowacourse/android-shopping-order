@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.utils.exception.LatchUtils.awaitOrThrow
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
@@ -18,21 +19,18 @@ class OrderRepositoryImpl(
         val latch = CountDownLatch(1)
         var exception: Exception? = null
 
-        orderDataSource.orderItems(ids = ids)
-            .enqueue(object : Callback<Unit>{
-                override fun onResponse(p0: Call<Unit>, response: Response<Unit>) {
-                    if (!response.isSuccessful){
-                        exception = NoSuchDataException()
-                    }
-                    latch.countDown()
+        thread {
+            try {
+                val response = orderDataSource.orderItems(ids = ids).execute()
+                if (!response.isSuccessful){
+                    exception = NoSuchDataException()
                 }
-
-                override fun onFailure(p0: Call<Unit>, t: Throwable) {
-                    exception = Exception(t.message)
-                    latch.countDown()
-                }
-
-            })
+            } catch (e: Exception){
+                exception = e
+            } finally {
+                latch.countDown()
+            }
+        }
         latch.awaitOrThrow(exception)
     }
 }

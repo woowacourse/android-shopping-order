@@ -40,7 +40,7 @@ interface CartApiService {
         @Body quantity: Int,
     ): Call<Unit>
 
-    @PATCH("/cart-items/counts")
+    @GET("/cart-items/counts")
     fun requestCartItemCount(
         @Header("accept") accept: String = "*/*",
     ): Call<CartItemQuantityDto>

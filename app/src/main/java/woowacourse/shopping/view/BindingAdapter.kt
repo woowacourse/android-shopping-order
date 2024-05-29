@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
+import woowacourse.shopping.R
 
 @BindingAdapter("bindingImageUrl")
 fun setImageUrl(
@@ -14,4 +15,5 @@ fun setImageUrl(
         .load(url)
         .override(Target.SIZE_ORIGINAL)
         .into(view)
+
 }

@@ -18,29 +18,27 @@ import kotlin.concurrent.thread
 class RealProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
+
     override fun loadPagingProducts(offset: Int): List<Product> {
         val latch = CountDownLatch(1)
         var products: List<Product>? = null
         var exception: Exception? = null
 
-        productDataSource.loadProducts(offset, PRODUCT_LOAD_PAGING_SIZE)
-            .enqueue(object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>
-                ) {
+        thread {
+            try {
+                val page =  offset/PRODUCT_LOAD_PAGING_SIZE
+                val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
+                if (response.isSuccessful && response.body() != null) {
                     products = response.body()?.productDto?.map { it.toProduct() }
-                    latch.countDown()
                 }
+            } catch (e: Exception) {
+                exception = e
+            } finally {
+                latch.countDown()
+            }
+        }
 
-                override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                    exception = Exception(t.message)
-                    latch.countDown()
-                }
-
-            })
         latch.awaitOrThrow(exception)
-
         return products ?: throw NoSuchDataException()
     }
 
@@ -48,21 +46,20 @@ class RealProductRepositoryImpl(
         val latch = CountDownLatch(1)
         var product: Product? = null
         var exception: Exception? = null
+
         thread {
-            productDataSource.loadProduct(productId.toInt())
-                .enqueue(object : Callback<ProductDto> {
-                    override fun onResponse(p0: Call<ProductDto>, response: Response<ProductDto>) {
-                        product = response.body()?.toProduct()
-                        latch.countDown()
-                    }
-
-                    override fun onFailure(p0: Call<ProductDto>, t: Throwable) {
-                        exception = Exception(t.message)
-                        latch.countDown()
-                    }
-
-                })
+            try {
+                val response = productDataSource.loadProduct(productId.toInt()).execute()
+                if (response.isSuccessful && response.body() != null) {
+                    product = response.body()?.toProduct()
+                }
+            } catch (e: Exception) {
+                exception = e
+            } finally {
+                latch.countDown()
+            }
         }
+
         latch.awaitOrThrow(exception)
         return product ?: throw NoSuchDataException()
     }
