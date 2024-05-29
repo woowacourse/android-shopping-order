@@ -3,7 +3,7 @@ package woowacourse.shopping.data.dto.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseCartItemGetDto(
+data class ResponseCartItemsGetDto(
     val totalPages: Int,
     val totalElements: Long,
     val sort: Sort,
@@ -49,4 +49,3 @@ data class ResponseCartItemGetDto(
         val product: Product,
     )
 }
-

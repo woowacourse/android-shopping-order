@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.cart.CartRepositoryTestImpl
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
@@ -73,8 +74,8 @@ class ProductDetailViewModel(
 
     fun addProductToCart() {
         _productWithQuantity.value?.let { productWithQuantity ->
-            repeat(productWithQuantity.quantity.value) {
-                cartRepository.plusQuantityByProductId(productWithQuantity.product.id)
+            with(productWithQuantity) {
+                CartRepositoryTestImpl.addProductToCart(this.product.id, this.quantity.value)
             }
             loadProduct()
         }

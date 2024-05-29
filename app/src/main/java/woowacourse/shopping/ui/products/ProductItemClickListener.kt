@@ -4,5 +4,4 @@ interface ProductItemClickListener {
     fun itemClickListener(productId: Long)
 
     fun addCart(productId: Long)
-
 }

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.cart
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
-import woowacourse.shopping.data.dto.response.ResponseCartItemGetDto
+import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.service.ApiFactory
 import woowacourse.shopping.model.Quantity
 import kotlin.concurrent.thread
@@ -33,31 +33,42 @@ interface CartRepository {
     fun minusQuantityByProductId(productId: Long)
 }
 
-
 interface CartRepositoryTest {
+    fun getCartItems(
+        page: Int,
+        size: Int,
+    ): List<Cart>
 
-    fun getCartItems(page: Int, size: Int): List<Cart>
-
+    fun getAllCartItems(): List<Cart>
 
     fun postCartItems(
-        productId: Long, quantity: Int
+        productId: Long,
+        quantity: Int,
     )
 
-    fun deleteCartItem(
-        id: Long
-    )
+    fun deleteCartItem(id: Long)
 
     fun getCartItemCounts(): Int
 
-    fun patchCartItem(id:Long, quantity: Int)
+    fun patchCartItem(
+        id: Long,
+        quantity: Int,
+    )
+
+    fun addProductToCart(
+        productId: Long,
+        quantity: Int,
+    )
 }
 
 object CartRepositoryTestImpl : CartRepositoryTest {
-    override fun getCartItems(page: Int, size: Int): List<Cart> {
-        var cartsDto: ResponseCartItemGetDto? = null
+    override fun getCartItems(
+        page: Int,
+        size: Int,
+    ): List<Cart> {
+        var cartsDto: ResponseCartItemsGetDto? = null
         thread {
             cartsDto = ApiFactory.getCartItems(page, size)
-
         }.join()
         val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
         return carts.content.map {
@@ -65,13 +76,29 @@ object CartRepositoryTestImpl : CartRepositoryTest {
         }
     }
 
-    override fun postCartItems(productId: Long, quantity: Int) {
+    override fun getAllCartItems(): List<Cart> {
+        val carts = mutableListOf<Cart>()
+        var currentPage = 0
+        while (true) {
+            val items = getCartItems(currentPage++, 100)
+            if (items.isEmpty()) {
+                break
+            }
+            carts.addAll(items)
+        }
+        return carts
+    }
+
+    override fun postCartItems(
+        productId: Long,
+        quantity: Int,
+    ) {
         thread {
             ApiFactory.postCartItems(
                 RequestCartItemPostDto(
                     productId = productId,
-                    quantity = quantity
-                )
+                    quantity = quantity,
+                ),
             )
         }.join()
     }
@@ -82,7 +109,7 @@ object CartRepositoryTestImpl : CartRepositoryTest {
         }.join()
     }
 
-    override fun getCartItemCounts(): Int{
+    override fun getCartItemCounts(): Int {
         var cartCountDto: ResponseCartItemCountsGetDto? = null
         thread {
             cartCountDto = ApiFactory.getCartItemCounts()
@@ -91,10 +118,24 @@ object CartRepositoryTestImpl : CartRepositoryTest {
         return count.quantity
     }
 
-    override fun patchCartItem(id: Long, quantity:Int) {
+    override fun patchCartItem(
+        id: Long,
+        quantity: Int,
+    ) {
         thread {
             ApiFactory.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
         }.join()
     }
 
+    override fun addProductToCart(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cart: Cart? = getAllCartItems().firstOrNull { it.productId == productId }
+        if (cart == null) {
+            postCartItems(productId, quantity)
+            return
+        }
+        patchCartItem(cart.id, cart.quantity.value + quantity)
+    }
 }

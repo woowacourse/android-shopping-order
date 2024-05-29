@@ -12,39 +12,37 @@ import retrofit2.http.Query
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
-import woowacourse.shopping.data.dto.response.ResponseCartItemGetDto
+import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 
 interface CartItemService {
-
     @GET("/cart-items")
     fun getCartItems(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ResponseCartItemGetDto>
+    ): Call<ResponseCartItemsGetDto>
 
     @POST("/cart-items")
     fun postCartItem(
         @Header("accept") accept: String = "*/*",
-        @Body request: RequestCartItemPostDto
+        @Body request: RequestCartItemPostDto,
     ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Long
+        @Path("id") id: Long,
     ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
-        @Body request: RequestCartItemsPatchDto
+        @Body request: RequestCartItemsPatchDto,
     ): Call<Unit>
 
     @GET("/cart-items/counts")
     fun getCartItemCounts(
         @Header("accept") accept: String = "*/*",
     ): Call<ResponseCartItemCountsGetDto>
-
 }

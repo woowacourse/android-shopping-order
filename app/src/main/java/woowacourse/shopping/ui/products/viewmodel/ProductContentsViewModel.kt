@@ -70,7 +70,7 @@ class ProductContentsViewModel(
     override fun plusCount(productId: Long) {
         CartRepositoryTestImpl.patchCartItem(
             findCartItemByProductId(productId),
-            findCartItemQuantityByProductId(productId).inc().value
+            findCartItemQuantityByProductId(productId).inc().value,
         )
         loadCartItems()
     }
@@ -108,16 +108,7 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        val carts = mutableListOf<Cart>()
-        var currentPage = 0
-        while (true) {
-            val items = CartRepositoryTestImpl.getCartItems(currentPage++, 100)
-            if (items.isEmpty()) {
-                break
-            }
-            carts.addAll(items)
-        }
-        cart.value = carts
+        cart.value = CartRepositoryTestImpl.getAllCartItems()
     }
 
     fun loadRecentProducts() {
@@ -130,7 +121,8 @@ class ProductContentsViewModel(
             currentProducts.map { product ->
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
-        productWithQuantity.value = ProductWithQuantityUiState(updatedList.map { it.toProductUiModel() }, isLoading = false)
+        productWithQuantity.value =
+            ProductWithQuantityUiState(updatedList.map { it.toProductUiModel() }, isLoading = false)
     }
 
     private fun getQuantity(productId: Long): Quantity {

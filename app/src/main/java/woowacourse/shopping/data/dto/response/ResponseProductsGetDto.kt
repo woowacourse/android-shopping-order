@@ -27,7 +27,7 @@ data class ResponseProductsGetDto(
 
     @Serializable
     data class Pageable(
-        val sort: ResponseCartItemGetDto.Sort,
+        val sort: ResponseCartItemsGetDto.Sort,
         val pageNumber: Int,
         val pageSize: Int,
         val paged: Boolean,
@@ -42,4 +42,3 @@ data class ResponseProductsGetDto(
         val empty: Boolean,
     )
 }
-
