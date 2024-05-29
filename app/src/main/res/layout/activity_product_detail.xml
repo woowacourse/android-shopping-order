@@ -6,12 +6,12 @@
     <data>
 
         <variable
-            name="lastProduct"
-            type="woowacourse.shopping.domain.RecentProductItem" />
+            name="viewModel"
+            type="woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel" />
 
         <variable
-            name="product"
-            type="woowacourse.shopping.domain.ProductListItem.ShoppingProductItem" />
+            name="lastProduct"
+            type="woowacourse.shopping.domain.RecentProductItem" />
 
         <variable
             name="detailHandler"
@@ -28,7 +28,7 @@
 
         <ImageView
             android:id="@+id/iv_product"
-            bindLoadImage="@{product.imgUrl}"
+            bindLoadImage="@{viewModel.product.imgUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="17dp"
-            android:text="@{product.name}"
+            android:text="@{viewModel.product.name}"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,12 +71,12 @@
             android:layout_marginEnd="14dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/line"
-            app:product="@{product}"
+            app:product="@{viewModel.product}"
             app:quantityHandler="@{detailHandler}" />
 
         <TextView
             android:id="@+id/tv_price_value"
-            bindTextFormattedCurrency="@{product.price*product.quantity}"
+            bindTextFormattedCurrency="@{viewModel.product.price*viewModel.product.quantity}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -102,7 +102,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            currentProduct="@{product}"
+            currentProduct="@{viewModel.product}"
             lastProduct="@{lastProduct}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

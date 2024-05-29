@@ -20,13 +20,16 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
 
     private val viewModel: ProductDetailViewModel by viewModels { ViewModelFactory() }
 
-    private var id by Delegates.notNull<Long>()
+    private var productId by Delegates.notNull<Long>()
+    private var cartId by Delegates.notNull<Long>()
 
     override fun initStartView(savedInstanceState: Bundle?) {
+        binding.lifecycleOwner = this
+        binding.detailHandler = viewModel
+        binding.viewModel = viewModel
         checkIsLastViewedProduct()
         initActionBarTitle()
         fetchInitialData()
-        binding.detailHandler = viewModel
         observeLiveDatas()
     }
 
@@ -40,15 +43,16 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     private fun fetchInitialData() {
-        id = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
-        if (id == -1L) finish()
-        viewModel.fetchInitialData(id)
+        cartId = intent.getLongExtra(EXTRA_CART_ID, -1L)
+        productId = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
+        val quantity = intent.getIntExtra(EXTRA_QUANTITY, 0)
+        if (productId == -1L) finish()
+        viewModel.fetchInitialData(cartId, quantity, productId)
     }
 
     private fun observeLiveDatas() {
         observeLastProductUpdates()
         observeErrorEventUpdates()
-        observeProductsUpdates()
         observeMoveEvent()
     }
 
@@ -68,15 +72,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         )
     }
 
-    private fun observeProductsUpdates() {
-        viewModel.shoppingProduct.observe(this) { state ->
-            when (state) {
-                is UiState.Loading -> {}
-                is UiState.Success -> binding.product = state.data
-            }
-        }
-    }
-
     private fun observeMoveEvent() {
         viewModel.moveEvent.observe(
             this,
@@ -87,7 +82,11 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                     }
 
                     is FromDetailToScreen.Shopping -> {
-                        ShoppingActivity.startWithNewProductQuantity(this, it.productId, it.quantity)
+                        ShoppingActivity.startWithNewProductQuantity(
+                            this,
+                            it.productId,
+                            it.quantity,
+                        )
                         finish()
                     }
                 }
@@ -96,6 +95,8 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     companion object {
+        const val EXTRA_QUANTITY = "quantity"
+        const val EXTRA_CART_ID = "cartId"
         const val EXTRA_PRODUCT_ID = "productId"
         const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_IS_LAST_VIEWED_PRODUCT = "isLastViewedProduct"
@@ -116,9 +117,13 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             context: Context,
             activityLauncher: ActivityResultLauncher<Intent>,
             productId: Long,
+            cartId: Long,
+            quantity: Int,
         ) {
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(EXTRA_PRODUCT_ID, productId)
+                putExtra(EXTRA_CART_ID, cartId)
+                putExtra(EXTRA_QUANTITY, quantity)
                 activityLauncher.launch(this)
             }
         }
