@@ -14,4 +14,6 @@
     <color name="gray_100">#AAAAAA</color>
     <color name="gray_line">#FFEBEBEB</color>
     <color name="primary">#FF04C09E</color>
+    <color name="shimmer_content_color">#D6D6D6</color>
+    <color name="shimmer_background_color">#E6E6E6</color>
 </resources>

@@ -24,6 +24,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_recent_product_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="40dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <include layout="@layout/item_shimmer_recent_product" />
+                <include layout="@layout/item_shimmer_recent_product" />
+                <include layout="@layout/item_shimmer_recent_product" />
+                <include layout="@layout/item_shimmer_recent_product" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recent_product"
             android:layout_marginTop="8dp"

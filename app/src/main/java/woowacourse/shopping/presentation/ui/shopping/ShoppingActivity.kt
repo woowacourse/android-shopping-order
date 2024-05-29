@@ -1,12 +1,16 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -43,6 +47,7 @@ class ShoppingActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         observeViewModel()
+        showShimmerListTest()
     }
 
     override fun onResume() {
@@ -106,6 +111,7 @@ class ShoppingActivity : AppCompatActivity() {
         }
     }
 
+    // TODO: 데이터 로딩 중인 경우에 LoadMore 버튼 숨기기
     private fun checkLoadMoreBtnVisibility() {
         binding.nestedScrollView.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { v, _, _, _, _ ->
@@ -140,5 +146,31 @@ class ShoppingActivity : AppCompatActivity() {
 
     private fun navigateToDetail(productId: Long) {
         startActivity(DetailActivity.createIntent(this, productId))
+    }
+
+    private fun showShimmerListTest() {
+        lifecycleScope.launch {
+            showProductData(isLoading = true)
+            delay(3000)
+            showProductData(isLoading = false)
+        }
+    }
+
+    private fun showProductData(isLoading: Boolean) {
+        if (isLoading) {
+            binding.horizontalView.shimmerRecentProductList.startShimmer()
+            binding.shimmerProductList.startShimmer()
+            binding.horizontalView.shimmerRecentProductList.visibility = View.VISIBLE
+            binding.shimmerProductList.visibility = View.VISIBLE
+            binding.horizontalView.rvRecentProduct.visibility = View.GONE
+            binding.rvProductList.visibility = View.GONE
+        } else {
+            binding.horizontalView.shimmerRecentProductList.stopShimmer()
+            binding.shimmerProductList.stopShimmer()
+            binding.horizontalView.shimmerRecentProductList.visibility = View.GONE
+            binding.shimmerProductList.visibility = View.GONE
+            binding.horizontalView.rvRecentProduct.visibility = View.VISIBLE
+            binding.rvProductList.visibility = View.VISIBLE
+        }
     }
 }

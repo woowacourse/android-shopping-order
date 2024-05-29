@@ -76,4 +76,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
+
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }

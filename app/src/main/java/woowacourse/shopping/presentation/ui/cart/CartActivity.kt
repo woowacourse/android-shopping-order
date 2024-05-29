@@ -3,9 +3,13 @@ package woowacourse.shopping.presentation.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -25,12 +29,12 @@ class CartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setUpViews()
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
         observeViewModel()
+        showSkeletonUI()
     }
 
     private fun setUpViews() {
@@ -95,6 +99,27 @@ class CartActivity : AppCompatActivity() {
 
     private fun navigateToDetail(productId: Long) {
         startActivity(DetailActivity.createIntent(this, productId))
+    }
+
+    private fun showSkeletonUI() {
+        lifecycleScope.launch {
+            showCartData(isLoading = true)
+            delay(3000)
+            showCartData(isLoading = false)
+            setUpViews()
+        }
+    }
+
+    private fun showCartData(isLoading: Boolean) {
+        if (isLoading) {
+            binding.shimmerCartList.startShimmer()
+            binding.shimmerCartList.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        } else {
+            binding.shimmerCartList.stopShimmer()
+            binding.shimmerCartList.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+        }
     }
 
     companion object {
