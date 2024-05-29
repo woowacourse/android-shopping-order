@@ -30,9 +30,9 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         return emptyList()
     }
 
-    override fun isFinalPage(page: Int): Boolean {
-        return true
-    }
+    override fun isFinalPage(page: Int): Boolean =
+        cartItemApiService.requestCartItems(page - 1).execute().body()?.last
+            ?: throw IllegalArgumentException()
 
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
         val call =
