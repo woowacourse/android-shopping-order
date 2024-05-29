@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.util
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,6 +10,7 @@ import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.RecentProductItem
+import woowacourse.shopping.presentation.ui.UiState
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -17,6 +19,18 @@ fun ImageView.loadImage(imgUrl: String?) {
     Glide.with(context)
         .load(imgUrl)
         .into(this)
+}
+
+@BindingAdapter("bindSetCartSkeletonVisibility")
+fun View.setCartSkeletonVisibility(state: UiState<List<ProductListItem.ShoppingProductItem>>) {
+    visibility =
+        if (state is UiState.Success) {
+            Log.d("ㅌㅅㅌ", "숨겨")
+            View.GONE
+        } else {
+            Log.d("ㅌㅅㅌ", "보여줘")
+            View.VISIBLE
+        }
 }
 
 @BindingAdapter("bindSetVisibility")

@@ -1,29 +1,24 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.domain.repository.CartRepository
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 @ExtendWith(MockKExtension::class)
 class CartViewModelTest {
-    @RelaxedMockK
-    private lateinit var cartRepository: CartRepository
-
-    @InjectMockKs
-    private lateinit var viewModel: CartViewModel
-
-    @BeforeEach
-    fun setUp() {
-        every { cartRepository.getMaxPage(any()) } returns Result.success(0) // 초기 오프셋 처리
-        viewModel = CartViewModel(cartRepository)
-    }
-
+//    @RelaxedMockK
+//    private lateinit var localCartDataSource: LocalCartDataSource
+//
+//    @InjectMockKs
+//    private lateinit var viewModel: CartViewModel
+//
+//    @BeforeEach
+//    fun setUp() {
+//        every { localCartDataSource.getMaxPage(any()) } returns Result.success(0) // 초기 오프셋 처리
+//        viewModel = CartViewModel(localCartDataSource)
+//    }
+//
 //    @Test
 //    fun `카트 아이템을 pageCount개씩 불러온다`() {
 //        every { cartRepository.load(any(), any()) } returns Result.success(dummyCartProducts)

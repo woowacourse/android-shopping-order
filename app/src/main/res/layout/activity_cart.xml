@@ -8,6 +8,7 @@
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.cart.CartViewModel" />
+
         <variable
             name="cartHandler"
             type="woowacourse.shopping.presentation.ui.cart.CartHandler" />
@@ -35,10 +36,10 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_page"
+            bindSetVisibility="@{viewModel.pageControllerIsVisible}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
-            bindSetVisibility="@{viewModel.pageControllerIsVisible}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -49,8 +50,8 @@
                 android:layout_width="42dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="115dp"
-                android:enabled="@{viewModel.isLeftButtonEnabled}"
                 android:background="@drawable/background_button"
+                android:enabled="@{viewModel.isLeftButtonEnabled}"
                 android:onClick="@{()->cartHandler.onBeforePageClick()}"
                 android:text="@string/left_arrow"
                 android:textColor="@color/white"
@@ -63,8 +64,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:textSize="20sp"
                 android:text="@{String.valueOf(1 + viewModel.currentPage)}"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btn_right"
@@ -76,10 +77,10 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_right"
                 android:layout_width="42dp"
-                android:enabled="@{viewModel.isRightButtonEnabled}"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="115dp"
                 android:background="@drawable/background_button"
+                android:enabled="@{viewModel.isRightButtonEnabled}"
                 android:onClick="@{()->cartHandler.onNextPageClick()}"
                 android:text="@string/right_arrow"
                 android:textColor="@color/white"
@@ -90,5 +91,16 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <include
+            android:id="@+id/cart_skelleton"
+            bindSetCartSkeletonVisibility="@{viewModel.shoppingProducts}"
+            layout="@layout/item_cart_skelleton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

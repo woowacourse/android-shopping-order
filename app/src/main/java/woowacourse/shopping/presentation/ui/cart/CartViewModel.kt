@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.ui.cart
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,22 +61,25 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
     }
 
     fun loadProductByPage(newPage: Int) {
-        cartRepository.load(newPage, PAGE_SIZE, onSuccess = { carts, totalPage ->
-            maxPage = totalPage
-            cartProducts.apply {
-                clear()
-                addAll(carts)
-            }
-            _shoppingProducts.value =
-                UiState.Success(
-                    cartProducts.map {
-                        joinProductAndCart(
-                            it.product,
-                            it,
-                        )
-                    },
-                )
-        }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            cartRepository.load(newPage, PAGE_SIZE, onSuccess = { carts, totalPage ->
+                maxPage = totalPage
+                cartProducts.apply {
+                    clear()
+                    addAll(carts)
+                }
+                _shoppingProducts.value =
+                    UiState.Success(
+                        cartProducts.map {
+                            joinProductAndCart(
+                                it.product,
+                                it,
+                            )
+                        },
+                    )
+            }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
+        }, 500)
     }
 
     private fun modifyShoppingProductQuantity(

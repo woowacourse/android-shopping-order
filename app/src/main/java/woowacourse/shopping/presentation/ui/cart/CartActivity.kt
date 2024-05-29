@@ -59,8 +59,13 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private fun observeCartUpdates() {
         viewModel.shoppingProducts.observe(this) {
             when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> handleSuccessState(it.data)
+                is UiState.Loading -> {
+//                    val skelletonBinding = ItemCartSkelletonBinding.inflate(layoutInflater)
+//                    skelletonBinding.s
+                }
+                is UiState.Success -> {
+                    handleSuccessState(it.data)
+                }
             }
         }
     }

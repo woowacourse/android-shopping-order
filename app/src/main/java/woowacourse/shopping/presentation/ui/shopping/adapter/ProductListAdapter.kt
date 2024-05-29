@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderRecentProductsBinding
 import woowacourse.shopping.databinding.ItemLoadBinding
 import woowacourse.shopping.databinding.ItemShoppingProductBinding
-import woowacourse.shopping.databinding.ItemSkelletonBinding
+import woowacourse.shopping.databinding.ItemShoppingSkelletonBinding
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.ui.shopping.ShoppingHandler
 
@@ -39,7 +39,7 @@ class ProductListAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (ShoppingViewType.of(viewType)) {
             ShoppingViewType.Loading -> {
-                val loadBinding = ItemSkelletonBinding.inflate(inflater, parent, false)
+                val loadBinding = ItemShoppingSkelletonBinding.inflate(inflater, parent, false)
                 ProductViewHolder.ShoppingProductLoadingViewHolder(loadBinding)
             }
 
