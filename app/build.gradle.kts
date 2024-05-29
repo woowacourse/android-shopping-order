@@ -98,7 +98,7 @@ dependencies {
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     // gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.10.0")
 
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")

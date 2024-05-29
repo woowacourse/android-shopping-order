@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.cart.CartRepositoryTestImpl
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
@@ -67,12 +68,12 @@ class ProductContentsViewModel(
     }
 
     override fun plusCount(productId: Long) {
-        cartRepository.plusQuantityByProductId(productId)
+        CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId),  findCartItemQuantityByProductId(productId).inc().value)
         loadCartItems()
     }
 
     override fun minusCount(productId: Long) {
-        cartRepository.minusQuantityByProductId(productId)
+        CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId), findCartItemQuantityByProductId(productId).dec().value)
         loadCartItems()
     }
 
@@ -83,10 +84,9 @@ class ProductContentsViewModel(
     fun loadProducts() {
         val handler = Handler(Looper.getMainLooper())
         runCatching {
-            productRepository.getProducts(currentOffset++, 20) {
-                items.addAll(it)
-                products.value = items
-            }
+            val products = productRepository.getProducts(currentOffset++, 20)
+            items.addAll(products)
+            this.products.value = items
         }.onSuccess {
             handler.postDelayed({
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
@@ -95,7 +95,16 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        cart.value = cartRepository.findAll()
+        val carts = mutableListOf<Cart>()
+        var currentPage = 0
+        while (true) {
+            val items = CartRepositoryTestImpl.getCartItems(currentPage++, 100)
+            if (items.isEmpty()) {
+                break
+            }
+            carts.addAll(items)
+        }
+        cart.value = carts
     }
 
     fun loadRecentProducts() {
@@ -122,6 +131,14 @@ class ProductContentsViewModel(
             return items.find { it.productId == productId }
         }
         return null
+    }
+
+    private fun findCartItemByProductId(productId: Long):Long {
+        return cart.value?.firstOrNull { it.productId == productId}?.id ?: error("일치하는 장바구니 아이템이 없습니다.")
+    }
+
+    private fun findCartItemQuantityByProductId(productId: Long):Quantity {
+        return cart.value?.firstOrNull {it.productId == productId}?.quantity ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
     companion object {

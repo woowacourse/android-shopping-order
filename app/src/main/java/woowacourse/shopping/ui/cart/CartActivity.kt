@@ -10,6 +10,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.cart.CartDatabase
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
@@ -20,7 +21,7 @@ class CartActivity : AppCompatActivity() {
     private lateinit var adapter: CartAdapter
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
-            (application as ShoppingApplication).productRepository,
+            ProductRepositoryImpl(),
             CartRepositoryImpl.get(CartDatabase.database().cartDao()),
         )
     }

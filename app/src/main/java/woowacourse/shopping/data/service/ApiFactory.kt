@@ -4,63 +4,60 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
-import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
+import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
+import woowacourse.shopping.data.dto.response.ResponseCartItemGetDto
+import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.model.Product
 
 object ApiFactory {
     private val client =
         OkHttpClient.Builder().addInterceptor(DefaultInterceptor("namyunsuk", "password")).build()
+
+    private val tokenClient =
+        OkHttpClient.Builder().addInterceptor(TokeInterceptor()).build()
+
+
     private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
+        retrofitBuilder(client)
+    }
+
+    private val tokenRetrofit: Retrofit by lazy {
+        retrofitBuilder(tokenClient)
+
     }
 
     private val productService = retrofit.create(ProductService::class.java)
 
+    private val cartItemService = tokenRetrofit.create(CartItemService::class.java)
+
+    private fun retrofitBuilder(client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .client(client)
+        .build()
+
+
     fun getProductsByOffset(
         page: Int,
         size: Int,
-        success: (List<Product>) -> Unit,
-    ) {
-        productService.getProductsByOffset(page = page, size = size)
-            .enqueue(
-                object : Callback<ResponseProductsGetDto> {
-                    override fun onResponse(
-                        call: Call<ResponseProductsGetDto>,
-                        response: Response<ResponseProductsGetDto>,
-                    ) {
-                        val body = response.body()
-                        val products =
-                            body?.content?.map {
-                                Product(
-                                    id = it.id,
-                                    imageUrl = it.imageUrl,
-                                    name = it.name,
-                                    price = it.price,
-                                )
-                            }
-                        products?.let {
-                            success(it)
-                        }
-                    }
+    ): ResponseProductsGetDto? =
+        productService.getProductsByOffset(page = page, size = size).execute().body()
 
-                    override fun onFailure(
-                        call: Call<ResponseProductsGetDto>,
-                        e: Throwable,
-                    ) {
-                        throw e
-                    }
-                },
-            )
-    }
 
-    fun getProductsById(id: Long) = productService.getProductsById(id = id).execute().body()
+    fun getProductsById(id: Long): ResponseProductIdGetDto? =
+        productService.getProductsById(id = id).execute().body()
+
+    fun getCartItems(page: Int, size: Int): ResponseCartItemGetDto? =
+        cartItemService.getCartItems(page = page, size = size).execute().body()
+
+    fun postCartItems(request: RequestCartItemPostDto) =
+        cartItemService.postCartItem(request = request).execute().body()
+
+    fun deleteCartItems(id: Long) = cartItemService.deleteCartItem(id = id).execute().body()
+
+    fun patchCartItems(id: Long, request: RequestCartItemsPatchDto) =
+        cartItemService.patchCartItem(id = id, request = request).execute().body()
+
+    fun getCartItemCounts() = cartItemService.getCartItemCounts().execute().body()
 }

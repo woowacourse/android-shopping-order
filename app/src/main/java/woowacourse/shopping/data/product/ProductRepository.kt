@@ -6,8 +6,7 @@ interface ProductRepository {
     fun getProducts(
         page: Int,
         size: Int,
-        success: (List<Product>) -> Unit,
-    )
+    ): List<Product>
 
     fun find(id: Long): Product
 }
