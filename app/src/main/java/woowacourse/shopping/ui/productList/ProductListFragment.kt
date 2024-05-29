@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.productList
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +72,6 @@ class ProductListFragment : Fragment() {
     private fun observeLoadedProducts() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
-                Log.d("ProductListFragment", "observeLoadedProducts: $products")
                 productsAdapter.updateAllLoadedProducts(products)
                 binding.shimmerProductList.stopShimmer()
                 binding.shimmerProductList.visibility = View.GONE

@@ -12,6 +12,7 @@ import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.currentPageIsNullException
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
+import woowacourse.shopping.domain.repository.ShoppingCartItemRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener

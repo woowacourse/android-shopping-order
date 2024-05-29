@@ -1,6 +1,5 @@
 package woowacourse.shopping.remote
 
-import android.util.Log
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
@@ -22,7 +21,6 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
                 quantity = it.quantity,
             )
         }.also {
-            Log.d("CartItemRemoteDataSource", "loadPaged: $it")
         }
     }
 
@@ -35,20 +33,24 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             ?: throw IllegalArgumentException()
 
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
-        val call =
-            cartItemApiService.addCartItem(
-                CartItemRequest(
-                    productIdsCount.productId,
-                    productIdsCount.quantity,
-                ),
-            )
+        val call = cartItemApiService.addCartItem(
+            CartItemRequest(
+                productIdsCount.productId,
+                productIdsCount.quantity,
+            ),
+        )
         call.execute()
 
         // TODO: code 값 확인해서 던지기
         return productIdsCount.productId
     }
 
+    // TODO: 동작 안됨
     override fun removedProductsId(productId: Long): Long {
+        val cartItem = cartItemApiService.requestCartItems().execute().body()?.content?.find {
+            it.product.id == productId
+        } ?: throw NoSuchElementException()
+        cartItemApiService.removeCartItem(cartItem.id)
         return 10
     }
 
@@ -56,10 +58,9 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         productId: Long,
         quantity: Int,
     ) {
-        val cartItem =
-            cartItemApiService.requestCartItems().execute().body()?.content?.find {
-                it.product.id == productId
-            } ?: throw NoSuchElementException()
+        val cartItem = cartItemApiService.requestCartItems().execute().body()?.content?.find {
+            it.product.id == productId
+        } ?: throw NoSuchElementException()
         cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 
@@ -68,8 +69,8 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         quantity: Int,
     ) {
         val body = cartItemApiService.requestCartItems().execute().body()
-        Log.d("ProductList", body.toString())
-        val cartItem = body?.content?.find { it.product.id == productId } ?: throw NoSuchElementException()
+        val cartItem =
+            body?.content?.find { it.product.id == productId } ?: throw NoSuchElementException()
         cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 

@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.productList
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -99,7 +98,6 @@ class ProductListViewModel(
                 productsRepository.increaseShoppingCartProduct(productId, quantity)
             } catch (e: NoSuchElementException) {
                 productsRepository.addShoppingCartProduct(productId)
-                Log.d("ProductList", "increase catch")
             } catch (_: Exception) {
             } finally {
                 val totalCount = productsRepository.shoppingCartProductQuantity()
