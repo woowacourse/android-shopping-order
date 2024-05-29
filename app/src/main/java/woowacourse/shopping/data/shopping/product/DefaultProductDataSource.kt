@@ -1,53 +1,31 @@
 package woowacourse.shopping.data.shopping.product
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.remote.dto.response.ProductResponse
 import woowacourse.shopping.remote.service.ProductService
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
 
 class DefaultProductDataSource(
+    private val ioExecutor: ExecutorService,
     private val productService: ProductService,
 ) : ProductDataSource {
     override fun products(
         currentPage: Int,
         size: Int,
     ): Result<ProductPageData> {
-        return runCatching {
-            productService.fetchProducts(
-                currentPage, size
-            ).enqueue(object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        println("body : $body")
-                    }
-                }
-
-                override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                    println("error : $t")
-                }
-            }))
-        }
+        return ioExecutor.submit(Callable {
+            productService.fetchProducts(currentPage, size)
+                .executeAsResult()
+                .mapCatching { it.toDataModel() }
+        }).get()
     }
 
     override fun productById(id: Long): Result<Product> {
-        return runCatching {
-            productService.fetchDetailProduct(id).toProduct()
-        }
-    }
-
-    override fun canLoadMore(
-        page: Int,
-        size: Int,
-    ): Result<Boolean> {
-        return runCatching {
-//            productService.canLoadMore(page, size)
-            true
-        }
+        return ioExecutor.submit(Callable {
+            productService.fetchDetailProduct(id)
+                .executeAsResult()
+                .mapCatching { it.toProduct() }
+        }).get()
     }
 }

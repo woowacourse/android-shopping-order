@@ -8,10 +8,9 @@ plugins {
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
 }
 
-val properties =
-    Properties().apply {
-        load(rootProject.file("local.properties").inputStream())
-    }
+val properties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
 
 android {
     namespace = "woowacourse.shopping"
@@ -27,6 +26,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        buildConfigField(
+            "String",
+            "SHOPPING_BASE_URL",
+            properties.getProperty("SHOPPING_BASE_URL")
+        )
+        buildConfigField(
+            "String",
+            "DUMMY_ID",
+            properties.getProperty("DUMMY_ID")
+        )
+        buildConfigField(
+            "String",
+            "DUMMY_PASSWORD",
+            properties.getProperty("DUMMY_PASSWORD")
+        )
     }
 
     buildTypes {
@@ -35,13 +49,6 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
-            )
-        }
-        debug {
-            buildConfigField(
-                "String",
-                "SHOPPING_BASE_URL",
-                properties.getProperty("SHOPPING_BASE_URL")
             )
         }
     }
@@ -59,6 +66,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         dataBinding = true
     }
     testOptions {

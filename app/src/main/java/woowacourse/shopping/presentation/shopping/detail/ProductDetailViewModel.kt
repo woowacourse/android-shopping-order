@@ -42,6 +42,7 @@ class ProductDetailViewModel(
             if (it.isEmpty()) {
                 return loadProduct(id)
             }
+            // TODO: Page가 0부터 시작인걸 알아야혀
             _uiState.value = uiState.value?.copy(cartProduct = it.first().toUiModel())
         }.onFailure {
             _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)

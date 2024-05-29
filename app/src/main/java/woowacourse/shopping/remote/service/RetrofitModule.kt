@@ -8,39 +8,20 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
-import retrofit2.create
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.remote.AuthInterceptor
 import java.util.concurrent.TimeUnit
 
 object RetrofitModule {
-    private const val BASE_URL = "http://54.180.95.212:8080/"
-    private const val user = "songpink"
-    private const val password = "password"
+    private const val BASE_URL = BuildConfig.SHOPPING_BASE_URL
+    private const val USER_ID = BuildConfig.DUMMY_ID
+    private const val USER_PASSWORD = BuildConfig.DUMMY_PASSWORD
+    private const val CONNECT_TIME_OUT = 60L
+    private const val READ_TIME_OUT = 30L
+    private const val WRITE_TIME_OUT = 15L
     private val json = Json {
         ignoreUnknownKeys = true
     }
-
-    private fun jsonConverterFactory(): Converter.Factory {
-        return json.asConverterFactory("application/json".toMediaType())
-    }
-
-    private fun loggingInterceptor(): Interceptor = HttpLoggingInterceptor().setLevel(
-        HttpLoggingInterceptor.Level.BODY
-//        if (BuildConfig.DEBUG) {
-//            HttpLoggingInterceptor.Level.BODY
-//        } else {
-//            HttpLoggingInterceptor.Level.NONE
-//        }
-    )
-
-    private fun httpClient(): OkHttpClient = OkHttpClient
-        .Builder()
-        .addInterceptor(loggingInterceptor())
-        .addInterceptor(AuthInterceptor(user, password))
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS).build()
-
     private val INSTANCE: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(httpClient())
@@ -48,4 +29,24 @@ object RetrofitModule {
         .build()
 
     fun retrofit(): Retrofit = INSTANCE
+
+    private fun jsonConverterFactory(): Converter.Factory {
+        return json.asConverterFactory("application/json".toMediaType())
+    }
+
+    private fun loggingInterceptor(): Interceptor = HttpLoggingInterceptor().setLevel(
+        if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    )
+
+    private fun httpClient(): OkHttpClient = OkHttpClient
+        .Builder()
+        .addInterceptor(loggingInterceptor())
+        .addInterceptor(AuthInterceptor(USER_ID, USER_PASSWORD))
+        .connectTimeout(CONNECT_TIME_OUT, TimeUnit.SECONDS)
+        .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
+        .writeTimeout(WRITE_TIME_OUT, TimeUnit.SECONDS).build()
 }

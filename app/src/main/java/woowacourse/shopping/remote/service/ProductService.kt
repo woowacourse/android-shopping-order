@@ -5,19 +5,20 @@ import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.remote.dto.response.ProductResponse
 import woowacourse.shopping.remote.dto.response.ProductsResponse
 
 interface ProductService {
 
-    @GET
+    @GET("products")
     fun fetchProducts(
 //        @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int
     ): Call<ProductsResponse>
 
-    @GET
-    fun fetchDetailProduct(@Path("id") id: Long): Call<ProductsResponse>
+    @GET("products/{id}")
+    fun fetchDetailProduct(@Path("id") id: Long): Call<ProductResponse>
 
     companion object {
         private var Instance: ProductService? = null

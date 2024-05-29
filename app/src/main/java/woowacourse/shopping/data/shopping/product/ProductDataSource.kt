@@ -9,9 +9,4 @@ interface ProductDataSource {
     ): Result<ProductPageData>
 
     fun productById(id: Long): Result<Product>
-
-    fun canLoadMore(
-        page: Int,
-        size: Int,
-    ): Result<Boolean>
 }
