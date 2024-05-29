@@ -26,9 +26,3 @@ data class CartResponse(
     @SerializedName("totalPages")
     val totalPages: Int,
 )
-
-data class CartItem2(
-    @SerializedName("id") val cartItemId: Int,
-    @SerializedName("quantity") val quantity: Int,
-    @SerializedName("product") val product: Product2,
-)

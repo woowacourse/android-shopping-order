@@ -15,7 +15,7 @@
 
         <variable
             name="cartItem"
-            type="woowacourse.shopping.domain.model.CartItem" />
+            type="woowacourse.shopping.data.model.CartItem2" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:background="@drawable/shopping_cart_item_gridview"
-        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartItem.productId)}">
+        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartItem.product.id)}">
 
         <TextView
             android:id="@+id/tv_product_name"
@@ -34,7 +34,7 @@
             android:layout_marginEnd="48dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cartItem.productName}"
+            android:text="@{cartItem.product.name}"
             android:textColor="@color/gray_500"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -50,7 +50,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="18dp"
             android:scaleType="fitXY"
-            app:imageUrl="@{cartItem.imageUrl}"
+            app:imageUrl="@{cartItem.product.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_product_name"
             app:layout_constraintTop_toBottomOf="@+id/tv_product_name"
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="12dp"
             app:quantity="@{cartItem.quantity}"
-            app:productId="@{cartItem.productId}"
+            app:productId="@{cartItem.product.id}"
             app:clickListener="@{quantityClickListener}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -86,7 +86,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_margin="12dp"
-            android:onClick="@{() -> cartItemClickListener.onDeleteButtonClick(cartItem.id)}"
+            android:onClick="@{() -> cartItemClickListener.onDeleteButtonClick(cartItem.cartItemId)}"
             android:src="@drawable/ic_back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

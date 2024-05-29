@@ -4,19 +4,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import woowacourse.shopping.data.model.CartItem2
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CartRepository2
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.state.UIState
 
-class CartViewModel(private val cartRepository: CartRepository) :
+class CartViewModel(private val cartRepository: CartRepository2) :
     ViewModel(),
     CartItemClickListener,
     QuantityClickListener {
     private var lastPage: Int = DEFAULT_PAGE
 
-    private val _cartUiState = MutableLiveData<UIState<List<CartItem>>>(UIState.Loading)
-    val cartUiState: LiveData<UIState<List<CartItem>>>
+    private val _cartUiState = MutableLiveData<UIState<List<CartItem2>>>(UIState.Loading)
+    val cartUiState: LiveData<UIState<List<CartItem2>>>
         get() = _cartUiState
 
     private val _currentPage = MutableLiveData(DEFAULT_PAGE)
@@ -55,9 +57,11 @@ class CartViewModel(private val cartRepository: CartRepository) :
     val isBackButtonClicked: LiveData<Event<Boolean>>
         get() = _isBackButtonClicked
 
-    private val _updatedCartItem = MutableLiveData<CartItem>()
-    val updatedCartItem: LiveData<CartItem>
+    private val _updatedCartItem = MutableLiveData<CartItem2>()
+    val updatedCartItem: LiveData<CartItem2>
         get() = _updatedCartItem
+
+    private lateinit var cartItems: List<CartItem2>
 
     init {
         loadPage(_currentPage.value ?: DEFAULT_PAGE)
@@ -68,7 +72,7 @@ class CartViewModel(private val cartRepository: CartRepository) :
     }
 
     fun loadPage(page: Int) {
-        val totalItems = cartRepository.cartItemSize()
+        val totalItems = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
         lastPage = (totalItems - PAGE_STEP) / PAGE_SIZE
         _currentPage.value = page.coerceIn(DEFAULT_PAGE, lastPage)
 
@@ -78,8 +82,10 @@ class CartViewModel(private val cartRepository: CartRepository) :
 
     fun loadCartItems() {
         try {
-            val cartItems =
-                cartRepository.findAllPagedItems(currentPage.value ?: DEFAULT_PAGE, PAGE_SIZE)
+            cartItems =
+                cartRepository.getCartItems(currentPage.value ?: DEFAULT_PAGE, PAGE_SIZE, "asc")
+                    .getOrNull()?.cartItems ?: emptyList()
+//                cartRepository.findAllPagedItems(currentPage.value ?: DEFAULT_PAGE, PAGE_SIZE)
             _cartUiState.value = UIState.Success(cartItems)
         } catch (e: Exception) {
             _cartUiState.value = UIState.Error(e)
@@ -97,7 +103,8 @@ class CartViewModel(private val cartRepository: CartRepository) :
     }
 
     fun deleteItem(itemId: Int) {
-        cartRepository.delete(itemId)
+        cartRepository.deleteCartItem(itemId)
+        cartItems = cartItems.filter { it.cartItemId != itemId }
         loadPage(currentPage.value ?: DEFAULT_PAGE)
     }
 
@@ -107,7 +114,6 @@ class CartViewModel(private val cartRepository: CartRepository) :
 
     override fun onDeleteButtonClick(itemId: Int) {
         deleteItem(itemId)
-        cartRepository.delete(itemId)
         _notifyDeletion.value = Event(true)
     }
 
@@ -116,16 +122,16 @@ class CartViewModel(private val cartRepository: CartRepository) :
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
-        var cartItem = cartRepository.findOrNullByProductId(productId) ?: return
+        var cartItem = cartItems.first { it.product.id == productId }
         cartItem = cartItem.plusQuantity()
-        cartRepository.update(productId, cartItem.quantity)
+        cartRepository.updateCartItem(productId, cartItem.quantity)
         _updatedCartItem.value = cartItem
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
-        var cartItem = cartRepository.findOrNullByProductId(productId) ?: return
+        var cartItem = cartItems.first { it.product.id == productId }
         cartItem = cartItem.minusQuantity()
-        cartRepository.update(productId, cartItem.quantity)
+        cartRepository.updateCartItem(productId, cartItem.quantity)
         _updatedCartItem.value = cartItem
     }
 

@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.data.model.CartItem2
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
 import woowacourse.shopping.domain.model.CartItem
@@ -64,7 +65,7 @@ class CartAdapter(
         return cartItems.size
     }
 
-    fun loadData(cartItems: List<CartItem>) {
+    fun loadData(cartItems: List<CartItem2>) {
         val newCartItems = cartItems.map { CartViewItem(it) }
         val oldCartItems = this.cartItems
         this.cartItems = newCartItems
@@ -86,9 +87,9 @@ class CartAdapter(
         }
     }
 
-    fun updateCartItemQuantity(cartItem: CartItem) {
+    fun updateCartItemQuantity(cartItem: CartItem2) {
         if (!isFirstLoad()) {
-            val position = cartItems.indexOfFirst { (it as CartViewItem).cartItem.id == cartItem.id }
+            val position = cartItems.indexOfFirst { (it as CartViewItem).cartItem.cartItemId == cartItem.cartItemId }
             if (position != -1) {
                 cartItems.toMutableList()[position] = CartViewItem(cartItem)
                 notifyItemChanged(position)
