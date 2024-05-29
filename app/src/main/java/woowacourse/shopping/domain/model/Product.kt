@@ -1,10 +1,11 @@
 package woowacourse.shopping.domain.model
 
-class Product private constructor(
-    val id: Long = currentId++,
+class Product(
+    val id: Long = -1L,
     val name: String,
     val price: Long,
     val imageUrl: String,
+    val category: String? = null,
 ) {
     companion object {
         private var currentId = 0L

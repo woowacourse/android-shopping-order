@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.repository.ShoppingItemsRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 
@@ -19,7 +19,7 @@ class DetailActivity : AppCompatActivity() {
     private val viewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(
             cartRepository = CartRepositoryImpl(this),
-            shoppingRepository = ShoppingItemsRepositoryImpl(),
+            shoppingRepository = RemoteShoppingRepositoryImpl(),
             recentProductRepository = RecentProductRepositoryImpl(this),
             productId = productId,
         )

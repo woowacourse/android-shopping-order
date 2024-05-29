@@ -10,7 +10,5 @@ interface ShoppingItemsRepository {
         end: Int,
     ): List<Product>
 
-    fun getAllProducts(): List<Product>
-
     fun findProductItem(id: Long): Product?
 }

@@ -3,8 +3,8 @@ package woowacourse.shopping.data.repository
 import android.content.Context
 import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.mapper.toDomainModel
-import woowacourse.shopping.data.model.CartItemEntity
-import woowacourse.shopping.data.model.mapper
+import woowacourse.shopping.data.model.entity.CartItemEntity
+import woowacourse.shopping.data.model.entity.mapper
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
