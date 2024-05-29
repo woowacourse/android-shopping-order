@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.RecentlyProduct
 
-object Mapper {
+object EntityMapper {
     fun CartItemEntity.toCartItem(): CartItem {
         return CartItem(
             id = id,
@@ -17,6 +17,7 @@ object Mapper {
                     imageUrl = product.imageUrl,
                     name = product.name,
                     price = product.price,
+                    category = product.category,
                 ),
         )
     }
