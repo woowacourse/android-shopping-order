@@ -84,7 +84,7 @@ class CartViewModel(
                 listOf()
             }
         val resultCartUiModel = CartUiModel.from(product, cartItem)
-        val newCartUiModels = oldCartUiModels.upsert(resultCartUiModel)
+        val newCartUiModels = oldCartUiModels.upsert(resultCartUiModel).sortedBy { it.cartItemId }
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
     }
