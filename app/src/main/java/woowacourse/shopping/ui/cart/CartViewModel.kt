@@ -1,8 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,11 +32,8 @@ class CartViewModel(
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    var itemSize: Int = 0
-
     init {
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({ loadCart() }, 1000)
+        loadCart()
     }
 
     private fun loadCart(page: Int = INITIALIZE_PAGE) {
@@ -50,7 +44,6 @@ class CartViewModel(
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
                     result.forEach {
-                        Log.d("LoadCart", "$it")
                         loadProduct(it)
                     }
                 }
