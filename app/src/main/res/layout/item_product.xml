@@ -59,7 +59,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/start_add_product"
-            android:onClick="@{() -> vm.plusCount(productWithQuantity.product.id)}"
+            android:onClick="@{() -> vm.addCart(productWithQuantity.product.id)}"
             android:src="@drawable/ic_plus"
             app:isVisible="@{productWithQuantity.quantity == 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"

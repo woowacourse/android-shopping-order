@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemGetDto
@@ -34,6 +35,7 @@ object ApiFactory {
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .baseUrl(BuildConfig.BASE_URL)
         .client(client)
         .build()
 

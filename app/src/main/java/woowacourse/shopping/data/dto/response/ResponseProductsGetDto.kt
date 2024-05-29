@@ -24,4 +24,22 @@ data class ResponseProductsGetDto(
         val imageUrl: String,
         val category: String,
     )
+
+    @Serializable
+    data class Pageable(
+        val sort: ResponseCartItemGetDto.Sort,
+        val pageNumber: Int,
+        val pageSize: Int,
+        val paged: Boolean,
+        val unpaged: Boolean,
+        val offset: Long,
+    )
+
+    @Serializable
+    data class Sort(
+        val sorted: Boolean,
+        val unsorted: Boolean,
+        val empty: Boolean,
+    )
 }
+

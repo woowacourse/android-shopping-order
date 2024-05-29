@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import woowacourse.shopping.data.cart.CartRepositoryTestImpl
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.service.ApiFactory
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
@@ -73,12 +75,22 @@ class ProductContentsViewModel(
     }
 
     override fun minusCount(productId: Long) {
-        CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId), findCartItemQuantityByProductId(productId).dec().value)
+        val currentCount = findCartItemQuantityByProductId(productId).dec().value
+        if (currentCount == 0) {
+            CartRepositoryTestImpl.deleteCartItem(findCartItemByProductId(productId))
+        } else {
+            CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId),currentCount)
+        }
         loadCartItems()
     }
 
     override fun itemClickListener(productId: Long) {
         _productDetailId.setValue(productId)
+    }
+
+    override fun addCart(productId: Long) {
+        CartRepositoryTestImpl.postCartItems(productId, 1)
+        loadCartItems()
     }
 
     fun loadProducts() {
