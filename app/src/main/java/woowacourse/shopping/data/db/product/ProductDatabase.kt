@@ -13,6 +13,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-단지(400ml) 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 1L,
@@ -22,6 +23,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-납작(2000ml) 밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 2L,
@@ -31,6 +33,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-밀크티(600ml)",
+                category = "fashion",
             ),
             Product(
                 id = 3L,
@@ -40,6 +43,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-정사각형(370ml) 딸기생과일",
+                category = "fashion",
             ),
             Product(
                 id = 4L,
@@ -49,6 +53,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-단지(260ml) 초록밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 5L,
@@ -58,6 +63,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-정사각형(500ml) 딸기생과일",
+                category = "fashion",
             ),
             Product(
                 id = 6L,
@@ -67,6 +73,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 20_000,
                 name = "PET보틀-단지(800ml) 수제 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 7L,
@@ -76,6 +83,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 18_000,
                 name = "PET보틀-단지(500ml) 초록밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 8L,
@@ -85,6 +93,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 5_000,
                 name = "PET보틀-단지(200ml) 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 9L,
@@ -94,6 +103,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 30_000,
                 name = "PET보틀-정사각형(1000ml) 딸기생과일",
+                category = "fashion",
             ),
             Product(
                 id = 10L,
@@ -103,6 +113,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-단지(400ml) 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 11L,
@@ -112,6 +123,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-납작(2000ml) 밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 12L,
@@ -121,6 +133,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-밀크티(600ml)",
+                category = "fashion",
             ),
             Product(
                 id = 13L,
@@ -130,6 +143,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-정사각형(370ml) 딸기생과일",
+                category = "fashion",
             ),
             Product(
                 id = 14L,
@@ -139,6 +153,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 12_000,
                 name = "PET보틀-단지(260ml) 초록밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 15L,
@@ -148,6 +163,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 10_000,
                 name = "PET보틀-정사각형(500ml) 딸기생과일",
+                category = "fashion",
             ),
             Product(
                 id = 16L,
@@ -157,6 +173,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 20_000,
                 name = "PET보틀-단지(800ml) 수제 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 17L,
@@ -166,6 +183,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 18_000,
                 name = "PET보틀-단지(500ml) 초록밀크티",
+                category = "fashion",
             ),
             Product(
                 id = 18L,
@@ -175,6 +193,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 5_000,
                 name = "PET보틀-단지(200ml) 레몬청",
+                category = "fashion",
             ),
             Product(
                 id = 19L,
@@ -184,6 +203,7 @@ object ProductDatabase {
                     """.trimIndent(),
                 price = 30_000,
                 name = "PET보틀-정사각형(1000ml) 딸기생과일",
+                category = "fashion",
             ),
         )
 }

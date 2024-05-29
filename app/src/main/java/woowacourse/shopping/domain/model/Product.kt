@@ -5,6 +5,7 @@ data class Product(
     val name: String,
     val price: Int,
     val imageUrl: String,
+    val category: String,
     val cartItemCounter: CartItemCounter = CartItemCounter(),
     val itemSelector: ItemSelector = ItemSelector(),
 ) {
@@ -26,6 +27,7 @@ data class Product(
                 DEFAULT_PRODUCT_ID,
                 "",
                 0,
+                "",
                 "",
             )
     }
