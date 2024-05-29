@@ -12,6 +12,7 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -150,4 +151,12 @@ class RepositoryImpl(
         runCatching {
             localDataSource.getMaxCartCount()
         }
+
+    override fun getCartItemsCounts(): Result<Int> = runCatching {
+        val response = remoteDataSource.getCartItemsCounts()
+        if (response.isSuccessful) {
+            return Result.success(response.body()?.quantity ?: 0)
+        }
+        return Result.failure(Throwable())
+    }
 }

@@ -10,6 +10,7 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface Repository {
     fun findProductByPaging(
@@ -70,4 +71,7 @@ interface Repository {
     fun deleteCart(id: Long): Result<Long>
 
     fun getMaxCartCount(): Result<Int>
+
+    fun getCartItemsCounts(): Result<Int>
+
 }

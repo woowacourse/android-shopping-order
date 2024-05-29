@@ -50,6 +50,7 @@ class ShoppingViewModel(private val repository: Repository) :
         cartProducts.addSource(_carts) {
             combineCartProducts()
         }
+        getCartItemCounts()
     }
 
     fun combineCartProducts() {
@@ -112,11 +113,12 @@ class ShoppingViewModel(private val repository: Repository) :
             }
         }
     }
-
-    fun getItemCount() {
+    fun getCartItemCounts() {
         thread {
-            repository.getMaxCartCount().onSuccess { maxCount ->
+            repository.getCartItemsCounts().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
+            }.onFailure {
+                _errorHandler.postValue(EventState(LOAD_ERROR))
             }
         }
     }
@@ -163,7 +165,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         this.cartProducts.postValue(UiState.Success(cartProducts))
-                        getItemCount()
+                        _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -176,7 +178,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
-                        getItemCount()
+                        _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -199,7 +201,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
-                        getItemCount()
+                        _cartCount.postValue(_cartCount.value?.minus(1))
                     }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -207,7 +209,7 @@ class ShoppingViewModel(private val repository: Repository) :
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     this.cartProducts.postValue(UiState.Success(cartProducts))
-                    getItemCount()
+                    _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }

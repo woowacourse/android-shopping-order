@@ -42,7 +42,7 @@ interface CartItemApi {
         @Body quantityRequest: QuantityRequest
     ): Call<Unit>
 
-    @GET("/car-items/counts")
+    @GET("/cart-items/counts")
     fun getCartItemsCounts(
         @Header("accept") accept: String = "*/*",
     ): Call<QuantityResponse>

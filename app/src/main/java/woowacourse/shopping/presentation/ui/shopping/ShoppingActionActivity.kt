@@ -57,6 +57,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                         }
                 }
                 viewModel.findAllRecent()
+                viewModel.getCartItemCounts()
             }
     }
 
@@ -64,7 +65,6 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.loadProductByOffset()
         viewModel.loadCartByOffset()
         viewModel.findAllRecent()
-        viewModel.getItemCount()
     }
 
     private fun initObserver() {
@@ -83,13 +83,8 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                 }
             }
         }
-        viewModel.carts.observe(this) {
-            when(it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    binding.tvCartCount.text = it.data.size.toString()
-                }
-            }
+        viewModel.cartCount.observe(this) {
+            binding.tvCartCount.text = it.toString()
         }
         viewModel.recentProducts.observe(this) {
             when (it) {
