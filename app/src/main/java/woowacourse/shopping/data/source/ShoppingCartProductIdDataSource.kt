@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
+import woowacourse.shopping.domain.model.ProductIdsCount
 
 interface ShoppingCartProductIdDataSource {
     fun findByProductId(productId: Long): ProductIdsCountData?
@@ -11,7 +12,7 @@ interface ShoppingCartProductIdDataSource {
 
     fun isFinalPage(page: Int): Boolean
 
-    fun addedNewProductsId(productIdsCountData: ProductIdsCountData): Long
+    fun addedNewProductsId(productIdsCount: ProductIdsCount): Long
 
     fun removedProductsId(productId: Long): Long
 

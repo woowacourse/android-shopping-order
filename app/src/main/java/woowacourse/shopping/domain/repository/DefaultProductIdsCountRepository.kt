@@ -2,7 +2,6 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.domain.model.toData
 import woowacourse.shopping.domain.model.toDomain
 
 class DefaultProductIdsCountRepository(
@@ -16,8 +15,7 @@ class DefaultProductIdsCountRepository(
             it.toDomain()
         }
 
-    override fun addedProductsId(productIdsCount: ProductIdsCount): Long =
-        productsIdsCountDataSource.addedNewProductsId(productIdsCount.toData())
+    override fun addedProductsId(productIdsCount: ProductIdsCount): Long = productsIdsCountDataSource.addedNewProductsId(productIdsCount)
 
     override fun removedProductsId(productId: Long): Long = productsIdsCountDataSource.removedProductsId(productId)
 

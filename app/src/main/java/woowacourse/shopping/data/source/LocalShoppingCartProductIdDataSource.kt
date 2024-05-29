@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
+import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.local.cart.ShoppingCartDao
 
 class LocalShoppingCartProductIdDataSource(private val dao: ShoppingCartDao) : ShoppingCartProductIdDataSource {
@@ -18,7 +19,10 @@ class LocalShoppingCartProductIdDataSource(private val dao: ShoppingCartDao) : S
         return page * 5 >= count
     }
 
-    override fun addedNewProductsId(productIdsCountData: ProductIdsCountData): Long = dao.insert(productIdsCountData)
+    override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long =
+        dao.insert(
+            ProductIdsCountData(productIdsCount.productId, productIdsCount.quantity),
+        )
 
     override fun removedProductsId(productId: Long): Long {
         val product = dao.findById(productId) ?: throw NoSuchElementException()

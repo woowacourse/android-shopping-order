@@ -3,8 +3,10 @@ package woowacourse.shopping.remote
 import android.util.Log
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.domain.model.ProductIdsCount
 
-class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) : ShoppingCartProductIdDataSource {
+class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
+    ShoppingCartProductIdDataSource {
     override fun findByProductId(productId: Long): ProductIdsCountData? {
         return null
     }
@@ -32,8 +34,18 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         return true
     }
 
-    override fun addedNewProductsId(productIdsCountData: ProductIdsCountData): Long {
-        return 10
+    override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
+        val call =
+            cartItemApiService.addCartItem(
+                CartItemRequest(
+                    productIdsCount.productId,
+                    productIdsCount.quantity,
+                ),
+            )
+        call.execute()
+
+        // TODO: code 값 확인해서 던지기
+        return productIdsCount.productId
     }
 
     override fun removedProductsId(productId: Long): Long {
@@ -50,5 +62,9 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     override fun clearAll() {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        private const val TAG = "CartItemRemoteDataSource"
     }
 }

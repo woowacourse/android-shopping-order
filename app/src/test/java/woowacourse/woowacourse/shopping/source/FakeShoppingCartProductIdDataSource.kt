@@ -2,7 +2,9 @@ package woowacourse.shopping.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.domain.model.ProductIdsCount
 
+// TODO: 이거 data 타입 바뀜
 class FakeShoppingCartProductIdDataSource(
     private val data: MutableList<ProductIdsCountData> = mutableListOf(),
 ) : ShoppingCartProductIdDataSource {
@@ -18,9 +20,8 @@ class FakeShoppingCartProductIdDataSource(
         TODO("Not yet implemented")
     }
 
-    override fun addedNewProductsId(productIdsCountData: ProductIdsCountData): Long {
-        data.add(productIdsCountData)
-        return productIdsCountData.productId
+    override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
+        TODO("Not yet implemented")
     }
 
     override fun removedProductsId(productId: Long): Long {

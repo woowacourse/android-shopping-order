@@ -1,7 +1,9 @@
 package woowacourse.shopping.remote
 
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface CartItemApiService {
@@ -10,4 +12,9 @@ interface CartItemApiService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
     ): Call<CartItemResponse>
+
+    @POST("/cart-items")
+    fun addCartItem(
+        @Body cartItemRequest: CartItemRequest,
+    ): Call<String>
 }

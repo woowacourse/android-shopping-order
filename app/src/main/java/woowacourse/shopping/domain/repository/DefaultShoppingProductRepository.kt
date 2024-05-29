@@ -1,10 +1,10 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductIdsCount
 
 class DefaultShoppingProductRepository(
     private val productsSource: ProductDataSource,
@@ -62,7 +62,7 @@ class DefaultShoppingProductRepository(
     }
 
     override fun addShoppingCartProduct(id: Long) {
-        cartSource.addedNewProductsId(ProductIdsCountData(id, FIRST_QUANTITY))
+        cartSource.addedNewProductsId(ProductIdsCount(id, FIRST_QUANTITY))
     }
 
     override fun removeShoppingCartProduct(id: Long) {
