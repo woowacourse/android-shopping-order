@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductsResponse(
+data class CartItemsResponse(
     @SerialName("content")
-    val products: List<ProductResponse>,
+    val products: List<CartItemResponse>,
     @SerialName("pageable")
     val pageConfig: PageConfigResponse,
     @SerialName("numberOfElements")
