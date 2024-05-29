@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.ui.cart.CartListener
-import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
+import woowacourse.shopping.ui.cart.CartUiModel
 
-class CartAdapter(private val cartListener: CartListener) : ListAdapter<ProductUiModel, CartViewHolder>(diffCallback) {
+class CartAdapter(private val cartListener: CartListener) : ListAdapter<CartUiModel, CartViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -30,17 +30,17 @@ class CartAdapter(private val cartListener: CartListener) : ListAdapter<ProductU
 
     companion object {
         private val diffCallback =
-            object : DiffUtil.ItemCallback<ProductUiModel>() {
+            object : DiffUtil.ItemCallback<CartUiModel>() {
                 override fun areItemsTheSame(
-                    oldItem: ProductUiModel,
-                    newItem: ProductUiModel,
+                    oldItem: CartUiModel,
+                    newItem: CartUiModel,
                 ): Boolean {
-                    return oldItem.productId == newItem.productId
+                    return oldItem.cartItemId == newItem.cartItemId
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: ProductUiModel,
-                    newItem: ProductUiModel,
+                    oldItem: CartUiModel,
+                    newItem: CartUiModel,
                 ): Boolean {
                     return oldItem == newItem
                 }

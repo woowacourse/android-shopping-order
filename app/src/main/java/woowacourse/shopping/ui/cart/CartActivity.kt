@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
@@ -17,7 +17,7 @@ class CartActivity : AppCompatActivity() {
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
             ProductRepository.getInstance(),
-            CartRepository.getInstance(),
+            RemoteCartRepository(),
         )
     }
     private val adapter by lazy { CartAdapter(viewModel) }
@@ -69,7 +69,7 @@ class CartActivity : AppCompatActivity() {
                 is CartUiState.Success -> {
                     binding.layoutCartSkeleton.visibility = View.GONE
                     binding.rvCart.visibility = View.VISIBLE
-                    adapter.submitList(cartUiState.productUiModels)
+                    adapter.submitList(cartUiState.cartUiModels)
                 }
             }
         }
