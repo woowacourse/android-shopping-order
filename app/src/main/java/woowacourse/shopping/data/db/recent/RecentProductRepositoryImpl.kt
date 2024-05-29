@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.db.recent
 
+import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.toRecentProductEntity
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.toRecentProductEntity
@@ -10,7 +12,7 @@ class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) 
     RecentProductRepository {
     private val dao = recentProductDatabase.recentProductDao()
 
-    override fun save(product: Product) {
+    override fun save(product: Product2) {
         if (findOrNullByProductId(product.id) != null) {
             update(product.id)
         } else {

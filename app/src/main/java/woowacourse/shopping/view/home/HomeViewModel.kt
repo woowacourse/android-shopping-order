@@ -102,14 +102,15 @@ class HomeViewModel(
         currentCartItems =
             cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
                 ?: emptyList()
-        _totalQuantity.value = currentCartItems.size
+        _totalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
+
+        currentCartItems.forEach {
+            println("${it.product.name} ${it.quantity}")
+        }
 
         val updatedProductItems =
             currentCartItems.map { cartItem ->
-                val product =
-                    productRepository.getProductById(cartItem.product.id).getOrNull() ?: return
-                val quantity = cartItem.quantity
-                ProductViewItem(product, quantity)
+                ProductViewItem(cartItem.product, cartItem.quantity)
             }
 
         loadedProductItems.value?.forEachIndexed { index, loadedItem ->
@@ -124,11 +125,12 @@ class HomeViewModel(
                 loadedProductItems.value?.indexOfFirst { loadedItem ->
                     loadedItem.product.id == updatedItem.product.id
                 }
-            if (position != null) {
+            if (position != -1 && position != null) {
                 (loadedProductItems.value as MutableList)[position] = updatedItem
             }
         }
         _loadedProductItems.value = loadedProductItems.value?.toList()
+        println("changed : ${currentCartItems}")
     }
 
     private fun loadTotalQuantity() {
