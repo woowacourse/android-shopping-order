@@ -25,7 +25,7 @@ class CartViewModel(
 
     private val cartPageAttribute = MutableLiveData<CartPageAttribute>()
 
-    val hasPage: LiveData<Boolean> = cartPageAttribute.map { it.totalPageCount == 1 }
+    val hasPage: LiveData<Boolean> = cartPageAttribute.map { it.totalPageCount != 1 }
     val hasPreviousPage: LiveData<Boolean> = cartPageAttribute.map { !it.isFirst }
     val hasNextPage: LiveData<Boolean> = cartPageAttribute.map { !it.isLast }
 
@@ -34,6 +34,7 @@ class CartViewModel(
 
     init {
         loadCart()
+        loadCartPageAttribute()
     }
 
     private fun loadCart(page: Int = INITIALIZE_PAGE) {
@@ -53,7 +54,6 @@ class CartViewModel(
                 }
             },
         )
-        loadCartPageAttribute()
     }
 
     private fun loadProduct(cartItem: CartItem) {
@@ -61,9 +61,7 @@ class CartViewModel(
             cartItem.productId,
             object : DataCallback<Product> {
                 override fun onSuccess(result: Product) {
-                    synchronized(_cartUiState) {
-                        updateCartUiState(result, cartItem)
-                    }
+                    updateCartUiState(result, cartItem)
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -152,17 +150,21 @@ class CartViewModel(
 
     fun moveNextPage() {
         _page.value = nextPage(_page.value ?: INITIALIZE_PAGE)
+        loadCartPageAttribute()
     }
 
     private fun nextPage(page: Int): Int {
         runCatching { loadCart(page + 1) }
             .onSuccess { return page + 1 }
-            .onFailure { _cartUiState.value = Event(CartUiState.Failure) }
+            .onFailure {
+                _cartUiState.value = Event(CartUiState.Failure)
+            }
         return page
     }
 
     fun movePreviousPage() {
         _page.value = previousPage(_page.value ?: INITIALIZE_PAGE)
+        loadCartPageAttribute()
     }
 
     private fun previousPage(page: Int): Int {
