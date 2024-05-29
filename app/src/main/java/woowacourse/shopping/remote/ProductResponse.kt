@@ -5,7 +5,7 @@ data class ProductResponse(
     val pageable: Pageable,
     val last: Boolean,
     val totalPages: Int,
-    val totalElements: Int,
+    val totalElements: Long,
     val sort: Sort,
     val first: Boolean,
     val number: Int,
