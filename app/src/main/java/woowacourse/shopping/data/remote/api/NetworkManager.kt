@@ -14,13 +14,15 @@ object NetworkManager {
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()
-                    .addInterceptor(BasicAuthInterceptor("jinuemong","password"))
-                    .build()
+                    .addInterceptor(BasicAuthInterceptor("jinuemong", "password"))
+                    .build(),
             )
             .build()
     }
 
     fun productService(): ProductApiService = getRetrofit().create(ProductApiService::class.java)
+
     fun cartService(): CartApiService = getRetrofit().create(CartApiService::class.java)
+
     fun orderService(): OrderApiService = getRetrofit().create(OrderApiService::class.java)
 }

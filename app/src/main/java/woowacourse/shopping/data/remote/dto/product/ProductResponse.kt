@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 import woowacourse.shopping.data.remote.dto.PageableDto
 import woowacourse.shopping.data.remote.dto.SortDto
@@ -27,5 +26,5 @@ data class ProductResponse(
     @SerializedName("totalElements")
     val totalElements: Int,
     @SerializedName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 )

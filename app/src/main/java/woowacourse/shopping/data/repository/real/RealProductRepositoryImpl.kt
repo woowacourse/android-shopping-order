@@ -1,10 +1,5 @@
 package woowacourse.shopping.data.repository.real
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.remote.dto.product.ProductDto
-import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
@@ -18,7 +13,6 @@ import kotlin.concurrent.thread
 class RealProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
-
     override fun loadPagingProducts(offset: Int): List<Product> {
         val latch = CountDownLatch(1)
         var products: List<Product>? = null
@@ -26,7 +20,7 @@ class RealProductRepositoryImpl(
 
         thread {
             try {
-                val page =  offset/PRODUCT_LOAD_PAGING_SIZE
+                val page = offset / PRODUCT_LOAD_PAGING_SIZE
                 val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
                 if (response.isSuccessful && response.body() != null) {
                     products = response.body()?.productDto?.map { it.toProduct() }
@@ -68,4 +62,3 @@ class RealProductRepositoryImpl(
         const val PRODUCT_LOAD_PAGING_SIZE = 20
     }
 }
-

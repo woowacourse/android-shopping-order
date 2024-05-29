@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.dto
 
-
 import com.google.gson.annotations.SerializedName
 
 data class SortDto(
@@ -9,5 +8,5 @@ data class SortDto(
     @SerializedName("sorted")
     val sorted: Boolean,
     @SerializedName("unsorted")
-    val unsorted: Boolean
+    val unsorted: Boolean,
 )

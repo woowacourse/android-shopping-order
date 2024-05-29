@@ -6,12 +6,14 @@ import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.remote.dto.product.ProductDto
 import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.data.source.ProductDataSource
-import javax.security.auth.callback.Callback
 
 class ProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),
 ) : ProductDataSource {
-    override fun loadProducts(page: Int, size: Int): Call<ProductResponse> {
+    override fun loadProducts(
+        page: Int,
+        size: Int,
+    ): Call<ProductResponse> {
         return productApiService.requestProducts(
             page = page,
             size = size,

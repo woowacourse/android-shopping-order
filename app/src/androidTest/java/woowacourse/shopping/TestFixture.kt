@@ -17,7 +17,7 @@ object TestFixture {
                     price = 10000,
                     name = "아메리카노",
                     id = 0L,
-                    category = ""
+                    category = "",
                 ),
         )
     }

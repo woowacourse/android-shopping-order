@@ -18,19 +18,26 @@ class CartItemDataSourceImpl(
         )
     }
 
-    override fun loadCartItems(page: Int, size: Int): Call<CartItemResponse> {
+    override fun loadCartItems(
+        page: Int,
+        size: Int,
+    ): Call<CartItemResponse> {
         return cartApiService.requestCartItems(
             page = page,
             size = size,
         )
     }
 
-    override fun addCartItem(productId: Int, quantity: Int): Call<Unit> {
+    override fun addCartItem(
+        productId: Int,
+        quantity: Int,
+    ): Call<Unit> {
         return cartApiService.insertCartItem(
-            cartItemRequest = CartItemRequest(
-                productId = productId,
-                quantity = quantity,
-            )
+            cartItemRequest =
+                CartItemRequest(
+                    productId = productId,
+                    quantity = quantity,
+                ),
         )
     }
 
@@ -38,7 +45,10 @@ class CartItemDataSourceImpl(
         return cartApiService.deleteCartItem(id = id)
     }
 
-    override fun updateCartItem(id: Int, quantity: Int): Call<Unit> {
+    override fun updateCartItem(
+        id: Int,
+        quantity: Int,
+    ): Call<Unit> {
         return cartApiService.updateCartItem(
             id = id,
             quantity = CartItemQuantityDto(quantity),

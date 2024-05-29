@@ -7,7 +7,7 @@ import woowacourse.shopping.data.source.OrderDataSource
 
 class OrderDataSourceImpl(
     private val orderApiService: OrderApiService = NetworkManager.orderService(),
-): OrderDataSource {
+) : OrderDataSource {
     override fun orderItems(ids: List<Int>): Call<Unit> {
         return orderApiService.orderItems(cartItemIds = ids)
     }

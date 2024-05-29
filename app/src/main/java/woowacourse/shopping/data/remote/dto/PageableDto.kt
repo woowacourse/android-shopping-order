@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.dto
 
-
 import com.google.gson.annotations.SerializedName
 
 data class PageableDto(
@@ -15,5 +14,5 @@ data class PageableDto(
     @SerializedName("sort")
     val sort: SortDto,
     @SerializedName("unpaged")
-    val unpaged: Boolean
+    val unpaged: Boolean,
 )

@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.real.RealProductRepositoryImpl
 import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding

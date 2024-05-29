@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository.real
 
-import android.util.Log
 import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.CartItem
@@ -27,10 +26,11 @@ class RealShoppingCartRepositoryImpl(
 
         thread {
             try {
-                val response = cartItemDataSource.addCartItem(
-                    product.id.toInt(),
-                    product.cartItemCounter.itemCount
-                ).execute()
+                val response =
+                    cartItemDataSource.addCartItem(
+                        product.id.toInt(),
+                        product.cartItemCounter.itemCount,
+                    ).execute()
                 if (!response.isSuccessful) {
                     exception = NoSuchDataException()
                 }
@@ -43,7 +43,10 @@ class RealShoppingCartRepositoryImpl(
         latch.awaitOrThrow(exception)
     }
 
-    override fun loadPagingCartItems(offset: Int, pagingSize: Int): List<CartItem> {
+    override fun loadPagingCartItems(
+        offset: Int,
+        pagingSize: Int,
+    ): List<CartItem> {
         val latch = CountDownLatch(1)
         var cartItems: List<CartItem>? = null
         var exception: Exception? = null
@@ -113,10 +116,11 @@ class RealShoppingCartRepositoryImpl(
         var exception: Exception? = null
         thread {
             try {
-                val response = cartItemDataSource.updateCartItem(
-                    id = cartItemResult.cartItemId.toInt(),
-                    quantity = cartItemResult.counter.itemCount,
-                ).execute()
+                val response =
+                    cartItemDataSource.updateCartItem(
+                        id = cartItemResult.cartItemId.toInt(),
+                        quantity = cartItemResult.counter.itemCount,
+                    ).execute()
                 if (!response.isSuccessful) {
                     exception = NoSuchDataException()
                 }
@@ -131,7 +135,7 @@ class RealShoppingCartRepositoryImpl(
 
     override fun updateCartItem(
         product: Product,
-        updateCartItemType: UpdateCartItemType
+        updateCartItemType: UpdateCartItemType,
     ): UpdateCartItemResult {
         val latch = CountDownLatch(1)
         var result: UpdateCartItemResult? = null
@@ -141,26 +145,28 @@ class RealShoppingCartRepositoryImpl(
                 val cartItemResult = getCartItemResultFromProductId(product.id)
                 when (updateCartItemType) {
                     UpdateCartItemType.INCREASE -> {
-                        result = if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
-                            UpdateCartItemResult.ADD
-                        } else {
-                            cartItemResult.increaseCount()
-                            product.updateCartItemCount(cartItemResult.counter.itemCount)
-                            addCartItem(product)
-                            updateCartCount(cartItemResult)
-                            UpdateCartItemResult.UPDATED(cartItemResult)
-                        }
+                        result =
+                            if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
+                                UpdateCartItemResult.ADD
+                            } else {
+                                cartItemResult.increaseCount()
+                                product.updateCartItemCount(cartItemResult.counter.itemCount)
+                                addCartItem(product)
+                                updateCartCount(cartItemResult)
+                                UpdateCartItemResult.UPDATED(cartItemResult)
+                            }
                     }
 
                     UpdateCartItemType.DECREASE -> {
                         val changeCartItemResult = cartItemResult.decreaseCount()
-                        result = if (changeCartItemResult == ChangeCartItemResultState.Fail) {
-                            deleteCartItem(cartItemResult.cartItemId)
-                            UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-                        } else {
-                            updateCartCount(cartItemResult)
-                            UpdateCartItemResult.UPDATED(cartItemResult)
-                        }
+                        result =
+                            if (changeCartItemResult == ChangeCartItemResultState.Fail) {
+                                deleteCartItem(cartItemResult.cartItemId)
+                                UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
+                            } else {
+                                updateCartCount(cartItemResult)
+                                UpdateCartItemResult.UPDATED(cartItemResult)
+                            }
                     }
 
                     is UpdateCartItemType.UPDATE -> {

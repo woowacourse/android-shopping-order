@@ -18,6 +18,7 @@ class ShoppingCartAdapter(
     private var cartItems: List<CartItem> = emptyList()
     private var productPosition: HashMap<Long, Int> = hashMapOf()
     var flag = true
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

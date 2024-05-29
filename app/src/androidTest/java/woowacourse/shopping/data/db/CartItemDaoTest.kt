@@ -39,7 +39,7 @@ class CartItemDaoTest {
 
     @Test
     fun `선택한_아이템을_장바구니에_저장할_수_있다`() {
-        val item = CartItemEntity(0, Product(0, "상품", 1000, "",""))
+        val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
         thread {
             dao.saveCartItem(item)
         }.join()
@@ -52,7 +52,7 @@ class CartItemDaoTest {
 
     @Test
     fun `특정_ID로_장바구니_아이템을_불러올_수_있다`() {
-        val item = CartItemEntity(0, Product(0, "상품", 1000, "",""))
+        val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
         var itemId = -1L
         thread {
             itemId = dao.saveCartItem(item)
@@ -66,7 +66,7 @@ class CartItemDaoTest {
 
     @Test
     fun `특정_ID로_장바구니_아이템을_삭제할_수_있다`() {
-        val item = CartItemEntity(0, Product(0, "상품", 1000, "",""))
+        val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
         var itemId = -1L
         thread {
             itemId = dao.saveCartItem(item)

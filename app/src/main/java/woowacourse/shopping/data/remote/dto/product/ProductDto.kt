@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 
 data class ProductDto(
@@ -13,5 +12,5 @@ data class ProductDto(
     @SerializedName("name")
     val name: String,
     @SerializedName("price")
-    val price: Int
+    val price: Int,
 )

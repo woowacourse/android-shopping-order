@@ -7,7 +7,6 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.service.ProductService
 
