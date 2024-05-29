@@ -28,7 +28,7 @@
             android:layout_height="0dp"
             android:layout_marginBottom="71dp"
             android:orientation="vertical"
-            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() ? View.GONE : View.VISIBLE }"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/tv_page"
             app:layout_constraintEnd_toEndOf="parent"
@@ -36,11 +36,16 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/holder_cart_product" />
 
+        <include
+            layout="@layout/include_skeleton_cart_product_list"
+            android:visibility="@{vm.loading ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty_shopping_cart_title"
-            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() ? View.VISIBLE : View.GONE }"
+            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() &amp;&amp; !vm.loading ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toTopOf="@+id/tv_page"
             app:layout_constraintEnd_toEndOf="@+id/rv_cart_products"
             app:layout_constraintStart_toStartOf="@+id/rv_cart_products"
@@ -50,6 +55,7 @@
         <Button
             android:id="@+id/tv_pre_page"
             currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
             last="@{vm.uiState.pagingCartProduct.last}"
             android:layout_width="42dp"
             android:layout_height="42dp"
@@ -61,6 +67,7 @@
             android:text="@string/tv_pre_page_title"
             android:textColor="@color/white"
             android:textSize="19dp"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="@+id/tv_page"
             app:layout_constraintEnd_toStartOf="@+id/tv_page"
@@ -69,6 +76,7 @@
         <TextView
             android:id="@+id/tv_page"
             currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
             last="@{vm.uiState.pagingCartProduct.last}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -85,6 +93,7 @@
         <Button
             android:id="@+id/tv_next_page"
             currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
             last="@{vm.uiState.pagingCartProduct.last}"
             android:layout_width="42dp"
             android:layout_height="42dp"
@@ -96,6 +105,7 @@
             android:text="@string/tv_next_page_title"
             android:textColor="@color/white"
             android:textSize="19dp"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="@+id/tv_page"
             app:layout_constraintStart_toEndOf="@+id/tv_page"

@@ -29,6 +29,9 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
 
     private fun loadCartProducts(page: Int) {
         thread {
+            showLoading()
+            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
+
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
                 _uiState.postValue(_uiState.value?.copy(pagingCartProduct = pagingCartProduct))
@@ -36,6 +39,8 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
+
+            hideLoading()
         }
     }
 
