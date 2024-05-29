@@ -130,7 +130,7 @@
 
         <include
             android:id="@+id/include_cart_list_order"
-            layout="@layout/layout_order"
+            layout="@layout/layout_cart_order"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

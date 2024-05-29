@@ -7,31 +7,31 @@
     android:background="@color/gray">
 
     <CheckBox
-        android:id="@+id/checkbox_order"
+        android:id="@+id/checkbox_cart_order"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="21dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        app:layout_constraintBottom_toTopOf="@id/tv_order_all"
+        app:layout_constraintBottom_toTopOf="@id/tv_cart_order_all"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_order_all"
+        android:id="@+id/tv_cart_order_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:text="@string/order_all"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/checkbox_order"
-        app:layout_constraintStart_toStartOf="@id/checkbox_order"
-        app:layout_constraintTop_toBottomOf="@id/checkbox_order" />
+        app:layout_constraintEnd_toEndOf="@id/checkbox_cart_order"
+        app:layout_constraintStart_toStartOf="@id/checkbox_cart_order"
+        app:layout_constraintTop_toBottomOf="@id/checkbox_cart_order" />
 
     <TextView
-        android:id="@+id/tv_order_total_price"
+        android:id="@+id/tv_cart_order_total_price"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
@@ -40,13 +40,13 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btn_order"
-        app:layout_constraintStart_toEndOf="@id/checkbox_order"
+        app:layout_constraintEnd_toStartOf="@id/btn_cart_order"
+        app:layout_constraintStart_toEndOf="@id/checkbox_cart_order"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="184,200원" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_order"
+        android:id="@+id/btn_cart_order"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="@drawable/shape_order_button"
@@ -56,7 +56,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_order_total_price"
+        app:layout_constraintStart_toEndOf="@id/tv_cart_order_total_price"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="주문하기(2)" />
 
