@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_LOAD_PAGING_SIZE
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -27,7 +27,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     private val shoppingCartViewModel: ShoppingCartViewModel by lazy {
         val viewModelFactory =
-            ViewModelFactory { ShoppingCartViewModel(ShoppingCartRepositoryImpl(context = requireContext())) }
+            ViewModelFactory { ShoppingCartViewModel(RealShoppingCartRepositoryImpl()) }
         viewModelFactory.create(ShoppingCartViewModel::class.java)
     }
     private lateinit var adapter: ShoppingCartAdapter

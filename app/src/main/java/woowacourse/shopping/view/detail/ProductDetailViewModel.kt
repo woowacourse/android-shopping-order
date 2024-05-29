@@ -47,7 +47,7 @@ class ProductDetailViewModel(
 
                 else -> {
                     shoppingCartRepository.updateCartItem(
-                        productId = product.id,
+                        product = product,
                         UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
                     )
                 }

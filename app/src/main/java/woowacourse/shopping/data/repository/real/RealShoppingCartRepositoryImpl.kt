@@ -52,7 +52,7 @@ class RealShoppingCartRepositoryImpl(
             try {
                 val response =
                     cartItemDataSource.loadCartItems(page = offset, size = pagingSize).execute()
-                if (!response.isSuccessful) {
+                if (response.isSuccessful) {
                     cartItems = response.body()?.cartItemDto?.map { it.toCartItem() }
                 }
             } catch (e: Exception) {
@@ -62,6 +62,7 @@ class RealShoppingCartRepositoryImpl(
             }
         }
         latch.awaitOrThrow(exception)
+
         return cartItems ?: throw NoSuchDataException()
     }
 
@@ -129,7 +130,7 @@ class RealShoppingCartRepositoryImpl(
     }
 
     override fun updateCartItem(
-        productId: Long,
+        product: Product,
         updateCartItemType: UpdateCartItemType
     ): UpdateCartItemResult {
         val latch = CountDownLatch(1)
@@ -137,13 +138,15 @@ class RealShoppingCartRepositoryImpl(
         var exception: Exception? = null
         thread {
             try {
-                val cartItemResult = getCartItemResultFromProductId(productId)
+                val cartItemResult = getCartItemResultFromProductId(product.id)
                 when (updateCartItemType) {
                     UpdateCartItemType.INCREASE -> {
                         result = if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
                             UpdateCartItemResult.ADD
                         } else {
                             cartItemResult.increaseCount()
+                            product.updateCartItemCount(cartItemResult.counter.itemCount)
+                            addCartItem(product)
                             updateCartCount(cartItemResult)
                             UpdateCartItemResult.UPDATED(cartItemResult)
                         }

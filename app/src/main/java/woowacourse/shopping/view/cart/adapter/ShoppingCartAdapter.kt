@@ -17,7 +17,7 @@ class ShoppingCartAdapter(
 ) : RecyclerView.Adapter<ShoppingCartViewHolder>() {
     private var cartItems: List<CartItem> = emptyList()
     private var productPosition: HashMap<Long, Int> = hashMapOf()
-
+    var flag = true
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -46,8 +46,9 @@ class ShoppingCartAdapter(
         hasLastItem: Boolean,
         cartItems: List<CartItem>,
     ) {
-        if (hasLastItem) {
+        if (hasLastItem && flag) {
             loadLastItem()
+            flag = false
         }
         this.cartItems = cartItems
         notifyDataSetChanged()

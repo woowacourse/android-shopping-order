@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -92,7 +93,7 @@ class ShoppingCartViewModel(
         try {
             val updateCartItemResult =
                 shoppingCartRepository.updateCartItem(
-                    product.id,
+                    product,
                     updateCartItemType,
                 )
             when (updateCartItemResult) {

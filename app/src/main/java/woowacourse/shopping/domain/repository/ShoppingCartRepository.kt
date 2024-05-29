@@ -19,7 +19,7 @@ interface ShoppingCartRepository {
     fun getCartItemResultFromProductId(productId: Long): CartItemResult
 
     fun updateCartItem(
-        productId: Long,
+        product: Product,
         updateCartItemType: UpdateCartItemType,
     ): UpdateCartItemResult
 

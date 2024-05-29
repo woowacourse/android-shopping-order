@@ -10,6 +10,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.repository.real.RealProductRepositoryImpl
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
@@ -27,8 +29,8 @@ class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter 
         val viewModelFactory =
             ViewModelFactory {
                 ProductDetailViewModel(
-                    productRepository = ProductRepositoryImpl(),
-                    shoppingCartRepository = ShoppingCartRepositoryImpl(requireContext()),
+                    productRepository = RealProductRepositoryImpl(),
+                    shoppingCartRepository = RealShoppingCartRepositoryImpl(),
                     recentlyProductRepository = RecentlyProductRepositoryImpl(requireContext()),
                 )
             }

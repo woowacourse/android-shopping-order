@@ -2,6 +2,7 @@ package woowacourse.shopping.view.products
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -91,7 +92,7 @@ class ProductListViewModel(
         try {
             val updateCartItemResult =
                 shoppingCartRepository.updateCartItem(
-                    product.id,
+                    product,
                     updateCartItemType,
                 )
             when (updateCartItemResult) {
@@ -101,12 +102,12 @@ class ProductListViewModel(
                     product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
                     when (updateCartItemType) {
                         UpdateCartItemType.DECREASE -> {
-                            decreaseTotalCartItemCount()
+                            updateTotalCartItemCount()
                         }
 
                         UpdateCartItemType.INCREASE -> {
                             product.updateItemSelector(true)
-                            increaseTotalCartItemCount()
+                            updateTotalCartItemCount()
                         }
 
                         is UpdateCartItemType.UPDATE -> {}
@@ -125,17 +126,16 @@ class ProductListViewModel(
     }
 
     private fun addCartItem(product: Product) {
-        shoppingCartRepository.addCartItem(product)
         product.updateCartItemCount(DEFAULT_CART_ITEM_COUNT)
         product.updateItemSelector(true)
-        increaseTotalCartItemCount()
+        updateTotalCartItemCount()
         _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
     }
 
     private fun deleteCartItem(product: Product) {
         try {
             product.updateItemSelector(false)
-            decreaseTotalCartItemCount()
+            updateTotalCartItemCount()
             _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
         } catch (e: Exception) {
             when (e) {
@@ -154,14 +154,6 @@ class ProductListViewModel(
         } catch (e: Exception) {
             _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
         }
-    }
-
-    private fun increaseTotalCartItemCount() {
-        _cartItemCount.value = _cartItemCount.value?.plus(DEFAULT_CART_ITEM_COUNT)
-    }
-
-    private fun decreaseTotalCartItemCount() {
-        _cartItemCount.value = _cartItemCount.value?.minus(DEFAULT_CART_ITEM_COUNT)
     }
 
     fun updateProducts(items: Map<Long, Int>) {

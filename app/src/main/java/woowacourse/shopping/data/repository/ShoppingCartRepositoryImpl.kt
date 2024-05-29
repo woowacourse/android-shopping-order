@@ -59,10 +59,10 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     }
 
     override fun updateCartItem(
-        productId: Long,
+        product: Product,
         updateCartItemType: UpdateCartItemType,
     ): UpdateCartItemResult {
-        val cartItemResult = getCartItemResultFromProductId(productId)
+        val cartItemResult = getCartItemResultFromProductId(product.id)
         when (updateCartItemType) {
             UpdateCartItemType.INCREASE -> {
                 if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
