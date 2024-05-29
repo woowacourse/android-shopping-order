@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +13,6 @@ import woowacourse.shopping.data.cart.CartRepositoryTestImpl
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
-import woowacourse.shopping.data.service.ApiFactory
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
@@ -70,7 +68,10 @@ class ProductContentsViewModel(
     }
 
     override fun plusCount(productId: Long) {
-        CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId),  findCartItemQuantityByProductId(productId).inc().value)
+        CartRepositoryTestImpl.patchCartItem(
+            findCartItemByProductId(productId),
+            findCartItemQuantityByProductId(productId).inc().value
+        )
         loadCartItems()
     }
 
@@ -79,7 +80,7 @@ class ProductContentsViewModel(
         if (currentCount == 0) {
             CartRepositoryTestImpl.deleteCartItem(findCartItemByProductId(productId))
         } else {
-            CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId),currentCount)
+            CartRepositoryTestImpl.patchCartItem(findCartItemByProductId(productId), currentCount)
         }
         loadCartItems()
     }
@@ -129,8 +130,7 @@ class ProductContentsViewModel(
             currentProducts.map { product ->
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
-        productWithQuantity.value =
-            ProductWithQuantityUiState(productWithQuantities = updatedList.map { it.toProductUiModel() })
+        productWithQuantity.value = ProductWithQuantityUiState(updatedList.map { it.toProductUiModel() }, isLoading = false)
     }
 
     private fun getQuantity(productId: Long): Quantity {
@@ -145,12 +145,14 @@ class ProductContentsViewModel(
         return null
     }
 
-    private fun findCartItemByProductId(productId: Long):Long {
-        return cart.value?.firstOrNull { it.productId == productId}?.id ?: error("일치하는 장바구니 아이템이 없습니다.")
+    private fun findCartItemByProductId(productId: Long): Long {
+        return cart.value?.firstOrNull { it.productId == productId }?.id
+            ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-    private fun findCartItemQuantityByProductId(productId: Long):Quantity {
-        return cart.value?.firstOrNull {it.productId == productId}?.quantity ?: error("일치하는 장바구니 아이템이 없습니다.")
+    private fun findCartItemQuantityByProductId(productId: Long): Quantity {
+        return cart.value?.firstOrNull { it.productId == productId }?.quantity
+            ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
     companion object {
