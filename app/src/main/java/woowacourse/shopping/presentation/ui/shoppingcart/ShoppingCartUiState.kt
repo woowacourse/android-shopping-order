@@ -4,6 +4,7 @@ import woowacourse.shopping.domain.model.Cart
 
 data class ShoppingCartUiState(
     val pagingCartProduct: PagingCartProduct = PagingCartProduct(),
+    val cartIdList: List<Int> = emptyList(),
 )
 
 data class PagingCartProduct(

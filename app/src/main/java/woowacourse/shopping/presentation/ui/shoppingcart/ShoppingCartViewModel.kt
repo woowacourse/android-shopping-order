@@ -38,7 +38,21 @@ class ShoppingCartViewModel(
 
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
-                _uiState.postValue(_uiState.value?.copy(pagingCartProduct = pagingCartProduct))
+
+                val newCartList =
+                    pagingCartProduct.cartList.map { cart ->
+                        if (cart.id in (uiState.value?.cartIdList ?: emptyList())) {
+                            cart.copy(isChecked = true)
+                        } else {
+                            cart
+                        }
+                    }
+
+                val newPagingCartProduct = pagingCartProduct.copy(cartList = newCartList)
+
+                _uiState.value?.let { state ->
+                    _uiState.postValue(state.copy(pagingCartProduct = newPagingCartProduct))
+                }
             }.onFailure { e ->
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
@@ -131,6 +145,12 @@ class ShoppingCartViewModel(
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
+        }
+    }
+
+    override fun checkCartProduct(cartId: Int) {
+        _uiState.value?.let { state ->
+            _uiState.value = state.copy(cartIdList = state.cartIdList + cartId)
         }
     }
 
