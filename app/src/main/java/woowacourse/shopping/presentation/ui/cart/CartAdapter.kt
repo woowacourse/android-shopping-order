@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.CartProduct
 
 class CartAdapter(
     private val cartActionHandler: CartActionHandler,
-) : ListAdapter<CartProduct, CartViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<CartProductUiModel, CartViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -29,17 +29,17 @@ class CartAdapter(
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<CartProduct>() {
+            object : DiffUtil.ItemCallback<CartProductUiModel>() {
                 override fun areItemsTheSame(
-                    oldItem: CartProduct,
-                    newItem: CartProduct,
+                    oldItem: CartProductUiModel,
+                    newItem: CartProductUiModel,
                 ): Boolean {
-                    return oldItem.productId == newItem.productId
+                    return oldItem.cartProduct.productId == newItem.cartProduct.productId
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: CartProduct,
-                    newItem: CartProduct,
+                    oldItem: CartProductUiModel,
+                    newItem: CartProductUiModel,
                 ): Boolean {
                     return oldItem == newItem
                 }
@@ -49,8 +49,8 @@ class CartAdapter(
 
 class CartViewHolder(private val binding: ItemCartBinding, val cartActionHandler: CartActionHandler) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: CartProduct) {
-        binding.cartProduct = item
+    fun bind(item: CartProductUiModel) {
+        binding.cartProductUiModel = item
         binding.cartActionHandler = cartActionHandler
     }
 }

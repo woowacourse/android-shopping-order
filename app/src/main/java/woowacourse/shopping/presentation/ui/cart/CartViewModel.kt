@@ -55,11 +55,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
     }
 
-    override fun onDelete(cartProduct: CartProduct) {
+    override fun onDelete(cartProduct: CartProductUiModel) {
         thread {
-            Log.d("AAFDF", "${cartProduct.cartId}")
+//            Log.d("AAFDF", "${cartProduct.cartId}")
 //            updateUiModel.add(cartProduct.productId, cartProduct.copy(quantity = 0))
-            repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+            repository.deleteCartItem(cartProduct.cartProduct.cartId.toInt()).onSuccess {
 
 //                findProductByOffset()
             }.onFailure {

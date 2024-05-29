@@ -68,9 +68,9 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
 
-                            cartAdapter.submitList(it.data)
+                            cartAdapter.submitList(it.data.map { CartProductUiModel(cartProduct = it) })
                             with(binding) {
-                                layoutPage.isVisible = viewModel.maxOffset > 0
+                                layoutPaging.isVisible = viewModel.maxOffset > 0
                                 btnRight.isEnabled = viewModel.offSet < viewModel.maxOffset
                                 btnLeft.isEnabled = viewModel.offSet > 0
                                 tvPageCount.text = (viewModel.offSet + OFFSET_BASE).toString()

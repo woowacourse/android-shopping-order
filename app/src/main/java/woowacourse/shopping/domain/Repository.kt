@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponse
@@ -43,6 +44,10 @@ interface Repository {
 
     fun deleteCartItem(
         id: Int
+    ): Result<Unit>
+
+    fun postOrders(
+        orderRequest: OrderRequest
     ): Result<Unit>
 
     fun findCartByPaging(
