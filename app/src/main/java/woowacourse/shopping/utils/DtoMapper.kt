@@ -6,6 +6,8 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.remote.dto.product.ProductDto
 import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.CartItemCounter
+import woowacourse.shopping.domain.model.ItemSelector
 import woowacourse.shopping.domain.model.Product
 
 object DtoMapper {
@@ -17,7 +19,7 @@ object DtoMapper {
     fun CartItemDto.toCartItem(): CartItem {
         return CartItem(
             id = id.toLong(),
-            product = product.toProduct(),
+            product = product.toProduct(quantity),
         )
     }
 
@@ -29,13 +31,15 @@ object DtoMapper {
         return productDto.map { it.toProduct() }
     }
 
-    fun ProductDto.toProduct(): Product {
+    fun ProductDto.toProduct(quantity: Int = 0): Product {
         return Product(
             id = id.toLong(),
             name = name,
             imageUrl = imageUrl,
             price = price,
             category = category,
+            cartItemCounter = CartItemCounter(quantity),
+            itemSelector = ItemSelector(),
         )
     }
 
