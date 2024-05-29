@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,13 +10,14 @@ import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartPageAttribute
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
-import woowacourse.shopping.domain.repository.ProductRepository
 
 class CartViewModel(
-    private val productRepository: ProductRepository,
+    private val productRepository: RemoteProductRepository,
     private val cartRepository: RemoteCartRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiState = MutableLiveData<Event<CartUiState>>()
@@ -33,6 +35,8 @@ class CartViewModel(
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
+    var itemSize: Int = 0
+
     init {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({ loadCart() }, 1000)
@@ -45,7 +49,10 @@ class CartViewModel(
             PAGE_SIZE,
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
-                    _cartUiState.value = Event(CartUiState.Success(result.toCartUiModels()))
+                    result.forEach {
+                        Log.d("LoadCart", "$it")
+                        loadProduct(it)
+                    }
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -56,11 +63,51 @@ class CartViewModel(
         loadCartPageAttribute()
     }
 
-    private fun List<CartItem>.toCartUiModels(): List<CartUiModel> {
-        return map {
-            val product = productRepository.find(it.productId)
-            CartUiModel.from(product, it)
+    private fun loadProduct(cartItem: CartItem) {
+        productRepository.find(
+            cartItem.productId,
+            object : DataCallback<Product> {
+                override fun onSuccess(result: Product) {
+                    synchronized(_cartUiState) {
+                        updateCartUiState(result, cartItem)
+                    }
+                }
+
+                override fun onFailure(t: Throwable) {
+                }
+            },
+        )
+    }
+
+    @Synchronized
+    private fun updateCartUiState(
+        product: Product,
+        cartItem: CartItem,
+    ) {
+        val oldCartUiModels =
+            if (cartUiState.value?.peekContent() is CartUiState.Success) {
+                (cartUiState.value?.peekContent() as CartUiState.Success).cartUiModels
+            } else {
+                listOf()
+            }
+        val resultCartUiModel = CartUiModel.from(product, cartItem)
+        val newCartUiModels = oldCartUiModels.upsert(resultCartUiModel)
+        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
+        _cartUiState.value = newCartUiState
+    }
+
+    private fun List<CartUiModel>.upsert(cartUiModel: CartUiModel): List<CartUiModel> {
+        val list = toMutableList()
+        if (this.none { it.cartItemId == cartUiModel.cartItemId }) {
+            list += cartUiModel
+        } else {
+            this.forEachIndexed { index, listItem ->
+                if (listItem.cartItemId == cartUiModel.cartItemId) {
+                    list[index] = cartUiModel
+                }
+            }
         }
+        return list.toList()
     }
 
     private fun loadCartPageAttribute() {
