@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.Cart
@@ -130,7 +131,9 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     override fun onRecentProductClick(recentProduct: RecentProduct) {
-
+        _navigateHandler.value = EventState(NavigateUiState.ToDetail(
+            recentProduct.toCartProduct()
+        ))
     }
 
     override fun onCartClick() {

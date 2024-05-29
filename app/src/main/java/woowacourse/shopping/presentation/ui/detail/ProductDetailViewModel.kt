@@ -52,6 +52,9 @@ class ProductDetailViewModel(
 
     fun setCartProduct(cartProduct: CartProduct?) {
         if(cartProduct != null) {
+            thread {
+                saveRecentProduct(cartProduct)
+            }
             val detailCartProduct = DetailCartProduct(
                 isNew = cartProduct.quantity == 0,
                 cartProduct = cartProduct.copy(
@@ -88,6 +91,7 @@ class ProductDetailViewModel(
                     )
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
+                    saveRecentProduct(detailCartProduct.cartProduct)
                 }.onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }
@@ -100,6 +104,7 @@ class ProductDetailViewModel(
                     )
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
+                    saveRecentProduct(detailCartProduct.cartProduct)
                 }
                     .onFailure {
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -139,8 +144,11 @@ class ProductDetailViewModel(
                     cartProduct.productId,
                     cartProduct.name,
                     cartProduct.imgUrl,
+                    cartProduct.quantity,
                     cartProduct.price,
                     System.currentTimeMillis(),
+                    category = cartProduct.category,
+                    cartId = cartProduct.cartId
                 ),
             ).onSuccess {
             }.onFailure {

@@ -16,14 +16,14 @@ interface RecentProductDao {
     fun saveRecentProduct(recentProductEntity: RecentProductEntity)
 
     @Query(
-        "SELECT productId, name, imgUrl, price, createdAt " +
+        "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +
                 "FROM recentproductentity " +
                 "ORDER BY createdAt DESC LIMIT :limit",
     )
     fun findByLimit(limit: Int): List<RecentProductEntity>
 
     @Query(
-        "SELECT productId, name, imgUrl, price, createdAt " +
+        "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +
             "FROM recentproductentity " +
             "ORDER BY createdAt DESC",
     )

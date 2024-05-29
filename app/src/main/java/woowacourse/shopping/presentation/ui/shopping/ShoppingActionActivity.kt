@@ -140,7 +140,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                 return if (shoppingAdapter.getItemViewType(position) == ShoppingViewType.Product.value) {
                     ShoppingViewType.Product.span
                 } else {
-                    2
+                    ShoppingViewType.LoadMore.span
                 }
             }
         }
