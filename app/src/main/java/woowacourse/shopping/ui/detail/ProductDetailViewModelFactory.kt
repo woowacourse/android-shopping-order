@@ -2,16 +2,16 @@ package woowacourse.shopping.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.lang.IllegalArgumentException
 
 class ProductDetailViewModelFactory(
     private val productId: Int,
-    private val productRepository: ProductRepository,
+    private val productRepository: RemoteProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
+    private val cartRepository: RemoteCartRepository,
     private val lastSeenProductVisible: Boolean,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -2,24 +2,22 @@ package woowacourse.shopping.ui.products
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository2
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
-import java.util.concurrent.CountDownLatch
 
 class ProductsViewModel(
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: RemoteProductRepository2,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: RemoteCartRepository,
 ) : ViewModel() {
@@ -43,6 +41,7 @@ class ProductsViewModel(
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({ loadPage() }, 1000)
         loadRecentProducts()
+        updateTotalCount()
     }
 
     fun loadPage() {
@@ -113,10 +112,12 @@ class ProductsViewModel(
                 }
             },
         )
+        updateTotalCount()
     }
 
     fun loadProduct(productId: Int) {
         updateProductUiModel(productId)
+        updateTotalCount()
     }
 
     private fun List<Product>.toProductUiModels(): List<ProductUiModel> {
@@ -139,32 +140,14 @@ class ProductsViewModel(
     }
 
     private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
-        val recentProductsUiModels: MutableList<RecentProductUiModel> = mutableListOf()
-        val latch = CountDownLatch(this.size)
-        this.forEach {
-            productRepository.find(
-                it.productId,
-                object : DataCallback<Product> {
-                    override fun onSuccess(result: Product) {
-                        recentProductsUiModels.add(
-                            RecentProductUiModel(
-                                result.id,
-                                result.imageUrl,
-                                result.name,
-                            ),
-                        )
-                        latch.countDown()
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        latch.countDown()
-                    }
-                },
+        return map {
+            val product = productRepository.syncFind(it.productId)
+            RecentProductUiModel(
+                product.id,
+                product.imageUrl,
+                product.name,
             )
-        }
-
-        latch.await()
-        return recentProductsUiModels.ifEmpty { null }
+        }.ifEmpty { null }
     }
 
     fun changeSeeMoreVisibility(lastPosition: Int) {
@@ -192,18 +175,13 @@ class ProductsViewModel(
     }
 
     private fun addCartItem(productId: Int) {
-        Log.e("TEST", "addCartItem")
         cartRepository.addCartItem(
             productId = productId,
             dataCallback =
                 object : DataCallback<Unit> {
-                    override fun onSuccess(result: Unit) {
-                        Log.e("TEST", "addCartItem onSuccess")
-                    }
+                    override fun onSuccess(result: Unit) {}
 
                     override fun onFailure(t: Throwable) {
-                        Log.e("TEST", "addCartItem onFailure")
-
                         setError()
                     }
                 },

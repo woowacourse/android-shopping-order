@@ -5,18 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
+import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.product.remote.retrofit.DataCallback
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import woowacourse.shopping.ui.utils.AddCartQuantityBundle
 
 class ProductDetailViewModel(
     private val productId: Int,
-    private val productRepository: ProductRepository,
+    private val productRepository: RemoteProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
+    private val cartRepository: RemoteCartRepository,
     private val lastSeenProductVisible: Boolean,
 ) : ViewModel() {
     private val _productUiModel = MutableLiveData<ProductUiModel>()
@@ -38,8 +39,6 @@ class ProductDetailViewModel(
             )
         }
 
-    private lateinit var product: Product
-
     private val _lastRecentProduct = MutableLiveData<LastRecentProductUiModel>()
     val lastRecentProduct: LiveData<LastRecentProductUiModel> get() = _lastRecentProduct
 
@@ -53,41 +52,47 @@ class ProductDetailViewModel(
     }
 
     private fun loadProduct() {
-        product =
-            runCatching {
-                productRepository.find(productId)
-            }.onFailure {
-                _productLoadError.value = Event(Unit)
-            }.getOrNull() ?: return
+        productRepository.find(
+            productId,
+            dataCallback =
+                object : DataCallback<Product> {
+                    override fun onSuccess(result: Product) {
+                        _productUiModel.postValue(result.toProductUiModel())
+                    }
 
-        _productUiModel.value = product.toProductUiModel()
+                    override fun onFailure(t: Throwable) {
+                        setError()
+                    }
+                },
+        )
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        return runCatching { cartRepository.find(id) }
-            .map { ProductUiModel.from(this, it.quantity) }
-            .getOrElse { ProductUiModel.from(this) }
+        val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
+        val cartItem =
+            cartRepository.syncFindByProductId(id, totalQuantityCount)
+                ?: return ProductUiModel.from(this)
+        return ProductUiModel.from(this, cartItem.quantity)
     }
 
     private fun loadLastRecentProduct() {
         val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
-        val product = productRepository.find(lastRecentProduct.productId)
-        _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
+        productRepository.find(
+            lastRecentProduct.productId,
+            object : DataCallback<Product> {
+                override fun onSuccess(result: Product) {
+                    _lastRecentProduct.postValue(LastRecentProductUiModel(result.id, result.name))
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                }
+            },
+        )
     }
 
     private fun saveRecentProduct() {
         recentProductRepository.save(productId)
-    }
-
-    fun addCartProduct() {
-        runCatching {
-            val productUiModel = _productUiModel.value ?: return
-            cartRepository.changeQuantity(productUiModel.productId, productUiModel.quantity)
-        }.onSuccess {
-            _isSuccessAddCart.value = Event(true)
-        }.onFailure {
-            _isSuccessAddCart.value = Event(false)
-        }
     }
 
     private fun increaseQuantity() {
@@ -98,5 +103,36 @@ class ProductDetailViewModel(
     private fun decreaseQuantity() {
         var quantity = _productUiModel.value?.quantity ?: return
         _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
+    }
+
+    fun addCartProduct() {
+        val productUiModel = _productUiModel.value ?: return
+        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
+
+        val addCartDataCallback =
+            object : DataCallback<Unit> {
+                override fun onSuccess(result: Unit) {
+                    _isSuccessAddCart.postValue(Event(true))
+                }
+
+                override fun onFailure(t: Throwable) {
+                    _isSuccessAddCart.postValue(Event(false))
+                }
+            }
+
+        if (cartItem == null) {
+            cartRepository.addCartItem(
+                productId = productId,
+                quantity = productUiModel.quantity,
+                dataCallback = addCartDataCallback,
+            )
+            return
+        }
+        cartRepository.setCartItemQuantity(cartItem.id, productUiModel.quantity, addCartDataCallback)
+    }
+
+    private fun setError() {
+        _productLoadError.postValue(Event(Unit))
     }
 }
