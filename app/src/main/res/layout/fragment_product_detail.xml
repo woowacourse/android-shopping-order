@@ -30,225 +30,136 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/product_detail_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:backgroundTint="@color/gray"
-            app:layout_constraintBottom_toTopOf="@id/product_detail_product_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/product_detail_toolbar_menu"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_product_detail_image"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/product_detail_product_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/product_detail_product_image"
-            app:shimmer_base_alpha="0.5">
-
-            <View
-                android:id="@+id/view_product_detail_skeleton_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/skeleton_background" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <ImageView
-            android:id="@+id/product_detail_product_image"
-            imageUrl="@{vm.currentProduct.imgUrl}"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:importantForAccessibility="no"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@id/product_detail_product_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_toolbar"
-            tools:src="@tools:sample/backgrounds/scenic" />
-
-        <TextView
-            android:id="@+id/product_detail_product_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="18dp"
-            android:text="@{vm.currentProduct.name}"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/product_detail_price_style"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_product_image"
-            tools:text="Product Name" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_product_detail_product_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/product_detail_product_name"
-            app:layout_constraintStart_toStartOf="@id/product_detail_product_name"
-            app:layout_constraintTop_toTopOf="@id/product_detail_product_name"
-            app:shimmer_base_alpha="0.5">
-
-            <TextView
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:background="@color/skeleton_background"
-                android:textSize="24sp" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <TextView
-            android:id="@+id/product_detail_price_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="18dp"
-            android:text="@string/product_price_description"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/product_detail_latest_product_container"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_product_name"
-            tools:text="가격" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_product_detail_product_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/product_detail_price_style"
-            app:layout_constraintStart_toStartOf="@id/product_detail_price_style"
-            app:layout_constraintTop_toTopOf="@id/product_detail_price_style"
-            app:shimmer_base_alpha="0.5">
-
-            <TextView
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:background="@color/skeleton_background"
-                android:textSize="20sp" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_product_detail_product_quantity"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/product_detail_product_quantity_change"
-            app:layout_constraintEnd_toEndOf="@id/product_detail_product_quantity_change"
-            app:layout_constraintStart_toStartOf="@id/product_detail_product_quantity_change"
-            app:layout_constraintTop_toTopOf="@id/product_detail_product_quantity_change"
-            app:shimmer_base_alpha="0.5">
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/skeleton_background" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
         <include
-            android:id="@+id/product_detail_product_quantity_change"
-            layout="@layout/item_change_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/product_detail_price_style"
-            bind:itemId="@{vm.currentProduct.id}"
-            bind:onItemChargeListener="@{onItemChargeListener}"
-            bind:quantity="@{vm.productCount}" />
+            android:id="@+id/include_product_detail_shimmer"
+            layout="@layout/layout_product_detail_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/product_detail_latest_product_container"
-            currentProductId="@{vm.currentProduct.id}"
-            latestProductId="@{vm.latestProduct.id}"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/grey_border"
-            android:onClick="@{() -> onProductClickListener.onClick(vm.latestProduct.id)}"
-            android:padding="10dp"
-            app:layout_constraintBottom_toTopOf="@id/btn_add_to_cart"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_price_style">
+            android:id="@+id/layout_product_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/product_detail_product_description"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/latest_product_guide"
-                android:textColor="@color/teal_700"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/product_detail_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:backgroundTint="@color/gray"
+                app:layout_constraintBottom_toTopOf="@id/product_detail_product_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:menu="@menu/product_detail_toolbar_menu"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/shimmer_product_detail_product_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/product_detail_product_description"
-                app:layout_constraintStart_toStartOf="@id/product_detail_product_description"
-                app:layout_constraintTop_toTopOf="@id/product_detail_product_description"
-                app:shimmer_base_alpha="0.5">
-
-                <TextView
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:background="@color/skeleton_background" />
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
+            <ImageView
+                android:id="@+id/product_detail_product_image"
+                imageUrl="@{vm.currentProduct.imgUrl}"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:importantForAccessibility="no"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@id/product_detail_product_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/product_detail_toolbar"
+                tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView
-                android:id="@+id/tv_latest_product_name"
-                android:layout_width="wrap_content"
+                android:id="@+id/product_detail_product_name"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@{vm.latestProduct.name}"
-                android:textSize="16dp"
-                app:layout_constraintStart_toStartOf="@id/product_detail_product_description"
-                app:layout_constraintTop_toBottomOf="@id/product_detail_product_description"
-                tools:ignore="SpUsage"
-                tools:text="PET보틀-정사각형(500ml)" />
+                android:layout_margin="18dp"
+                android:text="@{vm.currentProduct.name}"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/product_detail_price_style"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/product_detail_product_image"
+                tools:text="Product Name" />
 
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/shimmer_product_detail_latest_product_name"
+            <TextView
+                android:id="@+id/product_detail_price_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/tv_latest_product_name"
-                app:layout_constraintStart_toStartOf="@id/tv_latest_product_name"
-                app:layout_constraintTop_toTopOf="@id/tv_latest_product_name"
-                app:shimmer_base_alpha="0.5">
+                android:layout_margin="18dp"
+                android:text="@string/product_price_description"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/product_detail_latest_product_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/product_detail_product_name"
+                tools:text="가격" />
+
+            <include
+                android:id="@+id/product_detail_product_quantity_change"
+                layout="@layout/item_change_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/product_detail_price_style"
+                bind:itemId="@{vm.currentProduct.id}"
+                bind:onItemChargeListener="@{onItemChargeListener}"
+                bind:quantity="@{vm.productCount}" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/product_detail_latest_product_container"
+                currentProductId="@{vm.currentProduct.id}"
+                latestProductId="@{vm.latestProduct.id}"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/grey_border"
+                android:onClick="@{() -> onProductClickListener.onClick(vm.latestProduct.id)}"
+                android:padding="10dp"
+                app:layout_constraintBottom_toTopOf="@id/btn_add_to_cart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/product_detail_price_style">
 
                 <TextView
-                    android:layout_width="200dp"
+                    android:id="@+id/product_detail_product_description"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@color/skeleton_background" />
+                    android:text="@string/latest_product_guide"
+                    android:textColor="@color/teal_700"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                <TextView
+                    android:id="@+id/tv_latest_product_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@{vm.latestProduct.name}"
+                    android:textSize="16dp"
+                    app:layout_constraintStart_toStartOf="@id/product_detail_product_description"
+                    app:layout_constraintTop_toBottomOf="@id/product_detail_product_description"
+                    tools:ignore="SpUsage"
+                    tools:text="PET보틀-정사각형(500ml)" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/btn_add_to_cart"
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="35dp"
+                android:backgroundTint="@color/black"
+                android:onClick="@{() -> vm.addProductToCart(productCount)}"
+                android:text="@string/add_to_cart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/product_detail_latest_product_container" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <Button
-            android:id="@+id/btn_add_to_cart"
-            android:layout_width="0dp"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="35dp"
-
-            android:backgroundTint="@color/black"
-            android:onClick="@{() -> vm.addProductToCart(productCount)}"
-            android:text="@string/add_to_cart"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_latest_product_container" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

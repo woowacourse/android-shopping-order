@@ -41,7 +41,11 @@ class ProductDetailFragment : Fragment() {
             factory = ProductDetailViewModel.factory(productId = it.getLong(PRODUCT_ID))
         }
         viewModel = ViewModelProvider(this, factory)[ProductDetailViewModel::class.java]
-        viewModel.loadAll()
+    }
+
+    private fun showSkeletonUi() {
+        binding.includeProductDetailShimmer.root.visibility = View.VISIBLE
+        binding.layoutProductDetail.visibility = View.GONE
     }
 
     override fun onViewCreated(
@@ -49,12 +53,22 @@ class ProductDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        showSkeletonUi()
+        viewModel.loadAll()
+        observeCurrentProduct()
         viewModel.detailProductDestinationId.observe(viewLifecycleOwner) {
             navigateToProductDetail(it)
         }
-
         binding.productDetailToolbar.setOnMenuItemClickListener {
             navigateToMenuItem(it)
+        }
+    }
+
+    private fun observeCurrentProduct() {
+        viewModel.currentProduct.observe(viewLifecycleOwner) {
+            binding.includeProductDetailShimmer.root.stopShimmer()
+            binding.includeProductDetailShimmer.root.visibility = View.GONE
+            binding.layoutProductDetail.visibility = View.VISIBLE
         }
     }
 
