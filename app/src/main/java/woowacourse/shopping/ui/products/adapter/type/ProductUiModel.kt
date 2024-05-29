@@ -9,7 +9,6 @@ data class ProductUiModel(
     val title: String,
     val price: Int,
     val quantity: Quantity,
-    val cardItemId: Int = 0,
 ) : ProductsView {
     override val viewType: ProductsViewType = ProductsViewType.PRODUCTS_UI_MODEL
 

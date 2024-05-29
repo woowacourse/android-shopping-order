@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.products
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -87,25 +88,10 @@ class ProductsViewModel(
     fun loadProducts() {
         val productsUiState = _productsUiState.value?.peekContent() ?: return
         _productsUiState.value = Event(productsUiState.copy(isLoading = true))
+        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
 
-        val latch = CountDownLatch(1)
-
-        cartRepository.getCartQuantityCount(
-            object : DataCallback<Int> {
-                override fun onSuccess(result: Int) {
-                    _cartTotalCount.postValue(result)
-                    latch.countDown()
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                    latch.countDown()
-                }
-            },
-        )
-        latch.await()
         cartRepository.getAllCartItem(
-            cartTotalCount.value ?: 0,
+            cartTotalCount,
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
                     val productUiModels = productUiModels()?.toMutableList() ?: return
@@ -138,29 +124,13 @@ class ProductsViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        var productUiModel: ProductUiModel = ProductUiModel.from(this)
-        val latch = CountDownLatch(1)
-        cartRepository.findByProductId(
-            id,
-            cartTotalCount.value!!,
-            object : DataCallback<CartItem?> {
-                override fun onSuccess(result: CartItem?) {
-                    productUiModel =
-                        if (result == null) {
-                            ProductUiModel.from(this@toProductUiModel)
-                        } else {
-                            ProductUiModel.from(this@toProductUiModel, result.quantity)
-                        }
-                    latch.countDown()
-                }
-
-                override fun onFailure(t: Throwable) {
-                    latch.countDown()
-                }
-            },
-        )
-        latch.await()
-        return productUiModel
+        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartItem = cartRepository.syncFindByProductId(id, cartTotalCount)
+        return if (cartItem == null) {
+            ProductUiModel.from(this@toProductUiModel)
+        } else {
+            ProductUiModel.from(this@toProductUiModel, cartItem.quantity)
+        }
     }
 
     fun loadRecentProducts() {
@@ -214,14 +184,30 @@ class ProductsViewModel(
     }
 
     fun increaseQuantity(productId: Int) {
-        val productUiModel =
-            productUiModels()?.find {
-                it.productId == productId
-            } ?: return
+        val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.inc())
         updateCartQuantity(newProductUiModel)
         updateTotalCount()
         updateProductUiModel(productId)
+    }
+
+    private fun addCartItem(productId: Int) {
+        Log.e("TEST", "addCartItem")
+        cartRepository.addCartItem(
+            productId = productId,
+            dataCallback =
+                object : DataCallback<Unit> {
+                    override fun onSuccess(result: Unit) {
+                        Log.e("TEST", "addCartItem onSuccess")
+                    }
+
+                    override fun onFailure(t: Throwable) {
+                        Log.e("TEST", "addCartItem onFailure")
+
+                        setError()
+                    }
+                },
+        )
     }
 
     private fun updateProductUiModel(productId: Int) {
@@ -258,8 +244,15 @@ class ProductsViewModel(
     }
 
     private fun updateCartQuantity(productUiModel: ProductUiModel) {
+        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
+
+        if (cartItem == null) {
+            addCartItem(productUiModel.productId)
+            return
+        }
         cartRepository.setCartItemQuantity(
-            productUiModel.cardItemId,
+            cartItem.id,
             productUiModel.quantity,
             object : DataCallback<Unit> {
                 override fun onSuccess(result: Unit) {
