@@ -33,12 +33,13 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             ?: throw IllegalArgumentException()
 
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
-        val call = cartItemApiService.addCartItem(
-            CartItemRequest(
-                productIdsCount.productId,
-                productIdsCount.quantity,
-            ),
-        )
+        val call =
+            cartItemApiService.addCartItem(
+                CartItemRequest(
+                    productIdsCount.productId,
+                    productIdsCount.quantity,
+                ),
+            )
         call.execute()
 
         // TODO: code 값 확인해서 던지기
@@ -47,9 +48,10 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     // TODO: 동작 안됨
     override fun removedProductsId(productId: Long): Long {
-        val cartItem = cartItemApiService.requestCartItems().execute().body()?.content?.find {
-            it.product.id == productId
-        } ?: throw NoSuchElementException()
+        val cartItem =
+            cartItemApiService.requestCartItems().execute().body()?.content?.find {
+                it.product.id == productId
+            } ?: throw NoSuchElementException()
         cartItemApiService.removeCartItem(cartItem.id)
         return 10
     }
@@ -58,9 +60,10 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         productId: Long,
         quantity: Int,
     ) {
-        val cartItem = cartItemApiService.requestCartItems().execute().body()?.content?.find {
-            it.product.id == productId
-        } ?: throw NoSuchElementException()
+        val cartItem =
+            cartItemApiService.requestCartItems().execute().body()?.content?.find {
+                it.product.id == productId
+            } ?: throw NoSuchElementException()
         cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 
