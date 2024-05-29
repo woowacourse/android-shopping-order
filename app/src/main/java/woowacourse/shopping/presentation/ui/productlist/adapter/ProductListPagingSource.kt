@@ -1,8 +1,9 @@
 package woowacourse.shopping.presentation.ui.productlist.adapter
 
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.presentation.ui.productlist.PagingProduct
+import woowacourse.shopping.presentation.ui.productlist.PagingCart
 
 class ProductListPagingSource(
     private val productRepository: ProductRepository,
@@ -11,20 +12,20 @@ class ProductListPagingSource(
     private var currentPage = INIT_PAGE_NUM
     private var last = false
 
-    fun load(): Result<PagingProduct> {
+    fun load(): Result<PagingCart> {
         if (last) return Result.failure(NoSuchElementException())
 
         val result =
             productRepository.getPagingProduct(page = currentPage, pageSize = PAGING_SIZE)
                 .mapCatching { products ->
-                    val cartProducts = shoppingCartRepository.getAllCartProducts().getOrThrow()
+                    val cartProducts = productRepository.getAllCarts().getOrNull()
 
                     products.content.map { product ->
-                        val findProduct = cartProducts.find { it.id == product.id }
-                        if (findProduct == null) {
-                            product
+                        val findCart = cartProducts?.content?.find { it.product.id == product.id }
+                        if (findCart == null) {
+                            Cart(product = product)
                         } else {
-                            product.copy(quantity = findProduct.quantity)
+                            Cart(id = findCart.id, quantity = findCart.quantity, product = product)
                         }
                     }
                 }
@@ -33,7 +34,7 @@ class ProductListPagingSource(
             onSuccess = { products ->
                 if (products.size < PAGING_SIZE) last = true
                 currentPage++
-                Result.success(PagingProduct(products, last))
+                Result.success(PagingCart(products, last))
             },
             onFailure = { e ->
                 Result.failure(e)

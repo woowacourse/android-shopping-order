@@ -6,9 +6,4 @@ data class ProductDto(
     val price: Int,
     val category: String,
     val imageUrl: String,
-    val quantity: Int = INIT_QUANTITY,
-) {
-    companion object {
-        const val INIT_QUANTITY = 0
-    }
-}
+)

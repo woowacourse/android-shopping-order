@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.productlist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -17,7 +18,7 @@ import woowacourse.shopping.presentation.ui.productlist.adapter.ProductListPagin
 import kotlin.concurrent.thread
 
 class ProductListViewModel(
-    productRepository: ProductRepository,
+    private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val productHistoryRepository: ProductHistoryRepository,
 ) : BaseViewModel(), ProductListActionHandler, ProductCountHandler {
@@ -42,14 +43,14 @@ class ProductListViewModel(
     private fun initLoad() {
         thread {
             productListPagingSource.load().mapCatching { pagingProduct ->
-                val productHistorys =
+                val productHistories =
                     productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = pagingProduct.productList.sumOf { it.quantity }
+                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
 
                 ProductListUiState(
-                    pagingProduct = pagingProduct,
-                    productHistorys = productHistorys,
-                    cartCount = cartCount,
+                    pagingCart = pagingProduct,
+                    productHistories = productHistories,
+                    cartQuantity = cartCount,
                 )
             }.onSuccess { productListUiState ->
                 hideError()
@@ -78,17 +79,17 @@ class ProductListViewModel(
             productListPagingSource.load().onSuccess { pagingProduct ->
                 hideError()
                 _uiState.value?.let { state ->
-                    val nowPagingProduct =
-                        PagingProduct(
-                            productList = state.pagingProduct.productList + pagingProduct.productList,
+                    val nowPagingCart =
+                        PagingCart(
+                            cartList = state.pagingCart.cartList + pagingProduct.cartList,
                             last = pagingProduct.last,
                         )
-                    val cartCount = nowPagingProduct.productList.sumOf { it.quantity }
+                    val cartCount = nowPagingCart.cartList.sumOf { it.quantity }
 
                     _uiState.postValue(
                         state.copy(
-                            pagingProduct = nowPagingProduct,
-                            cartCount = cartCount,
+                            pagingCart = nowPagingCart,
+                            cartQuantity = cartCount,
                         ),
                     )
                 }
@@ -102,22 +103,27 @@ class ProductListViewModel(
     fun updateProducts() {
         thread {
             uiState.value?.let { state ->
-                val cartProducts = shoppingCartRepository.getAllCartProducts().getOrNull().orEmpty()
+                val cartProducts = productRepository.getAllCarts().getOrNull()
                 val updatedProductList =
-                    state.pagingProduct.productList.map { product ->
-                        val matchingCartProduct = cartProducts.find { it.id == product.id }
-                        product.copy(quantity = matchingCartProduct?.quantity ?: 0)
+                    state.pagingCart.cartList.map { cart ->
+                        val matchingCartProduct =
+                            cartProducts?.content?.find { it.product.id == cart.product.id }
+
+                        cart.copy(
+                            id = matchingCartProduct?.id ?: 0,
+                            quantity = matchingCartProduct?.quantity ?: 0,
+                        )
                     }
 
-                val productHistorys =
+                val productHistories =
                     productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val updatedCartCount = updatedProductList.sumOf { it.quantity }
+                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
 
                 _uiState.postValue(
                     state.copy(
-                        pagingProduct = PagingProduct(updatedProductList),
-                        productHistorys = productHistorys,
-                        cartCount = updatedCartCount,
+                        pagingCart = PagingCart(updatedProductList),
+                        productHistories = productHistories,
+                        cartQuantity = cartCount,
                     ),
                 )
             }
@@ -144,27 +150,27 @@ class ProductListViewModel(
     ) {
         _uiState.value?.let { state ->
             val updatedProductList =
-                state.pagingProduct.productList.map { product ->
-                    if (product.id == productId) {
-                        product.updateProduct(increment)
+                state.pagingCart.cartList.map { cart ->
+                    if (cart.product.id == productId) {
+                        cart.updateProduct(increment)
                     } else {
-                        product
+                        cart
                     }
                 }
             val updatedCartCount = updatedProductList.sumOf { it.quantity }
             _uiState.postValue(
                 state.copy(
-                    pagingProduct = PagingProduct(updatedProductList),
-                    cartCount = updatedCartCount,
+                    pagingCart = PagingCart(updatedProductList),
+                    cartQuantity = updatedCartCount,
                 ),
             )
         }
     }
 
-    private fun Product.updateProduct(increment: Boolean): Product {
+    private fun Cart.updateProduct(increment: Boolean): Cart {
         val updatedQuantity = if (increment) this.quantity + 1 else this.quantity - 1
         when {
-            this.quantity == 0 -> insertCartProduct(this, updatedQuantity)
+            this.quantity == 0 -> insertCartProduct(this.product, updatedQuantity)
             updatedQuantity == 0 -> deleteCartProduct(this.id)
             else -> updateCartProduct(this.id, updatedQuantity)
         }
@@ -178,20 +184,35 @@ class ProductListViewModel(
         thread {
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
-                name = product.name,
-                price = product.price,
                 quantity = quantity,
-                imageUrl = product.imageUrl,
-            ).onFailure { e ->
+            ).onSuccess { cartId ->
+                hideError()
+                _uiState.value?.let { state ->
+                    val updateCartList =
+                        state.pagingCart.cartList.map { cart ->
+                            if (cart.product.id == product.id) {
+                                cart.copy(id = cartId)
+                            } else {
+                                cart
+                            }
+                        }
+
+                    val pagingCart = PagingCart(cartList = updateCartList)
+
+                    _uiState.postValue(
+                        state.copy(pagingCart = pagingCart),
+                    )
+                }
+            }.onFailure { e ->
                 showError(e)
             }
         }
     }
 
-    private fun deleteCartProduct(productId: Long) {
+    private fun deleteCartProduct(cartId: Int) {
         thread {
             shoppingCartRepository.deleteCartProduct(
-                productId = productId,
+                cartId = cartId,
             ).onFailure { e ->
                 showError(e)
             }
@@ -199,12 +220,12 @@ class ProductListViewModel(
     }
 
     private fun updateCartProduct(
-        productId: Long,
+        cartId: Int,
         quantity: Int,
     ) {
         thread {
             shoppingCartRepository.updateCartProduct(
-                productId = productId,
+                cartId = cartId,
                 quantity = quantity,
             ).onFailure { e ->
                 showError(e)

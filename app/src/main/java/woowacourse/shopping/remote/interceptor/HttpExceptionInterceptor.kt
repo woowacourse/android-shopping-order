@@ -1,4 +1,4 @@
-package woowacourse.shopping.remote.api
+package woowacourse.shopping.remote.interceptor
 
 import okhttp3.Interceptor
 import okhttp3.Response

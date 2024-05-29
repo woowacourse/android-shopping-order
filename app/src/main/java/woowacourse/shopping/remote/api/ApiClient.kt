@@ -13,6 +13,6 @@ class ApiClient {
         const val POST_CART_ITEM = BASE_URL
         const val DELETE_CART_ITEM = "$BASE_URL/{id}"
         const val PATCH_CART_ITEMS = "$BASE_URL/{id}"
-        const val GET_CART_ITEMS_COUNT = BASE_URL
+        const val GET_CART_ITEMS_COUNT = "$BASE_URL/counts"
     }
 }

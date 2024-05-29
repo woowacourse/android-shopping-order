@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shoppingcart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -64,16 +65,17 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
     ) {
         _uiState.value?.let { state ->
             val updatedProductList =
-                state.pagingCartProduct.products.map { product ->
-                    if (product.id == productId) {
-                        product.updateProduct(increment)
+                state.pagingCartProduct.cartList.map { cart ->
+                    if (cart.product.id == productId) {
+                        cart.updateProduct(increment)
                     } else {
-                        product
+                        cart
                     }
                 }
             val pagingCartProduct =
                 PagingCartProduct(
-                    products = updatedProductList,
+                    cartList = updatedProductList,
+                    currentPage = state.pagingCartProduct.currentPage,
                     last = state.pagingCartProduct.last,
                 )
             _uiState.postValue(
@@ -82,10 +84,10 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
         }
     }
 
-    private fun Product.updateProduct(increment: Boolean): Product {
+    private fun Cart.updateProduct(increment: Boolean): Cart {
         val updatedQuantity = if (increment) this.quantity + 1 else this.quantity - 1
         when {
-            this.quantity == 0 -> insertCartProduct(this, updatedQuantity)
+            this.quantity == 0 -> insertCartProduct(this.product, updatedQuantity)
             updatedQuantity == 0 -> deleteCartProduct(this.id)
             else -> updateCartProduct(this.id, updatedQuantity)
         }
@@ -99,10 +101,7 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
         thread {
             repository.insertCartProduct(
                 productId = product.id,
-                name = product.name,
-                price = product.price,
                 quantity = quantity,
-                imageUrl = product.imageUrl,
             ).onSuccess {
                 hideError()
             }.onFailure { e ->
@@ -111,9 +110,9 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
         }
     }
 
-    override fun deleteCartProduct(productId: Long) {
+    override fun deleteCartProduct(cartId: Int) {
         thread {
-            repository.deleteCartProduct(productId = productId).onSuccess {
+            repository.deleteCartProduct(cartId = cartId).onSuccess {
                 uiState.value?.let { state ->
                     loadCartProducts(state.pagingCartProduct.currentPage)
                 }
@@ -127,12 +126,12 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
     }
 
     private fun updateCartProduct(
-        productId: Long,
+        cartId: Int,
         quantity: Int,
     ) {
         thread {
             repository.updateCartProduct(
-                productId = productId,
+                cartId = cartId,
                 quantity = quantity,
             ).onSuccess {
                 hideError()

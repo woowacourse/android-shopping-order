@@ -21,7 +21,6 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.local.datasource.ShoppingCartDataSourceImpl
 import woowacourse.shopping.local.db.ShoppingCartDatabase
 import woowacourse.shopping.presentation.ui.utils.RecyclerViewItemCountAssertion
 import woowacourse.shopping.remote.api.DummyData.STUB_PRODUCT_A
@@ -56,7 +55,7 @@ class ShoppingCartActivityTest {
         repeat(4) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -79,7 +78,7 @@ class ShoppingCartActivityTest {
         repeat(6) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -101,7 +100,7 @@ class ShoppingCartActivityTest {
         repeat(6) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -121,7 +120,7 @@ class ShoppingCartActivityTest {
         repeat(6) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -141,7 +140,7 @@ class ShoppingCartActivityTest {
         repeat(6) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -163,7 +162,7 @@ class ShoppingCartActivityTest {
         repeat(10) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -185,7 +184,7 @@ class ShoppingCartActivityTest {
         repeat(10) {
             thread {
                 repository.insertCartProduct(
-                    productId = STUB_PRODUCT_A.id + it,
+                    cartId = STUB_PRODUCT_A.id + it,
                     name = STUB_PRODUCT_A.name,
                     price = STUB_PRODUCT_A.price,
                     quantity = 0,
@@ -206,7 +205,7 @@ class ShoppingCartActivityTest {
     fun `장바구니의_상품이_있을_때_엑스_버튼을_누르면_장바구니_리스트에서_없어진다`() {
         thread {
             repository.insertCartProduct(
-                productId = STUB_PRODUCT_A.id,
+                cartId = STUB_PRODUCT_A.id,
                 name = STUB_PRODUCT_A.name,
                 price = STUB_PRODUCT_A.price,
                 quantity = 0,

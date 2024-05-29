@@ -39,7 +39,7 @@ class ShoppingCartViewModelTest {
     fun `첫 번째 페이지에 장바구니를 불러온다`() {
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.products).isEqualTo(CART_PRODUCTS.subList(0, 5).map { it.toDomain() })
+        assertThat(actual.pagingCartProduct.cartList).isEqualTo(CART_PRODUCTS.subList(0, 5).map { it.toDomain() })
     }
 
     @Test
@@ -60,7 +60,7 @@ class ShoppingCartViewModelTest {
         assertThat(productIdSlot.captured).isEqualTo(CART_PRODUCTS.first().id)
 
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.products).isEqualTo(CART_PRODUCTS.subList(1, 5).map { it.toDomain() })
+        assertThat(actual.pagingCartProduct.cartList).isEqualTo(CART_PRODUCTS.subList(1, 5).map { it.toDomain() })
     }
 
     @Test
@@ -71,7 +71,7 @@ class ShoppingCartViewModelTest {
         Thread.sleep(3000)
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.products).isEqualTo(CART_PRODUCTS.subList(5, 10).map { it.toDomain() })
+        assertThat(actual.pagingCartProduct.cartList).isEqualTo(CART_PRODUCTS.subList(5, 10).map { it.toDomain() })
     }
 
     @Test
@@ -84,6 +84,6 @@ class ShoppingCartViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.products).isEqualTo(CART_PRODUCTS.subList(0, 5).map { it.toDomain() })
+        assertThat(actual.pagingCartProduct.cartList).isEqualTo(CART_PRODUCTS.subList(0, 5).map { it.toDomain() })
     }
 }

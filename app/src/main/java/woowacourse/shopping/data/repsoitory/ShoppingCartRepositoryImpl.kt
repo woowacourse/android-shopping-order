@@ -2,47 +2,33 @@ package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource) :
     ShoppingCartRepository {
     override fun insertCartProduct(
         productId: Long,
-        name: String,
-        price: Int,
         quantity: Int,
-        imageUrl: String,
-    ): Result<Unit> =
+    ): Result<Int> =
         dataSource.insertCartProduct(
             productId = productId,
-            name = name,
-            price = price,
             quantity = quantity,
-            imageUrl = imageUrl,
         )
 
-    override fun findCartProduct(productId: Long): Result<Product> =
-        dataSource.findCartProduct(productId = productId).mapCatching { it.toDomain() }
-
     override fun updateCartProduct(
-        productId: Long,
+        cartId: Int,
         quantity: Int,
-    ): Result<Unit> = dataSource.updateCartProduct(productId = productId, quantity = quantity)
+    ): Result<Unit> = dataSource.updateCartProduct(cartId = cartId, quantity = quantity)
 
     override fun getCartProductsPaged(
         page: Int,
-        pageSize: Int,
-    ): Result<List<Product>> =
-        dataSource.getCartProductsPaged(page = page, pageSize = pageSize)
-            .mapCatching { result -> result.map { it.toDomain() } }
-
-    override fun getAllCartProducts(): Result<List<Product>> =
-        dataSource.getAllCartProducts().mapCatching { result -> result.map { it.toDomain() } }
+        size: Int,
+    ): Result<Carts> =
+        dataSource.getCartProductsPaged(page = page, size = size)
+            .mapCatching { result -> result.toDomain() }
 
     override fun getCartProductsTotal(): Result<Int> = dataSource.getCartProductsTotal()
 
-    override fun deleteCartProduct(productId: Long): Result<Unit> = dataSource.deleteCartProduct(productId = productId)
-
-    override fun deleteAllCartProducts(): Result<Unit> = dataSource.deleteAllCartProducts()
+    override fun deleteCartProduct(cartId: Int): Result<Unit> = dataSource.deleteCartProduct(cartId = cartId)
 }

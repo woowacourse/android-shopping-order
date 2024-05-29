@@ -1,33 +1,24 @@
 package woowacourse.shopping.data.datasource.local
 
-import woowacourse.shopping.data.model.local.CartProductDto
+import woowacourse.shopping.data.model.remote.CartsDto
 
 interface ShoppingCartDataSource {
     fun insertCartProduct(
         productId: Long,
-        name: String,
-        price: Int,
         quantity: Int,
-        imageUrl: String,
-    ): Result<Unit>
-
-    fun findCartProduct(productId: Long): Result<CartProductDto>
+    ): Result<Int>
 
     fun updateCartProduct(
-        productId: Long,
+        cartId: Int,
         quantity: Int,
     ): Result<Unit>
 
     fun getCartProductsPaged(
         page: Int,
-        pageSize: Int,
-    ): Result<List<CartProductDto>>
-
-    fun getAllCartProducts(): Result<List<CartProductDto>>
+        size: Int,
+    ): Result<CartsDto>
 
     fun getCartProductsTotal(): Result<Int>
 
-    fun deleteCartProduct(productId: Long): Result<Unit>
-
-    fun deleteAllCartProducts(): Result<Unit>
+    fun deleteCartProduct(cartId: Int): Result<Unit>
 }

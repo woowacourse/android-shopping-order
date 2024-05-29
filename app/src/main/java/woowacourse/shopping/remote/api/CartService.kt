@@ -8,7 +8,9 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
+import woowacourse.shopping.remote.model.response.CartItemCountResponse
 import woowacourse.shopping.remote.model.response.CartsResponse
 
 interface CartService {
@@ -30,9 +32,10 @@ interface CartService {
 
     @PATCH(ApiClient.Cart.PATCH_CART_ITEMS)
     fun patchCartItem(
-        @Body body: Int,
+        @Path("id") id: Int,
+        @Body body: PatchCartItemRequest,
     ): Call<Unit>
 
     @GET(ApiClient.Cart.GET_CART_ITEMS_COUNT)
-    fun getCartItemsCount(): Call<Int>
+    fun getCartItemsCount(): Call<CartItemCountResponse>
 }

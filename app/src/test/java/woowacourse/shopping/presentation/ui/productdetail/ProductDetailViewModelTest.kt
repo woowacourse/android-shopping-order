@@ -58,7 +58,7 @@ class ProductDetailViewModelTest {
         // then
         Thread.sleep(3000)
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.product).isEqualTo(STUB_PRODUCT_A.toDomain())
+        assertThat(actual.cart).isEqualTo(STUB_PRODUCT_A.toDomain())
     }
 
     @Test

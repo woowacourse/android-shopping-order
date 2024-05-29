@@ -1,18 +1,19 @@
 package woowacourse.shopping.presentation.ui.productlist
 
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 
 data class ProductListUiState(
-    val pagingProduct: PagingProduct = PagingProduct(),
-    val productHistorys: List<Product> = emptyList(),
-    val cartCount: Int = 0,
+    val pagingCart: PagingCart = PagingCart(),
+    val productHistories: List<Product> = emptyList(),
+    val cartQuantity: Int = 0,
 ) {
     val cartTotalCount: Int
         get() =
-            if (cartCount >= MAX_CART_COUNT) {
+            if (cartQuantity >= MAX_CART_COUNT) {
                 MAX_CART_COUNT
             } else {
-                cartCount
+                cartQuantity
             }
 
     companion object {
@@ -20,7 +21,7 @@ data class ProductListUiState(
     }
 }
 
-data class PagingProduct(
-    val productList: List<Product> = emptyList(),
+data class PagingCart(
+    val cartList: List<Cart> = emptyList(),
     val last: Boolean = false,
 )

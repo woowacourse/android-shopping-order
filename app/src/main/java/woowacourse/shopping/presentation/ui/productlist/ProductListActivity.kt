@@ -70,12 +70,12 @@ class ProductListActivity : BaseActivity<ActivityProductListBinding>() {
         }
 
         viewModel.uiState.observe(this) { state ->
-            productListAdapter.updateProductList(state.pagingProduct)
+            productListAdapter.updateProductList(state.pagingCart)
 
             val layoutManager = binding.rvProductHistoryList.layoutManager as LinearLayoutManager
             scrollPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
 
-            productHistoryListAdapter.submitList(state.productHistorys) {
+            productHistoryListAdapter.submitList(state.productHistories) {
                 if (scrollPosition != RecyclerView.NO_POSITION) {
                     layoutManager.scrollToPositionWithOffset(scrollPosition, 0)
                 }

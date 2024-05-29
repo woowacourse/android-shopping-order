@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCartProductBinding
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartActionHandler
 
 class CartProductsAdapter(
     private val actionHandler: ShoppingCartActionHandler,
     private val productCountHandler: ProductCountHandler,
-) : ListAdapter<Product, CartProductsAdapter.CartProductViewHolder>(ProductDiffCallback) {
+) : ListAdapter<Cart, CartProductsAdapter.CartProductViewHolder>(CartDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -40,11 +40,11 @@ class CartProductsAdapter(
         private val productCountHandler: ProductCountHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            cartProduct: Product,
+            cart: Cart,
             position: Int,
         ) {
             binding.apply {
-                product = cartProduct
+                this.cart = cart
                 this@apply.actionHandler = this@CartProductViewHolder.actionHandler
                 this@apply.position = position
                 this@apply.productCountHandler = this@CartProductViewHolder.productCountHandler
@@ -53,17 +53,17 @@ class CartProductsAdapter(
         }
     }
 
-    object ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
+    object CartDiffCallback : DiffUtil.ItemCallback<Cart>() {
         override fun areItemsTheSame(
-            oldItem: Product,
-            newItem: Product,
+            oldItem: Cart,
+            newItem: Cart,
         ): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Product,
-            newItem: Product,
+            oldItem: Cart,
+            newItem: Cart,
         ): Boolean {
             return oldItem == newItem
         }

@@ -11,15 +11,14 @@ import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
-import woowacourse.shopping.local.datasource.ShoppingCartDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
-import woowacourse.shopping.local.db.ShoppingCartDatabase
 import woowacourse.shopping.remote.api.NetworkModule
 import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
+import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
 
 class ShoppingApplication : Application() {
     private val shoppingCartDataSource: ShoppingCartDataSource by lazy {
-        ShoppingCartDataSourceImpl(ShoppingCartDatabase.getDatabase(applicationContext).dao())
+        ShoppingCartDataSourceImpl(NetworkModule.cartService)
     }
     val shoppingCartRepository: ShoppingCartRepository by lazy {
         ShoppingCartRepositoryImpl(shoppingCartDataSource)
@@ -38,10 +37,6 @@ class ShoppingApplication : Application() {
             productDataSource,
             shoppingCartDataSource,
         )
-    }
-
-    override fun onCreate() {
-        super.onCreate()
     }
 
     companion object {

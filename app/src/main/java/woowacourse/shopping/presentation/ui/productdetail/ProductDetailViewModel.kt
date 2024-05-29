@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -34,14 +35,14 @@ class ProductDetailViewModel(
 
     fun getProduct() {
         thread {
-            productRepository.findProductById(id).onSuccess { product ->
+            productRepository.findCartByProductId(id).onSuccess { cart ->
                 hideError()
                 _uiState.value?.let { state ->
                     if (state.isLastProductPage) {
-                        _uiState.postValue(state.copy(product = product))
-                        insertProductHistory(product)
+                        _uiState.postValue(state.copy(cart = cart))
+                        insertProductHistory(cart.product)
                     } else {
-                        getProductHistory(product)
+                        getProductHistory(cart)
                     }
                 }
             }.onFailure { e ->
@@ -54,34 +55,34 @@ class ProductDetailViewModel(
         getProduct()
     }
 
-    private fun getProductHistory(product: Product) {
-        productHistoryRepository.getProductHistory(2).onSuccess { productHistorys ->
+    private fun getProductHistory(cart: Cart) {
+        productHistoryRepository.getProductHistory(2).onSuccess { productHistories ->
             hideError()
             val productHistory =
-                if (productHistorys.isNotEmpty() && product.id == productHistorys.first().id) {
-                    if (productHistorys.size >= 2) productHistorys[1] else null
+                if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
+                    if (productHistories.size >= 2) productHistories[1] else null
                 } else {
-                    productHistorys.firstOrNull()
+                    productHistories.firstOrNull()
                 }
 
             val isLastProductPage =
                 when {
-                    productHistorys.isEmpty() -> true
-                    product.id == productHistorys.first().id -> productHistorys.size < 2
+                    productHistories.isEmpty() -> true
+                    cart.product.id == productHistories.first().id -> productHistories.size < 2
                     else -> false
                 }
 
             uiState.value?.let { state ->
                 _uiState.postValue(
                     state.copy(
-                        product = product,
+                        cart = cart,
                         productHistory = productHistory,
                         isLastProductPage = isLastProductPage,
                     ),
                 )
             }
 
-            insertProductHistory(product)
+            insertProductHistory(cart.product)
         }.onFailure { e ->
             showError(e)
             showMessage(MessageProvider.DefaultErrorMessage)
@@ -90,23 +91,42 @@ class ProductDetailViewModel(
 
     fun addToCart() {
         _uiState.value?.let { state ->
-            state.product?.let { product ->
+            state.cart?.let { cart ->
+
                 thread {
-                    shoppingCartRepository.insertCartProduct(
-                        productId = product.id,
-                        name = product.name,
-                        price = product.price,
-                        quantity = product.quantity,
-                        imageUrl = product.imageUrl,
-                    ).onSuccess {
-                        hideError()
-                        showMessage(ProductDetailMessage.AddToCartSuccessMessage)
-                    }.onFailure { e ->
-                        showError(e)
-                        showMessage(MessageProvider.DefaultErrorMessage)
+                    if (cart.id == Cart.DEFAULT_CART_ID) {
+                        insertCart(cart)
+                    } else {
+                        updateCart(cart)
                     }
                 }
             }
+        }
+    }
+
+    fun insertCart(cart: Cart) {
+        shoppingCartRepository.insertCartProduct(
+            productId = cart.product.id,
+            quantity = cart.quantity,
+        ).onSuccess {
+            hideError()
+            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+        }.onFailure { e ->
+            showError(e)
+            showMessage(MessageProvider.DefaultErrorMessage)
+        }
+    }
+
+    fun updateCart(cart: Cart) {
+        shoppingCartRepository.updateCartProduct(
+            cartId = cart.id,
+            quantity = cart.quantity,
+        ).onSuccess {
+            hideError()
+            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+        }.onFailure { e ->
+            showError(e)
+            showMessage(MessageProvider.DefaultErrorMessage)
         }
     }
 
@@ -115,8 +135,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         _uiState.value?.let { state ->
-            state.product?.let { product ->
-                _uiState.value = state.copy(product = product.copy(quantity = product.quantity + 1))
+            state.cart?.let { product ->
+                _uiState.value = state.copy(cart = product.copy(quantity = product.quantity + 1))
             }
         }
     }
@@ -126,8 +146,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         _uiState.value?.let { state ->
-            state.product?.let { product ->
-                _uiState.value = state.copy(product = product.copy(quantity = product.quantity - 1))
+            state.cart?.let { product ->
+                _uiState.value = state.copy(cart = product.copy(quantity = product.quantity - 1))
             }
         }
     }

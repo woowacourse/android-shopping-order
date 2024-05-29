@@ -1,33 +1,24 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingCartRepository {
     fun insertCartProduct(
         productId: Long,
-        name: String,
-        price: Int,
         quantity: Int,
-        imageUrl: String,
-    ): Result<Unit>
-
-    fun findCartProduct(productId: Long): Result<Product>
+    ): Result<Int>
 
     fun updateCartProduct(
-        productId: Long,
+        cartId: Int,
         quantity: Int,
     ): Result<Unit>
 
     fun getCartProductsPaged(
         page: Int,
-        pageSize: Int,
-    ): Result<List<Product>>
-
-    fun getAllCartProducts(): Result<List<Product>>
+        size: Int,
+    ): Result<Carts>
 
     fun getCartProductsTotal(): Result<Int>
 
-    fun deleteCartProduct(productId: Long): Result<Unit>
-
-    fun deleteAllCartProducts(): Result<Unit>
+    fun deleteCartProduct(cartId: Int): Result<Unit>
 }
