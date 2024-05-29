@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.dto.response
+package woowacourse.shopping.data.dto.response
 
 data class ProductResponse(
     val content: List<ProductDto>,

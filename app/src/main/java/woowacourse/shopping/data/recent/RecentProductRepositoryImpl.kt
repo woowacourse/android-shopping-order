@@ -1,11 +1,11 @@
-package woowacourse.shopping.data.db.recent
+package woowacourse.shopping.data.recent
 
-import woowacourse.shopping.data.db.recent.RecentProductEntity.Companion.toEntity
+import woowacourse.shopping.data.recent.RecentProductEntity.Companion.toEntity
 import woowacourse.shopping.domain.RecentProductItem
 import woowacourse.shopping.domain.repository.RecentRepository
 import kotlin.concurrent.thread
 
-class LocalRecentProductRepository(private val dao: RecentProductDao) : RecentRepository {
+class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentRepository {
     override fun loadAll(): Result<List<RecentProductItem>> {
         var result: Result<List<RecentProductItem>>? = null
         thread {

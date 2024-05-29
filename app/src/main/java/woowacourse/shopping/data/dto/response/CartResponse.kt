@@ -1,4 +1,6 @@
-package woowacourse.shopping.data.remote.dto.response
+package woowacourse.shopping.data.dto.response
+
+import com.google.gson.annotations.SerializedName
 
 data class CartResponse(
     val totalPages: Int,
@@ -10,6 +12,10 @@ data class CartResponse(
     val number: Int,
     val numberOfElements: Int,
     val size: Int,
-    val contentDto: List<ContentDto>,
+    @SerializedName("content") val cartDto: List<CartDto>,
     val empty: Boolean,
+)
+
+data class CartQuantityResponse(
+    val quantity: Int,
 )

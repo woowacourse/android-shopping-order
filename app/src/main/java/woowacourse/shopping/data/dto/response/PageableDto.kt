@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.dto.response
+package woowacourse.shopping.data.dto.response
 
 data class PageableDto(
     val sort: SortDto,

@@ -1,19 +1,19 @@
-package woowacourse.shopping.data.remote.shopping
+package woowacourse.shopping.data.product.remote
 
 import retrofit2.Call
+import woowacourse.shopping.data.dto.response.ProductDto
+import woowacourse.shopping.data.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.ApiClient
-import woowacourse.shopping.data.remote.dto.response.ProductDto
-import woowacourse.shopping.data.remote.dto.response.ProductResponse
 
-class RemoteProductDataSourceImpl : RemoteProductDataSource {
+class RemoteProductDataSource {
     private val productApiService: ProductApiService =
         ApiClient.getApiClient().create(ProductApiService::class.java)
 
-    override fun loadById(productId: Long): Call<ProductDto> {
+    fun loadById(productId: Long): Call<ProductDto> {
         return productApiService.requestProductDetail(productId = productId.toInt())
     }
 
-    override fun load(
+    fun load(
         startPage: Int,
         pageSize: Int,
     ): Call<ProductResponse> {

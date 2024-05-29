@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.remote.shopping
+package woowacourse.shopping.data.product.remote
 
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.remote.dto.response.ProductDto
-import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.dto.response.ProductDto
+import woowacourse.shopping.data.dto.response.ProductResponse
 
 interface ProductApiService {
     @GET("/products")

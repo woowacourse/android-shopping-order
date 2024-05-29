@@ -1,14 +1,15 @@
-package woowacourse.shopping.data.remote.shopping
+package woowacourse.shopping.data.product
 
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.remote.dto.response.ProductDto
-import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.dto.response.ProductDto
+import woowacourse.shopping.data.dto.response.ProductResponse
+import woowacourse.shopping.data.product.remote.RemoteProductDataSource
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class RemoteProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSourceImpl()) :
+class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSource()) :
     ProductRepository {
     override fun load(
         startPage: Int,
