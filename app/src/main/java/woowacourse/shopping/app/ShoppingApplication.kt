@@ -3,12 +3,15 @@ package woowacourse.shopping.app
 import android.app.Application
 import androidx.preference.PreferenceManager
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
-import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
+import woowacourse.shopping.data.datasource.remote.OrderDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.provider.AuthProvider
+import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -16,6 +19,7 @@ import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
 import woowacourse.shopping.remote.api.NetworkModule
+import woowacourse.shopping.remote.datasource.OrderDataSourceImpl
 import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
 import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
 
@@ -45,6 +49,13 @@ class ShoppingApplication : Application() {
         ProductRepositoryImpl(
             productDataSource,
             shoppingCartDataSource,
+        )
+    }
+
+    private val orderDataSource: OrderDataSource by lazy { OrderDataSourceImpl(networkModule.orderService) }
+    val orderRepository: OrderRepository by lazy {
+        OrderRepositoryImpl(
+            orderDataSource,
         )
     }
 

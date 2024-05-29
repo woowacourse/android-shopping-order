@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -13,15 +14,18 @@ import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.shoppingcart.adapter.ShoppingCartPagingSource
 import kotlin.concurrent.thread
 
-class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
+class ShoppingCartViewModel(
+    private val shoppingRepository: ShoppingCartRepository,
+    private val orderRepository: OrderRepository,
+) :
     BaseViewModel(),
-    ShoppingCartActionHandler,
-    ProductCountHandler {
+        ShoppingCartActionHandler,
+        ProductCountHandler {
     private val _uiState: MutableLiveData<ShoppingCartUiState> =
         MutableLiveData(ShoppingCartUiState())
     val uiState: LiveData<ShoppingCartUiState> get() = _uiState
 
-    private val shoppingCartPagingSource = ShoppingCartPagingSource(repository)
+    private val shoppingCartPagingSource = ShoppingCartPagingSource(shoppingRepository)
 
     init {
         loadCartProducts(INIT_PAGE)
@@ -104,7 +108,7 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
         quantity: Int,
     ) {
         thread {
-            repository.insertCartProduct(
+            shoppingRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
             ).onSuccess {
@@ -117,7 +121,7 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
 
     override fun deleteCartProduct(cartId: Int) {
         thread {
-            repository.deleteCartProduct(cartId = cartId).onSuccess {
+            shoppingRepository.deleteCartProduct(cartId = cartId).onSuccess {
                 uiState.value?.let { state ->
                     loadCartProducts(state.pagingCartProduct.currentPage)
                 }
@@ -135,7 +139,7 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
         quantity: Int,
     ) {
         thread {
-            repository.updateCartProduct(
+            shoppingRepository.updateCartProduct(
                 cartId = cartId,
                 quantity = quantity,
             ).onSuccess {
@@ -161,8 +165,16 @@ class ShoppingCartViewModel(private val repository: ShoppingCartRepository) :
     companion object {
         const val INIT_PAGE = 0
 
-        fun factory(repository: ShoppingCartRepository): ViewModelProvider.Factory {
-            return BaseViewModelFactory { ShoppingCartViewModel(repository) }
+        fun factory(
+            shoppingCartRepository: ShoppingCartRepository,
+            orderRepository: OrderRepository,
+        ): ViewModelProvider.Factory {
+            return BaseViewModelFactory {
+                ShoppingCartViewModel(
+                    shoppingCartRepository,
+                    orderRepository,
+                )
+            }
         }
     }
 }

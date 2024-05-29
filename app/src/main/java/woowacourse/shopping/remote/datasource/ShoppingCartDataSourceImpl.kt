@@ -1,7 +1,7 @@
 package woowacourse.shopping.remote.datasource
 
 import retrofit2.Response
-import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.model.remote.CartsDto
 import woowacourse.shopping.remote.api.CartService
 import woowacourse.shopping.remote.mapper.toData

@@ -15,4 +15,9 @@ class ApiClient {
         const val PATCH_CART_ITEMS = "$BASE_URL/{id}"
         const val GET_CART_ITEMS_COUNT = "$BASE_URL/counts"
     }
+
+    object Order {
+        private const val BASE_URL = "/orders"
+        const val POST_ORDER = BASE_URL
+    }
 }

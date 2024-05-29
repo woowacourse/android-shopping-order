@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.local.ShoppingCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
