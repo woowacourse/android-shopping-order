@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
@@ -26,7 +26,7 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel by viewModels<ProductsViewModel> {
         ProductsViewModelFactory(
-            ProductRepository.getInstance(),
+            RemoteProductRepository(),
             RecentProductRepository.getInstance(),
             CartRepository.getInstance(),
         )

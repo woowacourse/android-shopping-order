@@ -4,8 +4,6 @@ import woowacourse.shopping.data.product.remote.retrofit.Content
 import woowacourse.shopping.data.product.remote.retrofit.Pageable
 import woowacourse.shopping.data.product.remote.retrofit.ProductResponse
 import woowacourse.shopping.data.product.remote.retrofit.Sort
-import woowacourse.shopping.data.product.remote.retrofit.toProduct
-import woowacourse.shopping.domain.model.PagingProduct
 
 val dummyFoodContents =
     List(55) {
@@ -41,12 +39,4 @@ val dummyProductResponse =
         Sort(false, false, false),
         55,
         3,
-    )
-
-val dummyPagingProduct =
-    PagingProduct(
-        dummyFoodContents.subList(0, 20).toProduct(),
-        dummyProductResponse.first,
-        dummyProductResponse.last,
-        dummyProductResponse.empty,
     )

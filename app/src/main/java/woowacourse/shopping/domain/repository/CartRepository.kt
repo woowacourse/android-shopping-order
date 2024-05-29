@@ -6,6 +6,8 @@ import java.lang.IllegalArgumentException
 import kotlin.concurrent.Volatile
 
 interface CartRepository {
+    fun findAll(): List<CartItem>
+
     fun increaseQuantity(productId: Int)
 
     fun decreaseQuantity(productId: Int)

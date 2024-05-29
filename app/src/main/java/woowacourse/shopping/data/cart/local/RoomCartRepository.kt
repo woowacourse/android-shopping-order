@@ -9,6 +9,14 @@ import kotlin.IllegalArgumentException
 import kotlin.concurrent.thread
 
 class RoomCartRepository(private val cartDao: CartDao) : CartRepository {
+    override fun findAll(): List<CartItem> {
+        var cartItems: List<CartItem> = emptyList()
+        thread {
+            cartItems = cartDao.findAll().toCartItems()
+        }.join()
+        return cartItems
+    }
+
     override fun increaseQuantity(productId: Int) {
         thread {
             runCatching {

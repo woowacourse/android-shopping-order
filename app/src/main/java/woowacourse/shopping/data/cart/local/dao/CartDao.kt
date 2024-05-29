@@ -9,6 +9,9 @@ import woowacourse.shopping.domain.model.Quantity
 
 @Dao
 interface CartDao {
+    @Query("SELECT * FROM cart")
+    fun findAll(): List<CartItemEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cartItemEntity: CartItemEntity)
 
