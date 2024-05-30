@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.domain.repository.CartRepository.Companion.DEFAULT_QUANTITY
+import woowacourse.shopping.data.model.CartItem.Companion.DEFAULT_QUANTITY
 
 data class CartItem(
     val id: Int,

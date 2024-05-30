@@ -5,5 +5,8 @@ interface CartItemClickListener {
 
     fun onDeleteButtonClick(itemId: Int)
 
-    fun onSelectChanged(itemId: Int, isSelected: Boolean)
+    fun onSelectChanged(
+        itemId: Int,
+        isSelected: Boolean,
+    )
 }

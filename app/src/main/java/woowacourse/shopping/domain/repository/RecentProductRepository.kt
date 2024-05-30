@@ -1,11 +1,10 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.Product2
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 
 interface RecentProductRepository {
-    fun save(product: Product2)
+    fun save(product: Product)
 
     fun update(productId: Int)
 

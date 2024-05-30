@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ProductResponse(
     @SerializedName("content")
-    val products: List<Product2>,
+    val products: List<Product>,
     @SerializedName("empty")
     val empty: Boolean,
     @SerializedName("first")

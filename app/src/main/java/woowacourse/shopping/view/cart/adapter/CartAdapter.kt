@@ -3,10 +3,8 @@ package woowacourse.shopping.view.cart.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.data.model.CartItem2
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.view.cart.CartItemClickListener
 import woowacourse.shopping.view.cart.QuantityClickListener
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
@@ -76,33 +74,30 @@ class CartAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateCartItemQuantity(cartItem: CartItem2) {
+    fun updateCartItemQuantity(cartItem: woowacourse.shopping.data.model.CartItem) {
         if (!isFirstLoad()) {
-            println("input : $cartItem")
             val position =
                 cartItems.indexOfFirst { (it as CartViewItem).cartItem.cartItemId == cartItem.cartItemId }
             if (position != -1) {
-                println("unchanged : ${cartItems[position]}")
                 cartItems[position] = CartViewItem(cartItem)
 
                 notifyItemChanged(position)
-                println("changed : ${cartItems[position]}")
             }
         }
     }
 
     fun updateSelection(changedItemId: Int) {
-        val position = cartItems.indexOfFirst {
-            if (it is CartViewItem) {
-                it.cartItem.cartItemId == changedItemId
-            } else {
-                false
+        val position =
+            cartItems.indexOfFirst {
+                if (it is CartViewItem) {
+                    it.cartItem.cartItemId == changedItemId
+                } else {
+                    false
+                }
             }
-        }
         (cartItems[position] as CartViewItem).select()
         notifyDataSetChanged()
     }
 
-    private fun isFirstLoad() =
-        cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
+    private fun isFirstLoad() = cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
 }

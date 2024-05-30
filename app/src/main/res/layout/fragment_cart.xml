@@ -11,7 +11,7 @@
 
         <import type="android.view.View" />
 
-        <import type="woowacourse.shopping.data.model.CartItem2" />
+        <import type="woowacourse.shopping.data.model.CartItem" />
 
         <variable
             name="viewModel"

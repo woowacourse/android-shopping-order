@@ -2,7 +2,7 @@ package woowacourse.shopping.view.home.adapter.product
 
 sealed class HomeViewItem(open val viewType: Int) {
     data class ProductViewItem(
-        val product: woowacourse.shopping.data.model.Product2,
+        val product: woowacourse.shopping.data.model.Product,
         private var _quantity: Int = DEFAULT_SHOPPING_QUANTITY,
         override val viewType: Int = PRODUCT_VIEW_TYPE,
     ) : HomeViewItem(viewType) {

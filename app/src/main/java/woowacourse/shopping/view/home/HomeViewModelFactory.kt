@@ -2,13 +2,13 @@ package woowacourse.shopping.view.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.repository.CartRepository2
-import woowacourse.shopping.domain.repository.ProductRepository2
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class HomeViewModelFactory(
-    private val productRepository: ProductRepository2,
-    private val cartRepository: CartRepository2,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

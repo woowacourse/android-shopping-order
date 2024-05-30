@@ -1,10 +1,11 @@
-package woowacourse.shopping.data.db.recent
+package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.db.recent.RecentProductDatabase
+import woowacourse.shopping.data.db.recent.RecentProductEntity
+import woowacourse.shopping.data.db.recent.toRecentProduct
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.toRecentProductEntity
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.model.toRecentProductEntity
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
 
@@ -12,7 +13,7 @@ class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) 
     RecentProductRepository {
     private val dao = recentProductDatabase.recentProductDao()
 
-    override fun save(product: Product2) {
+    override fun save(product: Product) {
         if (findOrNullByProductId(product.id) != null) {
             update(product.id)
         } else {

@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.home
 
-import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.Product
 
 interface HomeClickListener {
     fun onProductClick(productId: Int)
@@ -9,5 +9,5 @@ interface HomeClickListener {
 
     fun onShoppingCartButtonClick()
 
-    fun onPlusButtonClick(product: Product2)
+    fun onPlusButtonClick(product: Product)
 }

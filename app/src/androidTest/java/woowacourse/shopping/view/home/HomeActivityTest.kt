@@ -12,9 +12,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.data.db.recent.RecentProductRepositoryImpl
+import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.helper.testProduct0
 
 @RunWith(AndroidJUnit4::class)
 class HomeActivityTest {
@@ -47,7 +47,7 @@ class HomeActivityTest {
 
     @Test
     fun `화면에_최근_본_상품_목록_보인다`() {
-        recentProductRepository.save(testProduct0)
+        recentProductRepository.save(Product("fashion", 0, "image", "name", 1000))
 
         ActivityScenario.launch(HomeActivity::class.java)
 

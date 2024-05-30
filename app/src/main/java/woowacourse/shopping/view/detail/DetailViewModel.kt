@@ -4,28 +4,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartRepository.Companion.DEFAULT_QUANTITY
-import woowacourse.shopping.domain.repository.CartRepository2
-import woowacourse.shopping.domain.repository.ProductRepository2
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
 import woowacourse.shopping.view.state.UIState
 
 class DetailViewModel(
-    private val cartRepository: CartRepository2,
-    private val productRepository: ProductRepository2,
+    private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productId: Int,
 ) : ViewModel(), DetailClickListener, QuantityClickListener {
-    private val _detailUiState = MutableLiveData<UIState<Product2>>(UIState.Loading)
-    val detailUiState: LiveData<UIState<Product2>>
+    private val _detailUiState = MutableLiveData<UIState<Product>>(UIState.Loading)
+    val detailUiState: LiveData<UIState<Product>>
         get() = _detailUiState
 
-    private val _product: MutableLiveData<Product2> = MutableLiveData()
-    val product: LiveData<Product2>
+    private val _product: MutableLiveData<Product> = MutableLiveData()
+    val product: LiveData<Product>
         get() = _product
 
     private val _mostRecentProduct: MutableLiveData<RecentProduct?> = MutableLiveData()
@@ -76,7 +75,6 @@ class DetailViewModel(
     }
 
     fun saveCartItem() {
-        println("inserted quantity : ${quantity.value}")
         val state = detailUiState.value
         if (state is UIState.Success) {
             val cartResponse = cartRepository.getCartItems(0, totalQuantity, "asc").getOrNull()
@@ -87,10 +85,8 @@ class DetailViewModel(
             val quantity = quantity.value ?: 0
 
             if (cartItemId == null) {
-                println("cart item is null")
                 cartRepository.addCartItem(productId, quantity)
             } else {
-                println("cart item $currentQuantity")
                 cartRepository.updateCartItem(cartItemId, quantity + currentQuantity)
             }
         }
@@ -113,8 +109,6 @@ class DetailViewModel(
     }
 
     override fun onPutCartButtonClick() {
-        println("currentQuantity : $totalQuantity")
-        println("add value : ${quantity.value}")
         saveCartItem()
         _navigateToCart.value = Event(true)
     }

@@ -5,7 +5,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.db.cart.CartDatabase
 import woowacourse.shopping.data.db.recent.RecentProductDatabase
 import woowacourse.shopping.data.remote.BasicAuthInterceptor
 import woowacourse.shopping.data.remote.CartService
@@ -43,12 +42,10 @@ class ShoppingApplication : Application() {
         remoteCartDataSource = RemoteCartDataSource(cartService)
         remoteProductDataSource = RemoteProductDataSource(productService)
         remoteOrderDataSource = RemoteOrderDataSource(orderService)
-        cartDatabase = CartDatabase.getInstance(this)
         recentProductDatabase = RecentProductDatabase.getInstance(this)
     }
 
     companion object {
-        lateinit var cartDatabase: CartDatabase
         lateinit var recentProductDatabase: RecentProductDatabase
         lateinit var remoteCartDataSource: RemoteCartDataSource
         lateinit var remoteProductDataSource: RemoteProductDataSource

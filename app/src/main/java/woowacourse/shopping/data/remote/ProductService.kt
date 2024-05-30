@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.ProductResponse
 
 interface ProductService {
@@ -19,5 +19,5 @@ interface ProductService {
     @GET("/products/{id}")
     fun getProductById(
         @Path("id") id: Int,
-    ): Call<Product2>
+    ): Call<Product>
 }

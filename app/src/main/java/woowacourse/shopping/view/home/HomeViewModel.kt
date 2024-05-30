@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.model.CartItem2
-import woowacourse.shopping.data.model.Product2
+import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartRepository2
-import woowacourse.shopping.domain.repository.ProductRepository2
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
@@ -16,8 +16,8 @@ import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewIt
 import woowacourse.shopping.view.state.UIState
 
 class HomeViewModel(
-    private val productRepository: ProductRepository2,
-    private val cartRepository: CartRepository2,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), HomeClickListener, QuantityClickListener {
     private var pageNumber = 0
@@ -59,7 +59,7 @@ class HomeViewModel(
     val loadedProductItems: LiveData<List<ProductViewItem>>
         get() = _loadedProductItems
 
-    private var currentCartItems: List<CartItem2> = emptyList()
+    private var currentCartItems: List<CartItem> = emptyList()
 
     init {
         loadRecentProducts()
@@ -104,10 +104,6 @@ class HomeViewModel(
                 ?: emptyList()
         _totalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
 
-        currentCartItems.forEach {
-            println("${it.product.name} ${it.quantity}")
-        }
-
         val updatedProductItems =
             currentCartItems.map { cartItem ->
                 ProductViewItem(cartItem.product, cartItem.quantity)
@@ -130,7 +126,6 @@ class HomeViewModel(
             }
         }
         _loadedProductItems.value = loadedProductItems.value?.toList()
-        println("changed : ${currentCartItems}")
     }
 
     private fun loadTotalQuantity() {
@@ -145,7 +140,7 @@ class HomeViewModel(
         _navigateToCart.value = Event(true)
     }
 
-    override fun onPlusButtonClick(product: Product2) {
+    override fun onPlusButtonClick(product: Product) {
         _totalQuantity.value = totalQuantity.value?.plus(1)
         cartRepository.addCartItem(product.id, 1).getOrNull()
         currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
@@ -155,7 +150,7 @@ class HomeViewModel(
     }
 
     private fun updateLoadedProductQuantity(
-        product: Product2,
+        product: Product,
         quantity: Int,
     ) {
         val productItem = ProductViewItem(product, quantity)

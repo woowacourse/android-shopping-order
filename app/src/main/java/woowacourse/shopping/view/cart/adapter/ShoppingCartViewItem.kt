@@ -1,13 +1,10 @@
 package woowacourse.shopping.view.cart.adapter
 
-import woowacourse.shopping.data.model.CartItem2
-import woowacourse.shopping.domain.model.CartItem
-
 sealed class ShoppingCartViewItem(open val viewType: Int) {
     data class CartViewItem(
-        val cartItem: CartItem2,
+        val cartItem: woowacourse.shopping.data.model.CartItem,
         val isSelected: Boolean = false,
-        override val viewType: Int = CART_VIEW_TYPE
+        override val viewType: Int = CART_VIEW_TYPE,
     ) :
         ShoppingCartViewItem(viewType) {
         fun select(): CartViewItem {
