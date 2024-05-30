@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="onOrderListener"
             type="woowacourse.shopping.ui.order.OnOrderListener" />
-
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

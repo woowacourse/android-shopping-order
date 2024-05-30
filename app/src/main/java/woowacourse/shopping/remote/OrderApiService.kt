@@ -7,6 +7,6 @@ import retrofit2.http.POST
 interface OrderApiService {
     @POST("/orders")
     fun createOrder(
-        @Body cartItemIds: List<Long> 
+        @Body cartItemIds: OrderRequest
     ): Call<Unit>
 }
