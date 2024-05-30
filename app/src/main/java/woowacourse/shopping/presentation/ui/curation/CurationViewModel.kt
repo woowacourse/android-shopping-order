@@ -35,10 +35,6 @@ class CurationViewModel(
         }
     }
 
-    companion object {
-        const val LOAD_ERROR = "큐레이션 로드 에러입니다"
-    }
-
     override fun order() {
         thread {
             val orderCartIds =
@@ -141,5 +137,9 @@ class CurationViewModel(
                 }
             }
         }
+    }
+
+    companion object {
+        const val LOAD_ERROR = "큐레이션 로드 에러입니다"
     }
 }

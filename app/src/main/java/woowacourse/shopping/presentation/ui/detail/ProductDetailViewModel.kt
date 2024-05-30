@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
@@ -28,25 +29,10 @@ class ProductDetailViewModel(
     private val _cartHandler = MutableLiveData<EventState<UpdateUiModel>>()
     val cartHandler: LiveData<EventState<UpdateUiModel>> get() = _cartHandler
 
-    private val _navigateHandler = MutableLiveData<EventState<Long>>()
-    val navigateHandler: LiveData<EventState<Long>> get() = _navigateHandler
+    private val _navigateHandler = MutableLiveData<EventState<CartProduct>>()
+    val navigateHandler: LiveData<EventState<CartProduct>> get() = _navigateHandler
 
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
-
-//    fun findCartProductById(id: Long) {
-//        thread {
-//            repository.getProductById(id.toInt()).onSuccess {
-//                if (it == null) {
-//                    _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
-//                } else {
-//                    _product.postValue(UiState.Success(it))
-//                    saveRecentProduct(it)
-//                }
-//            }.onFailure {
-//                _errorHandler.value = EventState(PRODUCT_NOT_FOUND)
-//            }
-//        }
-//    }
 
     fun setCartProduct(cartProduct: CartProduct?) {
         if (cartProduct != null) {
@@ -115,8 +101,8 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onNavigateToDetail(productId: Long) {
-        _navigateHandler.value = EventState(productId)
+    override fun onNavigateToDetail(recentProduct: RecentProduct) {
+        _navigateHandler.value = EventState(recentProduct.toCartProduct())
     }
 
     override fun onPlus(cartProduct: CartProduct) {

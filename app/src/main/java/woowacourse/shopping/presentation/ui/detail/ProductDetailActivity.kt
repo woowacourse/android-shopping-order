@@ -80,14 +80,14 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                 }
             },
         )
-//        viewModel.navigateHandler.observe(
-//            this,
-//            EventObserver {
-//                createIntent(this, it).apply {
-//                    startActivity(this)
-//                }
-//            },
-//        )
+        viewModel.navigateHandler.observe(
+            this,
+            EventObserver {
+                createIntent(this, it).apply {
+                    startActivity(this)
+                }
+            },
+        )
     }
 
     private fun initData(cartProduct: CartProduct?) {
@@ -107,7 +107,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     companion object {
-        const val EXTRA_PRODUCT_ID = "productId"
         const val EXTRA_CART_PRODUCT = "cartProduct"
         const val EXTRA_OVERLAY = "overlay"
 

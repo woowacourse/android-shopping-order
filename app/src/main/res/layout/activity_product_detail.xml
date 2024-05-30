@@ -87,7 +87,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/background_cart"
-                android:onClick="@{() -> detailActionHandler.onNavigateToDetail(recentProduct.productId)}"
+                android:onClick="@{() -> detailActionHandler.onNavigateToDetail(recentProduct)}"
                 android:padding="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

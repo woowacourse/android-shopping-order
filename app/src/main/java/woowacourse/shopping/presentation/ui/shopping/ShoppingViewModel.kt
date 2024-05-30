@@ -50,27 +50,21 @@ class ShoppingViewModel(private val repository: Repository) :
         getCartItemCounts()
     }
 
-    fun combineCartProducts() {
-        // _products와 _carts가 성공 상태인지 확인
+    private fun combineCartProducts() {
         if (_products.value is UiState.Success && _carts.value is UiState.Success) {
-            // 성공 상태인 경우 데이터 가져오기
             val products = (_products.value as UiState.Success).data
             val carts = (_carts.value as UiState.Success).data
 
             // cartProducts 리스트 생성
             val cartProducts =
                 products.map { product ->
-                    // carts에서 productId가 같은 항목을 찾음
                     val cartItem = carts.find { it.productId == product.productId }
                     if (cartItem != null) {
-                        // product의 quantity를 cartItem의 quantity로 업데이트
                         product.copy(quantity = cartItem.quantity, cartId = cartItem.cartId)
                     } else {
                         product
                     }
                 }
-
-            // 업데이트된 cartProducts를 반영 (예: _combinedProducts MutableLiveData에 저장)
             this.cartProducts.value = UiState.Success(cartProducts)
         }
     }
@@ -122,7 +116,6 @@ class ShoppingViewModel(private val repository: Repository) :
 
     companion object {
         const val LOAD_ERROR = "아이템을 끝까지 불러왔습니다"
-        const val PAGE_SIZE = 20
     }
 
     override fun onProductClick(cartProduct: CartProduct) {
@@ -216,7 +209,6 @@ class ShoppingViewModel(private val repository: Repository) :
     fun updateCartProducts(updateUiModel: UpdateUiModel) {
         val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
         updateUiModel.updatedItems.forEach { updatedItem ->
-            // 해당 productId를 갖는 제품을 찾아서 수량을 업데이트
             val cartProductToUpdate = cartProducts.find { it.productId == updatedItem.key }
             cartProductToUpdate?.quantity = updatedItem.value.quantity
         }
