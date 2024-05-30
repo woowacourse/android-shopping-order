@@ -18,6 +18,10 @@
             name="productWithQuantity"
             type="woowacourse.shopping.ui.products.ProductWithQuantityUiModel" />
 
+        <variable
+            name="addCartClickListener"
+            type="woowacourse.shopping.ui.utils.AddCartClickListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,7 +64,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/start_add_product"
-            android:onClick="@{() -> vm.addCart(productWithQuantity.product.id)}"
+            android:onClick="@{() -> addCartClickListener.addCart(productWithQuantity.product.id)}"
             android:src="@drawable/ic_plus"
             app:isVisible="@{productWithQuantity.quantity == 0}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"

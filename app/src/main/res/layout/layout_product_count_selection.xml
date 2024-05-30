@@ -16,6 +16,10 @@
             name="countButtonClickListener"
             type="woowacourse.shopping.ui.CountButtonClickListener" />
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.ui.cart.viewmodel.CartViewModel" />
+
     </data>
 
     <LinearLayout

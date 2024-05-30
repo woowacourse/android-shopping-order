@@ -19,6 +19,7 @@ import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.products.toProductUiModel
+import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 
@@ -27,7 +28,7 @@ class ProductContentsViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) :
-    ViewModel(), CountButtonClickListener, ProductItemClickListener {
+    ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
     private val items = mutableListOf<Product>()
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
 

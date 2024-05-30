@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
@@ -15,12 +16,16 @@ import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
 import woowacourse.shopping.ui.cart.CartUiModel
+import woowacourse.shopping.ui.cart.RecommendProductClickListener
+import woowacourse.shopping.ui.products.ProductWithQuantityUiState
+import woowacourse.shopping.ui.utils.AddCartClickListener
 
 class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel(), CountButtonClickListener {
+) : ViewModel(), CountButtonClickListener, RecommendProductClickListener, AddCartClickListener {
     private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
+    private val products: MutableLiveData<List<Product>> = MutableLiveData()
 
     val cart: LiveData<CartItemsUiState> = _cart
 
@@ -38,8 +43,18 @@ class CartViewModel(
 
     val isRecommendPage: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
+
     init {
         loadCartItems()
+    }
+
+    fun loadProducts() {
+        runCatching {
+            this.products.value = productRepository.getProducts(0, 200)
+        }.onSuccess {
+            productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
+        }
     }
 
     fun clickOrderButton() {
@@ -131,4 +146,27 @@ class CartViewModel(
         this.product.imageUrl,
         isChecked
     )
+
+    override fun plusRecommendCount(productId: Long) {
+        cartRepository.patchCartItem(
+            findCartIdByProductId(productId),
+            findCartItemQuantityByProductId(productId).inc().value,
+        )
+        loadCartItems()
+    }
+
+    override fun addCart(productId: Long) {
+        cartRepository.postCartItems(productId, 1)
+        loadCartItems()
+    }
+
+    override fun minusRecommendCount(productId: Long) {
+        val currentCount = findCartItemQuantityByProductId(productId).dec().value
+        if (currentCount == 0) {
+            cartRepository.deleteCartItem(findCartIdByProductId(productId))
+        } else {
+            cartRepository.patchCartItem(findCartIdByProductId(productId), currentCount)
+        }
+        loadCartItems()
+    }
 }

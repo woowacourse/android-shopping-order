@@ -11,12 +11,15 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.databinding.LayoutRecommendProductBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
+import woowacourse.shopping.ui.products.adapter.ProductAdapter
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
+    private lateinit var recommendBinding:LayoutRecommendProductBinding
     private lateinit var adapter: CartAdapter
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
@@ -31,6 +34,10 @@ class CartActivity : AppCompatActivity() {
         initBinding()
         initToolbar()
         setCartAdapter()
+
+
+        //recommendBinding.rvRecommendProduct.adapter = ProductAdapter()
+
         observeCartItems()
 
         binding.cbCartItemTotal.setOnCheckedChangeListener { _, isChecked ->
@@ -40,8 +47,10 @@ class CartActivity : AppCompatActivity() {
 
     private fun initBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
+        recommendBinding = DataBindingUtil.setContentView(this, R.layout.layout_recommend_product)
         binding.vm = viewModel
         binding.lifecycleOwner = this
+        recommendBinding.lifecycleOwner this
     }
 
     private fun initToolbar() {
