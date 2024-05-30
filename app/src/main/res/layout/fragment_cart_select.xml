@@ -109,18 +109,64 @@
             app:layout_constraintStart_toEndOf="@+id/tv_page"
             app:layout_constraintTop_toTopOf="@+id/tv_page" />
 
-        <Button
-            android:id="@+id/tv_add_to_cart"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="78dp"
-            android:background="@color/green"
-            android:gravity="center"
-            android:text="장바구니 담기"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tv_total_order_price"
+                priceToCurrency="@{vm.uiState.orderTotalPrice}"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="2"
+                android:background="@color/gray5"
+                android:gravity="end|center"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                tools:text="10000원" />
+
+
+            <TextView
+                android:id="@+id/tv_order"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:background="@color/green"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                tools:text="주문하기(2)" />
+        </LinearLayout>
+
+
+        <CheckBox
+            android:id="@+id/cb_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="25dp"
+            android:backgroundTint="@color/green"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:text="전체"
             android:textColor="@color/white"
-            android:textSize="20dp"
+            android:textSize="12dp"
             android:textStyle="bold"
-            app:backgroundTint="@null"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintEnd_toEndOf="@+id/cb_select_all"
+            app:layout_constraintStart_toStartOf="@+id/cb_select_all"
+            app:layout_constraintTop_toBottomOf="@+id/cb_select_all" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

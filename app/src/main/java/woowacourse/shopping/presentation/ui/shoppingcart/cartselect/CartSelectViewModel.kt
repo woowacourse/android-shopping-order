@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -39,12 +40,14 @@ class CartSelectViewModel(
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
 
+                val cartIdList = uiState.value?.orderCartList?.values?.map { it.id } ?: emptyList()
+
                 val newCartList =
                     pagingCartProduct.cartList.map { cart ->
-                        if (cart.id in (uiState.value?.cartIdList ?: emptyList())) {
+                        if (cart.id in cartIdList) {
                             cart.copy(isChecked = true)
                         } else {
-                            cart
+                            cart.copy(isChecked = false)
                         }
                     }
 
@@ -90,7 +93,9 @@ class CartSelectViewModel(
             val updatedProductList =
                 state.pagingCartProduct.cartList.map { cart ->
                     if (cart.product.id == productId) {
-                        cart.updateProduct(increment)
+                        val updateProduct = cart.updateProduct(increment)
+                        state.orderCartList[updateProduct.id] = updateProduct
+                        updateProduct
                     } else {
                         cart
                     }
@@ -148,9 +153,33 @@ class CartSelectViewModel(
         }
     }
 
-    override fun checkCartProduct(cartId: Int) {
+    override fun checkCartProduct(cart: Cart) {
         _uiState.value?.let { state ->
-            _uiState.value = state.copy(cartIdList = state.cartIdList + cartId)
+            Log.d("Ttt cart", "checkCartProduct: $cart")
+
+            if (cart.isChecked) {
+                Log.d("Ttt original", "checkCartProduct: $cart")
+                state.orderCartList.remove(cart.id)
+                _uiState.value = state.copy(orderCartList = state.orderCartList)
+            } else {
+                state.orderCartList[cart.id] = cart.copy(isChecked = true)
+                _uiState.value = state.copy(orderCartList = state.orderCartList)
+            }
+
+            val newPagingCartProduct =
+                state.pagingCartProduct.cartList.map { cart ->
+                    if (cart.id in state.orderCartList.map { it.key }) {
+                        cart.copy(isChecked = true)
+                    } else {
+                        cart.copy(isChecked = false)
+                    }
+                }
+
+            _uiState.postValue(state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct)))
+
+//            Log.d("Ttt cart", cart.toString())
+            Log.d("Ttt orderCartList", _uiState.value?.orderCartList.toString())
+//            Log.d("Ttt orderTotalPrice", _uiState.value?.orderTotalPrice.toString())
         }
     }
 

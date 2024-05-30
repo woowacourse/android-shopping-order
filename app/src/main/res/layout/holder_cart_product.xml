@@ -39,7 +39,7 @@
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> actionHandler.checkCartProduct(cart.id)}"
+            android:onClick="@{() -> actionHandler.checkCartProduct(cart)}"
             android:checked="@{cart.isChecked}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +51,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cart.product.name}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"

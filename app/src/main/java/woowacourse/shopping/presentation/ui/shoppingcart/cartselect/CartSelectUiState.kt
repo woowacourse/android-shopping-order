@@ -4,8 +4,10 @@ import woowacourse.shopping.domain.model.Cart
 
 data class CartSelectUiState(
     val pagingCartProduct: PagingCartProduct = PagingCartProduct(),
-    val cartIdList: List<Int> = emptyList(),
-)
+    val orderCartList: HashMap<Int, Cart> = hashMapOf(),
+) {
+    val orderTotalPrice get() = orderCartList.values.sumOf { it.totalPrice }
+}
 
 data class PagingCartProduct(
     val cartList: List<Cart> = emptyList(),

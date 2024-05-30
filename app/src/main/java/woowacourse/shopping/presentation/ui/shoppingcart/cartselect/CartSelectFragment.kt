@@ -27,7 +27,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
         initAdapter()
         initObserve()
 
-        binding.tvAddToCart.setOnClickListener {
+        binding.tvOrder.setOnClickListener {
             this.parentFragmentManager
                 .beginTransaction()
                 .replace(
