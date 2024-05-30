@@ -19,6 +19,7 @@ interface Repository {
     ): Result<List<CartProduct>>
 
     fun getProducts(
+        category: String,
         page: Int = 0,
         size: Int = 20,
     ): Result<List<CartProduct>?>
@@ -73,5 +74,7 @@ interface Repository {
     fun getMaxCartCount(): Result<Int>
 
     fun getCartItemsCounts(): Result<Int>
+
+    fun getCuration(): Result<List<CartProduct>>
 
 }

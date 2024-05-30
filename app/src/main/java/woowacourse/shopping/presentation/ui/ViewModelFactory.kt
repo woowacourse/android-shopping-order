@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
+import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
@@ -27,6 +28,13 @@ class ViewModelFactory : ViewModelProvider.Factory {
                     RepositoryInjector.repository,
                 ) as T
             }
+
+            modelClass.isAssignableFrom(CurationViewModel::class.java) -> {
+                CurationViewModel(
+                    RepositoryInjector.repository,
+                ) as T
+            }
+
 
             else -> {
                 throw IllegalArgumentException(INVALID_VIEWMODEL)

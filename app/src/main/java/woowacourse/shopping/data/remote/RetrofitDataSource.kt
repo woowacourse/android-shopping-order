@@ -18,8 +18,8 @@ class RetrofitDataSource(
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
     private val orderApi: OrderApi = RetrofitModule.orderApi
     ): RemoteDataSource {
-    override fun getProducts(page: Int, size: Int): Response<ProductResponse> {
-        return productApi.getProducts(page = page, size = size).execute()
+    override fun getProducts(category: String?, page: Int, size: Int): Response<ProductResponse> {
+        return productApi.getProducts(category= category, page = page, size = size).execute()
     }
 
     override fun postProduct(productRequest: ProductRequest): Response<Unit> {

@@ -35,7 +35,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     fun findCartByOffset() {
         thread {
-            repository.getCartItems(offSet, PAGE_SIZE).onSuccess {
+            repository.getCartItems(offSet, 1000).onSuccess {
                 if(it == null) {
                     _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
                 } else {

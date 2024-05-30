@@ -13,9 +13,10 @@ import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface RemoteDataSource {
     fun getProducts(
+        category: String? = null,
         page: Int = 0,
         size: Int = 20,
-    ): Response<ProductResponse>
+        ): Response<ProductResponse>
 
     fun postProduct(
         productRequest: ProductRequest

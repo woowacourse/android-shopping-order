@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.cart
 
 import android.content.Context
 import android.content.Intent
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -12,6 +13,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.curation.CurationActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
 import kotlin.concurrent.thread
 
@@ -67,14 +69,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         Thread.sleep(500)
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
-
                             cartAdapter.submitList(it.data.map { CartProductUiModel(cartProduct = it) })
-                            with(binding) {
-                                layoutPaging.isVisible = viewModel.maxOffset > 0
-                                btnRight.isEnabled = viewModel.offSet < viewModel.maxOffset
-                                btnLeft.isEnabled = viewModel.offSet > 0
-                                tvPageCount.text = (viewModel.offSet + OFFSET_BASE).toString()
-                            }
                         }
                     }
                 }
@@ -92,8 +87,21 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.cart_menu, menu)
+        return true
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
+        when(item.itemId) {
+            R.id.action_curation -> {
+                Intent(this, CurationActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+            else -> {
+                finish()
+            }
+        }
         return true
     }
 

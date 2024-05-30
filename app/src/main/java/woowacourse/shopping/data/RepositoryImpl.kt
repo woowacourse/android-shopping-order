@@ -33,8 +33,8 @@ class RepositoryImpl(
             localDataSource.findProductByPaging(offset, pageSize).map { it.toDomain() }
         }
 
-    override fun getProducts(page: Int, size: Int): Result<List<CartProduct>?> = runCatching {
-        val response = remoteDataSource.getProducts(page, size)
+    override fun getProducts(category: String, page: Int, size: Int): Result<List<CartProduct>?> = runCatching {
+        val response = remoteDataSource.getProducts(category, page, size)
         if (response.isSuccessful) {
             return Result.success(response.body()?.content?.map { it.toDomain() })
         }
@@ -156,6 +156,41 @@ class RepositoryImpl(
         val response = remoteDataSource.getCartItemsCounts()
         if (response.isSuccessful) {
             return Result.success(response.body()?.quantity ?: 0)
+        }
+        return Result.failure(Throwable())
+    }
+
+    override fun getCuration(): Result<List<CartProduct>>  {
+        localDataSource.findOne()?.toDomain()?.let {
+            val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
+            val cartResponse = remoteDataSource.getCartItems(0, 1000)
+
+            if(productResponse.isSuccessful && cartResponse.isSuccessful) {
+
+                val products = productResponse.body()?.content ?: emptyList()
+                val cartItems = cartResponse.body()?.content ?: emptyList()
+
+                val cartProductIds = cartItems.map { it.product.id }.toSet()
+
+                val filteredProducts = products.filter { product -> product.id !in cartProductIds }
+
+                val cartProducts = filteredProducts.map { product ->
+                    val cart = cartItems.find { it.product.id == product.id }
+
+                    CartProduct(
+                        productId = product.id.toLong(),
+                        name = product.name,
+                        imgUrl = product.imageUrl,
+                        price = product.price.toLong(),
+                        category = product.category,
+                        cartId = cart?.id?.toLong() ?: 0,
+                        quantity = cart?.quantity ?: 0
+                    )
+                }
+                return Result.success(cartProducts)
+            } else {
+                return Result.failure(Throwable())
+            }
         }
         return Result.failure(Throwable())
     }

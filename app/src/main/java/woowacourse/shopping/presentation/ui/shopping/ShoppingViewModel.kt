@@ -151,8 +151,6 @@ class ShoppingViewModel(private val repository: Repository) :
             val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
 
-            Log.d("CartId","${ cartProducts[index].cartId.toInt()}" )
-
             cartProducts[index].plusQuantity()
 
             if(cartProducts[index].quantity == 1) {
