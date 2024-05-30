@@ -45,6 +45,9 @@ class CartViewModel(
     private val _navigateEvent = MutableLiveData<Event<Unit>>()
     val navigateEvent: LiveData<Event<Unit>> get() = _navigateEvent
 
+    private val _checkboxVisibility = MutableLiveData<Boolean>(true)
+    val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
+
     init {
         loadAllCartItems()
         loadRecommendProductUiModels()
@@ -217,6 +220,7 @@ class CartViewModel(
 
     override fun navigateCartRecommend() {
         _navigateEvent.postValue(Event(Unit))
+        _checkboxVisibility.value = false
     }
 
     private fun loadRecommendProductUiModels() {
