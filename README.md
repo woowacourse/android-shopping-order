@@ -1,5 +1,11 @@
 # android-shopping-order
 
+### JSON 직렬화 라이브러리 선택 이유
+- selected: GSON
+- why gson is good to use: 
+- reason: One of generally used Library, simple, easy to use, good compatibility with Java
+- I trust the server will not return null type in this project
+
 ## Step1  ☝️
 
 - 데이터가 로딩되기 전 상태에서는 스켈레톤 UI를 노출한다
