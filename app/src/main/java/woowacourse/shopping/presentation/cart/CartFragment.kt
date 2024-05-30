@@ -14,6 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BindingFragment
+import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.util.showToast
 
@@ -25,6 +26,7 @@ class CartFragment :
             CartRepositoryInjector.cartRepository()
         CartViewModel.factory(cartRepository)
     }
+    private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
 
     override fun onViewCreated(
@@ -77,10 +79,13 @@ class CartFragment :
 
     private fun initObservers() {
         viewModel.uiState.observe(viewLifecycleOwner) {
-            adapter.submitList(it.products)
+            adapter.submitList(it.currentPageProducts)
         }
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()
+        }
+        viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
+            navigator.navigateToRecommend(it)
         }
     }
 
@@ -92,6 +97,7 @@ class CartFragment :
                 CartErrorEvent.UpdateCartProducts -> showToast(R.string.error_msg_update_cart_products)
                 CartErrorEvent.DecreaseCartCountLimit -> showToast(R.string.error_msg_decrease_cart_count_limit)
                 CartErrorEvent.DeleteCartProduct -> showToast(R.string.error_msg_delete_cart_product)
+                CartErrorEvent.EmptyOrderProduct -> showToast(R.string.error_msg_empty_order_product)
             }
         }
     }

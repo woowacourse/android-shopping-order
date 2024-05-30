@@ -27,11 +27,14 @@
             android:background="@drawable/shape_retangular_4"
             android:paddingHorizontal="12dp"
             android:paddingVertical="18dp"
+            android:onClick="@{() -> listener.toggleOrderProduct(cartProduct)}"
             app:layout_constraintTop_toTopOf="parent">
 
             <CheckBox
                 android:id="@+id/cb_product"
                 android:layout_width="32dp"
+                android:checked="@{cartProduct.isSelected}"
+                android:clickable="false"
                 android:layout_height="32dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

@@ -13,7 +13,13 @@ interface ProductService {
 
     @GET("products")
     fun fetchProducts(
-//        @Query("category") category: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<ProductsResponse>
+
+    @GET("products")
+    fun fetchProducts(
+        @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int
     ): Call<ProductsResponse>

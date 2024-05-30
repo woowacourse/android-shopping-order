@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,19 +12,22 @@ import woowacourse.shopping.presentation.util.SingleLiveData
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel(), CartProductListener {
-    private val _uiState = MutableLiveData<CartUiState>()
+    private val _uiState = MutableLiveData<CartUiState>(CartUiState())
     val uiState: LiveData<CartUiState> get() = _uiState
     private val _errorEvent = MutableSingleLiveData<CartErrorEvent>()
     val errorEvent: SingleLiveData<CartErrorEvent> = _errorEvent
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
     val updateCartEvent: SingleLiveData<Unit> get() = _updateCartEvent
+    private val _navigateToRecommendEvent: MutableSingleLiveData<List<Long>> =
+        MutableSingleLiveData()
+    val navigateToRecommendEvent: SingleLiveData<List<Long>> get() = _navigateToRecommendEvent
 
     init {
-        loadCartProducts(START_PAGE)
+        loadTotalCartProducts()
     }
 
     override fun increaseProductCount(id: Long) {
-        val product = _uiState.value?.findProduct(id) ?: return
+        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
         val uiState = _uiState.value ?: return
         cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
             val newUiState = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
@@ -37,7 +39,7 @@ class CartViewModel(
     }
 
     override fun decreaseProductCount(id: Long) {
-        val product = _uiState.value?.findProduct(id) ?: return
+        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
         val uiState = _uiState.value ?: return
         if (!uiState.canDecreaseProductCount(id, CART_PRODUCT_COUNT_LIMIT)) {
             return _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
@@ -60,47 +62,65 @@ class CartViewModel(
         }
     }
 
+    override fun toggleOrderProduct(product: CartProductUi) {
+        val uiState = _uiState.value ?: return
+        val newUiState = uiState.toggleProductSelected(product.product.id)
+        updateUiState(newUiState)
+    }
+
+    fun toggleTotalOrderProducts() {
+        val uiState = _uiState.value ?: return
+        val newUiState = uiState.toggleTotalOrderProducts()
+        updateUiState(newUiState)
+    }
+
     fun moveToNextPage() {
         val currentPage = uiState.value?.currentPage ?: return
-        loadCartProducts(currentPage + INCREMENT_AMOUNT)
+        loadCurrentPageCartProducts(currentPage + INCREMENT_AMOUNT)
     }
 
     fun moveToPrevPage() {
         val currentPage = uiState.value?.currentPage ?: return
-        loadCartProducts(currentPage - INCREMENT_AMOUNT)
+        loadCurrentPageCartProducts(currentPage - INCREMENT_AMOUNT)
+    }
+
+    fun navigateToRecommend() {
+        val orderedProductIds = _uiState.value?.orderedProducts?.map { it.product.id } ?: return
+        if (orderedProductIds.isEmpty()) return _errorEvent.setValue(CartErrorEvent.EmptyOrderProduct)
+        _navigateToRecommendEvent.setValue(orderedProductIds)
     }
 
     private fun updateUiState(
-        products: List<CartProductUi> = _uiState.value?.products ?: emptyList(),
-        currentPage: Int = _uiState.value?.currentPage ?: START_PAGE,
+        newUiState: CartUiState,
+        currentPage: Int = newUiState.currentPage,
     ) {
         val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
         val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
-
         _uiState.value =
-            CartUiState(
-                products = products,
+            newUiState.copy(
                 currentPage = currentPage,
                 canLoadPrevPage = canLoadPrevPage,
                 canLoadNextPage = canLoadNextPage,
             )
     }
 
-    private fun updateUiState(newUiState: CartUiState) {
-        val currentPage = newUiState.currentPage
-        val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
-        val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
-        _uiState.value =
-            newUiState.copy(
-                canLoadPrevPage = canLoadPrevPage,
-                canLoadNextPage = canLoadNextPage,
-            )
-    }
-
-    private fun loadCartProducts(page: Int) {
+    private fun loadCurrentPageCartProducts(page: Int) {
         cartRepository.cartProducts(page - 1, PAGE_SIZE).onSuccess { carts ->
             val newProducts = carts.map { it.toUiModel() }
-            updateUiState(products = newProducts, currentPage = page)
+            val uiState = _uiState.value ?: return
+            val newUiState = uiState.updateTargetPageProducts(newProducts, page)
+            updateUiState(newUiState)
+        }.onFailure {
+            _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
+        }
+    }
+
+    private fun loadTotalCartProducts() {
+        cartRepository.totalCartProducts().onSuccess { carts ->
+            val newProducts = carts.map { it.toUiModel() }
+            val uiState = _uiState.value ?: return
+            val newUiState = uiState.updateTotalProducts(newProducts)
+            updateUiState(newUiState, currentPage = START_PAGE)
         }.onFailure {
             _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
         }
@@ -108,7 +128,7 @@ class CartViewModel(
 
     private fun refreshCartProducts() {
         val currentPage = _uiState.value?.currentPage ?: START_PAGE
-        loadCartProducts(currentPage)
+        loadCurrentPageCartProducts(currentPage)
     }
 
     private fun canLoadMoreCartProducts(page: Int): Boolean {

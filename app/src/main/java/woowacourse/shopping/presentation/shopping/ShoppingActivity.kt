@@ -7,6 +7,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.cart.CartFragment
+import woowacourse.shopping.presentation.cart.recommend.RecommendCartProductFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
@@ -42,7 +43,18 @@ class ShoppingActivity :
                 R.id.fragment_container_shopping,
                 CartFragment.TAG,
             )
-            addToBackStack(ProductListFragment.TAG)
+            addToBackStack(CartFragment.TAG)
+        }
+    }
+
+    override fun navigateToRecommend(orderIds: List<Long>) {
+        supportFragmentManager.commit {
+            replace<RecommendCartProductFragment>(
+                R.id.fragment_container_shopping,
+                RecommendCartProductFragment.TAG,
+                RecommendCartProductFragment.args(orderIds)
+            )
+            addToBackStack(RecommendCartProductFragment.TAG)
         }
     }
 

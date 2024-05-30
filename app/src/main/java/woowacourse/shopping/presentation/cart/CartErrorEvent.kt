@@ -10,4 +10,6 @@ sealed interface CartErrorEvent {
     data object LoadCartProducts : CartErrorEvent
 
     data object DecreaseCartCountLimit : CartErrorEvent
+
+    data object EmptyOrderProduct : CartErrorEvent
 }
