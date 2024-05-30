@@ -10,7 +10,7 @@ import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
@@ -24,17 +24,37 @@ class CartViewModel(
 
     val cart: LiveData<CartItemsUiState> = _cart
 
+    val totalPrice: LiveData<Int> = _cart.map {
+        it.cartItems.filter { it.isChecked }.sumOf { it.totalPrice }
+    }
+
+    val isTotalChbChecked: LiveData<Boolean> = _cart.map {
+        it.cartItems.all { it.isChecked }
+    }
+
+    val checkedItemCount: LiveData<Int> = _cart.map {
+        it.cartItems.filter { it.isChecked }.size
+    }
+
     init {
         loadCartItems()
     }
 
     fun removeCartItem(productId: Long) {
-        cartRepository.deleteCartItem(findCartIdByProductId(productId))
-        _cart.value = CartItemsUiState(
-            cartRepository.getAllCartItemsWithProduct().map { it.toUiModel() },
-            isLoading = false
-        )
-        loadCartItems()
+        runCatching {
+            cartRepository.deleteCartItem(findCartIdByProductId(productId))
+        }.onSuccess {
+            _cart.value = CartItemsUiState(
+                cartRepository.getAllCartItemsWithProduct().map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                isLoading = false
+            ) }.onFailure {
+            Log.d("테스트", "${it}")
+        }
+    }
+
+    private fun findIsCheckedByProductId(productId:Long):Boolean {
+        val current = requireNotNull(_cart.value)
+        return current.cartItems.first { it.productId == productId }.isChecked
     }
 
     fun clickCheckBox(productId: Long) {
@@ -44,6 +64,13 @@ class CartViewModel(
         currentList[currentList.indexOf(checkedCart)] =
             checkedCart.copy(isChecked = !checkedCart.isChecked)
         _cart.value = CartItemsUiState(currentList, isLoading = false)
+    }
+
+    fun totalCheckBoxCheck(isChecked: Boolean) {
+        val currentCarts = requireNotNull(_cart.value)
+        _cart.value = CartItemsUiState(currentCarts.cartItems.map {
+            it.copy(isChecked = isChecked)
+        }, isLoading = false)
     }
 
     override fun plusCount(productId: Long) {
@@ -66,7 +93,7 @@ class CartViewModel(
         val handler = Handler(Looper.getMainLooper())
         runCatching {
             _cart.value = CartItemsUiState(
-                cartRepository.getAllCartItemsWithProduct().map { it.toUiModel() },
+                cartRepository.getAllCartItemsWithProduct().map { it.toUiModel(false) },
                 isLoading = true
             )
         }.onSuccess {
@@ -87,12 +114,13 @@ class CartViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-    private fun CartWithProduct.toUiModel() = CartUiModel(
+    private fun CartWithProduct.toUiModel(isChecked:Boolean) = CartUiModel(
         this.id,
         this.product.id,
         this.product.name,
         this.product.price,
         this.quantity,
-        this.product.imageUrl
+        this.product.imageUrl,
+        isChecked
     )
 }

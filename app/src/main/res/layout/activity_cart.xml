@@ -59,6 +59,8 @@
 
         <include
             layout="@layout/layout_order"
+            productCount="@{vm.checkedItemCount}"
+            totalPrice="@{vm.totalPrice}"
             android:layout_width="match_parent"
             android:layout_height="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -66,11 +68,13 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <CheckBox
+            android:id="@+id/cb_cart_item_total"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginBottom="25dp"
             android:background="@drawable/checkbox"
+            android:checked="@{vm.isTotalChbChecked}"
             android:button="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
