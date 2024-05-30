@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.productDetail
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,9 +58,10 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addProductToCart(quantity: Int) {
+    fun addProductToCart() {
+        val productCount = productCount.value ?: return
         thread {
-            shoppingProductsRepository.addShoppingCartProduct(productId)
+            shoppingProductsRepository.addShoppingCartProduct(productId, productCount)
         }
     }
 
@@ -68,6 +70,7 @@ class ProductDetailViewModel(
         quantity: Int,
     ) {
         _productCount.value = _productCount.value?.plus(1)
+        Log.d(TAG, "onIncrease: productCount: ${productCount.value}")
     }
 
     override fun onDecrease(

@@ -7,7 +7,12 @@ import woowacourse.shopping.domain.model.ProductIdsCount
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
     ShoppingCartProductIdDataSource {
     override fun findByProductId(productId: Long): ProductIdsCountData? {
-        return null
+        val allCartItems =
+            cartItemApiService.requestCartItems().execute().body()?.content
+                ?: throw IllegalStateException()
+        val find = allCartItems.find { it.product.id == productId } ?: return null
+
+        return ProductIdsCountData(find.product.id, find.quantity)
     }
 
     override fun loadPaged(page: Int): List<ProductIdsCountData> {

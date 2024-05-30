@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.repository
 
+import android.util.Log
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
@@ -13,7 +14,6 @@ class DefaultShoppingProductRepository(
 ) : ShoppingProductsRepository {
     override fun loadAllProducts(page: Int): List<Product> {
         val productsData = productsSource.findByPaged(page)
-
         return productsData.map { productData ->
             productData.toDomain(productQuantity(productData.id))
         }
@@ -25,13 +25,12 @@ class DefaultShoppingProductRepository(
                 id = it.id,
                 quantity = it.quantity,
                 product = it.product,
-                checked = false
+                checked = false,
             )
         }
     }
 
-    override fun loadProduct(id: Long): Product =
-        productsSource.findById(id).toDomain(productQuantity(id))
+    override fun loadProduct(id: Long): Product = productsSource.findById(id).toDomain(productQuantity(id))
 
     override fun isFinalPage(page: Int): Boolean = productsSource.isFinalPage(page)
 
@@ -40,18 +39,16 @@ class DefaultShoppingProductRepository(
     override fun shoppingCartProductQuantity(): Int = cartSource.loadAll().sumOf { it.quantity }
 
     private fun productQuantity(productId: Long): Int {
-        return try {
-            cartSource.findByProductId(productId)?.quantity ?: 0
-        } catch (e: NoSuchElementException) {
-            0
-        }
+        return cartSource.findByProductId(productId)?.quantity ?: 0
     }
 
     override fun increaseShoppingCartProduct(
         id: Long,
         quantity: Int,
     ) {
-        cartSource.plusProductsIdCount(id, quantity)
+        val all = cartSource.loadAllCartItems()
+        val cartItem = all.find { it.product.id == id } ?: throw NoSuchElementException()
+        cartSource.plusProductsIdCount(cartItem.id, quantity)
     }
 
     override fun decreaseShoppingCartProduct(
@@ -61,8 +58,20 @@ class DefaultShoppingProductRepository(
         cartSource.minusProductsIdCount(id, quantity)
     }
 
-    override fun addShoppingCartProduct(id: Long) {
-        cartSource.addedNewProductsId(ProductIdsCount(id, FIRST_QUANTITY))
+    override fun addShoppingCartProduct(
+        id: Long,
+        quantity: Int,
+    ) {
+        val all = cartSource.loadAllCartItems()
+        val cartItem = all.find { it.product.id == id }
+
+        if (cartItem == null) {
+            cartSource.addedNewProductsId(ProductIdsCount(id, quantity))
+            return
+        }
+
+        Log.d(TAG, "addShoppingCartProduct: 기존 quantity: ${cartItem.quantity} 추가 quantity: $quantity,")
+        cartSource.plusProductsIdCount(cartItem.id, quantity = cartItem.quantity + quantity)
     }
 
     override fun removeShoppingCartProduct(id: Long) {

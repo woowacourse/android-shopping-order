@@ -162,7 +162,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginTop="35dp"
                 android:background="@drawable/shape_order_button"
-                android:onClick="@{() -> vm.addProductToCart(productCount)}"
+                android:onClick="@{() -> vm.addProductToCart()}"
                 android:text="@string/add_to_cart"
                 android:textColor="@color/white"
                 android:textSize="20sp"

@@ -97,7 +97,7 @@ class ProductListViewModel(
             try {
                 productsRepository.increaseShoppingCartProduct(productId, quantity)
             } catch (e: NoSuchElementException) {
-                productsRepository.addShoppingCartProduct(productId)
+                productsRepository.addShoppingCartProduct(productId, quantity)
             } catch (_: Exception) {
             } finally {
                 val totalCount = productsRepository.shoppingCartProductQuantity()

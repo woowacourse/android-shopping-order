@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.remote.CartItemDto
 import woowacourse.shopping.ui.model.CartItem
 
 interface ShoppingProductsRepository {
@@ -27,7 +26,10 @@ interface ShoppingProductsRepository {
         quantity: Int,
     )
 
-    fun addShoppingCartProduct(id: Long)
+    fun addShoppingCartProduct(
+        id: Long,
+        quantity: Int,
+    )
 
     fun removeShoppingCartProduct(id: Long)
 }
