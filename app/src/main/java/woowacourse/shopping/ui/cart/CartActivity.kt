@@ -8,15 +8,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
-            ProductRepository.getInstance(),
+            RemoteProductRepository(),
             RemoteCartRepository(),
         )
     }
