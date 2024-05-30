@@ -9,9 +9,8 @@ import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.presentation.base.BaseActivity
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartSelectFragment
 
-class ShoppingCartActivity : BaseActivity<ActivityShoppingCartBinding>() {
-    override val layoutResourceId: Int get() = R.layout.activity_shopping_cart
-
+class ShoppingCartActivity :
+    BaseActivity<ActivityShoppingCartBinding>(R.layout.activity_shopping_cart) {
     override fun initCreateView() {
         initActionBar()
         initFragment()

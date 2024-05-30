@@ -2,13 +2,15 @@ package woowacourse.shopping.presentation.base
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.google.android.material.snackbar.Snackbar
 
-abstract class BaseActivity<T : ViewDataBinding> : AppCompatActivity() {
-    abstract val layoutResourceId: Int
+abstract class BaseActivity<T : ViewDataBinding>(
+    @LayoutRes private val layoutResourceId: Int,
+) : AppCompatActivity() {
     private var _binding: T? = null
     val binding get() = requireNotNull(_binding)
 
@@ -17,7 +19,10 @@ abstract class BaseActivity<T : ViewDataBinding> : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = DataBindingUtil.setContentView(this, layoutResourceId)
+        _binding =
+            DataBindingUtil.setContentView<T>(this, layoutResourceId).apply {
+                lifecycleOwner = this@BaseActivity
+            }
         initCreateView()
     }
 

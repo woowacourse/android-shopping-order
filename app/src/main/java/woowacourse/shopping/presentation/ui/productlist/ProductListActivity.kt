@@ -16,9 +16,8 @@ import woowacourse.shopping.presentation.ui.productlist.adapter.ProductListAdapt
 import woowacourse.shopping.presentation.ui.productlist.adapter.ProductListAdapterManager
 import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartActivity
 
-class ProductListActivity : BaseActivity<ActivityProductListBinding>() {
-    override val layoutResourceId: Int get() = R.layout.activity_product_list
-
+class ProductListActivity :
+    BaseActivity<ActivityProductListBinding>(R.layout.activity_product_list) {
     private val viewModel: ProductListViewModel by viewModels {
         ProductListViewModel.factory(
             (application as ShoppingApplication).productRepository,
@@ -42,10 +41,7 @@ class ProductListActivity : BaseActivity<ActivityProductListBinding>() {
     }
 
     private fun initDataBinding() {
-        binding.apply {
-            vm = viewModel
-            lifecycleOwner = this@ProductListActivity
-        }
+        binding.vm = viewModel
     }
 
     private fun initAdapter() {

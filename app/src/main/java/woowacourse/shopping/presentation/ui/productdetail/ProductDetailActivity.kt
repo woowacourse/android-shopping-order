@@ -12,7 +12,8 @@ import woowacourse.shopping.presentation.base.BaseActivity
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
 
-class ProductDetailActivity : BaseActivity<ActivityProductDetailBinding>() {
+class ProductDetailActivity :
+    BaseActivity<ActivityProductDetailBinding>(R.layout.activity_product_detail) {
     private val viewModel: ProductDetailViewModel by viewModels {
         ProductDetailViewModel.factory(
             (application as ShoppingApplication).productRepository,
@@ -20,9 +21,6 @@ class ProductDetailActivity : BaseActivity<ActivityProductDetailBinding>() {
             (application as ShoppingApplication).productHistoryRepository,
         )
     }
-
-    override val layoutResourceId: Int
-        get() = R.layout.activity_product_detail
 
     override fun initCreateView() {
         initActionBar()
@@ -37,7 +35,6 @@ class ProductDetailActivity : BaseActivity<ActivityProductDetailBinding>() {
     private fun initDataBinding() {
         binding.apply {
             vm = viewModel
-            lifecycleOwner = this@ProductDetailActivity
             productCountHandler = viewModel
         }
     }
