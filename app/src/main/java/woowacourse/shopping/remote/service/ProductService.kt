@@ -29,12 +29,12 @@ interface ProductService {
     ): Call<ProductResponse>
 
     companion object {
-        private var Instance: ProductService? = null
+        private var instance: ProductService? = null
 
         fun instance(): ProductService =
-            Instance ?: synchronized(this) {
-                Instance ?: RetrofitModule.retrofit().create<ProductService>().also {
-                    Instance = it
+            instance ?: synchronized(this) {
+                instance ?: RetrofitModule.retrofit().create<ProductService>().also {
+                    instance = it
                 }
             }
     }

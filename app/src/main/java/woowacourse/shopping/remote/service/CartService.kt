@@ -42,12 +42,12 @@ interface CartService {
     fun fetchCartItemCount(): Call<CartCountResponse>
 
     companion object {
-        private var Instance: CartService? = null
+        private var instance: CartService? = null
 
         fun instance(): CartService =
-            Instance ?: synchronized(this) {
-                Instance ?: RetrofitModule.retrofit().create<CartService>().also {
-                    Instance = it
+            instance ?: synchronized(this) {
+                instance ?: RetrofitModule.retrofit().create<CartService>().also {
+                    instance = it
                 }
             }
     }
