@@ -26,4 +26,8 @@ class RecommendProductAdapter(
     ) {
         holder.bind(getItem(position))
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 }

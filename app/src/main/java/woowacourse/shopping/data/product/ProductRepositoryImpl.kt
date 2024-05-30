@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product
 
-import android.util.Log
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.data.service.ApiFactory
@@ -33,7 +32,6 @@ class ProductRepositoryImpl : ProductRepository {
         thread {
             productDto = ApiFactory.getProductsById(id)
         }.join()
-        Log.e("seogi", "$$productDto")
         val product = productDto ?: error("$id 에 해당하는 productId가 없습니다")
         return Product(
             id = product.id,
@@ -47,10 +45,11 @@ class ProductRepositoryImpl : ProductRepository {
     override fun productsByCategory(category: String): List<Product> {
         var page = 0
         var products = mutableListOf<Product>()
-        var loadedProducts = mutableListOf<Product>()
-        while (loadedProducts.isNotEmpty() || products.size <= 10) {
+        var loadedProducts = listOf<Product>()
+        while (true) {
             loadedProducts =
                 getProducts(page, 20).filter { it.category == category }.toMutableList()
+            if (loadedProducts.isEmpty()) break
             products.addAll(loadedProducts)
             page++
         }

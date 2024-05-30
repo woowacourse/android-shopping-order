@@ -45,6 +45,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="추천 상품이 없습니다."
+            android:layout_marginStart="20dp"
+            android:textSize="20dp"
+            app:isVisible="@{vm.noRecommendProductState}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
             isVisible="@{!vm.cart.isLoading &amp; !vm.isRecommendPage}"
@@ -67,7 +80,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:productCount="@{vm.checkedItemCount}"
+            app:productCount="@{vm.checkedItemCount + vm.cartOfRecommendProductCount}"
             app:totalPrice="@{vm.totalPrice}" />
 
         <CheckBox

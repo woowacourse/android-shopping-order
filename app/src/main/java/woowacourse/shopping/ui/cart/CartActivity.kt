@@ -79,6 +79,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun setRecommendProductAdapter() {
+        binding.rvRecommend.rvRecommendProduct.itemAnimator = null
         recommendProductAdapter = RecommendProductAdapter(viewModel)
         binding.rvRecommend.rvRecommendProduct.adapter = recommendProductAdapter
     }

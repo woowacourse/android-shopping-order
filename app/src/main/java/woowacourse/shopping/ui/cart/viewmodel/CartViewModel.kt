@@ -8,12 +8,10 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
@@ -32,12 +30,18 @@ class CartViewModel(
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val products: LiveData<List<ProductWithQuantity>> = _products
 
+    val cartOfRecommendProductCount: LiveData<Int> =
+        _products.map {
+            it.sumOf { it.quantity.value }
+        }
+
     val cart: LiveData<CartItemsUiState> = _cart
 
-    val totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply {
-        addSource(_cart) { value = totalPrice() }
-        addSource(_products) { value = totalPrice() }
-    }
+    val totalPrice: MediatorLiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            addSource(_cart) { value = totalPrice() }
+            addSource(_products) { value = totalPrice() }
+        }
 
     val isTotalChbChecked: LiveData<Boolean> =
         _cart.map {
@@ -53,6 +57,8 @@ class CartViewModel(
 
     val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
 
+    val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
+
     init {
         loadCartItems()
     }
@@ -65,7 +71,11 @@ class CartViewModel(
             productRepository.productsByCategory(category)
                 .filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
         }.onSuccess {
-            _products.value = it.map { ProductWithQuantity(product = it) }
+            _products.value =
+                it.map { ProductWithQuantity(product = it) }.subList(0, minOf(it.size, 10))
+            noRecommendProductState.value = false
+        }.onFailure {
+            noRecommendProductState.value = true
         }
     }
 
@@ -125,7 +135,6 @@ class CartViewModel(
         }
     }
 
-
     override fun plusCount(productId: Long) {
         runCatching {
             val cartItem = cartRepository.getCartItem(productId)
@@ -145,7 +154,7 @@ class CartViewModel(
     override fun minusCount(productId: Long) {
         runCatching {
             val cartItem = cartRepository.getCartItem(productId)
-            if (cartItem.quantity.value > 0){
+            if (cartItem.quantity.value > 0) {
                 cartRepository.patchCartItem(
                     cartItem.id,
                     cartItem.quantity.value.dec(),
@@ -161,13 +170,27 @@ class CartViewModel(
     }
 
     private fun changeRecommendProductCount(productId: Long) {
-        val changed = cartRepository.getCartItem(productId)
+        runCatching {
+            cartRepository.getCartItem(productId)
+        }.onSuccess {
+            val current = productWithQuantities(productId, it.quantity)
+            _products.value = current
+        }.onFailure {
+            val current = productWithQuantities(productId, Quantity())
+            _products.value = current
+        }
+    }
+
+    private fun productWithQuantities(
+        productId: Long,
+        quantity: Quantity,
+    ): MutableList<ProductWithQuantity> {
         val changedRecommend =
             requireNotNull(_products.value?.firstOrNull { it.product.id == productId })
         val current = _products.value?.toMutableList() ?: mutableListOf()
         current[current.indexOf(changedRecommend)] =
-            changedRecommend.copy(quantity = changed.quantity)
-        _products.value = current
+            changedRecommend.copy(quantity = quantity)
+        return current
     }
 
     private fun loadCartItems() {
@@ -199,5 +222,4 @@ class CartViewModel(
             this.product.imageUrl,
             isChecked,
         )
-
 }
