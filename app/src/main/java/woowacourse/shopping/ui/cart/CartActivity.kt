@@ -13,7 +13,6 @@ import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartActivity : AppCompatActivity() {
     private lateinit var cartSelectionFragment: Fragment
@@ -28,7 +27,6 @@ class CartActivity : AppCompatActivity() {
             RemoteOrderRepository(),
         )
     }
-    private val adapter by lazy { CartAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
@@ -75,33 +73,5 @@ class CartActivity : AppCompatActivity() {
                 changeFragment(cartRecommendFragment)
             }
         }
-        /*
-        binding.rvCart.itemAnimator = null
-        binding.rvCart.adapter = adapter
-
-        viewModel.cartUiState.observe(this) {
-            val cartUiState = it.getContentIfNotHandled() ?: return@observe
-            when (cartUiState) {
-                CartUiState.Failure -> {
-                    Toast.makeText(
-                        this,
-                        R.string.load_page_error,
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-
-                CartUiState.Loading -> {
-                    binding.layoutCartSkeleton.visibility = View.VISIBLE
-                    binding.rvCart.visibility = View.GONE
-                }
-
-                is CartUiState.Success -> {
-                    binding.layoutCartSkeleton.visibility = View.GONE
-                    binding.rvCart.visibility = View.VISIBLE
-                    adapter.submitList(cartUiState.cartUiModels)
-                }
-            }
-        }
-         */
     }
 }

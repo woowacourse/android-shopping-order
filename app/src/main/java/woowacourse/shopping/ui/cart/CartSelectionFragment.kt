@@ -10,17 +10,35 @@ import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
     private lateinit var binding: FragmentCartSelectionBinding
-    private lateinit var cartAdapter: CartAdapter
+    private val adapter by lazy { CartAdapter(viewModel) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
-        cartAdapter = CartAdapter(viewModel)
-        val listView = binding.rvCart
-        listView.adapter = cartAdapter
+        binding.rvCart.itemAnimator = null
+        binding.rvCart.adapter = adapter
+
+        viewModel.cartUiState.observe(viewLifecycleOwner) {
+            val cartUiState = it.getContentIfNotHandled() ?: return@observe
+            when (cartUiState) {
+                CartUiState.Failure -> {
+                }
+
+                CartUiState.Loading -> {
+                    binding.layoutCartSkeleton.visibility = View.VISIBLE
+                    binding.rvCart.visibility = View.GONE
+                }
+
+                is CartUiState.Success -> {
+                    binding.layoutCartSkeleton.visibility = View.GONE
+                    binding.rvCart.visibility = View.VISIBLE
+                    adapter.submitList(cartUiState.cartUiModels)
+                }
+            }
+        }
         return binding.root
     }
 }
