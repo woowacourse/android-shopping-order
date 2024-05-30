@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
@@ -59,10 +60,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private fun observeCartUpdates() {
         viewModel.shoppingProducts.observe(this) {
             when (it) {
-                is UiState.Loading -> {
-//                    val skelletonBinding = ItemCartSkelletonBinding.inflate(layoutInflater)
-//                    skelletonBinding.s
-                }
+                is UiState.Loading -> {}
                 is UiState.Success -> {
                     handleSuccessState(it.data)
                 }

@@ -25,9 +25,8 @@
             android:id="@+id/rv_carts"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="100dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/layout_page"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -39,8 +38,9 @@
             bindSetVisibility="@{viewModel.pageControllerIsVisible}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="10dp"
+            android:paddingTop="10dp"
+            app:layout_constraintBottom_toTopOf="@id/order"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent">
@@ -90,6 +90,53 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="28dp"
+            android:text="주문하기"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey"
+            android:gravity="end"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="28dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/order"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="00,000원" />
+
+        <CheckBox
+            android:id="@+id/total_check_box"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginBottom="33dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/order" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="전체"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="@id/total_check_box"
+            app:layout_constraintTop_toBottomOf="@id/total_check_box" />
+
 
         <include
             android:id="@+id/cart_skelleton"

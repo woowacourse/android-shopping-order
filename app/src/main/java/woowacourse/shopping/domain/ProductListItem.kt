@@ -12,6 +12,7 @@ sealed interface ProductListItem {
         val imgUrl: String,
         val price: Long,
         var quantity: Int = 0,
+        var isChecked: Boolean = false,
     ) : ProductListItem {
         fun toProduct() =
             Product(

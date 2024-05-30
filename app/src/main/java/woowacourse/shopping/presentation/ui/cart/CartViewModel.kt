@@ -51,6 +51,10 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
         }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
     }
 
+    override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
+        product.isChecked = !product.isChecked
+    }
+
     fun updatePageController() {
         if (currentPage.value != null) {
             _currentPage.value = currentPage.value!!.coerceIn(0, maxPage)

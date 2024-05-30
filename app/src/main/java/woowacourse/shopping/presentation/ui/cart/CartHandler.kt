@@ -9,4 +9,6 @@ interface CartHandler : QuantityHandler {
     fun onBeforePageClick()
 
     fun onDeleteClick(product: ProductListItem.ShoppingProductItem)
+
+    fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem)
 }

@@ -21,10 +21,22 @@
         android:background="@drawable/background_cart"
         android:padding="12dp">
 
+        <CheckBox
+            android:id="@+id/check_box"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:checked="@{product.isChecked}"
+            android:onClick="@{()->cartHandler.onCheckBoxClicked(product)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginEnd="15dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -32,8 +44,8 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/iv_close"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/check_box"
+            app:layout_constraintTop_toTopOf="@id/check_box"
             tools:text="상품 제목" />
 
         <ImageView
