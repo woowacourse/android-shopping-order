@@ -2,6 +2,8 @@ package woowacourse.shopping.data.recent.local
 
 import woowacourse.shopping.data.recent.local.dao.RecentProductDao
 import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
@@ -25,17 +27,42 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
         return lastRecentProductEntity.toRecentProducts()
     }
 
-    override fun save(productId: Int) {
+    override fun save(product: Product) {
         thread {
-            if (recentProductDao.findOrNull(productId) == null) {
-                recentProductDao.insert(RecentProductEntity(productId = productId, seenDateTime = LocalDateTime.now()))
+            if (recentProductDao.findOrNull(product.id) == null) {
+                recentProductDao.insert(
+                    RecentProductEntity(
+                        product = product.toProductEntity(),
+                        seenDateTime = LocalDateTime.now(),
+                    ),
+                )
                 return@thread
             }
-            recentProductDao.update(productId, LocalDateTime.now())
+            recentProductDao.update(product.id, LocalDateTime.now())
         }.join()
+    }
+
+    override fun getRecommendProducts(
+        category: String,
+        cartItems: List<CartItem>,
+    ): List<Product> {
+        var recommendProducts: List<Product> = emptyList()
+        thread {
+            val categoryProducts = recentProductDao.findCategory(category)
+            val recommendCategoryProducts =
+                categoryProducts.filter { recentProduct ->
+                    cartItems.none { it.productId == recentProduct.product.productId }
+                }
+            recommendProducts =
+                recommendCategoryProducts
+                    .take(RECOMMEND_PRODUCTS_COUNT)
+                    .map { it.toRecentProduct().product }
+        }.join()
+        return recommendProducts
     }
 
     companion object {
         private const val FIND_RECENT_PRODUCTS_COUNT = 10
+        private const val RECOMMEND_PRODUCTS_COUNT = 10
     }
 }

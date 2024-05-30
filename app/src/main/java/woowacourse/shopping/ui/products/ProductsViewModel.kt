@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository2
+import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -16,7 +16,7 @@ import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class ProductsViewModel(
-    private val productRepository: RemoteProductRepository2,
+    private val productRepository: RemoteProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: RemoteCartRepository,
 ) : ViewModel() {
@@ -122,7 +122,7 @@ class ProductsViewModel(
 
     private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
         return map {
-            val product = productRepository.syncFind(it.productId)
+            val product = productRepository.syncFind(it.product.id)
             RecentProductUiModel(
                 product.id,
                 product.imageUrl,
