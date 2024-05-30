@@ -7,7 +7,7 @@ interface MainActivityListener {
 
     fun popFragment()
 
-    fun popAllFragment()
+    fun resetFragment()
 
     fun observeProductList(products: (Map<Long, Int>) -> Unit)
 

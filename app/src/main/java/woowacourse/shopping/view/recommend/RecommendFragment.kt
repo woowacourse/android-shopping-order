@@ -162,10 +162,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     private fun navigateToProduct() {
-        mainActivityListener?.popAllFragment()
-        val productFragment =
-            ProductsListFragment()
-        mainActivityListener?.changeFragment(productFragment)
+        mainActivityListener?.resetFragment()
     }
 
     private fun loadCheckedShoppingCart() {

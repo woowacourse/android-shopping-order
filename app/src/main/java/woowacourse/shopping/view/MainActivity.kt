@@ -36,11 +36,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         supportFragmentManager.popBackStack()
     }
 
-    override fun popAllFragment() {
-        val fragmentManager = supportFragmentManager
-        while(fragmentManager.backStackEntryCount>0){
-            fragmentManager.popBackStackImmediate()
-        }
+    override fun resetFragment() {
+        val intent = intent
+        finish()
+        startActivity(intent)
     }
 
 

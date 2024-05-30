@@ -84,7 +84,7 @@ class RecommendViewModel(
 
 
     fun orderItems() {
-        val ids = products.value?.map { it.id.toInt() }
+        val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         try {
             orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
             _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
