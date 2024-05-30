@@ -36,7 +36,7 @@ interface RetrofitService {
     @GET("/cart-items")
     fun requestCartItems(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 5,
+        @Query("size") size: Int = 50,
     ): Call<CartItemDto>
 
     @GET("/cart-items/counts")

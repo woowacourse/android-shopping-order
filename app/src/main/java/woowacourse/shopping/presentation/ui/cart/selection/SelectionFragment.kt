@@ -1,4 +1,134 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
-class SelectionFragment {
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
+import woowacourse.shopping.databinding.FragmentSelectionBinding
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.cart.CartAdapter
+import woowacourse.shopping.presentation.ui.detail.DetailActivity
+
+class SelectionFragment : Fragment() {
+    private lateinit var binding: FragmentSelectionBinding
+    private val viewModel: SelectionViewModel by lazy {
+        val viewModelFactory =
+            SelectionViewModelFactory(
+                shoppingRepository = RemoteShoppingRepositoryImpl(),
+                recentProductRepository = RecentProductRepositoryImpl(requireContext()),
+                cartRepository = RemoteCartRepositoryImpl(),
+            )
+        viewModelFactory.create(SelectionViewModel::class.java)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding = FragmentSelectionBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+
+        observeViewModel()
+        showSkeletonUI()
+    }
+
+    private fun setUpViews() {
+        setUpUIState()
+    }
+
+    private fun setUpRecyclerViewAdapter(): CartAdapter {
+        val adapter = CartAdapter(viewModel, viewModel)
+        binding.recyclerView.adapter = adapter
+        return adapter
+    }
+
+    private fun setUpUIState() {
+        val adapter = setUpRecyclerViewAdapter()
+        viewModel.cartItemsState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UIState.Success -> showData(state.data, adapter)
+                is UIState.Empty -> {} // emptyCart()
+                is UIState.Error ->
+                    showError(
+                        state.exception.message ?: getString(R.string.unknown_error),
+                    )
+            }
+        }
+    }
+
+    private fun showData(
+        data: List<CartItem>,
+        adapter: CartAdapter,
+    ) {
+        adapter.loadData(data)
+    }
+
+    private fun showError(errorMessage: String) {
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+    }
+
+    private fun emptyCart() {
+        viewModel.isCartEmpty()
+        Toast.makeText(requireContext(), getString(R.string.empty_cart_message), Toast.LENGTH_LONG).show()
+    }
+
+    private fun observeViewModel() {
+        viewModel.deleteCartItem.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { itemId ->
+                viewModel.deleteItem(itemId)
+            }
+        }
+
+        viewModel.navigateToDetail.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { productId ->
+                navigateToDetail(productId)
+            }
+        }
+    }
+
+    private fun navigateToDetail(productId: Long) {
+        startActivity(DetailActivity.createIntent(requireContext(), productId))
+    }
+
+    private fun showSkeletonUI() {
+        lifecycleScope.launch {
+            showCartData(isLoading = true)
+            delay(1500)
+            showCartData(isLoading = false)
+            setUpViews()
+        }
+    }
+
+    private fun showCartData(isLoading: Boolean) {
+        if (isLoading) {
+            binding.shimmerCartList.startShimmer()
+            binding.shimmerCartList.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        } else {
+            binding.shimmerCartList.stopShimmer()
+            binding.shimmerCartList.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+        }
+    }
 }

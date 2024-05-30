@@ -62,7 +62,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
             app:layout_constraintVertical_bias="0.0"
-            tools:layout="@layout/fragment_cart" />
+            tools:layout="@layout/fragment_selection" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

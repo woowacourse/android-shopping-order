@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.presentation.ui.cart.CartViewModel" />
+            type="woowacourse.shopping.presentation.ui.cart.selection.SelectionViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -111,7 +111,7 @@
             android:layout_marginEnd="6dp"
             app:cartViewVisibility="@{!viewModel.isEmpty}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/order_select_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -132,7 +132,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:checked="true"
                 android:text="@string/checkbox_select_total_text"
                 android:textColor="@color/white"
                 android:textSize="12sp"
@@ -167,6 +166,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:orderWithQuantityText="@{viewModel.totalQuantity}"
                 tools:text="주문하기(3)" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
