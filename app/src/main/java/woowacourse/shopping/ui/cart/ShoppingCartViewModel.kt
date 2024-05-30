@@ -37,6 +37,9 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsTotalPrice: LiveData<Int> get() = _selectedCartItemsTotalPrice
 
+    private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
+
     fun loadAll() {
         thread {
             val currentItems =
@@ -58,6 +61,11 @@ class ShoppingCartViewModel(
                 _cartItems.value = currentItems
             }
         }
+        updateSelectedCartItemsCount()
+    }
+
+    fun updateSelectedCartItemsCount() {
+        _selectedCartItemsCount.value = cartItems.value?.count { it.checked }
     }
 
     override fun onClick(productId: Long) {
@@ -88,6 +96,7 @@ class ShoppingCartViewModel(
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
+                updateSelectedCartItemsCount()
             }
         }
     }
@@ -114,6 +123,7 @@ class ShoppingCartViewModel(
                 }
             }
         updateTotalPrice()
+        updateSelectedCartItemsCount()
         _isAllSelected.value = cartItems.value?.all { it.checked }
     }
 
@@ -133,6 +143,7 @@ class ShoppingCartViewModel(
         }
         updateCartItemsChecked(checked = true)
         updateTotalPrice()
+        updateSelectedCartItemsCount()
         _isAllSelected.value = true
     }
 

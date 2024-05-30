@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="selectedItemsCount"
+            type="int" />
+
+        <variable
             name="isAllSelected"
             type="Boolean" />
 
@@ -75,6 +79,7 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:text="@{@string/order_items_count(selectedItemsCount)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_cart_order_total_price"
