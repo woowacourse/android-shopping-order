@@ -36,8 +36,14 @@ class CartViewModel(
         it.cartItems.filter { it.isChecked }.size
     }
 
+    val isRecommendPage: MutableLiveData<Boolean> = MutableLiveData(false)
+
     init {
         loadCartItems()
+    }
+
+    fun clickOrderButton() {
+        isRecommendPage.value = !requireNotNull(isRecommendPage.value)
     }
 
     fun removeCartItem(productId: Long) {
@@ -45,14 +51,16 @@ class CartViewModel(
             cartRepository.deleteCartItem(findCartIdByProductId(productId))
         }.onSuccess {
             _cart.value = CartItemsUiState(
-                cartRepository.getAllCartItemsWithProduct().map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                cartRepository.getAllCartItemsWithProduct()
+                    .map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
                 isLoading = false
-            ) }.onFailure {
+            )
+        }.onFailure {
             Log.d("테스트", "${it}")
         }
     }
 
-    private fun findIsCheckedByProductId(productId:Long):Boolean {
+    private fun findIsCheckedByProductId(productId: Long): Boolean {
         val current = requireNotNull(_cart.value)
         return current.cartItems.first { it.productId == productId }.isChecked
     }
@@ -114,7 +122,7 @@ class CartViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-    private fun CartWithProduct.toUiModel(isChecked:Boolean) = CartUiModel(
+    private fun CartWithProduct.toUiModel(isChecked: Boolean) = CartUiModel(
         this.id,
         this.product.id,
         this.product.name,

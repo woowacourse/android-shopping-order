@@ -12,6 +12,10 @@
             name="totalPrice"
             type="Integer" />
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.ui.cart.viewmodel.CartViewModel" />
+
     </data>
 
     <LinearLayout
@@ -42,6 +46,7 @@
             android:text="@{@string/order(productCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
+            android:onClick="@{() -> vm.clickOrderButton()}"
             android:textStyle="bold" />
 
     </LinearLayout>

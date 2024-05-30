@@ -40,13 +40,13 @@
             layout="@layout/layout_recommend_product"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:isVisible="@{false}"
+            app:isVisible="@{vm.isRecommendPage}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
-            isVisible="@{!vm.cart.isLoading}"
+            isVisible="@{!vm.cart.isLoading &amp; !vm.isRecommendPage}"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"
@@ -61,6 +61,7 @@
             layout="@layout/layout_order"
             productCount="@{vm.checkedItemCount}"
             totalPrice="@{vm.totalPrice}"
+            vm="@{vm}"
             android:layout_width="match_parent"
             android:layout_height="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -74,8 +75,9 @@
             android:layout_marginStart="24dp"
             android:layout_marginBottom="25dp"
             android:background="@drawable/checkbox"
-            android:checked="@{vm.isTotalChbChecked}"
             android:button="@android:color/transparent"
+            android:checked="@{vm.isTotalChbChecked}"
+            app:isVisible="@{!vm.isRecommendPage}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:checked="true" />
