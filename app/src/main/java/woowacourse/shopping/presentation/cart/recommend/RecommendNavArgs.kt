@@ -6,5 +6,5 @@ import woowacourse.shopping.presentation.cart.CartProductUi
 
 @Parcelize
 data class RecommendNavArgs(
-    val orderProducts: List<CartProductUi>
+    val orderProducts: List<CartProductUi>,
 ) : Parcelable

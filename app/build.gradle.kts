@@ -9,9 +9,10 @@ plugins {
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
 }
 
-val properties = Properties().apply {
-    load(rootProject.file("local.properties").inputStream())
-}
+val properties =
+    Properties().apply {
+        load(rootProject.file("local.properties").inputStream())
+    }
 
 android {
     namespace = "woowacourse.shopping"
@@ -30,17 +31,17 @@ android {
         buildConfigField(
             "String",
             "SHOPPING_BASE_URL",
-            properties.getProperty("SHOPPING_BASE_URL")
+            properties.getProperty("SHOPPING_BASE_URL"),
         )
         buildConfigField(
             "String",
             "DUMMY_ID",
-            properties.getProperty("DUMMY_ID")
+            properties.getProperty("DUMMY_ID"),
         )
         buildConfigField(
             "String",
             "DUMMY_PASSWORD",
-            properties.getProperty("DUMMY_PASSWORD")
+            properties.getProperty("DUMMY_PASSWORD"),
         )
     }
 

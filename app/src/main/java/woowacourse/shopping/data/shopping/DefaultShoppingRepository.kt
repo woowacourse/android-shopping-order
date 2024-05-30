@@ -34,7 +34,11 @@ class DefaultShoppingRepository(
             }
     }
 
-    override fun products(category: String, currentPage: Int, size: Int): Result<List<Product>> {
+    override fun products(
+        category: String,
+        currentPage: Int,
+        size: Int,
+    ): Result<List<Product>> {
         return productDataSource.products(category, currentPage, size)
             .mapCatching { it.products }
     }

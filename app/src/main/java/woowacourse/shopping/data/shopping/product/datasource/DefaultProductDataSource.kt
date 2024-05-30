@@ -17,26 +17,36 @@ class DefaultProductDataSource(
         currentPage: Int,
         size: Int,
     ): Result<ProductPageData> {
-        return ioExecutor.submit(Callable {
-            productService.fetchProducts(currentPage, size)
-                .executeAsResult()
-                .mapCatching { it.toData() }
-        }).get()
+        return ioExecutor.submit(
+            Callable {
+                productService.fetchProducts(currentPage, size)
+                    .executeAsResult()
+                    .mapCatching { it.toData() }
+            },
+        ).get()
     }
 
-    override fun products(category: String, currentPage: Int, size: Int): Result<ProductPageData> {
-        return ioExecutor.submit(Callable {
-            productService.fetchProducts(category, currentPage, size)
-                .executeAsResult()
-                .mapCatching { it.toData() }
-        }).get()
+    override fun products(
+        category: String,
+        currentPage: Int,
+        size: Int,
+    ): Result<ProductPageData> {
+        return ioExecutor.submit(
+            Callable {
+                productService.fetchProducts(category, currentPage, size)
+                    .executeAsResult()
+                    .mapCatching { it.toData() }
+            },
+        ).get()
     }
 
     override fun productById(id: Long): Result<Product> {
-        return ioExecutor.submit(Callable {
-            productService.fetchDetailProduct(id)
-                .executeAsResult()
-                .mapCatching { it.toProduct() }
-        }).get()
+        return ioExecutor.submit(
+            Callable {
+                productService.fetchDetailProduct(id)
+                    .executeAsResult()
+                    .mapCatching { it.toProduct() }
+            },
+        ).get()
     }
 }

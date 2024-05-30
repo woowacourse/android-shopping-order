@@ -8,7 +8,12 @@ interface ShoppingRepository {
         size: Int,
     ): Result<List<Product>>
 
-    fun products(category: String, currentPage: Int, size: Int): Result<List<Product>>
+    fun products(
+        category: String,
+        currentPage: Int,
+        size: Int,
+    ): Result<List<Product>>
+
     fun productById(id: Long): Result<Product>
 
     fun canLoadMore(

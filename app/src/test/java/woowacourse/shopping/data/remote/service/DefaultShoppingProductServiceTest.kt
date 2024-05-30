@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.service
 
-//class DefaultShoppingProductServiceTest {
+// class DefaultShoppingProductServiceTest {
 //    private lateinit var testExecutors: ExecutorService
 //
 //    @BeforeEach
@@ -26,4 +26,4 @@ package woowacourse.shopping.data.remote.service
 //            actual shouldHaveSize expectSize
 //        }
 //    }
-//}
+// }

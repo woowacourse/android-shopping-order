@@ -11,7 +11,7 @@ object ProductDataSourceInjector {
         instance ?: synchronized(this) {
             instance ?: DefaultProductDataSource(
                 ioExecutor,
-                ProductService.instance()
+                ProductService.instance(),
             ).also {
                 instance = it
             }

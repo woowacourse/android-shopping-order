@@ -9,15 +9,18 @@ import woowacourse.shopping.remote.dto.request.OrderRequest
 
 interface OrderService {
     @POST("orders")
-    fun orderProducts(@Body body: OrderRequest): Call<Unit>
+    fun orderProducts(
+        @Body body: OrderRequest,
+    ): Call<Unit>
 
     companion object {
         private var Instance: OrderService? = null
-        fun instance(): OrderService = Instance ?: synchronized(this) {
-            Instance ?: RetrofitModule.retrofit().create<OrderService>().also {
-                Instance = it
+
+        fun instance(): OrderService =
+            Instance ?: synchronized(this) {
+                Instance ?: RetrofitModule.retrofit().create<OrderService>().also {
+                    Instance = it
+                }
             }
-        }
     }
 }
-

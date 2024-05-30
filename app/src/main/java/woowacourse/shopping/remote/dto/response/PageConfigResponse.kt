@@ -1,6 +1,5 @@
 package woowacourse.shopping.remote.dto.response
 
-
 import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 

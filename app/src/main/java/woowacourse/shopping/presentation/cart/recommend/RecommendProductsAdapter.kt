@@ -13,8 +13,8 @@ class RecommendProductsAdapter(
     private val cartItemListener: CartItemListener,
 ) :
     ListAdapter<CartProductUi, RecommendProductsAdapter.RecommendProductsViewHolder>(
-        cartProductComparator
-    ) {
+            cartProductComparator,
+        ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

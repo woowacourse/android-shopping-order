@@ -116,13 +116,16 @@ class CartViewModel(
     }
 
     fun loadTotalCartProducts() {
+        val uiState = _uiState.value ?: return
+        _uiState.value = uiState.copy(isLoading = true)
         cartRepository.totalCartProducts().onSuccess { carts ->
             val newProducts = carts.map { it.toUiModel() }
-            val uiState = _uiState.value ?: return
             val newUiState = uiState.updateTotalProducts(newProducts)
+            _uiState.value = newUiState.copy(isLoading = false)
             updateUiState(newUiState, currentPage = START_PAGE)
         }.onFailure {
             _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
+            _uiState.value = uiState.copy(isLoading = false)
         }
     }
 

@@ -58,9 +58,10 @@ class DefaultCartRepository(
             }.mapCatching { Unit }
         }
         // patch CartProduct
-        val cartDetailData = cartProductMapByProductId[productId] ?: return Result.failure(
-            NoSuchElementException("No has productId($productId)")
-        )
+        val cartDetailData =
+            cartProductMapByProductId[productId] ?: return Result.failure(
+                NoSuchElementException("No has productId($productId)"),
+            )
         val cartId = cartDetailData.cartId
         return cartDataSource.updateCartCount(cartId, count).onSuccess {
             cartProductMapByProductId[productId] = cartDetailData.copy(count = count)
@@ -68,9 +69,10 @@ class DefaultCartRepository(
     }
 
     override fun deleteCartProduct(productId: Long): Result<Unit> {
-        val cartDetailData = cartProductMapByProductId[productId] ?: return Result.failure(
-            NoSuchElementException("there's no any CartProducts response to $productId")
-        )
+        val cartDetailData =
+            cartProductMapByProductId[productId] ?: return Result.failure(
+                NoSuchElementException("there's no any CartProducts response to $productId"),
+            )
         val cartId = cartDetailData.cartId
         return cartDataSource.deleteCartProduct(cartId).onSuccess {
             cartProductMapByProductId.remove(productId)
@@ -84,17 +86,19 @@ class DefaultCartRepository(
         pageSize: Int,
     ): Result<Boolean> {
         if (currentPage < 0) return Result.success(false)
-        val cartPageData = cartPageData ?: return Result.failure(
-            NoSuchElementException("there's no any CartProducts")
-        )
+        val cartPageData =
+            cartPageData ?: return Result.failure(
+                NoSuchElementException("there's no any CartProducts"),
+            )
         val minSize = currentPage * pageSize
         return Result.success(cartPageData.totalProductSize > minSize)
     }
 
     override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
-        val cartIds = productIds.mapNotNull {
-            cartProductMapByProductId[it]?.cartId
-        }
+        val cartIds =
+            productIds.mapNotNull {
+                cartProductMapByProductId[it]?.cartId
+            }
         return orderDataSource.orderProducts(cartIds).onSuccess {
             cartProductMapByProductId.clear()
             totalCartProducts()

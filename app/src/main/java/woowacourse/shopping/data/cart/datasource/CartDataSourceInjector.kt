@@ -10,7 +10,7 @@ object CartDataSourceInjector {
         instance ?: synchronized(this) {
             instance ?: DefaultCartDataSource(
                 ioExecutor,
-                CartService.instance()
+                CartService.instance(),
             )
         }.also { instance = it }
 }

@@ -8,12 +8,14 @@ import java.util.concurrent.ExecutorService
 
 class DefaultOrderDataSource(
     private val ioExecutor: ExecutorService,
-    private val orderService: OrderService
+    private val orderService: OrderService,
 ) : OrderDataSource {
     override fun orderProducts(productIds: List<Long>): Result<Unit> {
-        return ioExecutor.submit(Callable {
-            orderService.orderProducts(OrderRequest(productIds))
-                .executeAsResult()
-        }).get()
+        return ioExecutor.submit(
+            Callable {
+                orderService.orderProducts(OrderRequest(productIds))
+                    .executeAsResult()
+            },
+        ).get()
     }
 }

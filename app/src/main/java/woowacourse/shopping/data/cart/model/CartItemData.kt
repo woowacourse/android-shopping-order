@@ -13,5 +13,5 @@ data class CartPageData(
 data class CartItemData(
     val cartId: Long,
     val count: Int,
-    val product: Product
+    val product: Product,
 )

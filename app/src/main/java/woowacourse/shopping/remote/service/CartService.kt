@@ -43,10 +43,12 @@ interface CartService {
 
     companion object {
         private var Instance: CartService? = null
-        fun instance(): CartService = Instance ?: synchronized(this) {
-            Instance ?: RetrofitModule.retrofit().create<CartService>().also {
-                Instance = it
+
+        fun instance(): CartService =
+            Instance ?: synchronized(this) {
+                Instance ?: RetrofitModule.retrofit().create<CartService>().also {
+                    Instance = it
+                }
             }
-        }
     }
 }

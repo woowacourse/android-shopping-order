@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CartCountResponse(
     @SerialName("quantity")
-    val quantity: Int
+    val quantity: Int,
 )

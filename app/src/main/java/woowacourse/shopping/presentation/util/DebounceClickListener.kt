@@ -20,9 +20,8 @@ import kotlin.time.DurationUnit
  */
 class DebounceClickListener(
     private val interval: Duration,
-    private val onDebounceClick: (View) -> Unit
+    private val onDebounceClick: (View) -> Unit,
 ) : View.OnClickListener {
-
     private var lastClickTime: Long = 0
     private val handler = Handler(Looper.getMainLooper())
     private var runnable: Runnable? = null
@@ -38,7 +37,10 @@ class DebounceClickListener(
     }
 }
 
-fun View.setOnDebounceClickListener(interval: Duration, onDebounceClick: (View) -> Unit) {
+fun View.setOnDebounceClickListener(
+    interval: Duration,
+    onDebounceClick: (View) -> Unit,
+) {
     val debounceClickListener = DebounceClickListener(interval, onDebounceClick)
     setOnClickListener(debounceClickListener)
 }

@@ -42,7 +42,10 @@ class DefaultCartDataSource(
         ).get()
     }
 
-    override fun createCartProduct(productId: Long, count: Int): Result<Long> {
+    override fun createCartProduct(
+        productId: Long,
+        count: Int,
+    ): Result<Long> {
         return runCatching {
             ioExecutors.submit(
                 Callable {
@@ -55,7 +58,10 @@ class DefaultCartDataSource(
         }
     }
 
-    override fun updateCartCount(cartId: Long, count: Int): Result<Unit> {
+    override fun updateCartCount(
+        cartId: Long,
+        count: Int,
+    ): Result<Unit> {
         return ioExecutors.submit(
             Callable {
                 cartService.patchCartItem(cartId, UpdateCartCountRequest(count)).executeAsResult()

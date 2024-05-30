@@ -33,6 +33,6 @@ fun CartItemData.toDomain(): CartProduct {
     return CartProduct(
         id = cartId,
         product = product,
-        count = count
+        count = count,
     )
 }

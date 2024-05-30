@@ -9,6 +9,11 @@ interface ProductDataSource {
         size: Int,
     ): Result<ProductPageData>
 
-    fun products(category: String, currentPage: Int, size: Int): Result<ProductPageData>
+    fun products(
+        category: String,
+        currentPage: Int,
+        size: Int,
+    ): Result<ProductPageData>
+
     fun productById(id: Long): Result<Product>
 }

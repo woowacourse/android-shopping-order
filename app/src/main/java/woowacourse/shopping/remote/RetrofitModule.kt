@@ -18,14 +18,16 @@ object RetrofitModule {
     private const val CONNECT_TIME_OUT = 60L
     private const val READ_TIME_OUT = 30L
     private const val WRITE_TIME_OUT = 15L
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-    private val INSTANCE: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(httpClient())
-        .addConverterFactory(jsonConverterFactory())
-        .build()
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+        }
+    private val INSTANCE: Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(httpClient())
+            .addConverterFactory(jsonConverterFactory())
+            .build()
 
     fun retrofit(): Retrofit = INSTANCE
 
@@ -33,19 +35,21 @@ object RetrofitModule {
         return json.asConverterFactory("application/json".toMediaType())
     }
 
-    private fun loggingInterceptor(): Interceptor = HttpLoggingInterceptor().setLevel(
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BODY
-        } else {
-            HttpLoggingInterceptor.Level.NONE
-        }
-    )
+    private fun loggingInterceptor(): Interceptor =
+        HttpLoggingInterceptor().setLevel(
+            if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            },
+        )
 
-    private fun httpClient(): OkHttpClient = OkHttpClient
-        .Builder()
-        .addInterceptor(loggingInterceptor())
-        .addInterceptor(AuthInterceptor(USER_ID, USER_PASSWORD))
-        .connectTimeout(CONNECT_TIME_OUT, TimeUnit.SECONDS)
-        .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
-        .writeTimeout(WRITE_TIME_OUT, TimeUnit.SECONDS).build()
+    private fun httpClient(): OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(loggingInterceptor())
+            .addInterceptor(AuthInterceptor(USER_ID, USER_PASSWORD))
+            .connectTimeout(CONNECT_TIME_OUT, TimeUnit.SECONDS)
+            .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIME_OUT, TimeUnit.SECONDS).build()
 }

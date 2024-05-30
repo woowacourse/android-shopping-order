@@ -25,27 +25,28 @@ import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 
 class RecommendCartProductFragment :
     BindingFragment<FragmentRecommendCartProductBinding>(R.layout.fragment_recommend_cart_product) {
-
     private val viewModel by viewModels<RecommendCartProductViewModel> {
         val bundle = arguments
-        val orders: List<CartProductUi> = if (bundle != null) {
-            BundleCompat.getParcelable(
-                bundle,
-                ORDERED_PRODUCTS_KEY,
-                RecommendNavArgs::class.java
-            )?.orderProducts ?: emptyList()
-        } else emptyList()
+        val orders: List<CartProductUi> =
+            if (bundle != null) {
+                BundleCompat.getParcelable(
+                    bundle,
+                    ORDERED_PRODUCTS_KEY,
+                    RecommendNavArgs::class.java,
+                )?.orderProducts ?: emptyList()
+            } else {
+                emptyList()
+            }
         val cartRepository = CartRepositoryInjector.cartRepository()
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
         RecommendCartProductViewModel.factory(
             orders,
             cartRepository,
-            shoppingRepository,
             RecommendProductsUseCase(
                 shoppingRepository,
-                cartRepository
-            )
+                cartRepository,
+            ),
         )
     }
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
@@ -64,7 +65,10 @@ class RecommendCartProductFragment :
             .create()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
             vm = viewModel
@@ -126,6 +130,7 @@ class RecommendCartProductFragment :
         val TAG: String? = RecommendCartProductFragment::class.java.canonicalName
 
         private const val ORDERED_PRODUCTS_KEY = "ORDERED_PRODUCTS_KEY"
+
         fun args(navArgs: RecommendNavArgs): Bundle =
             Bundle().apply {
                 putParcelable(ORDERED_PRODUCTS_KEY, navArgs)

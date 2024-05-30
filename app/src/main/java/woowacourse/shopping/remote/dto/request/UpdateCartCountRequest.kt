@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdateCartCountRequest(
-    val quantity: Int
+    val quantity: Int,
 )
