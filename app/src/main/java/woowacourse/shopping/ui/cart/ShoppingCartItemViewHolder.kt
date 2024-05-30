@@ -10,10 +10,12 @@ class ShoppingCartItemViewHolder(
     private val binding: HolderCartBinding,
     private val onProductItemClickListener: OnProductItemClickListener,
     private val onItemChargeListener: OnItemQuantityChangeListener,
+    private val onCartItemSelectedListener: OnCartItemSelectedListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(cartItemDto: CartItemDto) {
         binding.cartItemDto = cartItemDto
         binding.onProductItemClickListener = onProductItemClickListener
         binding.onItemChargeListener = onItemChargeListener
+        binding.onCartItemSelectedListener = onCartItemSelectedListener
     }
 }

@@ -11,6 +11,7 @@ import woowacourse.shopping.ui.OnProductItemClickListener
 class CartItemRecyclerViewAdapter(
     private val onProductItemClickListener: OnProductItemClickListener,
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
+    private val onCartItemSelectedListener: OnCartItemSelectedListener,
 ) : RecyclerView.Adapter<ShoppingCartItemViewHolder>() {
     private var products: List<CartItemDto> = emptyList()
 
@@ -30,6 +31,7 @@ class CartItemRecyclerViewAdapter(
             HolderCartBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onProductItemClickListener,
             onItemQuantityChangeListener,
+            onCartItemSelectedListener,
         )
 
     override fun onBindViewHolder(
