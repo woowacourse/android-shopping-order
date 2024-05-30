@@ -10,6 +10,7 @@ val MAC_BOOK =
             """.trimIndent(),
         name = "맥북",
         price = 100,
+        category = "fashion",
     )
 
 val dummyProductsData =
