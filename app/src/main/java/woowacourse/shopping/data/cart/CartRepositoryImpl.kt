@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.cart
 
-import android.util.Log
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
@@ -33,7 +32,9 @@ class CartRepositoryImpl : CartRepository {
 
         return carts.content.map {
             CartWithProduct(
-                it.id, it.product.toDomain(), Quantity(it.quantity)
+                it.id,
+                it.product.toDomain(),
+                Quantity(it.quantity),
             )
         }
     }
@@ -94,6 +95,6 @@ class CartRepositoryImpl : CartRepository {
             imageUrl = this.imageUrl,
             name = this.name,
             price = this.price,
-            category = this.category
+            category = this.category,
         )
 }

@@ -37,6 +37,7 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
 
         <include
+            android:id="@+id/rv_recommend"
             layout="@layout/layout_recommend_product"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -58,15 +59,16 @@
             tools:visibility="gone" />
 
         <include
+            android:id="@+id/layout_order"
             layout="@layout/layout_order"
-            productCount="@{vm.checkedItemCount}"
-            totalPrice="@{vm.totalPrice}"
-            vm="@{vm}"
             android:layout_width="match_parent"
             android:layout_height="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:productCount="@{vm.checkedItemCount}"
+            app:totalPrice="@{vm.totalPrice}" />
 
         <CheckBox
             android:id="@+id/cb_cart_item_total"

@@ -12,7 +12,10 @@ class ProductViewHolder(
     RecyclerView.ViewHolder(binding.root) {
     fun bind(productWithQuantity: ProductWithQuantityUiModel) {
         binding.productWithQuantity = productWithQuantity
-        binding.vm = viewModel
+        binding.countButtonClickListener = viewModel
         binding.addCartClickListener = viewModel
+        binding.itemLayout.setOnClickListener {
+            viewModel.itemClickListener(productWithQuantity.product.id)
+        }
     }
 }

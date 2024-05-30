@@ -9,4 +9,6 @@ interface ProductRepository {
     ): List<Product>
 
     fun find(id: Long): Product
+
+    fun productsByCategory(category: String): List<Product>
 }

@@ -7,12 +7,8 @@
     <data>
 
         <variable
-            name="vm"
-            type="woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel" />
-
-        <variable
-            name="productItemClickListener"
-            type="woowacourse.shopping.ui.products.ProductItemClickListener" />
+            name="countButtonClickListener"
+            type="woowacourse.shopping.ui.CountButtonClickListener" />
 
         <variable
             name="productWithQuantity"
@@ -30,7 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:animateLayoutChanges="true"
-        android:onClick="@{() -> vm.itemClickListener(productWithQuantity.product.id)}"
         android:padding="6dp">
 
         <ImageView
@@ -54,7 +49,7 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
             app:layout_constraintStart_toStartOf="@id/iv_product_image"
             bind:count="@{String.valueOf(productWithQuantity.quantity)}"
-            bind:countButtonClickListener="@{vm}"
+            bind:countButtonClickListener="@{countButtonClickListener}"
             bind:productId="@{productWithQuantity.product.id}" />
 
         <ImageView
