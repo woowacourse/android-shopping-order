@@ -32,11 +32,11 @@
 
         <TextView
 
-            android:onClick="@{()->cartHandler.onOrderClicked()}"
             android:id="@+id/order"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/teal_200"
+            android:onClick="@{()->cartHandler.onOrderClicked()}"
             android:paddingHorizontal="16dp"
             android:paddingVertical="28dp"
             android:text="@{@string/order_text(viewModel.totalCount)}"
@@ -64,6 +64,7 @@
 
         <CheckBox
             android:id="@+id/total_check_box"
+            bindSetCartCheckBoxVisibility="@{viewModel.orderState}"
             bindTotalCheckBox="@{cartHandler}"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -75,6 +76,7 @@
             app:layout_constraintTop_toTopOf="@id/order" />
 
         <TextView
+            bindSetCartCheckBoxVisibility="@{viewModel.orderState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/whole"

@@ -12,8 +12,17 @@ import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.RecentProductItem
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartHandler
+import woowacourse.shopping.presentation.ui.cart.OrderState
 import java.text.NumberFormat
 import java.util.Locale
+
+@BindingAdapter("bindSetCartCheckBoxVisibility")
+fun setCartCheckBoxVisibility(
+    view: View,
+    orderState: OrderState,
+) {
+    view.visibility = if (orderState is OrderState.Recommend) View.GONE else View.VISIBLE
+}
 
 @BindingAdapter("bindTotalCheckBox")
 fun CheckBox.totalCheckBox(handler: CartHandler) {

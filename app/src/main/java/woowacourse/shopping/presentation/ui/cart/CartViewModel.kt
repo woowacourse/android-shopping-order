@@ -23,7 +23,9 @@ class CartViewModel(
 
     val error: LiveData<Event<CartError>> = _error
 
-    private var orderState: OrderState = OrderState.CartList
+    private val _orderState = MutableLiveData<OrderState>(OrderState.CartList)
+
+    val orderState: LiveData<OrderState> = _orderState
 
     private val _orderEvent = MutableLiveData<Event<OrderEvent>>()
 
@@ -78,7 +80,7 @@ class CartViewModel(
         }
 
     fun setOrderState(state: OrderState) {
-        orderState = state
+        _orderState.value = state
     }
 
     fun loadAllCartItems(pageSize: Int) {
@@ -128,7 +130,7 @@ class CartViewModel(
     }
 
     override fun onOrderClicked() {
-        when (orderState) {
+        when (orderState.value) {
             is OrderState.CartList -> {
                 if (totalCount.value != 0) {
                     _orderEvent.value = Event(OrderEvent.MoveToRecommend)
@@ -138,6 +140,8 @@ class CartViewModel(
             is OrderState.Recommend -> {
                 _orderEvent.value = Event(OrderEvent.CompleteOrder)
             }
+
+            null -> TODO()
         }
     }
 
@@ -199,7 +203,8 @@ class CartViewModel(
                 onSuccess = { products ->
                     val existCarts =
                         (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map { it.toProduct() }
-                    _recommendedProduct.value = (products - existCarts.toSet()).take(10).map { it.toInitialShoppingItem() }
+                    _recommendedProduct.value =
+                        (products - existCarts.toSet()).take(10).map { it.toInitialShoppingItem() }
                 },
                 onFailure = {},
             )
