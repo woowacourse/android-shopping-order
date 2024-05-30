@@ -26,8 +26,8 @@ class RecommendViewModel(
     val recommendItemsState: LiveData<UIState<List<ShoppingProduct>>>
         get() = _recommendItemsState
 
-    private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_TOTAL_PRICE)
-    val totalOrderPrice: LiveData<Int>
+    private val _totalOrderPrice: MutableLiveData<Long> = MutableLiveData(DEFAULT_TOTAL_PRICE)
+    val totalOrderPrice: LiveData<Long>
         get() = _totalOrderPrice
 
     private val _totalOrderQuantity: MutableLiveData<Int> = MutableLiveData(DEFAULT_TOTAL_QUANTITY)
@@ -105,7 +105,7 @@ class RecommendViewModel(
     }
 
     companion object {
-        private const val DEFAULT_TOTAL_PRICE = 0
+        private const val DEFAULT_TOTAL_PRICE = 0L
         private const val DEFAULT_TOTAL_QUANTITY = 0
         private const val DEFAULT_RECOMMEND_ITEM_COUNTS = 10
     }

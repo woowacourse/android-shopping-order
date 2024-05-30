@@ -82,7 +82,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/button_make_order"
                 app:layout_constraintTop_toTopOf="parent"
-                app:price="@{viewModel.totalPrice}"
+                app:price="@{viewModel.totalOrderPrice}"
                 tools:text="30,000원" />
 
             <TextView
@@ -95,7 +95,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:orderWithQuantityText="@{viewModel.totalQuantity}"
+                app:orderWithQuantityText="@{viewModel.totalOrderQuantity}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
