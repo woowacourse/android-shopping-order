@@ -49,14 +49,18 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentRecommendBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initView()
     }
@@ -65,10 +69,11 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = recommendViewModel
         recommendViewModel.loadRecommendData()
-        adapter = RecommendAdapter(
-            onClickProducts = this,
-            onClickCartItemCounter = this
-        )
+        adapter =
+            RecommendAdapter(
+                onClickProducts = this,
+                onClickCartItemCounter = this,
+            )
         observeData()
     }
 
@@ -79,7 +84,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is RecommendEvent.UpdateProductEvent.Success -> {
-
                 }
             }
         }
@@ -99,6 +103,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     override fun clickLoadPagingData() {}
+
     override fun clickProductItem(productId: Long) {
         val productFragment =
             ProductDetailFragment().apply {
@@ -108,11 +113,11 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     override fun clickRecentlyItem(recentlyProduct: RecentlyProduct) {}
+
     override fun clickShoppingCart() {
         val shoppingCartFragment = ShoppingCartFragment()
         mainActivityListener?.changeFragment(shoppingCartFragment)
     }
-
 
     override fun clickOrder() {
         recommendViewModel.orderItems()

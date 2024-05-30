@@ -17,7 +17,6 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
-import woowacourse.shopping.view.products.ProductListEvent
 
 class RecommendViewModel(
     private val orderRepository: OrderRepository,
@@ -37,13 +36,15 @@ class RecommendViewModel(
     val recommendEvent: SingleLiveData<RecommendEvent.SuccessEvent> get() = _recommendEvent
 
     val totalPrice: Int
-        get() = checkedShoppingCart.cartItems.value?.sumOf {
-            it.product.cartItemCounter.itemCount * it.product.price
-        } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
+        get() =
+            checkedShoppingCart.cartItems.value?.sumOf {
+                it.product.cartItemCounter.itemCount * it.product.price
+            } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
     val totalCount: Int
-        get() = checkedShoppingCart.cartItems.value?.count {
-            it.cartItemSelector.isSelected
-        } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
+        get() =
+            checkedShoppingCart.cartItems.value?.count {
+                it.cartItemSelector.isSelected
+            } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
 
     private fun loadRecentlyProduct(): RecentlyProduct {
         return recentlyRepository.getMostRecentlyProduct()
@@ -67,9 +68,9 @@ class RecommendViewModel(
         updateCarItem(product, UpdateCartItemType.DECREASE)
     }
 
-    fun orderItems(){
-        val ids = products.value?.map {it.id.toInt()}
-        if (!ids.isNullOrEmpty()){
+    fun orderItems() {
+        val ids = products.value?.map { it.id.toInt() }
+        if (!ids.isNullOrEmpty()) {
             orderRepository.orderShoppingCart(ids)
         }
     }
@@ -100,7 +101,6 @@ class RecommendViewModel(
                 else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
             }
         }
-
     }
 
     private fun addCartItem(product: Product) {
@@ -122,5 +122,4 @@ class RecommendViewModel(
             }
         }
     }
-
 }
