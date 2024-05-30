@@ -32,7 +32,6 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
-            android:checked="@{cartViewItem.isSelected}"
             android:onCheckedChanged="@{(view, isChecked) -> cartItemClickListener.onSelectChanged(cartViewItem.cartItem.cartItemId, isChecked)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

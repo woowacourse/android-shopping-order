@@ -5,23 +5,31 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.model.CartItem2
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CartRepository2
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository2
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem
 import woowacourse.shopping.view.state.UIState
 
 class CartViewModel(
     private val cartRepository: CartRepository2,
     private val orderRepository: OrderRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val productRepository: ProductRepository2,
 ) :
     ViewModel(),
     CartItemClickListener,
     QuantityClickListener {
 
-    private val _cartUiState = MutableLiveData<UIState<List<CartItem2>>>(UIState.Loading)
-    val cartUiState: LiveData<UIState<List<CartItem2>>>
+    private var isCartScreen = true
+
+    private val _cartUiState = MutableLiveData<UIState<List<ShoppingCartViewItem.CartViewItem>>>(UIState.Loading)
+    val cartUiState: LiveData<UIState<List<ShoppingCartViewItem.CartViewItem>>>
         get() = _cartUiState
 
     val isEmpty: LiveData<Boolean> =
@@ -30,7 +38,6 @@ class CartViewModel(
                 is UIState.Success -> {
                     state.data.isEmpty()
                 }
-
                 else -> {
                     true
                 }
@@ -53,12 +60,11 @@ class CartViewModel(
     val selectChangeId: LiveData<Int>
         get() = _selectChangeId
 
+    private val _totalPrice = MutableLiveData(0)
     val totalPrice: LiveData<Int>
-        get() = selectedItems.map {
-            it.sumOf { item -> item.totalPrice() }
-        }
+        get() = _totalPrice
 
-    private val cartItems: MutableList<CartItem2> = mutableListOf()
+    private val cartItems: MutableList<ShoppingCartViewItem.CartViewItem> = mutableListOf()
 
     private val _isBackButtonClicked = MutableLiveData<Event<Boolean>>()
     val isBackButtonClicked: LiveData<Event<Boolean>>
@@ -68,9 +74,15 @@ class CartViewModel(
     val isEntireCheckboxSelected: LiveData<Boolean>
         get() = _isEntireCheckboxSelected
 
-    private val _selectedItems = MutableLiveData<List<CartItem2>>(emptyList())
-    val selectedItems: LiveData<List<CartItem2>>
+    private val _selectedItems = MutableLiveData<List<ShoppingCartViewItem.CartViewItem>>(emptyList())
+    val selectedItems: LiveData<List<ShoppingCartViewItem.CartViewItem>>
         get() = _selectedItems
+
+    val recentProduct = recentProductRepository.findMostRecentProduct()
+
+    private val _recommendedProducts = MutableLiveData<List<HomeViewItem.ProductViewItem>>(emptyList())
+    val recommendedProducts: LiveData<List<HomeViewItem.ProductViewItem>>
+        get() = _recommendedProducts
 
     init {
         loadPage()
@@ -81,7 +93,8 @@ class CartViewModel(
             val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
             val cartItemResponse = cartRepository.getCartItems(0, totalQuantity, "asc")
                 .getOrNull()
-            cartItems.addAll(cartItemResponse?.cartItems ?: emptyList())
+            val cartViewItems = (cartItemResponse?.cartItems?.map(::CartViewItem) ?: emptyList())
+            cartItems.addAll(cartViewItems)
             _cartUiState.value = UIState.Success(cartItems)
             println("cartUiState : ${cartUiState.value}")
         }.onFailure {
@@ -93,16 +106,25 @@ class CartViewModel(
         cartRepository.deleteCartItem(itemId)
         println("cartItems1111 : $cartItems")
         println("itemId : $itemId")
-        val position = cartItems.indexOfFirst { it.cartItemId == itemId }
+        val position = cartItems.indexOfFirst { it.cartItem.cartItemId == itemId }
         cartItems.removeAt(position)
         _cartUiState.value = UIState.Success(cartItems)
+        _totalPrice.value =  selectedItems.value?.sumOf { item ->
+            item.cartItem.totalPrice()
+        }
     }
 
     fun selectAll(isChecked: Boolean) {
         if (isChecked) {
             _selectedItems.value = cartItems
+            _totalPrice.value =  selectedItems.value?.sumOf { item ->
+                item.cartItem.totalPrice()
+            }
         } else {
             _selectedItems.value = mutableListOf()
+            _totalPrice.value =  selectedItems.value?.sumOf { item ->
+                item.cartItem.totalPrice()
+            }
         }
     }
 
@@ -112,7 +134,7 @@ class CartViewModel(
 
     override fun onDeleteButtonClick(itemId: Int) {
         deleteItem(itemId)
-        val cartItem = cartItems.first { it.cartItemId == itemId }
+        val cartItem = cartItems.firstOrNull { it.cartItem.cartItemId == itemId } ?: return
         if (selectedItems.value?.contains(cartItem) == true) {
             _selectedItems.value = selectedItems.value?.minus(cartItem)
         }
@@ -120,41 +142,60 @@ class CartViewModel(
     }
 
     override fun onSelectChanged(itemId: Int, isSelected: Boolean) {
-        val cartItem = cartItems.first { it.cartItemId == itemId }
-        if (isSelected) {
-            _selectedItems.value = selectedItems.value?.minus(cartItem)
-        } else {
+        val cartItem = cartItems.firstOrNull { it.cartItem.cartItemId == itemId } ?: return
+        if (selectedItems.value?.contains(cartItem) == false && isSelected) {
             _selectedItems.value = selectedItems.value?.plus(cartItem)
+        } else {
+            _selectedItems.value = selectedItems.value?.minus(cartItem)
         }
         _selectChangeId.value = itemId
+        _totalPrice.value =  selectedItems.value?.sumOf { item ->
+            item.cartItem.totalPrice()
+        }
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
-        var cartItem = cartItems.first { it.product.id == productId }
-        cartItem = cartItem.plusQuantity()
-        val position = cartItems.indexOfFirst { it.cartItemId == cartItem.cartItemId }
-        cartItems[position] = cartItem
-        if(selectedItems.value?.contains(cartItem) == true) {
-            val selectedPosition = selectedItems.value?.indexOfFirst { it.product.id == productId } ?: return
-            (_selectedItems.value as MutableList)[selectedPosition] = cartItem
+        var targetCartItem = cartItems.firstOrNull { it.cartItem.product.id == productId } ?: return
+        // TODO
+        targetCartItem = targetCartItem.copy(
+            cartItem = targetCartItem.cartItem.plusQuantity()
+        )
+        val position = cartItems.indexOfFirst { it.cartItem.cartItemId == targetCartItem.cartItem.cartItemId }
+        cartItems[position] = targetCartItem
+        if(selectedItems.value?.contains(targetCartItem) == true) {
+            val selectedPosition = selectedItems.value?.indexOfFirst { it.cartItem.product.id == productId } ?: return
+            (_selectedItems.value as MutableList)[selectedPosition] = targetCartItem
         }
-        println("${cartItem.cartItemId} ${cartItem.quantity}")
-        cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity)
-        _updatedCartItem.value = cartItem
+        println("${targetCartItem.cartItem.cartItemId} ${targetCartItem.cartItem.quantity}")
+        cartRepository.updateCartItem(targetCartItem.cartItem.cartItemId, targetCartItem.cartItem.quantity)
+        _updatedCartItem.value = targetCartItem.cartItem
+        _totalPrice.value =  selectedItems.value?.sumOf { item ->
+            item.cartItem.totalPrice()
+        }
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
-        var cartItem = cartItems.first { it.product.id == productId }
-        cartItem = cartItem.minusQuantity()
-        val position = cartItems.indexOfFirst { it.cartItemId == cartItem.cartItemId }
-        cartItems[position] = cartItem
-        if(selectedItems.value?.contains(cartItem) == true) {
-            val selectedPosition = selectedItems.value?.indexOfFirst { it.product.id == productId } ?: return
-            (_selectedItems.value as MutableList)[selectedPosition] = cartItem
+        var targetCartItem = cartItems.firstOrNull { it.cartItem.product.id == productId } ?: return
+        targetCartItem = targetCartItem.copy(
+            cartItem = targetCartItem.cartItem.minusQuantity()
+        )
+//        cartItem = cartItem.cartItem.minusQuantity()
+        val position = cartItems.indexOfFirst { it.cartItem.cartItemId == targetCartItem.cartItem.cartItemId }
+        cartItems[position] = targetCartItem
+        if(selectedItems.value?.contains(targetCartItem) == true) {
+            val selectedPosition = selectedItems.value?.indexOfFirst { it.cartItem.product.id == productId } ?: return
+            (_selectedItems.value as MutableList)[selectedPosition] = targetCartItem
         }
-        println("${cartItem.cartItemId} ${cartItem.quantity}")
-        cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity)
-        _updatedCartItem.value = cartItem
+//        println("${cartItem.cartItemId} ${cartItem.quantity}")
+        cartRepository.updateCartItem(targetCartItem.cartItem.cartItemId, targetCartItem.cartItem.quantity)
+        _updatedCartItem.value = targetCartItem.cartItem
+        _totalPrice.value =  selectedItems.value?.sumOf { item ->
+            item.cartItem.totalPrice()
+        }
+    }
+
+    fun getRecommendedItems() {
+        val response = productRepository.getProducts(recentProduct?.category, 0, 10, "asc").getOrNull()
     }
 
     fun onBackButtonClick() {

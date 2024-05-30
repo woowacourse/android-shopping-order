@@ -36,6 +36,7 @@ fun Product2.toRecentProductEntity(): RecentProductEntity {
         productName = this.name,
         imageUrl = this.imageUrl,
         dateTime = localDateTime,
+        category = this.category
     )
 }
 

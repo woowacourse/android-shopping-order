@@ -20,6 +20,7 @@ import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.repository.CartRepository2
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.adapter.CartAdapter
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.state.UIState
 
@@ -89,7 +90,7 @@ class CartFragment : Fragment() {
         startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    private fun showData(data: List<CartItem2>) {
+    private fun showData(data: List<ShoppingCartViewItem.CartViewItem>) {
         println("data : $data")
         adapter.loadData(data)
     }

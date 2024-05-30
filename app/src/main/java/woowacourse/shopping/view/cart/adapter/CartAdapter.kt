@@ -69,38 +69,11 @@ class CartAdapter(
         return cartItems.size
     }
 
-    fun loadData(cartItems: List<CartItem2>) {
-        println("input cartItems : $cartItems")
-        val newCartItems = cartItems.map { CartViewItem(it) }
-        val oldCartItems = this.cartItems
+    fun loadData(cartItems: List<CartViewItem>) {
         this.cartItems.clear()
-        this.cartItems.addAll(newCartItems)
+        this.cartItems.addAll(cartItems)
 
         notifyDataSetChanged()
-
-//        val oldSize = oldCartItems.size
-//        val newSize = newCartItems.size
-//
-////        if ((oldSize == 1 && newSize == PAGE_SIZE) || (oldSize == PAGE_SIZE && newSize >= 1)) {
-////            notifyItemRangeRemoved(0, oldSize)
-////            notifyItemRangeChanged(0, newSize)
-////        } else {
-////            if (oldSize < newSize) {
-////                notifyItemInserted(oldSize + 1)
-////            } else {
-////                val removedItem = oldCartItems.find { !newCartItems.contains(it) }
-////                val removedPosition = oldCartItems.indexOf(removedItem)
-////                notifyItemRangeRemoved(removedPosition, oldSize - removedPosition)
-////            }
-////        }
-
-//        if (oldSize < newSize) {
-//            notifyItemRangeInserted(oldSize, newSize - oldSize)
-//        } else {
-//            val removedItem = oldCartItems.find { !newCartItems.contains(it) }
-//            val removedPosition = oldCartItems.indexOf(removedItem)
-//            notifyItemRangeRemoved(removedPosition, oldSize - removedPosition)
-//        }
     }
 
     fun updateCartItemQuantity(cartItem: CartItem2) {

@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase
     entities = [
         RecentProductEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 abstract class RecentProductDatabase : RoomDatabase() {
     abstract fun recentProductDao(): RecentProductDao
@@ -23,7 +23,7 @@ abstract class RecentProductDatabase : RoomDatabase() {
                     context.applicationContext,
                     RecentProductDatabase::class.java,
                     "recent_product_database",
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration().build().also { instance = it }
             }
         }
     }

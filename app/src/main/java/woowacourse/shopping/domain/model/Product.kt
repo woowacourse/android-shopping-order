@@ -9,6 +9,7 @@ data class Product(
     val name: String,
     val price: Int,
     val imageUrl: String,
+    val category: String? = null,
 )
 
 fun Product.toCartItemEntity(quantity: Int): CartItemEntity {
@@ -28,5 +29,6 @@ fun Product.toRecentProductEntity(): RecentProductEntity {
         productName = this.name,
         imageUrl = this.imageUrl,
         dateTime = localDateTime,
+        category = this.category,
     )
 }

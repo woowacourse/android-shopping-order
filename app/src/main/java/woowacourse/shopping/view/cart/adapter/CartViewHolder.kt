@@ -17,5 +17,6 @@ class CartViewHolder(private val binding: ItemCartBinding) :
         binding.cartViewItem = cartViewItem
         binding.cartItemClickListener = cartItemClickListener
         binding.quantityClickListener = quantityClickListener
+        binding.checkboxCart.isSelected = cartViewItem.isSelected
     }
 }

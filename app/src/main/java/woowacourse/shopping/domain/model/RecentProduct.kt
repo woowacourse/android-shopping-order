@@ -7,4 +7,5 @@ data class RecentProduct(
     val productName: String,
     val imageUrl: String,
     val dateTime: LocalDateTime,
+    val category: String?,
 )
