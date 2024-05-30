@@ -16,10 +16,14 @@ import woowacourse.shopping.data.remote.service.ProductApi
 class RetrofitDataSource(
     private val productApi: ProductApi = RetrofitModule.productApi,
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
-    private val orderApi: OrderApi = RetrofitModule.orderApi
-    ): RemoteDataSource {
-    override fun getProducts(category: String?, page: Int, size: Int): Response<ProductResponse> {
-        return productApi.getProducts(category= category, page = page, size = size).execute()
+    private val orderApi: OrderApi = RetrofitModule.orderApi,
+) : RemoteDataSource {
+    override fun getProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+    ): Response<ProductResponse> {
+        return productApi.getProducts(category = category, page = page, size = size).execute()
     }
 
     override fun postProduct(productRequest: ProductRequest): Response<Unit> {
@@ -34,7 +38,10 @@ class RetrofitDataSource(
         return productApi.deleteProductById(id = id).execute()
     }
 
-    override fun getCartItems(page: Int, size: Int): Response<CartResponse> {
+    override fun getCartItems(
+        page: Int,
+        size: Int,
+    ): Response<CartResponse> {
         return cartItemApi.getCartItems(page = page, size = size).execute()
     }
 
@@ -46,7 +53,10 @@ class RetrofitDataSource(
         return cartItemApi.deleteCartItem(id = id).execute()
     }
 
-    override fun patchCartItem(id: Int, quantityRequest: QuantityRequest): Response<Unit> {
+    override fun patchCartItem(
+        id: Int,
+        quantityRequest: QuantityRequest,
+    ): Response<Unit> {
         return cartItemApi.patchCartItem(id = id, quantityRequest = quantityRequest).execute()
     }
 

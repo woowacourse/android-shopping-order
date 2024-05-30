@@ -71,12 +71,17 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         Thread.sleep(500)
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
-                            binding.tvOrderCount.text = it.data.filter {
-                                it.isChecked
-                            }.sumOf { it.cartProduct.quantity }.toString()
-                            binding.tvPrice.text = getString(R.string.won, it.data.sumOf {
-                                it.cartProduct.quantity * it.cartProduct.price
-                            })
+                            binding.tvOrderCount.text =
+                                it.data.filter {
+                                    it.isChecked
+                                }.sumOf { it.cartProduct.quantity }.toString()
+                            binding.tvPrice.text =
+                                getString(
+                                    R.string.won,
+                                    it.data.sumOf {
+                                        it.cartProduct.quantity * it.cartProduct.price
+                                    },
+                                )
                             cartAdapter.submitList(it.data)
                         }
                     }
@@ -90,13 +95,16 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             }
         }
 
-        viewModel.eventHandler.observe(this, EventObserver {
-            when(it) {
-                is CartEvent.Update -> {
-                    Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+        viewModel.eventHandler.observe(
+            this,
+            EventObserver {
+                when (it) {
+                    is CartEvent.Update -> {
+                        Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun initTitle() {

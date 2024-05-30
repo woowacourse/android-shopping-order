@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.domain.CartProduct
 
 class CartAdapter(
     private val cartActionHandler: CartActionHandler,
@@ -55,7 +54,7 @@ class CartViewHolder(private val binding: ItemCartBinding, val cartActionHandler
         binding.cbCartItem.setOnClickListener {
             cartActionHandler.onCheck(
                 item,
-                binding.cbCartItem.isChecked
+                binding.cbCartItem.isChecked,
             )
         }
     }

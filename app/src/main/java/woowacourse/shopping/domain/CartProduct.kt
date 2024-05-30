@@ -11,7 +11,7 @@ data class CartProduct(
     val price: Long,
     var quantity: Int,
     val category: String = "fashion",
-    var cartId: Long = 0
+    var cartId: Long = 0,
 ) : Parcelable {
     fun plusQuantity() {
         quantity = quantity.plus(1)

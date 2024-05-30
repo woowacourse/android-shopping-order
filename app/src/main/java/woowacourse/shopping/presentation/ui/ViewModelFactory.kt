@@ -35,7 +35,6 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 ) as T
             }
 
-
             else -> {
                 throw IllegalArgumentException(INVALID_VIEWMODEL)
             }

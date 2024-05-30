@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
@@ -43,11 +42,15 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 if (it == null) {
                     _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
                 } else {
-                    _carts.postValue(UiState.Success(it.map { cartProduct ->
-                        CartProductUiModel(
-                            cartProduct
-                        )
-                    }))
+                    _carts.postValue(
+                        UiState.Success(
+                            it.map { cartProduct ->
+                                CartProductUiModel(
+                                    cartProduct,
+                                )
+                            },
+                        ),
+                    )
                 }
             }.onFailure {
                 _errorHandler.value = EventState(CART_LOAD_ERROR)
@@ -62,7 +65,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
                 updatedData.remove(cartProductUiModel)
                 _carts.postValue(
-                    UiState.Success(updatedData.toList())
+                    UiState.Success(updatedData.toList()),
                 )
             }.onFailure {
                 _errorHandler.postValue(EventState(CART_DELETE_ERROR))
@@ -76,8 +79,8 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         thread {
             repository.postOrders(
                 OrderRequest(
-                    checkedIds
-                )
+                    checkedIds,
+                ),
             ).onSuccess {
                 val currentCarts = (_carts.value as UiState.Success).data
                 val filteredCarts = currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
@@ -98,6 +101,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     private fun getCheckedIds(): List<Int> {
         return (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct.cartId.toInt() }
     }
+
     private fun updateCarts(productId: Int) {
         val currentCartItems = (_carts.value as? UiState.Success)?.data
         val updatedCartItems =
@@ -105,26 +109,33 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         _carts.postValue(UiState.Success(updatedCartItems ?: emptyList()))
     }
 
-    override fun onCheck(cartProduct: CartProductUiModel, isChecked: Boolean) {
-        _carts.value = UiState.Success(
-            (_carts.value as UiState.Success).data.map {
-                if (it.cartProduct.productId == cartProduct.cartProduct.productId) {
-                    cartProduct.copy(isChecked = isChecked)
-                } else {
-                    it
-                }
-            }
-        )
+    override fun onCheck(
+        cartProduct: CartProductUiModel,
+        isChecked: Boolean,
+    ) {
+        _carts.value =
+            UiState.Success(
+                (_carts.value as UiState.Success).data.map {
+                    if (it.cartProduct.productId == cartProduct.cartProduct.productId) {
+                        cartProduct.copy(isChecked = isChecked)
+                    } else {
+                        it
+                    }
+                },
+            )
 
-        if(!isChecked) _isAllChecked.value = false
-        if((_carts.value as UiState.Success).data.all { it.isChecked }) _isAllChecked.value = true
+        if (!isChecked) _isAllChecked.value = false
+        if ((_carts.value as UiState.Success).data.all { it.isChecked }) _isAllChecked.value = true
     }
 
     override fun onCheckAll() {
         val selectAll = isAllChecked.value ?: false
-        _carts.value = UiState.Success((_carts.value as UiState.Success).data.map {
-            it.copy(isChecked = !selectAll)
-        })
+        _carts.value =
+            UiState.Success(
+                (_carts.value as UiState.Success).data.map {
+                    it.copy(isChecked = !selectAll)
+                },
+            )
         _isAllChecked.value = !selectAll
     }
 
@@ -151,7 +162,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity)
+                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
@@ -163,7 +174,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        if(cartProduct.quantity == 1) return
+        if (cartProduct.quantity == 1) return
         thread {
             val cartProducts = (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index = cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
@@ -172,7 +183,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity)
+                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))

@@ -1,14 +1,11 @@
 package woowacourse.shopping.presentation.ui.curation
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.databinding.ItemLoadBinding
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewHolder
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 
@@ -45,6 +42,7 @@ class CurationAdapter(
                 ): Boolean {
                     return oldItem.productId == newItem.productId
                 }
+
                 override fun areContentsTheSame(
                     oldItem: CartProduct,
                     newItem: CartProduct,

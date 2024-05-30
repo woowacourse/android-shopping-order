@@ -1,13 +1,11 @@
 package woowacourse.shopping.presentation.ui.curation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -16,19 +14,16 @@ import woowacourse.shopping.presentation.ui.UiState
 import kotlin.concurrent.thread
 
 class CurationViewModel(
-    private val repository: Repository
-): ViewModel(), CurationActionHandler {
-
+    private val repository: Repository,
+) : ViewModel(), CurationActionHandler {
     private val _cartProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val cartProducts: LiveData<UiState<List<CartProduct>>> get() = _cartProducts
 
     private val _errorHandler = MutableLiveData<EventState<String>>()
     val errorHandler: LiveData<EventState<String>> get() = _errorHandler
 
-
     private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
-
 
     init {
         thread {
@@ -46,15 +41,16 @@ class CurationViewModel(
 
     override fun order() {
         thread {
-            val orderCartIds = (_cartProducts.value as UiState.Success).data.filter {
-                it.quantity > 0
-            }.map {
-                it.cartId.toInt()
-            }
+            val orderCartIds =
+                (_cartProducts.value as UiState.Success).data.filter {
+                    it.quantity > 0
+                }.map {
+                    it.cartId.toInt()
+                }
             repository.postOrders(
                 OrderRequest(
-                    orderCartIds
-                )
+                    orderCartIds,
+                ),
             ).onSuccess {
                 val cartProducts =
                     (this.cartProducts.value as UiState.Success).data.map { it.copy() }
@@ -91,12 +87,12 @@ class CurationViewModel(
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].plusQuantity()
 
-            if(cartProducts[index].quantity == 1) {
+            if (cartProducts[index].quantity == 1) {
                 repository.postCartItem(
                     CartItemRequest(
                         productId = cartProducts[index].productId.toInt(),
-                        quantity = cartProducts[index].quantity
-                    )
+                        quantity = cartProducts[index].quantity,
+                    ),
                 )
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
@@ -108,7 +104,7 @@ class CurationViewModel(
             } else {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)
+                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         _cartProducts.postValue(UiState.Success(cartProducts))
@@ -129,7 +125,7 @@ class CurationViewModel(
             if (cartProducts[index].quantity > 0) {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)
+                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         _cartProducts.postValue(UiState.Success(cartProducts))

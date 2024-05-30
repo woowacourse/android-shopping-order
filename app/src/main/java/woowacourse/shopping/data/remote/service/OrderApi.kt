@@ -10,6 +10,6 @@ interface OrderApi {
     @POST("/orders")
     fun postOrders(
         @Header("accept") accept: String = "*/*",
-        @Body orderRequest: OrderRequest
+        @Body orderRequest: OrderRequest,
     ): Call<Unit>
 }

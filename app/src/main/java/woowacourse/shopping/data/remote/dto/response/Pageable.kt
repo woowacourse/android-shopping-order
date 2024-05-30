@@ -2,7 +2,6 @@ package woowacourse.shopping.data.remote.dto.response
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class Pageable(
     val sort: Sort,
@@ -10,5 +9,5 @@ data class Pageable(
     val pageSize: Int,
     val offset: Int,
     val paged: Boolean,
-    val unpaged: Boolean
+    val unpaged: Boolean,
 )

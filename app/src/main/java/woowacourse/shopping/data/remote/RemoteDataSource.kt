@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.remote
 
 import retrofit2.Response
-import woowacourse.shopping.data.local.entity.CartProductEntity
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.ProductRequest
@@ -16,44 +15,29 @@ interface RemoteDataSource {
         category: String? = null,
         page: Int = 0,
         size: Int = 20,
-        ): Response<ProductResponse>
+    ): Response<ProductResponse>
 
-    fun postProduct(
-        productRequest: ProductRequest
-    ): Response<Unit>
+    fun postProduct(productRequest: ProductRequest): Response<Unit>
 
-    fun getProductById(
-        id: Int
-    ): Response<Product>
+    fun getProductById(id: Int): Response<Product>
 
-    fun deleteProducyById(
-        id: Int
-    ): Response<Unit>
-
+    fun deleteProducyById(id: Int): Response<Unit>
 
     fun getCartItems(
         page: Int = 0,
         size: Int = 20,
     ): Response<CartResponse>
 
-    fun postCartItem(
-        cartItemRequest: CartItemRequest
-    ): Response<Unit>
+    fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit>
 
-    fun deleteCartItem(
-        id: Int
-    ): Response<Unit>
+    fun deleteCartItem(id: Int): Response<Unit>
 
     fun patchCartItem(
         id: Int,
-        quantityRequest: QuantityRequest
+        quantityRequest: QuantityRequest,
     ): Response<Unit>
 
-    fun getCartItemsCounts(
+    fun getCartItemsCounts(): Response<QuantityResponse>
 
-    ): Response<QuantityResponse>
-
-    fun postOrders(
-        orderRequest: OrderRequest
-    ): Response<Unit>
+    fun postOrders(orderRequest: OrderRequest): Response<Unit>
 }

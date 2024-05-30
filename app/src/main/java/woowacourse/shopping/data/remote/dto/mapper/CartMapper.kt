@@ -3,7 +3,6 @@ package woowacourse.shopping.data.remote.dto.mapper
 import woowacourse.shopping.data.remote.dto.response.Cart
 import woowacourse.shopping.domain.CartProduct
 
-
 fun Cart.toDomain(): CartProduct {
     return CartProduct(
         cartId = id.toLong(),
@@ -12,6 +11,6 @@ fun Cart.toDomain(): CartProduct {
         price = product.price.toLong(),
         imgUrl = product.imageUrl,
         category = product.category,
-        quantity = quantity
+        quantity = quantity,
     )
 }

@@ -17,25 +17,24 @@ interface ProductApi {
         @Header("accept") accept: String = "*/*",
         @Query("category") category: String? = null,
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 1
+        @Query("size") size: Int = 1,
     ): Call<ProductResponse>
 
     @POST("/products")
     fun postProduct(
         @Header("accept") accept: String = "*/*",
-        @Body productRequest: ProductRequest
+        @Body productRequest: ProductRequest,
     ): Call<Unit>
 
     @GET("/products/{id}")
     fun getProductById(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int
+        @Path("id") id: Int,
     ): Call<Product>
-
 
     @DELETE("/products/{id}")
     fun deleteProductById(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int
+        @Path("id") id: Int,
     ): Call<Unit>
 }

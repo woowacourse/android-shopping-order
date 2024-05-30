@@ -14,5 +14,5 @@ data class CartResponse(
     val number: Int,
     val numberOfElements: Int,
     val size: Int,
-    val empty: Boolean
+    val empty: Boolean,
 )

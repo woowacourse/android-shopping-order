@@ -1,12 +1,10 @@
 package woowacourse.shopping.presentation.ui.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -51,16 +49,18 @@ class ProductDetailViewModel(
 //    }
 
     fun setCartProduct(cartProduct: CartProduct?) {
-        if(cartProduct != null) {
+        if (cartProduct != null) {
             thread {
                 saveRecentProduct(cartProduct)
             }
-            val detailCartProduct = DetailCartProduct(
-                isNew = cartProduct.quantity == 0,
-                cartProduct = cartProduct.copy(
-                    quantity = if(cartProduct.quantity == 0) 1 else cartProduct.quantity
+            val detailCartProduct =
+                DetailCartProduct(
+                    isNew = cartProduct.quantity == 0,
+                    cartProduct =
+                        cartProduct.copy(
+                            quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
+                        ),
                 )
-            )
             _product.value = UiState.Success(detailCartProduct)
         }
     }
@@ -83,12 +83,12 @@ class ProductDetailViewModel(
         thread {
             updateUiModel.add(detailCartProduct.cartProduct.productId, detailCartProduct.cartProduct)
 
-            if(detailCartProduct.isNew) {
+            if (detailCartProduct.isNew) {
                 repository.postCartItem(
                     CartItemRequest(
                         productId = detailCartProduct.cartProduct.productId.toInt(),
-                        quantity = detailCartProduct.cartProduct.quantity
-                    )
+                        quantity = detailCartProduct.cartProduct.quantity,
+                    ),
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
                     saveRecentProduct(detailCartProduct.cartProduct)
@@ -96,12 +96,12 @@ class ProductDetailViewModel(
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }
             } else {
-
                 repository.patchCartItem(
                     id = detailCartProduct.cartProduct.cartId.toInt(),
-                    quantityRequest = QuantityRequest(
-                        detailCartProduct.cartProduct.quantity
-                    )
+                    quantityRequest =
+                        QuantityRequest(
+                            detailCartProduct.cartProduct.quantity,
+                        ),
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
                     saveRecentProduct(detailCartProduct.cartProduct)
@@ -122,18 +122,22 @@ class ProductDetailViewModel(
     override fun onPlus(cartProduct: CartProduct) {
         thread {
             cartProduct.plusQuantity()
-            _product.postValue(UiState.Success(
-                (_product.value as UiState.Success).data.copy(cartProduct = cartProduct)
-            ))
+            _product.postValue(
+                UiState.Success(
+                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+                ),
+            )
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
         thread {
             cartProduct.minusQuantity()
-            _product.postValue(UiState.Success(
-                (_product.value as UiState.Success).data.copy(cartProduct = cartProduct)
-            ))
+            _product.postValue(
+                UiState.Success(
+                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+                ),
+            )
         }
     }
 
@@ -148,7 +152,7 @@ class ProductDetailViewModel(
                     cartProduct.price,
                     System.currentTimeMillis(),
                     category = cartProduct.category,
-                    cartId = cartProduct.cartId
+                    cartId = cartProduct.cartId,
                 ),
             ).onSuccess {
             }.onFailure {

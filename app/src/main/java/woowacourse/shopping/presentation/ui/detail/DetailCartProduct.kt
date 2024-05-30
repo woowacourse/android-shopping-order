@@ -4,5 +4,5 @@ import woowacourse.shopping.domain.CartProduct
 
 data class DetailCartProduct(
     val isNew: Boolean = false,
-    val cartProduct: CartProduct
+    val cartProduct: CartProduct,
 )

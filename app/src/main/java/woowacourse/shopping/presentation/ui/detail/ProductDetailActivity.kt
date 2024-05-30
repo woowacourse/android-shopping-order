@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.detail
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -17,7 +16,6 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity.Companion.EXTRA_UPDATED_PRODUCT
 import woowacourse.shopping.utils.getParcelableExtraCompat
-import kotlin.concurrent.thread
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
@@ -110,7 +108,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
 
     companion object {
         const val EXTRA_PRODUCT_ID = "productId"
-        const val EXTRA_CART_PRODUCT ="cartProduct"
+        const val EXTRA_CART_PRODUCT = "cartProduct"
         const val EXTRA_OVERLAY = "overlay"
 
         fun createIntent(

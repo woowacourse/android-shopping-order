@@ -14,5 +14,5 @@ data class ProductResponse(
     val number: Int,
     val numberOfElements: Int,
     val size: Int,
-    val empty: Boolean
+    val empty: Boolean,
 )

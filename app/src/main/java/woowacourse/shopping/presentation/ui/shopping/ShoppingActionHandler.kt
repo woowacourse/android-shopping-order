@@ -9,7 +9,6 @@ interface ShoppingActionHandler : CartCountHandler {
 
     fun onRecentProductClick(recentProduct: RecentProduct)
 
-
     fun onCartClick()
 
     fun loadMore()

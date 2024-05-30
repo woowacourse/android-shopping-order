@@ -9,4 +9,3 @@ data class RecentEntity(
     val productId: Long,
     val createdAt: Long,
 )
-

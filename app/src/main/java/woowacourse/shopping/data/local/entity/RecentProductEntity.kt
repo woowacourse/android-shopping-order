@@ -13,5 +13,5 @@ data class RecentProductEntity(
     val price: Long,
     val createdAt: Long,
     val category: String,
-    val cartId: Long
+    val cartId: Long,
 )

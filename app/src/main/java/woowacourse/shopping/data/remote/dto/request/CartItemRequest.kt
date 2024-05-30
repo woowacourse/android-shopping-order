@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CartItemRequest(
     val productId: Int,
-    val quantity: Int
+    val quantity: Int,
 )

@@ -12,18 +12,32 @@ fun RecentProductEntity.toDomain(): RecentProduct {
         quantity,
         price,
         createdAt,
-        category, cartId
+        category,
+        cartId,
     )
 }
 
 fun RecentProduct.toEntity(): RecentProductEntity {
     return RecentProductEntity(
-        productId, name, imgUrl, quantity, price, createdAt, category, cartId
+        productId,
+        name,
+        imgUrl,
+        quantity,
+        price,
+        createdAt,
+        category,
+        cartId,
     )
 }
 
 fun RecentProduct.toCartProduct(): CartProduct {
     return CartProduct(
-        productId, name, imgUrl, price, quantity, category, cartId
+        productId,
+        name,
+        imgUrl,
+        price,
+        quantity,
+        category,
+        cartId,
     )
 }

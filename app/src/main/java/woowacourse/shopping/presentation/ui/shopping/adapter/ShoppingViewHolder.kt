@@ -13,7 +13,6 @@ sealed class ShoppingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val shoppingActionHandler: ShoppingActionHandler,
     ) :
         ShoppingViewHolder(binding.root) {
-
         fun bind(item: CartProduct) {
             binding.cartProduct = item
             binding.shoppingActionHandler = shoppingActionHandler

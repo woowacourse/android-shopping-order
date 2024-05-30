@@ -1,3 +1,10 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
+var properties =
+    Properties().apply {
+        load(rootProject.file("local.properties").inputStream())
+    }
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -11,6 +18,10 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "woowacourse.shopping"
         minSdk = 26
@@ -20,6 +31,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "USER", properties.getProperty("USER"))
+        buildConfigField("String", "PASSWORD", properties.getProperty("PASSWORD"))
     }
 
     buildTypes {
@@ -79,7 +93,6 @@ dependencies {
 
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     implementation("com.google.code.gson:gson:2.9.0")
-
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")

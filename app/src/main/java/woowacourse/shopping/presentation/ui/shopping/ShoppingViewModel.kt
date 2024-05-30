@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shopping
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -33,7 +31,6 @@ class ShoppingViewModel(private val repository: Repository) :
 
     private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
     val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
-
 
     private val _products = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val products: LiveData<UiState<List<CartProduct>>> get() = _products
@@ -61,27 +58,27 @@ class ShoppingViewModel(private val repository: Repository) :
             val carts = (_carts.value as UiState.Success).data
 
             // cartProducts 리스트 생성
-            val cartProducts = products.map { product ->
-                // carts에서 productId가 같은 항목을 찾음
-                val cartItem = carts.find { it.productId == product.productId }
-                if (cartItem != null) {
-                    // product의 quantity를 cartItem의 quantity로 업데이트
-                    product.copy(quantity = cartItem.quantity, cartId = cartItem.cartId)
-                } else {
-                    product
+            val cartProducts =
+                products.map { product ->
+                    // carts에서 productId가 같은 항목을 찾음
+                    val cartItem = carts.find { it.productId == product.productId }
+                    if (cartItem != null) {
+                        // product의 quantity를 cartItem의 quantity로 업데이트
+                        product.copy(quantity = cartItem.quantity, cartId = cartItem.cartId)
+                    } else {
+                        product
+                    }
                 }
-            }
 
             // 업데이트된 cartProducts를 반영 (예: _combinedProducts MutableLiveData에 저장)
             this.cartProducts.value = UiState.Success(cartProducts)
         }
     }
 
-
     fun loadProductByOffset() {
         thread {
             repository.getProductsByPaging().onSuccess {
-                if(it == null) {
+                if (it == null) {
                     _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {
                     if (_products.value is UiState.Loading) {
@@ -96,14 +93,13 @@ class ShoppingViewModel(private val repository: Repository) :
             }.onFailure {
                 _errorHandler.postValue(EventState(LOAD_ERROR))
             }
-
         }
     }
 
     fun loadCartByOffset() {
         thread {
             repository.getCartItems(offSet, 2000).onSuccess {
-                if(it == null) {
+                if (it == null) {
                     _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
                 } else {
                     _carts.postValue(UiState.Success(it))
@@ -113,6 +109,7 @@ class ShoppingViewModel(private val repository: Repository) :
             }
         }
     }
+
     fun getCartItemCounts() {
         thread {
             repository.getCartItemsCounts().onSuccess { maxCount ->
@@ -133,9 +130,12 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     override fun onRecentProductClick(recentProduct: RecentProduct) {
-        _navigateHandler.value = EventState(NavigateUiState.ToDetail(
-            recentProduct.toCartProduct()
-        ))
+        _navigateHandler.value =
+            EventState(
+                NavigateUiState.ToDetail(
+                    recentProduct.toCartProduct(),
+                ),
+            )
     }
 
     override fun onCartClick() {
@@ -153,12 +153,12 @@ class ShoppingViewModel(private val repository: Repository) :
 
             cartProducts[index].plusQuantity()
 
-            if(cartProducts[index].quantity == 1) {
+            if (cartProducts[index].quantity == 1) {
                 repository.postCartItem(
                     CartItemRequest(
                         productId = cartProducts[index].productId.toInt(),
-                        quantity = cartProducts[index].quantity
-                    )
+                        quantity = cartProducts[index].quantity,
+                    ),
                 )
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
@@ -171,7 +171,7 @@ class ShoppingViewModel(private val repository: Repository) :
             } else {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)
+                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
@@ -181,7 +181,6 @@ class ShoppingViewModel(private val repository: Repository) :
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
                     }
             }
-
         }
     }
 
@@ -194,7 +193,7 @@ class ShoppingViewModel(private val repository: Repository) :
             if (cartProducts[index].quantity > 0) {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)
+                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
