@@ -49,10 +49,10 @@
             android:overScrollMode="never"
             android:paddingVertical="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/layout_order_bottom_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
-            app:layout_constraintBottom_toTopOf="@id/layout_order_bottom_bar"
             tools:listitem="@layout/item_cart" />
 
         <LinearLayout
@@ -94,47 +94,47 @@
             android:layout_width="match_parent"
             android:layout_height="78dp"
             android:background="@color/gray_500"
-            app:layout_constraintBottom_toBottomOf="parent"
-            >
+            app:layout_constraintBottom_toBottomOf="parent">
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-            <CheckBox
-                android:id="@+id/cb_select_order"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="20dp"
-                android:buttonTint="@color/teal_200"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="전체"
-                android:textColor="@color/white"
-                app:layout_constraintTop_toBottomOf="@id/cb_select_order"
-                app:layout_constraintStart_toStartOf="@id/cb_select_order"
-                app:layout_constraintEnd_toEndOf="@id/cb_select_order"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <CheckBox
+                    android:id="@+id/cb_select_order"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="20dp"
+                    android:buttonTint="@color/teal_200"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전체"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/cb_select_order"
+                    app:layout_constraintStart_toStartOf="@id/cb_select_order"
+                    app:layout_constraintTop_toBottomOf="@id/cb_select_order" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="@{@string/product_price(viewModel.totalPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tv_order"
-                android:layout_marginEnd="12dp"
-                tools:text = "30,000원"
-                />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="30,000원" />
 
             <TextView
                 android:id="@+id/tv_order"
@@ -147,6 +147,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="주문하기(4)" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
