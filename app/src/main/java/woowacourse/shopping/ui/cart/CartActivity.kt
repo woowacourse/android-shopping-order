@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import woowacourse.shopping.R
+import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
@@ -35,10 +38,7 @@ class CartActivity : AppCompatActivity() {
         cartRecommendFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartRecommendFragment::class.java.name)
         // binding = DataBindingUtil.setContentView(this, layoutId)
 
-        // supportFragmentManager.commit {
-        //    add(containerId, fragment, CartSelectionFragment.TAG)
-        //    addToBackStack(null)
-        // }
+        changeFragment(cartSelectionFragment)
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -61,7 +61,20 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
+    private fun changeFragment(fragment: Fragment) {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.fragment_container_view_cart, fragment)
+            addToBackStack(null)
+        }
+    }
+
     private fun initializeCartAdapter() {
+        viewModel.navigateEvent.observeEvent(this) {
+            if (supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart) is CartSelectionFragment) {
+                changeFragment(cartRecommendFragment)
+            }
+        }
         /*
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter

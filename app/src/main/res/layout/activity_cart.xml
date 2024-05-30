@@ -96,6 +96,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:onClick="@{() ->listener.navigateCartRecommend()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="주문하기(4)" />
 

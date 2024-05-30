@@ -42,6 +42,9 @@ class CartViewModel(
     private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
     val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
 
+    private val _navigateEvent = MutableLiveData<Event<Unit>>()
+    val navigateEvent: LiveData<Event<Unit>> get() = _navigateEvent
+
     init {
         loadAllCartItems()
     }
@@ -209,6 +212,10 @@ class CartViewModel(
         cartUiModels()?.forEach {
             selectCartItem(it.productId, isSelected = isChecked)
         }
+    }
+
+    override fun navigateCartRecommend() {
+        _navigateEvent.postValue(Event(Unit))
     }
 
     private fun loadRecommendProductUiModels() {
