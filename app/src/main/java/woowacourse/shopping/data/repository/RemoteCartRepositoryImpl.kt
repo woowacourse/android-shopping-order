@@ -8,9 +8,11 @@ import retrofit2.Response
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.CartItemDto
+import woowacourse.shopping.data.model.dto.CartItemsDto
 import woowacourse.shopping.data.model.dto.Content
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
@@ -91,6 +93,11 @@ class RemoteCartRepositoryImpl : CartRepository {
         return cartItems?.find { it.id == contentId }?.quantity ?: 0
     }
 
+    override fun makeOrder(order: Order) {
+        val cartItemIds = order.list.map { it.id }
+        service.makeOrder(CartItemsDto(cartItemIds)).execute()
+    }
+
     override fun size(): Int {
         return cartItemData?.totalElements ?: 0
     }
@@ -108,7 +115,6 @@ class RemoteCartRepositoryImpl : CartRepository {
                 break
             }
         }
-
         Log.d("crong count", "$quantity")
 
         return quantity

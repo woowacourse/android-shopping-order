@@ -6,6 +6,7 @@ import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.entity.CartItemEntity
 import woowacourse.shopping.data.model.entity.mapper
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
@@ -63,6 +64,10 @@ class CartRepositoryImpl(context: Context) : CartRepository {
             quantity = dao.findQuantityWithProductId(productId)
         }
         return quantity
+    }
+
+    override fun makeOrder(order: Order) {
+        TODO("Not yet implemented")
     }
 
     override fun size(): Int {

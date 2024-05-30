@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartTempBinding
+import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.cart.selection.SelectionFragment
 
 class CartActivity : AppCompatActivity(), CartClickListener {
@@ -29,7 +30,27 @@ class CartActivity : AppCompatActivity(), CartClickListener {
     }
 
     override fun onBackButtonClick() {
-        finish()
+        val topFragment = supportFragmentManager.fragments.lastOrNull()
+        when (topFragment) {
+            is SelectionFragment -> {
+                supportFragmentManager.beginTransaction()
+                    .remove(selectionFragment)
+                    .setReorderingAllowed(true)
+                    .commit()
+                finish()
+            }
+
+            is RecommendationFragment -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.cart_fragment, selectionFragment)
+                    .setReorderingAllowed(true)
+                    .commit()
+            }
+
+            else -> {
+                finish()
+            }
+        }
     }
 
     companion object {

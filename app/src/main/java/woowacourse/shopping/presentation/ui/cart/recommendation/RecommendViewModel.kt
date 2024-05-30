@@ -1,9 +1,11 @@
 package woowacourse.shopping.presentation.ui.cart.recommendation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.data.database.OrderDatabase
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -17,9 +19,9 @@ class RecommendViewModel(
     private val shoppingRepository: ShoppingItemsRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), RecommendItemCountHandler {
-    private val _cartItemsState: MutableLiveData<UIState<List<CartItem>>> = MutableLiveData()
-    val cartItemsState: LiveData<UIState<List<CartItem>>>
-        get() = _cartItemsState
+    private val _order: MutableLiveData<Order> = MutableLiveData()
+    val order: LiveData<Order>
+        get() = _order
 
     private val _recommendItemsState: MutableLiveData<UIState<List<ShoppingProduct>>> =
         MutableLiveData()
@@ -43,12 +45,19 @@ class RecommendViewModel(
         get() = _deleteCartItem
 
     init {
+        fetchOrder()
         setUpUIState()
+    }
+
+    private fun fetchOrder() {
+        _order.value = OrderDatabase.getOrder()
+        updatePriceAndQuantity()
     }
 
     private fun setUpUIState() {
         _recommendItemsState.value =
             try {
+                Log.d("crong", "setupState")
                 loadRecommendationProducts()
             } catch (e: Exception) {
                 UIState.Error(e)
@@ -56,15 +65,24 @@ class RecommendViewModel(
             }
     }
 
+    private fun updatePriceAndQuantity() {
+        _totalOrderPrice.value = _order.value?.getTotalPrice() ?: 0L
+        _totalOrderQuantity.value = _order.value?.getTotalQuantity() ?: 0
+    }
+
     private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
         val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
+        cartRepository.updateCartItems()
+        Log.d("crong", "${recentProduct.category}")
         val cartItemIds = cartRepository.findAll().items.map { it.productId }
+        Log.d("crong", "$cartItemIds")
         val items =
             shoppingRepository.recommendProducts(
                 recentProduct.category,
                 DEFAULT_RECOMMEND_ITEM_COUNTS,
                 cartItemIds,
             ).mapperToShoppingProductList()
+        Log.d("crong", "$items")
         return if (items.isEmpty()) {
             UIState.Empty
         } else {
@@ -79,6 +97,11 @@ class RecommendViewModel(
     fun deleteItem(itemId: Long) {
         cartRepository.delete(itemId)
         loadRecommendationProducts()
+    }
+
+    fun completeOrder() {
+        val currentOrder = _order.value ?: return
+        cartRepository.makeOrder(currentOrder)
     }
 
     override fun increaseCount(productId: Long) {

@@ -10,20 +10,21 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.repository.ShoppingItemsRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.state.UIState
 
-class RecommendationFragment : Fragment() {
+class RecommendationFragment : Fragment(), RecommendationClickListener {
     private lateinit var binding: FragmentRecommendBinding
+    private lateinit var recommendAdapter: RecommendAdapter
     private val recommendViewModel: RecommendViewModel by lazy {
         val viewModelFactory =
             RecommendViewModelFactory(
-                cartRepository = CartRepositoryImpl(requireContext()),
-                shoppingRepository = ShoppingItemsRepositoryImpl(),
+                cartRepository = RemoteCartRepositoryImpl(),
+                shoppingRepository = RemoteShoppingRepositoryImpl(),
                 recentProductRepository = RecentProductRepositoryImpl(requireContext()),
             )
         viewModelFactory.create(RecommendViewModel::class.java)
@@ -45,28 +46,29 @@ class RecommendationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = recommendViewModel
+        binding.clickListener = this
         loadRecommendItems()
     }
 
     private fun loadRecommendItems() {
         lifecycleScope.launch {
             showSkeletonUI(isLoading = true)
-            delay(3000)
+            delay(1500)
             showSkeletonUI(isLoading = false)
             setUpViews()
         }
     }
 
     private fun showSkeletonUI(isLoading: Boolean) {
-//        if (isLoading) {
-//            binding. .startShimmer()
-//            binding.shimmerCartList.visibility = View.VISIBLE
-//            binding.recyclerView.visibility = View.GONE
-//        } else {
-//            binding.shimmerCartList.stopShimmer()
-//            binding.shimmerCartList.visibility = View.GONE
-//            binding.recyclerView.visibility = View.VISIBLE
-//        }
+        if (isLoading) {
+            binding.shimmerRecommendationList.startShimmer()
+            binding.shimmerRecommendationList.visibility = View.VISIBLE
+            binding.recyclerviewRecommendationList.visibility = View.GONE
+        } else {
+            binding.shimmerRecommendationList.stopShimmer()
+            binding.shimmerRecommendationList.visibility = View.GONE
+            binding.recyclerviewRecommendationList.visibility = View.VISIBLE
+        }
     }
 
     private fun setUpViews() {
@@ -74,10 +76,10 @@ class RecommendationFragment : Fragment() {
     }
 
     private fun setUpUIState() {
-        val adapter = setUpRecyclerViewAdapter()
+        setUpRecyclerViewAdapter()
         recommendViewModel.recommendItemsState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UIState.Success -> showData(state.data, adapter)
+                is UIState.Success -> showData(state.data)
                 is UIState.Empty -> {}
                 is UIState.Error ->
                     showError(
@@ -87,20 +89,21 @@ class RecommendationFragment : Fragment() {
         }
     }
 
-    private fun setUpRecyclerViewAdapter(): RecommendAdapter {
-        val adapter = RecommendAdapter(recommendViewModel)
-        binding.recyclerviewRecommendationList.adapter = adapter
-        return adapter
+    private fun setUpRecyclerViewAdapter() {
+        recommendAdapter = RecommendAdapter(recommendViewModel)
+        binding.recyclerviewRecommendationList.adapter = recommendAdapter
     }
 
-    private fun showData(
-        data: List<ShoppingProduct>,
-        adapter: RecommendAdapter,
-    ) {
-        adapter.loadData(data)
+    private fun showData(data: List<ShoppingProduct>) {
+        recommendAdapter.loadData(data)
     }
 
     private fun showError(errorMessage: String) {
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onMakeOrderClick() {
+        recommendViewModel.completeOrder()
+        requireActivity().finish()
     }
 }

@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 
@@ -28,6 +29,8 @@ interface CartRepository {
     )
 
     fun findQuantityWithProductId(productId: Long): Int
+
+    fun makeOrder(order: Order)
 
     fun size(): Int
 

@@ -175,6 +175,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
                 app:orderWithQuantityText="@{viewModel.totalQuantity}"
                 tools:text="주문하기(3)" />
 

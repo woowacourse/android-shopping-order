@@ -9,6 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.dto.CartItemDto
+import woowacourse.shopping.data.model.dto.CartItemsDto
 import woowacourse.shopping.data.model.dto.ProductDto
 import woowacourse.shopping.data.model.dto.ProductResponseDto
 import woowacourse.shopping.data.model.dto.QuantityDto
@@ -56,5 +57,10 @@ interface RetrofitService {
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Path("id") id: Long,
+    ): Call<Unit>
+
+    @POST("/orders")
+    fun makeOrder(
+        @Body cartItemIds: CartItemsDto,
     ): Call<Unit>
 }

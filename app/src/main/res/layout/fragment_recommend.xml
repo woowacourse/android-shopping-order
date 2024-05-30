@@ -7,7 +7,10 @@
 
         <import type="android.view.View" />
 
-        <!--    새로운 뷰모델 바인딩하기    -->
+        <variable
+            name="clickListener"
+            type= "woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationClickListener"/>
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.cart.recommendation.RecommendViewModel" />
@@ -46,6 +49,31 @@
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_recommendation_title" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_recommendation_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textview_recommendation_explanation">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="20dp"
+                    android:paddingHorizontal="4dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
+
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_recommendation_list"
@@ -95,6 +123,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
                 app:orderWithQuantityText="@{viewModel.totalOrderQuantity}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

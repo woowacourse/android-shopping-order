@@ -10,12 +10,15 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
+import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 
 class SelectionFragment : Fragment(), SelectionClickListener {
@@ -132,7 +135,15 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         }
     }
 
+    override fun onMakeOrderClick() {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.cart_fragment, RecommendationFragment())
+            .setReorderingAllowed(true)
+            .commit()
+    }
+
     override fun onSelectAllClick() {
+        OrderDatabase.postOrder(viewModel.order.value ?: Order())
         viewModel.selectAllByCondition()
     }
 }
