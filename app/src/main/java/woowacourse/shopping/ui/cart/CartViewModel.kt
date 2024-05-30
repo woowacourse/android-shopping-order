@@ -25,8 +25,10 @@ class CartViewModel(
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    private val cartItemSelectedCount = MutableLiveData<Int>()
-    val cartItemAllSelected: LiveData<Boolean> = cartItemSelectedCount.map { it == cartUiModels().size }
+    private val _cartItemSelectedCount = MutableLiveData<Int>(0)
+    val cartItemSelectedCount: LiveData<Int> get() = _cartItemSelectedCount
+
+    val cartItemAllSelected: LiveData<Boolean> = _cartItemSelectedCount.map { it == cartUiModels()?.size }
 
     init {
         loadAllCartItems()
@@ -51,7 +53,7 @@ class CartViewModel(
     }
 
     private fun updateTotalPrice() {
-        val uiModels = cartUiModels()
+        val uiModels = cartUiModels() ?: emptyList()
         val totalPrice =
             uiModels
                 .filter { it.isSelected }
@@ -79,7 +81,7 @@ class CartViewModel(
         product: Product,
         cartItem: CartItem,
     ) {
-        val oldCartUiModels = cartUiModels()
+        val oldCartUiModels = cartUiModels() ?: emptyList()
         val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
         val newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
         val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
@@ -148,10 +150,11 @@ class CartViewModel(
         productId: Int,
         isSelected: Boolean,
     ) {
+        val oldCartUiModels = cartUiModels() ?: emptyList()
         val oldCartUiModel = cartUiModel(productId) ?: return
         if (oldCartUiModel.isSelected == isSelected) return
 
-        val newCartUiModels = cartUiModels().upsert(oldCartUiModel.copy(isSelected = isSelected))
+        val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
         updateTotalPrice()
@@ -159,10 +162,10 @@ class CartViewModel(
     }
 
     private fun updateCartSelectedCount(isSelected: Boolean) {
-        val cartItemSelectedCount = cartItemSelectedCount.value ?: 0
+        val cartItemSelectedCount = _cartItemSelectedCount.value ?: 0
         val newCartItemSelectedCount =
             if (isSelected) cartItemSelectedCount + 1 else cartItemSelectedCount - 1
-        this.cartItemSelectedCount.value = newCartItemSelectedCount
+        this._cartItemSelectedCount.value = newCartItemSelectedCount
     }
 
     private fun setQuantity(
@@ -186,7 +189,7 @@ class CartViewModel(
 
     override fun selectAllCartItem(isChecked: Boolean) {
         if (cartItemAllSelected.value == true && isChecked) return
-        cartUiModels().forEach {
+        cartUiModels()?.forEach {
             selectCartItem(it.productId, isSelected = isChecked)
         }
     }
@@ -196,14 +199,14 @@ class CartViewModel(
     }
 
     private fun cartUiModel(productId: Int): CartUiModel? {
-        return cartUiModels().find { it.productId == productId }
+        return cartUiModels()?.find { it.productId == productId }
     }
 
-    private fun cartUiModels(): List<CartUiModel> {
+    private fun cartUiModels(): List<CartUiModel>? {
         val cartUiState = cartUiState.value?.peekContent()
         if (cartUiState is CartUiState.Success) {
             return cartUiState.cartUiModels
         }
-        return emptyList()
+        return null
     }
 }

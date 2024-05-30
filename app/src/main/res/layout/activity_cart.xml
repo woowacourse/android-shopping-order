@@ -111,12 +111,12 @@
                     android:id="@+id/cb_select_order"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:checked="@{viewModel.cartItemAllSelected}"
-                    app:onChecked="@{listener}"
                     android:layout_marginStart="20dp"
                     android:buttonTint="@color/teal_200"
+                    android:checked="@{viewModel.cartItemAllSelected}"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:onChecked="@{listener}" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -148,6 +148,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/teal_200"
                 android:gravity="center"
+                android:text="@{@string/order_button_title(viewModel.cartItemSelectedCount)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
