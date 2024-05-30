@@ -22,7 +22,8 @@ class ShoppingCartViewModel(
     OnProductItemClickListener,
     OnItemQuantityChangeListener,
     OnCartItemSelectedListener,
-    OnAllCartItemSelectedListener {
+    OnAllCartItemSelectedListener,
+    OnNavigationOrderListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _cartItems = MutableLiveData<List<CartItem>>()
@@ -39,6 +40,9 @@ class ShoppingCartViewModel(
 
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
+
+    private var _navigationOrder = MutableSingleLiveData(false)
+    val navigationOrder: SingleLiveData<Boolean> get() = _navigationOrder
 
     fun loadAll() {
         thread {
@@ -66,6 +70,10 @@ class ShoppingCartViewModel(
 
     fun updateSelectedCartItemsCount() {
         _selectedCartItemsCount.value = cartItems.value?.count { it.checked }
+    }
+
+    override fun navigateToOrder() {
+        _navigationOrder.setValue(true)
     }
 
     override fun onClick(productId: Long) {

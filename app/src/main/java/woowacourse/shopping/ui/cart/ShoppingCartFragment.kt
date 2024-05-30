@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentCartListBinding
+import woowacourse.shopping.ui.FragmentNavigator
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
@@ -55,6 +56,7 @@ class ShoppingCartFragment : Fragment() {
         showSkeletonUi()
         observeDeletedItem()
         observeItemsInCurrentPage()
+        observeOrderNavigation()
     }
 
     override fun onResume() {
@@ -89,6 +91,14 @@ class ShoppingCartFragment : Fragment() {
             binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
             binding.shimmerCartList.visibility = View.GONE
+        }
+    }
+
+    private fun observeOrderNavigation() {
+        viewModel.navigationOrder.observe(viewLifecycleOwner) { isNavigationOrder ->
+            if (isNavigationOrder) {
+                (requireActivity() as? FragmentNavigator)?.navigateToOrder()
+            }
         }
     }
 

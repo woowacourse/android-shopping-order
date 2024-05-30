@@ -87,6 +87,7 @@
             bind:selectedItemsCount="@{vm.selectedCartItemsCount}"
             bind:isAllSelected="@{vm.isAllSelected}"
             bind:onAllCartItemSelectedListener="@{vm}"
+            bind:onNavigationOrderListener="@{vm}"
             bind:selectedCartItemsTotalPrice="@{vm.selectedCartItemsTotalPrice}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

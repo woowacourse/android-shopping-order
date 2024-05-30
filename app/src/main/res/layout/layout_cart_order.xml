@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="onNavigationOrderListener"
+            type="woowacourse.shopping.ui.cart.OnNavigationOrderListener" />
+
+        <variable
             name="selectedItemsCount"
             type="int" />
 
@@ -75,11 +79,12 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/shape_order_button"
+            android:onClick="@{() -> onNavigationOrderListener.navigateToOrder()}"
             android:paddingHorizontal="16dp"
+            android:text="@{@string/order_items_count(selectedItemsCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="@{@string/order_items_count(selectedItemsCount)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_cart_order_total_price"

@@ -58,6 +58,15 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         }
     }
 
+    override fun navigateToOrder() {
+        removeBackStack()
+
+        supportFragmentManager.commit {
+            replace(R.id.container, OrderFragment::class.java, null, OrderFragment.TAG)
+            addToBackStack(OrderFragment.TAG)
+        }
+    }
+
     private fun removeBackStack() {
         val isFirstFragment = supportFragmentManager.backStackEntryCount == 0
         if (!isFirstFragment) {
@@ -72,4 +81,6 @@ interface FragmentNavigator {
     fun navigateToShoppingCart()
 
     fun navigateToProductDetail(productId: Long)
+
+    fun navigateToOrder()
 }
