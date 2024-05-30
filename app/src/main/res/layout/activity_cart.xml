@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.cart.CartViewModel" />
@@ -75,6 +77,7 @@
                 android:layout_marginTop="20dp"
                 android:checked="@{viewModel.isEntireCheckboxSelected}"
                 android:onCheckedChanged="@{(view, isChecked) -> viewModel.selectAll(isChecked)}"
+                android:visibility="@{viewModel.isCartScreen ? View.VISIBLE : View.GONE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:checked="true" />
@@ -85,6 +88,7 @@
                 android:text="전체"
                 android:textColor="@color/white"
                 android:textSize="12dp"
+                android:visibility="@{viewModel.isCartScreen ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="@id/checkbox_cart_all"
                 app:layout_constraintStart_toStartOf="@id/checkbox_cart_all"
                 app:layout_constraintTop_toBottomOf="@id/checkbox_cart_all" />
@@ -111,6 +115,7 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:text="@{@string/order_format(viewModel.selectedItems.size)}"
+                android:onClick="@{() -> viewModel.onNextButtonClick()}"
                 android:textColor="@color/white"
                 android:textSize="18dp"
                 android:textStyle="bold"

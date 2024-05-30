@@ -75,6 +75,16 @@ class CartActivity : AppCompatActivity() {
                 finish()
             }
         }
+        viewModel.navigateBack.observe(this) {
+            it.getContentIfNotHandled()?.let {
+                finish()
+            }
+        }
+        viewModel.navigateToRecommend.observe(this) {
+            it.getContentIfNotHandled()?.let {
+                replaceFragment(recommendFragment)
+            }
+        }
     }
 
     companion object {
