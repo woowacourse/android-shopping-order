@@ -30,7 +30,7 @@ class ShoppingViewModel(
     val recentProducts: LiveData<List<RecentProduct>>
         get() = _recentProducts
 
-    private val _cartCount = MutableLiveData<Int>(cartItemsRepository.sumOfQuantity())
+    private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int>
         get() = _cartCount
 
@@ -64,6 +64,7 @@ class ShoppingViewModel(
     }
 
     fun reloadProducts() {
+        cartItemsRepository.updateCartItems()
         _shoppingProducts.value = loadProducts(end = offset).mapperToShoppingProductList()
         _cartCount.value = cartItemsRepository.sumOfQuantity()
     }

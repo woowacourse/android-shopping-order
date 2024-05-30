@@ -9,6 +9,10 @@ import woowacourse.shopping.presentation.ui.testCartItem0
 class FakeCartRepositoryImpl() : CartRepository {
     val cartItems = mutableListOf<CartItem>()
 
+    override fun updateCartItems() {
+        TODO("Not yet implemented")
+    }
+
     override fun insert(
         product: Product,
         quantity: Int,

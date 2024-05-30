@@ -11,23 +11,27 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
+import woowacourse.shopping.databinding.ActivityCartTempBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.state.UIState
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 
 class CartActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityCartBinding
+    private lateinit var binding: ActivityCartTempBinding
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
-            repository = CartRepositoryImpl(this),
+            shoppingRepository = RemoteShoppingRepositoryImpl(),
+            recentProductRepository = RecentProductRepositoryImpl(this),
+            cartRepository = RemoteCartRepositoryImpl(),
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCartBinding.inflate(layoutInflater)
+        binding = ActivityCartTempBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.lifecycleOwner = this

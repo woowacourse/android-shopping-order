@@ -13,6 +13,10 @@ import woowacourse.shopping.domain.repository.CartRepository
 class CartRepositoryImpl(context: Context) : CartRepository {
     private val dao = ShoppingDatabase.getInstance(context).cartDao()
 
+    override fun updateCartItems() {
+        TODO("Not yet implemented")
+    }
+
     override fun insert(
         product: Product,
         quantity: Int,

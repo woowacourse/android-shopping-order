@@ -7,6 +7,10 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.ui.testCartItem0
 
 class FakeCartRepositoryImpl(private val cartItems: MutableList<CartItem>) : CartRepository {
+    override fun updateCartItems() {
+        TODO("Not yet implemented")
+    }
+
     override fun insert(
         product: Product,
         quantity: Int,

@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.domain.model.Product
@@ -32,7 +32,7 @@ class ShoppingActivity : AppCompatActivity() {
     private val viewModel: ShoppingViewModel by viewModels {
         ShoppingViewModelFactory(
             shoppingItemsRepository = RemoteShoppingRepositoryImpl(),
-            cartItemsRepository = CartRepositoryImpl(context = this),
+            cartItemsRepository = RemoteCartRepositoryImpl(),
             recentProductRepository = RecentProductRepositoryImpl(context = this),
         )
     }
@@ -151,7 +151,7 @@ class ShoppingActivity : AppCompatActivity() {
     private fun showShimmerListTest() {
         lifecycleScope.launch {
             showProductData(isLoading = true)
-            delay(3000)
+            delay(2500)
             showProductData(isLoading = false)
         }
     }

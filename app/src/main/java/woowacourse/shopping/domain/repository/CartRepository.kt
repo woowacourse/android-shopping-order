@@ -5,6 +5,8 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 
 interface CartRepository {
+    fun updateCartItems()
+
     fun insert(
         product: Product,
         quantity: Int,

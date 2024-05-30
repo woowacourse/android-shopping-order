@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.model.dto
 
 data class ProductDto(
-    val id: Int,
+    val id: Long,
     val name: String,
-    val price: Int,
+    val price: Long,
     val imageUrl: String,
     val category: String,
 )

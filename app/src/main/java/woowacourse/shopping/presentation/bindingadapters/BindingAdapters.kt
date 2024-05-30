@@ -115,3 +115,11 @@ fun setViewVisibility(
         }
     }
 }
+
+@BindingAdapter("app:orderWithQuantityText")
+fun setOrderWithQuantityText(
+    view: TextView,
+    totalQuantity: Int?,
+) {
+    view.text = view.context.getString(R.string.make_order_with_total_quantity, totalQuantity ?: 0)
+}

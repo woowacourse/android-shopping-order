@@ -7,11 +7,16 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
 
-class CartViewModel(private val repository: CartRepository) :
-    ViewModel(),
+class CartViewModel(
+    private val shoppingRepository: ShoppingItemsRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val cartRepository: CartRepository,
+) : ViewModel(),
     CartEventHandler,
     CartItemCountHandler {
     private val pageSize = PAGE_SIZE
@@ -28,7 +33,7 @@ class CartViewModel(private val repository: CartRepository) :
         currentPage.map { page ->
             page == lastPage
         }
-    private val _totalItemSize = MutableLiveData<Int>(repository.size())
+    private val _totalItemSize = MutableLiveData<Int>(cartRepository.size())
 
     val totalItemSize: LiveData<Int> = _totalItemSize
     private val _isPageControlVisible =
@@ -51,23 +56,32 @@ class CartViewModel(private val repository: CartRepository) :
         }
 
     private val _isEmpty = MutableLiveData<Boolean>(false)
+
     val isEmpty: LiveData<Boolean>
         get() = _isEmpty
-
     private val _navigateToShopping = MutableLiveData<Event<Boolean>>()
+
     val navigateToShopping: LiveData<Event<Boolean>>
         get() = _navigateToShopping
-
     private val _navigateToDetail = MutableLiveData<Event<Long>>()
+
     val navigateToDetail: LiveData<Event<Long>>
         get() = _navigateToDetail
-
     private val _deleteCartItem = MutableLiveData<Event<Long>>()
+
     val deleteCartItem: LiveData<Event<Long>>
         get() = _deleteCartItem
 
+    private val _totalPrice = MutableLiveData<Long>(0)
+    val totalPrice: LiveData<Long>
+        get() = _totalPrice
+
+    private val _totalQuantity = MutableLiveData<Int>(0)
+    val totalQuantity: LiveData<Int>
+        get() = _totalQuantity
+
     private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
-        val items = repository.findAllPagedItems(page, pageSize).items
+        val items = cartRepository.findAllPagedItems(page, pageSize).items
         return if (items.isEmpty()) {
             UIState.Empty
         } else {
@@ -80,7 +94,7 @@ class CartViewModel(private val repository: CartRepository) :
     }
 
     private fun updatePageControlVisibility() {
-        _totalItemSize.postValue(repository.size())
+        _totalItemSize.postValue(cartRepository.size())
         lastPage = ((totalItemSize.value ?: 0) - PAGE_STEP) / pageSize
         _isPageControlVisible.postValue((totalItemSize.value ?: 0) > pageSize)
     }
@@ -103,7 +117,7 @@ class CartViewModel(private val repository: CartRepository) :
     }
 
     fun deleteItem(itemId: Long) {
-        repository.delete(itemId)
+        cartRepository.delete(itemId)
         loadPage()
     }
 
@@ -124,15 +138,15 @@ class CartViewModel(private val repository: CartRepository) :
     }
 
     override fun increaseCount(productId: Long) {
-        val currentQuantity = repository.findQuantityWithProductId(productId)
-        repository.updateQuantityWithProductId(productId, currentQuantity + 1)
+        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
+        cartRepository.updateQuantityWithProductId(productId, currentQuantity + 1)
         loadPage()
     }
 
     override fun decreaseCount(productId: Long) {
-        val currentQuantity = repository.findQuantityWithProductId(productId)
+        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
         if (currentQuantity > 1) {
-            repository.updateQuantityWithProductId(productId, currentQuantity - 1)
+            cartRepository.updateQuantityWithProductId(productId, currentQuantity - 1)
         }
         loadPage()
     }
