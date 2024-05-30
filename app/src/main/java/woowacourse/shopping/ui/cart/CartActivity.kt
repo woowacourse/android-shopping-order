@@ -2,17 +2,18 @@ package woowacourse.shopping.ui.cart
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
+import androidx.fragment.app.Fragment
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartActivity : AppCompatActivity() {
+    private lateinit var cartSelectionFragment: Fragment
+    private lateinit var cartRecommendFragment: Fragment
+
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
@@ -23,8 +24,17 @@ class CartActivity : AppCompatActivity() {
     private val adapter by lazy { CartAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        cartSelectionFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartSelectionFragment::class.java.name)
+        cartRecommendFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartRecommendFragment::class.java.name)
+        // binding = DataBindingUtil.setContentView(this, layoutId)
+
+        // supportFragmentManager.commit {
+        //    add(containerId, fragment, CartSelectionFragment.TAG)
+        //    addToBackStack(null)
+        // }
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -48,6 +58,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun initializeCartAdapter() {
+        /*
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
 
@@ -74,5 +85,6 @@ class CartActivity : AppCompatActivity() {
                 }
             }
         }
+         */
     }
 }
