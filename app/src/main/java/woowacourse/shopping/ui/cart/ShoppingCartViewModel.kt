@@ -19,7 +19,7 @@ import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val shoppingProductsRepository: ShoppingProductsRepository,
-) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener, OnCartItemSelectedListener {
+) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener, OnCartItemSelectedListener, OnAllCartItemSelectedListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _itemsInCurrentPage = MutableLiveData<List<CartItemDto>>()
@@ -30,6 +30,9 @@ class ShoppingCartViewModel(
 
     private var _selectedProducts = MutableLiveData<List<Long>>(emptyList())
     val selectedProducts: LiveData<List<Long>> get() = _selectedProducts
+
+    private var _isAllSelected = MutableLiveData(false)
+    val isAllSelected: LiveData<Boolean> get() = _isAllSelected
 
     fun loadAll() {
         thread {
@@ -52,6 +55,10 @@ class ShoppingCartViewModel(
                 _itemsInCurrentPage.value = currentItems
             }
         }
+    }
+
+    fun isAllCartItemSelected() {
+        _isAllSelected.value = (itemsInCurrentPage.value?.size == selectedProducts.value?.size && itemsInCurrentPage.value?.size != 0)
     }
 
     override fun onClick(productId: Long) {
@@ -93,14 +100,26 @@ class ShoppingCartViewModel(
         } else {
             _selectedProducts.value = cartItemIds - cartItemId
         }
+        isAllCartItemSelected()
+    }
 
-        Log.d("cart", "cart id : $cartItemId")
-        Log.d("cart", "selected : ${selectedProducts.value}")
+    override fun selectedAll() {
+        if (isAllSelected.value == true) {
+            _selectedProducts.value = emptyList()
+            _isAllSelected.value = false
+            Log.d("cart", "${isAllSelected.value}")
+            Log.d("cart", "${selectedProducts.value}")
+        } else {
+            _selectedProducts.value = itemsInCurrentPage.value?.map { it.id }
+            _isAllSelected.value = true
+            Log.d("cart", "${isAllSelected.value}")
+            Log.d("cart", "${selectedProducts.value}")
+        }
     }
 
     companion object {
-        private const val TAG = "ShoppingCartViewModel"
 
+        private const val TAG = "ShoppingCartViewModel"
         fun factory(
             shoppingProductsRepository: ShoppingProductsRepository =
                 DefaultShoppingProductRepository(
