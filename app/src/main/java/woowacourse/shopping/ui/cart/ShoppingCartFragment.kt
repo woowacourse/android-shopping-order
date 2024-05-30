@@ -15,10 +15,7 @@ import woowacourse.shopping.databinding.FragmentCartListBinding
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
-    private val binding
-        get() =
-            _binding
-                ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+    private val binding get() = _binding ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
 

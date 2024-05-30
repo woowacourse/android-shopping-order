@@ -114,6 +114,7 @@ class ShoppingCartViewModel(
                 }
             }
         updateTotalPrice()
+        _isAllSelected.value = cartItems.value?.all { it.checked }
     }
 
     private fun updateTotalPrice() {
