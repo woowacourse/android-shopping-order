@@ -25,6 +25,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
+            android:checked="@{cartUiModel.isSelected}"
             android:buttonTint="@color/teal_500"
             app:layout_constraintEnd_toStartOf="@id/tv_cart_product_title"
             app:layout_constraintStart_toStartOf="parent"

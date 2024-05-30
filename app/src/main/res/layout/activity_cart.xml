@@ -8,6 +8,10 @@
         <variable
             name="viewModel"
             type="woowacourse.shopping.ui.cart.CartViewModel" />
+
+        <variable
+            name="listener"
+            type="woowacourse.shopping.ui.cart.CartListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -107,6 +111,8 @@
                     android:id="@+id/cb_select_order"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:checked="@{viewModel.cartItemAllSelected}"
+                    app:onChecked="@{listener}"
                     android:layout_marginStart="20dp"
                     android:buttonTint="@color/teal_200"
                     app:layout_constraintStart_toStartOf="parent"

@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
@@ -23,6 +24,9 @@ class CartViewModel(
 
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
+
+    private val cartItemSelectedCount = MutableLiveData<Int>()
+    val cartItemAllSelected: LiveData<Boolean> = cartItemSelectedCount.map { it == cartUiModels().size }
 
     init {
         loadAllCartItems()
@@ -144,12 +148,20 @@ class CartViewModel(
         productId: Int,
         isSelected: Boolean,
     ) {
+        updateCartSelectedCount(isSelected)
         val cartUiModel = cartUiModel(productId)?.copy(isSelected = isSelected) ?: return
         val newCartUiModels =
             cartUiModels().upsert(cartUiModel.copy(isSelected = isSelected))
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
         updateTotalPrice()
+    }
+
+    private fun updateCartSelectedCount(isSelected: Boolean) {
+        val cartItemSelectedCount = cartItemSelectedCount.value ?: 0
+        val newCartItemSelectedCount =
+            if (isSelected) cartItemSelectedCount + 1 else cartItemSelectedCount - 1
+        this.cartItemSelectedCount.value = newCartItemSelectedCount
     }
 
     private fun setQuantity(
@@ -171,6 +183,11 @@ class CartViewModel(
         )
     }
 
+    override fun selectAllCartItem(isChecked: Boolean) {
+        if (cartItemAllSelected.value == true) return
+        cartUiModels().forEach { selectCartItem(it.productId, isSelected = isChecked) }
+    }
+
     private fun setError() {
         _cartUiState.value = Event(CartUiState.Failure)
     }
@@ -185,11 +202,5 @@ class CartViewModel(
             return cartUiState.cartUiModels
         }
         return emptyList()
-    }
-
-    companion object {
-        private const val INITIALIZE_CART_SIZE = 0
-        private const val INITIALIZE_PAGE = 0
-        private const val PAGE_SIZE = 5
     }
 }
