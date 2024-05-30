@@ -8,7 +8,7 @@ interface ProductIdsCountRepository {
 
     fun loadAllProductIdsCounts(): List<ProductIdsCount>
 
-    fun loadPagedCartItem(page: Int): List<CartItemDto>
+    fun loadPagedCartItem(): List<CartItemDto>
 
     fun addedProductsId(productIdsCount: ProductIdsCount): Long
 

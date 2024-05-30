@@ -17,8 +17,8 @@ class DefaultProductIdsCountRepository(
             it.toDomain()
         }
 
-    override fun loadPagedCartItem(page: Int): List<CartItemDto> {
-        return productsIdsCountDataSource.loadPagedItems(page)
+    override fun loadPagedCartItem(): List<CartItemDto> {
+        return productsIdsCountDataSource.loadAllCartItems()
     }
 
     override fun addedProductsId(productIdsCount: ProductIdsCount): Long = productsIdsCountDataSource.addedNewProductsId(productIdsCount)

@@ -38,6 +38,20 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         }
     }
 
+    override fun loadAllCartItems(): List<CartItemDto> {
+        val response =
+            cartItemApiService.requestCartItems().execute().body()?.content
+                ?: throw NoSuchElementException("there is no product")
+
+        return response.map {
+            CartItemDto(
+                id = it.id,
+                quantity = it.quantity,
+                product = it.product,
+            )
+        }
+    }
+
     override fun loadAll(): List<ProductIdsCountData> {
         return emptyList()
     }

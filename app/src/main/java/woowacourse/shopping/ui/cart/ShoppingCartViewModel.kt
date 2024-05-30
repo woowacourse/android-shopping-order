@@ -40,7 +40,7 @@ class ShoppingCartViewModel(
     fun loadAll() {
         thread {
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             val isLastPage =
                 shoppingProductsRepository.isCartFinalPage(currentPage.value ?: currentPageIsNullException())
 
@@ -59,7 +59,7 @@ class ShoppingCartViewModel(
             val isLastPage =
                 shoppingProductsRepository.isCartFinalPage(currentPage.value ?: currentPageIsNullException())
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
                 _isLastPage.value = isLastPage
                 _itemsInCurrentPage.value = currentItems
@@ -75,7 +75,7 @@ class ShoppingCartViewModel(
             val isLastPage =
                 shoppingProductsRepository.isCartFinalPage(currentPage.value ?: currentPageIsNullException())
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
                 _isLastPage.value = isLastPage
                 _itemsInCurrentPage.value = currentItems
@@ -87,7 +87,7 @@ class ShoppingCartViewModel(
         thread {
             shoppingProductsRepository.removeShoppingCartProduct(cartItemId)
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             val isLastPage =
                 shoppingProductsRepository.isCartFinalPage(currentPage.value ?: currentPageIsNullException())
 
@@ -109,7 +109,7 @@ class ShoppingCartViewModel(
         thread {
             shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
                 _itemsInCurrentPage.value = currentItems
             }
@@ -123,7 +123,7 @@ class ShoppingCartViewModel(
         thread {
             shoppingProductsRepository.decreaseShoppingCartProduct(productId, quantity)
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem(page = currentPage.value ?: currentPageIsNullException())
+                shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
                 _itemsInCurrentPage.value = currentItems
             }

@@ -19,8 +19,8 @@ class DefaultShoppingProductRepository(
         }
     }
 
-    override fun loadPagedCartItem(page: Int): List<CartItemDto> {
-        return cartSource.loadPagedItems(page)
+    override fun loadPagedCartItem(): List<CartItemDto> {
+        return cartSource.loadAllCartItems()
     }
 
     override fun loadProduct(id: Long): Product = productsSource.findById(id).toDomain(productQuantity(id))

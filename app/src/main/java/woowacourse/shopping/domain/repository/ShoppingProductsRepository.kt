@@ -6,7 +6,7 @@ import woowacourse.shopping.remote.CartItemDto
 interface ShoppingProductsRepository {
     fun loadAllProducts(page: Int): List<Product>
 
-    fun loadPagedCartItem(page: Int): List<CartItemDto>
+    fun loadPagedCartItem(): List<CartItemDto>
 
     fun loadProduct(id: Long): Product
 

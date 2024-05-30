@@ -13,6 +13,8 @@ interface ShoppingCartProductIdDataSource {
 
     fun loadAll(): List<ProductIdsCountData>
 
+    fun loadAllCartItems(): List<CartItemDto>
+
     fun isFinalPage(page: Int): Boolean
 
     fun addedNewProductsId(productIdsCount: ProductIdsCount): Long
