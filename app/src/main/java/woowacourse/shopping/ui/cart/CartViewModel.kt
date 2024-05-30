@@ -53,7 +53,6 @@ class CartViewModel(
 
     init {
         loadAllCartItems()
-        loadRecommendProductUiModels()
     }
 
     private fun loadAllCartItems() {
@@ -227,9 +226,8 @@ class CartViewModel(
         _checkboxVisibility.value = false
     }
 
-    private fun loadRecommendProductUiModels() {
-        val cartItems =
-            cartUiModels()?.map { it.toCartItem() } ?: return
+    fun loadRecommendProductUiModels() {
+        val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
         val recommendProducts = recommendRepository.getRecommendProducts(cartItems = cartItems)
         _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
     }
