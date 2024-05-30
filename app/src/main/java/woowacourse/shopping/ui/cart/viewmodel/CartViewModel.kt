@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.cart.viewmodel
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -194,7 +192,6 @@ class CartViewModel(
     }
 
     private fun loadCartItems() {
-        val handler = Handler(Looper.getMainLooper())
         runCatching {
             _cart.value =
                 CartItemsUiState(

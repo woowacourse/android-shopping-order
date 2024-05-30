@@ -1,59 +1,69 @@
 package woowacourse.shopping.ui.products
 
+import io.mockk.every
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.api.ProductMockWebServer
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.cart.Cart
+import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.ui.FakeCartDao
-import woowacourse.shopping.ui.FakeRecentProductDao
+import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductContentsViewModelTest {
     private lateinit var viewModel: ProductContentsViewModel
-    private val productRepository = ProductRepositoryImpl(ProductMockWebServer())
-    private val recentProductRepository = RecentProductRepositoryImpl.get(FakeRecentProductDao)
-    private val cartRepository = CartRepositoryImpl.get(FakeCartDao)
+
+    private lateinit var productRepository: ProductRepository
+    private lateinit var recentProductRepository: RecentProductRepository
+    private lateinit var cartRepository: CartRepository
 
     @BeforeEach
     fun setUp() {
-        cartRepository.deleteAll()
-        productRepository.start()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        productRepository.shutdown()
+        productRepository = mockk<ProductRepository>()
+        recentProductRepository = mockk<RecentProductRepository>()
+        cartRepository = mockk<CartRepository>()
+        every { productRepository.getProducts(0, 20) } returns PRODUCT_STUB.subList(0, 20)
+        viewModel =
+            ProductContentsViewModel(productRepository, recentProductRepository, cartRepository)
     }
 
     @Test
-    fun `상품은 한 화면에 20개까지만 보여져야 한다`() {
+    fun `상품을 가져올 때, 20개씩 가져온다`() {
         // given
+        every { productRepository.getProducts(1, 20) } returns PRODUCT_STUB.subList(20, 40)
 
         // when
-        viewModel =
-            ProductContentsViewModel(productRepository, recentProductRepository, cartRepository)
+        viewModel.loadProducts()
+        val actual = viewModel.productWithQuantity.getOrAwaitValue()
 
         // then
-        assertThat(viewModel.productWithQuantity.getOrAwaitValue().size).isEqualTo(20)
+        assertThat(actual.productWithQuantities).hasSize(40)
     }
 
     @Test
-    fun `첫번째 상품은 맥북0이어야 한다`() {
+    fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // given
+        every { cartRepository.addProductToCart(0, 1) }
+        every { cartRepository.getAllCartItems() } returns listOf(Cart(0L, 0L, Quantity(1)))
 
         // when
-        viewModel =
-            ProductContentsViewModel(productRepository, recentProductRepository, cartRepository)
+        viewModel.addCart(0)
+        val actual = viewModel.productWithQuantity.getOrAwaitValue()
+
+        val actualProduct = (actual as List<ProductWithQuantityUiModel>)
 
         // then
-        assertThat(viewModel.productWithQuantity.getOrAwaitValue()[0].product.name).isEqualTo("맥북0")
+        assertThat(actualProduct.first { it.product.id == 0L }.quantity).isEqualTo(1)
+    }
+
+    companion object {
+        val PRODUCT_STUB = (0..60).toList().map { Product(it.toLong(), "", "", 0, "") }
     }
 }
