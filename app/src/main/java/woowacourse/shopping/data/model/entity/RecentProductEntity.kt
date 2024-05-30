@@ -10,6 +10,7 @@ data class RecentProductEntity(
     val productId: Long,
     val productName: String,
     val imgUrl: String,
+    val category: String,
 )
 
 fun Product.mapper(): RecentProductEntity {
@@ -17,5 +18,6 @@ fun Product.mapper(): RecentProductEntity {
         productId = this.id,
         productName = this.name,
         imgUrl = this.imageUrl,
+        category = this.category,
     )
 }

@@ -7,14 +7,10 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
 
 class CartViewModel(
-    private val shoppingRepository: ShoppingItemsRepository,
-    private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(),
     CartEventHandler,

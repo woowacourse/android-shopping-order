@@ -48,4 +48,34 @@ class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
         }
         latch.await()
     }
+
+    override fun recommendProducts(
+        category: String,
+        count: Int,
+        cartItemIds: List<Long>,
+    ): List<Product> {
+        var categoryProducts: MutableList<Product> = mutableListOf()
+        threadAction {
+            productData =
+                service.requestProductWithCategory(
+                    category = category,
+                    size = count + cartItemIds.size,
+                ).execute().body()
+            categoryProducts =
+                productData?.content?.map { it.toDomainModel() }.orEmpty().toMutableList()
+        }
+        removeDuplicateItemsFromCart(categoryProducts, cartItemIds)
+        return categoryProducts.take(count)
+    }
+
+    private fun removeDuplicateItemsFromCart(
+        categoryProducts: MutableList<Product>,
+        cartItemIds: List<Long>,
+    ) {
+        if (categoryProducts.isNotEmpty()) {
+            cartItemIds.forEach { cartItemId ->
+                categoryProducts.removeIf { it.id == cartItemId }
+            }
+        }
+    }
 }

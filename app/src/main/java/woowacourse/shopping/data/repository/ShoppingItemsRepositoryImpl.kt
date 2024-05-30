@@ -81,6 +81,14 @@ class ShoppingItemsRepositoryImpl(
         return product
     }
 
+    override fun recommendProducts(
+        category: String,
+        count: Int,
+        cartItemIds: List<Long>,
+    ): List<Product> {
+        return listOf()
+    }
+
     private fun threadAction(action: () -> Unit) {
         val thread = Thread(action)
         thread.start()

@@ -5,7 +5,7 @@ class Product(
     val name: String,
     val price: Long,
     val imageUrl: String,
-    val category: String? = null,
+    val category: String = "",
 ) {
     companion object {
         private var currentId = 0L

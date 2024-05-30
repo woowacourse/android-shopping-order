@@ -1,32 +1,31 @@
-package woowacourse.shopping.presentation.ui.cart
+package woowacourse.shopping.presentation.ui.cart.selection
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler
 
-class CartAdapter(
-    private val cartEventHandler: SelectionEventHandler,
-    private val cartItemCountHandler: CartItemCountHandler,
-) : RecyclerView.Adapter<CartViewHolder>() {
+class SelectionAdapter(
+    private val selectionEventHandler: SelectionEventHandler,
+    private val selectionCountHandler: SelectionCountHandler,
+) : RecyclerView.Adapter<SelectionViewHolder>() {
     private var cartItems: List<CartItem> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CartViewHolder {
+    ): SelectionViewHolder {
         val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CartViewHolder(binding)
+        return SelectionViewHolder(binding)
     }
 
     override fun onBindViewHolder(
-        holder: CartViewHolder,
+        holder: SelectionViewHolder,
         position: Int,
     ) {
         val cartItem = cartItems[position]
-        return holder.bind(cartItem, cartEventHandler, cartItemCountHandler)
+        return holder.bind(cartItem, selectionEventHandler, selectionCountHandler)
     }
 
     override fun getItemCount(): Int {

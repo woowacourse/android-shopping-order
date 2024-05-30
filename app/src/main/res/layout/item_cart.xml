@@ -11,7 +11,7 @@
 
         <variable
             name="eventHandler"
-            type="woowacourse.shopping.presentation.ui.cart.CartEventHandler" />
+            type="woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler" />
 
         <variable
             name="cartItem"
@@ -26,6 +26,8 @@
         android:onClick="@{() -> eventHandler.navigateToDetail(cartItem.productId)}">
 
         <CheckBox
+            android:onClick="@{() -> eventHandler.onCheckItem(cartItem.id)}"
+            android:checked="@{cartItem.isChecked}"
             android:id="@+id/checkBox"
             android:layout_width="25dp"
             android:layout_height="25dp"

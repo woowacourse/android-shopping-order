@@ -29,9 +29,9 @@ interface RetrofitService {
     @GET("/products")
     fun requestProductWithCategory(
         @Query("category") category: String,
-        @Query("query") query: Int = 0,
+        @Query("query") page: Int = 0,
         @Query("size") size: Int = 50,
-    )
+    ): Call<ProductResponseDto>
 
     @GET("/cart-items")
     fun requestCartItems(

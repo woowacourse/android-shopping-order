@@ -1,0 +1,112 @@
+package woowacourse.shopping.presentation.ui.cart.recommendation
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ShoppingProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.repository.ShoppingItemsRepository
+import woowacourse.shopping.presentation.event.Event
+import woowacourse.shopping.presentation.state.UIState
+
+class RecommendViewModel(
+    private val cartRepository: CartRepository,
+    private val shoppingRepository: ShoppingItemsRepository,
+    private val recentProductRepository: RecentProductRepository,
+) : ViewModel(), RecommendItemCountHandler {
+    private val _cartItemsState: MutableLiveData<UIState<List<CartItem>>> = MutableLiveData()
+    val cartItemsState: LiveData<UIState<List<CartItem>>>
+        get() = _cartItemsState
+
+    private val _recommendItemsState: MutableLiveData<UIState<List<ShoppingProduct>>> =
+        MutableLiveData()
+    val recommendItemsState: LiveData<UIState<List<ShoppingProduct>>>
+        get() = _recommendItemsState
+
+    private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_TOTAL_PRICE)
+    val totalOrderPrice: LiveData<Int>
+        get() = _totalOrderPrice
+
+    private val _totalOrderQuantity: MutableLiveData<Int> = MutableLiveData(DEFAULT_TOTAL_QUANTITY)
+    val totalOrderQuantity: LiveData<Int>
+        get() = _totalOrderQuantity
+
+    private val _isEmpty = MutableLiveData<Boolean>(false)
+    val isEmpty: LiveData<Boolean>
+        get() = _isEmpty
+
+    private val _deleteCartItem = MutableLiveData<Event<Long>>()
+    val deleteCartItem: LiveData<Event<Long>>
+        get() = _deleteCartItem
+
+    init {
+        setUpUIState()
+    }
+
+    private fun setUpUIState() {
+        _recommendItemsState.value =
+            try {
+                loadRecommendationProducts()
+            } catch (e: Exception) {
+                UIState.Error(e)
+                loadRecommendationProducts()
+            }
+    }
+
+    private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
+        val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
+        val cartItemIds = cartRepository.findAll().items.map { it.productId }
+        val items =
+            shoppingRepository.recommendProducts(
+                recentProduct.category,
+                DEFAULT_RECOMMEND_ITEM_COUNTS,
+                cartItemIds,
+            ).mapperToShoppingProductList()
+        return if (items.isEmpty()) {
+            UIState.Empty
+        } else {
+            UIState.Success(items)
+        }
+    }
+
+    private fun List<Product>.mapperToShoppingProductList(): List<ShoppingProduct> {
+        return this.map { ShoppingProduct(it) }
+    }
+
+    fun deleteItem(itemId: Long) {
+        cartRepository.delete(itemId)
+        loadRecommendationProducts()
+    }
+
+    override fun increaseCount(productId: Long) {
+        val shoppingProduct =
+            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
+        shoppingProduct?.increase()
+        val product = shoppingRepository.findProductItem(productId) ?: return
+        cartRepository.insert(product, shoppingProduct?.quantity() ?: 1)
+        loadRecommendationProducts()
+    }
+
+    override fun decreaseCount(productId: Long) {
+        val shoppingProduct =
+            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
+        shoppingProduct?.decrease()
+        val quantity = shoppingProduct?.quantity() ?: 0
+
+        if (quantity > 0) {
+            cartRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
+        } else {
+            cartRepository.deleteWithProductId(productId)
+        }
+        loadRecommendationProducts()
+    }
+
+    companion object {
+        private const val DEFAULT_TOTAL_PRICE = 0
+        private const val DEFAULT_TOTAL_QUANTITY = 0
+        private const val DEFAULT_RECOMMEND_ITEM_COUNTS = 10
+    }
+}

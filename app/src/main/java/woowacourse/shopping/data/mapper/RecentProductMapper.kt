@@ -8,5 +8,6 @@ fun RecentProductEntity.toDomainModel(): RecentProduct {
         productId = this.productId,
         productName = this.productName,
         imageUrl = this.imgUrl,
+        category = this.category,
     )
 }

@@ -1,16 +1,15 @@
-package woowacourse.shopping.presentation.ui.cart
+package woowacourse.shopping.presentation.ui.cart.selection
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler
 
-class CartViewHolder(private val binding: ItemCartBinding) :
+class SelectionViewHolder(private val binding: ItemCartBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
         cartItem: CartItem,
         eventHandler: SelectionEventHandler,
-        countHandler: CartItemCountHandler,
+        countHandler: SelectionCountHandler,
     ) {
         binding.cartItem = cartItem
         binding.eventHandler = eventHandler

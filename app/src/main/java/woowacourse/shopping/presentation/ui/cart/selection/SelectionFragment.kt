@@ -16,10 +16,9 @@ import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.state.UIState
-import woowacourse.shopping.presentation.ui.cart.CartAdapter
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 
-class SelectionFragment : Fragment() {
+class SelectionFragment : Fragment(), SelectionClickListener {
     private lateinit var binding: FragmentSelectionBinding
     private val viewModel: SelectionViewModel by lazy {
         val viewModelFactory =
@@ -48,6 +47,7 @@ class SelectionFragment : Fragment() {
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        binding.clickListener = this
 
         observeViewModel()
         showSkeletonUI()
@@ -57,8 +57,8 @@ class SelectionFragment : Fragment() {
         setUpUIState()
     }
 
-    private fun setUpRecyclerViewAdapter(): CartAdapter {
-        val adapter = CartAdapter(viewModel, viewModel)
+    private fun setUpRecyclerViewAdapter(): SelectionAdapter {
+        val adapter = SelectionAdapter(viewModel, viewModel)
         binding.recyclerView.adapter = adapter
         return adapter
     }
@@ -79,7 +79,7 @@ class SelectionFragment : Fragment() {
 
     private fun showData(
         data: List<CartItem>,
-        adapter: CartAdapter,
+        adapter: SelectionAdapter,
     ) {
         adapter.loadData(data)
     }
@@ -130,5 +130,9 @@ class SelectionFragment : Fragment() {
             binding.shimmerCartList.visibility = View.GONE
             binding.recyclerView.visibility = View.VISIBLE
         }
+    }
+
+    override fun onSelectAllClick() {
+        viewModel.selectAllByCondition()
     }
 }

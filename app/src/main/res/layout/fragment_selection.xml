@@ -10,6 +10,14 @@
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.cart.selection.SelectionViewModel" />
+
+        <variable
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler" />
+
+        <variable
+            name = "clickListener"
+            type = "woowacourse.shopping.presentation.ui.cart.selection.SelectionClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -128,6 +136,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <CheckBox
+                android:onClick="@{() -> clickListener.onSelectAllClick()}"
                 android:id="@+id/checkbox_select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

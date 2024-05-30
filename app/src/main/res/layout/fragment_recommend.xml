@@ -10,7 +10,7 @@
         <!--    새로운 뷰모델 바인딩하기    -->
         <variable
             name="viewModel"
-            type="woowacourse.shopping.presentation.ui.cart.CartViewModel" />
+            type="woowacourse.shopping.presentation.ui.cart.recommendation.RecommendViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

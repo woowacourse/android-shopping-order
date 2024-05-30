@@ -6,20 +6,23 @@ class Order {
         get() = _list
 
     fun addCartItem(cartItem: CartItem) {
+        cartItem.isChecked = true
         _list.add(cartItem)
     }
 
     fun removeCartItem(cartItem: CartItem) {
+        cartItem.isChecked = false
         _list.remove(cartItem)
     }
 
     fun clearOrder() {
+        _list.forEach { it.isChecked = false }
         _list.clear()
     }
 
     fun selectAllCartItems(cartItems: List<CartItem>) {
         clearOrder()
-        _list.addAll(cartItems)
+        cartItems.forEach { addCartItem(it) }
     }
 
     fun getTotalPrice(): Long {

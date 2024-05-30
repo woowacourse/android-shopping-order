@@ -7,4 +7,5 @@ data class CartItem(
     val price: Long,
     val imgUrl: String,
     val quantity: Int,
+    var isChecked: Boolean = false,
 )

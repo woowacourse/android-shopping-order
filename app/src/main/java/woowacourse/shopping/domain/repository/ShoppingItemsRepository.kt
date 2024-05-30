@@ -11,4 +11,10 @@ interface ShoppingItemsRepository {
     ): List<Product>
 
     fun findProductItem(id: Long): Product?
+
+    fun recommendProducts(
+        category: String,
+        count: Int,
+        cartItemIds: List<Long>,
+    ): List<Product>
 }
