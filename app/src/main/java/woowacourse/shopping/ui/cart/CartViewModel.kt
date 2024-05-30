@@ -29,6 +29,7 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
+        _cartUiState.value = Event(CartUiState.Success(listOf()))
         val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         cartRepository.getAllCartItem(
             totalQuantityCount,
@@ -43,6 +44,7 @@ class CartViewModel(
                 }
             },
         )
+        updateTotalPrice()
     }
 
     private fun updateTotalPrice() {
