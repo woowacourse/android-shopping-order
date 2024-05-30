@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -68,7 +69,7 @@ class CartFragmentTest {
             0,
             R.id.btn_increase_product,
         )
-        Thread.sleep(100) // ... 반영되는데 시간이 걸림
+        Thread.sleep(100)
         onView(withId(R.id.rv_shopping_cart)).check(matchDescendantSoftly("2"))
     }
 
@@ -82,7 +83,7 @@ class CartFragmentTest {
             0,
             R.id.btn_increase_product,
         )
-        Thread.sleep(100) // ... 반영되는데 시간이 걸림
+        Thread.sleep(100)
         onView(withId(R.id.rv_shopping_cart)).check(matchDescendantSoftly("2,000"))
     }
 
@@ -109,7 +110,7 @@ class CartFragmentTest {
             0,
             R.id.btn_decrease_product,
         )
-        Thread.sleep(100) // ... 반영되는데 시간이 걸림
+        Thread.sleep(100)
         onView(withId(R.id.rv_shopping_cart)).check(matchDescendantSoftly("2"))
     }
 
@@ -160,6 +161,7 @@ class CartFragmentTest {
         // then
         val expectCount = 1
         val expectProductTitle = "6"
+        Espresso.onIdle()
         onView(withId(R.id.rv_shopping_cart))
             .check(matchDescendantSoftly(expectProductTitle))
         onView(withId(R.id.rv_shopping_cart))

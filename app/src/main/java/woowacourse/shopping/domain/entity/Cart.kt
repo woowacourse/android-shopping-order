@@ -13,7 +13,12 @@ data class Cart(
     }
 
     fun remove(product: Product): Cart {
-        return Cart(productMap.minus(product))
+        if (!productMap.containsKey(product)) return this
+        if (productMap[product] == 1) {
+            return Cart(productMap.minus(product))
+        }
+        val count = productMap[product] ?: return this
+        return Cart(productMap.plus(product to count - 1))
     }
 
     fun totalPrice(): Int =

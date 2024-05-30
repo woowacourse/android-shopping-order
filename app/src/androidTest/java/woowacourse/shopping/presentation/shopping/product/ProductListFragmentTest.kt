@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.shopping.product
 
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.shopping.product.adpater.ShoppingViewHolder
+import woowacourse.shopping.util.RecyclerViewItemCountAssertion
 import woowacourse.shopping.util.matchDescendantSoftly
 import woowacourse.shopping.util.performClickHolderAt
 import woowacourse.shopping.util.performScrollToHolder
@@ -38,7 +40,6 @@ class ProductListFragmentTest {
     @DisplayName("더보기 버튼을 누를 시, 상품이 20개 추가 된다")
     fun test2() {
         // given
-        val expectProductTitle = "40"
         // when
         onView(withId(R.id.rv_product_list)).performScrollToHolder<ShoppingViewHolder.LoadMore>()
         onView(withId(R.id.rv_product_list)).performClickHolderAt<ShoppingViewHolder.LoadMore>(
@@ -48,8 +49,9 @@ class ProductListFragmentTest {
         // 더보기 버튼까지 스크롤
         onView(withId(R.id.rv_product_list))
             .performScrollToHolder<ShoppingViewHolder.LoadMore>()
+        Espresso.onIdle()
         // then
         onView(withId(R.id.rv_product_list))
-            .check(matchDescendantSoftly(expectProductTitle))
+            .check((RecyclerViewItemCountAssertion(42)))
     }
 }
