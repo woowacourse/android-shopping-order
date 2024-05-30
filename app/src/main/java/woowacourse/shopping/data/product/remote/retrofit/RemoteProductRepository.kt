@@ -5,6 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
 import woowacourse.shopping.domain.model.Product
+import kotlin.concurrent.thread
 
 class RemoteProductRepository {
     fun findProducts(
@@ -85,6 +86,17 @@ class RemoteProductRepository {
                 }
             },
         )
+    }
+
+    fun syncFind(id: Int): Product {
+        var product: Product? = null
+        thread {
+            val response = retrofitApi.requestProduct(id = id).execute()
+            val body = response.body()
+            product = body?.toProduct()
+        }.join()
+
+        return product!!
     }
 }
 

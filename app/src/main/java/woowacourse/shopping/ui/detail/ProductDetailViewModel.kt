@@ -78,7 +78,7 @@ class ProductDetailViewModel(
     private fun loadLastRecentProduct() {
         val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
         productRepository.find(
-            lastRecentProduct.productId,
+            lastRecentProduct.product.id,
             object : DataCallback<Product> {
                 override fun onSuccess(result: Product) {
                     _lastRecentProduct.postValue(LastRecentProductUiModel(result.id, result.name))
@@ -92,7 +92,8 @@ class ProductDetailViewModel(
     }
 
     private fun saveRecentProduct() {
-        recentProductRepository.save(productId)
+        val product = productRepository.syncFind(productId)
+        recentProductRepository.save(product)
     }
 
     private fun increaseQuantity() {

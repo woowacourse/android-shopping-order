@@ -4,6 +4,6 @@ import java.time.LocalDateTime
 
 class RecentProduct(
     var id: Int = 0,
-    val productId: Int,
+    val product: Product,
     val seenDateTime: LocalDateTime,
 )
