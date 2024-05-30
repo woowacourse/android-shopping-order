@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shopping
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -49,7 +48,6 @@ class ShoppingViewModel(
 
     fun loadInitialShoppingItems() {
         if (shoppingProducts.value !is UiState.Success<List<ProductListItem.ShoppingProductItem>>) {
-            Log.e("ㅌㅅㅌ", "데이터 불러옴")
 //            val handler = Handler(Looper.getMainLooper())
             fetchInitialRecentProducts()
 //            handler.postDelayed({
@@ -81,12 +79,10 @@ class ShoppingViewModel(
             startPage = 0,
             pageSize = _cartItemQuantity.value ?: 0,
             onSuccess = { cartItems, _ ->
-                Log.e("ㅌㅅㅌ", "fetchInitialCartProducts -> success $cartItems")
                 cartProducts.addAll(cartItems)
                 fetchInitialProducts(cartItems)
             },
             onFailure = {
-                Log.e("ㅌㅅㅌ", "fetchInitialCartProducts -> fail")
                 _error.value = Event(ShoppingError.CartItemsNotFound)
             },
         )

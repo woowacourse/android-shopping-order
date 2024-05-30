@@ -15,6 +15,7 @@ data class ProductDto(
             name = name,
             imgUrl = imageUrl,
             price = price.toLong(),
+            category = category,
         )
     }
 }

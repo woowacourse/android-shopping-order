@@ -15,7 +15,7 @@ import woowacourse.shopping.presentation.util.EventObserver
 class RecommendFragment : Fragment() {
     lateinit var binding: FragmentRecommendBinding
     private val viewModel: CartViewModel by activityViewModels()
-//    private val recommendAdapter:
+    private lateinit var adapter: RecommendAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,19 +23,35 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentRecommendBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
         initCartAdapter()
         observeErrorEventUpdates()
         observeCartUpdates()
-        return binding.root
+        observeRecommendedUpdates()
+        viewModel.buildRecommendProducts()
+    }
+
+    private fun initCartAdapter() {
+        adapter = RecommendAdapter(quantityHandler = viewModel)
+        binding.rvRecommendProducts.adapter = adapter
+    }
+
+    private fun observeRecommendedUpdates() {
+        viewModel.recommendedProduct.observe(viewLifecycleOwner) {
+            adapter.updateItems(it)
+        }
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.setOrderState(OrderState.Recommend)
-    }
-
-    private fun initCartAdapter() {
-//        binding.rvCarts.adapter = cartAdapter
     }
 
     private fun observeErrorEventUpdates() {

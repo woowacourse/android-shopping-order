@@ -49,10 +49,11 @@ class ProductDetailViewModel(
                     ProductListItem.ShoppingProductItem(
                         cartId = initialCartId,
                         id = productId,
-                        it.name,
-                        it.imgUrl,
-                        it.price,
-                        initialQuantity,
+                        name = it.name,
+                        imgUrl = it.imgUrl,
+                        price = it.price,
+                        category = it.category,
+                        quantity = initialQuantity,
                     )
                 addRecentProduct(it)
             },
@@ -82,6 +83,7 @@ class ProductDetailViewModel(
                     name = product.name,
                     imgUrl = product.imgUrl,
                     dateTime = LocalDateTime.now(),
+                    category = product.category,
                 ),
             )
         }.join()

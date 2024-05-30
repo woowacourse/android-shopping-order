@@ -13,6 +13,7 @@ data class Cart(
             imgUrl = this.product.imgUrl,
             price = this.product.price,
             quantity = this.quantity,
+            category = this.product.category,
             isChecked = false,
         )
 

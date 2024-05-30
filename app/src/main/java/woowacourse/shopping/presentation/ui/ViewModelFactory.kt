@@ -43,6 +43,7 @@ class ViewModelFactory() : ViewModelProvider.Factory {
             }
 
             modelClass.isAssignableFrom(CartViewModel::class.java) -> {
+                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
                 val cartDao = AppDatabase.instanceOrNull.cartDao()
                 CartViewModel(
                     cartRepository =
@@ -50,6 +51,8 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                             localCartDataSource = LocalCartDataSourceImpl(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
+                    productRepository = ProductRepositoryImpl(),
+                    recentRepository = RecentProductRepositoryImpl(recentDao),
                 ) as T
             }
 

@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.cart
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,10 +9,16 @@ import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.util.Event
 
-class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), CartHandler {
+class CartViewModel(
+    private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
+    private val recentRepository: RecentRepository,
+) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
 
     val error: LiveData<Event<CartError>> = _error
@@ -24,6 +29,10 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
 
     val orderEvent: LiveData<Event<OrderEvent>> = _orderEvent
 
+    private val _recommendedProduct =
+        MutableLiveData<List<ProductListItem.ShoppingProductItem>>()
+
+    val recommendedProduct: LiveData<List<ProductListItem.ShoppingProductItem>> get() = _recommendedProduct
     private val _shoppingProducts =
         MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.Loading)
 
@@ -119,7 +128,6 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
     }
 
     override fun onOrderClicked() {
-        Log.d("ㅌㅅㅌ", "onOrderClicked : $orderState")
         when (orderState) {
             is OrderState.CartList -> {
                 if (totalCount.value != 0) {
@@ -179,5 +187,25 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                 onFailure = {},
             )
         }
+    }
+
+    fun buildRecommendProducts() {
+        recentRepository.loadMostRecent().onSuccess {
+            val recentViewedCategory = it?.category ?: "최근 본 아이템 없음"
+            productRepository.loadWithCategory(
+                recentViewedCategory,
+                0,
+                20,
+                onSuccess = { products ->
+                    val existCarts =
+                        (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map { it.toProduct() }
+                    _recommendedProduct.value = (products - existCarts.toSet()).take(10).map { it.toInitialShoppingItem() }
+                },
+                onFailure = {},
+            )
+        }
+    }
+
+    fun completeOrder() {
     }
 }

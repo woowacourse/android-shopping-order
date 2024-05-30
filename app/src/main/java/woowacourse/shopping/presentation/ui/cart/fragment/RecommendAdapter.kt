@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.ui.QuantityHandler
 
 class RecommendAdapter(
-    private val items: List<ProductListItem.ShoppingProductItem>,
+    private var items: List<ProductListItem.ShoppingProductItem> = emptyList(),
     private val quantityHandler: QuantityHandler,
 ) : RecyclerView.Adapter<RecommendViewHolder>() {
     override fun onCreateViewHolder(
@@ -27,5 +27,10 @@ class RecommendAdapter(
         position: Int,
     ) {
         holder.bind(items[position])
+    }
+
+    fun updateItems(newItems: List<ProductListItem.ShoppingProductItem>) {
+        items = newItems
+        notifyDataSetChanged()
     }
 }

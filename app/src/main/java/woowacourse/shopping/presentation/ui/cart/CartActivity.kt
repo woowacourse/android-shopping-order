@@ -44,7 +44,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             EventObserver {
                 when (it) {
                     OrderEvent.CompleteOrder -> {
-//                    viewModel.completeOrder()
+                        viewModel.completeOrder()
                     }
 
                     OrderEvent.MoveToRecommend -> {

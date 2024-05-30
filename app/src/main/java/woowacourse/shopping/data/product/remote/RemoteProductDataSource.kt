@@ -19,4 +19,12 @@ class RemoteProductDataSource {
     ): Call<ProductResponse> {
         return productApiService.requestProducts(page = startPage, size = pageSize)
     }
+
+    fun loadWithCategory(
+        category: String,
+        startPage: Int,
+        pageSize: Int,
+    ): Call<ProductResponse> {
+        return productApiService.requestProductsWithCategory(category = category, page = startPage, size = pageSize)
+    }
 }

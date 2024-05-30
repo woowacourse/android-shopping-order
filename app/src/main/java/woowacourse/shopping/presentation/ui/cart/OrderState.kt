@@ -5,9 +5,3 @@ sealed interface OrderState {
 
     data object CartList : OrderState
 }
-
-sealed interface OrderEvent {
-    data object CompleteOrder : OrderEvent
-
-    data object MoveToRecommend : OrderEvent
-}

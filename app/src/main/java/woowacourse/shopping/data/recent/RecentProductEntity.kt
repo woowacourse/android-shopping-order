@@ -14,6 +14,7 @@ data class RecentProductEntity(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "img_url") val imgUrl: String,
     @ColumnInfo(name = "date_time") val dateTime: LocalDateTime,
+    @ColumnInfo(name = "category") val category: String,
 ) {
     fun toDomain() =
         RecentProductItem(
@@ -21,16 +22,18 @@ data class RecentProductEntity(
             name = name,
             imgUrl = imgUrl,
             dateTime = dateTime,
+            category = category,
         )
 
     companion object {
         fun RecentProductItem.toEntity() =
             RecentProductEntity(
                 uid = 0,
-                this.productId,
-                this.name,
-                this.imgUrl,
-                this.dateTime,
+                productId = this.productId,
+                name = this.name,
+                imgUrl = this.imgUrl,
+                dateTime = this.dateTime,
+                category = this.category,
             )
     }
 }

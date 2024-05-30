@@ -11,6 +11,37 @@ import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSource()) :
     ProductRepository {
+    override fun loadWithCategory(
+        category: String,
+        startPage: Int,
+        pageSize: Int,
+        onSuccess: (List<Product>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        remoteProductDataSource.loadWithCategory(category, startPage, pageSize).enqueue(
+            object : Callback<ProductResponse> {
+                override fun onResponse(
+                    call: Call<ProductResponse>,
+                    response: Response<ProductResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it.content.map { it.toProduct() })
+                        } ?: onSuccess(emptyList())
+                    } else {
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<ProductResponse>,
+                    t: Throwable,
+                ) {
+                    onFailure()
+                }
+            },
+        )
+    }
+
     override fun load(
         startPage: Int,
         pageSize: Int,
