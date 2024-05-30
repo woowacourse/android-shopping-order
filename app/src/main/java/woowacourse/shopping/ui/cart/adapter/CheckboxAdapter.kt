@@ -6,7 +6,7 @@ import woowacourse.shopping.ui.cart.CartListener
 
 @BindingAdapter("onChecked")
 fun CheckBox.onChecked(listener: CartListener) {
-    setOnCheckedChangeListener { _, isChecked ->
+    setOnClickListener {
         listener.selectAllCartItem(isChecked)
     }
 }
