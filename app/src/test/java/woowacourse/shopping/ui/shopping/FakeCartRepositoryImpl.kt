@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
@@ -51,6 +52,10 @@ class FakeCartRepositoryImpl() : CartRepository {
 
     override fun findQuantityWithProductId(productId: Long): Int {
         return 0
+    }
+
+    override fun makeOrder(order: Order) {
+        TODO("Not yet implemented")
     }
 
     override fun size(): Int {
