@@ -49,10 +49,10 @@
             android:overScrollMode="never"
             android:paddingVertical="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/layout_page"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
+            app:layout_constraintBottom_toTopOf="@id/layout_order_bottom_bar"
             tools:listitem="@layout/item_cart" />
 
         <LinearLayout
@@ -62,7 +62,7 @@
             android:layout_marginHorizontal="6dp"
             android:orientation="vertical"
             android:paddingVertical="12dp"
-            app:layout_constraintBottom_toTopOf="@id/layout_page"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart">
@@ -90,68 +90,12 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_page"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/layout_order_bottom_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_cart"
-            app:visibility="@{viewModel.hasPage}">
-
-            <Button
-                android:id="@+id/btn_cart_previous_page"
-                style="@style/PageButtonStyle"
-                android:layout_marginVertical="50dp"
-                android:background="@drawable/selector_previous_page_button"
-                android:enabled="@{viewModel.hasPreviousPage}"
-                android:onClick="@{() -> viewModel.movePreviousPage()}"
-                android:text="@string/previous_page"
-                app:backgroundTint="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tv_cart_page"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:enabled="false" />
-
-            <TextView
-                android:id="@+id/tv_cart_page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:text="@{String.valueOf(viewModel.page + 1)}"
-                android:textColor="@color/gray_500"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_cart_next_page"
-                app:layout_constraintStart_toEndOf="@id/btn_cart_previous_page"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="1" />
-
-            <Button
-                android:id="@+id/btn_cart_next_page"
-                style="@style/PageButtonStyle"
-                android:background="@drawable/selector_next_page_button"
-                android:enabled="@{viewModel.hasNextPage}"
-                android:onClick="@{() -> viewModel.moveNextPage()}"
-                android:text="@string/next_page"
-                app:backgroundTint="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tv_cart_page"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:enabled="true" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_order_bottom_bar"
             android:layout_width="match_parent"
             android:layout_height="78dp"
             android:background="@color/gray_500"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_page">
+            >
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -202,7 +146,6 @@
                 android:textSize="18dp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:orderButtonQuantity="@{2}"
                 tools:text="주문하기(4)" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
