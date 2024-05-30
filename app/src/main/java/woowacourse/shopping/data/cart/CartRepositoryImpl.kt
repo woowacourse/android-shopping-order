@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart
 
+import android.util.Log
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
@@ -15,7 +16,7 @@ class CartRepositoryImpl : CartRepository {
         val size = getCartItemCounts()
         thread {
             cartsDto = ApiFactory.getCartItems(0, size)
-        }
+        }.join()
         val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
         return carts.content.map {
             Cart(id = it.id, productId = it.product.id, quantity = Quantity(it.quantity))
@@ -27,7 +28,7 @@ class CartRepositoryImpl : CartRepository {
         val size = getCartItemCounts()
         thread {
             cartsDto = ApiFactory.getCartItems(0, size)
-        }
+        }.join()
         val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
 
         return carts.content.map {

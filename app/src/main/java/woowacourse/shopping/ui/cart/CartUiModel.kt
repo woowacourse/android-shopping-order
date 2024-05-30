@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import woowacourse.shopping.model.Quantity
 
 data class CartUiModel(
+    val id: Long,
     val productId: Long,
     val name: String,
     val price: Int,
