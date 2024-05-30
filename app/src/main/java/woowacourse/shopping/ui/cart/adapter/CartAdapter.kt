@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 
 class CartAdapter(
     private val viewModel: CartViewModel,
-) : ListAdapter<ProductWithQuantity, CartViewHolder>(CartDiffUtil) {
+) : ListAdapter<CartUiModel, CartViewHolder>(CartDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

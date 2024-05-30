@@ -5,35 +5,36 @@ import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.service.ApiFactory
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Quantity
 import kotlin.concurrent.thread
 
 class CartRepositoryImpl : CartRepository {
-    override fun getCartItems(
-        page: Int,
-        size: Int,
-    ): List<Cart> {
+    override fun getAllCartItems(): List<Cart> {
         var cartsDto: ResponseCartItemsGetDto? = null
+        val size = getCartItemCounts()
         thread {
-            cartsDto = ApiFactory.getCartItems(page, size)
-        }.join()
+            cartsDto = ApiFactory.getCartItems(0, size)
+        }
         val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
         return carts.content.map {
             Cart(id = it.id, productId = it.product.id, quantity = Quantity(it.quantity))
         }
     }
 
-    override fun getAllCartItems(): List<Cart> {
-        val carts = mutableListOf<Cart>()
-        var currentPage = 0
-        while (true) {
-            val items = getCartItems(currentPage++, 100)
-            if (items.isEmpty()) {
-                break
-            }
-            carts.addAll(items)
+    override fun getAllCartItemsWithProduct(): List<CartWithProduct> {
+        var cartsDto: ResponseCartItemsGetDto? = null
+        val size = getCartItemCounts()
+        thread {
+            cartsDto = ApiFactory.getCartItems(0, size)
         }
-        return carts
+        val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
+
+        return carts.content.map {
+            CartWithProduct(
+                it.id, it.product.toDomain(), Quantity(it.quantity)
+            )
+        }
     }
 
     override fun postCartItems(
@@ -85,4 +86,13 @@ class CartRepositoryImpl : CartRepository {
         }
         patchCartItem(cart.id, cart.quantity.value + quantity)
     }
+
+    private fun ResponseCartItemsGetDto.Product.toDomain() =
+        Product(
+            id = this.id,
+            imageUrl = this.imageUrl,
+            name = this.name,
+            price = this.price,
+            category = this.category
+        )
 }

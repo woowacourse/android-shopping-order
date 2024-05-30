@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="productWithQuantity"
-            type="woowacourse.shopping.model.ProductWithQuantity" />
+            name="cartUiModel"
+            type="woowacourse.shopping.ui.cart.CartUiModel" />
 
         <variable
             name="vm"
@@ -27,6 +27,7 @@
             android:id="@+id/cb_cart_item_check"
             android:layout_width="18dp"
             android:layout_height="18dp"
+            android:checked="@{cartUiModel.isChecked}"
             android:layout_marginStart="12dp"
             android:layout_marginTop="23dp"
             android:background="@drawable/checkbox"
@@ -41,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:text="@{productWithQuantity.product.name}"
+            android:text="@{cartUiModel.name}"
             android:textColor="@color/gray5"
             android:layout_marginStart="8dp"
             android:textSize="18sp"
@@ -56,7 +57,7 @@
             android:layout_height="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:onClick="@{() -> vm.removeCartItem(productWithQuantity.product.id)}"
+            android:onClick="@{() -> vm.removeCartItem(cartUiModel.productId)}"
             android:scaleType="fitStart"
             android:src="@drawable/close_button"
             app:layout_constraintEnd_toEndOf="parent"
@@ -70,7 +71,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="12dp"
             android:scaleType="fitXY"
-            app:imageUrl="@{productWithQuantity.product.imageUrl}"
+            app:imageUrl="@{cartUiModel.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_product_name"
@@ -85,9 +86,9 @@
             android:layout_marginBottom="6dp"
             app:layout_constraintBottom_toTopOf="@id/tv_product_price"
             app:layout_constraintEnd_toEndOf="parent"
-            bind:count="@{String.valueOf(productWithQuantity.quantity.value)}"
+            bind:count="@{String.valueOf(cartUiModel.quantity.value)}"
             bind:countButtonClickListener="@{vm}"
-            bind:productId="@{productWithQuantity.product.id}" />
+            bind:productId="@{cartUiModel.productId}" />
 
         <TextView
             android:id="@+id/tv_product_price"
@@ -95,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="17dp"
-            android:text="@{@string/product_price(productWithQuantity.totalPrice)}"
+            android:text="@{@string/product_price(cartUiModel.totalPrice)}"
             android:textColor="@color/gray5"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

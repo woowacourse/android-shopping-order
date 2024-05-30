@@ -7,24 +7,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
+import woowacourse.shopping.ui.cart.CartUiModel
 
 class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), CountButtonClickListener {
-    val cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
+    private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
 
-    val productWithQuantity: LiveData<List<ProductWithQuantity>> =
-        cart.map {
-            it.cartItems.map { cart ->
-                ProductWithQuantity(productRepository.find(cart.productId), cart.quantity)
-            }
-        }
+    val cart: LiveData<CartItemsUiState> = _cart
 
     init {
         loadCartItems()
@@ -32,7 +29,7 @@ class CartViewModel(
 
     fun removeCartItem(productId: Long) {
         cartRepository.deleteCartItem(findCartIdByProductId(productId))
-        cart.value = CartItemsUiState(cartRepository.getAllCartItems())
+        _cart.value = CartItemsUiState(cartRepository.getAllCartItemsWithProduct().map { it.toUiModel() }, isLoading = false)
         loadCartItems()
     }
 
@@ -55,17 +52,20 @@ class CartViewModel(
     private fun loadCartItems() {
         val handler = Handler(Looper.getMainLooper())
         runCatching {
-            cart.value = CartItemsUiState(cartRepository.getAllCartItems(), isLoading = true)
+            _cart.value = CartItemsUiState(
+                cartRepository.getAllCartItemsWithProduct().map { it.toUiModel() },
+                isLoading = true
+            )
         }.onSuccess {
             handler.postDelayed({
-                cart.value =
+                _cart.value =
                     cart.value?.copy(isLoading = false)
-            }, 2000)
+            }, 500)
         }
     }
 
     private fun findCartIdByProductId(productId: Long): Long {
-        return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
+        return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.productId
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
@@ -73,4 +73,12 @@ class CartViewModel(
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.quantity
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
+
+    private fun CartWithProduct.toUiModel() = CartUiModel(
+        this.product.id,
+        this.product.name,
+        this.product.price,
+        this.quantity,
+        this.product.imageUrl
+    )
 }

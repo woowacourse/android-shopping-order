@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart.adapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 
 class CartViewHolder(
@@ -10,8 +11,8 @@ class CartViewHolder(
     private val viewModel: CartViewModel,
 ) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(productWithQuantity: ProductWithQuantity) {
-        binding.productWithQuantity = productWithQuantity
+    fun bind(cartUiModel: CartUiModel) {
+        binding.cartUiModel = cartUiModel
         binding.vm = viewModel
     }
 }
