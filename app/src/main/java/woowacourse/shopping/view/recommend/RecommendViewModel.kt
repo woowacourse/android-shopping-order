@@ -1,10 +1,15 @@
 package woowacourse.shopping.view.recommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.model.UpdateCartItemResult
@@ -27,8 +32,6 @@ class RecommendViewModel(
     private var checkedShoppingCart = ShoppingCart()
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
-
-    private var shoppingCart = ShoppingCart()
 
     private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> =
         MutableSingleLiveData()
@@ -55,11 +58,22 @@ class RecommendViewModel(
     fun loadRecommendData() {
         try {
             val recentlyProduct = loadRecentlyProduct()
-//            shoppingCart = shoppingCartRepository
-//            val loadData = productRepository.loadCategoryProducts(
-//                recentlyProduct.category
-//            )
-//            _products.value = loadData
+            val myCartItems = shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            )
+
+            val loadData = productRepository.loadCategoryProducts(
+                size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+                category = recentlyProduct.category,
+            )
+
+            _products.value = getFilteredRandomProducts(
+                 myCartItems = myCartItems,
+                loadData = loadData,
+                LOAD_RECOMMEND_ITEM_SIZE,
+            )
+
         } catch (e: Exception) {
             _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
         }
@@ -78,7 +92,7 @@ class RecommendViewModel(
         try {
             orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
             _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-        } catch (e:Exception){
+        } catch (e: Exception) {
             _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
         }
     }
@@ -131,7 +145,18 @@ class RecommendViewModel(
         }
     }
 
-    fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart){
+    private fun getFilteredRandomProducts(
+        myCartItems: List<CartItem>,
+        loadData: List<Product>,
+        sampleSize: Int
+    ): List<Product> {
+        val cartProductIds = myCartItems.map { it.product.id }.toSet()
+        val filteredProducts = loadData.filter { it.id !in cartProductIds }
+
+        return filteredProducts.shuffled().take(sampleSize)
+    }
+
+    fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart) {
         checkedShoppingCart = shoppingCart
     }
 }

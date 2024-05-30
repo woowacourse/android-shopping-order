@@ -173,5 +173,7 @@ class RealShoppingCartRepositoryImpl(
     companion object {
         private const val ERROR_QUANTITY_SIZE = -1
         const val LOAD_SHOPPING_ITEM_SIZE = 50
+        const val LOAD_SHOPPING_ITEM_OFFSET = 0
+        const val LOAD_RECOMMEND_ITEM_SIZE = 10
     }
 }

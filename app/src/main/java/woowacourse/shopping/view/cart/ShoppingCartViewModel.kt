@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -22,7 +23,6 @@ class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel() {
     val shoppingCart = ShoppingCart()
-    private val totalItemSize: Int get() = shoppingCart.cartItems.value?.size ?: DEFAULT_ITEM_SIZE
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> =
         MutableLiveData()
@@ -72,7 +72,7 @@ class ShoppingCartViewModel(
             try {
                 val pagingData =
                     shoppingCartRepository.loadPagingCartItems(
-                        totalItemSize,
+                        LOAD_SHOPPING_ITEM_OFFSET,
                         LOAD_SHOPPING_ITEM_SIZE
                     )
                 _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
