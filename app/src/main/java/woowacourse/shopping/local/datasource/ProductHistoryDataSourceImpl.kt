@@ -12,6 +12,7 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
         productId: Long,
         name: String,
         price: Int,
+        category: String,
         imageUrl: String,
     ): Result<Unit> =
         runCatching {
@@ -21,6 +22,7 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
                     name = name,
                     price = price,
                     imageUrl = imageUrl,
+                    category = category,
                     createAt = LocalDateTime.now(),
                 )
 
@@ -30,6 +32,11 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
     override fun findProductHistory(productId: Long): Result<ProductHistoryDto> =
         runCatching {
             dao.findProductHistory(productId = productId).toData()
+        }
+
+    override fun getProductHistoriesByCategory(category: String): Result<List<ProductHistoryDto>> =
+        runCatching {
+            dao.getProductHistoriesByCategory(category = category).map { it.toData() }
         }
 
     override fun getProductHistory(size: Int): Result<List<ProductHistoryDto>> =

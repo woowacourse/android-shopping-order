@@ -9,6 +9,7 @@ fun ProductHistoryEntity.toData(): ProductHistoryDto {
         name = this.name,
         price = this.price,
         imageUrl = this.imageUrl,
+        category = this.category,
         createAt = this.createAt,
     )
 }

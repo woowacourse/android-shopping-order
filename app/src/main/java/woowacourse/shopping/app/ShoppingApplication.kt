@@ -41,7 +41,7 @@ class ShoppingApplication : Application() {
         ProductHistoryDataSourceImpl(ProductHistoryDatabase.getDatabase(applicationContext).dao())
     }
     val productHistoryRepository: ProductHistoryRepository by lazy {
-        ProductHistoryRepositoryImpl(productHistoryDataSource)
+        ProductHistoryRepositoryImpl(productHistoryDataSource, shoppingCartRepository)
     }
 
     private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(networkModule.productService) }

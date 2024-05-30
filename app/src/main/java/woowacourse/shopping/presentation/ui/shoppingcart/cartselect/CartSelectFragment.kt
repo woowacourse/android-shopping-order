@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
+import android.os.Bundle
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication
@@ -16,7 +17,6 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
     private val viewModel: CartSelectViewModel by viewModels {
         CartSelectViewModel.factory(
             (requireContext().applicationContext as ShoppingApplication).shoppingCartRepository,
-            (requireContext().applicationContext as ShoppingApplication).orderRepository,
         )
     }
 
@@ -26,17 +26,6 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
         initDataBinding()
         initAdapter()
         initObserve()
-
-        binding.tvOrder.setOnClickListener {
-            this.parentFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.fragment_container_view_main,
-                    OrderRecommendFragment(),
-                    OrderRecommendFragment.TAG,
-                )
-                .commit()
-        }
     }
 
     private fun initDataBinding() {
@@ -58,6 +47,25 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
         viewModel.message.observeEvent(viewLifecycleOwner) { message ->
             when (message) {
                 is MessageProvider.DefaultErrorMessage -> showSnackbar(message.getMessage(this.requireContext()))
+            }
+        }
+
+        viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
+            when (navigateAction) {
+                is CartSelectNavigateAction.NavigateToRecommend -> {
+                    val bundle = Bundle()
+
+                    bundle.putParcelableArray(
+                        OrderRecommendFragment.PUT_EXTRA_CART_IDS_KEY,
+                        navigateAction.orderCarts.toTypedArray(),
+                    )
+
+                    val orderRecommendFragment = OrderRecommendFragment()
+                    orderRecommendFragment.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_view_main, orderRecommendFragment)
+                        .commit()
+                }
             }
         }
     }

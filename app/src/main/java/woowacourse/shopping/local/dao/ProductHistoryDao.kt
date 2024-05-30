@@ -14,6 +14,9 @@ interface ProductHistoryDao {
     @Query("SELECT * FROM productHistoryEntity WHERE productId = :productId")
     fun findProductHistory(productId: Long): ProductHistoryEntity
 
+    @Query("SELECT * FROM productHistoryEntity WHERE category = :category ORDER BY createAt")
+    fun getProductHistoriesByCategory(category: String): List<ProductHistoryEntity>
+
     @Query("SELECT * FROM productHistoryEntity ORDER BY createAt DESC LIMIT :size")
     fun getProductHistoryPaged(size: Int): List<ProductHistoryEntity>
 

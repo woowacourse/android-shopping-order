@@ -158,6 +158,7 @@ class ProductDetailViewModel(
                 productId = productValue.id,
                 name = productValue.name,
                 price = productValue.price,
+                category = productValue.category,
                 imageUrl = productValue.imageUrl,
             ).onSuccess {
                 hideError()

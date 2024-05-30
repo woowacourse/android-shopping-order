@@ -10,5 +10,6 @@ data class ProductHistoryEntity(
     val name: String,
     val price: Int,
     val imageUrl: String,
+    val category: String,
     val createAt: LocalDateTime,
 )

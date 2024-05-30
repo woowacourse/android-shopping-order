@@ -5,18 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
+import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.MessageProvider
+import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.ShoppingCartPagingSource
 import kotlin.concurrent.thread
 
 class CartSelectViewModel(
     private val shoppingRepository: ShoppingCartRepository,
-    private val orderRepository: OrderRepository,
 ) :
     BaseViewModel(),
         CartSelectActionHandler,
@@ -24,6 +24,10 @@ class CartSelectViewModel(
     private val _uiState: MutableLiveData<CartSelectUiState> =
         MutableLiveData(CartSelectUiState())
     val uiState: LiveData<CartSelectUiState> get() = _uiState
+
+    private val _navigateAction: MutableLiveData<Event<CartSelectNavigateAction>> =
+        MutableLiveData(null)
+    val navigateAction: LiveData<Event<CartSelectNavigateAction>> get() = _navigateAction
 
     private val shoppingCartPagingSource = ShoppingCartPagingSource(shoppingRepository)
 
@@ -254,17 +258,21 @@ class CartSelectViewModel(
         }
     }
 
+    fun navigateToRecommend() {
+        _uiState.value?.let { state ->
+            _navigateAction.emit(
+                CartSelectNavigateAction.NavigateToRecommend(orderCarts = state.orderCartList.values.toList()),
+            )
+        }
+    }
+
     companion object {
         const val INIT_PAGE = 0
 
-        fun factory(
-            shoppingCartRepository: ShoppingCartRepository,
-            orderRepository: OrderRepository,
-        ): ViewModelProvider.Factory {
+        fun factory(shoppingCartRepository: ShoppingCartRepository): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 CartSelectViewModel(
                     shoppingCartRepository,
-                    orderRepository,
                 )
             }
         }
