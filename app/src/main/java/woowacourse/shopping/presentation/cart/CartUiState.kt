@@ -38,9 +38,9 @@ data class CartUiState(
         val newPagingProducts =
             pagingProducts.map {
                 it.key to
-                        it.value.map { cartProductUi ->
-                            cartProductUi.copy(isSelected = !isSelectedAll)
-                        }
+                    it.value.map { cartProductUi ->
+                        cartProductUi.copy(isSelected = !isSelectedAll)
+                    }
             }.toMap()
         return copy(
             pagingProducts = newPagingProducts,
@@ -124,6 +124,5 @@ data class CartUiState(
         return product.count > countLimit
     }
 
-    fun findProductAtCurrentPage(productId: Long): CartProductUi? =
-        currentPageProducts.find { it.product.id == productId }
+    fun findProductAtCurrentPage(productId: Long): CartProductUi? = currentPageProducts.find { it.product.id == productId }
 }

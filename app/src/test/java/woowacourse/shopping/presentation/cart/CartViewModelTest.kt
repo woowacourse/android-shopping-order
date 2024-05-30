@@ -24,41 +24,42 @@ class CartViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        every { cartRepository.cartProducts(any(), any()) } returns
-            Result.success(
-                listOf(
-                    cartProduct(),
-                ),
+        every { cartRepository.totalCartProducts() } returns Result.success(
+            listOf(
+                cartProduct(),
             )
+        )
         every { cartRepository.canLoadMoreCartProducts(any(), PAGE_SIZE) } returns
-            Result.success(
-                true,
-            )
+                Result.success(
+                    true,
+                )
         cartViewModel = CartViewModel(cartRepository)
     }
 
     @Test
-    @DisplayName("ViewModel 이 초기화될 때, 1 페이지의 장바구니 상품을 가져온다")
+    @DisplayName("ViewModel 이 초기화될 때, 장바구니 상품을 모두 가져온다")
     fun test0() {
-        verify(exactly = 1) { cartRepository.cartProducts(1, PAGE_SIZE) }
+        verify(exactly = 1) { cartRepository.totalCartProducts() }
         cartViewModel.uiState.getOrAwaitValue().currentPage shouldBe 1
     }
 
     @Test
-    @DisplayName("현재 페이지가 1일 때, 다음 페이지로 이동하면, 페이지가 2가 된다")
+    @DisplayName("현재 페이지가 1일 때, 다음 페이지로 이동하면, 페이지가 2가 된다,")
     fun test1() {
         val nextPage = 2
+        // View 에서는 페이지가 1부터 시작, 서버에서는 0부터 시작
+        val serverNextPage = 1
         // given
-        every { cartRepository.cartProducts(nextPage, PAGE_SIZE) } returns
-            Result.success(
-                listOf(
-                    cartProduct(),
-                ),
-            )
+        every { cartRepository.cartProducts(serverNextPage, PAGE_SIZE) } returns
+                Result.success(
+                    listOf(
+                        cartProduct(),
+                    ),
+                )
         // when
         cartViewModel.moveToNextPage()
         // then
-        verify(exactly = 1) { cartRepository.cartProducts(nextPage, PAGE_SIZE) }
+        verify(exactly = 1) { cartRepository.cartProducts(serverNextPage, PAGE_SIZE) }
         uiState.currentPage shouldBe nextPage
     }
 
@@ -66,14 +67,20 @@ class CartViewModelTest {
     @DisplayName("현재 페이지가 1일 때, 다음 페이지로 이동하면, 페이지가 2가 된다")
     fun test2() {
         val nextPage = 2
+        val serverNextPage = 1
         // given
-        every { cartRepository.canLoadMoreCartProducts(1, PAGE_SIZE) } returns Result.success(true)
-        every { cartRepository.canLoadMoreCartProducts(3, PAGE_SIZE) } returns Result.success(true)
+        every { cartRepository.canLoadMoreCartProducts(0, PAGE_SIZE) } returns Result.success(true)
+        every { cartRepository.canLoadMoreCartProducts(2, PAGE_SIZE) } returns Result.success(true)
+        every { cartRepository.cartProducts(serverNextPage, PAGE_SIZE) } returns Result.success(
+            listOf(
+                cartProduct(),
+            ),
+        )
         // when
         cartViewModel.moveToNextPage()
         // then
-        verify(exactly = 1) { cartRepository.canLoadMoreCartProducts(1, PAGE_SIZE) }
-        verify(exactly = 1) { cartRepository.canLoadMoreCartProducts(3, PAGE_SIZE) }
+        verify(exactly = 1) { cartRepository.canLoadMoreCartProducts(0, PAGE_SIZE) }
+        verify(exactly = 1) { cartRepository.canLoadMoreCartProducts(2, PAGE_SIZE) }
         uiState.currentPage shouldBe nextPage
     }
 
