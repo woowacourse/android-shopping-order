@@ -24,6 +24,14 @@ class DefaultProductDataSource(
         }).get()
     }
 
+    override fun products(category: String, currentPage: Int, size: Int): Result<ProductPageData> {
+        return ioExecutor.submit(Callable {
+            productService.fetchProducts(category, currentPage, size)
+                .executeAsResult()
+                .mapCatching { it.toData() }
+        }).get()
+    }
+
     override fun productById(id: Long): Result<Product> {
         return ioExecutor.submit(Callable {
             productService.fetchDetailProduct(id)

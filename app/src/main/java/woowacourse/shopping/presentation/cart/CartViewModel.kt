@@ -18,9 +18,9 @@ class CartViewModel(
     val errorEvent: SingleLiveData<CartErrorEvent> = _errorEvent
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
     val updateCartEvent: SingleLiveData<Unit> get() = _updateCartEvent
-    private val _navigateToRecommendEvent: MutableSingleLiveData<List<Long>> =
+    private val _navigateToRecommendEvent: MutableSingleLiveData<List<CartProductUi>> =
         MutableSingleLiveData()
-    val navigateToRecommendEvent: SingleLiveData<List<Long>> get() = _navigateToRecommendEvent
+    val navigateToRecommendEvent: SingleLiveData<List<CartProductUi>> get() = _navigateToRecommendEvent
 
     init {
         loadTotalCartProducts()
@@ -85,7 +85,7 @@ class CartViewModel(
     }
 
     fun navigateToRecommend() {
-        val orderedProductIds = _uiState.value?.orderedProducts?.map { it.product.id } ?: return
+        val orderedProductIds = _uiState.value?.orderedProducts ?: return
         if (orderedProductIds.isEmpty()) return _errorEvent.setValue(CartErrorEvent.EmptyOrderProduct)
         _navigateToRecommendEvent.setValue(orderedProductIds)
     }
@@ -115,7 +115,7 @@ class CartViewModel(
         }
     }
 
-    private fun loadTotalCartProducts() {
+    fun loadTotalCartProducts() {
         cartRepository.totalCartProducts().onSuccess { carts ->
             val newProducts = carts.map { it.toUiModel() }
             val uiState = _uiState.value ?: return

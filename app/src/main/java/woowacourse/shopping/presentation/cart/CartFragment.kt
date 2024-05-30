@@ -60,7 +60,7 @@ class CartFragment :
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     if (menuItem.itemId == android.R.id.home) {
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        navigator.popBackStack()
                         return true
                     }
                     return false
@@ -83,6 +83,9 @@ class CartFragment :
         }
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()
+        }
+        eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {
+            viewModel.loadTotalCartProducts()
         }
         viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
             navigator.navigateToRecommend(it)

@@ -18,6 +18,6 @@ fun Product.toUiModel(): ProductUi {
     return ProductUi(id, name, price, imageUrl)
 }
 
-fun Product.toCartUiModel(): CartProductUi {
-    return CartProductUi(toUiModel(), 1)
+fun Product.toCartUiModel(initCount: Int = 1): CartProductUi {
+    return CartProductUi(toUiModel(), initCount)
 }

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.shopping
 
-import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
 import woowacourse.shopping.data.shopping.product.ProductPageData
+import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
 import woowacourse.shopping.data.shopping.recent.RecentProductData
 import woowacourse.shopping.data.shopping.recent.RecentProductDataSource
 import woowacourse.shopping.domain.entity.Product
@@ -32,6 +32,13 @@ class DefaultShoppingRepository(
                 }
                 it.products
             }
+    }
+
+    override fun products(category: String, currentPage: Int, size: Int): Result<List<Product>> {
+        val products = cachedPagingProducts[currentPage]
+        if (products != null) return Result.success(products)
+        return productDataSource.products(category, currentPage, size)
+            .mapCatching { it.products }
     }
 
     override fun productById(id: Long): Result<Product> {

@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("kotlin-parcelize")
     kotlin("plugin.serialization")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
 }
