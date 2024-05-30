@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import android.os.Bundle
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication
@@ -62,9 +64,10 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
 
                     val orderRecommendFragment = OrderRecommendFragment()
                     orderRecommendFragment.arguments = bundle
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container_view_main, orderRecommendFragment)
-                        .commit()
+                    parentFragmentManager.commit {
+                        replace(R.id.fragment_container_view_main, orderRecommendFragment)
+                        addToBackStack(OrderRecommendFragment.TAG)
+                    }
                 }
             }
         }
