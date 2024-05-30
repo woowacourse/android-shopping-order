@@ -9,7 +9,6 @@ import woowacourse.shopping.common.Event
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository2
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -87,31 +86,13 @@ class ProductsViewModel(
     fun loadProducts() {
         val productsUiState = _productsUiState.value?.peekContent() ?: return
         _productsUiState.value = Event(productsUiState.copy(isLoading = true))
-        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val productUiModels = productUiModels()?.toMutableList() ?: return
 
-        cartRepository.getAllCartItem(
-            cartTotalCount,
-            object : DataCallback<List<CartItem>> {
-                override fun onSuccess(result: List<CartItem>) {
-                    val productUiModels = productUiModels()?.toMutableList() ?: return
-                    result.forEach { cartItem ->
-                        val productId = cartItem.productId
-                        val index =
-                            productUiModels.indexOfFirst { productUiModel ->
-                                productId == productUiModel.productId
-                            }
-                        productUiModels[index] =
-                            productUiModels[index].copy(quantity = cartItem.quantity)
-                    }
-                    _productsUiState.value =
-                        Event(ProductsUiState(productUiModels = productUiModels))
-                }
-
-                override fun onFailure(t: Throwable) {
-                    _productsUiState.value = Event(ProductsUiState(isError = true))
-                }
-            },
-        )
+        productUiModels.forEachIndexed { index, productUiModel ->
+            val product = productRepository.syncFind(productUiModel.productId)
+            productUiModels[index] = product.toProductUiModel()
+        }
+        _productsUiState.value = Event(ProductsUiState(productUiModels = productUiModels))
         updateTotalCount()
     }
 
