@@ -108,7 +108,7 @@ class ProductListViewModel(
     fun updateProducts() {
         thread {
             uiState.value?.let { state ->
-                val cartProducts = productRepository.getAllCarts().getOrNull()
+                val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
                 val updatedProductList =
                     state.pagingCart.cartList.map { cart ->
                         val matchingCartProduct =

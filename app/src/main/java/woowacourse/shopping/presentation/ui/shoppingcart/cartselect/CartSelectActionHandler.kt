@@ -6,4 +6,6 @@ interface CartSelectActionHandler {
     fun deleteCartProduct(cartId: Int)
 
     fun checkCartProduct(cart: Cart)
+
+    fun checkAllCartProduct()
 }

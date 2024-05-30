@@ -151,6 +151,8 @@
             android:layout_marginStart="12dp"
             android:layout_marginBottom="25dp"
             android:backgroundTint="@color/green"
+            android:checked="@{vm.uiState.isAllChecked}"
+            android:onClick="@{() -> vm.checkAllCartProduct()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

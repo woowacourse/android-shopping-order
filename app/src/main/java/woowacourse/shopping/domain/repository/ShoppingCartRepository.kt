@@ -21,4 +21,6 @@ interface ShoppingCartRepository {
     fun getCartProductsTotal(): Result<Int>
 
     fun deleteCartProduct(cartId: Int): Result<Unit>
+
+    fun getAllCarts(): Result<Carts>
 }

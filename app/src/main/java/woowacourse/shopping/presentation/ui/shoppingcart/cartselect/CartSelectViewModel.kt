@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -40,6 +39,8 @@ class CartSelectViewModel(
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
 
+                val carts = shoppingRepository.getAllCarts().getOrNull()
+
                 val cartIdList = uiState.value?.orderCartList?.values?.map { it.id } ?: emptyList()
 
                 val newCartList =
@@ -54,7 +55,12 @@ class CartSelectViewModel(
                 val newPagingCartProduct = pagingCartProduct.copy(cartList = newCartList)
 
                 _uiState.value?.let { state ->
-                    _uiState.postValue(state.copy(pagingCartProduct = newPagingCartProduct))
+                    _uiState.postValue(
+                        state.copy(
+                            pagingCartProduct = newPagingCartProduct,
+                            totalElements = carts?.totalElements ?: 0,
+                        ),
+                    )
                 }
             }.onFailure { e ->
                 showError(e)
@@ -155,10 +161,7 @@ class CartSelectViewModel(
 
     override fun checkCartProduct(cart: Cart) {
         _uiState.value?.let { state ->
-            Log.d("Ttt cart", "checkCartProduct: $cart")
-
             if (cart.isChecked) {
-                Log.d("Ttt original", "checkCartProduct: $cart")
                 state.orderCartList.remove(cart.id)
                 _uiState.value = state.copy(orderCartList = state.orderCartList)
             } else {
@@ -176,10 +179,50 @@ class CartSelectViewModel(
                 }
 
             _uiState.postValue(state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct)))
+        }
+    }
 
-//            Log.d("Ttt cart", cart.toString())
-            Log.d("Ttt orderCartList", _uiState.value?.orderCartList.toString())
-//            Log.d("Ttt orderTotalPrice", _uiState.value?.orderTotalPrice.toString())
+    override fun checkAllCartProduct() {
+        thread {
+            shoppingRepository.getAllCarts().onSuccess { carts ->
+                hideError()
+
+                if (carts.totalElements == _uiState.value?.orderCartList?.size) {
+                    _uiState.value?.let { state ->
+
+                        val newPagingCartProduct =
+                            state.pagingCartProduct.cartList.map { cart ->
+                                cart.copy(isChecked = false)
+                            }
+
+                        _uiState.postValue(
+                            state.copy(
+                                orderCartList = mutableMapOf(),
+                                pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
+                            ),
+                        )
+                    }
+                } else {
+                    _uiState.value?.let { state ->
+                        val newPagingCartProduct =
+                            state.pagingCartProduct.cartList.map { cart ->
+                                cart.copy(isChecked = true)
+                            }
+
+                        val orderCartList =
+                            carts.content.associateBy { cart -> cart.id }.toMutableMap()
+
+                        _uiState.postValue(
+                            state.copy(
+                                orderCartList = orderCartList,
+                                pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
+                            ),
+                        )
+                    }
+                }
+            }.onFailure { e ->
+                showError(e)
+            }
         }
     }
 

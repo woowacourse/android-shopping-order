@@ -18,7 +18,7 @@ class ProductListPagingSource(
         val result =
             productRepository.getPagingProduct(page = currentPage, pageSize = PAGING_SIZE)
                 .mapCatching { products ->
-                    val cartProducts = productRepository.getAllCarts().getOrNull()
+                    val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
 
                     products.content.map { product ->
                         val findCart = cartProducts?.content?.find { it.product.id == product.id }

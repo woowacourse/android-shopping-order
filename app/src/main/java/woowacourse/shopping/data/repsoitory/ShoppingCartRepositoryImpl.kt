@@ -31,4 +31,19 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
     override fun getCartProductsTotal(): Result<Int> = dataSource.getCartProductsTotal()
 
     override fun deleteCartProduct(cartId: Int): Result<Unit> = dataSource.deleteCartProduct(cartId = cartId)
+
+    override fun getAllCarts(): Result<Carts> {
+        val totalElements =
+            dataSource.getCartProductsPaged(
+                page = ProductRepositoryImpl.FIRST_PAGE,
+                size = ProductRepositoryImpl.FIRST_SIZE,
+            )
+                .getOrThrow().totalElements
+
+        return dataSource.getCartProductsPaged(
+            page = ProductRepositoryImpl.FIRST_PAGE,
+            size = totalElements,
+        )
+            .mapCatching { it.toDomain() }
+    }
 }
