@@ -45,6 +45,13 @@ class MockProductRepository : ProductRepository {
         return products.subList(offset, 3)
     }
 
+    override fun loadCategoryProducts(size: Int, category: String): List<Product> {
+        repeat(5) {
+            products.addAll(products)
+        }
+        return products.subList(size, 3)
+    }
+
     override fun getProduct(productId: Long): Product {
         return products.firstOrNull { it.id == productId } ?: defaultProduct
     }

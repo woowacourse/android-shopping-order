@@ -72,27 +72,4 @@ class ShoppingCartFragmentTest {
         onView(withId(R.id.tv_cart_item_price)).check(matches(withText("0원")))
     }
 
-    @Test
-    fun `다음_페이지의_데이터가_있을_때_다음_버튼을_클릭하면_페이지의_숫자가_증가한다`() {
-        thread {
-            dao.saveCartItem(TestFixture.makeCartItemEntity())
-            dao.saveCartItem(TestFixture.makeCartItemEntity())
-            dao.saveCartItem(TestFixture.makeCartItemEntity())
-        }.join()
-        activityRule.scenario.onActivity { activity ->
-            activity.supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ShoppingCartFragment())
-                .commitNow()
-        }
-
-        onView(withId(R.id.btn_next)).perform(ViewActions.click())
-        onView(withId(R.id.tv_page_count)).check(matches(withText("2")))
-    }
-
-    @Test
-    fun `다음_페이지의_데이터가_없을_때_다음_버튼을_클릭하면_페이지의_숫자가_증가하지_않는다`() {
-        onView(withId(R.id.btn_next)).perform(ViewActions.click())
-
-        onView(withId(R.id.tv_page_count)).check(matches(withText("1")))
-    }
 }

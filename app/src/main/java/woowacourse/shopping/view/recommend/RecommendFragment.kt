@@ -99,6 +99,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
                         )
                         saveUpdateCartItem()
                     }
+                    adapter.updateProduct(state.product)
                 }
 
                 RecommendEvent.OrderRecommends.Success -> navigateToProduct()

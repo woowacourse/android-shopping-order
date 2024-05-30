@@ -77,8 +77,8 @@ class MockShoppingCartRepository : ShoppingCartRepository {
     }
 
     override fun updateCartItem(
-        itemId: Long,
-        updateCartItemType: UpdateCartItemType,
+        product: Product,
+        updateCartItemType: UpdateCartItemType
     ): UpdateCartItemResult {
         return UpdateCartItemResult.UPDATED(CartItemResult(0, CartItemCounter()))
     }

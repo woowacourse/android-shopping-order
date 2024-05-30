@@ -45,4 +45,14 @@ class RecommendAdapter(
             return oldItem == newItem
         }
     }
+
+    fun updateProduct(product: Product) {
+        val index = currentList.indexOfFirst { it.id == product.id }
+        if (index != -1) {
+            val updatedList = currentList.toMutableList()
+            updatedList[index] = product
+            submitList(updatedList)
+            notifyItemChanged (index)
+        }
+    }
 }
