@@ -5,7 +5,7 @@ import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.CartItemDto
+import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingProductRepository(
     private val productsSource: ProductDataSource,
@@ -19,11 +19,19 @@ class DefaultShoppingProductRepository(
         }
     }
 
-    override fun loadPagedCartItem(): List<CartItemDto> {
-        return cartSource.loadAllCartItems()
+    override fun loadPagedCartItem(): List<CartItem> {
+        return cartSource.loadAllCartItems().map {
+            CartItem(
+                id = it.id,
+                quantity = it.quantity,
+                product = it.product,
+                checked = false
+            )
+        }
     }
 
-    override fun loadProduct(id: Long): Product = productsSource.findById(id).toDomain(productQuantity(id))
+    override fun loadProduct(id: Long): Product =
+        productsSource.findById(id).toDomain(productQuantity(id))
 
     override fun isFinalPage(page: Int): Boolean = productsSource.isFinalPage(page)
 

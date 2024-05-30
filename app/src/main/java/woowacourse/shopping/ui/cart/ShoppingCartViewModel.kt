@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,27 +11,28 @@ import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
-import woowacourse.shopping.remote.CartItemDto
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.model.CartItem
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val shoppingProductsRepository: ShoppingProductsRepository,
-) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener, OnCartItemSelectedListener, OnAllCartItemSelectedListener {
+) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener,
+    OnCartItemSelectedListener, OnAllCartItemSelectedListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
-    private var _itemsInCurrentPage = MutableLiveData<List<CartItemDto>>()
-    val itemsInCurrentPage: LiveData<List<CartItemDto>> get() = _itemsInCurrentPage
+    private var _cartItems = MutableLiveData<List<CartItem>>()
+    val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
     private var _deletedItemId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val deletedItemId: SingleLiveData<Long> get() = _deletedItemId
 
-    private var _selectedProducts = MutableLiveData<List<Long>>(emptyList())
-    val selectedProducts: LiveData<List<Long>> get() = _selectedProducts
-
     private var _isAllSelected = MutableLiveData(false)
     val isAllSelected: LiveData<Boolean> get() = _isAllSelected
+
+    private var _selectedCartItemsTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedCartItemsTotalPrice: LiveData<Int> get() = _selectedCartItemsTotalPrice
 
     fun loadAll() {
         thread {
@@ -40,7 +40,7 @@ class ShoppingCartViewModel(
                 shoppingProductsRepository.loadPagedCartItem()
 
             uiHandler.post {
-                _itemsInCurrentPage.value = currentItems
+                _cartItems.value = currentItems
             }
         }
     }
@@ -52,13 +52,9 @@ class ShoppingCartViewModel(
                 shoppingProductsRepository.loadPagedCartItem()
 
             uiHandler.post {
-                _itemsInCurrentPage.value = currentItems
+                _cartItems.value = currentItems
             }
         }
-    }
-
-    fun isAllCartItemSelected() {
-        _isAllSelected.value = (itemsInCurrentPage.value?.size == selectedProducts.value?.size && itemsInCurrentPage.value?.size != 0)
     }
 
     override fun onClick(productId: Long) {
@@ -71,10 +67,10 @@ class ShoppingCartViewModel(
     ) {
         thread {
             shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
-            val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+            val currentItems = shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
-                _itemsInCurrentPage.value = currentItems
+                updateCartItems(currentItems)
+                updateTotalPrice()
             }
         }
     }
@@ -85,40 +81,61 @@ class ShoppingCartViewModel(
     ) {
         thread {
             shoppingProductsRepository.decreaseShoppingCartProduct(productId, quantity)
-            val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+            val currentItems = shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
-                _itemsInCurrentPage.value = currentItems
+                updateCartItems(currentItems)
+                updateTotalPrice()
             }
         }
     }
 
-    override fun selected(cartItemId: Long) {
-        val cartItemIds = selectedProducts.value ?: emptyList()
-        if (!cartItemIds.contains(cartItemId)) {
-            _selectedProducts.value = cartItemIds + cartItemId
-        } else {
-            _selectedProducts.value = cartItemIds - cartItemId
+    private fun updateCartItems(currentItems: List<CartItem>) {
+        _cartItems.value = currentItems.map { cartItem ->
+            // TODO: 널 단언 제거하기
+            cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
         }
-        isAllCartItemSelected()
+    }
+
+    override fun selected(cartItemId: Long) {
+        val selectedItem =
+            cartItems.value?.find { it.id == cartItemId } ?: throw IllegalStateException()
+        val changedItem = selectedItem.copy(checked = !selectedItem.checked)
+
+        _cartItems.value = cartItems.value?.map {
+            if (it.id == cartItemId) {
+                changedItem
+            } else {
+                it
+            }
+        }
+        updateTotalPrice()
+    }
+
+    private fun updateTotalPrice() {
+        _selectedCartItemsTotalPrice.value = cartItems.value?.filter { it.checked }?.sumOf {
+            it.product.price * it.quantity
+        }
     }
 
     override fun selectedAll() {
         if (isAllSelected.value == true) {
-            _selectedProducts.value = emptyList()
+            updateCartItemsChecked(checked = false)
+            updateTotalPrice()
             _isAllSelected.value = false
-            Log.d("cart", "${isAllSelected.value}")
-            Log.d("cart", "${selectedProducts.value}")
-        } else {
-            _selectedProducts.value = itemsInCurrentPage.value?.map { it.id }
-            _isAllSelected.value = true
-            Log.d("cart", "${isAllSelected.value}")
-            Log.d("cart", "${selectedProducts.value}")
+            return
+        }
+        updateCartItemsChecked(checked = true)
+        updateTotalPrice()
+        _isAllSelected.value = true
+    }
+
+    private fun updateCartItemsChecked(checked: Boolean) {
+        _cartItems.value = cartItems.value?.map { cartItem ->
+            cartItem.copy(checked = checked)
         }
     }
 
     companion object {
-
         private const val TAG = "ShoppingCartViewModel"
         fun factory(
             shoppingProductsRepository: ShoppingProductsRepository =

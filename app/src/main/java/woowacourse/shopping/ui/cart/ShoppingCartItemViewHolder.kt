@@ -5,6 +5,7 @@ import woowacourse.shopping.databinding.HolderCartBinding
 import woowacourse.shopping.remote.CartItemDto
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.model.CartItem
 
 class ShoppingCartItemViewHolder(
     private val binding: HolderCartBinding,
@@ -12,8 +13,8 @@ class ShoppingCartItemViewHolder(
     private val onItemChargeListener: OnItemQuantityChangeListener,
     private val onCartItemSelectedListener: OnCartItemSelectedListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(cartItemDto: CartItemDto) {
-        binding.cartItemDto = cartItemDto
+    fun bind(cartItem: CartItem) {
+        binding.cartItem = cartItem
         binding.onProductItemClickListener = onProductItemClickListener
         binding.onItemChargeListener = onItemChargeListener
         binding.onCartItemSelectedListener = onCartItemSelectedListener

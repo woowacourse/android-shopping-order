@@ -15,7 +15,9 @@ import woowacourse.shopping.databinding.FragmentCartListBinding
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
-    private val binding get() = _binding ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+    private val binding
+        get() = _binding
+            ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
 
@@ -84,7 +86,7 @@ class ShoppingCartFragment : Fragment() {
     }
 
     private fun observeItemsInCurrentPage() {
-        viewModel.itemsInCurrentPage.observe(viewLifecycleOwner) { products ->
+        viewModel.cartItems.observe(viewLifecycleOwner) { products ->
             adapter.updateData(products)
             binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
