@@ -6,6 +6,8 @@ import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
 import woowacourse.shopping.data.local.AppDatabase
+import woowacourse.shopping.data.order.OrderRepositoryImpl
+import woowacourse.shopping.data.order.RemoteOrderDataSource
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
@@ -53,6 +55,7 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                         ),
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
+                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSource()),
                 ) as T
             }
 

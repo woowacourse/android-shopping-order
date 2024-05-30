@@ -9,6 +9,7 @@ import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.UiState
@@ -18,6 +19,7 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
 
@@ -141,7 +143,7 @@ class CartViewModel(
                 _orderEvent.value = Event(OrderEvent.CompleteOrder)
             }
 
-            null -> TODO()
+            null -> throw IllegalAccessError()
         }
     }
 
@@ -212,5 +214,11 @@ class CartViewModel(
     }
 
     fun completeOrder() {
+        val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
+        if (cartItemIds.isNotEmpty()) {
+            orderRepository.completeOrder(cartItemIds, onSuccess = {
+                _orderEvent.value = Event(OrderEvent.FinishOrder)
+            }, onFailure = {})
+        }
     }
 }
