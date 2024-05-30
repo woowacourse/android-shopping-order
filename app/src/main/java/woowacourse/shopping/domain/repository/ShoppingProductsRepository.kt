@@ -1,11 +1,12 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.remote.CartItemDto
 
 interface ShoppingProductsRepository {
     fun loadAllProducts(page: Int): List<Product>
 
-    fun loadProductsInCart(page: Int): List<Product>
+    fun loadPagedCartItem(page: Int): List<CartItemDto>
 
     fun loadProduct(id: Long): Product
 

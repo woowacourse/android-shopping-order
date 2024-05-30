@@ -2,11 +2,14 @@ package woowacourse.shopping.data.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.domain.model.ProductIdsCount
+import woowacourse.shopping.remote.CartItemDto
 
 interface ShoppingCartProductIdDataSource {
     fun findByProductId(productId: Long): ProductIdsCountData?
 
     fun loadPaged(page: Int): List<ProductIdsCountData>
+
+    fun loadPagedItems(page: Int): List<CartItemDto>
 
     fun loadAll(): List<ProductIdsCountData>
 

@@ -24,6 +24,20 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         }
     }
 
+    override fun loadPagedItems(page: Int): List<CartItemDto> {
+        val response =
+            cartItemApiService.requestCartItems(page = page - 1).execute().body()?.content
+                ?: throw NoSuchElementException("there is no product with page: $page")
+
+        return response.map {
+            CartItemDto(
+                id = it.id,
+                quantity = it.quantity,
+                product = it.product,
+            )
+        }
+    }
+
     override fun loadAll(): List<ProductIdsCountData> {
         return emptyList()
     }
@@ -32,6 +46,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         cartItemApiService.requestCartItems(page - 1).execute().body()?.last
             ?: throw IllegalArgumentException()
 
+    // TODO: ProductIdsCountData -> CartItem
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
         val call =
             cartItemApiService.addCartItem(
@@ -56,6 +71,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         return 10
     }
 
+    // TODO: productId -> cartItemId
     override fun plusProductsIdCount(
         productId: Long,
         quantity: Int,
@@ -67,6 +83,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
     }
 
+    // TODO: productId -> cartItemId
     override fun minusProductsIdCount(
         productId: Long,
         quantity: Int,

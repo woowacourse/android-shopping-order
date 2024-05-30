@@ -1,11 +1,14 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.ProductIdsCount
+import woowacourse.shopping.remote.CartItemDto
 
 interface ProductIdsCountRepository {
     fun findByProductId(productId: Long): ProductIdsCount
 
     fun loadAllProductIdsCounts(): List<ProductIdsCount>
+
+    fun loadPagedCartItem(page: Int): List<CartItemDto>
 
     fun addedProductsId(productIdsCount: ProductIdsCount): Long
 

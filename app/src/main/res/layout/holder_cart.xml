@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="product"
-            type="woowacourse.shopping.domain.model.Product" />
+            name="cartItemDto"
+            type="woowacourse.shopping.remote.CartItemDto" />
 
         <variable
             name="onProductItemClickListener"
@@ -41,7 +41,7 @@
             android:layout_marginEnd="10dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{product.name}"
+            android:text="@{cartItemDto.product.name}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/checkbox_cart"
@@ -56,7 +56,7 @@
             android:layout_height="16dp"
             android:layout_marginEnd="16dp"
             android:importantForAccessibility="no"
-            android:onClick="@{() -> onProductItemClickListener.onClick(product.id)}"
+            android:onClick="@{() -> onProductItemClickListener.onClick(cartItemDto.product.id)}"
             android:src="@drawable/ic_x"
             app:layout_constraintBottom_toBottomOf="@id/cart_product_name"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
 
         <ImageView
             android:id="@+id/cart_product_image"
-            imageUrl="@{product.imgUrl}"
+            imageUrl="@{cartItemDto.product.imageUrl}"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginTop="16dp"
@@ -84,16 +84,16 @@
             app:layout_constraintBottom_toTopOf="@id/cart_product_price"
             app:layout_constraintEnd_toEndOf="@id/cart_product_delete"
             app:layout_constraintTop_toTopOf="@id/cart_product_image"
-            bind:itemId="@{product.id}"
+            bind:itemId="@{cartItemDto.product.id}"
             bind:onItemChargeListener="@{onItemChargeListener}"
-            bind:quantity="@{product.quantity}" />
+            bind:quantity="@{cartItemDto.quantity}" />
 
         <TextView
             android:id="@+id/cart_product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@{@string/price_format(product.price * product.quantity) }"
+            android:text="@{@string/price_format(cartItemDto.product.price * cartItemDto.quantity) }"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/cart_product_image"
             app:layout_constraintEnd_toEndOf="@id/cart_product_delete"

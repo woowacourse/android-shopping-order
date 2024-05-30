@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.PagingStrategy
 import woowacourse.shopping.data.model.ProductData
+import woowacourse.shopping.remote.CartItemDto
 
 class DummyShoppingCartItemRepository(private val pagingStrategy: PagingStrategy<ProductData>) :
     ShoppingCartItemRepository {
@@ -15,6 +16,10 @@ class DummyShoppingCartItemRepository(private val pagingStrategy: PagingStrategy
         cartItems.find { it.id == id } ?: throw NoSuchElementException("there is no product with id: $id")
 
     override fun loadPagedCartItems(page: Int): List<ProductData> = pagingStrategy.loadPagedData(page, cartItems)
+
+    override fun loadPagedItems(page: Int): List<CartItemDto> {
+        return emptyList()
+    }
 
     override fun removeCartItem(productId: Long): ProductData {
         val product = cartItems.find { it.id == productId } ?: throw NoSuchElementException()
