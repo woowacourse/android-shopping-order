@@ -8,7 +8,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartTempBinding
 import woowacourse.shopping.presentation.ui.cart.selection.SelectionFragment
 
-class CartActivity : AppCompatActivity() {
+class CartActivity : AppCompatActivity(), CartClickListener {
     private lateinit var binding: ActivityCartTempBinding
     private val selectionFragment by lazy { SelectionFragment() }
 
@@ -17,6 +17,8 @@ class CartActivity : AppCompatActivity() {
         binding = ActivityCartTempBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.clickListener = this
+
         setupInitialFragment()
     }
 
@@ -24,6 +26,10 @@ class CartActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(R.id.cart_fragment, selectionFragment)
             .commit()
+    }
+
+    override fun onBackButtonClick() {
+        finish()
     }
 
     companion object {

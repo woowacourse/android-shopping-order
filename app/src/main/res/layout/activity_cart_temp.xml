@@ -8,6 +8,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="clickListener"
+            type= "woowacourse.shopping.presentation.ui.cart.CartClickListener" />
+
+        <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.cart.CartViewModel" />
     </data>
@@ -32,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:onClick="@{() -> viewModel.navigateToShopping()}"
+                android:onClick="@{() -> clickListener.onBackButtonClick()}"
                 android:padding="10dp"
                 android:src="@drawable/ic_back_vector"
                 app:layout_constraintBottom_toBottomOf="parent"
