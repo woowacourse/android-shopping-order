@@ -46,9 +46,8 @@ interface CartService {
 
         fun instance(): CartService =
             instance ?: synchronized(this) {
-                instance ?: RetrofitModule.retrofit().create<CartService>().also {
-                    instance = it
-                }
+                instance ?: RetrofitModule.retrofit().create<CartService>()
+                    .also { instance = it }
             }
     }
 }

@@ -33,9 +33,8 @@ interface ProductService {
 
         fun instance(): ProductService =
             instance ?: synchronized(this) {
-                instance ?: RetrofitModule.retrofit().create<ProductService>().also {
-                    instance = it
-                }
+                instance ?: RetrofitModule.retrofit().create<ProductService>()
+                    .also { instance = it }
             }
     }
 }

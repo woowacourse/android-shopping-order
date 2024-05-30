@@ -18,9 +18,8 @@ interface OrderService {
 
         fun instance(): OrderService =
             instance ?: synchronized(this) {
-                instance ?: RetrofitModule.retrofit().create<OrderService>().also {
-                    instance = it
-                }
+                instance ?: RetrofitModule.retrofit().create<OrderService>()
+                    .also { instance = it }
             }
     }
 }
