@@ -24,6 +24,10 @@ class RecommendCartProductViewModel(
     val uiState: LiveData<RecommendOrderUiState> get() = _uiState
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
     val updateCartEvent: SingleLiveData<Unit> get() = _updateCartEvent
+    private val _showOrderDialogEvent = MutableSingleLiveData<Unit>()
+    val showOrderDialogEvent: SingleLiveData<Unit> get() = _showOrderDialogEvent
+    private val _finishOrderEvent = MutableSingleLiveData<Unit>()
+    val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
 
     init {
         val uiState = _uiState.value
@@ -33,6 +37,19 @@ class RecommendCartProductViewModel(
         } else {
             _uiState.value = RecommendOrderUiState(orders, recommendProducts)
         }
+    }
+
+    fun startOrder() {
+        _showOrderDialogEvent.setValue(Unit)
+    }
+
+    fun orderProducts() {
+        val uiState = _uiState.value ?: return
+        cartRepository.orderCartProducts(uiState.totalOrderIds)
+            .onSuccess {
+                _updateCartEvent.setValue(Unit)
+                _finishOrderEvent.setValue(Unit)
+            }
     }
 
     override fun increaseProductCount(id: Long) {
@@ -95,6 +112,8 @@ data class RecommendOrderUiState(
     private val totalProducts
         get() = orderedProducts + recommendProducts
 
+    val totalOrderIds
+        get() = totalProducts.map { it.product.id }
     val totalCount
         get() = totalProducts.sumOf { it.count }
 

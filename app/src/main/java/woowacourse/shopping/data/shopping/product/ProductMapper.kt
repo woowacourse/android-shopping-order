@@ -11,6 +11,7 @@ fun ProductResponse.toProduct(): Product {
         price = price,
         name = name,
         imageUrl = imageUrl,
+        category = category,
     )
 }
 

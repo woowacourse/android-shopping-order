@@ -3,6 +3,7 @@ package woowacourse.shopping.data.cart
 import woowacourse.shopping.data.cart.datasource.CartDataSource
 import woowacourse.shopping.data.cart.model.CartItemData
 import woowacourse.shopping.data.cart.model.CartPageData
+import woowacourse.shopping.data.cart.order.OrderDataSource
 import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource,
     private val productDataSource: ProductDataSource,
+    private val orderDataSource: OrderDataSource,
 ) : CartRepository {
     private var cartPageData: CartPageData? = null
     private val cartProductMapByProductId = ConcurrentHashMap<Long, CartItemData>()
@@ -87,6 +89,16 @@ class DefaultCartRepository(
         )
         val minSize = currentPage * pageSize
         return Result.success(cartPageData.totalProductSize > minSize)
+    }
+
+    override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
+        val cartIds = productIds.mapNotNull {
+            cartProductMapByProductId[it]?.cartId
+        }
+        return orderDataSource.orderProducts(cartIds).onSuccess {
+            cartProductMapByProductId.clear()
+            totalCartProducts()
+        }
     }
 
     private fun Result<CartPageData>.toCartProducts(): Result<List<CartProduct>> {

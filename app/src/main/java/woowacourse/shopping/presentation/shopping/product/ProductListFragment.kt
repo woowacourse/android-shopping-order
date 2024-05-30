@@ -74,7 +74,7 @@ class ProductListFragment :
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     if (menuItem.itemId == R.id.menu_item_cart) {
-                        navigator.navigateToCart()
+                        navigator.navigateToCart(true, TAG)
                         return true
                     }
                     return false
@@ -106,7 +106,7 @@ class ProductListFragment :
         }
 
         viewModel.navigateToDetailEvent.observe(viewLifecycleOwner) {
-            navigator.navigateToProductDetail(it)
+            navigator.navigateToProductDetail(it, true, TAG)
         }
 
         eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {

@@ -28,35 +28,39 @@ class ShoppingActivity :
         }
     }
 
-    override fun navigateToProductDetail(productId: Long) {
+    override fun navigateToProductDetail(productId: Long, addBackStack: Boolean, tag: String?) {
         supportFragmentManager.commit {
             replace<ProductDetailFragment>(
                 R.id.fragment_container_shopping,
                 ProductDetailFragment.TAG,
                 args = ProductDetailFragment.args(productId),
             )
-            addToBackStack(ProductListFragment.TAG)
+            if (addBackStack) addToBackStack(tag)
         }
     }
 
-    override fun navigateToCart() {
+    override fun navigateToCart(addBackStack: Boolean, tag: String?) {
         supportFragmentManager.commit {
             replace<CartFragment>(
                 R.id.fragment_container_shopping,
                 CartFragment.TAG,
             )
-            addToBackStack(CartFragment.TAG)
+            if (addBackStack) addToBackStack(tag)
         }
     }
 
-    override fun navigateToRecommend(productOrders: List<CartProductUi>) {
+    override fun navigateToRecommend(
+        productOrders: List<CartProductUi>,
+        addBackStack: Boolean,
+        tag: String?
+    ) {
         supportFragmentManager.commit {
             replace<RecommendCartProductFragment>(
                 R.id.fragment_container_shopping,
                 RecommendCartProductFragment.TAG,
                 RecommendCartProductFragment.args(RecommendNavArgs(productOrders))
             )
-            addToBackStack(RecommendCartProductFragment.TAG)
+            if (addBackStack) addToBackStack(tag)
         }
     }
 

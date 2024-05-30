@@ -8,12 +8,15 @@ data class CartUiState(
 ) {
     val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
 
+    val totalProductCount get() = totalProducts.sumOf { it.count }
+
     val currentPageProducts get() = pagingProducts[currentPage] ?: emptyList()
     val orderedProducts: List<CartProductUi> get() = totalProducts.filter { it.isSelected }
 
     val isTotalProductsOrdered get() = (orderedProducts.size == totalProducts.size)
 
     val orderPrice: Int get() = orderedProducts.sumOf { it.totalPrice }
+
 
     fun toggleProductSelected(productId: Long): CartUiState {
         val newCurrentProducts = currentPageProducts.map {

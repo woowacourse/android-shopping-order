@@ -35,8 +35,6 @@ class DefaultShoppingRepository(
     }
 
     override fun products(category: String, currentPage: Int, size: Int): Result<List<Product>> {
-        val products = cachedPagingProducts[currentPage]
-        if (products != null) return Result.success(products)
         return productDataSource.products(category, currentPage, size)
             .mapCatching { it.products }
     }

@@ -69,10 +69,10 @@ class ProductDetailFragment :
 
     private fun initObservers() {
         viewModel.addCartEvent.observe(viewLifecycleOwner) {
-            navigator.navigateToCart()
+            navigator.navigateToCart(true, TAG)
         }
         viewModel.recentProductEvent.observe(viewLifecycleOwner) { id ->
-            navigator.navigateToProductDetail(id)
+            navigator.navigateToProductDetail(id, true, TAG)
         }
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()

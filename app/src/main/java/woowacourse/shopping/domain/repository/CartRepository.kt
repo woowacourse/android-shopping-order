@@ -23,4 +23,6 @@ interface CartRepository {
         currentPage: Int,
         pageSize: Int,
     ): Result<Boolean>
+
+    fun orderCartProducts(productIds: List<Long>): Result<Unit>
 }

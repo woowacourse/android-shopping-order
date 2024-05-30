@@ -88,7 +88,7 @@ class CartFragment :
             viewModel.loadTotalCartProducts()
         }
         viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
-            navigator.navigateToRecommend(it)
+            navigator.navigateToRecommend(it, true, TAG)
         }
     }
 

@@ -61,7 +61,7 @@
             android:id="@+id/product_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{@string/price_format(cartProduct.totalPrice)}"
+            android:text="@{@string/price_format(cartProduct.product.price)}"
             android:textAlignment="center"
             android:theme="@style/B1"
             app:layout_constraintEnd_toEndOf="parent"
