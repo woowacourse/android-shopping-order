@@ -24,9 +24,11 @@ class RecommendViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
 ) : ViewModel() {
-    private val checkedShoppingCart = ShoppingCart()
+    private var checkedShoppingCart = ShoppingCart()
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
+
+    private var shoppingCart = ShoppingCart()
 
     private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> =
         MutableSingleLiveData()
@@ -53,8 +55,11 @@ class RecommendViewModel(
     fun loadRecommendData() {
         try {
             val recentlyProduct = loadRecentlyProduct()
-            val loadData = productRepository.loadCategoryProducts(recentlyProduct.category)
-            _products.value = loadData
+//            shoppingCart = shoppingCartRepository
+//            val loadData = productRepository.loadCategoryProducts(
+//                recentlyProduct.category
+//            )
+//            _products.value = loadData
         } catch (e: Exception) {
             _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
         }
@@ -90,7 +95,7 @@ class RecommendViewModel(
                 is UpdateCartItemResult.DELETE -> deleteCartItem(product)
                 is UpdateCartItemResult.UPDATED -> {
                     product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product.id))
+                    _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
                 }
             }
         } catch (e: Exception) {
@@ -106,13 +111,13 @@ class RecommendViewModel(
     private fun addCartItem(product: Product) {
         product.updateCartItemCount(CartItemEntity.DEFAULT_CART_ITEM_COUNT)
         product.updateItemSelector(true)
-        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product.id))
+        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
     }
 
     private fun deleteCartItem(product: Product) {
         try {
             product.updateItemSelector(false)
-            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product.id))
+            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
         } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
@@ -121,5 +126,9 @@ class RecommendViewModel(
                 else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
             }
         }
+    }
+
+    fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart){
+        checkedShoppingCart = shoppingCart
     }
 }

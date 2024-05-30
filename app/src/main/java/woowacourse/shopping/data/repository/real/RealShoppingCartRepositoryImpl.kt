@@ -51,12 +51,14 @@ class RealShoppingCartRepositoryImpl(
     override fun loadPagingCartItems(offset: Int, pagingSize: Int): List<CartItem> {
         var cartItems: List<CartItem>? = null
         executeWithLatch {
+            val page = (offset+1)/LOAD_SHOPPING_ITEM_SIZE
             val response =
-                cartItemDataSource.loadCartItems(page = offset, size = pagingSize).execute()
+                cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
             if (response.isSuccessful) {
                 cartItems = response.body()?.cartItemDto?.map { it.toCartItem() }
             }
         }
+        if (cartItems.isNullOrEmpty()) throw NoSuchDataException()
         return cartItems ?: throw NoSuchDataException()
     }
 
@@ -170,5 +172,6 @@ class RealShoppingCartRepositoryImpl(
 
     companion object {
         private const val ERROR_QUANTITY_SIZE = -1
+        const val LOAD_SHOPPING_ITEM_SIZE = 50
     }
 }

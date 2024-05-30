@@ -19,7 +19,7 @@ class ProductRepositoryImpl : ProductRepository {
         return pagingData
     }
 
-    override fun loadCategoryProducts(category: String): List<Product> {
+    override fun loadCategoryProducts(size : Int, category: String): List<Product> {
         var pagingData: List<Product> = listOf()
         thread {
             pagingData = mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)

@@ -9,9 +9,7 @@ interface OnClickShoppingCart {
 
     fun clickRemoveCartItem(cartItem: CartItem)
 
-    fun clickPrevPage()
-
-    fun clickNextPage()
-
     fun clickCheckBox(cartItem: CartItem)
+
+    fun clickOrder()
 }

@@ -3,8 +3,9 @@ package woowacourse.shopping.view.cart.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.domain.model.CartItem
+import java.io.Serializable
 
-class ShoppingCart {
+class ShoppingCart: Serializable {
     private val _cartItems: MutableLiveData<List<CartItem>> = MutableLiveData(listOf())
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 

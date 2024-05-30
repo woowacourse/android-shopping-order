@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.recommend
 
+import woowacourse.shopping.domain.model.Product
+
 interface RecommendEvent {
     sealed interface ErrorEvent : RecommendEvent {
         data object NotKnownError : ErrorEvent
@@ -8,7 +10,7 @@ interface RecommendEvent {
     sealed interface SuccessEvent : RecommendEvent
 
     sealed interface UpdateProductEvent : RecommendEvent {
-        data class Success(val productId: Long) : UpdateProductEvent, SuccessEvent
+        data class Success(val product: Product) : UpdateProductEvent, SuccessEvent
 
         data object Fail : UpdateProductEvent, ErrorEvent
     }

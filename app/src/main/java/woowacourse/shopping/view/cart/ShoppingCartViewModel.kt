@@ -1,11 +1,11 @@
 package woowacourse.shopping.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_LOAD_PAGING_SIZE
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_PAGE_SIZE
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
+import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateCartItemResult
@@ -19,12 +19,8 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel() {
-    var shoppingCart = ShoppingCart()
+    val shoppingCart = ShoppingCart()
     private val totalItemSize: Int get() = shoppingCart.cartItems.value?.size ?: DEFAULT_ITEM_SIZE
-
-    private val _currentPage: MutableLiveData<Int> =
-        MutableLiveData(MIN_PAGE_COUNT)
-    val currentPage: LiveData<Int> get() = _currentPage
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> =
         MutableLiveData()
@@ -34,17 +30,11 @@ class ShoppingCartViewModel(
         MutableSingleLiveData()
     val errorEvent: SingleLiveData<ShoppingCartEvent.ErrorState> get() = _errorEvent
 
-    private val checkedShoppingCart = ShoppingCart()
-    val totalPrice: Int
-        get() =
-            checkedShoppingCart.cartItems.value?.sumOf {
-                it.product.cartItemCounter.itemCount * it.product.price
-            } ?: DEFAULT_ITEM_SIZE
-    val totalCount: Int
-        get() =
-            checkedShoppingCart.cartItems.value?.count {
-                it.cartItemSelector.isSelected
-            } ?: DEFAULT_ITEM_SIZE
+    val checkedShoppingCart = ShoppingCart()
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
+    private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
+    val totalCount: LiveData<Int> get() = _totalCount
 
     fun deleteShoppingCartItem(
         cartItemId: Long,
@@ -70,17 +60,15 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun loadPagingCartItemList(pagingSize: Int) {
+    fun loadPagingCartItemList() {
         try {
-            val itemSize = shoppingCart.cartItems.value?.size ?: DEFAULT_ITEM_SIZE
-            val pagingData = shoppingCartRepository.loadPagingCartItems(itemSize, pagingSize)
+            val pagingData =
+                shoppingCartRepository.loadPagingCartItems(totalItemSize, LOAD_SHOPPING_ITEM_SIZE)
             shoppingCart.addProducts(pagingData)
         } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ShoppingCartEvent.LoadCartItemList.Fail,
-                    )
+                    _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
 
                 else ->
                     _errorEvent.setValue(
@@ -138,50 +126,21 @@ class ShoppingCartViewModel(
     fun addCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.selectItem()
         checkedShoppingCart.addProduct(cartItem)
+        updateCheckItemData()
     }
 
     fun deleteCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.unSelectItem()
         checkedShoppingCart.deleteProduct(cartItem.id)
+        updateCheckItemData()
     }
 
-    fun getUpdatePageData(): List<CartItem> {
-        val startIndex =
-            ((currentPage.value ?: MIN_PAGE_COUNT) - MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE
-        val endIndex = getLastItemIndex()
-        return shoppingCart.cartItems.value?.subList(startIndex, endIndex)
-            ?: emptyList()
-    }
-
-    fun isExistPrevPage(): Boolean {
-        return (currentPage.value ?: MIN_PAGE_COUNT) > MIN_PAGE_COUNT
-    }
-
-    fun isExistNextPage(): Boolean {
-        return (currentPage.value ?: MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE < totalItemSize
-    }
-
-    fun isExistNextData(): Boolean {
-        return (totalItemSize - (currentPage.value ?: MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE) == CART_ITEM_LOAD_PAGING_SIZE
-    }
-
-    fun increaseCurrentPage() {
-        _currentPage.value = _currentPage.value?.plus(INCREMENT_AMOUNT)
-    }
-
-    fun decreaseCurrentPage() {
-        _currentPage.value = _currentPage.value?.minus(INCREMENT_AMOUNT)
-    }
-
-    private fun getLastItemIndex(): Int {
-        return minOf(
-            (currentPage.value ?: MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE,
-            totalItemSize,
-        )
-    }
-
-    companion object {
-        private const val MIN_PAGE_COUNT = 1
-        private const val INCREMENT_AMOUNT = 1
+    private fun updateCheckItemData() {
+        _totalPrice.value = checkedShoppingCart.cartItems.value?.sumOf {
+            it.product.cartItemCounter.itemCount * it.product.price
+        } ?: DEFAULT_ITEM_SIZE
+        _totalCount.value = checkedShoppingCart.cartItems.value?.count {
+            it.cartItemSelector.isSelected
+        } ?: DEFAULT_ITEM_SIZE
     }
 }

@@ -68,54 +68,49 @@
             android:layout_margin="18dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/paging_buttons"
+            app:layout_constraintBottom_toTopOf="@id/view2"
             app:layout_constraintTop_toBottomOf="@id/vw_cart_top_bar"
             tools:context=".view.cart.ShoppingCartFragment"
             tools:itemCount="3"
             tools:listitem="@layout/item_shopping_cart" />
 
-        <LinearLayout
-            android:id="@+id/paging_buttons"
+        <View
+            android:id="@+id/view2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:layout_height="78dp"
+            android:background="@color/gray_5"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_shopping_cart">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageButton
-                android:id="@+id/btn_prev"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@{onPrevButton ? @color/primary : @color/gray}"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:onClick="@{()->onClickShoppingCart.clickPrevPage()}"
-                android:padding="0dp"
-                android:src="@drawable/ic_arrow_back_24" />
+        <TextView
+            android:id="@+id/btn_order"
+            android:layout_width="122dp"
+            android:layout_height="78dp"
+            android:background="@color/primary"
+            android:gravity="center"
+            android:onClick="@{()->onClickShoppingCart.clickOrder()}"
+            android:text="@{@string/formatted_order(vm.totalCount)}"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            tools:text="주문하기"
+            app:layout_constraintBottom_toBottomOf="@+id/view2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/view2" />
 
-            <TextView
-                android:id="@+id/tv_page_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:text="@{String.valueOf(vm.currentPage)}"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                tools:text="1" />
-
-            <ImageButton
-                android:id="@+id/btn_next"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@{onNextButton ? @color/primary : @color/gray}"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:onClick="@{()->onClickShoppingCart.clickNextPage()}"
-                android:padding="0dp"
-                android:src="@drawable/ic_arrow_forward_24" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:textColor="@color/white"
+            android:text="@{@string/formatted_price(vm.totalPrice)}"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_order"
+            app:layout_constraintTop_toTopOf="@+id/view2"
+            tools:text="12,000원" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

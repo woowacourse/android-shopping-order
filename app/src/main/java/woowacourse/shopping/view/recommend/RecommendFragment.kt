@@ -1,7 +1,9 @@
 package woowacourse.shopping.view.recommend
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +17,11 @@ import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
+import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.OnClickProducts
@@ -74,8 +78,11 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
                 onClickProducts = this,
                 onClickCartItemCounter = this,
             )
+        binding.recyclerView.adapter = adapter
         observeData()
+        loadCheckedShoppingCart()
     }
+
 
     private fun observeData() {
         recommendViewModel.products.observe(viewLifecycleOwner) { products ->
@@ -83,8 +90,11 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         }
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is RecommendEvent.UpdateProductEvent.Success -> {
-                }
+                is RecommendEvent.UpdateProductEvent.Success ->
+                    mainActivityListener?.saveUpdateProduct(
+                        productId = state.product.id,
+                        count = state.product.cartItemCounter.itemCount,
+                    )
             }
         }
         recommendViewModel.errorEvent.observe(viewLifecycleOwner) {
@@ -123,9 +133,47 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         recommendViewModel.orderItems()
     }
 
+    override fun clickBack() {
+        mainActivityListener?.popFragment()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
         mainActivityListener = null
+    }
+
+    private fun receiveCheckedShoppingCart(): ShoppingCart {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(CHECKED_SHOPPING_CART, ShoppingCart::class.java)
+                ?: throw NoSuchDataException()
+        } else {
+            arguments?.getSerializable(CHECKED_SHOPPING_CART) as? ShoppingCart
+                ?: throw NoSuchDataException()
+        }
+    }
+
+    private fun loadCheckedShoppingCart() {
+        try {
+            val shoppingCart = receiveCheckedShoppingCart()
+            recommendViewModel.saveCheckedShoppingCarts(shoppingCart)
+        } catch (e: Exception) {
+            requireContext().makeToast(
+                getString(R.string.error_data_load),
+            )
+            clickBack()
+        }
+    }
+
+    companion object {
+        fun createBundle(
+            checkedShoppingCart: ShoppingCart,
+        ): Bundle {
+            return Bundle().apply {
+                putSerializable(CHECKED_SHOPPING_CART, checkedShoppingCart)
+            }
+        }
+
+        private const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
     }
 }

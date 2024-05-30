@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.real
 
+import android.util.Log
 import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
@@ -37,7 +38,7 @@ class RealProductRepositoryImpl(
         return products ?: throw NoSuchDataException()
     }
 
-    override fun loadCategoryProducts(category: String): List<Product> {
+    override fun loadCategoryProducts(size: Int,category: String): List<Product> {
         val latch = CountDownLatch(1)
         var products: List<Product>? = null
         var exception: Exception? = null
@@ -59,8 +60,8 @@ class RealProductRepositoryImpl(
                 latch.countDown()
             }
         }
-
         latch.awaitOrThrow(exception)
+
         return products ?: throw NoSuchDataException()
     }
 
