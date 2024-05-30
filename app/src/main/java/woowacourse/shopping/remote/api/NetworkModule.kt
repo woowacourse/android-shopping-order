@@ -16,27 +16,16 @@ class NetworkModule(authProvider: AuthProvider) {
             .addInterceptor(HttpExceptionInterceptor())
             .build()
 
-    val productService: ProductService =
+    private val retrofit: Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-            .create(ProductService::class.java)
 
-    val cartService: CartService =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(CartService::class.java)
+    val productService: ProductService = retrofit.create(ProductService::class.java)
 
-    val orderService: OrderService =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(OrderService::class.java)
+    val cartService: CartService = retrofit.create(CartService::class.java)
+
+    val orderService: OrderService = retrofit.create(OrderService::class.java)
 }
