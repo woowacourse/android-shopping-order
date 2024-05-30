@@ -55,14 +55,16 @@ class OrderRecommendViewModel(
     override fun retry() {}
 
     fun order() {
-        _uiState.value?.let { state ->
-            orderRepository.insertOrder(state.orderCarts.keys.toList())
-                .onSuccess {
-                    hideError()
-                    _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
-                }.onFailure { e ->
-                    showError(e)
-                }
+        thread {
+            _uiState.value?.let { state ->
+                orderRepository.insertOrder(state.orderCarts.keys.toList())
+                    .onSuccess {
+                        hideError()
+                        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
+                    }.onFailure { e ->
+                        showError(e)
+                    }
+            }
         }
     }
 
