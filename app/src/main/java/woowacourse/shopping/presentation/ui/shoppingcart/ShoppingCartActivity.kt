@@ -36,6 +36,15 @@ class ShoppingCartActivity :
         return true
     }
 
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            super.onBackPressed()
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view_main)
+        } else {
+            finish()
+        }
+    }
+
     companion object {
         fun getIntent(context: Context): Intent {
             return Intent(context, ShoppingCartActivity::class.java)
