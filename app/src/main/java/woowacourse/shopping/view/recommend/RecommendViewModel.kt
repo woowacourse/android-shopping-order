@@ -75,8 +75,11 @@ class RecommendViewModel(
 
     fun orderItems() {
         val ids = products.value?.map { it.id.toInt() }
-        if (!ids.isNullOrEmpty()) {
-            orderRepository.orderShoppingCart(ids)
+        try {
+            orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
+            _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
+        } catch (e:Exception){
+            _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
         }
     }
 
