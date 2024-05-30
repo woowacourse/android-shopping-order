@@ -3,7 +3,6 @@ package woowacourse.shopping.view.recommend
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,11 +91,15 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         }
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is RecommendEvent.UpdateProductEvent.Success ->
-                    mainActivityListener?.saveUpdateProduct(
-                        productId = state.product.id,
-                        count = state.product.cartItemCounter.itemCount,
-                    )
+                is RecommendEvent.UpdateProductEvent.Success -> {
+                    mainActivityListener?.apply {
+                        saveUpdateProduct(
+                            productId = state.product.id,
+                            count = state.product.cartItemCounter.itemCount,
+                        )
+                        saveUpdateCartItem()
+                    }
+                }
 
                 RecommendEvent.OrderRecommends.Success -> navigateToProduct()
             }
@@ -157,7 +160,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         }
     }
 
-    private fun navigateToProduct(){
+    private fun navigateToProduct() {
         mainActivityListener?.popAllFragment()
         val productFragment =
             ProductsListFragment()

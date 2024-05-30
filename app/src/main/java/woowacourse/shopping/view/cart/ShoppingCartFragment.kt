@@ -135,6 +135,10 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
                     )
             }
         }
+
+        mainActivityListener?.observeCartItem {
+            shoppingCartViewModel.loadPagingCartItemList()
+        }
     }
 
     override fun onDestroyView() {

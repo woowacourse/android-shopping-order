@@ -66,4 +66,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun saveUpdateRecentlyProduct() {
         mainViewModel.saveUpdateRecentlyProduct()
     }
+
+    override fun observeCartItem(reset: () -> Unit) {
+        mainViewModel.updateCartItemEvent.observe(this) {
+            reset()
+        }
+    }
+
+    override fun saveUpdateCartItem() {
+        mainViewModel.saveUpdateCartItem()
+    }
 }

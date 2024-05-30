@@ -19,4 +19,8 @@ interface MainActivityListener {
     fun observeRecentlyProduct(reset: () -> Unit)
 
     fun saveUpdateRecentlyProduct()
+
+    fun observeCartItem(reset: () -> Unit)
+
+    fun saveUpdateCartItem()
 }

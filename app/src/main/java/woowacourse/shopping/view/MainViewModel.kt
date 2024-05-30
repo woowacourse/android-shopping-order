@@ -11,11 +11,18 @@ class MainViewModel : ViewModel() {
     private val _updateRecentlyProductEvent: MutableSingleLiveData<Unit> = MutableSingleLiveData()
     val updateRecentlyProductEvent: SingleLiveData<Unit> get() = _updateRecentlyProductEvent
 
+    private val _updateCartItemEvent: MutableSingleLiveData<Unit> = MutableSingleLiveData()
+    val updateCartItemEvent: SingleLiveData<Unit> get() = _updateCartItemEvent
+
     fun saveUpdateProduct(updateList: Map<Long, Int>) {
         _updateProductEvent.setValue(updateList)
     }
 
     fun saveUpdateRecentlyProduct() {
         _updateRecentlyProductEvent.setValue(Unit)
+    }
+
+    fun saveUpdateCartItem(){
+        _updateCartItemEvent.setValue(Unit)
     }
 }
