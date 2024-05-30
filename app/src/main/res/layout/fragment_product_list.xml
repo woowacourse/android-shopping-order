@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -14,6 +14,12 @@
         android:layout_height="match_parent"
         android:paddingTop="20dp"
         tools:context=".presentation.shopping.product.ProductListFragment">
+
+        <include
+            layout="@layout/layout_skeleton_products"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            bind:visible="@{vm.uiState.isLoading}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_product_list"

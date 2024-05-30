@@ -28,9 +28,11 @@ class ProductListViewModel(
     val errorEvent: SingleLiveData<ProductListErrorEvent> = _errorEvent
 
     init {
+        _uiState.value = _uiState.value?.copy(isLoading = true)
         loadProducts()
         loadCartProducts()
         loadRecentProducts()
+        _uiState.value = _uiState.value?.copy(isLoading = false)
     }
 
     override fun loadProducts() {
@@ -121,6 +123,7 @@ class ProductListViewModel(
 
 data class ProductListUiState(
     val currentPage: Int = 1,
+    val isLoading: Boolean = false,
     val totalProducts: List<ShoppingUiModel> = emptyList(),
     val recentProducts: List<ProductUi> = emptyList(),
 ) {
@@ -143,12 +146,12 @@ data class ProductListUiState(
     fun updateCartProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
         return copy(
             totalProducts =
-                products.map { originalProduct ->
-                    val newProduct =
-                        newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
-                            ?: return@map originalProduct.copy(count = 0)
-                    originalProduct.copy(count = newProduct.count)
-                } + loadMoreModels,
+            products.map { originalProduct ->
+                val newProduct =
+                    newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
+                        ?: return@map originalProduct.copy(count = 0)
+                originalProduct.copy(count = newProduct.count)
+            } + loadMoreModels,
         )
     }
 
@@ -158,13 +161,13 @@ data class ProductListUiState(
     ): ProductListUiState =
         copy(
             totalProducts =
-                totalProducts.map {
-                    if (it is ShoppingUiModel.Product && it.id == productId) {
-                        it.copy(count = it.count + amount)
-                    } else {
-                        it
-                    }
-                },
+            totalProducts.map {
+                if (it is ShoppingUiModel.Product && it.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
         )
 
     fun decreaseProductCount(
