@@ -14,4 +14,7 @@
     <string name="load_more_products">상품 더보기</string>
     <string name="last_viewed_product">마지막으로 본 상품</string>
     <string name="order_text">주문하기(%d)</string>
+    <string name="whole">전체</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.cart
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,12 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
     private val _error = MutableLiveData<Event<CartError>>()
 
     val error: LiveData<Event<CartError>> = _error
+
+    private var orderState: OrderState = OrderState.CartList
+
+    private val _orderEvent = MutableLiveData<Event<OrderEvent>>()
+
+    val orderEvent: LiveData<Event<OrderEvent>> = _orderEvent
 
     private val _shoppingProducts =
         MutableLiveData<UiState<List<ProductListItem.ShoppingProductItem>>>(UiState.Loading)
@@ -61,6 +68,10 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
             )
         }
 
+    fun setOrderState(state: OrderState) {
+        orderState = state
+    }
+
     fun loadAllCartItems(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
@@ -104,6 +115,21 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                 shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>
             _shoppingProducts.value =
                 UiState.Success(cart.data.map { it.copy(isChecked = isChecked) })
+        }
+    }
+
+    override fun onOrderClicked() {
+        Log.d("ㅌㅅㅌ", "onOrderClicked : $orderState")
+        when (orderState) {
+            is OrderState.CartList -> {
+                if (totalCount.value != 0) {
+                    _orderEvent.value = Event(OrderEvent.MoveToRecommend)
+                }
+            }
+
+            is OrderState.Recommend -> {
+                _orderEvent.value = Event(OrderEvent.CompleteOrder)
+            }
         }
     }
 

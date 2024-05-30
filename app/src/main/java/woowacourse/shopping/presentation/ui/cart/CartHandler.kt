@@ -9,4 +9,6 @@ interface CartHandler : QuantityHandler {
     fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem)
 
     fun onTotalCheckBoxClicked(isChecked: Boolean)
+
+    fun onOrderClicked()
 }
