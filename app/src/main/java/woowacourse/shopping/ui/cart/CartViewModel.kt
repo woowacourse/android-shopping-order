@@ -227,7 +227,10 @@ class CartViewModel(
     }
 
     fun loadRecommendProductUiModels() {
-        val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
+        val cartItems =
+            cartUiModels()
+                ?.filter { it.isSelected }
+                ?.map { it.toCartItem() } ?: return
         val recommendProducts = recommendRepository.getRecommendProducts(cartItems = cartItems)
         _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
     }
