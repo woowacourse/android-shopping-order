@@ -18,8 +18,11 @@ import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val shoppingProductsRepository: ShoppingProductsRepository,
-) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener,
-    OnCartItemSelectedListener, OnAllCartItemSelectedListener {
+) : ViewModel(),
+    OnProductItemClickListener,
+    OnItemQuantityChangeListener,
+    OnCartItemSelectedListener,
+    OnAllCartItemSelectedListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _cartItems = MutableLiveData<List<CartItem>>()
@@ -90,10 +93,11 @@ class ShoppingCartViewModel(
     }
 
     private fun updateCartItems(currentItems: List<CartItem>) {
-        _cartItems.value = currentItems.map { cartItem ->
-            // TODO: 널 단언 제거하기
-            cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
-        }
+        _cartItems.value =
+            currentItems.map { cartItem ->
+                // TODO: 널 단언 제거하기
+                cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
+            }
     }
 
     override fun selected(cartItemId: Long) {
@@ -101,20 +105,22 @@ class ShoppingCartViewModel(
             cartItems.value?.find { it.id == cartItemId } ?: throw IllegalStateException()
         val changedItem = selectedItem.copy(checked = !selectedItem.checked)
 
-        _cartItems.value = cartItems.value?.map {
-            if (it.id == cartItemId) {
-                changedItem
-            } else {
-                it
+        _cartItems.value =
+            cartItems.value?.map {
+                if (it.id == cartItemId) {
+                    changedItem
+                } else {
+                    it
+                }
             }
-        }
         updateTotalPrice()
     }
 
     private fun updateTotalPrice() {
-        _selectedCartItemsTotalPrice.value = cartItems.value?.filter { it.checked }?.sumOf {
-            it.product.price * it.quantity
-        }
+        _selectedCartItemsTotalPrice.value =
+            cartItems.value?.filter { it.checked }?.sumOf {
+                it.product.price * it.quantity
+            }
     }
 
     override fun selectedAll() {
@@ -130,13 +136,15 @@ class ShoppingCartViewModel(
     }
 
     private fun updateCartItemsChecked(checked: Boolean) {
-        _cartItems.value = cartItems.value?.map { cartItem ->
-            cartItem.copy(checked = checked)
-        }
+        _cartItems.value =
+            cartItems.value?.map { cartItem ->
+                cartItem.copy(checked = checked)
+            }
     }
 
     companion object {
         private const val TAG = "ShoppingCartViewModel"
+
         fun factory(
             shoppingProductsRepository: ShoppingProductsRepository =
                 DefaultShoppingProductRepository(
