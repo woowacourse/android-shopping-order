@@ -146,6 +146,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                     is FromShoppingToScreen.Cart ->
                         CartActivity.startWithResult(
                             this,
+                            cartItemQuantity = viewModel.cartItemQuantity.value ?: 0,
                             activityResultLauncher,
                         )
                 }

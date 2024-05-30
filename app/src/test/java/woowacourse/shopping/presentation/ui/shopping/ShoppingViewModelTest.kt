@@ -1,14 +1,15 @@
-// package woowacourse.shopping.presentation.ui.shopping
+package woowacourse.shopping.presentation.ui.shopping
 //
 // import io.mockk.every
 // import io.mockk.impl.annotations.InjectMockKs
 // import io.mockk.impl.annotations.RelaxedMockK
-// import io.mockk.junit5.MockKExtension
+import io.mockk.junit5.MockKExtension
 // import org.assertj.core.api.Assertions
 // import org.junit.jupiter.api.Assertions.assertEquals
 // import org.junit.jupiter.api.Test
-// import org.junit.jupiter.api.extension.ExtendWith
-// import woowacourse.shopping.InstantTaskExecutorExtension
+import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.InstantTaskExecutorExtension
+
 // import woowacourse.shopping.domain.repository.LocalCartDataSource
 // import woowacourse.shopping.domain.repository.ProductRepository
 // import woowacourse.shopping.domain.repository.RecentRepository
@@ -19,9 +20,9 @@
 // import woowacourse.shopping.getOrAwaitValue
 // import woowacourse.shopping.presentation.ui.UiState
 //
-// @ExtendWith(InstantTaskExecutorExtension::class)
-// @ExtendWith(MockKExtension::class)
-// class ShoppingViewModelTest {
+@ExtendWith(InstantTaskExecutorExtension::class)
+@ExtendWith(MockKExtension::class)
+class ShoppingViewModelTest {
 //    @RelaxedMockK
 //    private lateinit var productRepository: ProductRepository
 //
@@ -135,4 +136,4 @@
 //            ShoppingError.AllProductsLoaded,
 //        )
 //    }
-// }
+}

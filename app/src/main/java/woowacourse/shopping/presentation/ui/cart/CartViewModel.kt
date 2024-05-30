@@ -13,19 +13,6 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.util.Event
 
 class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), CartHandler {
-    private val _isRightButtonEnabled = MutableLiveData<Boolean>()
-    val isRightButtonEnabled: LiveData<Boolean> get() = _isRightButtonEnabled
-
-    private val _isLeftButtonEnabled = MutableLiveData<Boolean>()
-    val isLeftButtonEnabled: LiveData<Boolean> get() = _isLeftButtonEnabled
-
-    private val _pageControllerIsVisible = MutableLiveData<Boolean>()
-    val pageControllerIsVisible: LiveData<Boolean> get() = _pageControllerIsVisible
-
-    private var maxPage: Int = 0
-
-    private val _currentPage = MutableLiveData(0)
-    val currentPage: LiveData<Int> get() = _currentPage
 
     private val _error = MutableLiveData<Event<CartError>>()
 
@@ -41,34 +28,10 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
     private val _changedCartProducts = MutableLiveData<List<Cart>>()
     val changedCartProducts: LiveData<List<Cart>> get() = _changedCartProducts
 
-    override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
-        cartRepository.deleteExistCartItem(product.cartId, onSuccess = { cartId, newQuantity ->
-            val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
-            _changedCartProducts.value =
-                originalChangedCartProducts.plus(Cart(cartId, product.toProduct(), newQuantity))
-            updatePageController()
-            loadProductByPage(currentPage.value ?: 0)
-        }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
-    }
-
-    override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
-        product.isChecked = !product.isChecked
-    }
-
-    fun updatePageController() {
-        if (currentPage.value != null) {
-            _currentPage.value = currentPage.value!!.coerceIn(0, maxPage)
-            _isLeftButtonEnabled.value = currentPage.value!! > 0
-            _isRightButtonEnabled.value = currentPage.value!! < maxPage - 1
-        }
-        _pageControllerIsVisible.value = maxPage > 0
-    }
-
-    fun loadProductByPage(newPage: Int) {
+    fun loadProductByPage(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
-            cartRepository.load(newPage, PAGE_SIZE, onSuccess = { carts, totalPage ->
-                maxPage = totalPage
+            cartRepository.load(0, pageSize, onSuccess = { carts, totalPage ->
                 cartProducts.apply {
                     clear()
                     addAll(carts)
@@ -84,6 +47,18 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                     )
             }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
         }, 500)
+    }
+
+    override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
+        cartRepository.deleteExistCartItem(product.cartId, onSuccess = { cartId, newQuantity ->
+            val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
+            _changedCartProducts.value =
+                originalChangedCartProducts.plus(Cart(cartId, product.toProduct(), newQuantity))
+        }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
+    }
+
+    override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
+        product.isChecked = !product.isChecked
     }
 
     private fun modifyShoppingProductQuantity(
@@ -104,20 +79,6 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
             )
         val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
         _changedCartProducts.value = originalChangedCartProducts.plus(updatedItem)
-    }
-
-    override fun onNextPageClick() {
-        if (currentPage.value == maxPage - 1) return
-        val newPage = ((currentPage.value ?: 0) + 1).coerceAtMost(maxPage)
-        _currentPage.value = newPage
-        loadProductByPage(newPage)
-    }
-
-    override fun onBeforePageClick() {
-        if (currentPage.value == 0) return
-        val newPage = (currentPage.value ?: 0) - 1
-        _currentPage.value = newPage
-        loadProductByPage(newPage)
     }
 
     override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
@@ -151,9 +112,5 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                 onFailure = {},
             )
         }
-    }
-
-    companion object {
-        private const val PAGE_SIZE = 5
     }
 }

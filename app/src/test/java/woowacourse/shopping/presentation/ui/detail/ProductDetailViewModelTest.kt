@@ -1,4 +1,4 @@
-// package woowacourse.shopping.presentation.ui.detail
+package woowacourse.shopping.presentation.ui.detail
 //
 // import io.mockk.every
 // import io.mockk.impl.annotations.InjectMockKs

@@ -3,13 +3,11 @@ package woowacourse.shopping.presentation.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
@@ -26,8 +24,9 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
 
     override fun initStartView(savedInstanceState: Bundle?) {
+        val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
         if (savedInstanceState == null) {
-            viewModel.loadProductByPage(0)
+            viewModel.loadProductByPage(initialItemQuantity)
         }
         binding.cartHandler = viewModel
         binding.viewModel = viewModel
@@ -62,15 +61,10 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    handleSuccessState(it.data)
+                    cartAdapter.updateList(it.data)
                 }
             }
         }
-    }
-
-    private fun handleSuccessState(products: List<ProductListItem.ShoppingProductItem>) {
-        cartAdapter.updateList(products)
-        viewModel.updatePageController()
     }
 
     private fun observeChangedCartProducts() {
@@ -91,14 +85,17 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     companion object {
+        private const val EXTRA_CART_ITEM_QUANTITY = "cartItemQuantity"
         const val EXTRA_CHANGED_PRODUCT_IDS = "changedProductIds"
         const val EXTRA_NEW_PRODUCT_QUANTITIES = "newProductQuantities"
 
         fun startWithResult(
             context: Context,
+            cartItemQuantity: Int,
             activityLauncher: ActivityResultLauncher<Intent>,
         ) {
             Intent(context, CartActivity::class.java).apply {
+                putExtra(EXTRA_CART_ITEM_QUANTITY, cartItemQuantity)
                 activityLauncher.launch(this)
             }
         }
