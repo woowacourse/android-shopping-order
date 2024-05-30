@@ -30,6 +30,7 @@ class RecommendViewModel(
     private val recentlyRepository: RecentlyProductRepository,
 ) : ViewModel() {
     private var checkedShoppingCart = ShoppingCart()
+
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
 
@@ -40,16 +41,10 @@ class RecommendViewModel(
         MutableSingleLiveData()
     val recommendEvent: SingleLiveData<RecommendEvent.SuccessEvent> get() = _recommendEvent
 
-    val totalPrice: Int
-        get() =
-            checkedShoppingCart.cartItems.value?.sumOf {
-                it.product.cartItemCounter.itemCount * it.product.price
-            } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
-    val totalCount: Int
-        get() =
-            checkedShoppingCart.cartItems.value?.count {
-                it.cartItemSelector.isSelected
-            } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
+    private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
+    val totalCount: LiveData<Int> get() = _totalCount
 
     private fun loadRecentlyProduct(): RecentlyProduct {
         return recentlyRepository.getMostRecentlyProduct()
@@ -68,12 +63,12 @@ class RecommendViewModel(
                 category = recentlyProduct.category,
             )
 
-            _products.value = getFilteredRandomProducts(
-                 myCartItems = myCartItems,
+            val recommendData = getFilteredRandomProducts(
+                myCartItems = myCartItems,
                 loadData = loadData,
-                LOAD_RECOMMEND_ITEM_SIZE,
             )
-
+            _products.value = recommendData
+            updateCheckItemData()
         } catch (e: Exception) {
             _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
         }
@@ -86,6 +81,7 @@ class RecommendViewModel(
     fun decreaseShoppingCart(product: Product) {
         updateCarItem(product, UpdateCartItemType.DECREASE)
     }
+
 
     fun orderItems() {
         val ids = products.value?.map { it.id.toInt() }
@@ -113,6 +109,7 @@ class RecommendViewModel(
                 is UpdateCartItemResult.UPDATED -> {
                     product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
                     _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+                    updateCheckItemData()
                 }
             }
         } catch (e: Exception) {
@@ -126,15 +123,28 @@ class RecommendViewModel(
     }
 
     private fun addCartItem(product: Product) {
-        product.updateCartItemCount(CartItemEntity.DEFAULT_CART_ITEM_COUNT)
-        product.updateItemSelector(true)
-        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+        try {
+            product.updateCartItemCount(CartItemEntity.DEFAULT_CART_ITEM_COUNT)
+            product.updateItemSelector(true)
+            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+            checkedShoppingCart.addProduct(CartItem(product = product))
+            updateCheckItemData()
+        } catch (e: Exception){
+            when (e) {
+                is NoSuchDataException ->
+                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
+
+                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            }
+        }
     }
 
     private fun deleteCartItem(product: Product) {
         try {
             product.updateItemSelector(false)
             _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+            checkedShoppingCart.deleteProductFromProductId(product.id)
+            updateCheckItemData()
         } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
@@ -148,15 +158,24 @@ class RecommendViewModel(
     private fun getFilteredRandomProducts(
         myCartItems: List<CartItem>,
         loadData: List<Product>,
-        sampleSize: Int
     ): List<Product> {
         val cartProductIds = myCartItems.map { it.product.id }.toSet()
         val filteredProducts = loadData.filter { it.id !in cartProductIds }
 
-        return filteredProducts.shuffled().take(sampleSize)
+        return filteredProducts.shuffled().take(LOAD_RECOMMEND_ITEM_SIZE)
     }
 
     fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart) {
         checkedShoppingCart = shoppingCart
+        updateCheckItemData()
+    }
+
+    private fun updateCheckItemData() {
+        _totalPrice.value = checkedShoppingCart.cartItems.value?.sumOf {
+            it.product.cartItemCounter.itemCount * it.product.price
+        } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
+        _totalCount.value = checkedShoppingCart.cartItems.value?.count {
+            it.cartItemSelector.isSelected
+        } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
     }
 }

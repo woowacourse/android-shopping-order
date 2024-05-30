@@ -2,6 +2,7 @@ package woowacourse.shopping.view.cart
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,6 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
-import woowacourse.shopping.view.products.ProductListEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
@@ -37,6 +37,7 @@ class ShoppingCartViewModel(
     val loadingEvent: SingleLiveData<ShoppingCartEvent.LoadCartItemList> get() = _loadingEvent
 
     val checkedShoppingCart = ShoppingCart()
+
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -44,13 +45,14 @@ class ShoppingCartViewModel(
 
     fun deleteShoppingCartItem(
         cartItemId: Long,
-        productId: Long,
+        product: Product,
     ) {
         try {
             shoppingCartRepository.deleteCartItem(cartItemId)
             shoppingCart.deleteProduct(cartItemId)
             _shoppingCartEvent.value =
-                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = productId)
+                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
+            deleteCheckedItem(CartItem(cartItemId,product))
         } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
@@ -76,7 +78,7 @@ class ShoppingCartViewModel(
                         LOAD_SHOPPING_ITEM_SIZE
                     )
                 _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
-                shoppingCart.addProducts(pagingData)
+                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             } catch (e: Exception) {
                 when (e) {
                     is NoSuchDataException ->
@@ -89,6 +91,25 @@ class ShoppingCartViewModel(
                 }
             }
         }, 1000)
+    }
+
+    private fun synchronizeLoadingData(pagingData: List<CartItem>): List<CartItem> {
+        return if ((totalCount.value ?: DEFAULT_ITEM_SIZE) > DEFAULT_ITEM_SIZE) {
+            return pagingData.map { cartItem ->
+                val checkedCartItem =
+                    checkedShoppingCart.cartItems.value?.find { it.id == cartItem.id }
+                if (checkedCartItem != null) {
+                    if (checkedCartItem.cartItemSelector.isSelected) {
+                        cartItem.cartItemSelector.selectItem()
+                    } else {
+                        cartItem.cartItemSelector.unSelectItem()
+                    }
+                }
+                cartItem
+            }
+        } else {
+            pagingData
+        }
     }
 
     fun increaseCartItem(product: Product) {
@@ -114,7 +135,7 @@ class ShoppingCartViewModel(
                 is UpdateCartItemResult.DELETE ->
                     deleteShoppingCartItem(
                         updateCartItemResult.cartItemId,
-                        productId = product.id,
+                        product = product
                     )
 
                 is UpdateCartItemResult.UPDATED -> {
@@ -139,6 +160,7 @@ class ShoppingCartViewModel(
     fun addCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.selectItem()
         checkedShoppingCart.addProduct(cartItem)
+        checkedShoppingCart
         updateCheckItemData()
     }
 

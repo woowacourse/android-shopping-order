@@ -10,7 +10,7 @@ class ShoppingCart: Serializable {
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
     fun addProducts(cartItems: List<CartItem>) {
-        _cartItems.value = _cartItems.value?.plus(cartItems)
+        _cartItems.value = cartItems
     }
 
     fun addProduct(cartItem: CartItem) {
@@ -19,5 +19,9 @@ class ShoppingCart: Serializable {
 
     fun deleteProduct(itemId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.id != itemId }
+    }
+
+    fun deleteProductFromProductId(productId: Long){
+        _cartItems.value = _cartItems.value?.filter { it.product.id != productId }
     }
 }
