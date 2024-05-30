@@ -2,7 +2,6 @@ package woowacourse.shopping.view.cart
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +37,8 @@ class ShoppingCartViewModel(
 
     val checkedShoppingCart = ShoppingCart()
 
+    private val _allCheck: MutableLiveData<Boolean> = MutableLiveData(false)
+    val allCheck: LiveData<Boolean> get() = _allCheck
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -79,6 +80,7 @@ class ShoppingCartViewModel(
                     )
                 _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
                 shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+                setAllCheck()
             } catch (e: Exception) {
                 when (e) {
                     is NoSuchDataException ->
@@ -91,6 +93,28 @@ class ShoppingCartViewModel(
                 }
             }
         }, 1000)
+    }
+
+    private fun setAllCheck(){
+        _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
+    }
+
+    fun checkAllItems(){
+        if (allCheck.value == true) {
+            shoppingCart.cartItems.value?.forEach { cartItem ->
+                if (cartItem.cartItemSelector.isSelected){
+                    deleteCheckedItem(cartItem)
+                }
+            }
+        } else{
+            shoppingCart.cartItems.value?.forEach { cartItem ->
+                if (!cartItem.cartItemSelector.isSelected){
+                    addCheckedItem(cartItem)
+                }
+            }
+        }
+        updateCheckItemData()
+        _shoppingCartEvent.value = ShoppingCartEvent.UpdateCheckItem.Success
     }
 
     private fun synchronizeLoadingData(pagingData: List<CartItem>): List<CartItem> {
@@ -177,5 +201,6 @@ class ShoppingCartViewModel(
         _totalCount.value = checkedShoppingCart.cartItems.value?.count {
             it.cartItemSelector.isSelected
         } ?: DEFAULT_ITEM_SIZE
+        setAllCheck()
     }
 }

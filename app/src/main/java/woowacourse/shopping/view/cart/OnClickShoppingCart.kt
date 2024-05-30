@@ -12,4 +12,6 @@ interface OnClickShoppingCart {
     fun clickCheckBox(cartItem: CartItem)
 
     fun clickOrder()
+
+    fun clickCheckAll()
 }

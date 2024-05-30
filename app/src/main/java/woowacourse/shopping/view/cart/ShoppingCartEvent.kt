@@ -26,4 +26,8 @@ sealed interface ShoppingCartEvent {
 
         data object Fail : LoadCartItemList, ErrorState
     }
+
+    sealed interface UpdateCheckItem: ShoppingCartEvent {
+        data object Success : UpdateCheckItem, SuccessEvent
+    }
 }

@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -74,6 +75,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         binding.rvShoppingCart.adapter = adapter
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
             adapter.setShowSkeleton(false)
@@ -103,6 +105,8 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
                         ),
                     )
                 }
+
+                ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
             }
         }
 
@@ -182,6 +186,10 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
                 )
             }
         mainActivityListener?.changeFragment(recommendFragment)
+    }
+
+    override fun clickCheckAll() {
+        shoppingCartViewModel.checkAllItems()
     }
 
     private fun updateRecyclerView(cartItems: List<CartItem>) {
