@@ -19,6 +19,7 @@
     <string name="shopping_cart_title">장바구니</string>
     <string name="tv_pre_page_title"><![CDATA[<]]></string>
     <string name="tv_next_page_title"><![CDATA[>]]></string>
+    <string name="tv_order">주문하기(%d)</string>
 
     <!--    에러-->
     <string name="retry_title">재시도</string>

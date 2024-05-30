@@ -10,6 +10,8 @@ data class CartSelectUiState(
     val orderTotalPrice get() = orderCartList.values.sumOf { it.totalPrice }
 
     val isAllChecked get() = totalElements == orderCartList.size
+
+    val totalQuantity get() = orderCartList.values.sumOf { it.quantity }
 }
 
 data class PagingCartProduct(
