@@ -73,6 +73,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = recommendViewModel
+        binding.onClickRecommend = this
         recommendViewModel.loadRecommendData()
         adapter =
             RecommendAdapter(
@@ -157,6 +158,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     private fun navigateToProduct(){
+        mainActivityListener?.popAllFragment()
         val productFragment =
             ProductsListFragment()
         mainActivityListener?.changeFragment(productFragment)

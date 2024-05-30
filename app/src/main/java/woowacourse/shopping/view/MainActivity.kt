@@ -36,6 +36,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         supportFragmentManager.popBackStack()
     }
 
+    override fun popAllFragment() {
+        val fragmentManager = supportFragmentManager
+        while(fragmentManager.backStackEntryCount>0){
+            fragmentManager.popBackStackImmediate()
+        }
+    }
+
+
     override fun observeProductList(products: (Map<Long, Int>) -> Unit) {
         mainViewModel.updateProductEvent.observe(this) {
             products(it)
