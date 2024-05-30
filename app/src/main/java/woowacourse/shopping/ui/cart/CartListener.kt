@@ -6,4 +6,9 @@ interface CartListener {
     fun increaseQuantity(productId: Int)
 
     fun decreaseQuantity(productId: Int)
+
+    fun selectCartItem(
+        productId: Int,
+        isSelected: Boolean,
+    )
 }

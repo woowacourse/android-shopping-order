@@ -29,7 +29,6 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
-        _cartUiState.value = Event(CartUiState.Success(listOf()))
         val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         cartRepository.getAllCartItem(
             totalQuantityCount,
@@ -48,8 +47,11 @@ class CartViewModel(
     }
 
     private fun updateTotalPrice() {
-        val uiModels = productUiModels() ?: listOf()
-        val totalPrice = uiModels.sumOf { it.totalPrice() }
+        val uiModels = cartUiModels()
+        val totalPrice =
+            uiModels
+                .filter { it.isSelected }
+                .sumOf { it.totalPrice() }
         _totalPrice.value = totalPrice
     }
 
@@ -73,14 +75,10 @@ class CartViewModel(
         product: Product,
         cartItem: CartItem,
     ) {
-        val oldCartUiModels =
-            if (cartUiState.value?.peekContent() is CartUiState.Success) {
-                (cartUiState.value?.peekContent() as CartUiState.Success).cartUiModels
-            } else {
-                listOf()
-            }
-        val resultCartUiModel = CartUiModel.from(product, cartItem)
-        val newCartUiModels = oldCartUiModels.upsert(resultCartUiModel).sortedBy { it.cartItemId }
+        val oldCartUiModels = cartUiModels()
+        val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
+        val newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
+        val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
     }
@@ -101,7 +99,7 @@ class CartViewModel(
 
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
-        val cartUiModel = productUiModel(productId) ?: return
+        val cartUiModel = cartUiModel(productId) ?: return
         cartRepository.deleteCartItem(
             cartUiModel.cartItemId,
             object : DataCallback<Unit> {
@@ -117,13 +115,14 @@ class CartViewModel(
     }
 
     private fun updateDeletedCart() {
+        _cartUiState.value = Event(CartUiState.Success(listOf()))
         loadAllCartItems()
     }
 
     override fun increaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
-        val cartUiModel = productUiModel(productId) ?: return
+        val cartUiModel = cartUiModel(productId) ?: return
         var newQuantity = cartUiModel.quantity
         setQuantity(cartUiModel.cartItemId, ++newQuantity)
     }
@@ -131,7 +130,7 @@ class CartViewModel(
     override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
-        val cartUiModel = productUiModel(productId) ?: return
+        val cartUiModel = cartUiModel(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(productId)
             return
@@ -139,6 +138,18 @@ class CartViewModel(
 
         var newQuantity = cartUiModel.quantity
         setQuantity(cartUiModel.cartItemId, --newQuantity)
+    }
+
+    override fun selectCartItem(
+        productId: Int,
+        isSelected: Boolean,
+    ) {
+        val cartUiModel = cartUiModel(productId)?.copy(isSelected = isSelected) ?: return
+        val newCartUiModels =
+            cartUiModels().upsert(cartUiModel.copy(isSelected = isSelected))
+        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
+        _cartUiState.value = newCartUiState
+        updateTotalPrice()
     }
 
     private fun setQuantity(
@@ -164,16 +175,16 @@ class CartViewModel(
         _cartUiState.value = Event(CartUiState.Failure)
     }
 
-    private fun productUiModel(productId: Int): CartUiModel? {
-        return productUiModels()?.find { it.productId == productId }
+    private fun cartUiModel(productId: Int): CartUiModel? {
+        return cartUiModels().find { it.productId == productId }
     }
 
-    private fun productUiModels(): List<CartUiModel>? {
-        val cartUiState = cartUiState.value?.peekContent() ?: return null
+    private fun cartUiModels(): List<CartUiModel> {
+        val cartUiState = cartUiState.value?.peekContent()
         if (cartUiState is CartUiState.Success) {
             return cartUiState.cartUiModels
         }
-        return null
+        return emptyList()
     }
 
     companion object {

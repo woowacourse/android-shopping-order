@@ -22,5 +22,8 @@ class CartViewHolder(private val binding: ItemCartBinding) : ViewHolder(binding.
                 cartListener::increaseQuantity,
                 cartListener::decreaseQuantity,
             )
+        binding.checkBoxCart.setOnCheckedChangeListener { _, isChecked ->
+            cartListener.selectCartItem(cartUiModel.productId, isChecked)
+        }
     }
 }

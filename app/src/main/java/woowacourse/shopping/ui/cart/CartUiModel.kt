@@ -11,6 +11,7 @@ data class CartUiModel(
     val title: String,
     val price: Int,
     val quantity: Quantity,
+    val isSelected: Boolean,
 ) {
     fun totalPrice() = price * quantity.count
 
@@ -19,7 +20,7 @@ data class CartUiModel(
             product: Product,
             cartItem: CartItem,
         ): CartUiModel {
-            return CartUiModel(cartItem.id, product.id, product.imageUrl, product.name, product.price, cartItem.quantity)
+            return CartUiModel(cartItem.id, product.id, product.imageUrl, product.name, product.price, cartItem.quantity, false)
         }
     }
 }
