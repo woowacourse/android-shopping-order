@@ -26,7 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:animateLayoutChanges="true"
-        android:onClick="@{() -> vm.itemClickListener(productWithQuantity.product.id)}">
+        android:onClick="@{() -> vm.itemClickListener(productWithQuantity.product.id)}"
+        android:padding="6dp">
 
         <ImageView
             android:id="@+id/iv_product_image"
@@ -49,8 +50,8 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
             app:layout_constraintStart_toStartOf="@id/iv_product_image"
             bind:count="@{String.valueOf(productWithQuantity.quantity)}"
-            bind:productId = "@{productWithQuantity.product.id}"
-            bind:countButtonClickListener="@{vm}" />
+            bind:countButtonClickListener="@{vm}"
+            bind:productId="@{productWithQuantity.product.id}" />
 
         <ImageView
             android:id="@+id/btn_start_add_product"

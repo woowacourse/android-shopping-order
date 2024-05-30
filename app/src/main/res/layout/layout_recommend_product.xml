@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="이런 상품은 어떠세요?"
+            android:textColor="#333333"
+            android:textSize="24dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_recommend_product"
+            app:layout_constraintStart_toStartOf="@id/tv_recommend_product" />
+
+        <TextView
+            android:id="@+id/tv_recommend_product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="29dp"
+            android:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
+            android:textColor="@color/gray5"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toTopOf="@id/rv_recommend_product"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_recommend_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="6dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_product" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

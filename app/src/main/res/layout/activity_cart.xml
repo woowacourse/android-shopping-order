@@ -29,10 +29,18 @@
         </com.google.android.material.appbar.MaterialToolbar>
 
         <include
-            isVisible="@{vm.cart.isLoading}"
             layout="@layout/layout_cart_skeleton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:isVisible="@{vm.cart.isLoading}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
+        <include
+            layout="@layout/layout_recommend_product"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:isVisible="@{false}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
 
@@ -44,60 +52,29 @@
             android:layout_marginHorizontal="18dp"
             android:paddingBottom="60dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/btn_previous"
+            app:layout_constraintBottom_toTopOf="@id/layout_order"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
             tools:listitem="@layout/item_cart"
             tools:visibility="gone" />
 
-        <Button
-            android:id="@+id/btn_previous"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="133dp"
-            android:layout_marginBottom="50dp"
-            android:background="@drawable/selector_left_button"
-            android:clickable="@{vm.canMovePreviousPage}"
-            android:enabled="@{vm.canMovePreviousPage}"
-            android:onClick="@{() -> vm.minusPageNum()}"
-            android:text="@string/previous_page"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:textStyle="bold"
+        <include
+            layout="@layout/layout_order"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_page_number"
-            android:layout_width="45dp"
-            android:layout_height="42dp"
-            android:layout_marginBottom="50dp"
-            android:gravity="center"
-            android:text="@{String.valueOf(vm.pageNumber + 1)}"
-            android:textColor="@color/gray5"
-            android:textSize="22sp"
-            android:textStyle="bold"
+        <CheckBox
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/checkbox"
+            android:button="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_next"
-            app:layout_constraintStart_toEndOf="@id/btn_previous"
-            tools:text="1" />
-
-
-        <Button
-            android:id="@+id/btn_next"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginBottom="50dp"
-            android:background="@drawable/selector_right_button"
-            android:clickable="@{vm.canMoveNextPage}"
-            android:enabled="@{vm.canMoveNextPage}"
-            android:onClick="@{() -> vm.plusPageNum()}"
-            android:text="@string/next_page"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_page_number" />
-
+            app:layout_constraintStart_toStartOf="parent"
+            tools:checked="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

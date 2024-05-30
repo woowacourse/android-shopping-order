@@ -21,8 +21,20 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/round"
-        android:paddingStart="12dp">
+        android:background="@drawable/round">
+
+        <CheckBox
+            android:id="@+id/cb_cart_item_check"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/checkbox"
+            android:button="@android:color/transparent"
+            app:layout_constraintEnd_toStartOf="@id/tv_product_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
 
         <TextView
             android:id="@+id/tv_product_name"
@@ -31,9 +43,10 @@
             android:layout_marginTop="18dp"
             android:text="@{productWithQuantity.product.name}"
             android:textColor="@color/gray5"
+            android:layout_marginStart="8dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cb_cart_item_check"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="[든든] 동원 스위트콘" />
 
@@ -53,6 +66,7 @@
             android:id="@+id/iv_product_image"
             android:layout_width="136dp"
             android:layout_height="72dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="12dp"
             android:scaleType="fitXY"

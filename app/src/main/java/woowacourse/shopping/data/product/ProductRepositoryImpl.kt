@@ -22,6 +22,7 @@ class ProductRepositoryImpl : ProductRepository {
                 imageUrl = product.imageUrl,
                 name = product.name,
                 price = product.price,
+                category = product.category,
             )
         }
     }
@@ -37,6 +38,7 @@ class ProductRepositoryImpl : ProductRepository {
             imageUrl = product.imageUrl,
             name = product.name,
             price = product.price,
+            category = product.category,
         )
     }
 }
