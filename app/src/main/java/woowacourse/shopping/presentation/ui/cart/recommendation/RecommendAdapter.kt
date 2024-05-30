@@ -7,7 +7,7 @@ import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.ShoppingProduct
 
 class RecommendAdapter(
-    private val recommendItemCountHandler: RecommendItemCountHandler
+    private val recommendItemCountHandler: RecommendItemCountHandler,
 ) : RecyclerView.Adapter<RecommendViewHolder>() {
     private var recommendItems: List<ShoppingProduct> = emptyList()
 
