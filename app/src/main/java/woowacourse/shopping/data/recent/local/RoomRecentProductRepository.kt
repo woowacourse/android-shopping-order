@@ -42,12 +42,10 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
         }.join()
     }
 
-    override fun getRecommendProducts(
-        category: String,
-        cartItems: List<CartItem>,
-    ): List<Product> {
+    override fun getRecommendProducts(cartItems: List<CartItem>): List<Product> {
         var recommendProducts: List<Product> = emptyList()
         thread {
+            val category = findLastOrNull()?.product?.category ?: return@thread
             val categoryProducts = recentProductDao.findCategory(category)
             val recommendCategoryProducts =
                 categoryProducts.filter { recentProduct ->

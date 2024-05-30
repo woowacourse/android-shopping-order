@@ -6,8 +6,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartActivity : AppCompatActivity() {
@@ -18,7 +20,9 @@ class CartActivity : AppCompatActivity() {
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
             RemoteProductRepository(),
+            RecentProductRepository.getInstance(),
             RemoteCartRepository(),
+            RemoteOrderRepository(),
         )
     }
     private val adapter by lazy { CartAdapter(viewModel) }

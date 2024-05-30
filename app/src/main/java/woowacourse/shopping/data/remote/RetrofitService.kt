@@ -13,6 +13,7 @@ import woowacourse.shopping.data.cart.remote.AddCartItemRequest
 import woowacourse.shopping.data.cart.remote.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.remote.CartResponse
 import woowacourse.shopping.data.cart.remote.CountResponse
+import woowacourse.shopping.data.order.remote.CreateOrderRequest
 import woowacourse.shopping.data.product.remote.retrofit.Content
 import woowacourse.shopping.data.product.remote.retrofit.ProductResponse
 
@@ -59,5 +60,11 @@ interface RetrofitService {
     fun requestCartQuantityCount(
         @Header("accept") accept: String = "*/*",
         @Body addCartItemRequest: AddCartItemRequest,
+    ): Call<Unit>
+
+    @POST("/orders")
+    fun requestCreateOrder(
+        @Header("accept") accept: String = "*/*",
+        @Body createOrderRequest: CreateOrderRequest,
     ): Call<Unit>
 }

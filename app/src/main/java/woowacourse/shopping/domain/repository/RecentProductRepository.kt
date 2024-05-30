@@ -12,10 +12,7 @@ interface RecentProductRepository {
 
     fun save(product: Product)
 
-    fun getRecommendProducts(
-        category: String,
-        cartItems: List<CartItem>,
-    ): List<Product>
+    fun getRecommendProducts(cartItems: List<CartItem>): List<Product>
 
     companion object {
         private const val NOT_INITIALIZE_INSTANCE_MESSAGE = "초기화된 인스턴스가 없습니다."
