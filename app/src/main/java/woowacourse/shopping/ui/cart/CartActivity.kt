@@ -32,6 +32,10 @@ class CartActivity : AppCompatActivity() {
         initToolbar()
         setCartAdapter()
         observeCartItems()
+
+        binding.cbCartItemTotal.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.totalCheckBoxCheck(isChecked)
+        }
     }
 
     private fun initBinding() {

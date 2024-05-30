@@ -27,6 +27,7 @@
             android:id="@+id/cb_cart_item_check"
             android:layout_width="18dp"
             android:layout_height="18dp"
+            android:checked="@{cartUiModel.checked}"
             android:layout_marginStart="12dp"
             android:layout_marginTop="23dp"
             android:background="@drawable/checkbox"
