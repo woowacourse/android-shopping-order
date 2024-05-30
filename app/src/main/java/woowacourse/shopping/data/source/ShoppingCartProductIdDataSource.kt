@@ -20,12 +20,12 @@ interface ShoppingCartProductIdDataSource {
     fun removedProductsId(productId: Long): Long
 
     fun plusProductsIdCount(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     )
 
     fun minusProductsIdCount(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     )
 

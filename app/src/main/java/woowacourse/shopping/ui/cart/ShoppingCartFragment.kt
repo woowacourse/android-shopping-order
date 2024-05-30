@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,6 +74,7 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeDeletedItem() {
         viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
+            Log.d("fragment", "$productId")
             viewModel.deleteItem(productId)
         }
     }

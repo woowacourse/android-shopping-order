@@ -46,7 +46,6 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         cartItemApiService.requestCartItems(page - 1).execute().body()?.last
             ?: throw IllegalArgumentException()
 
-    // TODO: ProductIdsCountData -> CartItem
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
         val call =
             cartItemApiService.addCartItem(
@@ -62,36 +61,23 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
     }
 
     // TODO: 동작 안됨
-    override fun removedProductsId(productId: Long): Long {
-        val cartItem =
-            cartItemApiService.requestCartItems().execute().body()?.content?.find {
-                it.product.id == productId
-            } ?: throw NoSuchElementException()
-        cartItemApiService.removeCartItem(cartItem.id)
+    override fun removedProductsId(cartItemId: Long): Long {
+        cartItemApiService.removeCartItem(cartItemId)
         return 10
     }
 
-    // TODO: productId -> cartItemId
     override fun plusProductsIdCount(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     ) {
-        val cartItem =
-            cartItemApiService.requestCartItems().execute().body()?.content?.find {
-                it.product.id == productId
-            } ?: throw NoSuchElementException()
-        cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
+        cartItemApiService.updateCartItemQuantity(cartItemId, quantity).execute()
     }
 
-    // TODO: productId -> cartItemId
     override fun minusProductsIdCount(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     ) {
-        val body = cartItemApiService.requestCartItems().execute().body()
-        val cartItem =
-            body?.content?.find { it.product.id == productId } ?: throw NoSuchElementException()
-        cartItemApiService.updateCartItemQuantity(cartItem.id, quantity).execute()
+        cartItemApiService.updateCartItemQuantity(cartItemId, quantity).execute()
     }
 
     override fun clearAll() {
