@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_LOAD_PAGING_SIZE
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_PAGE_SIZE
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItem
@@ -32,6 +33,18 @@ class ShoppingCartViewModel(
     private val _errorEvent: MutableSingleLiveData<ShoppingCartEvent.ErrorState> =
         MutableSingleLiveData()
     val errorEvent: SingleLiveData<ShoppingCartEvent.ErrorState> get() = _errorEvent
+
+    private val checkedShoppingCart = ShoppingCart()
+    val totalPrice: Int
+        get() =
+            checkedShoppingCart.cartItems.value?.sumOf {
+                it.product.cartItemCounter.itemCount * it.product.price
+            } ?: DEFAULT_ITEM_SIZE
+    val totalCount: Int
+        get() =
+            checkedShoppingCart.cartItems.value?.count {
+                it.cartItemSelector.isSelected
+            } ?: DEFAULT_ITEM_SIZE
 
     fun deleteShoppingCartItem(
         cartItemId: Long,
@@ -122,6 +135,16 @@ class ShoppingCartViewModel(
         }
     }
 
+    fun addCheckedItem(cartItem: CartItem) {
+        cartItem.cartItemSelector.selectItem()
+        checkedShoppingCart.addProduct(cartItem)
+    }
+
+    fun deleteCheckedItem(cartItem: CartItem) {
+        cartItem.cartItemSelector.unSelectItem()
+        checkedShoppingCart.deleteProduct(cartItem.id)
+    }
+
     fun getUpdatePageData(): List<CartItem> {
         val startIndex =
             ((currentPage.value ?: MIN_PAGE_COUNT) - MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE
@@ -130,17 +153,16 @@ class ShoppingCartViewModel(
             ?: emptyList()
     }
 
-    fun hasLastItem(): Boolean {
-        val endIndex = getLastItemIndex()
-        return endIndex >= (totalItemSize)
-    }
-
     fun isExistPrevPage(): Boolean {
         return (currentPage.value ?: MIN_PAGE_COUNT) > MIN_PAGE_COUNT
     }
 
     fun isExistNextPage(): Boolean {
         return (currentPage.value ?: MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE < totalItemSize
+    }
+
+    fun isExistNextData(): Boolean {
+        return (totalItemSize - (currentPage.value ?: MIN_PAGE_COUNT) * CART_ITEM_PAGE_SIZE) == CART_ITEM_LOAD_PAGING_SIZE
     }
 
     fun increaseCurrentPage() {

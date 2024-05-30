@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_LOAD_PAGING_SIZE
+import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.FIRST_CART_ITEM_LOAD_PAGING_SIZE
 import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
@@ -27,7 +28,11 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     private val shoppingCartViewModel: ShoppingCartViewModel by lazy {
         val viewModelFactory =
-            ViewModelFactory { ShoppingCartViewModel(RealShoppingCartRepositoryImpl()) }
+            ViewModelFactory {
+                ShoppingCartViewModel(
+                    shoppingCartRepository = RealShoppingCartRepositoryImpl(),
+                )
+            }
         viewModelFactory.create(ShoppingCartViewModel::class.java)
     }
     private lateinit var adapter: ShoppingCartAdapter
@@ -60,15 +65,12 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = shoppingCartViewModel
-        shoppingCartViewModel.loadPagingCartItemList(CART_ITEM_LOAD_PAGING_SIZE)
+        shoppingCartViewModel.loadPagingCartItemList(FIRST_CART_ITEM_LOAD_PAGING_SIZE)
         binding.onClickShoppingCart = this
         adapter =
             ShoppingCartAdapter(
                 onClickShoppingCart = this,
                 onClickCartItemCounter = this,
-                loadLastItem = {
-                    shoppingCartViewModel.loadPagingCartItemList(CART_ITEM_LOAD_PAGING_SIZE)
-                },
             )
         binding.rvShoppingCart.adapter = adapter
     }
@@ -166,6 +168,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     override fun clickNextPage() {
         if (shoppingCartViewModel.isExistNextPage()) {
+            loadNextData()
             shoppingCartViewModel.increaseCurrentPage()
             updateRecyclerView()
         } else {
@@ -175,10 +178,23 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         }
     }
 
+    override fun clickCheckBox(cartItem: CartItem) {
+        if (cartItem.cartItemSelector.isSelected) {
+            shoppingCartViewModel.deleteCheckedItem(cartItem)
+        } else {
+            shoppingCartViewModel.addCheckedItem(cartItem)
+        }
+    }
+
+    private fun loadNextData() {
+        if (shoppingCartViewModel.isExistNextData()) {
+            shoppingCartViewModel.loadPagingCartItemList(CART_ITEM_LOAD_PAGING_SIZE)
+        }
+    }
+
     private fun updateRecyclerView() {
         val updatePageData = shoppingCartViewModel.getUpdatePageData()
-        val isLastItem = shoppingCartViewModel.hasLastItem()
-        adapter.updateCartItems(isLastItem, updatePageData)
+        adapter.updateCartItems(updatePageData)
         updateImageButtonColor()
     }
 

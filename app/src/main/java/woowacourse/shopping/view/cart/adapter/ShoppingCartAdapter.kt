@@ -13,11 +13,9 @@ import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 class ShoppingCartAdapter(
     private val onClickShoppingCart: OnClickShoppingCart,
     private val onClickCartItemCounter: OnClickCartItemCounter,
-    private val loadLastItem: () -> Unit,
 ) : RecyclerView.Adapter<ShoppingCartViewHolder>() {
     private var cartItems: List<CartItem> = emptyList()
     private var productPosition: HashMap<Long, Int> = hashMapOf()
-    var flag = true
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -43,14 +41,7 @@ class ShoppingCartAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateCartItems(
-        hasLastItem: Boolean,
-        cartItems: List<CartItem>,
-    ) {
-        if (hasLastItem && flag) {
-            loadLastItem()
-            flag = false
-        }
+    fun updateCartItems(cartItems: List<CartItem>) {
         this.cartItems = cartItems
         notifyDataSetChanged()
     }

@@ -12,6 +12,10 @@ class ShoppingCart {
         _cartItems.value = _cartItems.value?.plus(cartItems)
     }
 
+    fun addProduct(cartItem: CartItem) {
+        _cartItems.value = _cartItems.value?.plus(cartItem)
+    }
+
     fun deleteProduct(itemId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.id != itemId }
     }

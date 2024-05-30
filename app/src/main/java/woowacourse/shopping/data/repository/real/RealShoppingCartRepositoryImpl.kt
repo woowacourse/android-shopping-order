@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository.real
 
 import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
+import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.CART_ITEM_LOAD_PAGING_SIZE
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
@@ -53,8 +54,9 @@ class RealShoppingCartRepositoryImpl(
 
         thread {
             try {
+                val page = offset / CART_ITEM_LOAD_PAGING_SIZE
                 val response =
-                    cartItemDataSource.loadCartItems(page = offset, size = pagingSize).execute()
+                    cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
                 if (response.isSuccessful) {
                     cartItems = response.body()?.cartItemDto?.map { it.toCartItem() }
                 }
