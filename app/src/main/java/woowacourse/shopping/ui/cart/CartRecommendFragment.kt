@@ -36,7 +36,7 @@ class CartRecommendFragment(val viewModel: CartViewModel) : Fragment() {
     private fun initializeView() {
         binding.rvRecommendProduct.itemAnimator = null
         binding.rvRecommendProduct.adapter = adapter
-        viewModel.recommendProductUiModels.observe(this) {
+        viewModel.recommendProductUiModels.observe(viewLifecycleOwner) {
             adapter.updateProducts(it)
         }
     }

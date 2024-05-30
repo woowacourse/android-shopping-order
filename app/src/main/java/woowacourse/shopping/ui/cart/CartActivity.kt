@@ -1,8 +1,11 @@
 package woowacourse.shopping.ui.cart
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -51,6 +54,35 @@ class CartActivity : AppCompatActivity() {
             it.getContentIfNotHandled() ?: return@observe
             setResult(Activity.RESULT_OK)
         }
+        viewModel.isSuccessCreateOrder.observe(this) {
+            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
+            if (isSuccessCreateOrder) {
+                showDialogSuccessCreateOrder()
+            } else {
+                showToastFailureCreateOrder()
+            }
+        }
+    }
+
+    private fun showDialogSuccessCreateOrder() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.create_order_success_title))
+            .setMessage(getString(R.string.create_order_success))
+            .setPositiveButton(getString(R.string.common_confirm)) { _, _ ->
+                navigateToProductsView()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun navigateToProductsView() {
+        val intent = Intent(this, CartActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showToastFailureCreateOrder() {
+        Toast.makeText(this, R.string.create_order_failure, Toast.LENGTH_SHORT).show()
     }
 
     private fun initializeToolbar() {
@@ -69,8 +101,11 @@ class CartActivity : AppCompatActivity() {
 
     private fun initializeCartAdapter() {
         viewModel.navigateEvent.observeEvent(this) {
-            if (supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart) is CartSelectionFragment) {
+            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
+            if (fragment is CartSelectionFragment) {
                 changeFragment(cartRecommendFragment)
+            } else {
+                viewModel.createOrder()
             }
         }
     }

@@ -27,7 +27,7 @@
     <string name="order_button_title">주문하기 (%d)</string>
 
     <string name="create_order_success_title">주문 완료</string>
-    <string name="create_order_success">주문을 완료했습니다. 메인 화면으로 이동합니다.</string>
+    <string name="create_order_success">주문을 완료했습니다. 장바구니로 이동합니다.</string>
     <string name="create_order_failure">예기치 못한 오류로 주문이 완료되지 못했습니다. 다시 시도해 주세요.</string>
 
     <string name="recommend_product_title">이런 상품은 어떠세요?</string>

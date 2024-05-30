@@ -47,6 +47,7 @@ class CartViewModel(
 
     init {
         loadAllCartItems()
+        loadRecommendProductUiModels()
     }
 
     private fun loadAllCartItems() {
@@ -260,6 +261,7 @@ class CartViewModel(
     }
 
     private fun deleteCartItemIds(cartItemIds: List<Int>) {
+        _changedCartEvent.value = Event(Unit)
         cartItemIds.forEach {
             cartRepository.deleteCartItem(
                 it,
