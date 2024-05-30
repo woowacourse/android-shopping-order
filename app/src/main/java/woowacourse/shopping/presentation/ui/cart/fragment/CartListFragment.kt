@@ -33,6 +33,7 @@ class CartListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.setOrderState(OrderState.CartList)
+        viewModel.loadAllCartItems(50)
     }
 
     private fun initCartAdapter() {

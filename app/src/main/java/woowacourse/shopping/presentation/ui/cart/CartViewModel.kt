@@ -162,38 +162,6 @@ class CartViewModel(
         _shoppingProducts.value = UiState.Success(newShoppingProducts)
     }
 
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        val updatedQuantity = item?.let { it.quantity - 1 } ?: 1
-        if (updatedQuantity > 0) {
-            item?.let { item ->
-                cartRepository.updateDecrementQuantity(
-                    item.cartId,
-                    item.id,
-                    1,
-                    item.quantity,
-                    onSuccess = { _, resultQuantity ->
-                        modifyShoppingProductQuantity(item, resultQuantity)
-                    },
-                    onFailure = {},
-                )
-            }
-        }
-    }
-
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let { item ->
-            cartRepository.updateIncrementQuantity(
-                item.cartId,
-                item.id,
-                1,
-                item.quantity,
-                onSuccess = { _, resultQuantity ->
-                    modifyShoppingProductQuantity(item, resultQuantity)
-                },
-                onFailure = {},
-            )
-        }
-    }
 
     fun buildRecommendProducts() {
         recentRepository.loadMostRecent().onSuccess {
@@ -211,6 +179,76 @@ class CartViewModel(
                 onFailure = {},
             )
         }
+    }
+
+    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
+        val updatedQuantity = item?.let { it.quantity - 1 } ?: 1
+        if (updatedQuantity > 0) {
+            item?.let { item ->
+                cartRepository.updateDecrementQuantity(
+                    item.cartId,
+                    item.id,
+                    1,
+                    item.quantity,
+                    onSuccess = { cartId, resultQuantity ->
+//                        modifyShoppingProductQuantity(item, resultQuantity)
+                        val orderState = orderState.value ?: throw IllegalStateException()
+                        handleQuantity(orderState, item, resultQuantity, cartId)
+                    },
+                    onFailure = {},
+                )
+            }
+        }
+    }
+
+    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
+        item?.let { item ->
+            cartRepository.updateIncrementQuantity(
+                item.cartId,
+                item.id,
+                1,
+                item.quantity,
+                onSuccess = { cartId, resultQuantity ->
+                    val orderState = orderState.value ?: throw IllegalStateException()
+                    handleQuantity(orderState, item, resultQuantity, cartId)
+                },
+                onFailure = {},
+            )
+        }
+    }
+
+    private fun handleQuantity(
+        orderState: OrderState,
+        item: ProductListItem.ShoppingProductItem,
+        resultQuantity: Int,
+        cartId: Long,
+    ) {
+        when (orderState) {
+            OrderState.CartList -> {
+                modifyShoppingProductQuantity(item, resultQuantity)
+            }
+
+            OrderState.Recommend -> {
+                modifyRecentProductQuantity(cartId, item, resultQuantity)
+            }
+        }
+    }
+
+    private fun modifyRecentProductQuantity(
+        cartId: Long,
+        selectedItem: ProductListItem.ShoppingProductItem,
+        resultQuantity: Int,
+    ) {
+        val recommended = recommendedProduct.value ?: emptyList()
+        val updated =
+            recommended.map {
+                if (it.id == selectedItem.id) {
+                    it.copy(cartId = cartId, quantity = resultQuantity)
+                } else {
+                    it
+                }
+            }
+        _recommendedProduct.value = updated
     }
 
     fun completeOrder() {
