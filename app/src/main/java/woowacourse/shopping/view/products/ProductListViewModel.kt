@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.products
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,19 +49,19 @@ class ProductListViewModel(
     fun loadPagingProduct() {
         _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
 //        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-                val pagingData = productRepository.loadPagingProducts(itemSize)
-                _products.value = _products.value?.plus(pagingData)
+        try {
+            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+            val pagingData = productRepository.loadPagingProducts(itemSize)
+            _products.value = _products.value?.plus(pagingData)
 
-                _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-                _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-            } catch (e: Exception) {
-                when (e) {
-                    is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
-                    else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
-                }
+            _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+            _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+        } catch (e: Exception) {
+            when (e) {
+                is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
+                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
             }
+        }
 //        }, 1000)
     }
 

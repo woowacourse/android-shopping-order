@@ -52,7 +52,7 @@ class RecommendAdapter(
             val updatedList = currentList.toMutableList()
             updatedList[index] = product
             submitList(updatedList)
-            notifyItemChanged (index)
+            notifyItemChanged(index)
         }
     }
 }

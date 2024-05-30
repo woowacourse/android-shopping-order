@@ -20,7 +20,6 @@ import kotlin.concurrent.thread
 class RealShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
-
     private fun executeWithLatch(action: () -> Unit) {
         val latch = CountDownLatch(1)
         var exception: Exception? = null
@@ -38,20 +37,24 @@ class RealShoppingCartRepositoryImpl(
 
     override fun addCartItem(product: Product) {
         executeWithLatch {
-            val response = cartItemDataSource.addCartItem(
-                product.id.toInt(),
-                product.cartItemCounter.itemCount,
-            ).execute()
+            val response =
+                cartItemDataSource.addCartItem(
+                    product.id.toInt(),
+                    product.cartItemCounter.itemCount,
+                ).execute()
             if (!response.isSuccessful) {
                 throw NoSuchDataException()
             }
         }
     }
 
-    override fun loadPagingCartItems(offset: Int, pagingSize: Int): List<CartItem> {
+    override fun loadPagingCartItems(
+        offset: Int,
+        pagingSize: Int,
+    ): List<CartItem> {
         var cartItems: List<CartItem>? = null
         executeWithLatch {
-            val page = (offset+1)/LOAD_SHOPPING_ITEM_SIZE
+            val page = (offset + 1) / LOAD_SHOPPING_ITEM_SIZE
             val response =
                 cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
             if (response.isSuccessful) {
@@ -75,8 +78,9 @@ class RealShoppingCartRepositoryImpl(
         var cartItem: CartItem? = null
         executeWithLatch {
             val response = cartItemDataSource.loadCartItems().execute()
-            cartItem = response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }
-                ?.toCartItem()
+            cartItem =
+                response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }
+                    ?.toCartItem()
         }
         return CartItemResult(
             cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
@@ -86,10 +90,11 @@ class RealShoppingCartRepositoryImpl(
 
     private fun updateCartCount(cartItemResult: CartItemResult) {
         executeWithLatch {
-            val response = cartItemDataSource.updateCartItem(
-                id = cartItemResult.cartItemId.toInt(),
-                quantity = cartItemResult.counter.itemCount,
-            ).execute()
+            val response =
+                cartItemDataSource.updateCartItem(
+                    id = cartItemResult.cartItemId.toInt(),
+                    quantity = cartItemResult.counter.itemCount,
+                ).execute()
             if (!response.isSuccessful) {
                 throw NoSuchDataException()
             }
@@ -149,7 +154,7 @@ class RealShoppingCartRepositoryImpl(
 
     private fun increaseItem(
         cartItemResult: CartItemResult,
-        product: Product
+        product: Product,
     ) {
         cartItemResult.increaseCount()
         product.updateCartItemCount(cartItemResult.counter.itemCount)

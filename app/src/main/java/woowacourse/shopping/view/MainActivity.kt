@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         startActivity(intent)
     }
 
-
     override fun observeProductList(products: (Map<Long, Int>) -> Unit) {
         mainViewModel.updateProductEvent.observe(this) {
             products(it)

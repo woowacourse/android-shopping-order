@@ -181,9 +181,10 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     override fun clickOrder() {
         val recommendFragment =
             RecommendFragment().apply {
-                arguments = RecommendFragment.createBundle(
-                    shoppingCartViewModel.checkedShoppingCart,
-                )
+                arguments =
+                    RecommendFragment.createBundle(
+                        shoppingCartViewModel.checkedShoppingCart,
+                    )
             }
         mainActivityListener?.changeFragment(recommendFragment)
     }
@@ -195,7 +196,6 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     private fun updateRecyclerView(cartItems: List<CartItem>) {
         adapter.updateCartItems(cartItems)
     }
-
 
     override fun clickIncrease(product: Product) {
         shoppingCartViewModel.increaseCartItem(product)

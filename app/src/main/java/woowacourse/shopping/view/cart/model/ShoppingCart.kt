@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.domain.model.CartItem
 import java.io.Serializable
 
-class ShoppingCart: Serializable {
+class ShoppingCart : Serializable {
     private val _cartItems: MutableLiveData<List<CartItem>> = MutableLiveData(listOf())
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
@@ -21,7 +21,7 @@ class ShoppingCart: Serializable {
         _cartItems.value = _cartItems.value?.filter { it.id != itemId }
     }
 
-    fun deleteProductFromProductId(productId: Long){
+    fun deleteProductFromProductId(productId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.product.id != productId }
     }
 }

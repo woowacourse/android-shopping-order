@@ -24,7 +24,6 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.OnClickProducts
-import woowacourse.shopping.view.products.ProductsListFragment
 
 class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, OnClickProducts {
     private var mainActivityListener: MainActivityListener? = null
@@ -83,7 +82,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         observeData()
         loadCheckedShoppingCart()
     }
-
 
     private fun observeData() {
         recommendViewModel.products.observe(viewLifecycleOwner) { products ->
@@ -178,9 +176,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     companion object {
-        fun createBundle(
-            checkedShoppingCart: ShoppingCart,
-        ): Bundle {
+        fun createBundle(checkedShoppingCart: ShoppingCart): Bundle {
             return Bundle().apply {
                 putSerializable(CHECKED_SHOPPING_CART, checkedShoppingCart)
             }

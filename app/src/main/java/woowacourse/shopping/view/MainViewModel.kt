@@ -22,7 +22,7 @@ class MainViewModel : ViewModel() {
         _updateRecentlyProductEvent.setValue(Unit)
     }
 
-    fun saveUpdateCartItem(){
+    fun saveUpdateCartItem() {
         _updateCartItemEvent.setValue(Unit)
     }
 }

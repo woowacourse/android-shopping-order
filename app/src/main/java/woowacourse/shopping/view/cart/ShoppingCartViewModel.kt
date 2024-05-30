@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,7 +51,7 @@ class ShoppingCartViewModel(
             shoppingCart.deleteProduct(cartItemId)
             _shoppingCartEvent.value =
                 ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
-            deleteCheckedItem(CartItem(cartItemId,product))
+            deleteCheckedItem(CartItem(cartItemId, product))
         } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
@@ -72,43 +70,43 @@ class ShoppingCartViewModel(
     fun loadPagingCartItemList() {
         _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Loading)
 //        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                val pagingData =
-                    shoppingCartRepository.loadPagingCartItems(
-                        LOAD_SHOPPING_ITEM_OFFSET,
-                        LOAD_SHOPPING_ITEM_SIZE
-                    )
-                _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
-                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
-                setAllCheck()
-            } catch (e: Exception) {
-                when (e) {
-                    is NoSuchDataException ->
-                        _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
+        try {
+            val pagingData =
+                shoppingCartRepository.loadPagingCartItems(
+                    LOAD_SHOPPING_ITEM_OFFSET,
+                    LOAD_SHOPPING_ITEM_SIZE,
+                )
+            _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
+            shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+            setAllCheck()
+        } catch (e: Exception) {
+            when (e) {
+                is NoSuchDataException ->
+                    _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
 
-                    else ->
-                        _errorEvent.setValue(
-                            ShoppingCartEvent.ErrorState.NotKnownError,
-                        )
-                }
+                else ->
+                    _errorEvent.setValue(
+                        ShoppingCartEvent.ErrorState.NotKnownError,
+                    )
             }
+        }
 //        }, 1000)
     }
 
-    private fun setAllCheck(){
+    private fun setAllCheck() {
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
     }
 
-    fun checkAllItems(){
+    fun checkAllItems() {
         if (allCheck.value == true) {
             shoppingCart.cartItems.value?.forEach { cartItem ->
-                if (cartItem.cartItemSelector.isSelected){
+                if (cartItem.cartItemSelector.isSelected) {
                     deleteCheckedItem(cartItem)
                 }
             }
-        } else{
+        } else {
             shoppingCart.cartItems.value?.forEach { cartItem ->
-                if (!cartItem.cartItemSelector.isSelected){
+                if (!cartItem.cartItemSelector.isSelected) {
                     addCheckedItem(cartItem)
                 }
             }
@@ -159,7 +157,7 @@ class ShoppingCartViewModel(
                 is UpdateCartItemResult.DELETE ->
                     deleteShoppingCartItem(
                         updateCartItemResult.cartItemId,
-                        product = product
+                        product = product,
                     )
 
                 is UpdateCartItemResult.UPDATED -> {

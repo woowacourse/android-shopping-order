@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.recommend
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,20 +52,23 @@ class RecommendViewModel(
     fun loadRecommendData() {
         try {
             val recentlyProduct = loadRecentlyProduct()
-            val myCartItems = shoppingCartRepository.loadPagingCartItems(
-                LOAD_SHOPPING_ITEM_OFFSET,
-                LOAD_SHOPPING_ITEM_SIZE,
-            )
+            val myCartItems =
+                shoppingCartRepository.loadPagingCartItems(
+                    LOAD_SHOPPING_ITEM_OFFSET,
+                    LOAD_SHOPPING_ITEM_SIZE,
+                )
 
-            val loadData = productRepository.loadCategoryProducts(
-                size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-                category = recentlyProduct.category,
-            )
+            val loadData =
+                productRepository.loadCategoryProducts(
+                    size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+                    category = recentlyProduct.category,
+                )
 
-            val recommendData = getFilteredRandomProducts(
-                myCartItems = myCartItems,
-                loadData = loadData,
-            )
+            val recommendData =
+                getFilteredRandomProducts(
+                    myCartItems = myCartItems,
+                    loadData = loadData,
+                )
             _products.value = recommendData
             updateCheckItemData()
         } catch (e: Exception) {
@@ -81,7 +83,6 @@ class RecommendViewModel(
     fun decreaseShoppingCart(product: Product) {
         updateCarItem(product, UpdateCartItemType.DECREASE)
     }
-
 
     fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
@@ -129,7 +130,7 @@ class RecommendViewModel(
             _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             checkedShoppingCart.addProduct(CartItem(product = product))
             updateCheckItemData()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             when (e) {
                 is NoSuchDataException ->
                     _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)

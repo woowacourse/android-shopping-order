@@ -17,6 +17,7 @@ interface RecommendEvent {
 
     sealed interface OrderRecommends : RecommendEvent {
         data object Success : OrderRecommends, SuccessEvent
-        data object Fail : OrderRecommends , ErrorEvent
+
+        data object Fail : OrderRecommends, ErrorEvent
     }
 }

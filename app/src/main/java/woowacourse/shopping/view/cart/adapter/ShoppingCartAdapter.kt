@@ -62,9 +62,7 @@ class ShoppingCartAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateCartItems(
-        addedCartItems: List<CartItem>,
-    ) {
+    fun updateCartItems(addedCartItems: List<CartItem>) {
         cartItems.clear()
         cartItems.addAll(addedCartItems.map { ShoppingCartItem.CartProductItem(it) })
         if (showSkeleton) {
