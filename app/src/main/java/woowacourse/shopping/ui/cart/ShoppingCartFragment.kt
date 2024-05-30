@@ -16,7 +16,9 @@ import woowacourse.shopping.ui.FragmentNavigator
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
-    private val binding get() = _binding ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+    private val binding
+        get() = _binding
+            ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
 
@@ -95,9 +97,10 @@ class ShoppingCartFragment : Fragment() {
     }
 
     private fun observeOrderNavigation() {
-        viewModel.navigationOrder.observe(viewLifecycleOwner) { isNavigationOrder ->
-            if (isNavigationOrder) {
-                (requireActivity() as? FragmentNavigator)?.navigateToOrder()
+        viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
+            if (orderItemsIds.isNotEmpty()) {
+                Log.d(TAG, "observeOrderNavigation: orderItemsIds: ${orderItemsIds}")
+                (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderItemsIds)
             }
         }
     }

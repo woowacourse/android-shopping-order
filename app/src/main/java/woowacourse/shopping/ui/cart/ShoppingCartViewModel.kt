@@ -41,8 +41,8 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
 
-    private var _navigationOrder = MutableSingleLiveData(false)
-    val navigationOrder: SingleLiveData<Boolean> get() = _navigationOrder
+    private var _navigationOrderEvent = MutableLiveData<List<Long>>(emptyList())
+    val navigationOrderEvent: LiveData<List<Long>> get() = _navigationOrderEvent
 
     fun loadAll() {
         thread {
@@ -73,7 +73,11 @@ class ShoppingCartViewModel(
     }
 
     override fun navigateToOrder() {
-        _navigationOrder.setValue(true)
+        if (selectedCartItemsCount.value == 0) return
+
+        _navigationOrderEvent.value = cartItems.value?.filter {
+            it.checked
+        }?.map { it.id }
     }
 
     override fun onClick(productId: Long) {
