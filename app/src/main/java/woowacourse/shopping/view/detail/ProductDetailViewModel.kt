@@ -144,6 +144,7 @@ class ProductDetailViewModel(
                 productId = product.id,
                 imageUrl = product.imageUrl,
                 name = product.name,
+                category = product.category,
             ),
         )
     }

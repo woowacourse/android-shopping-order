@@ -21,7 +21,35 @@ class RealProductRepositoryImpl(
         thread {
             try {
                 val page = offset / PRODUCT_LOAD_PAGING_SIZE
-                val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
+                val response =
+                    productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
+                if (response.isSuccessful && response.body() != null) {
+                    products = response.body()?.productDto?.map { it.toProduct() }
+                }
+            } catch (e: Exception) {
+                exception = e
+            } finally {
+                latch.countDown()
+            }
+        }
+
+        latch.awaitOrThrow(exception)
+        return products ?: throw NoSuchDataException()
+    }
+
+    override fun loadCategoryProducts(category: String): List<Product> {
+        val latch = CountDownLatch(1)
+        var products: List<Product>? = null
+        var exception: Exception? = null
+
+        thread {
+            try {
+                val response =
+                    productDataSource.loadCategoryProducts(
+                        page = DEFAULT_PAGE,
+                        size = RECOMMEND_PRODUCT_LOAD_PAGING_SIZE,
+                        category = category,
+                    ).execute()
                 if (response.isSuccessful && response.body() != null) {
                     products = response.body()?.productDto?.map { it.toProduct() }
                 }
@@ -59,6 +87,8 @@ class RealProductRepositoryImpl(
     }
 
     companion object {
+        const val DEFAULT_PAGE = 0
+        const val RECOMMEND_PRODUCT_LOAD_PAGING_SIZE = 10
         const val PRODUCT_LOAD_PAGING_SIZE = 20
     }
 }

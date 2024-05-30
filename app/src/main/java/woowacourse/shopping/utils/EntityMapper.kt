@@ -32,6 +32,7 @@ object EntityMapper {
             productId = productId,
             imageUrl = imageUrl,
             name = name,
+            category = category,
         )
     }
 
@@ -40,6 +41,7 @@ object EntityMapper {
             productId = productId,
             name = name,
             imageUrl = imageUrl,
+            category = category,
         )
     }
 }

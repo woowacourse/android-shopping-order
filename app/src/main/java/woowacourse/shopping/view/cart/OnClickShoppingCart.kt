@@ -12,4 +12,6 @@ interface OnClickShoppingCart {
     fun clickPrevPage()
 
     fun clickNextPage()
+
+    fun clickCheckBox(cartItem: CartItem)
 }
