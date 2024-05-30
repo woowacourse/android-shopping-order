@@ -1,4 +1,5 @@
 package woowacourse.shopping.presentation.ui.detail
+
 //
 // import io.mockk.every
 // import io.mockk.impl.annotations.InjectMockKs
@@ -20,7 +21,7 @@ package woowacourse.shopping.presentation.ui.detail
 //
 // @ExtendWith(InstantTaskExecutorExtension::class)
 // @ExtendWith(MockKExtension::class)
-// class ProductDetailViewModelTest {
+class ProductDetailViewModelTest {
 //    @MockK
 //    private lateinit var productRepository: ProductRepository
 //
@@ -103,4 +104,4 @@ package woowacourse.shopping.presentation.ui.detail
 //            DetailError.RecentItemNotFound,
 //        )
 //    }
-// }
+}

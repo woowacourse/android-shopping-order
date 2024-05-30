@@ -5,15 +5,14 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.ProductListItem
-import woowacourse.shopping.domain.ProductListItem.ShoppingProductItem.Companion.joinProductAndCart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.util.Event
 
 class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), CartHandler {
-
     private val _error = MutableLiveData<Event<CartError>>()
 
     val error: LiveData<Event<CartError>> = _error
@@ -23,28 +22,50 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
 
     val shoppingProducts: LiveData<UiState<List<ProductListItem.ShoppingProductItem>>> get() = _shoppingProducts
 
-    private val cartProducts = mutableListOf<Cart>()
-
     private val _changedCartProducts = MutableLiveData<List<Cart>>()
     val changedCartProducts: LiveData<List<Cart>> get() = _changedCartProducts
 
-    fun loadProductByPage(pageSize: Int) {
+    val isAllCartItemsSelected: LiveData<Boolean> =
+        shoppingProducts.switchMap {
+            MutableLiveData(
+                if (it is UiState.Success && it.data.isNotEmpty()) {
+                    it.data.all { it.isChecked }
+                } else {
+                    false
+                },
+            )
+        }
+
+    private val selectedCartItems: LiveData<List<ProductListItem.ShoppingProductItem>> =
+        shoppingProducts.switchMap {
+            MutableLiveData(
+                if (it is UiState.Success) {
+                    it.data.filter { it.isChecked }
+                } else {
+                    emptyList()
+                },
+            )
+        }
+
+    val totalPrice: LiveData<Long> =
+        selectedCartItems.switchMap {
+            MutableLiveData(
+                it.sumOf { it.price * it.quantity },
+            )
+        }
+
+    val totalCount: LiveData<Int> =
+        selectedCartItems.switchMap {
+            MutableLiveData(
+                it.sumOf { it.quantity },
+            )
+        }
+
+    fun loadAllCartItems(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
-            cartRepository.load(0, pageSize, onSuccess = { carts, totalPage ->
-                cartProducts.apply {
-                    clear()
-                    addAll(carts)
-                }
-                _shoppingProducts.value =
-                    UiState.Success(
-                        cartProducts.map {
-                            joinProductAndCart(
-                                it.product,
-                                it,
-                            )
-                        },
-                    )
+            cartRepository.load(0, pageSize, onSuccess = { carts, _ ->
+                _shoppingProducts.value = UiState.Success(carts.map { it.toShoppingProduct() })
             }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
         }, 500)
     }
@@ -54,31 +75,51 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
             val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
             _changedCartProducts.value =
                 originalChangedCartProducts.plus(Cart(cartId, product.toProduct(), newQuantity))
+            val newShoppingProduct =
+                (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.filter { it.id != product.id }
+            _shoppingProducts.value = UiState.Success(newShoppingProduct)
         }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
     }
 
     override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
-        product.isChecked = !product.isChecked
+        if (shoppingProducts.value is UiState.Success) {
+            val cartItems =
+                (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data
+
+            val updatedCartItems =
+                cartItems.map {
+                    if (it.id == product.id) {
+                        it.copy(isChecked = !product.isChecked)
+                    } else {
+                        it
+                    }
+                }
+            _shoppingProducts.value = UiState.Success(updatedCartItems)
+        }
+    }
+
+    override fun onTotalCheckBoxClicked(isChecked: Boolean) {
+        if (shoppingProducts.value is UiState.Success) {
+            val cart =
+                shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>
+            _shoppingProducts.value =
+                UiState.Success(cart.data.map { it.copy(isChecked = isChecked) })
+        }
     }
 
     private fun modifyShoppingProductQuantity(
-        cartId: Long,
+        cartItem: ProductListItem.ShoppingProductItem,
         resultQuantity: Int,
     ) {
-        val productIndex = cartProducts.indexOfFirst { it.cartId == cartId }
-        val updatedItem = cartProducts[productIndex].copy(quantity = resultQuantity)
-        cartProducts[productIndex] = updatedItem
-        _shoppingProducts.value =
-            UiState.Success(
-                cartProducts.map {
-                    joinProductAndCart(
-                        it.product,
-                        it,
-                    )
-                },
-            )
-        val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
-        _changedCartProducts.value = originalChangedCartProducts.plus(updatedItem)
+        val newShoppingProducts =
+            (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map {
+                if (it.cartId == cartItem.cartId) {
+                    it.copy(quantity = resultQuantity, isChecked = cartItem.isChecked)
+                } else {
+                    it
+                }
+            }
+        _shoppingProducts.value = UiState.Success(newShoppingProducts)
     }
 
     override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
@@ -91,7 +132,7 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                     1,
                     item.quantity,
                     onSuccess = { _, resultQuantity ->
-                        modifyShoppingProductQuantity(item.cartId, resultQuantity)
+                        modifyShoppingProductQuantity(item, resultQuantity)
                     },
                     onFailure = {},
                 )
@@ -106,8 +147,8 @@ class CartViewModel(private val cartRepository: CartRepository) : ViewModel(), C
                 item.id,
                 1,
                 item.quantity,
-                onSuccess = { cartId, resultQuantity ->
-                    modifyShoppingProductQuantity(item.cartId, resultQuantity)
+                onSuccess = { _, resultQuantity ->
+                    modifyShoppingProductQuantity(item, resultQuantity)
                 },
                 onFailure = {},
             )

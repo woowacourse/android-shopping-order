@@ -40,13 +40,15 @@
             android:background="@color/teal_200"
             android:paddingHorizontal="16dp"
             android:paddingVertical="28dp"
-            android:text="주문하기"
+            android:text="@{@string/order_text(viewModel.totalCount)}"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
+            bindTextFormattedCurrency="@{viewModel.totalPrice}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/dark_grey"
@@ -63,11 +65,13 @@
 
         <CheckBox
             android:id="@+id/total_check_box"
+            bindTotalCheckBox="@{cartHandler}"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="21dp"
             android:layout_marginBottom="33dp"
+            android:checked="@{viewModel.isAllCartItemsSelected}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/order" />
 

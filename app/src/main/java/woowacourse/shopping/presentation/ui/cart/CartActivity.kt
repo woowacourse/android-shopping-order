@@ -26,7 +26,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     override fun initStartView(savedInstanceState: Bundle?) {
         val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
         if (savedInstanceState == null) {
-            viewModel.loadProductByPage(initialItemQuantity)
+            viewModel.loadAllCartItems(initialItemQuantity)
         }
         binding.cartHandler = viewModel
         binding.viewModel = viewModel

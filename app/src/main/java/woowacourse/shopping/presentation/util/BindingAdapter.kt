@@ -1,8 +1,8 @@
 package woowacourse.shopping.presentation.util
 
 import android.content.Context
-import android.util.Log
 import android.view.View
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -11,8 +11,17 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.RecentProductItem
 import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.ui.cart.CartHandler
 import java.text.NumberFormat
 import java.util.Locale
+
+@BindingAdapter("bindTotalCheckBox")
+fun CheckBox.totalCheckBox(handler: CartHandler) {
+    this.setOnClickListener {
+        val isChecked = this.isChecked
+        handler.onTotalCheckBoxClicked(isChecked)
+    }
+}
 
 @BindingAdapter("bindLoadImage")
 fun ImageView.loadImage(imgUrl: String?) {
@@ -25,10 +34,8 @@ fun ImageView.loadImage(imgUrl: String?) {
 fun View.setCartSkeletonVisibility(state: UiState<List<ProductListItem.ShoppingProductItem>>) {
     visibility =
         if (state is UiState.Success) {
-            Log.d("ㅌㅅㅌ", "숨겨")
             View.GONE
         } else {
-            Log.d("ㅌㅅㅌ", "보여줘")
             View.VISIBLE
         }
 }
