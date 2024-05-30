@@ -11,4 +11,5 @@ data class RecentlyProductEntity(
     val productId: Long,
     val imageUrl: String,
     val name: String,
+    val category: String,
 )

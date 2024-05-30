@@ -5,6 +5,7 @@ data class RecentlyProduct(
     val productId: Long,
     val imageUrl: String,
     val name: String,
+    val category: String,
 ) {
     companion object {
         const val DEFAULT_RECENTLY_PRODUCT_ID = -1L
@@ -12,6 +13,7 @@ data class RecentlyProduct(
             RecentlyProduct(
                 DEFAULT_RECENTLY_PRODUCT_ID,
                 DEFAULT_RECENTLY_PRODUCT_ID,
+                "",
                 "",
                 "",
             )
