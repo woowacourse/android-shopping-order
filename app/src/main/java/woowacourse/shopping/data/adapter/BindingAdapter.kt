@@ -45,6 +45,7 @@ fun setViewVisibility(
     view: View,
     isVisible: Boolean,
 ) {
+    println("visible : ${view::class.simpleName} ${isVisible}")
     view.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 

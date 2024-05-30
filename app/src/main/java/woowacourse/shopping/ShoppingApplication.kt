@@ -9,8 +9,10 @@ import woowacourse.shopping.data.db.cart.CartDatabase
 import woowacourse.shopping.data.db.recent.RecentProductDatabase
 import woowacourse.shopping.data.remote.BasicAuthInterceptor
 import woowacourse.shopping.data.remote.CartService
+import woowacourse.shopping.data.remote.OrderService
 import woowacourse.shopping.data.remote.ProductService
 import woowacourse.shopping.data.remote.RemoteCartDataSource
+import woowacourse.shopping.data.remote.RemoteOrderDataSource
 import woowacourse.shopping.data.remote.RemoteProductDataSource
 
 class ShoppingApplication : Application() {
@@ -36,9 +38,11 @@ class ShoppingApplication : Application() {
 
         val productService = retrofit.create(ProductService::class.java)
         val cartService = retrofit.create(CartService::class.java)
+        val orderService = retrofit.create(OrderService::class.java)
 
         remoteCartDataSource = RemoteCartDataSource(cartService)
         remoteProductDataSource = RemoteProductDataSource(productService)
+        remoteOrderDataSource = RemoteOrderDataSource(orderService)
         cartDatabase = CartDatabase.getInstance(this)
         recentProductDatabase = RecentProductDatabase.getInstance(this)
     }
@@ -48,6 +52,7 @@ class ShoppingApplication : Application() {
         lateinit var recentProductDatabase: RecentProductDatabase
         lateinit var remoteCartDataSource: RemoteCartDataSource
         lateinit var remoteProductDataSource: RemoteProductDataSource
+        lateinit var remoteOrderDataSource: RemoteOrderDataSource
         private const val BASE_URL = "http://54.180.95.212:8080/"
     }
 }

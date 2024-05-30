@@ -10,11 +10,11 @@ import woowacourse.shopping.view.cart.QuantityClickListener
 class CartViewHolder(private val binding: ItemCartBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
-        cartItem: CartItem2,
+        cartViewItem: ShoppingCartViewItem.CartViewItem,
         cartItemClickListener: CartItemClickListener,
         quantityClickListener: QuantityClickListener,
     ) {
-        binding.cartItem = cartItem
+        binding.cartViewItem = cartViewItem
         binding.cartItemClickListener = cartItemClickListener
         binding.quantityClickListener = quantityClickListener
     }
