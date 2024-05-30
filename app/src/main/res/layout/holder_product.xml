@@ -21,33 +21,34 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:paddingHorizontal="6dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> onProductItemClickListener.onClick(product.id)}">
+        android:onClick="@{() -> onProductItemClickListener.onClick(product.id)}"
+        android:padding="6dp">
 
         <ImageView
-            android:id="@+id/main_product_list_item_img"
+            android:id="@+id/iv_product"
             imageUrl="@{product.imgUrl}"
-            android:layout_width="154dp"
-            android:layout_height="154dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:importantForAccessibility="no"
             android:textAppearance="?attr/textAppearanceListItem"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             tools:src="@tools:sample/avatars" />
 
         <include
-            android:id="@+id/main_product_list_change_button"
+            android:id="@+id/include_product_change_button"
             layout="@layout/item_change_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="10dp"
-            app:layout_constraintBottom_toBottomOf="@id/main_product_list_item_img"
-            app:layout_constraintEnd_toEndOf="@id/main_product_list_item_img"
-            app:layout_constraintStart_toStartOf="@id/main_product_list_item_img"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_product"
+            app:layout_constraintEnd_toEndOf="@id/iv_product"
+            app:layout_constraintStart_toStartOf="@id/iv_product"
             bind:itemId="@{product.id}"
             bind:onItemChargeListener="@{onItemChargeListener}"
             bind:quantity="@{product.quantity}" />
@@ -56,14 +57,16 @@
             android:id="@+id/main_product_list_product_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{product.name}"
             android:textAppearance="?attr/textAppearanceListItem"
+            android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@id/main_product_list_item_img"
-            app:layout_constraintStart_toStartOf="@id/main_product_list_item_img"
-            app:layout_constraintTop_toBottomOf="@id/main_product_list_item_img"
+            app:layout_constraintEnd_toEndOf="@id/iv_product"
+            app:layout_constraintStart_toStartOf="@id/iv_product"
+            app:layout_constraintTop_toBottomOf="@id/iv_product"
             tools:text="product name" />
 
         <TextView
@@ -78,6 +81,7 @@
             app:layout_constraintEnd_toEndOf="@id/main_product_list_product_name"
             app:layout_constraintStart_toStartOf="@id/main_product_list_product_name"
             app:layout_constraintTop_toBottomOf="@id/main_product_list_product_name"
-            tools:text="100000" />
+            tools:text="100,000원" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

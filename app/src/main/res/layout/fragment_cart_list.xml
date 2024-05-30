@@ -19,21 +19,15 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:backgroundTint="@color/gray"
+            android:backgroundTint="@color/gray_500"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/shopping_cart_description"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/shopping_cart_description"
+            app:titleTextColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cart_list"
@@ -52,13 +46,13 @@
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_cart_list"
-
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/cart_list"
-            app:layout_constraintEnd_toEndOf="@id/cart_list"
-            app:layout_constraintStart_toStartOf="@id/cart_list"
-            app:layout_constraintTop_toTopOf="@id/cart_list"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintBottom_toTopOf="@id/cart_list_left_page_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/product_detail_toolbar"
             app:shimmer_auto_start="true"
             app:shimmer_base_alpha="0.5">
 

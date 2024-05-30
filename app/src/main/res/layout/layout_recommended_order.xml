@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray">
+    android:background="@color/gray_500">
 
     <TextView
         android:id="@+id/tv_recommended_order_price"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="26dp"
         android:gravity="end"
         android:textColor="@color/white"
         android:textSize="18sp"
-        android:layout_marginVertical="26dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btn_recommended_order"

@@ -73,9 +73,9 @@ class ProductListFragment : Fragment() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
                 productsAdapter.updateAllLoadedProducts(products)
-                binding.shimmerProductList.stopShimmer()
-                binding.shimmerProductList.visibility = View.GONE
                 binding.productDetailList.visibility = View.VISIBLE
+                binding.shimmerProductList.visibility = View.GONE
+                binding.shimmerProductList.stopShimmer()
             }
         }
     }

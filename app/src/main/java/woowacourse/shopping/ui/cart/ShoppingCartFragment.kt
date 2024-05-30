@@ -56,7 +56,7 @@ class ShoppingCartFragment : Fragment() {
 
     private fun showSkeletonUi() {
         binding.shimmerCartList.visibility = View.VISIBLE
-        binding.cartList.visibility = View.GONE
+        binding.cartList.visibility = View.INVISIBLE
     }
 
     private fun initNavigation() {
@@ -73,10 +73,10 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeItemsInCurrentPage() {
         viewModel.itemsInCurrentPage.observe(viewLifecycleOwner) { products ->
+            adapter.updateData(products)
+            binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
             binding.shimmerCartList.visibility = View.GONE
-            binding.cartList.visibility = View.VISIBLE
-            adapter.updateData(products)
         }
     }
 

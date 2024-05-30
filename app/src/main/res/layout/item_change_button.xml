@@ -23,32 +23,30 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@{quantity > 0 ? @color/white : @android:color/transparent}"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_decrease"
-            android:layout_width="42dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
+            style="@style/QuantityButtonStyle"
+            android:background="@drawable/shape_minus_quantity"
             android:onClick="@{() -> onItemChargeListener.onDecrease(itemId, quantity - 1)}"
             android:text="@string/minus"
-            android:textColor="@color/black"
-            android:textSize="22dp"
             android:visibility="@{quantity > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toStartOf="@id/tv_quantity"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpUsage" />
 
         <TextView
             android:id="@+id/tv_quantity"
-            android:layout_width="42dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@color/white"
             android:gravity="center"
+            android:paddingHorizontal="15dp"
             android:text="@{String.valueOf(quantity)}"
-            android:textColor="@color/black"
+            android:textColor="@color/gray_500"
             android:textSize="22dp"
             android:visibility="@{quantity > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@id/btn_decrease"
@@ -58,15 +56,12 @@
             tools:ignore="SpUsage"
             tools:text="1" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_increase"
-            android:layout_width="42dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
+            style="@style/QuantityButtonStyle"
+            android:background="@drawable/shape_plus_quantity"
             android:onClick="@{() -> onItemChargeListener.onIncrease(itemId, quantity + 1)}"
             android:text="@string/plus"
-            android:textColor="@color/black"
-            android:textSize="22dp"
             android:visibility="@{quantity > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_quantity"
