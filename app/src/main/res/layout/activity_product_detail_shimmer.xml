@@ -14,7 +14,7 @@
         tools:context=".presentation.ui.detail.ProductDetailActivity">
 
         <ImageView
-            android:id="@+id/iv_product"
+            android:id="@+id/iv_product_shimmer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#e8e8e8"
@@ -26,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_name"
+            android:id="@+id/tv_name_shimmer"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
@@ -35,11 +35,11 @@
             android:textStyle="bold"
             android:background="#e8e8e8"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_product"
+            app:layout_constraintTop_toBottomOf="@id/iv_product_shimmer"
             app:layout_goneMarginStart="18dp"/>
 
         <TextView
-            android:id="@+id/tv_price_value"
+            android:id="@+id/tv_price_value_shimmer"
             android:layout_width="200dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -48,34 +48,34 @@
             android:background="#e8e8e8"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/line" />
+            app:layout_constraintTop_toBottomOf="@id/line_shimmer" />
 
 
 
         <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/line"
+            android:id="@+id/line_shimmer"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="17dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/tv_name"
-            app:layout_constraintTop_toBottomOf="@id/tv_name" />
+            app:layout_constraintStart_toStartOf="@id/tv_name_shimmer"
+            app:layout_constraintTop_toBottomOf="@id/tv_name_shimmer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_recent"
+            android:id="@+id/layout_recent_shimmer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#e8e8e8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_price_value"
+            app:layout_constraintTop_toBottomOf="@id/tv_price_value_shimmer"
             android:layout_marginStart="15dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="15dp"
             android:padding="15dp">
 
             <TextView
-                android:id="@+id/tv_recent_title"
+                android:id="@+id/tv_recent_title_shimmer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
@@ -86,10 +86,10 @@
                 android:text=" "/>
 
             <TextView
-                android:id="@+id/tv_recent_product_name"
+                android:id="@+id/tv_recent_product_name_shimmer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/tv_recent_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_recent_title_shimmer"
                 android:layout_marginTop="5dp"
                 android:maxLines="1"
                 android:ellipsize="end"

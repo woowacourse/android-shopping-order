@@ -25,7 +25,7 @@ class ShoppingViewModelTest {
 
     @Test
     fun `viewModel이 초기화되면 데이터가 20개 불러와진다`() {
-        every { repository.findProductByPagingWithMock(any(), any()) } returns Result.success(cartProducts)
+        every { repository.getProducts(any(), any()) } returns Result.success(cartProducts)
         viewModel.loadProductByOffset()
         Thread.sleep(1000)
         assertEquals(viewModel.products.getOrAwaitValue(), UiState.Success(cartProducts))
@@ -33,7 +33,7 @@ class ShoppingViewModelTest {
 
     @Test
     fun `viewModel에서 데이터 로드가 실패하면 Error로 상태가 변화한다`() {
-        every { repository.findProductByPagingWithMock(any(), any()) } returns Result.failure(Throwable())
+        every { repository.getProducts(any(), any()) } returns Result.failure(Throwable())
         viewModel.loadProductByOffset()
         Thread.sleep(1000)
         assertEquals(viewModel.errorHandler.getOrAwaitValue(1).getContentIfNotHandled(), LOAD_ERROR)

@@ -33,6 +33,7 @@ class ShoppingActivityTest {
 
     @Test
     fun `상품_목록의_맨_아래_20번째는_더보기_뷰홀더가_등장한다`() {
+        Thread.sleep(2000) // 스켈레톤 UI 로딩 시간
         onView(withId(R.id.rv_shopping)).perform(
             RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(
                 20,

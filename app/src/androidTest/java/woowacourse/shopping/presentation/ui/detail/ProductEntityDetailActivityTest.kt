@@ -16,7 +16,8 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.cart.CartActivity
-import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity.Companion.EXTRA_PRODUCT_ID
+import woowacourse.shopping.presentation.ui.cartProduct
+import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity.Companion.EXTRA_CART_PRODUCT
 import woowacourse.shopping.presentation.ui.fakeRepository
 import java.lang.IllegalStateException
 
@@ -26,7 +27,7 @@ class ProductEntityDetailActivityTest {
         Intent(
             ApplicationProvider.getApplicationContext(),
             ProductDetailActivity::class.java,
-        ).apply { putExtra(EXTRA_PRODUCT_ID, 1L) }
+        ).apply { putExtra(EXTRA_CART_PRODUCT, cartProduct) }
 
     @Before
     fun setUp() {
@@ -60,9 +61,14 @@ class ProductEntityDetailActivityTest {
     @Test
     fun `장바구니에_담으면_상품이_데이터에_추가된다`() {
         ActivityScenario.launch<CartActivity>(intent)
+        RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
+            it?.size shouldBe 57 // 디폴트 갯수
+        }.onFailure {
+            throw IllegalStateException()
+        }
         onView(withId(R.id.tv_add_cart)).perform(click())
-        RepositoryInjector.repository.findCartByPaging(0, 1).onSuccess {
-            it.size shouldBe 1
+        RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
+            it?.size shouldBe 58 // 하나 증가한 갯수
         }.onFailure {
             throw IllegalStateException()
         }

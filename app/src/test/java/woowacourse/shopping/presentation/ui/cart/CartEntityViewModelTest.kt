@@ -57,7 +57,11 @@ class CartEntityViewModelTest {
             Result.success(
                 cartProducts,
             )
-        viewModel.onDelete(cartProduct)
+        viewModel.onDelete(
+            CartProductUiModel(
+                cartProduct = cartProduct,
+            ),
+        )
         Thread.sleep(1000)
         assertThat(viewModel.carts.getOrAwaitValue()).isEqualTo(UiState.Success(cartProducts))
     }
@@ -65,7 +69,11 @@ class CartEntityViewModelTest {
     @Test
     fun `데이터 삭제에 실패하면 Error 상태로 변화한다`() {
         every { productCartRepository.deleteCart(any()) } returns Result.failure(Throwable())
-        viewModel.onDelete(cartProduct)
+        viewModel.onDelete(
+            CartProductUiModel(
+                cartProduct = cartProduct,
+            ),
+        )
         Thread.sleep(1000)
         assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(CART_DELETE_ERROR)
     }
