@@ -39,13 +39,11 @@ class ShoppingAdapter(
         holder: ShoppingViewHolder,
         position: Int,
     ) {
-        Log.d("LLLLLLLLL", "{$position}")
         when (holder) {
             is ShoppingViewHolder.ProductViewHolder -> {
                 holder.bind(getItem(position))
             }
             is ShoppingViewHolder.LoadViewHolder -> {
-                Log.d("XXXX", "IN")
                 holder.bind()
             }
         }

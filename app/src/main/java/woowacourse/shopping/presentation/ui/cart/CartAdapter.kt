@@ -52,5 +52,11 @@ class CartViewHolder(private val binding: ItemCartBinding, val cartActionHandler
     fun bind(item: CartProductUiModel) {
         binding.cartProductUiModel = item
         binding.cartActionHandler = cartActionHandler
+        binding.cbCartItem.setOnClickListener {
+            cartActionHandler.onCheck(
+                item,
+                binding.cbCartItem.isChecked
+            )
+        }
     }
 }

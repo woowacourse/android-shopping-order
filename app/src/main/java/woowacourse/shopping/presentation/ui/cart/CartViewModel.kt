@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
@@ -20,26 +22,32 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     var offSet: Int = 0
         private set
         get() = field.coerceAtMost(maxOffset)
-    private val _carts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
+    private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
 
-    val carts: LiveData<UiState<List<CartProduct>>> get() = _carts
+    val carts: LiveData<UiState<List<CartProductUiModel>>> get() = _carts
 
     private val _errorHandler = MutableLiveData<EventState<String>>()
     val errorHandler: LiveData<EventState<String>> get() = _errorHandler
 
+    private val _eventHandler = MutableLiveData<EventState<CartEvent>>()
+    val eventHandler: LiveData<EventState<CartEvent>> get() = _eventHandler
+
     val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    init {
-        getItemCount()
-    }
+    private var _isAllChecked = MutableLiveData<Boolean>(true)
+    val isAllChecked: LiveData<Boolean> get() = _isAllChecked
 
     fun findCartByOffset() {
         thread {
             repository.getCartItems(offSet, 1000).onSuccess {
-                if(it == null) {
+                if (it == null) {
                     _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
                 } else {
-                    _carts.postValue(UiState.Success(it))
+                    _carts.postValue(UiState.Success(it.map { cartProduct ->
+                        CartProductUiModel(
+                            cartProduct
+                        )
+                    }))
                 }
             }.onFailure {
                 _errorHandler.value = EventState(CART_LOAD_ERROR)
@@ -47,25 +55,77 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
     }
 
-    private fun getItemCount() {
+    override fun onDelete(cartProductUiModel: CartProductUiModel) {
         thread {
-            repository.getMaxCartCount().onSuccess { maxCount ->
-                maxOffset = ((maxCount + PAGE_UPPER_BOUND) / PAGE_SIZE - 1).coerceAtLeast(0)
-            }
-        }
-    }
-
-    override fun onDelete(cartProduct: CartProductUiModel) {
-        thread {
-//            Log.d("AAFDF", "${cartProduct.cartId}")
-//            updateUiModel.add(cartProduct.productId, cartProduct.copy(quantity = 0))
-            repository.deleteCartItem(cartProduct.cartProduct.cartId.toInt()).onSuccess {
-
-//                findProductByOffset()
+            updateUiModel.add(cartProductUiModel.cartProduct.productId, cartProductUiModel.cartProduct.copy(quantity = 0))
+            repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
+                val updatedData = (_carts.value as UiState.Success).data.toMutableList()
+                updatedData.remove(cartProductUiModel)
+                _carts.postValue(
+                    UiState.Success(updatedData.toList())
+                )
             }.onFailure {
                 _errorHandler.postValue(EventState(CART_DELETE_ERROR))
             }
         }
+    }
+
+    fun postCheckedItems() {
+        val checkedIds = getCheckedIds()
+
+        thread {
+            repository.postOrders(
+                OrderRequest(
+                    checkedIds
+                )
+            ).onSuccess {
+                val currentCarts = (_carts.value as UiState.Success).data
+                val filteredCarts = currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+
+                val removedCarts = currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+                removedCarts.forEach { cartProduct ->
+                    updateUiModel.add(cartProduct.cartProduct.productId, cartProduct.cartProduct.copy(quantity = 0))
+                }
+
+                _carts.postValue(UiState.Success(filteredCarts))
+                _eventHandler.postValue(EventState(CartEvent.Update))
+            }.onFailure {
+                _errorHandler.postValue(EventState("ERROR"))
+            }
+        }
+    }
+
+    private fun getCheckedIds(): List<Int> {
+        return (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct.cartId.toInt() }
+    }
+    private fun updateCarts(productId: Int) {
+        val currentCartItems = (_carts.value as? UiState.Success)?.data
+        val updatedCartItems =
+            currentCartItems?.filterNot { it.cartProduct.productId.toInt() == productId }
+        _carts.postValue(UiState.Success(updatedCartItems ?: emptyList()))
+    }
+
+    override fun onCheck(cartProduct: CartProductUiModel, isChecked: Boolean) {
+        _carts.value = UiState.Success(
+            (_carts.value as UiState.Success).data.map {
+                if (it.cartProduct.productId == cartProduct.cartProduct.productId) {
+                    cartProduct.copy(isChecked = isChecked)
+                } else {
+                    it
+                }
+            }
+        )
+
+        if(!isChecked) _isAllChecked.value = false
+        if((_carts.value as UiState.Success).data.all { it.isChecked }) _isAllChecked.value = true
+    }
+
+    override fun onCheckAll() {
+        val selectAll = isAllChecked.value ?: false
+        _carts.value = UiState.Success((_carts.value as UiState.Success).data.map {
+            it.copy(isChecked = !selectAll)
+        })
+        _isAllChecked.value = !selectAll
     }
 
     override fun onNext() {
@@ -82,12 +142,17 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     override fun onPlus(cartProduct: CartProduct) {
         thread {
-            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy() }
-            val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
-            cartProducts[index].plusQuantity()
-            updateUiModel.add(cartProduct.productId, cartProducts[index])
+            Log.d("PlusClick", "PPPP")
+            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val index = cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            cartProducts[index].cartProduct.plusQuantity()
 
-            repository.saveCart(Cart(cartProducts[index].productId, cartProducts[index].quantity))
+            updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
+
+            repository.patchCartItem(
+                id = cartProducts[index].cartProduct.cartId.toInt(),
+                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity)
+            )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
                 }
@@ -98,34 +163,23 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     }
 
     override fun onMinus(cartProduct: CartProduct) {
+        if(cartProduct.quantity == 1) return
         thread {
-            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy() }
-            val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
-            cartProducts[index].minusQuantity()
-            updateUiModel.add(cartProduct.productId, cartProducts[index])
+            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val index = cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            cartProducts[index].cartProduct.minusQuantity()
+            updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            if (cartProducts[index].quantity > 0) {
-                repository.saveCart(
-                    Cart(
-                        cartProducts[index].productId,
-                        cartProducts[index].quantity,
-                    ),
-                )
-                    .onSuccess {
-                        _carts.postValue(UiState.Success(cartProducts))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
-                    }
-            } else {
-                repository.deleteCart(
-                    cartProducts[index].productId,
-                ).onSuccess {
+            repository.patchCartItem(
+                id = cartProducts[index].cartProduct.cartId.toInt(),
+                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity)
+            )
+                .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
-                }.onFailure {
+                }
+                .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }
-            }
         }
     }
 

@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
+import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
@@ -30,6 +31,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         initTitle()
         binding.rvCarts.adapter = cartAdapter
         binding.cartActionHandler = viewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         initData()
@@ -69,17 +71,32 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         Thread.sleep(500)
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
-                            cartAdapter.submitList(it.data.map { CartProductUiModel(cartProduct = it) })
+                            binding.tvOrderCount.text = it.data.filter {
+                                it.isChecked
+                            }.sumOf { it.cartProduct.quantity }.toString()
+                            binding.tvPrice.text = getString(R.string.won, it.data.sumOf {
+                                it.cartProduct.quantity * it.cartProduct.price
+                            })
+                            cartAdapter.submitList(it.data)
                         }
                     }
                 }
             }
         }
+
         viewModel.errorHandler.observe(this) { event ->
             event.getContentIfNotHandled()?.let { message ->
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             }
         }
+
+        viewModel.eventHandler.observe(this, EventObserver {
+            when(it) {
+                is CartEvent.Update -> {
+                    Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
     private fun initTitle() {
@@ -91,15 +108,25 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         menuInflater.inflate(R.menu.cart_menu, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.action_curation -> {
                 Intent(this, CurationActivity::class.java).apply {
                     startActivity(this)
                 }
             }
+
             else -> {
-                finish()
+                Intent().apply {
+                    putExtra(
+                        ShoppingActionActivity.EXTRA_UPDATED_PRODUCT,
+                        viewModel.updateUiModel,
+                    )
+                }.run {
+                    setResult(RESULT_OK, this)
+                    finish()
+                }
             }
         }
         return true

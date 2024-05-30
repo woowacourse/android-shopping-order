@@ -169,7 +169,6 @@ class ShoppingViewModel(private val repository: Repository) :
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
                     }
             } else {
-                Log.d("CartId","${ cartProducts[index].cartId.toInt()}" )
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)

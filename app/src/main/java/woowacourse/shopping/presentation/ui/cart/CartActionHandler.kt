@@ -9,4 +9,8 @@ interface CartActionHandler : CartCountHandler {
     fun onNext()
 
     fun onPrevious()
+
+    fun onCheck(cartProduct: CartProductUiModel, isChecked: Boolean)
+
+    fun onCheckAll()
 }

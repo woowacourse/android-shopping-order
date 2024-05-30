@@ -70,19 +70,19 @@ class CurationViewModel(
     }
 
     override fun onProductClick(cartProduct: CartProduct) {
-        TODO("인터페이스 분리 원칙 필요")
+        // 인터페이스 분리 원칙 필요
     }
 
     override fun onRecentProductClick(recentProduct: RecentProduct) {
-        TODO("인터페이스 분리 원칙 필요")
+        // 인터페이스 분리 원칙 필요
     }
 
     override fun onCartClick() {
-        TODO("인터페이스 분리 원칙 필요")
+        // 인터페이스 분리 원칙 필요
     }
 
     override fun loadMore() {
-        TODO("인터페이스 분리 원칙 필요")
+        // 인터페이스 분리 원칙 필요
     }
 
     override fun onPlus(cartProduct: CartProduct) {
@@ -106,7 +106,6 @@ class CurationViewModel(
                         _errorHandler.postValue(EventState("아이템 증가 오류"))
                     }
             } else {
-                Log.d("CartId","${ cartProducts[index].cartId.toInt()}" )
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity)
