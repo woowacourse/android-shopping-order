@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.databinding.ItemSkeletonBinding
+import woowacourse.shopping.databinding.ItemProductSkeletonBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.products.OnClickProducts
@@ -58,7 +58,7 @@ class ProductAdapter(
 
             else -> {
                 val view =
-                    ItemSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ItemProductSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SkeletonViewHolder(view)
             }
         }

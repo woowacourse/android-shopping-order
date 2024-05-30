@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.cart
 
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
+import woowacourse.shopping.view.products.ProductListEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
@@ -29,6 +31,10 @@ class ShoppingCartViewModel(
     private val _errorEvent: MutableSingleLiveData<ShoppingCartEvent.ErrorState> =
         MutableSingleLiveData()
     val errorEvent: SingleLiveData<ShoppingCartEvent.ErrorState> get() = _errorEvent
+
+    private val _loadingEvent: MutableSingleLiveData<ShoppingCartEvent.LoadCartItemList> =
+        MutableSingleLiveData()
+    val loadingEvent: SingleLiveData<ShoppingCartEvent.LoadCartItemList> get() = _loadingEvent
 
     val checkedShoppingCart = ShoppingCart()
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
@@ -61,21 +67,28 @@ class ShoppingCartViewModel(
     }
 
     fun loadPagingCartItemList() {
-        try {
-            val pagingData =
-                shoppingCartRepository.loadPagingCartItems(totalItemSize, LOAD_SHOPPING_ITEM_SIZE)
-            shoppingCart.addProducts(pagingData)
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
-
-                else ->
-                    _errorEvent.setValue(
-                        ShoppingCartEvent.ErrorState.NotKnownError,
+        _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Loading)
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                val pagingData =
+                    shoppingCartRepository.loadPagingCartItems(
+                        totalItemSize,
+                        LOAD_SHOPPING_ITEM_SIZE
                     )
+                _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
+                shoppingCart.addProducts(pagingData)
+            } catch (e: Exception) {
+                when (e) {
+                    is NoSuchDataException ->
+                        _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
+
+                    else ->
+                        _errorEvent.setValue(
+                            ShoppingCartEvent.ErrorState.NotKnownError,
+                        )
+                }
             }
-        }
+        }, 1000)
     }
 
     fun increaseCartItem(product: Product) {

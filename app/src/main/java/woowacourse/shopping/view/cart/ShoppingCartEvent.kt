@@ -22,6 +22,8 @@ sealed interface ShoppingCartEvent {
     sealed interface LoadCartItemList : ShoppingCartEvent {
         data object Success : LoadCartItemList
 
+        data object Loading : LoadCartItemList
+
         data object Fail : LoadCartItemList, ErrorState
     }
 }

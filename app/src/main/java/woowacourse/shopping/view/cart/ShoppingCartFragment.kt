@@ -76,13 +76,13 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
+            adapter.setShowSkeleton(false)
             updateRecyclerView(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
                     adapter.updateCartItem(cartState.productId)
-
                     mainActivityListener?.saveUpdateProduct(
                         cartState.productId,
                         cartState.count,
@@ -104,6 +104,10 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
                     )
                 }
             }
+        }
+
+        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) {
+            adapter.setShowSkeleton(true)
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
