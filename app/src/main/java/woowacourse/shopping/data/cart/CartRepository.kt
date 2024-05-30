@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.cart
 
 interface CartRepository {
+    fun getCartItem(productId: Long): CartWithProduct
+
     fun getAllCartItems(): List<Cart>
 
     fun getAllCartItemsWithProduct(): List<CartWithProduct>

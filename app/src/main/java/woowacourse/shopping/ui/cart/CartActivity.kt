@@ -16,7 +16,7 @@ import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.adapter.RecommendProductAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
-import woowacourse.shopping.ui.products.toProductUiModel
+import woowacourse.shopping.ui.products.toUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -46,7 +46,7 @@ class CartActivity : AppCompatActivity() {
         }
 
         viewModel.products.observe(this) {
-            recommendProductAdapter.submitList(it.map { it.toProductUiModel() })
+            recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
 
         binding.cbCartItemTotal.setOnCheckedChangeListener { _, isChecked ->

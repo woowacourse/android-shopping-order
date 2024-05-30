@@ -8,11 +8,13 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
@@ -26,15 +28,16 @@ class CartViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
     private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
-    private val _products: MutableLiveData<List<Product>> = MutableLiveData()
-    val products: LiveData<List<Product>> = _products
+
+    private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
+    val products: LiveData<List<ProductWithQuantity>> = _products
 
     val cart: LiveData<CartItemsUiState> = _cart
 
-    val totalPrice: LiveData<Int> =
-        _cart.map {
-            it.cartItems.filter { it.isChecked }.sumOf { it.totalPrice }
-        }
+    val totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply {
+        addSource(_cart) { value = totalPrice() }
+        addSource(_products) { value = totalPrice() }
+    }
 
     val isTotalChbChecked: LiveData<Boolean> =
         _cart.map {
@@ -56,17 +59,21 @@ class CartViewModel(
 
     fun loadRecommendProducts() {
         runCatching {
-            val recentProductId = requireNotNull(recentProductRepository.findMostRecentProduct()).productId
+            val recentProductId =
+                requireNotNull(recentProductRepository.findMostRecentProduct()).productId
             val category = productRepository.find(recentProductId).category
             productRepository.productsByCategory(category)
                 .filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
         }.onSuccess {
-            _products.value = it
+            _products.value = it.map { ProductWithQuantity(product = it) }
         }
     }
 
-    fun clickOrderButton() {
-        isRecommendPage.value = !requireNotNull(isRecommendPage.value)
+    fun totalPrice(): Int {
+        val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice } ?: 0
+        val recommends =
+            _products.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
+        return carts + recommends
     }
 
     fun removeCartItem(productId: Long) {
@@ -111,24 +118,56 @@ class CartViewModel(
     }
 
     override fun addCart(productId: Long) {
-        cartRepository.postCartItems(productId, 1)
-        loadCartItems()
+        runCatching {
+            cartRepository.postCartItems(productId, 1)
+        }.onSuccess {
+            changeRecommendProductCount(productId)
+        }
     }
 
+
     override fun plusCount(productId: Long) {
-        cartRepository.patchCartItem(
-            findCartIdByProductId(productId),
-            findCartItemQuantityByProductId(productId).inc().value,
-        )
-        loadCartItems()
+        runCatching {
+            val cartItem = cartRepository.getCartItem(productId)
+            cartRepository.patchCartItem(
+                cartItem.id,
+                cartItem.quantity.value.inc(),
+            )
+        }.onSuccess {
+            if (!requireNotNull(isRecommendPage.value)) {
+                loadCartItems()
+            } else {
+                changeRecommendProductCount(productId)
+            }
+        }
     }
 
     override fun minusCount(productId: Long) {
-        cartRepository.patchCartItem(
-            findCartIdByProductId(productId),
-            findCartItemQuantityByProductId(productId).dec().value,
-        )
-        loadCartItems()
+        runCatching {
+            val cartItem = cartRepository.getCartItem(productId)
+            if (cartItem.quantity.value > 0){
+                cartRepository.patchCartItem(
+                    cartItem.id,
+                    cartItem.quantity.value.dec(),
+                )
+            }
+        }.onSuccess {
+            if (!requireNotNull(isRecommendPage.value)) {
+                loadCartItems()
+            } else {
+                changeRecommendProductCount(productId)
+            }
+        }
+    }
+
+    private fun changeRecommendProductCount(productId: Long) {
+        val changed = cartRepository.getCartItem(productId)
+        val changedRecommend =
+            requireNotNull(_products.value?.firstOrNull { it.product.id == productId })
+        val current = _products.value?.toMutableList() ?: mutableListOf()
+        current[current.indexOf(changedRecommend)] =
+            changedRecommend.copy(quantity = changed.quantity)
+        _products.value = current
     }
 
     private fun loadCartItems() {
@@ -140,20 +179,13 @@ class CartViewModel(
                     isLoading = true,
                 )
         }.onSuccess {
-            handler.postDelayed({
-                _cart.value =
-                    cart.value?.copy(isLoading = false)
-            }, 500)
+            _cart.value =
+                cart.value?.copy(isLoading = false)
         }
     }
 
     private fun findCartIdByProductId(productId: Long): Long {
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
-            ?: error("일치하는 장바구니 아이템이 없습니다.")
-    }
-
-    private fun findCartItemQuantityByProductId(productId: Long): Quantity {
-        return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.quantity
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
@@ -167,4 +199,5 @@ class CartViewModel(
             this.product.imageUrl,
             isChecked,
         )
+
 }

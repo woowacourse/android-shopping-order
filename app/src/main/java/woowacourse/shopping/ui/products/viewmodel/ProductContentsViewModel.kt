@@ -18,7 +18,7 @@ import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
-import woowacourse.shopping.ui.products.toProductUiModel
+import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
@@ -122,7 +122,7 @@ class ProductContentsViewModel(
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
         productWithQuantity.value =
-            ProductWithQuantityUiState(updatedList.map { it.toProductUiModel() }, isLoading = false)
+            ProductWithQuantityUiState(updatedList.map { it.toUiModel() }, isLoading = false)
     }
 
     private fun getQuantity(productId: Long): Quantity {

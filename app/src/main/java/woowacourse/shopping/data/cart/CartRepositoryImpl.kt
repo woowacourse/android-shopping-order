@@ -10,6 +10,12 @@ import woowacourse.shopping.model.Quantity
 import kotlin.concurrent.thread
 
 class CartRepositoryImpl : CartRepository {
+    override fun getCartItem(productId: Long): CartWithProduct {
+        val cart = getAllCartItemsWithProduct().firstOrNull { it.product.id == productId }
+            ?: error("장바구니 정보를 불러올 수 없습니다.")
+        return cart
+    }
+
     override fun getAllCartItems(): List<Cart> {
         var cartsDto: ResponseCartItemsGetDto? = null
         val size = getCartItemCounts()
