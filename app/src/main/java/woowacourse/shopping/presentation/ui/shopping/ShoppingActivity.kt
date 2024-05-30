@@ -156,8 +156,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchInitialRecentProducts()
-//        viewModel.fetchCartData()
+        viewModel.loadInitialShoppingItems()
     }
 
     companion object {

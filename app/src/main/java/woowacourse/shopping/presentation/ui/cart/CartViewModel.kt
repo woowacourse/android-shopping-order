@@ -162,7 +162,6 @@ class CartViewModel(
         _shoppingProducts.value = UiState.Success(newShoppingProducts)
     }
 
-
     fun buildRecommendProducts() {
         recentRepository.loadMostRecent().onSuccess {
             val recentViewedCategory = it?.category ?: "최근 본 아이템 없음"
