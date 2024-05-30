@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.model.CartItem2
+import woowacourse.shopping.data.model.Product2
 import woowacourse.shopping.domain.repository.CartRepository2
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -13,6 +14,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.home.HomeClickListener
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem
 import woowacourse.shopping.view.state.UIState
 
@@ -21,10 +23,7 @@ class CartViewModel(
     private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository2,
-) :
-    ViewModel(),
-    CartItemClickListener,
-    QuantityClickListener {
+) : ViewModel(), CartItemClickListener, QuantityClickListener, HomeClickListener {
 
     private val _isCartScreen = MutableLiveData(true)
     val isCartScreen: LiveData<Boolean>
@@ -94,8 +93,8 @@ class CartViewModel(
     val recentProduct = recentProductRepository.findMostRecentProduct()
 
     private val _recommendedProducts =
-        MutableLiveData<List<HomeViewItem.ProductViewItem>>(emptyList())
-    val recommendedProducts: LiveData<List<HomeViewItem.ProductViewItem>>
+        MutableLiveData<UIState<List<HomeViewItem.ProductViewItem>>>(UIState.Loading)
+    val recommendedProducts: LiveData<UIState<List<HomeViewItem.ProductViewItem>>>
         get() = _recommendedProducts
 
     init {
@@ -222,6 +221,7 @@ class CartViewModel(
         if (isCartScreen.value == true) {
             _navigateToRecommend.value = Event(Unit)
             _isCartScreen.value = false
+            getRecommendedItems()
         } else {
             val result = orderRepository.postOrder(selectedItems.value?.map {
                 it.cartItem.cartItemId
@@ -230,12 +230,35 @@ class CartViewModel(
         }
     }
 
-    fun getRecommendedItems() {
+    private fun getRecommendedItems() {
         val response =
-            productRepository.getProducts(recentProduct?.category, 0, 10, "asc").getOrNull()
+            productRepository.getProducts(recentProduct?.category, 0, 10 + cartItems.size, "asc")
+                .getOrNull()
+        val cartItems =
+            response?.products?.filter { it.id !in cartItems.map { cartItem -> cartItem.cartItem.product.id } }
+                ?: emptyList()
+        _recommendedProducts.value = UIState.Success(cartItems.map {
+            HomeViewItem.ProductViewItem(it)
+        })
     }
 
     fun onBackButtonClick() {
         _isBackButtonClicked.value = Event(true)
+    }
+
+    override fun onProductClick(productId: Int) {
+        _navigateToDetail.value = Event(productId)
+    }
+
+    override fun onLoadMoreButtonClick() {
+        Unit
+    }
+
+    override fun onShoppingCartButtonClick() {
+        Unit
+    }
+
+    override fun onPlusButtonClick(product: Product2) {
+        cartRepository.addCartItem(product.id, 1).getOrNull()
     }
 }
