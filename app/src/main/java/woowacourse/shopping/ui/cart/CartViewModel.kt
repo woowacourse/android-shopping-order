@@ -48,6 +48,9 @@ class CartViewModel(
     private val _checkboxVisibility = MutableLiveData<Boolean>(true)
     val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
 
+    private val _orderButtonEnabled = MutableLiveData(false)
+    val orderButtonEnabled: LiveData<Boolean> get() = _orderButtonEnabled
+
     init {
         loadAllCartItems()
         loadRecommendProductUiModels()
@@ -78,6 +81,7 @@ class CartViewModel(
                 .filter { it.isSelected }
                 .sumOf { it.totalPrice() }
         _totalPrice.value = totalPrice
+        _orderButtonEnabled.value = totalPrice != 0
     }
 
     private fun loadProduct(cartItem: CartItem) {
