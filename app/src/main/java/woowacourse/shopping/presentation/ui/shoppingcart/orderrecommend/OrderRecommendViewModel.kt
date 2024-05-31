@@ -121,7 +121,7 @@ class OrderRecommendViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingCartRepository.insertCartProduct(
+            shoppingCartRepository.postCartItem(
                 productId = product.id,
                 quantity = quantity,
             ).onSuccess { cartItemId ->
@@ -152,7 +152,7 @@ class OrderRecommendViewModel(
 
     private fun deleteCartProduct(cartId: Int) {
         thread {
-            shoppingCartRepository.deleteCartProduct(
+            shoppingCartRepository.deleteCartItem(
                 cartId = cartId,
             ).onSuccess {
                 _uiState.value?.let { state ->
@@ -174,7 +174,7 @@ class OrderRecommendViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingCartRepository.updateCartProduct(
+            shoppingCartRepository.patchCartItem(
                 cartId = cart.id,
                 quantity = quantity,
             ).onSuccess {

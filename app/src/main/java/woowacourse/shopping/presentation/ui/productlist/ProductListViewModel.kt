@@ -47,7 +47,7 @@ class ProductListViewModel(
             productListPagingSource.load().mapCatching { pagingProduct ->
                 val productHistories =
                     productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
+                val cartCount = shoppingCartRepository.getCartItemsCount().getOrDefault(0)
 
                 ProductListUiState(
                     pagingCart = pagingProduct,
@@ -122,7 +122,7 @@ class ProductListViewModel(
 
                 val productHistories =
                     productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
+                val cartCount = shoppingCartRepository.getCartItemsCount().getOrDefault(0)
 
                 _uiState.postValue(
                     state.copy(
@@ -187,7 +187,7 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingCartRepository.insertCartProduct(
+            shoppingCartRepository.postCartItem(
                 productId = product.id,
                 quantity = quantity,
             ).onSuccess { cartItemId ->
@@ -216,7 +216,7 @@ class ProductListViewModel(
 
     private fun deleteCartProduct(cartId: Int) {
         thread {
-            shoppingCartRepository.deleteCartProduct(
+            shoppingCartRepository.deleteCartItem(
                 cartId = cartId,
             ).onFailure { e ->
                 showError(e)
@@ -229,7 +229,7 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingCartRepository.updateCartProduct(
+            shoppingCartRepository.patchCartItem(
                 cartId = cartId,
                 quantity = quantity,
             ).onFailure { e ->

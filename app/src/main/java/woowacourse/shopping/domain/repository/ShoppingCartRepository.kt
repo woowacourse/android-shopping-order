@@ -4,12 +4,12 @@ import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingCartRepository {
-    fun insertCartProduct(
+    fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemId>
 
-    fun updateCartProduct(
+    fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit>
@@ -19,9 +19,9 @@ interface ShoppingCartRepository {
         size: Int,
     ): Result<Carts>
 
-    fun getCartProductsTotal(): Result<Int>
+    fun getCartItemsCount(): Result<Int>
 
-    fun deleteCartProduct(cartId: Int): Result<Unit>
+    fun deleteCartItem(cartId: Int): Result<Unit>
 
     fun getAllCarts(): Result<Carts>
 }

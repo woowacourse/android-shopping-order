@@ -8,19 +8,19 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource) :
     ShoppingCartRepository {
-    override fun insertCartProduct(
+    override fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemId> =
-        dataSource.insertCartProduct(
+        dataSource.postCartItem(
             productId = productId,
             quantity = quantity,
         ).mapCatching { it.toDomain() }
 
-    override fun updateCartProduct(
+    override fun patchCartItem(
         cartId: Int,
         quantity: Int,
-    ): Result<Unit> = dataSource.updateCartProduct(cartId = cartId, quantity = quantity)
+    ): Result<Unit> = dataSource.patchCartItem(cartId = cartId, quantity = quantity)
 
     override fun getCartProductsPaged(
         page: Int,
@@ -29,9 +29,9 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
         dataSource.getCartProductsPaged(page = page, size = size)
             .mapCatching { result -> result.toDomain() }
 
-    override fun getCartProductsTotal(): Result<Int> = dataSource.getCartProductsTotal()
+    override fun getCartItemsCount(): Result<Int> = dataSource.getCartItemsCount()
 
-    override fun deleteCartProduct(cartId: Int): Result<Unit> = dataSource.deleteCartProduct(cartId = cartId)
+    override fun deleteCartItem(cartId: Int): Result<Unit> = dataSource.deleteCartItem(cartId = cartId)
 
     override fun getAllCarts(): Result<Carts> {
         val totalElements =

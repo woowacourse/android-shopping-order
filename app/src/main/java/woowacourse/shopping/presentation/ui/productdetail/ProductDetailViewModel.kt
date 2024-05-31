@@ -105,7 +105,7 @@ class ProductDetailViewModel(
     }
 
     fun insertCart(cart: Cart) {
-        shoppingCartRepository.insertCartProduct(
+        shoppingCartRepository.postCartItem(
             productId = cart.product.id,
             quantity = cart.quantity,
         ).onSuccess {
@@ -118,7 +118,7 @@ class ProductDetailViewModel(
     }
 
     fun updateCart(cart: Cart) {
-        shoppingCartRepository.updateCartProduct(
+        shoppingCartRepository.patchCartItem(
             cartId = cart.id,
             quantity = cart.quantity,
         ).onSuccess {

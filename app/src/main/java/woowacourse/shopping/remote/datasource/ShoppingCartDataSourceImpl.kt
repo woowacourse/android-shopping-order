@@ -10,7 +10,7 @@ import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
 
 class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCartDataSource {
-    override fun insertCartProduct(
+    override fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemIdDto> =
@@ -23,7 +23,7 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
             service.postCartItem(body).execute().toCartItemIdDto()
         }
 
-    override fun updateCartProduct(
+    override fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit> =
@@ -47,12 +47,12 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
                 ?.toData()?.totalElements ?: 0
         }
 
-    override fun getCartProductsTotal(): Result<Int> =
+    override fun getCartItemsCount(): Result<Int> =
         runCatching {
             service.getCartItemsCount().execute().body()?.quantity ?: 0
         }
 
-    override fun deleteCartProduct(cartId: Int): Result<Unit> =
+    override fun deleteCartItem(cartId: Int): Result<Unit> =
         runCatching {
             service.deleteCartItem(id = cartId).execute().body()
         }
