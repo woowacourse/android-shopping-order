@@ -17,7 +17,7 @@ import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class CartViewModel(
     private val productRepository: RemoteProductRepository,
-    private val recommendRepository: RecentProductRepository,
+    private val recentRepository: RecentProductRepository,
     private val cartRepository: RemoteCartRepository,
     private val orderRepository: RemoteOrderRepository,
 ) : ViewModel(), CartListener {
@@ -57,9 +57,7 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
-        val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         cartRepository.getAllCartItem(
-            totalQuantityCount,
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
                     if (result.isEmpty()) {
@@ -251,12 +249,25 @@ class CartViewModel(
     }
 
     fun loadRecommendProductUiModels() {
+        val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
         val cartItems =
             cartUiModels()
                 ?.filter { it.isSelected }
                 ?.map { it.toCartItem() } ?: return
-        val recommendProducts = recommendRepository.getRecommendProducts(cartItems = cartItems)
-        _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
+
+        productRepository.getRecommendProducts(
+            recentProductCategory,
+            cartItems,
+            object : DataCallback<List<Product>> {
+                override fun onSuccess(result: List<Product>) {
+                    _recommendProductUiModels.value = result.map { ProductUiModel.from(it) }
+                }
+
+                override fun onFailure(t: Throwable) {
+                    setError()
+                }
+            },
+        )
     }
 
     private fun addCartItem(productId: Int) {

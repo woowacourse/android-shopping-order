@@ -43,11 +43,28 @@ class RemoteCartRepository {
             )
     }
 
-    fun getAllCartItem(
-        totalItemCount: Int,
-        dataCallback: DataCallback<List<CartItem>>,
-    ) {
-        getCartItems(0, totalItemCount, dataCallback)
+    fun getAllCartItem(dataCallback: DataCallback<List<CartItem>>) {
+        retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
+            .enqueue(
+                object : Callback<CartResponse> {
+                    override fun onResponse(
+                        call: Call<CartResponse>,
+                        response: Response<CartResponse>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val body = response.body() ?: return
+                            dataCallback.onSuccess(body.toCartItems())
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartResponse>,
+                        t: Throwable,
+                    ) {
+                        dataCallback.onFailure(t)
+                    }
+                },
+            )
     }
 
     fun getCartItems(
@@ -236,5 +253,9 @@ class RemoteCartRepository {
                 }
             },
         )
+    }
+
+    companion object {
+        private const val MAX_CART_ITEM_COUNT = 9999999
     }
 }
