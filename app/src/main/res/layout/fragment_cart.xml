@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState" />
+        <import type="woowacourse.shopping.view.state.UiState" />
 
         <import type="java.util.List" />
 
@@ -35,7 +35,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:visibility="@{viewModel.cartUiState instanceof UIState.Success ? View.GONE : View.VISIBLE}" />
+            android:visibility="@{viewModel.cartUiState instanceof UiState.Success ? View.GONE : View.VISIBLE}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
@@ -43,7 +43,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            android:visibility="@{viewModel.cartUiState instanceof UIState.Success ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.cartUiState instanceof UiState.Success ? View.VISIBLE : View.GONE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

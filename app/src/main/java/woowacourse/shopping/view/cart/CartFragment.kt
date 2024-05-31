@@ -12,7 +12,7 @@ import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.view.cart.adapter.CartAdapter
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.view.detail.DetailActivity
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.UiState
 
 class CartFragment : Fragment() {
     private var _binding: FragmentCartBinding? = null
@@ -45,9 +45,9 @@ class CartFragment : Fragment() {
 
         viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UIState.Success -> showData(state.data)
-                is UIState.Loading -> return@observe
-                is UIState.Error ->
+                is UiState.Success -> showData(state.data)
+                is UiState.Loading -> return@observe
+                is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
@@ -87,7 +87,7 @@ class CartFragment : Fragment() {
     }
 
     private fun showError(errorMessage: String) {
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun alertDeletion() {

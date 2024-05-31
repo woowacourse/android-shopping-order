@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase
     entities = [
         RecentProductEntity::class,
     ],
-    version = 2,
+    version = 1,
 )
 abstract class RecentProductDatabase : RoomDatabase() {
     abstract fun recentProductDao(): RecentProductDao

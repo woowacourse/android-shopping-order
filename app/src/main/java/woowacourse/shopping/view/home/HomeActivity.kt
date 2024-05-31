@@ -19,7 +19,7 @@ import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOA
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.UiState
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -64,44 +64,45 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         binding.rvProductList.layoutManager = layoutManager
+        binding.rvProductList.itemAnimator = null
+
         recentProductAdapter = RecentProductAdapter(viewModel)
         binding.rvRecentProducts.adapter = recentProductAdapter
-        binding.rvProductList.itemAnimator = null
         binding.rvRecentProducts.itemAnimator = null
     }
 
     private fun observeViewModel() {
-        viewModel.shoppingUiState.observe(this) { state ->
+        viewModel.homeUiState.observe(this) { state ->
             when (state) {
-                is UIState.Success -> showData(state.data)
-                is UIState.Loading -> return@observe
-                is UIState.Error ->
+                is UiState.Success -> showData(state.data)
+                is UiState.Loading -> return@observe
+                is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
             }
         }
 
-        viewModel.recentProducts.observe(this) {
-            recentProductAdapter.loadData(it)
+        viewModel.recentProducts.observe(this) { recentProducts ->
+            recentProductAdapter.loadData(recentProducts)
         }
 
-        viewModel.updatedProductItem.observe(this) {
-            productAdapter.updateProductQuantity(it)
+        viewModel.updatedProductViewItem.observe(this) { updatedProductViewItem ->
+            productAdapter.updateProductQuantity(updatedProductViewItem)
         }
 
-        viewModel.loadedProductItems.observe(this) {
-            productAdapter.updateData(it)
+        viewModel.loadedProductViewItems.observe(this) { loadedProductViewItems ->
+            productAdapter.updateData(loadedProductViewItems)
         }
 
-        viewModel.navigateToDetail.observe(this) {
-            it.getContentIfNotHandled()?.let { productId ->
+        viewModel.navigateToDetail.observe(this) { navigateToDetail ->
+            navigateToDetail.getContentIfNotHandled()?.let { productId ->
                 navigateToDetail(productId)
             }
         }
 
-        viewModel.navigateToCart.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.navigateToCart.observe(this) { navigateToCart ->
+            navigateToCart.getContentIfNotHandled()?.let {
                 navigateToCart()
             }
         }
@@ -112,7 +113,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToDetail(productId: Int) {

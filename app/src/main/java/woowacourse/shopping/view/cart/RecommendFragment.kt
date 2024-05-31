@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.view.home.adapter.product.ProductAdapter
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.UiState
 
 class RecommendFragment : Fragment() {
     private var _binding: FragmentRecommendBinding? = null
@@ -39,9 +39,9 @@ class RecommendFragment : Fragment() {
 
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UIState.Success -> adapter.loadData(state.data, false)
-                is UIState.Loading -> return@observe
-                is UIState.Error -> showError(state.exception.message ?: getString(R.string.unknown_error))
+                is UiState.Success -> adapter.loadData(state.data, false)
+                is UiState.Loading -> return@observe
+                is UiState.Error -> showError(state.exception.message ?: getString(R.string.unknown_error))
             }
         }
     }
@@ -52,6 +52,6 @@ class RecommendFragment : Fragment() {
     }
 
     private fun showError(errorMessage: String) {
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
 }

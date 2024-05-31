@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
 class ProductRepositoryImpl(
     private val remoteProductDataSource: RemoteProductDataSource,
 ) : ProductRepository {
-    override fun getProducts(
+    override fun getProductResponse(
         category: String?,
         page: Int,
         size: Int,

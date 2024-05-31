@@ -14,8 +14,8 @@ class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) 
     private val dao = recentProductDatabase.recentProductDao()
 
     override fun save(product: Product) {
-        if (findOrNullByProductId(product.id) != null) {
-            update(product.id)
+        if (findOrNullByProductId(product.productId) != null) {
+            update(product.productId)
         } else {
             threadAction {
                 dao.save(product.toRecentProductEntity())

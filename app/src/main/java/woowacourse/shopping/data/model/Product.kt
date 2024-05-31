@@ -8,7 +8,7 @@ data class Product(
     @SerializedName("category")
     val category: String,
     @SerializedName("id")
-    val id: Int,
+    val productId: Int,
     @SerializedName("imageUrl")
     val imageUrl: String,
     @SerializedName("name")
@@ -20,7 +20,7 @@ data class Product(
 fun Product.toRecentProductEntity(): RecentProductEntity {
     val localDateTime = LocalDateTime.now().toString()
     return RecentProductEntity(
-        productId = this.id,
+        productId = this.productId,
         productName = this.name,
         imageUrl = this.imageUrl,
         dateTime = localDateTime,

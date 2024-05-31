@@ -25,7 +25,7 @@ class ShoppingApplication : Application() {
 
         val client =
             OkHttpClient.Builder()
-                .addInterceptor(BasicAuthInterceptor(username = "kmkim2689", password = "password"))
+                .addInterceptor(BasicAuthInterceptor(username = "dpcks0509", password = "password"))
                 .addInterceptor(logging)
                 .build()
 

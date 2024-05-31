@@ -95,7 +95,7 @@ class ProductAdapter(
         if (!isFirstLoad()) {
             val position =
                 homeViewItems.indexOfFirst { item ->
-                    item is ProductViewItem && item.product.id == updatedProductItem.product.id
+                    item is ProductViewItem && item.product.productId == updatedProductItem.product.productId
                 }
 
             if (position != -1) {

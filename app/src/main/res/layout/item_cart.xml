@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:background="@drawable/shopping_cart_item_gridview"
-        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartViewItem.cartItem.product.id)}">
+        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartViewItem.cartItem.product.productId)}">
 
         <CheckBox
             android:id="@+id/checkbox_cart"
@@ -90,7 +90,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:productId="@{cartViewItem.cartItem.product.id}"
+            app:productId="@{cartViewItem.cartItem.product.productId}"
             app:quantity="@{cartViewItem.cartItem.quantity}" />
 
         <ImageView

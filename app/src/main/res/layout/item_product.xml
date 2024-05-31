@@ -21,7 +21,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> shoppingClickListener.onProductClick(productItem.product.id)}"
+        android:onClick="@{() -> shoppingClickListener.onProductClick(productItem.product.productId)}"
         android:paddingBottom="12dp">
 
         <ImageView
@@ -59,7 +59,7 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintLeft_toLeftOf="@id/iv_product"
             app:layout_constraintRight_toRightOf="@id/iv_product"
-            app:productId="@{productItem.product.id}"
+            app:productId="@{productItem.product.productId}"
             app:quantity="@{productItem.quantity}"
             app:viewVisibility="@{productItem.quantityControlVisible}" />
 

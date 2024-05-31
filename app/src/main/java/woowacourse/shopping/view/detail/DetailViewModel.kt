@@ -11,7 +11,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityClickListener
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.UiState
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
@@ -19,8 +19,8 @@ class DetailViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val productId: Int,
 ) : ViewModel(), DetailClickListener, QuantityClickListener {
-    private val _detailUiState = MutableLiveData<UIState<Product>>(UIState.Loading)
-    val detailUiState: LiveData<UIState<Product>>
+    private val _detailUiState = MutableLiveData<UiState<Product>>(UiState.Loading)
+    val detailUiState: LiveData<UiState<Product>>
         get() = _detailUiState
 
     private val _product: MutableLiveData<Product> = MutableLiveData()
@@ -68,18 +68,18 @@ class DetailViewModel(
         try {
             val productData = productRepository.getProductById(productId).getOrNull() ?: return
             _product.value = productData
-            _detailUiState.value = UIState.Success(productData)
+            _detailUiState.value = UiState.Success(productData)
         } catch (e: Exception) {
-            _detailUiState.value = UIState.Error(e)
+            _detailUiState.value = UiState.Error(e)
         }
     }
 
     fun saveCartItem() {
         val state = detailUiState.value
-        if (state is UIState.Success) {
+        if (state is UiState.Success) {
             val cartResponse = cartRepository.getCartItems(0, totalQuantity, "asc").getOrNull()
             val cartItems = cartResponse?.cartItems
-            val cartItemId = cartItems?.firstOrNull { it.product.id == productId }?.cartItemId
+            val cartItemId = cartItems?.firstOrNull { it.product.productId == productId }?.cartItemId
             val currentQuantity =
                 cartItems?.firstOrNull { it.cartItemId == cartItemId }?.quantity ?: 0
             val quantity = quantity.value ?: 0
@@ -101,7 +101,7 @@ class DetailViewModel(
 
     fun updateRecentProductVisible(isMostRecentProductClicked: Boolean) {
         _isMostRecentProductVisible.value =
-            if (mostRecentProduct.value == null || product.value?.id == mostRecentProduct.value?.productId) {
+            if (mostRecentProduct.value == null || product.value?.productId == mostRecentProduct.value?.productId) {
                 false
             } else {
                 !isMostRecentProductClicked

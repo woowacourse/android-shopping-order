@@ -103,7 +103,7 @@
             app:clickListener="@{viewModel}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider"
-            app:productId="@{viewModel.product.id}"
+            app:productId="@{viewModel.product.productId}"
             app:quantity="@{viewModel.quantity}" />
 
         <TextView
@@ -129,6 +129,7 @@
             android:layout_height="80dp"
             android:layout_marginBottom="35dp"
             android:background="@drawable/shopping_cart_item_gridview"
+            android:onClick="@{() -> viewModel.onRecentProductClick()}"
             app:layout_constraintBottom_toTopOf="@id/btn_put_cart"
             app:layout_constraintLeft_toLeftOf="@id/tv_detail_price"
             app:layout_constraintRight_toRightOf="@id/btn_quantity_control"
@@ -154,7 +155,6 @@
                 android:layout_marginTop="6dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:onClick="@{() -> viewModel.onRecentProductClick()}"
                 android:text="@{viewModel.mostRecentProduct.productName}"
                 android:textColor="@color/gray_500"
                 android:textSize="18dp"

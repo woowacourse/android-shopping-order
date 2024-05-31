@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState"/>
+        <import type="woowacourse.shopping.view.state.UiState"/>
 
         <variable
             name="viewModel"

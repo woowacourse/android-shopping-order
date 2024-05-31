@@ -55,14 +55,14 @@
                 android:backgroundTint="@color/teal_200"
                 android:gravity="center"
                 android:onClick="@{() -> viewModel.onShoppingCartButtonClick()}"
-                android:text="@{String.valueOf(viewModel.totalQuantity)}"
+                android:text="@{String.valueOf(viewModel.cartTotalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="14dp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:totalQuantityVisibility="@{viewModel.totalQuantity}"
+                app:totalQuantityVisibility="@{viewModel.cartTotalQuantity}"
                 tools:text="2"
                 tools:visibility="visible" />
 

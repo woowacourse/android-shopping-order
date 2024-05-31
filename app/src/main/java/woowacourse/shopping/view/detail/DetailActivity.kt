@@ -15,7 +15,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.cart.CartActivity
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.UiState
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
@@ -56,7 +56,7 @@ class DetailActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.detailUiState.observe(this) { state ->
-            if (state is UIState.Error) {
+            if (state is UiState.Error) {
                 showError(
                     state.exception.message ?: getString(R.string.unknown_error),
                 )
@@ -83,7 +83,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToDetail() {
