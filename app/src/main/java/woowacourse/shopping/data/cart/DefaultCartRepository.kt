@@ -31,8 +31,7 @@ class DefaultCartRepository(
     }
 
     override fun totalCartProducts(): Result<List<CartProduct>> {
-        return cartDataSource.loadTotalCarts()
-            .toCartProducts()
+        return cartDataSource.loadTotalCarts().toCartProducts()
     }
 
     override fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
