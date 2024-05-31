@@ -172,6 +172,12 @@ class CartViewModel(
     override fun increaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
+        if (isRecommendProduct(productId)) {
+            var newQuantity = getRecommendProductUiModel(productId)?.quantity ?: return
+            updateRecommendProducts(productId, ++newQuantity)
+            return
+        }
+
         val cartUiModel = cartUiModel(productId)
         if (cartUiModel == null) {
             addCartItem(productId)
@@ -185,6 +191,12 @@ class CartViewModel(
     override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
+        if (isRecommendProduct(productId)) {
+            var newQuantity = getRecommendProductUiModel(productId)?.quantity ?: return
+            updateRecommendProducts(productId, --newQuantity)
+            return
+        }
+
         val cartUiModel = cartUiModel(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(productId)
@@ -193,6 +205,30 @@ class CartViewModel(
 
         var newQuantity = cartUiModel.quantity
         setQuantity(cartUiModel.cartItemId, --newQuantity)
+    }
+
+    private fun getRecommendProductUiModel(productId: Int): ProductUiModel? {
+        return _recommendProductUiModels.value?.find { it.productId == productId }
+    }
+
+    private fun isRecommendProduct(productId: Int): Boolean {
+        val recommendProductUiModels = _recommendProductUiModels.value ?: return false
+        return recommendProductUiModels.any { it.productId == productId }
+    }
+
+    private fun updateRecommendProducts(
+        productId: Int,
+        quantity: Quantity,
+    ) {
+        val recommendProductUiModels = _recommendProductUiModels.value?.toMutableList() ?: return
+        val recommendProductUiModel =
+            recommendProductUiModels.find { it.productId == productId } ?: return
+        val position = recommendProductUiModels.indexOf(recommendProductUiModel)
+
+        recommendProductUiModels[position] = recommendProductUiModel.copy(quantity = quantity)
+        _recommendProductUiModels.value = recommendProductUiModels
+        updateTotalQuantity()
+        updateTotalPrice()
     }
 
     override fun selectCartItem(
@@ -250,10 +286,7 @@ class CartViewModel(
 
     fun loadRecommendProductUiModels() {
         val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
-        val cartItems =
-            cartUiModels()
-                ?.filter { it.isSelected }
-                ?.map { it.toCartItem() } ?: return
+        val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
 
         productRepository.getRecommendProducts(
             recentProductCategory,
