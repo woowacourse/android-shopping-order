@@ -34,7 +34,7 @@ class OrderRecommendViewModel(
 
     private fun recommendProductLoad() {
         thread {
-            productHistoryRepository.getProductHistoriesByCategory(10)
+            productHistoryRepository.getRecommendedProducts(10)
                 .onSuccess { recommendProducts ->
 
                     hideError()

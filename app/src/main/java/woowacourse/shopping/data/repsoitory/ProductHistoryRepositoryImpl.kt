@@ -31,7 +31,7 @@ class ProductHistoryRepositoryImpl(
         productHistoryDataSource.findProductHistory(productId = productId)
             .mapCatching { it.toDomain() }
 
-    override fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
+    override fun getRecommendedProducts(size: Int): Result<List<Cart>> {
         val recentHistory =
             productHistoryDataSource.getProductHistory(1).getOrNull() ?: return Result.success(
                 emptyList(),
