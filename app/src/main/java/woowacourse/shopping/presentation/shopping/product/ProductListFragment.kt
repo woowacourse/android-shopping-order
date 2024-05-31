@@ -57,6 +57,11 @@ class ProductListFragment :
         initErrorEvent()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadCartProducts()
+    }
+
     private fun initAppBar() {
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.apply {
             title = getString(R.string.app_name)
