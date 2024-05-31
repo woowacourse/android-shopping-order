@@ -21,7 +21,7 @@ interface ProductApi {
     ): Call<ProductResponse>
 
     @POST("/products")
-    fun postProduct(
+    fun addProduct(
         @Header("accept") accept: String = "*/*",
         @Body productRequest: ProductRequest,
     ): Call<Unit>

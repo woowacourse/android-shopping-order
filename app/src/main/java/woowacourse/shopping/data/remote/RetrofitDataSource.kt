@@ -26,8 +26,8 @@ class RetrofitDataSource(
         return productApi.getProducts(category = category, page = page, size = size).execute()
     }
 
-    override fun postProduct(productRequest: ProductRequest): Response<Unit> {
-        return productApi.postProduct(productRequest = productRequest).execute()
+    override fun addProduct(productRequest: ProductRequest): Response<Unit> {
+        return productApi.addProduct(productRequest = productRequest).execute()
     }
 
     override fun getProductById(id: Int): Response<Product> {

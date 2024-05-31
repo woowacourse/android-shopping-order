@@ -17,7 +17,7 @@ interface RemoteDataSource {
         size: Int = 20,
     ): Response<ProductResponse>
 
-    fun postProduct(productRequest: ProductRequest): Response<Unit>
+    fun addProduct(productRequest: ProductRequest): Response<Unit>
 
     fun getProductById(id: Int): Response<Product>
 
