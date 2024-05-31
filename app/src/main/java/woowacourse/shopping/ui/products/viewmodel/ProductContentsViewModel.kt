@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -108,7 +109,11 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        cart.value = cartRepository.getAllCartItems()
+        cartRepository.getAllCartItems().onSuccess {
+            cart.value = it
+        }.onFailure {
+            Log.e("Test", it.message.toString())
+        }
     }
 
     fun loadRecentProducts() {

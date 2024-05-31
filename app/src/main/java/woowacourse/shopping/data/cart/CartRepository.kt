@@ -1,28 +1,28 @@
 package woowacourse.shopping.data.cart
 
 interface CartRepository {
-    fun getCartItem(productId: Long): CartWithProduct
+    fun getCartItem(productId: Long): Result<CartWithProduct>
 
-    fun getAllCartItems(): List<Cart>
+    fun getAllCartItems(): Result<List<Cart>>
 
-    fun getAllCartItemsWithProduct(): List<CartWithProduct>
+    fun getAllCartItemsWithProduct(): Result<List<CartWithProduct>>
 
     fun postCartItems(
         productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun deleteCartItem(id: Long)
+    fun deleteCartItem(id: Long): Result<Unit>
 
-    fun getCartItemCounts(): Int
+    fun getCartItemCounts(): Result<Int>
 
     fun patchCartItem(
         id: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
     fun addProductToCart(
         productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 }

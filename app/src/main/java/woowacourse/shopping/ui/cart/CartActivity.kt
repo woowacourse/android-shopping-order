@@ -3,8 +3,8 @@ package woowacourse.shopping.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -21,6 +21,7 @@ import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.products.toUiModel
 
 class CartActivity : AppCompatActivity() {
+    private var toast: Toast? = null
     private lateinit var binding: ActivityCartBinding
     private lateinit var adapter: CartAdapter
     private lateinit var recommendProductAdapter: RecommendProductAdapter
@@ -55,6 +56,14 @@ class CartActivity : AppCompatActivity() {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
 
+        observeError()
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(this) {
+            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
+            toast?.show()
+        }
     }
 
     private fun initBinding() {
