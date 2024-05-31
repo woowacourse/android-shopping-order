@@ -9,7 +9,13 @@ class ShoppingCartPagingSource(private val repository: ShoppingCartRepository) {
 
         return result.fold(
             onSuccess = { cardProducts ->
-                Result.success(PagingCartProduct(cardProducts.content, cardProducts.pageable.pageNumber, cardProducts.last))
+                Result.success(
+                    PagingCartProduct(
+                        cardProducts.content,
+                        cardProducts.pageable.pageNumber,
+                        cardProducts.last,
+                    ),
+                )
             },
             onFailure = { e ->
                 Result.failure(e)

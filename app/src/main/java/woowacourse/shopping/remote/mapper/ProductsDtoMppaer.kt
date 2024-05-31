@@ -7,14 +7,5 @@ fun ProductsResponse.toData(): ProductsDto {
     return ProductsDto(
         content = this.content.map { it.toData() },
         pageableDto = this.pageableResponse.toData(),
-        last = this.last,
-        totalPages = this.totalPages,
-        totalElements = this.totalElements,
-        sortDto = this.sortResponse.toData(),
-        first = this.first,
-        number = this.number,
-        numberOfElements = this.numberOfElements,
-        size = this.size,
-        empty = this.empty,
     )
 }
