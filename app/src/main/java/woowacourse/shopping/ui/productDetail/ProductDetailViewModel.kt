@@ -11,9 +11,11 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
+import woowacourse.shopping.domain.repository.cart.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.product.DefaultProductRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
@@ -23,6 +25,7 @@ class ProductDetailViewModel(
     private val productId: Long,
     private val shoppingProductsRepository: ProductRepository,
     private val productHistoryRepository: ProductHistoryRepository,
+    private val cartItemRepository: CartItemRepository,
 ) : ViewModel(), OnItemQuantityChangeListener, OnProductItemClickListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
@@ -61,7 +64,7 @@ class ProductDetailViewModel(
     fun addProductToCart() {
         val productCount = productCount.value ?: return
         thread {
-            shoppingProductsRepository.addShoppingCartProduct(productId, productCount)
+            cartItemRepository.addCartItem(productId, productCount)
         }
     }
 
@@ -98,17 +101,22 @@ class ProductDetailViewModel(
                     productDataSource = ShoppingApp.productSource,
                     cartItemDataSource = ShoppingApp.cartSource,
                 ),
-            historyRepository: ProductHistoryRepository =
+            productHistoryRepository: ProductHistoryRepository =
                 DefaultProductHistoryRepository(
                     productHistoryDataSource = ShoppingApp.historySource,
                     productDataSource = ShoppingApp.productSource,
+                ),
+            cartItemRepository: CartItemRepository =
+                DefaultCartItemRepository(
+                    cartItemDataSource = ShoppingApp.cartSource,
                 ),
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 ProductDetailViewModel(
                     productId = productId,
                     shoppingProductsRepository = shoppingProductsRepository,
-                    productHistoryRepository = historyRepository,
+                    productHistoryRepository = productHistoryRepository,
+                    cartItemRepository = cartItemRepository,
                 )
             }
         }

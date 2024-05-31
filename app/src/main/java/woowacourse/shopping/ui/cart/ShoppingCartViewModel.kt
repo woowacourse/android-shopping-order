@@ -9,8 +9,8 @@ import woowacourse.shopping.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.domain.repository.product.DefaultProductRepository
-import woowacourse.shopping.domain.repository.product.ProductRepository
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
+import woowacourse.shopping.domain.repository.cart.DefaultCartItemRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
@@ -20,7 +20,7 @@ import woowacourse.shopping.ui.model.CartItem
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
-    private val shoppingProductsRepository: ProductRepository,
+    private val cartItemRepository: CartItemRepository,
 ) : ViewModel(),
     OnProductItemClickListener,
     OnItemQuantityChangeListener,
@@ -50,7 +50,7 @@ class ShoppingCartViewModel(
     fun loadAll() {
         thread {
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+                cartItemRepository.loadPagedCartItem()
 
             uiHandler.post {
                 _cartItems.value = currentItems
@@ -60,9 +60,9 @@ class ShoppingCartViewModel(
 
     fun deleteItem(cartItemId: Long) {
         thread {
-            shoppingProductsRepository.removeShoppingCartProduct(cartItemId)
+            cartItemRepository.removeCartItem(cartItemId)
             val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+                cartItemRepository.loadPagedCartItem()
 
             uiHandler.post {
                 _cartItems.value = currentItems
@@ -71,16 +71,17 @@ class ShoppingCartViewModel(
         updateSelectedCartItemsCount()
     }
 
-    fun updateSelectedCartItemsCount() {
+    private fun updateSelectedCartItemsCount() {
         _selectedCartItemsCount.value = cartItems.value?.count { it.checked }
     }
 
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-        _navigationOrderEvent.value = cartItems.value?.filter {
-            it.checked
-        }?.map { it.id }
+        _navigationOrderEvent.value =
+            cartItems.value?.filter {
+                it.checked
+            }?.map { it.id }
     }
 
     override fun onClick(productId: Long) {
@@ -92,8 +93,8 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
-            val currentItems = shoppingProductsRepository.loadPagedCartItem()
+            cartItemRepository.increaseCartProduct(productId, quantity)
+            val currentItems = cartItemRepository.loadPagedCartItem()
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
@@ -106,8 +107,8 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingProductsRepository.decreaseShoppingCartProduct(productId, quantity)
-            val currentItems = shoppingProductsRepository.loadPagedCartItem()
+            cartItemRepository.decreaseCartProduct(productId, quantity)
+            val currentItems = cartItemRepository.loadPagedCartItem()
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
@@ -173,14 +174,13 @@ class ShoppingCartViewModel(
         private const val TAG = "ShoppingCartViewModel"
 
         fun factory(
-            shoppingProductsRepository: ProductRepository =
-                DefaultProductRepository(
-                    productDataSource = ShoppingApp.productSource,
+            cartItemRepository: CartItemRepository =
+                DefaultCartItemRepository(
                     cartItemDataSource = ShoppingApp.cartSource,
                 ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ShoppingCartViewModel(shoppingProductsRepository)
+                ShoppingCartViewModel(cartItemRepository)
             }
     }
 }

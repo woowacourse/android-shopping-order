@@ -11,9 +11,11 @@ import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.currentPageIsNullException
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
+import woowacourse.shopping.domain.repository.cart.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.product.DefaultProductRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
@@ -22,6 +24,7 @@ import kotlin.concurrent.thread
 class ProductListViewModel(
     private val productsRepository: ProductRepository,
     private val productHistoryRepository: ProductHistoryRepository,
+    private val cartItemRepository: CartItemRepository,
     private var _currentPage: MutableLiveData<Int> = MutableLiveData(FIRST_PAGE),
 ) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener {
     val currentPage: LiveData<Int> get() = _currentPage
@@ -95,10 +98,9 @@ class ProductListViewModel(
     ) {
         thread {
             try {
-                productsRepository.increaseShoppingCartProduct(productId, quantity)
+                cartItemRepository.increaseCartProduct(productId, quantity)
             } catch (e: NoSuchElementException) {
-                productsRepository.addShoppingCartProduct(productId, quantity)
-            } catch (_: Exception) {
+                cartItemRepository.addCartItem(productId, quantity)
             } finally {
                 val totalCount = productsRepository.shoppingCartProductQuantity()
 
@@ -122,7 +124,7 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         thread {
-            productsRepository.decreaseShoppingCartProduct(productId, quantity)
+            cartItemRepository.decreaseCartProduct(productId, quantity)
 
             val totalCount = productsRepository.shoppingCartProductQuantity()
 
@@ -157,9 +159,13 @@ class ProductListViewModel(
                     ShoppingApp.historySource,
                     ShoppingApp.productSource,
                 ),
+            cartItemRepository: CartItemRepository =
+                DefaultCartItemRepository(
+                    ShoppingApp.cartSource,
+                ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ProductListViewModel(productRepository, historyRepository)
+                ProductListViewModel(productRepository, historyRepository, cartItemRepository)
             }
     }
 }
