@@ -54,7 +54,7 @@ class ProductContentsViewModel(
     private val _recentProducts: MutableLiveData<List<RecentProduct>> = MutableLiveData()
     val recentProducts: LiveData<List<Product>> =
         _recentProducts.map { recentProducts ->
-            recentProducts.map { productRepository.find(it.productId) }
+            recentProducts.map { productRepository.find(it.productId).getOrThrow() }
         }
 
     private val _productDetailId = MutableSingleLiveData<Long>()
@@ -97,11 +97,9 @@ class ProductContentsViewModel(
 
     fun loadProducts() {
         val handler = Handler(Looper.getMainLooper())
-        runCatching {
-            val products = productRepository.getProducts(currentOffset++, 20)
-            items.addAll(products)
+        productRepository.getProducts(currentOffset++, 20).onSuccess {
+            items.addAll(it)
             this.products.value = items
-        }.onSuccess {
             handler.postDelayed({
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }, 2000)

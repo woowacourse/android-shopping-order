@@ -6,9 +6,9 @@ interface ProductRepository {
     fun getProducts(
         page: Int,
         size: Int,
-    ): List<Product>
+    ): Result<List<Product>>
 
-    fun find(id: Long): Product
+    fun find(id: Long): Result<Product>
 
-    fun productsByCategory(category: String): List<Product>
+    fun productsByCategory(category: String): Result<List<Product>>
 }

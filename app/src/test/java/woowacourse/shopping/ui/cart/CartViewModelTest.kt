@@ -25,7 +25,7 @@ class CartViewModelTest {
     fun setUp() {
         productRepository = mockk<ProductRepositoryImpl>()
         cartRepository = mockk<CartRepositoryImpl>()
-        every { cartRepository.getAllCartItemsWithProduct() } returns emptyList()
+        every { cartRepository.getAllCartItemsWithProduct().getOrThrow() } returns emptyList()
         viewModel = CartViewModel(productRepository, cartRepository, recentProductRepository)
     }
 

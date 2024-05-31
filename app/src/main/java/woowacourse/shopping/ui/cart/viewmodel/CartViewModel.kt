@@ -9,6 +9,7 @@ import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
@@ -88,15 +89,21 @@ class CartViewModel(
     }
 
     fun loadRecommendProducts() {
-        runCatching {
-            val recentProductId =
-                requireNotNull(recentProductRepository.findMostRecentProduct()).productId
-            val category = productRepository.find(recentProductId).category
-            productRepository.productsByCategory(category)
-                .filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
-        }.onSuccess {
+        val recentProductId =
+            requireNotNull(recentProductRepository.findMostRecentProduct()).productId
+        productRepository.find(recentProductId).onSuccess {
+            setRecommendProducts(it)
+        }.onFailure {
+            error.setValue(it)
+        }
+    }
+
+    private fun setRecommendProducts(it: Product) {
+        productRepository.productsByCategory(it.category).onSuccess {
             _products.value =
-                it.map { ProductWithQuantity(product = it) }.subList(0, minOf(it.size, 10))
+                it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
+                    .map { ProductWithQuantity(product = it) }
+                    .subList(0, minOf(it.size, 10))
             noRecommendProductState.value = false
         }.onFailure {
             noRecommendProductState.value = true

@@ -29,7 +29,7 @@ class ProductContentsViewModelTest {
         productRepository = mockk<ProductRepository>()
         recentProductRepository = mockk<RecentProductRepository>()
         cartRepository = mockk<CartRepository>()
-        every { productRepository.getProducts(0, 20) } returns PRODUCT_STUB.subList(0, 20)
+        every { productRepository.getProducts(0, 20).getOrThrow() } returns PRODUCT_STUB.subList(0, 20)
         viewModel =
             ProductContentsViewModel(productRepository, recentProductRepository, cartRepository)
     }
@@ -37,7 +37,7 @@ class ProductContentsViewModelTest {
     @Test
     fun `상품을 가져올 때, 20개씩 가져온다`() {
         // given
-        every { productRepository.getProducts(1, 20) } returns PRODUCT_STUB.subList(20, 40)
+        every { productRepository.getProducts(1, 20).getOrThrow() } returns PRODUCT_STUB.subList(20, 40)
 
         // when
         viewModel.loadProducts()
@@ -51,7 +51,7 @@ class ProductContentsViewModelTest {
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // given
         every { cartRepository.addProductToCart(0, 1) }
-        every { cartRepository.getAllCartItems() } returns listOf(Cart(0L, 0L, Quantity(1)))
+        every { cartRepository.getAllCartItems().getOrThrow() } returns listOf(Cart(0L, 0L, Quantity(1)))
 
         // when
         viewModel.addCart(0)

@@ -26,7 +26,7 @@ class ProductDetailViewModelTest {
     fun setUp() {
         productRepository = mockk<ProductRepositoryImpl>()
         cartRepository = mockk<CartRepositoryImpl>()
-        every { productRepository.find(1L) } returns PRODUCT_STUB
+        every { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
         viewModel =
             ProductDetailViewModel(1L, productRepository, recentProductRepository, cartRepository)
     }
@@ -34,7 +34,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `선택한 상품이 불러와진다`() {
         // given
-        every { productRepository.find(1L) } returns PRODUCT_STUB
+        every { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
 
         // when
         viewModel.loadProduct()

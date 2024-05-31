@@ -48,9 +48,7 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-        runCatching {
-            productRepository.find(productId)
-        }.onSuccess {
+        productRepository.find(productId).onSuccess {
             _error.value = false
             _productWithQuantity.value = ProductWithQuantity(product = it)
         }.onFailure {
@@ -91,9 +89,7 @@ class ProductDetailViewModel(
         lastSeenProductState: Boolean,
     ) {
         recentProductRepository.findMostRecentProduct()?.let {
-            runCatching {
-                productRepository.find(it.productId)
-            }.onSuccess {
+            productRepository.find(it.productId).onSuccess {
                 _error.value = false
                 _mostRecentProduct.value = it
                 if (!lastSeenProductState) return
