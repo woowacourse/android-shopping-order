@@ -7,6 +7,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object NetworkManager {
     private var instance: Retrofit? = null
     private const val BASE_URL = "http://54.180.95.212:8080"
+    const val ACCEPT_HEADER = "*/*"
+    const val ACCEPT_KEY = "accept"
+    const val AUTH_KEY = "Authorization"
 
     private fun getRetrofit(): Retrofit {
         return instance ?: Retrofit.Builder()
