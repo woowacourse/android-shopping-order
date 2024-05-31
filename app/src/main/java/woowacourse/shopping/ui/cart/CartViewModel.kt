@@ -64,6 +64,7 @@ class CartViewModel(
                         _cartUiState.value = Event(CartUiState.Empty)
                         updateTotalQuantity()
                         updateTotalPrice()
+                        return
                     }
                     result.forEach { loadProduct(it) }
                 }
@@ -124,7 +125,13 @@ class CartViewModel(
     ) {
         val oldCartUiModels = cartUiModels() ?: emptyList()
         val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
-        val newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
+
+        var newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
+
+        if (isRecommendProduct(product.id)) {
+            newCartUiModel = newCartUiModel.copy(isSelected = true)
+        }
+
         val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
@@ -152,6 +159,9 @@ class CartViewModel(
             object : DataCallback<Unit> {
                 override fun onSuccess(result: Unit) {
                     updateDeletedCart(cartUiModel)
+                    if (isRecommendProduct(cartUiModel.productId)) {
+                        updateRecommendProducts(cartUiModel.productId, Quantity())
+                    }
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -172,43 +182,25 @@ class CartViewModel(
     override fun increaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
-        if (isRecommendProduct(productId)) {
-            var newQuantity = getRecommendProductUiModel(productId)?.quantity ?: return
-            updateRecommendProducts(productId, ++newQuantity)
-            return
-        }
-
         val cartUiModel = cartUiModel(productId)
         if (cartUiModel == null) {
             addCartItem(productId)
             return
         }
-
         var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel.cartItemId, ++newQuantity)
+        setQuantity(cartUiModel, ++newQuantity)
     }
 
     override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
-
-        if (isRecommendProduct(productId)) {
-            var newQuantity = getRecommendProductUiModel(productId)?.quantity ?: return
-            updateRecommendProducts(productId, --newQuantity)
-            return
-        }
 
         val cartUiModel = cartUiModel(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(productId)
             return
         }
-
         var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel.cartItemId, --newQuantity)
-    }
-
-    private fun getRecommendProductUiModel(productId: Int): ProductUiModel? {
-        return _recommendProductUiModels.value?.find { it.productId == productId }
+        setQuantity(cartUiModel, --newQuantity)
     }
 
     private fun isRecommendProduct(productId: Int): Boolean {
@@ -218,7 +210,7 @@ class CartViewModel(
 
     private fun updateRecommendProducts(
         productId: Int,
-        quantity: Quantity,
+        quantity: Quantity = Quantity(1),
     ) {
         val recommendProductUiModels = _recommendProductUiModels.value?.toMutableList() ?: return
         val recommendProductUiModel =
@@ -227,8 +219,6 @@ class CartViewModel(
 
         recommendProductUiModels[position] = recommendProductUiModel.copy(quantity = quantity)
         _recommendProductUiModels.value = recommendProductUiModels
-        updateTotalQuantity()
-        updateTotalPrice()
     }
 
     override fun selectCartItem(
@@ -242,6 +232,7 @@ class CartViewModel(
         val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
+
         updateTotalPrice()
         updateTotalQuantity()
         updateCartSelectedCount()
@@ -254,15 +245,19 @@ class CartViewModel(
     }
 
     private fun setQuantity(
-        cartItemId: Int,
+        cartUiModel: CartUiModel,
         quantity: Quantity,
     ) {
         cartRepository.setCartItemQuantity(
-            cartItemId,
+            cartUiModel.cartItemId,
             quantity,
             object : DataCallback<Unit> {
                 override fun onSuccess(result: Unit) {
                     loadAllCartItems()
+
+                    if (isRecommendProduct(cartUiModel.productId)) {
+                        updateRecommendProducts(cartUiModel.productId, quantity)
+                    }
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -310,6 +305,10 @@ class CartViewModel(
                 object : DataCallback<Unit> {
                     override fun onSuccess(result: Unit) {
                         loadAllCartItems()
+
+                        if (isRecommendProduct(productId)) {
+                            updateRecommendProducts(productId)
+                        }
                     }
 
                     override fun onFailure(t: Throwable) {
