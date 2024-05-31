@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.home
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,15 +59,17 @@ class HomeViewModel(
     private var cartItems: List<CartItem> = emptyList()
 
     init {
-        loadRecentProducts()
-        loadCartItems()
-        loadProductViewItems()
+        Handler(Looper.getMainLooper()).postDelayed({
+            loadCartItems()
+            loadProductViewItems()
+            loadRecentProducts()
+        }, 1000)
     }
 
     fun updateData() {
-        loadRecentProducts()
         loadCartItems()
         updateProductViewItems()
+        loadRecentProducts()
     }
 
     private fun loadRecentProducts() {
@@ -78,7 +82,7 @@ class HomeViewModel(
                 category = CATEGORY_UNDEFINED,
                 page = page++,
                 size = PAGE_SIZE,
-                sort = DESCENDING_SORT_ORDER,
+                sort = ASCENDING_SORT_ORDER,
             )
         }.onSuccess { productResponse ->
             val products = productResponse.getOrNull()?.products ?: emptyList()
@@ -89,6 +93,8 @@ class HomeViewModel(
             _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
             _loadedProductViewItems.value = loadedProductViewItems.value?.plus(productViewItems)
             _homeUiState.value = UiState.Success(loadedProductViewItems.value ?: emptyList())
+        }.onFailure {
+            _homeUiState.value = UiState.Error(it)
         }
     }
 
@@ -196,5 +202,6 @@ class HomeViewModel(
         private val CATEGORY_UNDEFINED: String? = null
         private const val PAGE_SIZE = 20
         private const val RECENT_PRODUCTS_LIMIT = 10
+        const val ASCENDING_SORT_ORDER = "asc"
     }
 }

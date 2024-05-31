@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
+import woowacourse.shopping.view.cart.CartViewModel.Companion.DESCENDING_SORT_ORDER
 import woowacourse.shopping.view.cart.QuantityClickListener
 import woowacourse.shopping.view.state.UiState
 
@@ -77,9 +78,11 @@ class DetailViewModel(
     fun saveCartItem() {
         val state = detailUiState.value
         if (state is UiState.Success) {
-            val cartResponse = cartRepository.getCartItems(0, totalQuantity, "asc").getOrNull()
+            val cartResponse =
+                cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER).getOrNull()
             val cartItems = cartResponse?.cartItems
-            val cartItemId = cartItems?.firstOrNull { it.product.productId == productId }?.cartItemId
+            val cartItemId =
+                cartItems?.firstOrNull { it.product.productId == productId }?.cartItemId
             val currentQuantity =
                 cartItems?.firstOrNull { it.cartItemId == cartItemId }?.quantity ?: 0
             val quantity = quantity.value ?: 0

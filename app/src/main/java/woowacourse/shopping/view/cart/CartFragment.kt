@@ -15,23 +15,16 @@ import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.state.UiState
 
 class CartFragment : Fragment() {
-    private var _binding: FragmentCartBinding? = null
-    private val binding: FragmentCartBinding
-        get() = _binding!!
-
-    private val viewModel by activityViewModels<CartViewModel>()
-//    private val viewModel by viewModels<CartListViewModel> {
-//        CartListViewModelFactory(CartRepositoryImpl2(remoteCartDataSource))
-//    }
-
+    private lateinit var binding: FragmentCartBinding
     private lateinit var adapter: CartAdapter
+    private val viewModel by activityViewModels<CartViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentCartBinding.inflate(inflater, container, false)
+        binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -42,6 +35,7 @@ class CartFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpAdapter()
         binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -71,11 +65,6 @@ class CartFragment : Fragment() {
         viewModel.selectChangeId.observe(viewLifecycleOwner) {
             adapter.updateSelection(it)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun navigateToDetail(productId: Int) {

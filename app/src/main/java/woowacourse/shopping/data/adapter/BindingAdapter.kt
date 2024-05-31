@@ -3,7 +3,6 @@ package woowacourse.shopping.data.adapter
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -18,7 +17,6 @@ fun loadImage(
     if (!url.isNullOrEmpty()) {
         Glide.with(view.context)
             .load(url)
-            .placeholder(R.drawable.ic_launcher_background)
             .error(R.drawable.ic_launcher_background)
             .into(view)
     }
@@ -30,14 +28,6 @@ fun setPrice(
     price: Int,
 ) {
     view.text = view.context.getString(R.string.price_format, price)
-}
-
-@BindingAdapter("app:selectedBasedOn")
-fun setSelectedBasedOn(
-    button: AppCompatButton,
-    isSelected: Boolean,
-) {
-    button.isSelected = isSelected
 }
 
 @BindingAdapter("app:viewVisibility")
@@ -68,14 +58,10 @@ fun <T> setEmptyCartVisibility(
 
 @BindingAdapter("app:isEmpty", "app:state", requireAll = true)
 fun <T> setCartVisibility(
-    view: RecyclerView,
+    recyclerView: RecyclerView,
     isEmpty: Boolean,
     state: UiState<T>,
 ) {
-    view.visibility =
-        if (state is UiState.Success && !isEmpty || state is UiState.Loading) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+    recyclerView.visibility =
+        if ((state is UiState.Success && !isEmpty) || state is UiState.Loading) View.VISIBLE else View.GONE
 }

@@ -7,12 +7,6 @@
 
         <import type="woowacourse.shopping.view.state.UiState" />
 
-        <import type="java.util.List" />
-
-        <import type="android.view.View" />
-
-        <import type="woowacourse.shopping.data.model.CartItem" />
-
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.cart.CartViewModel" />
@@ -31,11 +25,12 @@
             android:textColor="@color/gray_500"
             android:textSize="100dp"
             android:textStyle="bold"
+            app:isEmpty="@{viewModel.isEmpty}"
+            app:state="@{viewModel.cartUiState}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="@{viewModel.cartUiState instanceof UiState.Success ? View.GONE : View.VISIBLE}" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
@@ -43,7 +38,8 @@
             android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            android:visibility="@{viewModel.cartUiState instanceof UiState.Success ? View.VISIBLE : View.GONE}"
+            app:isEmpty="@{viewModel.isEmpty}"
+            app:state="@{viewModel.cartUiState}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

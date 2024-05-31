@@ -13,10 +13,7 @@ import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.state.UiState
 
 class RecommendFragment : Fragment() {
-    private var _binding: FragmentRecommendBinding? = null
-    private val binding: FragmentRecommendBinding
-        get() = _binding!!
-
+    private lateinit var binding: FragmentRecommendBinding
     private lateinit var adapter: ProductAdapter
     private val viewModel by activityViewModels<CartViewModel>()
 
@@ -25,7 +22,7 @@ class RecommendFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentRecommendBinding.inflate(inflater, container, false)
+        binding = FragmentRecommendBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -36,19 +33,17 @@ class RecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         adapter = ProductAdapter(viewModel, viewModel)
         binding.rvRecommend.adapter = adapter
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> adapter.submitProductItems(state.data, false)
                 is UiState.Loading -> return@observe
-                is UiState.Error -> showError(state.exception.message ?: getString(R.string.unknown_error))
+                is UiState.Error -> showError(
+                    state.exception.message ?: getString(R.string.unknown_error)
+                )
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun showError(errorMessage: String) {

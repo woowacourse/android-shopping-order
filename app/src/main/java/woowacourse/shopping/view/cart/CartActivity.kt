@@ -40,9 +40,7 @@ class CartActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-        if (savedInstanceState == null) {
-            replaceFragment(cartFragment)
-        }
+        replaceFragment(cartFragment)
     }
 
     private fun replaceFragment(fragment: Fragment) {
