@@ -78,7 +78,6 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            adapter.setShowSkeleton(false)
             updateRecyclerView(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
@@ -110,12 +109,20 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
             }
         }
 
-        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) {
-            adapter.setShowSkeleton(true)
+        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
+            when (loadingState) {
+                ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
+                ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
+                ShoppingCartEvent.LoadCartItemList.Fail -> {
+                    adapter.setShowSkeleton(false)
+                    requireContext().makeToast(
+                        getString(R.string.error_default),
+                    )
+                }
+            }
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            adapter.setShowSkeleton(false)
             when (errorState) {
                 ShoppingCartEvent.DeleteShoppingCart.Fail ->
                     requireContext().makeToast(
