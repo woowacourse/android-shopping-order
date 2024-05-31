@@ -2,7 +2,6 @@ package woowacourse.shopping.data.recent.local
 
 import woowacourse.shopping.data.recent.local.dao.RecentProductDao
 import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -40,23 +39,6 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
             }
             recentProductDao.update(product.id, LocalDateTime.now())
         }.join()
-    }
-
-    override fun getRecommendProducts(cartItems: List<CartItem>): List<Product> {
-        var recommendProducts: List<Product> = emptyList()
-        thread {
-            val category = findLastOrNull()?.product?.category ?: return@thread
-            val categoryProducts = recentProductDao.findCategory(category)
-            val recommendCategoryProducts =
-                categoryProducts.filter { recentProduct ->
-                    cartItems.none { it.productId == recentProduct.product.productId }
-                }
-            recommendProducts =
-                recommendCategoryProducts
-                    .take(RECOMMEND_PRODUCTS_COUNT)
-                    .map { it.toRecentProduct().product }
-        }.join()
-        return recommendProducts
     }
 
     companion object {

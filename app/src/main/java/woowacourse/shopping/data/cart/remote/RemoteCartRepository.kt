@@ -6,7 +6,6 @@ import retrofit2.Response
 import woowacourse.shopping.data.product.remote.retrofit.DataCallback
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartPageAttribute
 import woowacourse.shopping.domain.model.Quantity
 import kotlin.concurrent.thread
 
@@ -45,34 +44,6 @@ class RemoteCartRepository {
 
     fun getAllCartItem(dataCallback: DataCallback<List<CartItem>>) {
         retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
-            .enqueue(
-                object : Callback<CartResponse> {
-                    override fun onResponse(
-                        call: Call<CartResponse>,
-                        response: Response<CartResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body = response.body() ?: return
-                            dataCallback.onSuccess(body.toCartItems())
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartResponse>,
-                        t: Throwable,
-                    ) {
-                        dataCallback.onFailure(t)
-                    }
-                },
-            )
-    }
-
-    fun getCartItems(
-        page: Int,
-        pageSize: Int,
-        dataCallback: DataCallback<List<CartItem>>,
-    ) {
-        retrofitApi.requestCartItems(page = page, size = pageSize)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
@@ -192,35 +163,6 @@ class RemoteCartRepository {
                 }
             },
         )
-    }
-
-    fun getCartPageAttribute(
-        page: Int,
-        pageSize: Int,
-        dataCallback: DataCallback<CartPageAttribute>,
-    ) {
-        retrofitApi.requestCartItems(page = page, size = pageSize)
-            .enqueue(
-                object : Callback<CartResponse> {
-                    override fun onResponse(
-                        call: Call<CartResponse>,
-                        response: Response<CartResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body = response.body() ?: return
-                            val cartPage = body.toCartPage()
-                            dataCallback.onSuccess(cartPage)
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartResponse>,
-                        t: Throwable,
-                    ) {
-                        dataCallback.onFailure(t)
-                    }
-                },
-            )
     }
 
     fun addCartItem(
