@@ -33,7 +33,7 @@ class RecommendAdapter(
         holder.bind(getItem(position), position)
     }
 
-    open class RecommendViewHolder(
+    class RecommendViewHolder(
         private val binding: HolderProductBinding,
         private val productCountHandler: ProductCountHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
