@@ -110,8 +110,17 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
             }
         }
 
-        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) {
-            adapter.setShowSkeleton(true)
+        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
+            when (loadingState) {
+                ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
+                ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
+                ShoppingCartEvent.LoadCartItemList.Fail -> {
+                    adapter.setShowSkeleton(false)
+                    requireContext().makeToast(
+                        getString(R.string.error_default),
+                    )
+                }
+            }
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
