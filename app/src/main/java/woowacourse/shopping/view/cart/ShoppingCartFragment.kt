@@ -123,10 +123,12 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
                         ),
                     )
 
-                ShoppingCartEvent.LoadCartItemList.Fail ->
+                ShoppingCartEvent.LoadCartItemList.Fail -> {
                     requireContext().makeToast(
                         getString(R.string.max_paging_data),
                     )
+                    adapter.setShowSkeleton(false)
+                }
 
                 ShoppingCartEvent.ErrorState.NotKnownError ->
                     requireContext().makeToast(

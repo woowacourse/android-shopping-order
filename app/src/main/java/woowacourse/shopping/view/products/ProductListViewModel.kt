@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.products
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -48,7 +50,7 @@ class ProductListViewModel(
 
     fun loadPagingProduct() {
         _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             val pagingData = productRepository.loadPagingProducts(itemSize)
@@ -62,7 +64,7 @@ class ProductListViewModel(
                 else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
             }
         }
-//        }, 1000)
+        }, 1000)
     }
 
     fun loadPagingRecentlyProduct() {
