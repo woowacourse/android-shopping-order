@@ -37,10 +37,6 @@ class HomeViewModel(
     val loadedProductViewItems: LiveData<List<ProductViewItem>>
         get() = _loadedProductViewItems
 
-    private val _updatedProductViewItem = MutableLiveData<ProductViewItem>()
-    val updatedProductViewItem: LiveData<ProductViewItem>
-        get() = _updatedProductViewItem
-
     private val _canLoadMore = MutableLiveData(false)
     val canLoadMore: LiveData<Boolean>
         get() = _canLoadMore
@@ -141,13 +137,12 @@ class HomeViewModel(
         quantity: Int,
     ) {
         val updatedProductViewItem = ProductViewItem(product, quantity)
-        _updatedProductViewItem.value = updatedProductViewItem
-
         val position =
-            _loadedProductViewItems.value?.indexOfFirst { it.product.productId == product.productId }
+            _loadedProductViewItems.value?.indexOfFirst { loadedProductViewItem -> loadedProductViewItem.product.productId == product.productId }
                 ?: -1
         if (position != -1) {
             (loadedProductViewItems.value as MutableList)[position] = updatedProductViewItem
+            _loadedProductViewItems.value = loadedProductViewItems.value?.toList()
         }
     }
 

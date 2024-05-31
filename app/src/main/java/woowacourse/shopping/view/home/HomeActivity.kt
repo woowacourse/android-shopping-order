@@ -87,12 +87,11 @@ class HomeActivity : AppCompatActivity() {
             recentProductAdapter.loadData(recentProducts)
         }
 
-        viewModel.updatedProductViewItem.observe(this) { updatedProductViewItem ->
-            productAdapter.updateProductQuantity(updatedProductViewItem)
-        }
-
-        viewModel.loadedProductViewItems.observe(this) { loadedProductViewItems ->
-            productAdapter.updateData(loadedProductViewItems)
+        viewModel.loadedProductViewItems.observe(this) {
+            productAdapter.submitProductItems(
+                viewModel.loadedProductViewItems.value ?: emptyList(),
+                viewModel.canLoadMore.value ?: false
+            )
         }
 
         viewModel.navigateToDetail.observe(this) { navigateToDetail ->
@@ -109,7 +108,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.loadData(data, viewModel.canLoadMore.value ?: false)
+        productAdapter.submitProductItems(data, viewModel.canLoadMore.value ?: false)
+//        productAdapter.loadData(data, viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {

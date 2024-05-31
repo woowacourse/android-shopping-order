@@ -39,7 +39,7 @@ class RecommendFragment : Fragment() {
 
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UiState.Success -> adapter.loadData(state.data, false)
+                is UiState.Success -> adapter.submitProductItems(state.data, false)
                 is UiState.Loading -> return@observe
                 is UiState.Error -> showError(state.exception.message ?: getString(R.string.unknown_error))
             }

@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UiState"/>
+        <import type="woowacourse.shopping.view.state.UiState" />
 
         <variable
             name="viewModel"
@@ -20,7 +20,7 @@
             android:id="@+id/tv_recommend_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginBottom="4dp"
             android:text="이런 상품은 어떠세요?"
             android:textColor="@color/black"
@@ -44,7 +44,7 @@
             android:id="@+id/rv_recommend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
