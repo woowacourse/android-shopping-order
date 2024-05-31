@@ -70,9 +70,6 @@ class CartItemDaoTest {
         var itemId = -1L
         thread {
             itemId = dao.saveCartItem(item)
-        }.join()
-
-        thread {
             dao.deleteCartItemById(itemId)
         }.join()
 
