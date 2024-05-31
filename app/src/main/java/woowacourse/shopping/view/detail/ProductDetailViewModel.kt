@@ -96,22 +96,28 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun loadProductItemCount(productId: Long): CartItemCounter {
-        return try {
-            val result =
-                shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
-            cartItemId = result.cartItemId
-            result.counter
+    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
+        try {
+            deletePrevRecentlyProduct(recentlyProduct.id)
+            val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
+            val product = productRepository.getProduct(recentlyProduct.productId)
+            product.updateItemSelector(true)
+            product.updateCartItemCount(loadItemCounter.itemCount)
+            _product.value = product
+            _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
+            _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException -> CartItemCounter()
+                is NoSuchDataException ->
+                    _errorEvent.setValue(
+                        ProductDetailEvent.LoadProductItem.Fail,
+                    )
 
                 else ->
                     _errorEvent.setValue(
                         ProductDetailEvent.ErrorEvent.NotKnownError,
                     )
             }
-            CartItemCounter()
         }
     }
 
@@ -149,33 +155,27 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
-        recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
-    }
-
-    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        try {
-            deletePrevRecentlyProduct(recentlyProduct.id)
-            val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
-            val product = productRepository.getProduct(recentlyProduct.productId)
-            product.updateItemSelector(true)
-            product.updateCartItemCount(loadItemCounter.itemCount)
-            _product.value = product
-            _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
-            _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
+    private fun loadProductItemCount(productId: Long): CartItemCounter {
+        return try {
+            val result =
+                shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
+            cartItemId = result.cartItemId
+            result.counter
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.LoadProductItem.Fail,
-                    )
+                is NoSuchDataException -> CartItemCounter()
 
                 else ->
                     _errorEvent.setValue(
                         ProductDetailEvent.ErrorEvent.NotKnownError,
                     )
             }
+            CartItemCounter()
         }
+    }
+
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
+        recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
     }
 
     private fun loadRecentlyProduct(product: Product) {

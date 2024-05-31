@@ -62,17 +62,60 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         observeData()
     }
 
-    private fun initView() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.vm = shoppingCartViewModel
-        shoppingCartViewModel.loadPagingCartItemList()
-        binding.onClickShoppingCart = this
-        adapter =
-            ShoppingCartAdapter(
-                onClickShoppingCart = this,
-                onClickCartItemCounter = this,
-            )
-        binding.rvShoppingCart.adapter = adapter
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mainActivityListener = null
+    }
+
+    override fun clickBack() {
+        mainActivityListener?.popFragment()
+    }
+
+    override fun clickCartItem(productId: Long) {
+        val productFragment =
+            ProductDetailFragment().apply {
+                arguments = ProductDetailFragment.createBundle(productId)
+            }
+        mainActivityListener?.changeFragment(productFragment)
+    }
+
+    override fun clickRemoveCartItem(cartItem: CartItem) {
+        shoppingCartViewModel.deleteShoppingCartItem(
+            cartItemId = cartItem.id,
+            product = cartItem.product,
+        )
+    }
+
+    override fun clickCheckBox(cartItem: CartItem) {
+        if (cartItem.cartItemSelector.isSelected) {
+            shoppingCartViewModel.deleteCheckedItem(cartItem)
+        } else {
+            shoppingCartViewModel.addCheckedItem(cartItem)
+        }
+    }
+
+    override fun clickOrder() {
+        val recommendFragment =
+            RecommendFragment().apply {
+                arguments =
+                    RecommendFragment.createBundle(
+                        shoppingCartViewModel.checkedShoppingCart,
+                    )
+            }
+        mainActivityListener?.changeFragment(recommendFragment)
+    }
+
+    override fun clickCheckAll() {
+        shoppingCartViewModel.checkAllItems()
+    }
+
+    override fun clickIncrease(product: Product) {
+        shoppingCartViewModel.increaseCartItem(product)
+    }
+
+    override fun clickDecrease(product: Product) {
+        shoppingCartViewModel.decreaseCartItem(product)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -154,63 +197,20 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mainActivityListener = null
-    }
-
-    override fun clickBack() {
-        mainActivityListener?.popFragment()
-    }
-
-    override fun clickCartItem(productId: Long) {
-        val productFragment =
-            ProductDetailFragment().apply {
-                arguments = ProductDetailFragment.createBundle(productId)
-            }
-        mainActivityListener?.changeFragment(productFragment)
-    }
-
-    override fun clickRemoveCartItem(cartItem: CartItem) {
-        shoppingCartViewModel.deleteShoppingCartItem(
-            cartItemId = cartItem.id,
-            product = cartItem.product,
-        )
-    }
-
-    override fun clickCheckBox(cartItem: CartItem) {
-        if (cartItem.cartItemSelector.isSelected) {
-            shoppingCartViewModel.deleteCheckedItem(cartItem)
-        } else {
-            shoppingCartViewModel.addCheckedItem(cartItem)
-        }
-    }
-
-    override fun clickOrder() {
-        val recommendFragment =
-            RecommendFragment().apply {
-                arguments =
-                    RecommendFragment.createBundle(
-                        shoppingCartViewModel.checkedShoppingCart,
-                    )
-            }
-        mainActivityListener?.changeFragment(recommendFragment)
-    }
-
-    override fun clickCheckAll() {
-        shoppingCartViewModel.checkAllItems()
+    private fun initView() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.vm = shoppingCartViewModel
+        shoppingCartViewModel.loadPagingCartItemList()
+        binding.onClickShoppingCart = this
+        adapter =
+            ShoppingCartAdapter(
+                onClickShoppingCart = this,
+                onClickCartItemCounter = this,
+            )
+        binding.rvShoppingCart.adapter = adapter
     }
 
     private fun updateRecyclerView(cartItems: List<CartItem>) {
         adapter.updateCartItems(cartItems)
-    }
-
-    override fun clickIncrease(product: Product) {
-        shoppingCartViewModel.increaseCartItem(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        shoppingCartViewModel.decreaseCartItem(product)
     }
 }

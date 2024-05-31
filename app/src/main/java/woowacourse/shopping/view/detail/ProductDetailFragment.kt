@@ -61,6 +61,32 @@ class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter 
         observeData()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mainActivityListener = null
+    }
+
+    override fun clickClose() {
+        mainActivityListener?.popFragment()
+    }
+
+    override fun clickAddCart(product: Product) {
+        productDetailViewModel.addShoppingCartItem(product)
+    }
+
+    override fun clickRecently(recentlyProduct: RecentlyProduct) {
+        productDetailViewModel.updateRecentlyProduct(recentlyProduct)
+    }
+
+    override fun clickIncrease(product: Product) {
+        productDetailViewModel.increaseItemCounter()
+    }
+
+    override fun clickDecrease(product: Product) {
+        productDetailViewModel.decreaseItemCounter()
+    }
+
     private fun observeData() {
         productDetailViewModel.productDetailEvent.observe(viewLifecycleOwner) { productDetailState ->
             when (productDetailState) {
@@ -128,32 +154,6 @@ class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter 
         binding.onClickDetail = this
         binding.onClickCartItemCounter = this
         binding.lifecycleOwner = viewLifecycleOwner
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mainActivityListener = null
-    }
-
-    override fun clickClose() {
-        mainActivityListener?.popFragment()
-    }
-
-    override fun clickAddCart(product: Product) {
-        productDetailViewModel.addShoppingCartItem(product)
-    }
-
-    override fun clickRecently(recentlyProduct: RecentlyProduct) {
-        productDetailViewModel.updateRecentlyProduct(recentlyProduct)
-    }
-
-    override fun clickIncrease(product: Product) {
-        productDetailViewModel.increaseItemCounter()
-    }
-
-    override fun clickDecrease(product: Product) {
-        productDetailViewModel.decreaseItemCounter()
     }
 
     companion object {

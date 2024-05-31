@@ -69,7 +69,6 @@ class ShoppingCartViewModel(
 
     fun loadPagingCartItemList() {
         _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val pagingData =
                 shoppingCartRepository.loadPagingCartItems(
@@ -90,11 +89,6 @@ class ShoppingCartViewModel(
                     )
             }
         }
-//        }, 1000)
-    }
-
-    private fun setAllCheck() {
-        _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
     }
 
     fun checkAllItems() {
@@ -113,6 +107,27 @@ class ShoppingCartViewModel(
         }
         updateCheckItemData()
         _shoppingCartEvent.value = ShoppingCartEvent.UpdateCheckItem.Success
+    }
+
+    fun increaseCartItem(product: Product) {
+        updateCartItem(product, UpdateCartItemType.INCREASE)
+    }
+
+    fun addCheckedItem(cartItem: CartItem) {
+        cartItem.cartItemSelector.selectItem()
+        checkedShoppingCart.addProduct(cartItem)
+        checkedShoppingCart
+        updateCheckItemData()
+    }
+
+    fun deleteCheckedItem(cartItem: CartItem) {
+        cartItem.cartItemSelector.unSelectItem()
+        checkedShoppingCart.deleteProduct(cartItem.id)
+        updateCheckItemData()
+    }
+
+    fun decreaseCartItem(product: Product) {
+        updateCartItem(product, UpdateCartItemType.DECREASE)
     }
 
     private fun synchronizeLoadingData(pagingData: List<CartItem>): List<CartItem> {
@@ -134,12 +149,8 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun increaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.INCREASE)
-    }
-
-    fun decreaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.DECREASE)
+    private fun setAllCheck() {
+        _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
     }
 
     private fun updateCartItem(
@@ -177,19 +188,6 @@ class ShoppingCartViewModel(
                 else -> _errorEvent.setValue(ShoppingCartEvent.ErrorState.NotKnownError)
             }
         }
-    }
-
-    fun addCheckedItem(cartItem: CartItem) {
-        cartItem.cartItemSelector.selectItem()
-        checkedShoppingCart.addProduct(cartItem)
-        checkedShoppingCart
-        updateCheckItemData()
-    }
-
-    fun deleteCheckedItem(cartItem: CartItem) {
-        cartItem.cartItemSelector.unSelectItem()
-        checkedShoppingCart.deleteProduct(cartItem.id)
-        updateCheckItemData()
     }
 
     private fun updateCheckItemData() {
