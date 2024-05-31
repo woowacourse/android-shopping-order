@@ -44,6 +44,11 @@ class ProductDetailActivity : AppCompatActivity() {
         initializeView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadProductDetail()
+    }
+
     private fun initializeView() {
         initializeToolbar()
         initializeAddCartButton()

@@ -46,9 +46,12 @@ class ProductDetailViewModel(
         _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
 
     init {
+        saveRecentProduct()
+    }
+
+    fun loadProductDetail() {
         loadProduct()
         loadLastRecentProduct()
-        saveRecentProduct()
     }
 
     private fun loadProduct() {

@@ -9,7 +9,9 @@ import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
 class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
-    private lateinit var binding: FragmentCartSelectionBinding
+    private var _binding: FragmentCartSelectionBinding? = null
+    private val binding get() = _binding!!
+
     private val adapter by lazy { CartAdapter(viewModel) }
 
     override fun onCreateView(
@@ -17,7 +19,7 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
+        _binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
 
@@ -47,5 +49,10 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
             }
         }
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

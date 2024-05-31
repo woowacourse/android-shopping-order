@@ -35,6 +35,7 @@ class CartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
+        setContentView(binding.root)
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -51,7 +52,10 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun createFragment(fragmentClass: KClass<out Fragment>): Fragment {
-        return supportFragmentManager.fragmentFactory.instantiate(classLoader, fragmentClass.java.name)
+        return supportFragmentManager.fragmentFactory.instantiate(
+            classLoader,
+            fragmentClass.java.name,
+        )
     }
 
     private fun addFragment(fragment: Fragment) {
