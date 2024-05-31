@@ -18,6 +18,8 @@ interface ShoppingCartDataSource {
         size: Int,
     ): Result<CartsDto>
 
+    fun getCartProductTotalElements(): Result<Int>
+
     fun getCartProductsTotal(): Result<Int>
 
     fun deleteCartProduct(cartId: Int): Result<Unit>

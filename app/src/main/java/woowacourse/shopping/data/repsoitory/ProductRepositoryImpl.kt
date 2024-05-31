@@ -12,9 +12,7 @@ class ProductRepositoryImpl(
     private val shoppingCartDataSource: ShoppingCartDataSource,
 ) : ProductRepository {
     override fun findCartByProductId(id: Long): Result<Cart> {
-        val totalElements =
-            shoppingCartDataSource.getCartProductsPaged(page = FIRST_PAGE, size = FIRST_SIZE)
-                .getOrThrow().totalElements
+        val totalElements = shoppingCartDataSource.getCartProductTotalElements().getOrThrow()
 
         val cartsDto =
             shoppingCartDataSource.getCartProductsPaged(page = FIRST_PAGE, size = totalElements)

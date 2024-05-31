@@ -40,6 +40,12 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
                 ?: throw IllegalArgumentException()
         }
 
+    override fun getCartProductTotalElements(): Result<Int> =
+        runCatching {
+            service.getCartItems(page = FIRST_PAGE, size = FIRST_SIZE).execute().body()
+                ?.toData()?.totalElements ?: 0
+        }
+
     override fun getCartProductsTotal(): Result<Int> =
         runCatching {
             service.getCartItemsCount().execute().body()?.quantity ?: 0
@@ -54,6 +60,9 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
         this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
 
     companion object {
+        const val FIRST_PAGE = 0
+        const val FIRST_SIZE = 1
+
         private var instance: ShoppingCartDataSourceImpl? = null
 
         fun setInstance(cartService: CartService) {
