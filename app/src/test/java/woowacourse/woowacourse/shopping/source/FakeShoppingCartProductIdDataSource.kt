@@ -1,13 +1,13 @@
 package woowacourse.shopping.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.cart.CartItemDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
 
 // TODO: 이거 data 타입 바뀜
 class FakeShoppingCartProductIdDataSource(
     private val data: MutableList<ProductIdsCountData> = mutableListOf(),
-) : ShoppingCartProductIdDataSource {
+) : CartItemDataSource {
     override fun findByProductId(productId: Long): ProductIdsCountData? = data.find { it.productId == productId }
 
     override fun loadPaged(page: Int): List<ProductIdsCountData> {

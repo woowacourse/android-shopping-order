@@ -9,15 +9,18 @@ import woowacourse.shopping.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
-import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
+import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
+import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
 import woowacourse.shopping.ui.model.CartItem
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
-    private val shoppingProductsRepository: ShoppingProductsRepository,
+    private val shoppingProductsRepository: ProductRepository,
 ) : ViewModel(),
     OnProductItemClickListener,
     OnItemQuantityChangeListener,
@@ -170,10 +173,10 @@ class ShoppingCartViewModel(
         private const val TAG = "ShoppingCartViewModel"
 
         fun factory(
-            shoppingProductsRepository: ShoppingProductsRepository =
-                DefaultShoppingProductRepository(
-                    productsSource = ShoppingApp.productSource,
-                    cartSource = ShoppingApp.cartSource,
+            shoppingProductsRepository: ProductRepository =
+                DefaultProductRepository(
+                    productDataSource = ShoppingApp.productSource,
+                    cartItemDataSource = ShoppingApp.cartSource,
                 ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {

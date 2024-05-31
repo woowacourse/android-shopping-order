@@ -4,8 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.NumberPagingStrategy
-import woowacourse.shopping.data.source.DummyProductsDataSource
-import woowacourse.shopping.data.source.ProductDataSource
+import woowacourse.shopping.data.source.product.ProductDataSource
 
 class DummyProductsDataSourceTest {
     private lateinit var productDataSource: ProductDataSource

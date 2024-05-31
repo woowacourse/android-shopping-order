@@ -7,7 +7,7 @@
 
         <variable
             name="onNavigationOrderListener"
-            type="woowacourse.shopping.ui.cart.OnNavigationOrderListener" />
+            type="woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener" />
 
         <variable
             name="selectedItemsCount"
@@ -19,7 +19,7 @@
 
         <variable
             name="onAllCartItemSelectedListener"
-            type="woowacourse.shopping.ui.cart.OnAllCartItemSelectedListener" />
+            type="woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener" />
 
         <variable
             name="selectedCartItemsTotalPrice"

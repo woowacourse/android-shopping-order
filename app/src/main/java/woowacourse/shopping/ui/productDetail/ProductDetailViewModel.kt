@@ -11,17 +11,17 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
 import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val productId: Long,
-    private val shoppingProductsRepository: ShoppingProductsRepository,
+    private val shoppingProductsRepository: ProductRepository,
     private val productHistoryRepository: ProductHistoryRepository,
 ) : ViewModel(), OnItemQuantityChangeListener, OnProductItemClickListener {
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -93,10 +93,10 @@ class ProductDetailViewModel(
 
         fun factory(
             productId: Long,
-            shoppingProductsRepository: ShoppingProductsRepository =
-                DefaultShoppingProductRepository(
-                    productsSource = ShoppingApp.productSource,
-                    cartSource = ShoppingApp.cartSource,
+            shoppingProductsRepository: ProductRepository =
+                DefaultProductRepository(
+                    productDataSource = ShoppingApp.productSource,
+                    cartItemDataSource = ShoppingApp.cartSource,
                 ),
             historyRepository: ProductHistoryRepository =
                 DefaultProductHistoryRepository(

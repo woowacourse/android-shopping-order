@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.order
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.remote.OrderRemoteDataSource
+import woowacourse.shopping.remote.order.OrderRemoteDataSource
 
 class OrderViewModel(
     private val cartItemIds: List<Long>,
@@ -23,7 +23,8 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    cartItemIds, orderDataSource
+                    cartItemIds,
+                    orderDataSource,
                 )
             }
         }

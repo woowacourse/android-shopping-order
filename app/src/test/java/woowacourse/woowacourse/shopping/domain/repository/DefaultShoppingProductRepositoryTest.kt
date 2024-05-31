@@ -3,8 +3,10 @@ package woowacourse.shopping.domain.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.cart.CartItemDataSource
+import woowacourse.shopping.data.source.product.ProductDataSource
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
 import woowacourse.shopping.source.FakeProductDataSource
@@ -13,8 +15,8 @@ import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 
 class DefaultShoppingProductRepositoryTest {
     lateinit var productDataSource: ProductDataSource
-    lateinit var shoppingCartProductIdDataSource: ShoppingCartProductIdDataSource
-    lateinit var repository: ShoppingProductsRepository
+    lateinit var shoppingCartProductIdDataSource: CartItemDataSource
+    lateinit var repository: ProductRepository
 
     @Test
     fun `첫번재 페이지 데이터 로드`() {
@@ -28,9 +30,9 @@ class DefaultShoppingProductRepositoryTest {
                 data = productsIdCountDataTestFixture(dataCount = 10, 2).toMutableList(),
             )
         repository =
-            DefaultShoppingProductRepository(
-                productsSource = productDataSource,
-                cartSource = shoppingCartProductIdDataSource,
+            DefaultProductRepository(
+                productDataSource = productDataSource,
+                cartItemDataSource = shoppingCartProductIdDataSource,
             )
 
         // when

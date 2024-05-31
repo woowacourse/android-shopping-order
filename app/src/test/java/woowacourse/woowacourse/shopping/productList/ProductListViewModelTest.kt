@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.data.source.ProductHistoryDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
-import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.data.source.cart.CartItemDataSource
+import woowacourse.shopping.data.source.history.ProductHistoryDataSource
+import woowacourse.shopping.data.source.product.ProductDataSource
+import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
@@ -28,15 +28,15 @@ import woowacourse.shopping.source.FakeProductDataSource
 import woowacourse.shopping.source.FakeProductHistorySource
 import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
 import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
-import woowacourse.shopping.ui.productList.ProductListViewModel
+import woowacourse.shopping.ui.product.ProductListViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
     private lateinit var productSource: ProductDataSource
-    private lateinit var cartSource: ShoppingCartProductIdDataSource
+    private lateinit var cartSource: CartItemDataSource
     private lateinit var historyDataSource: ProductHistoryDataSource
 
-    private lateinit var shoppingProductRepository: ShoppingProductsRepository
+    private lateinit var shoppingProductRepository: ProductRepository
     private lateinit var historyRepository: ProductHistoryRepository
 
     private lateinit var viewModel: ProductListViewModel
@@ -65,7 +65,7 @@ class ProductListViewModelTest {
         cartSource = FakeShoppingCartProductIdDataSource()
         historyDataSource = FakeProductHistorySource()
 
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
     }
 
@@ -116,7 +116,7 @@ class ProductListViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(15).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
         viewModel = ProductListViewModel(shoppingProductRepository, historyRepository)
 
@@ -135,7 +135,7 @@ class ProductListViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(20).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
 
         viewModel = ProductListViewModel(shoppingProductRepository, historyRepository)
@@ -156,7 +156,7 @@ class ProductListViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(21).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
 
         viewModel = ProductListViewModel(shoppingProductRepository, historyRepository)
@@ -176,7 +176,7 @@ class ProductListViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(21).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
         viewModel = ProductListViewModel(shoppingProductRepository, historyRepository)
 
@@ -195,7 +195,7 @@ class ProductListViewModelTest {
         // given
         productSource = FakeProductDataSource(allProducts = productsTestFixture(21).toMutableList())
         cartSource = FakeShoppingCartProductIdDataSource(data = productsIdCountDataTestFixture(10).toMutableList())
-        shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
 
         viewModel = ProductListViewModel(shoppingProductRepository, historyRepository)
@@ -219,7 +219,7 @@ class ProductListViewModelTest {
                 data = productsIdCountDataTestFixture(5).toMutableList(),
             )
         shoppingProductRepository =
-            DefaultShoppingProductRepository(
+            DefaultProductRepository(
                 productSource,
                 cartSource,
             )

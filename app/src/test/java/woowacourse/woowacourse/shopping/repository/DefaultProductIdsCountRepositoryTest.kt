@@ -3,17 +3,15 @@ package woowacourse.shopping.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.cart.CartItemDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.domain.repository.DefaultProductIdsCountRepository
-import woowacourse.shopping.domain.repository.ProductIdsCountRepository
 import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
 import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 import woowacourse.shopping.testfixture.productsIdCountTestFixture
 
 class DefaultProductIdsCountRepositoryTest {
     private lateinit var repository: ProductIdsCountRepository
-    private lateinit var source: ShoppingCartProductIdDataSource
+    private lateinit var source: CartItemDataSource
 
     @Test
     fun `모두 불러온다`() {

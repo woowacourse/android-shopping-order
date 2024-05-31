@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="woowacourse.shopping.ui.productList.ProductListViewModel" />
+            type="woowacourse.shopping.ui.product.ProductListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -107,7 +107,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/product_latest_title"
-                    tools:context=".ui.productList.ProductListFragment"
+                    tools:context=".ui.product.ProductListFragment"
                     tools:itemCount="10"
                     tools:listitem="@layout/holder_product_history" />
 

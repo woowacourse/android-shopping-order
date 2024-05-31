@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.data.source.ProductHistoryDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.cart.CartItemDataSource
+import woowacourse.shopping.data.source.history.ProductHistoryDataSource
+import woowacourse.shopping.data.source.product.ProductDataSource
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
@@ -30,14 +30,13 @@ import woowacourse.shopping.source.FakeProductHistorySource
 import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
 import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
-import kotlin.concurrent.thread
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductDetailViewModelTest {
     private var productId: Long = -1
     private lateinit var productsSource: ProductDataSource
-    private lateinit var cartSource: ShoppingCartProductIdDataSource
-    private lateinit var shoppingProductRepository: ShoppingProductsRepository
+    private lateinit var cartSource: CartItemDataSource
+    private lateinit var shoppingProductRepository: ProductRepository
 
     private lateinit var historyDataSource: ProductHistoryDataSource
     private lateinit var historyRepository: ProductHistoryRepository
@@ -66,7 +65,7 @@ class ProductDetailViewModelTest {
                 allProducts = productsTestFixture(40).toMutableList(),
             )
         cartSource = FakeShoppingCartProductIdDataSource(data = mutableListOf())
-        shoppingProductRepository = DefaultShoppingProductRepository(productsSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
 
         historyDataSource = FakeProductHistorySource()
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productsSource)
@@ -84,7 +83,7 @@ class ProductDetailViewModelTest {
             FakeShoppingCartProductIdDataSource(
                 data = productsIdCountDataTestFixture(3, 2).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productsSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
 
         // when
@@ -100,7 +99,7 @@ class ProductDetailViewModelTest {
     fun `현재 상품의 개수를 ui 에서만 더한다`() {
         // given
         cartSource = FakeShoppingCartProductIdDataSource(data = mutableListOf())
-        shoppingProductRepository = DefaultShoppingProductRepository(productsSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
         viewModel.loadAll()
 
@@ -135,7 +134,7 @@ class ProductDetailViewModelTest {
             FakeShoppingCartProductIdDataSource(
                 data = productsIdCountDataTestFixture(3, 2).toMutableList(),
             )
-        shoppingProductRepository = DefaultShoppingProductRepository(productsSource, cartSource)
+        shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
         viewModel.loadAll()
 

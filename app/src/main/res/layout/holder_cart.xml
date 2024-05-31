@@ -20,7 +20,7 @@
 
         <variable
             name="onCartItemSelectedListener"
-            type="woowacourse.shopping.ui.cart.OnCartItemSelectedListener" />
+            type="woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

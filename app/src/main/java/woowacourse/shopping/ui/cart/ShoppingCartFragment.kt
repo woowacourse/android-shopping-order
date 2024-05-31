@@ -13,12 +13,14 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.cart.adapter.CartItemAdapter
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
     private val binding
-        get() = _binding
-            ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+        get() =
+            _binding
+                ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
 
@@ -26,8 +28,8 @@ class ShoppingCartFragment : Fragment() {
         ViewModelProvider(this, factory)[ShoppingCartViewModel::class.java]
     }
 
-    private val adapter: CartItemRecyclerViewAdapter by lazy {
-        CartItemRecyclerViewAdapter(
+    private val adapter: CartItemAdapter by lazy {
+        CartItemAdapter(
             onProductItemClickListener = viewModel,
             onItemQuantityChangeListener = viewModel,
             onCartItemSelectedListener = viewModel,
@@ -99,7 +101,7 @@ class ShoppingCartFragment : Fragment() {
     private fun observeOrderNavigation() {
         viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
             if (orderItemsIds.isNotEmpty()) {
-                Log.d(TAG, "observeOrderNavigation: orderItemsIds: ${orderItemsIds}")
+                Log.d(TAG, "observeOrderNavigation: orderItemsIds: $orderItemsIds")
                 (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderItemsIds)
             }
         }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.source
 
-import woowacourse.shopping.data.source.ProductHistoryDataSource
+import woowacourse.shopping.data.source.history.ProductHistoryDataSource
 
 class FakeProductHistorySource(
     private val history: MutableList<Long> = ArrayDeque(MAX_SIZE),
