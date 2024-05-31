@@ -30,11 +30,8 @@ class CartViewModel(
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    private val _cartItemSelectedCount = MutableLiveData<Int>(0)
-    val cartItemSelectedCount: LiveData<Int> get() = _cartItemSelectedCount
-
-    val cartItemAllSelected: LiveData<Boolean> =
-        _cartItemSelectedCount.map { it == cartUiModels()?.size }
+    private val cartItemSelectedCount = MutableLiveData<Int>(0)
+    val cartItemAllSelected: LiveData<Boolean> = cartItemSelectedCount.map { it == cartUiModels()?.size }
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
@@ -48,8 +45,11 @@ class CartViewModel(
     private val _checkboxVisibility = MutableLiveData<Boolean>(true)
     val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
 
-    private val _orderButtonEnabled = MutableLiveData(false)
+    private val _orderButtonEnabled = MutableLiveData<Boolean>(false)
     val orderButtonEnabled: LiveData<Boolean> get() = _orderButtonEnabled
+
+    private val _totalQuantity = MutableLiveData<Int>()
+    val totalQuantity: LiveData<Int> get() = _totalQuantity
 
     init {
         loadAllCartItems()
@@ -61,16 +61,22 @@ class CartViewModel(
             totalQuantityCount,
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
-                    result.forEach {
-                        loadProduct(it)
-                    }
+                    result.forEach { loadProduct(it) }
                 }
 
                 override fun onFailure(t: Throwable) {
                 }
             },
         )
-        updateTotalPrice()
+    }
+
+    private fun updateTotalQuantity() {
+        val cartUiModels = cartUiModels() ?: emptyList()
+        val totalQuantity =
+            cartUiModels
+                .filter { it.isSelected }
+                .sumOf { it.quantity.count }
+        _totalQuantity.value = totalQuantity
     }
 
     private fun updateTotalPrice() {
@@ -89,6 +95,7 @@ class CartViewModel(
             object : DataCallback<Product> {
                 override fun onSuccess(result: Product) {
                     updateCartUiState(result, cartItem)
+                    updateTotalQuantity()
                     updateTotalPrice()
                 }
 
@@ -98,7 +105,6 @@ class CartViewModel(
         )
     }
 
-    @Synchronized
     private fun updateCartUiState(
         product: Product,
         cartItem: CartItem,
@@ -185,14 +191,15 @@ class CartViewModel(
         val newCartUiState = Event(CartUiState.Success(newCartUiModels))
         _cartUiState.value = newCartUiState
         updateTotalPrice()
+        updateTotalQuantity()
         updateCartSelectedCount(isSelected)
     }
 
     private fun updateCartSelectedCount(isSelected: Boolean) {
-        val cartItemSelectedCount = _cartItemSelectedCount.value ?: 0
+        val cartItemSelectedCount = cartItemSelectedCount.value ?: 0
         val newCartItemSelectedCount =
             if (isSelected) cartItemSelectedCount + 1 else cartItemSelectedCount - 1
-        this._cartItemSelectedCount.value = newCartItemSelectedCount
+        this.cartItemSelectedCount.value = newCartItemSelectedCount
     }
 
     private fun setQuantity(

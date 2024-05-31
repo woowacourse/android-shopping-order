@@ -94,7 +94,7 @@
                 android:background="@drawable/selector_add_cart_button"
                 android:gravity="center"
                 setEnable="@{viewModel.orderButtonEnabled}"
-                android:text="@{@string/order_button_title(viewModel.cartItemSelectedCount)}"
+                android:text="@{@string/order_button_title(viewModel.totalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
