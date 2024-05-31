@@ -16,6 +16,7 @@ import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import kotlin.reflect.KClass
 
 class CartActivity : AppCompatActivity() {
     private lateinit var cartSelectionFragment: Fragment
@@ -34,22 +35,35 @@ class CartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        cartSelectionFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartSelectionFragment::class.java.name)
-        cartRecommendFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartRecommendFragment::class.java.name)
-        // binding = DataBindingUtil.setContentView(this, layoutId)
-
-        changeFragment(cartSelectionFragment)
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.listener = viewModel
+
+        cartSelectionFragment = createFragment(CartSelectionFragment::class)
+        cartRecommendFragment = createFragment(CartRecommendFragment::class)
+
+        if (savedInstanceState == null) {
+            addFragment(cartSelectionFragment)
+        }
+
         initializeView()
+    }
+
+    private fun createFragment(fragmentClass: KClass<out Fragment>): Fragment {
+        return supportFragmentManager.fragmentFactory.instantiate(classLoader, fragmentClass.java.name)
+    }
+
+    private fun addFragment(fragment: Fragment) {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.fragment_container_view_cart, fragment)
+            addToBackStack(null)
+        }
     }
 
     private fun initializeView() {
         initializeToolbar()
-        initializeCartAdapter()
         viewModel.changedCartEvent.observe(this) {
             it.getContentIfNotHandled() ?: return@observe
             setResult(Activity.RESULT_OK)
@@ -61,6 +75,33 @@ class CartActivity : AppCompatActivity() {
             } else {
                 showToastFailureCreateOrder()
             }
+        }
+        viewModel.navigateEvent.observeEvent(this) {
+            if (isVisibleCartSelectionFragment()) {
+                addFragment(cartRecommendFragment)
+            } else {
+                viewModel.createOrder()
+            }
+        }
+    }
+
+    private fun initializeToolbar() {
+        binding.toolbarCart.setNavigationOnClickListener {
+            if (isVisibleCartSelectionFragment()) {
+                finish()
+            }
+            removeLastFragment()
+        }
+    }
+
+    private fun isVisibleCartSelectionFragment(): Boolean {
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
+        return fragment is CartSelectionFragment
+    }
+
+    private fun removeLastFragment() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
         }
     }
 
@@ -83,30 +124,5 @@ class CartActivity : AppCompatActivity() {
 
     private fun showToastFailureCreateOrder() {
         Toast.makeText(this, R.string.create_order_failure, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun initializeToolbar() {
-        binding.toolbarCart.setNavigationOnClickListener {
-            finish()
-        }
-    }
-
-    private fun changeFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view_cart, fragment)
-            addToBackStack(null)
-        }
-    }
-
-    private fun initializeCartAdapter() {
-        viewModel.navigateEvent.observeEvent(this) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
-            if (fragment is CartSelectionFragment) {
-                changeFragment(cartRecommendFragment)
-            } else {
-                viewModel.createOrder()
-            }
-        }
     }
 }
