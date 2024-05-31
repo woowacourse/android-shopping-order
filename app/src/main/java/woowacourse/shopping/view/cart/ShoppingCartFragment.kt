@@ -115,6 +115,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
+            adapter.setShowSkeleton(false)
             when (errorState) {
                 ShoppingCartEvent.DeleteShoppingCart.Fail ->
                     requireContext().makeToast(
