@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.cart.recommendation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,7 +56,6 @@ class RecommendViewModel(
     private fun setUpUIState() {
         _recommendItemsState.value =
             try {
-                Log.d("crong", "setupState")
                 loadRecommendationProducts()
             } catch (e: Exception) {
                 UIState.Error(e)
@@ -73,16 +71,13 @@ class RecommendViewModel(
     private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
         val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
         cartRepository.updateCartItems()
-        Log.d("crong", "${recentProduct.category}")
         val cartItemIds = cartRepository.findAll().items.map { it.productId }
-        Log.d("crong", "$cartItemIds")
         val items =
             shoppingRepository.recommendProducts(
                 recentProduct.category,
                 DEFAULT_RECOMMEND_ITEM_COUNTS,
                 cartItemIds,
             ).mapperToShoppingProductList()
-        Log.d("crong", "$items")
         return if (items.isEmpty()) {
             UIState.Empty
         } else {

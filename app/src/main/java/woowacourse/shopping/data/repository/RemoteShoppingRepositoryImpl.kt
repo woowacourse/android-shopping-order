@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.ProductResponseDto
@@ -55,7 +54,6 @@ class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
         count: Int,
         cartItemIds: List<Long>,
     ): List<Product> {
-        Log.d("crong", "recommend called")
         var categoryProducts: MutableList<Product> = mutableListOf()
         threadAction {
             productData =
@@ -67,7 +65,6 @@ class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
         categoryProducts =
             productData?.content?.map { it.toDomainModel() }.orEmpty().toMutableList()
         removeDuplicateItemsFromCart(categoryProducts, cartItemIds)
-        Log.d("crong", "on recommend $categoryProducts")
         return categoryProducts.take(count)
     }
 

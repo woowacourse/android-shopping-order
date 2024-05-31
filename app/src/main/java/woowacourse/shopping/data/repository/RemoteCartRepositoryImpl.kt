@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -115,7 +114,6 @@ class RemoteCartRepositoryImpl : CartRepository {
                 break
             }
         }
-        Log.d("crong count", "$quantity")
 
         return quantity
     }

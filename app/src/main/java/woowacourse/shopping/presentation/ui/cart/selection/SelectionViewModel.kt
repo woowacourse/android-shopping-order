@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -112,7 +111,6 @@ class SelectionViewModel(
         // To notify the change of order
         _order.value = _order.value
         updatePriceAndQuantity()
-        Log.d("crong", "onCheckItem: ${_order.value?.list}")
     }
 
     private fun updatePriceAndQuantity() {
@@ -162,14 +160,12 @@ class SelectionViewModel(
         _order.value?.clearOrder()
         _order.value = _order.value
         updatePriceAndQuantity()
-        Log.d("crong", "unSelectAll: ${_order.value?.list}")
     }
 
     private fun selectAll() {
         _order.value?.selectAllCartItems(cartRepository.findAll().items)
         _order.value = _order.value
         updatePriceAndQuantity()
-        Log.d("crong", "selectAll: ${_order.value?.list}")
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +39,6 @@ class ShoppingItemsRepositoryImpl(
                 break
             }
         }
-        Log.d("crong", "${productData?.totalElements}")
         return productData?.totalElements ?: 0
     }
 
@@ -53,7 +51,6 @@ class ShoppingItemsRepositoryImpl(
             products = productService.loadPagingProducts(start, end - start)
         }
         return products*/
-        Log.d("crong", "$products")
         return products?.subList(start, end) ?: emptyList()
     }
 
@@ -64,19 +61,15 @@ class ShoppingItemsRepositoryImpl(
         }
         return product*/
         var product: Product? = null
-        Log.d("crong", "detail activity")
-        Log.d("crong", "$id")
         CoroutineScope(Dispatchers.IO).launch {
             product = service.requestProduct(id).execute().body()?.toDomainModel()
         }
         while (true) {
-            Log.d("crong", "$product")
             sleep(1000)
             if (product != null) {
                 break
             }
         }
-        Log.d("crong", "$product")
 
         return product
     }
