@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.real
+package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.remote.source.OrderDataSourceImpl
 import woowacourse.shopping.data.source.OrderDataSource
@@ -8,7 +8,7 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-class OrderRepositoryImpl(
+class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
 ) : OrderRepository {
     override fun orderShoppingCart(ids: List<Int>) {

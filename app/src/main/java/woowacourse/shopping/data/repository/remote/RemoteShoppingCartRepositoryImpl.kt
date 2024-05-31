@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.real
+package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
@@ -17,7 +17,7 @@ import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-class RealShoppingCartRepositoryImpl(
+class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
     private fun executeWithLatch(action: () -> Unit) {

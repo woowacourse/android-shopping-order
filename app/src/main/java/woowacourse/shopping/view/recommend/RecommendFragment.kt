@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
-import woowacourse.shopping.data.repository.real.OrderRepositoryImpl
-import woowacourse.shopping.data.repository.real.RealProductRepositoryImpl
-import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
+import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
+import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
@@ -33,9 +33,9 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         val viewModelFactory =
             ViewModelFactory {
                 RecommendViewModel(
-                    orderRepository = OrderRepositoryImpl(),
-                    productRepository = RealProductRepositoryImpl(),
-                    shoppingCartRepository = RealShoppingCartRepositoryImpl(),
+                    orderRepository = RemoteOrderRepositoryImpl(),
+                    productRepository = RemoteProductRepositoryImpl(),
+                    shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
                     recentlyRepository = RecentlyProductRepositoryImpl(requireContext()),
                 )
             }
