@@ -9,7 +9,6 @@ import woowacourse.shopping.data.remote.dto.cart.CartOrderRequest
 interface OrderApiService {
     @POST("/orders")
     fun orderItems(
-        @Header("accept") accept: String = "*/*",
         @Body cartItemIds: CartOrderRequest,
     ): Call<Unit>
 }
