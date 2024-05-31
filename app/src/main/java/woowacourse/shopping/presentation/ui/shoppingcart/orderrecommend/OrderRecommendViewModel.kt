@@ -124,14 +124,14 @@ class OrderRecommendViewModel(
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
-            ).onSuccess { cartId ->
+            ).onSuccess { cartItemId ->
                 hideError()
                 _uiState.value?.let { state ->
                     val updateRecommendCarts =
                         state.recommendCarts.map { cart ->
                             if (cart.product.id == product.id) {
-                                state.orderCarts[cartId] = cart.copy(id = cartId, quantity = 1)
-                                cart.copy(id = cartId)
+                                state.orderCarts[cartItemId.id] = cart.copy(id = cartItemId.id, quantity = 1)
+                                cart.copy(id = cartItemId.id)
                             } else {
                                 cart
                             }

@@ -1,9 +1,10 @@
 package woowacourse.shopping.remote.datasource
 
-import retrofit2.Response
 import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
+import woowacourse.shopping.data.model.remote.CartItemIdDto
 import woowacourse.shopping.data.model.remote.CartsDto
 import woowacourse.shopping.remote.api.CartService
+import woowacourse.shopping.remote.mapper.toCartItemIdDto
 import woowacourse.shopping.remote.mapper.toData
 import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
@@ -12,14 +13,14 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
     override fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Int> =
+    ): Result<CartItemIdDto> =
         runCatching {
             val body =
                 PostCartItemRequest(
                     productId = productId.toInt(),
                     quantity = quantity,
                 )
-            service.postCartItem(body).execute().toCartId()
+            service.postCartItem(body).execute().toCartItemIdDto()
         }
 
     override fun updateCartProduct(
@@ -55,9 +56,6 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
         runCatching {
             service.deleteCartItem(id = cartId).execute().body()
         }
-
-    private fun <T> Response<T>.toCartId(): Int =
-        this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
 
     companion object {
         const val FIRST_PAGE = 0

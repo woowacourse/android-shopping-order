@@ -190,13 +190,13 @@ class ProductListViewModel(
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
-            ).onSuccess { cartId ->
+            ).onSuccess { cartItemId ->
                 hideError()
                 _uiState.value?.let { state ->
                     val updateCartList =
                         state.pagingCart.cartList.map { cart ->
                             if (cart.product.id == product.id) {
-                                cart.copy(id = cartId)
+                                cart.copy(id = cartItemId.id)
                             } else {
                                 cart
                             }

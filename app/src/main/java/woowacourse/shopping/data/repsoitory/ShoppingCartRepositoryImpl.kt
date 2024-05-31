@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
@@ -10,11 +11,11 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
     override fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Int> =
+    ): Result<CartItemId> =
         dataSource.insertCartProduct(
             productId = productId,
             quantity = quantity,
-        )
+        ).mapCatching { it.toDomain() }
 
     override fun updateCartProduct(
         cartId: Int,

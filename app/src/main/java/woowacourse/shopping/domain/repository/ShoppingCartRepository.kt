@@ -1,12 +1,13 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingCartRepository {
     fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Int>
+    ): Result<CartItemId>
 
     fun updateCartProduct(
         cartId: Int,

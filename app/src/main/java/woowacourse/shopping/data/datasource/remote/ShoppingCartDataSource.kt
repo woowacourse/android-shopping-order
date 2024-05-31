@@ -1,12 +1,13 @@
 package woowacourse.shopping.data.datasource.remote
 
+import woowacourse.shopping.data.model.remote.CartItemIdDto
 import woowacourse.shopping.data.model.remote.CartsDto
 
 interface ShoppingCartDataSource {
     fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Int>
+    ): Result<CartItemIdDto>
 
     fun updateCartProduct(
         cartId: Int,
