@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ProductHistoryRepositoryImpl(
     private val productHistoryDataSource: ProductHistoryDataSource,
-    private val shoppingCartRepository: ShoppingCartRepository,
+    private val shoppingCartDataSource: ShoppingCartDataSource,
 ) :
     ProductHistoryRepository {
     override fun insertProductHistory(
@@ -39,9 +39,20 @@ class ProductHistoryRepositoryImpl(
 
         return productHistoryDataSource.getProductHistoriesByCategory(category = recentHistory.first().category)
             .mapCatching { result ->
-                val carts = shoppingCartRepository.getAllCarts().getOrNull()
 
-                val productsId = carts?.content?.map { it.product.id } ?: emptyList()
+                val totalElements =
+                    shoppingCartDataSource.getCartProductsPaged(
+                        page = ProductRepositoryImpl.FIRST_PAGE,
+                        size = ProductRepositoryImpl.FIRST_SIZE,
+                    ).getOrThrow().totalElements
+
+                val carts =
+                    shoppingCartDataSource.getCartProductsPaged(
+                        page = ProductRepositoryImpl.FIRST_PAGE,
+                        size = totalElements,
+                    ).getOrThrow().toDomain()
+
+                val productsId = carts.content.map { it.product.id }
                 result.filter {
                     it.productId !in productsId
                 }.map { Cart(product = it.toDomain()) }.take(size)
@@ -55,4 +66,21 @@ class ProductHistoryRepositoryImpl(
     override fun deleteProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.deleteProductHistory(productId = productId)
 
     override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
+
+    companion object {
+        private var instance: ProductHistoryRepositoryImpl? = null
+
+        fun setInstance(
+            productHistoryDataSource: ProductHistoryDataSource,
+            shoppingCartDataSource: ShoppingCartDataSource,
+        ) {
+            instance =
+                ProductHistoryRepositoryImpl(
+                    productHistoryDataSource = productHistoryDataSource,
+                    shoppingCartDataSource = shoppingCartDataSource,
+                )
+        }
+
+        fun getInstance(): ProductHistoryRepositoryImpl = requireNotNull(instance)
+    }
 }

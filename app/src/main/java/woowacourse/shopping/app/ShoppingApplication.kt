@@ -2,69 +2,62 @@ package woowacourse.shopping.app
 
 import android.app.Application
 import androidx.preference.PreferenceManager
-import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
-import woowacourse.shopping.data.datasource.remote.OrderDataSource
-import woowacourse.shopping.data.datasource.remote.ProductDataSource
-import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
-import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
+import woowacourse.shopping.remote.api.BaseUrl
 import woowacourse.shopping.remote.api.NetworkModule
 import woowacourse.shopping.remote.datasource.OrderDataSourceImpl
 import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
 import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
 
 class ShoppingApplication : Application() {
-    private val authProvider: AuthProvider by lazy {
-        AuthProviderImpl(PreferenceManager.getDefaultSharedPreferences(applicationContext))
-    }
-
-    private val networkModule by lazy { NetworkModule(authProvider = authProvider) }
-
-    private val shoppingCartDataSource: ShoppingCartDataSource by lazy {
-        ShoppingCartDataSourceImpl(networkModule.cartService)
-    }
-    val shoppingCartRepository: ShoppingCartRepository by lazy {
-        ShoppingCartRepositoryImpl(shoppingCartDataSource)
-    }
-
-    private val productHistoryDataSource: ProductHistoryDataSource by lazy {
-        ProductHistoryDataSourceImpl(ProductHistoryDatabase.getDatabase(applicationContext).dao())
-    }
-    val productHistoryRepository: ProductHistoryRepository by lazy {
-        ProductHistoryRepositoryImpl(productHistoryDataSource, shoppingCartRepository)
-    }
-
-    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(networkModule.productService) }
-    val productRepository: ProductRepository by lazy {
-        ProductRepositoryImpl(
-            productDataSource,
-            shoppingCartDataSource,
-        )
-    }
-
-    private val orderDataSource: OrderDataSource by lazy { OrderDataSourceImpl(networkModule.orderService) }
-    val orderRepository: OrderRepository by lazy {
-        OrderRepositoryImpl(
-            orderDataSource,
-        )
-    }
-
     override fun onCreate() {
         super.onCreate()
-        authProvider.apply {
-            name = "junjange"
-            password = "password"
-        }
+        initAuthProvider()
+        initNetworkModule()
+        initDataSources()
+        initRepositories()
+    }
+
+    private fun initAuthProvider() {
+        AuthProviderImpl.setInstance(
+            sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(applicationContext),
+        )
+    }
+
+    private fun initNetworkModule() {
+        NetworkModule.setInstance(
+            baseUrl = BaseUrl(BASE_URL),
+            authProvider = AuthProviderImpl.getInstance(),
+        )
+    }
+
+    private fun initDataSources() {
+        ShoppingCartDataSourceImpl.setInstance(cartService = NetworkModule.getInstance().cartService)
+        ProductDataSourceImpl.setInstance(productService = NetworkModule.getInstance().productService)
+        OrderDataSourceImpl.setInstance(orderService = NetworkModule.getInstance().orderService)
+        ProductHistoryDataSourceImpl.setInstance(
+            productHistoryDao = ProductHistoryDatabase.getDatabase(applicationContext).dao(),
+        )
+    }
+
+    private fun initRepositories() {
+        ShoppingCartRepositoryImpl.setInstance(dataSource = ShoppingCartDataSourceImpl.getInstance())
+        ProductRepositoryImpl.setInstance(
+            productDataSource = ProductDataSourceImpl.getInstance(),
+            shoppingCartDataSource = ShoppingCartDataSourceImpl.getInstance(),
+        )
+        OrderRepositoryImpl.setInstance(orderDataSource = OrderDataSourceImpl.getInstance())
+        ProductHistoryRepositoryImpl.setInstance(
+            productHistoryDataSource = ProductHistoryDataSourceImpl.getInstance(),
+            shoppingCartDataSource = ShoppingCartDataSourceImpl.getInstance(),
+        )
     }
 
     companion object {

@@ -24,5 +24,17 @@ class AuthProviderImpl(private val sharedPreferences: SharedPreferences) : AuthP
     companion object {
         const val KEY_AUTH_NAME = "KEY_AUTH_NAME"
         const val KEY_AUTH_PASSWORD = "KEY_AUTH_PASSWORD"
+
+        private var instance: AuthProviderImpl? = null
+
+        fun setInstance(sharedPreferences: SharedPreferences) {
+            instance =
+                AuthProviderImpl(sharedPreferences = sharedPreferences).apply {
+                    name = "junjange"
+                    password = "password"
+                }
+        }
+
+        fun getInstance(): AuthProviderImpl = requireNotNull(instance)
     }
 }

@@ -50,5 +50,16 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
             service.deleteCartItem(id = cartId).execute().body()
         }
 
-    fun <T> Response<T>.toCartId(): Int = this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
+    private fun <T> Response<T>.toCartId(): Int =
+        this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
+
+    companion object {
+        private var instance: ShoppingCartDataSourceImpl? = null
+
+        fun setInstance(cartService: CartService) {
+            instance = ShoppingCartDataSourceImpl(service = cartService)
+        }
+
+        fun getInstance(): ShoppingCartDataSourceImpl = requireNotNull(instance)
+    }
 }

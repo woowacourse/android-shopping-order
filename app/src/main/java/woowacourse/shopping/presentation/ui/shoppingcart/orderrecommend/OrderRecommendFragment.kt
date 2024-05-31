@@ -3,7 +3,9 @@ package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 import android.os.Build
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication
+import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
+import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
+import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentOrderRecommendBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.base.BaseFragment
@@ -15,9 +17,9 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
 
     private val viewModel: OrderRecommendViewModel by viewModels {
         OrderRecommendViewModel.factory(
-            (requireContext().applicationContext as ShoppingApplication).productHistoryRepository,
-            (requireContext().applicationContext as ShoppingApplication).shoppingCartRepository,
-            (requireContext().applicationContext as ShoppingApplication).orderRepository,
+            ProductHistoryRepositoryImpl.getInstance(),
+            ShoppingCartRepositoryImpl.getInstance(),
+            OrderRepositoryImpl.getInstance(),
         )
     }
 

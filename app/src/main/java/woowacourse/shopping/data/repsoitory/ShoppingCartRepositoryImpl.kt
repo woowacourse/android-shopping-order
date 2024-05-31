@@ -37,13 +37,21 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
             dataSource.getCartProductsPaged(
                 page = ProductRepositoryImpl.FIRST_PAGE,
                 size = ProductRepositoryImpl.FIRST_SIZE,
-            )
-                .getOrThrow().totalElements
+            ).getOrThrow().totalElements
 
         return dataSource.getCartProductsPaged(
             page = ProductRepositoryImpl.FIRST_PAGE,
             size = totalElements,
-        )
-            .mapCatching { it.toDomain() }
+        ).mapCatching { it.toDomain() }
+    }
+
+    companion object {
+        private var instance: ShoppingCartRepositoryImpl? = null
+
+        fun setInstance(dataSource: ShoppingCartDataSource) {
+            instance = ShoppingCartRepositoryImpl(dataSource = dataSource)
+        }
+
+        fun getInstance(): ShoppingCartRepositoryImpl = requireNotNull(instance)
     }
 }
