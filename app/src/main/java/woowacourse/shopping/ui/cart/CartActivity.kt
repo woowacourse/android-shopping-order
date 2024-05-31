@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.CheckBox
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -38,20 +40,21 @@ class CartActivity : AppCompatActivity() {
         setCartAdapter()
         setRecommendProductAdapter()
         observeCartItems()
+
         binding.layoutOrder.btnOrder.setOnClickListener {
             if (!requireNotNull(viewModel.isRecommendPage.value)) {
                 viewModel.isRecommendPage.value = true
                 viewModel.loadRecommendProducts()
             }
         }
+        binding.cbCartItemTotal.setOnClickListener {
+            viewModel.totalCheckBoxCheck((it as CheckBox).isChecked)
+        }
 
         viewModel.products.observe(this) {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
 
-        binding.cbCartItemTotal.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.totalCheckBoxCheck(isChecked)
-        }
     }
 
     private fun initBinding() {
