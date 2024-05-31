@@ -24,17 +24,24 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         viewModel.cartUiState.observe(viewLifecycleOwner) {
             val cartUiState = it.getContentIfNotHandled() ?: return@observe
             when (cartUiState) {
-                CartUiState.Failure -> {
-                }
+                CartUiState.Failure -> {}
 
                 CartUiState.Loading -> {
                     binding.layoutCartSkeleton.visibility = View.VISIBLE
                     binding.rvCart.visibility = View.GONE
+                    binding.tvEmptyCart.visibility = View.GONE
+                }
+
+                CartUiState.Empty -> {
+                    binding.layoutCartSkeleton.visibility = View.GONE
+                    binding.rvCart.visibility = View.GONE
+                    binding.tvEmptyCart.visibility = View.VISIBLE
                 }
 
                 is CartUiState.Success -> {
                     binding.layoutCartSkeleton.visibility = View.GONE
                     binding.rvCart.visibility = View.VISIBLE
+                    binding.tvEmptyCart.visibility = View.GONE
                     adapter.submitList(cartUiState.cartUiModels)
                 }
             }

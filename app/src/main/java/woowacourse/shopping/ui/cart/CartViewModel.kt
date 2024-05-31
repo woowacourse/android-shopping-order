@@ -63,6 +63,7 @@ class CartViewModel(
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
                     if (result.isEmpty()) {
+                        _cartUiState.value = Event(CartUiState.Empty)
                         updateTotalQuantity()
                         updateTotalPrice()
                     }
@@ -70,6 +71,7 @@ class CartViewModel(
                 }
 
                 override fun onFailure(t: Throwable) {
+                    setError()
                 }
             },
         )
@@ -103,6 +105,7 @@ class CartViewModel(
                 }
 
                 override fun onFailure(t: Throwable) {
+                    setError()
                 }
             },
         )
