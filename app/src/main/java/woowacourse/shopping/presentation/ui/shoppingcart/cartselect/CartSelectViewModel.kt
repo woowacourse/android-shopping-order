@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
+import woowacourse.shopping.presentation.base.LoadingProvider
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
@@ -37,7 +38,7 @@ class CartSelectViewModel(
 
     private fun loadCartProducts(page: Int) {
         thread {
-            showLoading()
+            showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
             Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
 
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
@@ -263,6 +264,15 @@ class CartSelectViewModel(
             _navigateAction.emit(
                 CartSelectNavigateAction.NavigateToRecommend(orderCarts = state.orderCartList.values.toList()),
             )
+        }
+    }
+
+    fun showPageIndicator(): Boolean {
+        val state = uiState.value ?: return false
+        return if (loading.value == LoadingProvider.SKELETON_LOADING) {
+            false
+        } else {
+            !(state.pagingCartProduct.currentPage == 0 && state.pagingCartProduct.last)
         }
     }
 

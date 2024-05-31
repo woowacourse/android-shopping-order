@@ -7,6 +7,9 @@
 
         <import type="android.view.View" />
 
+        <import type="woowacourse.shopping.presentation.base.LoadingProvider" />
+
+
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.ui.productlist.ProductListViewModel" />
@@ -147,7 +150,7 @@
 
             <include
                 layout="@layout/include_skeleton_product_list"
-                android:visibility="@{vm.loading ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{vm.loading == LoadingProvider.SKELETON_LOADING ? View.VISIBLE : View.GONE}" />
 
 
             <include

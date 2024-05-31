@@ -15,8 +15,8 @@ abstract class BaseViewModel : ViewModel() {
     private val _error: MutableLiveData<ErrorState?> = MutableLiveData(null)
     val error: LiveData<ErrorState?> get() = _error
 
-    private val _loading: MutableLiveData<Boolean> = MutableLiveData(false)
-    val loading: LiveData<Boolean> get() = _loading
+    private val _loading: MutableLiveData<LoadingProvider?> = MutableLiveData(null)
+    val loading: LiveData<LoadingProvider?> get() = _loading
 
     abstract fun retry()
 
@@ -62,11 +62,11 @@ abstract class BaseViewModel : ViewModel() {
         _error.postValue(null)
     }
 
-    fun showLoading() {
-        _loading.postValue(true)
+    fun showLoading(loadingProvider: LoadingProvider) {
+        _loading.postValue(loadingProvider)
     }
 
     fun hideLoading() {
-        _loading.postValue(false)
+        _loading.postValue(null)
     }
 }

@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
+import woowacourse.shopping.presentation.base.LoadingProvider
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
@@ -42,7 +43,7 @@ class ProductListViewModel(
 
     private fun initLoad() {
         thread {
-            showLoading()
+            showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
             Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             productListPagingSource.load().mapCatching { pagingProduct ->
                 val productHistories =
