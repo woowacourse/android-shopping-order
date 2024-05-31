@@ -15,10 +15,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.RepositoryInjector
+import woowacourse.shopping.presentation.ui.FakeRepository
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.cartProduct
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity.Companion.EXTRA_CART_PRODUCT
-import woowacourse.shopping.presentation.ui.fakeRepository
 import java.lang.IllegalStateException
 
 @RunWith(AndroidJUnit4::class)
@@ -31,7 +31,7 @@ class ProductEntityDetailActivityTest {
 
     @Before
     fun setUp() {
-        RepositoryInjector.setInstance(fakeRepository)
+        RepositoryInjector.setInstance(FakeRepository())
     }
 
     @Test

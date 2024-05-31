@@ -16,13 +16,13 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.presentation.ui.fakeRepository
+import woowacourse.shopping.presentation.ui.FakeRepository
 
 @RunWith(AndroidJUnit4::class)
 class CartEntityActivityTest {
     @Before
     fun setUp() {
-        RepositoryInjector.setInstance(fakeRepository)
+        RepositoryInjector.setInstance(FakeRepository())
     }
 
     @Test
