@@ -40,7 +40,6 @@ class ProductsViewModel(
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({ loadPage() }, 1000)
         loadRecentProducts()
-        updateTotalCount()
     }
 
     fun loadPage() {
@@ -55,6 +54,7 @@ class ProductsViewModel(
                     val newProductUiModels =
                         (productUiModels() ?: emptyList()) + additionalProductUiModels
                     _productsUiState.postValue(Event(ProductsUiState(productUiModels = newProductUiModels)))
+                    updateTotalCount()
                     _showLoadMore.value = false
                     page++
                 }
@@ -98,7 +98,6 @@ class ProductsViewModel(
 
     fun loadProduct(productId: Int) {
         updateProductUiModel(productId)
-        updateTotalCount()
     }
 
     private fun List<Product>.toProductUiModels(): List<ProductUiModel> {
@@ -143,7 +142,6 @@ class ProductsViewModel(
             } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.dec())
         updateCartQuantity(newProductUiModel)
-        updateTotalCount()
         updateProductUiModel(productId)
     }
 
@@ -151,7 +149,6 @@ class ProductsViewModel(
         val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.inc())
         updateCartQuantity(newProductUiModel)
-        updateTotalCount()
         updateProductUiModel(productId)
     }
 
@@ -179,6 +176,7 @@ class ProductsViewModel(
                     val position = productUiModels.indexOfFirst { it.productId == productId }
                     productUiModels[position] = newProductUiModel
                     _productsUiState.postValue(Event(ProductsUiState(productUiModels)))
+                    updateTotalCount()
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -188,7 +186,7 @@ class ProductsViewModel(
         )
     }
 
-    private fun updateTotalCount() {
+    fun updateTotalCount() {
         cartRepository.getCartQuantityCount(
             object : DataCallback<Int> {
                 override fun onSuccess(result: Int) {

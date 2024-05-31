@@ -11,7 +11,7 @@ object RetrofitClient {
             .Builder()
             .addInterceptor(
                 AuthenticationInterceptor(
-                    "aprilgom",
+                    "kimhm0728",
                     "password",
                 ),
             ).build()
