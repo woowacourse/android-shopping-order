@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.history.ProductHistoryDataSource
-import woowacourse.shopping.data.source.product.ProductDataSource
-import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
+import woowacourse.shopping.data.history.ProductHistoryDataSource
+import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.history.DefaultProductHistoryRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture

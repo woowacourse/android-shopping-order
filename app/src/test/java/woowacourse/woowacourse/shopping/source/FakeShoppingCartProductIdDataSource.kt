@@ -1,7 +1,7 @@
 package woowacourse.shopping.source
 
 import woowacourse.shopping.data.model.ProductIdsCountData
-import woowacourse.shopping.data.source.cart.CartItemDataSource
+import woowacourse.shopping.data.cart.CartItemDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
 
 // TODO: 이거 data 타입 바뀜

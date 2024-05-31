@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.history
+package woowacourse.shopping.data.history
 
 interface ProductHistoryDataSource {
     fun saveProductHistory(productId: Long)

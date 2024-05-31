@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.cart
+package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.domain.model.ProductIdsCount

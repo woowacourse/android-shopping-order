@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.cart.CartItemDataSource
-import woowacourse.shopping.data.source.history.ProductHistoryDataSource
-import woowacourse.shopping.data.source.product.ProductDataSource
-import woowacourse.shopping.domain.repository.history.DefaultProductHistoryRepository
+import woowacourse.shopping.data.cart.CartItemDataSource
+import woowacourse.shopping.data.history.ProductHistoryDataSource
+import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.history.DefaultProductHistoryRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.product.DefaultProductRepository
+import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.productTestFixture

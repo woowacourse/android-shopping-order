@@ -1,9 +1,9 @@
-package woowacourse.shopping.domain.repository.history
+package woowacourse.shopping.data.history
 
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.history.ProductHistoryDataSource
-import woowacourse.shopping.data.source.product.ProductDataSource
+import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 
 class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,

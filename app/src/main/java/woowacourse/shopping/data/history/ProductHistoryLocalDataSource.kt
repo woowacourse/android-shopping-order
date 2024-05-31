@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.history
+package woowacourse.shopping.data.history
 
 import woowacourse.shopping.data.model.HistoryProduct
 import woowacourse.shopping.local.history.HistoryProductDao

@@ -1,12 +1,12 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.data.source.cart.CartItemDataSource
-import woowacourse.shopping.data.source.cart.CartItemRemoteDataSource
-import woowacourse.shopping.data.source.history.ProductHistoryDataSource
-import woowacourse.shopping.data.source.history.ProductHistoryLocalDataSource
-import woowacourse.shopping.data.source.product.ProductDataSource
-import woowacourse.shopping.data.source.product.ProductRemoteDataSource
+import woowacourse.shopping.data.cart.CartItemDataSource
+import woowacourse.shopping.data.cart.CartItemRemoteDataSource
+import woowacourse.shopping.data.history.ProductHistoryDataSource
+import woowacourse.shopping.data.history.ProductHistoryLocalDataSource
+import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.local.history.HistoryProductDao
 import woowacourse.shopping.local.history.HistoryProductDatabase
 import woowacourse.shopping.remote.cart.CartItemApiService

@@ -1,7 +1,7 @@
-package woowacourse.shopping.domain.repository.cart
+package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.data.source.cart.CartItemDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.model.CartItem
 
 class DefaultCartItemRepository(

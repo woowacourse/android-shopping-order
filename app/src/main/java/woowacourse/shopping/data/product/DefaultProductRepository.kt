@@ -1,9 +1,9 @@
-package woowacourse.shopping.domain.repository.product
+package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.cart.CartItemDataSource
-import woowacourse.shopping.data.source.product.ProductDataSource
+import woowacourse.shopping.data.cart.CartItemDataSource
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.product.ProductRepository
 
 class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
