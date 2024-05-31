@@ -10,12 +10,12 @@ class RecentProductConverter {
 
     @TypeConverter
     fun convertSeenDateTimeToString(seenDateTime: LocalDateTime): String {
-        return gson.toJson(seenDateTime)
+        return seenDateTime.toString()
     }
 
     @TypeConverter
     fun convertStringToSeenDateTime(seenDateTimeValue: String): LocalDateTime {
-        return gson.fromJson(seenDateTimeValue, LocalDateTime::class.java)
+        return LocalDateTime.parse(seenDateTimeValue)
     }
 
     @TypeConverter
