@@ -84,21 +84,20 @@ class ProductListViewModel(
         thread {
             productListPagingSource.load().onSuccess { pagingProduct ->
                 hideError()
-                _uiState.value?.let { state ->
-                    val nowPagingCart =
-                        PagingCart(
-                            cartList = state.pagingCart.cartList + pagingProduct.cartList,
-                            last = pagingProduct.last,
-                        )
-                    val cartCount = nowPagingCart.cartList.sumOf { it.quantity }
-
-                    _uiState.postValue(
-                        state.copy(
-                            pagingCart = nowPagingCart,
-                            cartQuantity = cartCount,
-                        ),
+                val state = uiState.value ?: return@onSuccess
+                val nowPagingCart =
+                    PagingCart(
+                        cartList = state.pagingCart.cartList + pagingProduct.cartList,
+                        last = pagingProduct.last,
                     )
-                }
+                val cartCount = nowPagingCart.cartList.sumOf { it.quantity }
+
+                _uiState.postValue(
+                    state.copy(
+                        pagingCart = nowPagingCart,
+                        cartQuantity = cartCount,
+                    ),
+                )
             }.onFailure { e ->
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
@@ -154,33 +153,51 @@ class ProductListViewModel(
         productId: Long,
         increment: Boolean,
     ) {
-        _uiState.value?.let { state ->
-            val updatedProductList =
-                state.pagingCart.cartList.map { cart ->
-                    if (cart.product.id == productId) {
-                        cart.updateProduct(increment)
-                    } else {
-                        cart
-                    }
+        val state = uiState.value ?: return
+        val updatedProductList =
+            state.pagingCart.cartList.map { cart ->
+                if (cart.product.id == productId) {
+                    updateCart(cart, increment)
+                } else {
+                    cart
                 }
-            val updatedCartCount = updatedProductList.sumOf { it.quantity }
-            _uiState.postValue(
-                state.copy(
-                    pagingCart = PagingCart(updatedProductList),
-                    cartQuantity = updatedCartCount,
-                ),
-            )
-        }
+            }
+        val updatedCartCount = updatedProductList.sumOf { it.quantity }
+        _uiState.postValue(
+            state.copy(
+                pagingCart = PagingCart(updatedProductList),
+                cartQuantity = updatedCartCount,
+            ),
+        )
     }
 
-    private fun Cart.updateProduct(increment: Boolean): Cart {
-        val updatedQuantity = if (increment) this.quantity + 1 else this.quantity - 1
-        when {
-            this.quantity == 0 -> insertCartProduct(this.product, updatedQuantity)
-            updatedQuantity == 0 -> deleteCartProduct(this.id)
-            else -> updateCartProduct(this.id, updatedQuantity)
+    private fun updateCart(
+        cart: Cart,
+        increment: Boolean,
+    ): Cart {
+        val updatedQuantity = calculateUpdatedQuantity(cart.quantity, increment)
+        calculatedUpdateCart(cart, updatedQuantity)
+        return cart.copy(quantity = updatedQuantity)
+    }
+
+    private fun calculateUpdatedQuantity(
+        currentQuantity: Int,
+        increment: Boolean,
+    ): Int {
+        return if (increment) currentQuantity + 1 else currentQuantity - 1
+    }
+
+    private fun calculatedUpdateCart(
+        cart: Cart,
+        updatedQuantity: Int,
+    ) {
+        if (cart.quantity == Cart.INIT_QUANTITY_NUM) {
+            insertCartProduct(cart.product, updatedQuantity)
+        } else if (updatedQuantity == Cart.INIT_QUANTITY_NUM) {
+            deleteCartProduct(cart.id)
+        } else {
+            updateCartProduct(cart.id, updatedQuantity)
         }
-        return this.copy(quantity = updatedQuantity)
     }
 
     private fun insertCartProduct(
@@ -193,22 +210,21 @@ class ProductListViewModel(
                 quantity = quantity,
             ).onSuccess { cartItemId ->
                 hideError()
-                _uiState.value?.let { state ->
-                    val updateCartList =
-                        state.pagingCart.cartList.map { cart ->
-                            if (cart.product.id == product.id) {
-                                cart.copy(id = cartItemId.id)
-                            } else {
-                                cart
-                            }
+                val state = uiState.value ?: return@onSuccess
+                val updateCartList =
+                    state.pagingCart.cartList.map { cart ->
+                        if (cart.product.id == product.id) {
+                            cart.copy(id = cartItemId.id)
+                        } else {
+                            cart
                         }
+                    }
 
-                    val pagingCart = PagingCart(cartList = updateCartList)
+                val pagingCart = PagingCart(cartList = updateCartList)
 
-                    _uiState.postValue(
-                        state.copy(pagingCart = pagingCart),
-                    )
-                }
+                _uiState.postValue(
+                    state.copy(pagingCart = pagingCart),
+                )
             }.onFailure { e ->
                 showError(e)
             }
