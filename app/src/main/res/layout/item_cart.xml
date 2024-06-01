@@ -37,7 +37,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/tv_item_product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -51,7 +51,7 @@
             tools:text="상품명" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/iv_item_product_image"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginTop="20dp"
@@ -60,8 +60,8 @@
             app:imageUrl="@{cartItem.imgUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/checkBox"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"
-            tools:src="@drawable/ic_launcher_background" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_product_name"
+            tools:src="@color/shimmer_content_color" />
 
         <include
             android:id="@+id/btn_quantity"
@@ -71,19 +71,19 @@
             android:layout_marginBottom="4dp"
             app:cartItem="@{cartItem}"
             app:countHandler="@{countHandler}"
-            app:layout_constraintBottom_toTopOf="@id/tv_item_cart_price"
-            app:layout_constraintEnd_toEndOf="@id/tv_item_cart_price" />
+            app:layout_constraintBottom_toTopOf="@id/tv_cart_item_price"
+            app:layout_constraintEnd_toEndOf="@id/tv_cart_item_price" />
 
         <TextView
-            android:id="@+id/tv_item_cart_price"
+            android:id="@+id/tv_cart_item_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:textColor="@color/gray_500"
             android:textSize="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            android:text="@{@string/price_format(cartItem.price*cartItem.quantity)}"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_item_product_image"
             app:layout_constraintEnd_toEndOf="parent"
-            app:price="@{cartItem.price*cartItem.quantity}"
             tools:text="10,000원" />
 
         <ImageView
@@ -96,6 +96,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/gray_100" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
