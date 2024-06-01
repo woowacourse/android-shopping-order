@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.recommend
+package woowacourse.shopping.presentation.cart.order
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,21 +13,21 @@ import woowacourse.shopping.presentation.shopping.toCartUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 
-class RecommendProductViewModel(
+class OrderViewModel(
     orders: List<CartProductUi>,
     private val cartRepository: CartRepository,
     recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel(), CartItemListener {
-    private val _uiState = MutableLiveData(RecommendOrderUiState(orders))
-    val uiState: LiveData<RecommendOrderUiState> get() = _uiState
+    private val _uiState = MutableLiveData(OrderUiState(orders))
+    val uiState: LiveData<OrderUiState> get() = _uiState
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
     val updateCartEvent: SingleLiveData<Unit> get() = _updateCartEvent
     private val _showOrderDialogEvent = MutableSingleLiveData<Unit>()
     val showOrderDialogEvent: SingleLiveData<Unit> get() = _showOrderDialogEvent
     private val _finishOrderEvent = MutableSingleLiveData<Unit>()
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
-    private val _errorEvent = MutableSingleLiveData<RecommendProductErrorEvent>()
-    val errorEvent: SingleLiveData<RecommendProductErrorEvent> get() = _errorEvent
+    private val _errorEvent = MutableSingleLiveData<OrderErrorEvent>()
+    val errorEvent: SingleLiveData<OrderErrorEvent> get() = _errorEvent
 
     init {
         val uiState = _uiState.value
@@ -35,7 +35,7 @@ class RecommendProductViewModel(
         if (uiState != null) {
             _uiState.value = uiState.copy(recommendProducts = recommendProducts)
         } else {
-            _uiState.value = RecommendOrderUiState(orders, recommendProducts)
+            _uiState.value = OrderUiState(orders, recommendProducts)
         }
     }
 
@@ -50,7 +50,7 @@ class RecommendProductViewModel(
                 _updateCartEvent.setValue(Unit)
                 _finishOrderEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductErrorEvent.OrderProducts)
+                _errorEvent.setValue(OrderErrorEvent.OrderProducts)
             }
     }
 
@@ -63,7 +63,7 @@ class RecommendProductViewModel(
                     uiState.increaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductErrorEvent.IncreaseCartProduct)
+                _errorEvent.setValue(OrderErrorEvent.IncreaseCartProduct)
             }
     }
 
@@ -78,7 +78,7 @@ class RecommendProductViewModel(
                     )
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductErrorEvent.DeleteCartProduct)
+                _errorEvent.setValue(OrderErrorEvent.DeleteCartProduct)
             }
             return
         }
@@ -89,7 +89,7 @@ class RecommendProductViewModel(
                     uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductErrorEvent.DecreaseCartProduct)
+                _errorEvent.setValue(OrderErrorEvent.DecreaseCartProduct)
             }
     }
 
@@ -102,7 +102,7 @@ class RecommendProductViewModel(
             recommendProductsUseCase: RecommendProductsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                RecommendProductViewModel(
+                OrderViewModel(
                     orders,
                     cartRepository,
                     recommendProductsUseCase,
@@ -112,25 +112,25 @@ class RecommendProductViewModel(
     }
 }
 
-private fun RecommendOrderUiState.increaseProductCount(
+private fun OrderUiState.increaseProductCount(
     productId: Long,
     amount: Int,
-): RecommendOrderUiState =
+): OrderUiState =
     copy(
         recommendProducts =
-            recommendProducts.map {
-                if (it.product.id == productId) {
-                    it.copy(count = it.count + amount)
-                } else {
-                    it
-                }
-            },
+        recommendProducts.map {
+            if (it.product.id == productId) {
+                it.copy(count = it.count + amount)
+            } else {
+                it
+            }
+        },
     )
 
-private fun RecommendOrderUiState.decreaseProductCount(
+private fun OrderUiState.decreaseProductCount(
     productId: Long,
     amount: Int,
-): RecommendOrderUiState {
+): OrderUiState {
     val newProducts =
         recommendProducts.map {
             if (it.product.id == productId) {
@@ -142,9 +142,10 @@ private fun RecommendOrderUiState.decreaseProductCount(
     return copy(recommendProducts = newProducts)
 }
 
-private fun RecommendOrderUiState.shouldDeleteFromCart(productId: Long): Boolean {
+private fun OrderUiState.shouldDeleteFromCart(productId: Long): Boolean {
     val product = findProduct(productId) ?: return false
     return product.count <= 1
 }
 
-private fun RecommendOrderUiState.findProduct(productId: Long): CartProductUi? = recommendProducts.find { it.product.id == productId }
+private fun OrderUiState.findProduct(productId: Long): CartProductUi? =
+    recommendProducts.find { it.product.id == productId }

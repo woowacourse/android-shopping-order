@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.recommend
+package woowacourse.shopping.presentation.cart.order
 
 import android.os.Bundle
 import android.view.Menu
@@ -14,7 +14,7 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.shopping.ShoppingRepositoryInjector
-import woowacourse.shopping.databinding.FragmentRecommendCartProductBinding
+import woowacourse.shopping.databinding.FragmentOrderProductBinding
 import woowacourse.shopping.domain.RecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
@@ -24,16 +24,16 @@ import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 import woowacourse.shopping.presentation.util.parcelable
 import woowacourse.shopping.presentation.util.showToast
 
-class RecommendProductFragment :
-    BindingFragment<FragmentRecommendCartProductBinding>(R.layout.fragment_recommend_cart_product) {
-    private val viewModel by viewModels<RecommendProductViewModel> {
+class OrderFragment :
+    BindingFragment<FragmentOrderProductBinding>(R.layout.fragment_order_product) {
+    private val viewModel by viewModels<OrderViewModel> {
         val orders: List<CartProductUi> =
-            arguments?.parcelable<RecommendNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
+            arguments?.parcelable<OrderNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
                 ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
-        RecommendProductViewModel.factory(
+        OrderViewModel.factory(
             orders,
             cartRepository,
             RecommendProductsUseCase(
@@ -45,7 +45,7 @@ class RecommendProductFragment :
 
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
-    private lateinit var adapter: RecommendProductsAdapter
+    private lateinit var adapter: OrderAdapter
 
     override fun onViewCreated(
         view: View,
@@ -63,7 +63,7 @@ class RecommendProductFragment :
     }
 
     private fun initViews() {
-        adapter = RecommendProductsAdapter(viewModel)
+        adapter = OrderAdapter(viewModel)
         binding?.rvRecommendProducts?.adapter = adapter
     }
 
@@ -127,19 +127,19 @@ class RecommendProductFragment :
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) {
             when (it) {
-                RecommendProductErrorEvent.OrderProducts -> {
+                OrderErrorEvent.OrderProducts -> {
                     showToast(R.string.error_msg_order_products)
                 }
 
-                RecommendProductErrorEvent.DeleteCartProduct -> {
+                OrderErrorEvent.DeleteCartProduct -> {
                     showToast(R.string.error_msg_delete_cart_product)
                 }
 
-                RecommendProductErrorEvent.IncreaseCartProduct -> {
+                OrderErrorEvent.IncreaseCartProduct -> {
                     showToast(R.string.error_msg_increase_cart_count)
                 }
 
-                RecommendProductErrorEvent.DecreaseCartProduct -> {
+                OrderErrorEvent.DecreaseCartProduct -> {
                     showToast(R.string.error_msg_decrease_cart_count)
                 }
             }
@@ -147,11 +147,11 @@ class RecommendProductFragment :
     }
 
     companion object {
-        val TAG: String? = RecommendProductFragment::class.java.canonicalName
+        val TAG: String? = OrderFragment::class.java.canonicalName
 
         private const val ORDERED_PRODUCTS_KEY = "ORDERED_PRODUCTS_KEY"
 
-        fun args(navArgs: RecommendNavArgs): Bundle =
+        fun args(navArgs: OrderNavArgs): Bundle =
             Bundle().apply {
                 putParcelable(ORDERED_PRODUCTS_KEY, navArgs)
             }
