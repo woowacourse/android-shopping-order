@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -60,6 +59,9 @@ class ProductContentsViewModel(
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
+    private val _error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
+    val error: SingleLiveData<Throwable> = _error
+
     private var currentOffset = 0
 
     init {
@@ -103,6 +105,8 @@ class ProductContentsViewModel(
             handler.postDelayed({
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }, 2000)
+        }.onFailure {
+            _error.setValue(it)
         }
     }
 
@@ -110,12 +114,14 @@ class ProductContentsViewModel(
         cartRepository.getAllCartItems().onSuccess {
             cart.value = it
         }.onFailure {
-            Log.e("Test", it.message.toString())
+            _error.setValue(it)
         }
     }
 
     fun loadRecentProducts() {
-        _recentProducts.value = recentProductRepository.findAll()
+        recentProductRepository.findAll().onSuccess {
+            _recentProducts.value = it
+        }
     }
 
     private fun updateProductWithQuantity() {

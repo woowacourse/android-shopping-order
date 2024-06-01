@@ -89,10 +89,12 @@ class CartViewModel(
     }
 
     fun loadRecommendProducts() {
-        val recentProductId =
-            requireNotNull(recentProductRepository.findMostRecentProduct()).productId
-        productRepository.find(recentProductId).onSuccess {
-            setRecommendProducts(it)
+        recentProductRepository.findMostRecentProduct().onSuccess {
+            productRepository.find(it.id).onSuccess {
+                setRecommendProducts(it)
+            }.onFailure {
+                error.setValue(it)
+            }
         }.onFailure {
             error.setValue(it)
         }

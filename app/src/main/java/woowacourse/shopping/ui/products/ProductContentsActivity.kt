@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.products
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
@@ -23,6 +24,7 @@ import woowacourse.shopping.ui.utils.urlToImage
 
 class ProductContentsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductContentsBinding
+    private var toast: Toast? = null
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: ProductContentsViewModel by viewModels {
@@ -41,6 +43,10 @@ class ProductContentsActivity : AppCompatActivity() {
         initToolbar()
         observeProductItems()
         observeRecentProductItems()
+        viewModel.error.observe(this) {
+            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
+            toast?.show()
+        }
         moveToProductDetailPage()
     }
 

@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.recentproduct
 
 interface RecentProductRepository {
-    fun insert(productId: Long): Long
+    fun insert(productId: Long): Result<Long>
 
-    fun findMostRecentProduct(): RecentProduct?
+    fun findMostRecentProduct(): Result<RecentProduct>
 
-    fun findAll(): List<RecentProduct>
+    fun findAll(): Result<List<RecentProduct>>
 
-    fun deleteAll()
+    fun deleteAll(): Result<Unit>
 }

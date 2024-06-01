@@ -88,12 +88,12 @@ class ProductDetailViewModel(
         productId: Long,
         lastSeenProductState: Boolean,
     ) {
-        recentProductRepository.findMostRecentProduct()?.let {
-            productRepository.find(it.productId).onSuccess {
+        recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
+            productRepository.find(recentProduct.productId).onSuccess { product ->
                 _error.value = false
-                _mostRecentProduct.value = it
+                _mostRecentProduct.value = product
                 if (!lastSeenProductState) return
-                setMostRecentVisibility(it.id, productId)
+                setMostRecentVisibility(product.id, productId)
             }.onFailure {
                 _error.value = true
                 _mostRecentProductVisibility.value = false
