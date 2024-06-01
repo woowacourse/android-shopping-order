@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCartProductBinding
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.common.ProductCountHandler
+import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartProduct
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartSelectActionHandler
 
 class CartProductsAdapter(
     private val actionHandler: CartSelectActionHandler,
     private val productCountHandler: ProductCountHandler,
-) : ListAdapter<Cart, CartProductsAdapter.CartProductViewHolder>(CartDiffCallback) {
+) : ListAdapter<CartProduct, CartProductsAdapter.CartProductViewHolder>(CartProductDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -40,11 +40,11 @@ class CartProductsAdapter(
         private val productCountHandler: ProductCountHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            cart: Cart,
+            cartProduct: CartProduct,
             position: Int,
         ) {
             binding.apply {
-                this.cart = cart
+                this.cartProduct = cartProduct
                 this@apply.actionHandler = this@CartProductViewHolder.actionHandler
                 this@apply.position = position
                 this@apply.productCountHandler = this@CartProductViewHolder.productCountHandler
@@ -53,17 +53,17 @@ class CartProductsAdapter(
         }
     }
 
-    object CartDiffCallback : DiffUtil.ItemCallback<Cart>() {
+    object CartProductDiffCallback : DiffUtil.ItemCallback<CartProduct>() {
         override fun areItemsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: CartProduct,
+            newItem: CartProduct,
         ): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.cart.id == newItem.cart.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: CartProduct,
+            newItem: CartProduct,
         ): Boolean {
             return oldItem == newItem
         }

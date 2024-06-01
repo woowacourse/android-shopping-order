@@ -8,7 +8,6 @@ data class Cart(
     val id: Int = DEFAULT_CART_ID,
     val quantity: Int = INIT_QUANTITY_NUM,
     val product: Product,
-    val isChecked: Boolean = false,
 ) : Parcelable {
     val totalPrice: Int
         get() = product.price * quantity

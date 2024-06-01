@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -34,21 +35,19 @@ class OrderRecommendViewModel(
 
     private fun recommendProductLoad() {
         thread {
-            productHistoryRepository.getRecommendedProducts(10)
-                .onSuccess { recommendProducts ->
+            productHistoryRepository.getRecommendedProducts(10).onSuccess { recommendProducts ->
 
-                    hideError()
-                    _uiState.value?.let { state ->
-                        _uiState.postValue(state.copy(recommendCarts = recommendProducts))
-                    }
-                }.onFailure { e -> showError(e) }
+                hideError()
+                _uiState.value?.let { state ->
+                    _uiState.postValue(state.copy(recommendCarts = recommendProducts))
+                }
+            }.onFailure { e -> showError(e) }
         }
     }
 
     fun load(orderCarts: List<Cart>) {
         _uiState.value?.let { state ->
-            _uiState.value =
-                state.copy(orderCarts = orderCarts.associateBy { cart -> cart.id }.toMutableMap())
+            _uiState.value = state.copy(orderCarts = orderCarts)
         }
     }
 
@@ -57,13 +56,12 @@ class OrderRecommendViewModel(
     fun order() {
         thread {
             _uiState.value?.let { state ->
-                orderRepository.insertOrder(state.orderCarts.keys.toList())
-                    .onSuccess {
-                        hideError()
-                        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
-                    }.onFailure { e ->
-                        showError(e)
-                    }
+                orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
+                    hideError()
+                    _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
+                }.onFailure { e ->
+                    showError(e)
+                }
             }
         }
     }
@@ -86,31 +84,29 @@ class OrderRecommendViewModel(
         productId: Long,
         increment: Boolean,
     ) {
-        _uiState.value?.let { state ->
-            val updatedRecommendCarts =
-                state.recommendCarts.map { cart ->
-                    if (cart.product.id == productId) {
-                        state.orderCarts[cart.id] = cart
-                        cart.updateProduct(increment)
-                    } else {
-                        cart
-                    }
-                }
+        val state = _uiState.value ?: return
 
-            _uiState.postValue(
-                state.copy(
-                    recommendCarts = updatedRecommendCarts,
-                    orderCarts = state.orderCarts,
-                ),
+        val updatedRecommendCarts =
+            state.recommendCarts.map { cart ->
+                if (cart.product.id == productId) {
+                    cart.updateProduct(increment)
+                } else {
+                    cart
+                }
+            }
+
+        _uiState.value =
+            state.copy(
+                recommendCarts = updatedRecommendCarts,
+                orderCarts = state.orderCarts,
             )
-        }
     }
 
     private fun Cart.updateProduct(increment: Boolean): Cart {
         val updatedQuantity = if (increment) this.quantity + 1 else this.quantity - 1
         when {
             this.quantity == 0 -> insertCartProduct(this.product, updatedQuantity)
-            updatedQuantity == 0 -> deleteCartProduct(this.id)
+            updatedQuantity == 0 -> deleteCartProduct(this)
             else -> updateCartProduct(this, updatedQuantity)
         }
         return this.copy(quantity = updatedQuantity)
@@ -126,43 +122,37 @@ class OrderRecommendViewModel(
                 quantity = quantity,
             ).onSuccess { cartItemId ->
                 hideError()
-                _uiState.value?.let { state ->
-                    val updateRecommendCarts =
-                        state.recommendCarts.map { cart ->
-                            if (cart.product.id == product.id) {
-                                state.orderCarts[cartItemId.id] = cart.copy(id = cartItemId.id, quantity = 1)
-                                cart.copy(id = cartItemId.id)
-                            } else {
-                                cart
-                            }
+                var state = _uiState.value ?: return@onSuccess
+                val updateRecommendCarts =
+                    state.recommendCarts.map { cart ->
+                        if (cart.product.id == product.id) {
+                            val insertCart = cart.copy(id = cartItemId.id, quantity = 1)
+                            state = state.copy(orderCarts = state.orderCarts + insertCart)
+                            insertCart
+                        } else {
+                            cart
                         }
+                    }
 
-                    _uiState.postValue(
-                        state.copy(
-                            recommendCarts = updateRecommendCarts,
-                            orderCarts = state.orderCarts,
-                        ),
-                    )
-                }
+                _uiState.postValue(
+                    state.copy(
+                        recommendCarts = updateRecommendCarts,
+                        orderCarts = state.orderCarts,
+                    ),
+                )
             }.onFailure { e ->
                 showError(e)
             }
         }
     }
 
-    private fun deleteCartProduct(cartId: Int) {
+    private fun deleteCartProduct(cart: Cart) {
         thread {
             shoppingCartRepository.deleteCartItem(
-                cartId = cartId,
+                cartId = cart.id,
             ).onSuccess {
-                _uiState.value?.let { state ->
-                    state.orderCarts.remove(cartId)
-                    _uiState.postValue(
-                        state.copy(
-                            orderCarts = state.orderCarts,
-                        ),
-                    )
-                }
+                val state = _uiState.value ?: return@onSuccess
+                _uiState.postValue(state.copy(orderCarts = state.orderCarts - cart))
             }.onFailure { e ->
                 showError(e)
             }
@@ -178,10 +168,14 @@ class OrderRecommendViewModel(
                 cartId = cart.id,
                 quantity = quantity,
             ).onSuccess {
-                _uiState.value?.let { state ->
-                    state.orderCarts[cart.id] = cart.copy(quantity = quantity)
-                    _uiState.postValue(state.copy(orderCarts = state.orderCarts))
-                }
+                var state = _uiState.value ?: return@onSuccess
+                Log.d("ttt state.orderCarts", state.orderCarts.toString())
+                Log.d("ttt cart", cart.toString())
+
+                state = state.copy(orderCarts = state.orderCarts - cart)
+                state = state.copy(orderCarts = state.orderCarts + cart.copy(quantity = quantity))
+                Log.d("ttt state", state.toString())
+                _uiState.postValue(state.copy(orderCarts = state.orderCarts))
             }.onFailure { e ->
                 showError(e)
             }

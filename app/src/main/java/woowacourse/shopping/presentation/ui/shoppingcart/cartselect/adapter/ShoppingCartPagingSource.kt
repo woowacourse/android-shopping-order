@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter
 
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.PagingCartProduct
+import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.toCartProduct
 
 class ShoppingCartPagingSource(private val repository: ShoppingCartRepository) {
     fun load(page: Int): Result<PagingCartProduct> {
@@ -11,7 +12,7 @@ class ShoppingCartPagingSource(private val repository: ShoppingCartRepository) {
             onSuccess = { cardProducts ->
                 Result.success(
                     PagingCartProduct(
-                        cardProducts.content,
+                        cardProducts.content.map { it.toCartProduct() },
                         cardProducts.pageable.pageNumber,
                         cardProducts.last,
                     ),

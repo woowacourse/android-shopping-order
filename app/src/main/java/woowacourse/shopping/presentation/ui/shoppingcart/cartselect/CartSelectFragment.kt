@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import android.os.Bundle
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
@@ -57,7 +56,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
 
                     bundle.putParcelableArray(
                         OrderRecommendFragment.PUT_EXTRA_CART_IDS_KEY,
-                        navigateAction.orderCarts.toTypedArray(),
+                        navigateAction.orderCartProducts.toTypedArray(),
                     )
 
                     val orderRecommendFragment = OrderRecommendFragment()
