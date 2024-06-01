@@ -60,7 +60,7 @@
             app:imageUrl="@{viewModel.shoppingProduct.product.imageUrl}"
             app:layout_constraintTop_toBottomOf="@id/toolbar_detail"
             tools:layout_editor_absoluteX="-157dp"
-            tools:src="@drawable/ic_launcher_background" />
+            tools:src="@color/gray_100" />
 
         <TextView
             android:id="@+id/tv_detail_product_name"
@@ -90,14 +90,14 @@
             android:layout_marginStart="18dp"
             android:textColor="@color/black"
             android:textSize="25dp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_quantity"
+            app:layout_constraintBottom_toBottomOf="@id/btn_quantity_detail"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btn_quantity"
+            app:layout_constraintTop_toTopOf="@id/btn_quantity_detail"
             app:price="@{viewModel.shoppingProduct.product.price*viewModel.shoppingProduct.quantity()}"
             tools:text="99,800원" />
 
         <include
-            android:id="@+id/btn_quantity"
+            android:id="@+id/btn_quantity_detail"
             layout="@layout/product_quantity_selection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -155,5 +155,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
