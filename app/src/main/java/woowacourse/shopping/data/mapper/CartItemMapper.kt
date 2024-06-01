@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.dto.Content
+import woowacourse.shopping.data.model.dto.ContentDto
 import woowacourse.shopping.data.model.entity.CartItemEntity
 import woowacourse.shopping.domain.model.CartItem
 
@@ -15,7 +15,7 @@ fun CartItemEntity.toDomainModel(): CartItem {
     )
 }
 
-fun Content.toDomainModel(): CartItem {
+fun ContentDto.toDomainModel(): CartItem {
     return CartItem(
         id = this.id,
         productId = this.product.id,

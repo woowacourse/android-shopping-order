@@ -9,7 +9,7 @@ import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.CartItemDto
 import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.Content
+import woowacourse.shopping.data.model.dto.ContentDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
@@ -121,7 +121,7 @@ class RemoteCartRepositoryImpl : CartRepository {
     }
 
     override fun findOrNullWithProductId(productId: Long): CartItem? {
-        var content: Content? = null
+        var content: ContentDto? = null
         threadAction {
             content =
                 service.requestCartItems().execute().body()?.content?.find {
