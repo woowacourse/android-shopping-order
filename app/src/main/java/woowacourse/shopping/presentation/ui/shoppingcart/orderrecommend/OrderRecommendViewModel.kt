@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -36,7 +35,6 @@ class OrderRecommendViewModel(
     private fun recommendProductLoad() {
         thread {
             productHistoryRepository.getRecommendedProducts(10).onSuccess { recommendProducts ->
-
                 hideError()
                 _uiState.value?.let { state ->
                     _uiState.postValue(state.copy(recommendCarts = recommendProducts))
@@ -55,13 +53,12 @@ class OrderRecommendViewModel(
 
     fun order() {
         thread {
-            _uiState.value?.let { state ->
-                orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
-                    hideError()
-                    _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
-                }.onFailure { e ->
-                    showError(e)
-                }
+            val state = uiState.value ?: return@thread
+            orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
+                hideError()
+                _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
+            }.onFailure { e ->
+                showError(e)
             }
         }
     }
@@ -84,12 +81,12 @@ class OrderRecommendViewModel(
         productId: Long,
         increment: Boolean,
     ) {
-        val state = _uiState.value ?: return
+        val state = uiState.value ?: return
 
         val updatedRecommendCarts =
             state.recommendCarts.map { cart ->
                 if (cart.product.id == productId) {
-                    cart.updateProduct(increment)
+                    updateCart(cart, increment)
                 } else {
                     cart
                 }
@@ -102,14 +99,33 @@ class OrderRecommendViewModel(
             )
     }
 
-    private fun Cart.updateProduct(increment: Boolean): Cart {
-        val updatedQuantity = if (increment) this.quantity + 1 else this.quantity - 1
-        when {
-            this.quantity == 0 -> insertCartProduct(this.product, updatedQuantity)
-            updatedQuantity == 0 -> deleteCartProduct(this)
-            else -> updateCartProduct(this, updatedQuantity)
+    private fun updateCart(
+        cart: Cart,
+        increment: Boolean,
+    ): Cart {
+        val updatedQuantity = calculateUpdatedQuantity(cart.quantity, increment)
+        calculatedUpdateCart(cart, updatedQuantity)
+        return cart.copy(quantity = updatedQuantity)
+    }
+
+    private fun calculateUpdatedQuantity(
+        currentQuantity: Int,
+        increment: Boolean,
+    ): Int {
+        return if (increment) currentQuantity + 1 else currentQuantity - 1
+    }
+
+    private fun calculatedUpdateCart(
+        cart: Cart,
+        updatedQuantity: Int,
+    ) {
+        if (cart.quantity == Cart.INIT_QUANTITY_NUM) {
+            insertCartProduct(cart.product, updatedQuantity)
+        } else if (updatedQuantity == Cart.INIT_QUANTITY_NUM) {
+            deleteCartProduct(cart)
+        } else {
+            updateCartProduct(cart, updatedQuantity)
         }
-        return this.copy(quantity = updatedQuantity)
     }
 
     private fun insertCartProduct(
@@ -122,7 +138,7 @@ class OrderRecommendViewModel(
                 quantity = quantity,
             ).onSuccess { cartItemId ->
                 hideError()
-                var state = _uiState.value ?: return@onSuccess
+                var state = uiState.value ?: return@onSuccess
                 val updateRecommendCarts =
                     state.recommendCarts.map { cart ->
                         if (cart.product.id == product.id) {
@@ -151,7 +167,7 @@ class OrderRecommendViewModel(
             shoppingCartRepository.deleteCartItem(
                 cartId = cart.id,
             ).onSuccess {
-                val state = _uiState.value ?: return@onSuccess
+                val state = uiState.value ?: return@onSuccess
                 _uiState.postValue(state.copy(orderCarts = state.orderCarts - cart))
             }.onFailure { e ->
                 showError(e)
@@ -168,13 +184,9 @@ class OrderRecommendViewModel(
                 cartId = cart.id,
                 quantity = quantity,
             ).onSuccess {
-                var state = _uiState.value ?: return@onSuccess
-                Log.d("ttt state.orderCarts", state.orderCarts.toString())
-                Log.d("ttt cart", cart.toString())
-
+                var state = uiState.value ?: return@onSuccess
                 state = state.copy(orderCarts = state.orderCarts - cart)
                 state = state.copy(orderCarts = state.orderCarts + cart.copy(quantity = quantity))
-                Log.d("ttt state", state.toString())
                 _uiState.postValue(state.copy(orderCarts = state.orderCarts))
             }.onFailure { e ->
                 showError(e)
