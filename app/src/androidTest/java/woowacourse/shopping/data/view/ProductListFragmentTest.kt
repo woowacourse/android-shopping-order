@@ -1,11 +1,16 @@
 package woowacourse.shopping.data.view
 
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -40,4 +45,20 @@ class ProductListFragmentTest {
         onView(withId(R.id.btn_more_product))
             .check(matches(not(isDisplayed())))
     }
+
+    //TODO 스크롤 관련 테스트코드 학습 필
+//    @Test
+//    fun `더보기_버튼을_클릭하면_새로운_상품이_로드_되어야_한다`() {
+//        Thread.sleep(2000)
+//        onView(withId(R.id.rv_products))
+//            .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(18))
+//
+//        onView(withI요(R.id.btn_more_product)).perform(ViewActions.click())
+//
+//        onView(withId(R.id.rv_products)).check { view, _ ->
+//            val recyclerView = view as RecyclerView
+//            val itemCount = recyclerView.adapter?.itemCount ?: 0
+//            assertTrue(itemCount > 20)
+//        }
+//    }
 }

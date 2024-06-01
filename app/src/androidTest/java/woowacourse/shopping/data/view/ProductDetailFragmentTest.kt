@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.view
 
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -24,7 +25,7 @@ class ProductDetailFragmentTest {
     fun setUp() {
         val productDetailFragment =
             ProductDetailFragment().apply {
-                arguments = ProductDetailFragment.createBundle(0L)
+                arguments = ProductDetailFragment.createBundle(2L)
             }
         activityRule.scenario.onActivity { activity ->
             activity.supportFragmentManager.beginTransaction()
@@ -41,5 +42,12 @@ class ProductDetailFragmentTest {
     @Test
     fun `선택한_상품의_가격이_보여져야_한다`() {
         onView(withId(R.id.tv_detail_product_price)).check(matches(withText("0원")))
+    }
+
+    @Test
+    fun `수량을_증가하면_선택한_수량의_개수가_보여져야_한다`() {
+        onView(withId(R.id.btn_add_count)).perform(click())
+
+        onView(withId(R.id.tv_count)).check(matches(withText("1")))
     }
 }

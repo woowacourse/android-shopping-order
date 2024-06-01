@@ -32,6 +32,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/btn_minus_count"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:gravity="center"
@@ -42,6 +43,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_count"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:gravity="center"
@@ -52,6 +54,7 @@
                 tools:text="0" />
 
             <TextView
+                android:id="@+id/btn_add_count"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:gravity="center"
