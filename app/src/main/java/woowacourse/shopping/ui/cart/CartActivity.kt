@@ -13,7 +13,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import kotlin.reflect.KClass

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.cart.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.product.remote.retrofit.DataCallback
+import woowacourse.shopping.data.product.remote.DataCallback
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity

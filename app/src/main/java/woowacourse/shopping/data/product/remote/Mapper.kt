@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.remote.retrofit
+package woowacourse.shopping.data.product.remote
 
 import woowacourse.shopping.domain.model.Product
 

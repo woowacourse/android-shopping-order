@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.cart.remote
 
-import woowacourse.shopping.data.product.remote.retrofit.Sort
+import woowacourse.shopping.data.product.remote.Sort
 
 data class Pageable(
     val offset: Int,

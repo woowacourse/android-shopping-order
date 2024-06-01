@@ -3,8 +3,9 @@ package woowacourse.shopping.data.order.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.product.remote.retrofit.DataCallback
+import woowacourse.shopping.data.product.remote.DataCallback
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
+import woowacourse.shopping.domain.repository.CartRepository
 
 class RemoteOrderRepository {
     fun createOrder(
@@ -31,5 +32,16 @@ class RemoteOrderRepository {
                     }
                 },
             )
+    }
+
+    companion object {
+        @Volatile
+        private var instance: CartRepository? = null
+
+        fun getInstance(cartRepository: CartRepository) {
+            synchronized(this) {
+                instance = cartRepository
+            }
+        }
     }
 }

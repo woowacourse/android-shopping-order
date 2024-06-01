@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.remote.retrofit
+package woowacourse.shopping.data.product.remote
 
 data class Content(
     val id: Int,

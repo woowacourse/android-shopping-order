@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.remote.retrofit
+package woowacourse.shopping.data.product.remote
 
 import retrofit2.Call
 import retrofit2.Callback

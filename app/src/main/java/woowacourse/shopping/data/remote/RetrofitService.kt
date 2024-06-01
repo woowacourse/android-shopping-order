@@ -14,8 +14,8 @@ import woowacourse.shopping.data.cart.remote.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.remote.CartResponse
 import woowacourse.shopping.data.cart.remote.CountResponse
 import woowacourse.shopping.data.order.remote.CreateOrderRequest
-import woowacourse.shopping.data.product.remote.retrofit.Content
-import woowacourse.shopping.data.product.remote.retrofit.ProductResponse
+import woowacourse.shopping.data.product.remote.Content
+import woowacourse.shopping.data.product.remote.ProductResponse
 
 interface RetrofitService {
     @GET("/products")

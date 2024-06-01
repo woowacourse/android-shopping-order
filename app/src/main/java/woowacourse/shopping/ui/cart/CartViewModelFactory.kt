@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.lang.IllegalArgumentException
 
