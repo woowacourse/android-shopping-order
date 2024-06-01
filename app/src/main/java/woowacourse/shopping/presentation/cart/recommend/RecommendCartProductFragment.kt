@@ -93,6 +93,7 @@ class RecommendCartProductFragment :
 
     private fun initObserver() {
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
+            eventBusViewModel.sendRefreshCartEvent()
             eventBusViewModel.sendUpdateCartEvent()
         }
         viewModel.uiState.observe(viewLifecycleOwner) {

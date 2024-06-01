@@ -84,7 +84,7 @@ class CartFragment :
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()
         }
-        eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {
+        eventBusViewModel.refreshCartEvent.observe(viewLifecycleOwner) {
             viewModel.loadTotalCartProducts()
         }
         viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
