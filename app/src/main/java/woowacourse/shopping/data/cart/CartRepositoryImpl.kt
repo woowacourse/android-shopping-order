@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import java.util.concurrent.ConcurrentHashMap
 
-class DefaultCartRepository(
+class CartRepositoryImpl(
     private val cartDataSource: CartDataSource,
     private val productDataSource: ProductDataSource,
     private val orderDataSource: OrderDataSource,

@@ -8,7 +8,7 @@ object CartDataSourceInjector {
 
     fun cartDataSource(): CartDataSource =
         instance ?: synchronized(this) {
-            instance ?: DefaultCartDataSource(
+            instance ?: CartDataSourceImpl(
                 ioExecutor,
                 CartService.instance(),
             )

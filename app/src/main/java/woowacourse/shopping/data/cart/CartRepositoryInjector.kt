@@ -14,7 +14,7 @@ object CartRepositoryInjector {
 
     fun cartRepository(): CartRepository =
         instance ?: synchronized(this) {
-            instance ?: DefaultCartRepository(
+            instance ?: CartRepositoryImpl(
                 CartDataSourceInjector.cartDataSource(),
                 ProductDataSourceInjector.productDataSource(),
                 DefaultOrderDataSource(ioExecutor, OrderService.instance()),

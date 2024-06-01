@@ -10,7 +10,7 @@ import woowacourse.shopping.remote.service.CartService
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 
-class DefaultCartDataSource(
+class CartDataSourceImpl(
     private val ioExecutors: ExecutorService,
     private val cartService: CartService,
 ) : CartDataSource {
