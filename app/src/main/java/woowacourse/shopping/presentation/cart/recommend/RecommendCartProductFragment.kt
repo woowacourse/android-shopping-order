@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.BundleCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -22,21 +21,14 @@ import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
+import woowacourse.shopping.presentation.util.parcelable
 
 class RecommendCartProductFragment :
     BindingFragment<FragmentRecommendCartProductBinding>(R.layout.fragment_recommend_cart_product) {
     private val viewModel by viewModels<RecommendCartProductViewModel> {
-        val bundle = arguments
         val orders: List<CartProductUi> =
-            if (bundle != null) {
-                BundleCompat.getParcelable(
-                    bundle,
-                    ORDERED_PRODUCTS_KEY,
-                    RecommendNavArgs::class.java,
-                )?.orderProducts ?: emptyList()
-            } else {
-                emptyList()
-            }
+            arguments?.parcelable<RecommendNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
+                ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
@@ -49,6 +41,7 @@ class RecommendCartProductFragment :
             ),
         )
     }
+
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private lateinit var adapter: RecommendProductsAdapter
