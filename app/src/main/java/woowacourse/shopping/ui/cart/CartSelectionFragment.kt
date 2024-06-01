@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
@@ -26,7 +28,9 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         viewModel.cartUiState.observe(viewLifecycleOwner) {
             val cartUiState = it.getContentIfNotHandled() ?: return@observe
             when (cartUiState) {
-                CartUiState.Failure -> {}
+                CartUiState.Failure -> {
+                    showToastCartFailure()
+                }
 
                 CartUiState.Loading -> {
                     binding.layoutCartSkeleton.visibility = View.VISIBLE
@@ -49,6 +53,10 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
             }
         }
         return binding.root
+    }
+
+    private fun showToastCartFailure() {
+        Toast.makeText(requireContext(), R.string.common_error_retry, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -113,7 +113,7 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private fun showErrorSnackBar() {
         Snackbar
-            .make(binding.root, getString(R.string.common_error), Snackbar.LENGTH_INDEFINITE)
+            .make(binding.root, getString(R.string.common_error_previous_view), Snackbar.LENGTH_INDEFINITE)
             .setAction(getString(R.string.common_confirm)) { finish() }
             .show()
     }
