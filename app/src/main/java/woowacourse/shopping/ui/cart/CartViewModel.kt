@@ -5,21 +5,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.order.remote.RemoteOrderRepository
-import woowacourse.shopping.data.product.remote.DataCallback
-import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class CartViewModel(
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: ProductRepository,
     private val recentRepository: RecentProductRepository,
-    private val cartRepository: RemoteCartRepository,
-    private val orderRepository: RemoteOrderRepository,
+    private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiState = MutableLiveData<Event<CartUiState>>()
     val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
@@ -57,7 +57,7 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
-        cartRepository.getAllCartItem(
+        cartRepository.findAll(
             object : DataCallback<List<CartItem>> {
                 override fun onSuccess(result: List<CartItem>) {
                     if (result.isEmpty()) {
@@ -154,7 +154,7 @@ class CartViewModel(
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         val cartUiModel = cartUiModel(productId) ?: return
-        cartRepository.deleteCartItem(
+        cartRepository.delete(
             cartUiModel.cartItemId,
             object : DataCallback<Unit> {
                 override fun onSuccess(result: Unit) {
@@ -248,7 +248,7 @@ class CartViewModel(
         cartUiModel: CartUiModel,
         quantity: Quantity,
     ) {
-        cartRepository.setCartItemQuantity(
+        cartRepository.changeQuantity(
             cartUiModel.cartItemId,
             quantity,
             object : DataCallback<Unit> {
@@ -283,7 +283,7 @@ class CartViewModel(
         val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
         val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
 
-        productRepository.getRecommendProducts(
+        productRepository.findRecommendProducts(
             recentProductCategory,
             cartItems,
             object : DataCallback<List<Product>> {
@@ -299,7 +299,7 @@ class CartViewModel(
     }
 
     private fun addCartItem(productId: Int) {
-        cartRepository.addCartItem(
+        cartRepository.add(
             productId = productId,
             dataCallback =
                 object : DataCallback<Unit> {
@@ -339,7 +339,7 @@ class CartViewModel(
     private fun deleteCartItemIds(cartItemIds: List<Int>) {
         _changedCartEvent.value = Event(Unit)
         cartItemIds.forEach {
-            cartRepository.deleteCartItem(
+            cartRepository.delete(
                 it,
                 object : DataCallback<Unit> {
                     override fun onSuccess(result: Unit) {}

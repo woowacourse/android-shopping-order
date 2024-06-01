@@ -18,7 +18,7 @@ abstract class ShoppingCartDataBase : RoomDatabase() {
         @Volatile
         private var instance: ShoppingCartDataBase? = null
 
-        fun instance(context: Context): ShoppingCartDataBase {
+        fun getInstance(context: Context): ShoppingCartDataBase {
             return instance ?: synchronized(this) {
                 val newInstance = Room.databaseBuilder(context, ShoppingCartDataBase::class.java, "shopping_cart").build()
                 instance = newInstance

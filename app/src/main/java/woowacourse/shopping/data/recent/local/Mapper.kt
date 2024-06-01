@@ -9,10 +9,6 @@ fun RecentProductEntity.toRecentProduct() = RecentProduct(id, product.toProduct(
 
 fun List<RecentProductEntity>.toRecentProducts() = map { it.toRecentProduct() }
 
-fun RecentProduct.toRecentProductEntity() = RecentProductEntity(id, product.toProductEntity(), seenDateTime)
-
-fun List<RecentProduct>.toRecentProductEntities() = map { it.toRecentProductEntity() }
-
 fun ProductEntity.toProduct() = Product(productId, name, price, imageUrl, category)
 
 fun Product.toProductEntity() = ProductEntity(id, name, price, imageUrl, category)

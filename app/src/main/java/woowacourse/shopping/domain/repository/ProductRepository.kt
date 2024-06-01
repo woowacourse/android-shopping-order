@@ -1,32 +1,32 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
-import java.lang.IllegalArgumentException
 
 interface ProductRepository {
-    fun find(id: Int): Product
+    fun find(
+        id: Int,
+        dataCallback: DataCallback<Product>,
+    )
 
-    fun findRange(
+    fun syncFind(id: Int): Product
+
+    fun findPage(
         page: Int,
         pageSize: Int,
-    ): List<Product>
+        dataCallback: DataCallback<List<Product>>,
+    )
 
-    fun totalProductCount(): Int
+    fun isPageLast(
+        page: Int,
+        pageSize: Int,
+        dataCallback: DataCallback<Boolean>,
+    )
 
-    companion object {
-        private const val NOT_INITIALIZE_INSTANCE_MESSAGE = "초기화된 인스턴스가 없습니다."
-
-        @Volatile
-        private var instance: ProductRepository? = null
-
-        fun setInstance(productRepository: ProductRepository) {
-            synchronized(this) {
-                instance = productRepository
-            }
-        }
-
-        fun getInstance(): ProductRepository {
-            return instance ?: throw IllegalArgumentException(NOT_INITIALIZE_INSTANCE_MESSAGE)
-        }
-    }
+    fun findRecommendProducts(
+        category: String,
+        cartItems: List<CartItem>,
+        dataCallback: DataCallback<List<Product>>,
+    )
 }

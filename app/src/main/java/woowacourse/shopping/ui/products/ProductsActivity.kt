@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
+import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
 import woowacourse.shopping.databinding.ActivityProductsBinding
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductsAdapter
@@ -26,9 +27,9 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel by viewModels<ProductsViewModel> {
         ProductsViewModelFactory(
-            RemoteProductRepository(),
-            RecentProductRepository.getInstance(),
-            RemoteCartRepository(),
+            RemoteProductRepository,
+            RoomRecentProductRepository.getInstance(ShoppingCartDataBase.getInstance(applicationContext).recentProductDao()),
+            RemoteCartRepository,
         )
     }
     private val adapter by lazy {

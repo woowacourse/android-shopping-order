@@ -2,7 +2,7 @@ package woowacourse.shopping.data.recent.local.converter
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import woowacourse.shopping.data.product.local.entity.ProductEntity
+import woowacourse.shopping.data.recent.local.entity.ProductEntity
 import java.time.LocalDateTime
 
 class RecentProductConverter {

@@ -43,6 +43,14 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
 
     companion object {
         private const val FIND_RECENT_PRODUCTS_COUNT = 10
-        private const val RECOMMEND_PRODUCTS_COUNT = 10
+
+        @Volatile
+        private var instance: RoomRecentProductRepository? = null
+
+        fun getInstance(recentProductDao: RecentProductDao): RoomRecentProductRepository {
+            return instance ?: synchronized(this) {
+                RoomRecentProductRepository(recentProductDao).also { instance = it }
+            }
+        }
     }
 }

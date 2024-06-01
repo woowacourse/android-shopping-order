@@ -1,47 +1,41 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Quantity
-import java.lang.IllegalArgumentException
-import kotlin.concurrent.Volatile
 
 interface CartRepository {
-    fun findAll(): List<CartItem>
-
-    fun increaseQuantity(productId: Int)
-
-    fun decreaseQuantity(productId: Int)
-
-    fun changeQuantity(
+    fun findByProductId(
         productId: Int,
-        quantity: Quantity,
+        totalItemCount: Int,
+        dataCallback: DataCallback<CartItem?>,
     )
 
-    fun deleteCartItem(productId: Int)
+    fun syncFindByProductId(
+        productId: Int,
+        totalItemCount: Int,
+    ): CartItem?
 
-    fun find(productId: Int): CartItem
+    fun findAll(dataCallback: DataCallback<List<CartItem>>)
 
-    fun findRange(
-        page: Int,
-        pageSize: Int,
-    ): List<CartItem>
+    fun delete(
+        id: Int,
+        dataCallback: DataCallback<Unit>,
+    )
 
-    fun totalCartItemCount(): Int
+    fun add(
+        productId: Int,
+        quantity: Quantity = Quantity(1),
+        dataCallback: DataCallback<Unit>,
+    )
 
-    companion object {
-        private const val NOT_INITIALIZE_INSTANCE_MESSAGE = "초기화된 인스턴스가 없습니다."
+    fun changeQuantity(
+        id: Int,
+        quantity: Quantity,
+        dataCallback: DataCallback<Unit>,
+    )
 
-        @Volatile
-        private var instance: CartRepository? = null
+    fun getTotalQuantity(dataCallback: DataCallback<Int>)
 
-        fun setInstance(cartRepository: CartRepository) {
-            synchronized(this) {
-                instance = cartRepository
-            }
-        }
-
-        fun getInstance(): CartRepository {
-            return instance ?: throw IllegalArgumentException(NOT_INITIALIZE_INSTANCE_MESSAGE)
-        }
-    }
+    fun syncGetTotalQuantity(): Int
 }

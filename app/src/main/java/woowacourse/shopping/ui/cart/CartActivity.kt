@@ -12,10 +12,11 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
+import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
+import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import kotlin.reflect.KClass
 
 class CartActivity : AppCompatActivity() {
@@ -25,10 +26,10 @@ class CartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
-            RemoteProductRepository(),
-            RecentProductRepository.getInstance(),
-            RemoteCartRepository(),
-            RemoteOrderRepository(),
+            RemoteProductRepository,
+            RoomRecentProductRepository.getInstance(ShoppingCartDataBase.getInstance(applicationContext).recentProductDao()),
+            RemoteCartRepository,
+            RemoteOrderRepository,
         )
     }
 

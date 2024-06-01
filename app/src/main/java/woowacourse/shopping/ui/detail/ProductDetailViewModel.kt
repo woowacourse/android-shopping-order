@@ -5,19 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.product.remote.DataCallback
-import woowacourse.shopping.data.product.remote.RemoteProductRepository
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import woowacourse.shopping.ui.utils.AddCartQuantityBundle
 
 class ProductDetailViewModel(
     private val productId: Int,
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: RemoteCartRepository,
+    private val cartRepository: CartRepository,
     private val lastSeenProductVisible: Boolean,
 ) : ViewModel() {
     private val _productUiModel = MutableLiveData<ProductUiModel>()
@@ -71,7 +71,7 @@ class ProductDetailViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
+        val totalQuantityCount = cartRepository.syncGetTotalQuantity()
         val cartItem =
             cartRepository.syncFindByProductId(id, totalQuantityCount)
                 ?: return ProductUiModel.from(this)
@@ -111,7 +111,7 @@ class ProductDetailViewModel(
 
     fun addCartProduct() {
         val productUiModel = _productUiModel.value ?: return
-        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartTotalCount = cartRepository.syncGetTotalQuantity()
         val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
 
         val addCartDataCallback =
@@ -126,14 +126,14 @@ class ProductDetailViewModel(
             }
 
         if (cartItem == null) {
-            cartRepository.addCartItem(
+            cartRepository.add(
                 productId = productId,
                 quantity = productUiModel.quantity,
                 dataCallback = addCartDataCallback,
             )
             return
         }
-        cartRepository.setCartItemQuantity(cartItem.id, productUiModel.quantity, addCartDataCallback)
+        cartRepository.changeQuantity(cartItem.id, productUiModel.quantity, addCartDataCallback)
     }
 
     private fun setError() {

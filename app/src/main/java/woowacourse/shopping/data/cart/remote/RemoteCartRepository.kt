@@ -3,14 +3,17 @@ package woowacourse.shopping.data.cart.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.product.remote.DataCallback
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.concurrent.thread
 
-class RemoteCartRepository {
-    fun findByProductId(
+object RemoteCartRepository : CartRepository {
+    private const val MAX_CART_ITEM_COUNT = 9999999
+
+    override fun findByProductId(
         productId: Int,
         totalItemCount: Int,
         dataCallback: DataCallback<CartItem?>,
@@ -42,7 +45,20 @@ class RemoteCartRepository {
             )
     }
 
-    fun getAllCartItem(dataCallback: DataCallback<List<CartItem>>) {
+    override fun syncFindByProductId(
+        productId: Int,
+        totalItemCount: Int,
+    ): CartItem? {
+        var cartItem: CartItem? = null
+        thread {
+            val response = retrofitApi.requestCartItems(page = 0, size = totalItemCount).execute()
+            val body = response.body()
+            cartItem = body?.toCartItems()?.firstOrNull { productId == it.productId }
+        }.join()
+        return cartItem
+    }
+
+    override fun findAll(dataCallback: DataCallback<List<CartItem>>) {
         retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
             .enqueue(
                 object : Callback<CartResponse> {
@@ -66,7 +82,7 @@ class RemoteCartRepository {
             )
     }
 
-    fun deleteCartItem(
+    override fun delete(
         id: Int,
         dataCallback: DataCallback<Unit>,
     ) {
@@ -91,83 +107,9 @@ class RemoteCartRepository {
         )
     }
 
-    fun setCartItemQuantity(
-        id: Int,
+    override fun add(
+        productId: Int,
         quantity: Quantity,
-        dataCallback: DataCallback<Unit>,
-    ) {
-        retrofitApi.setCartItemQuantity(id = id, quantity = CartItemQuantityRequest(quantity.count))
-            .enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            dataCallback.onSuccess(Unit)
-                            return
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        dataCallback.onFailure(t)
-                    }
-                },
-            )
-    }
-
-    fun syncFindByProductId(
-        productId: Int,
-        totalItemCount: Int,
-    ): CartItem? {
-        var cartItem: CartItem? = null
-        thread {
-            val response = retrofitApi.requestCartItems(page = 0, size = totalItemCount).execute()
-            val body = response.body()
-            cartItem = body?.toCartItems()?.firstOrNull { productId == it.productId }
-        }.join()
-        return cartItem
-    }
-
-    fun syncGetCartQuantityCount(): Int {
-        var cartQuantityCount = 0
-        thread {
-            val response = retrofitApi.requestCartQuantityCount().execute()
-            val body = response.body()?.quantity
-            cartQuantityCount = body ?: 0
-        }.join()
-        return cartQuantityCount
-    }
-
-    fun getCartQuantityCount(dataCallback: DataCallback<Int>) {
-        retrofitApi.requestCartQuantityCount().enqueue(
-            object : Callback<CountResponse> {
-                override fun onResponse(
-                    call: Call<CountResponse>,
-                    response: Response<CountResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body() ?: return
-                        dataCallback.onSuccess(body.quantity)
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<CountResponse>,
-                    t: Throwable,
-                ) {
-                    dataCallback.onFailure(t)
-                }
-            },
-        )
-    }
-
-    fun addCartItem(
-        productId: Int,
-        quantity: Quantity = Quantity(1),
         dataCallback: DataCallback<Unit>,
     ) {
         retrofitApi.requestCartQuantityCount(
@@ -197,7 +139,64 @@ class RemoteCartRepository {
         )
     }
 
-    companion object {
-        private const val MAX_CART_ITEM_COUNT = 9999999
+    override fun changeQuantity(
+        id: Int,
+        quantity: Quantity,
+        dataCallback: DataCallback<Unit>,
+    ) {
+        retrofitApi.setCartItemQuantity(id = id, quantity = CartItemQuantityRequest(quantity.count))
+            .enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(
+                        call: Call<Unit>,
+                        response: Response<Unit>,
+                    ) {
+                        if (response.isSuccessful) {
+                            dataCallback.onSuccess(Unit)
+                            return
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<Unit>,
+                        t: Throwable,
+                    ) {
+                        dataCallback.onFailure(t)
+                    }
+                },
+            )
+    }
+
+    override fun getTotalQuantity(dataCallback: DataCallback<Int>) {
+        retrofitApi.requestCartQuantityCount().enqueue(
+            object : Callback<CountResponse> {
+                override fun onResponse(
+                    call: Call<CountResponse>,
+                    response: Response<CountResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body() ?: return
+                        dataCallback.onSuccess(body.quantity)
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<CountResponse>,
+                    t: Throwable,
+                ) {
+                    dataCallback.onFailure(t)
+                }
+            },
+        )
+    }
+
+    override fun syncGetTotalQuantity(): Int {
+        var cartQuantityCount = 0
+        thread {
+            val response = retrofitApi.requestCartQuantityCount().execute()
+            val body = response.body()?.quantity
+            cartQuantityCount = body ?: 0
+        }.join()
+        return cartQuantityCount
     }
 }

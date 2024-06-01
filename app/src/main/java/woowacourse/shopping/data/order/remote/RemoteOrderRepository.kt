@@ -3,12 +3,12 @@ package woowacourse.shopping.data.order.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.product.remote.DataCallback
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
-import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.model.DataCallback
+import woowacourse.shopping.domain.repository.OrderRepository
 
-class RemoteOrderRepository {
-    fun createOrder(
+object RemoteOrderRepository : OrderRepository {
+    override fun createOrder(
         cartItemIds: List<Int>,
         dataCallback: DataCallback<Unit>,
     ) {
@@ -32,16 +32,5 @@ class RemoteOrderRepository {
                     }
                 },
             )
-    }
-
-    companion object {
-        @Volatile
-        private var instance: CartRepository? = null
-
-        fun getInstance(cartRepository: CartRepository) {
-            synchronized(this) {
-                instance = cartRepository
-            }
-        }
     }
 }

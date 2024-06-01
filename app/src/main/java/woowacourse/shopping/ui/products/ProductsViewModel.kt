@@ -6,19 +6,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.product.remote.DataCallback
-import woowacourse.shopping.data.product.remote.RemoteProductRepository
+import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class ProductsViewModel(
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: RemoteCartRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _productsUiState = MutableLiveData<Event<ProductsUiState>>(Event(ProductsUiState()))
     val productsUiState: LiveData<Event<ProductsUiState>> = _productsUiState
@@ -45,7 +45,7 @@ class ProductsViewModel(
     fun loadPage() {
         val productsUiState = _productsUiState.value?.peekContent() ?: return
         _productsUiState.value = Event(productsUiState.copy(isLoading = true))
-        productRepository.findProducts(
+        productRepository.findPage(
             page,
             PAGE_SIZE,
             object : DataCallback<List<Product>> {
@@ -68,7 +68,7 @@ class ProductsViewModel(
     }
 
     private fun loadIsPageLast() {
-        productRepository.getIsPageLast(
+        productRepository.isPageLast(
             page,
             PAGE_SIZE,
             object : DataCallback<Boolean> {
@@ -105,7 +105,7 @@ class ProductsViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartTotalCount = cartRepository.syncGetTotalQuantity()
         val cartItem = cartRepository.syncFindByProductId(id, cartTotalCount)
         return if (cartItem == null) {
             ProductUiModel.from(this@toProductUiModel)
@@ -153,7 +153,7 @@ class ProductsViewModel(
     }
 
     private fun addCartItem(productId: Int) {
-        cartRepository.addCartItem(
+        cartRepository.add(
             productId = productId,
             dataCallback =
                 object : DataCallback<Unit> {
@@ -187,7 +187,7 @@ class ProductsViewModel(
     }
 
     fun updateTotalCount() {
-        cartRepository.getCartQuantityCount(
+        cartRepository.getTotalQuantity(
             object : DataCallback<Int> {
                 override fun onSuccess(result: Int) {
                     _cartTotalCount.postValue(result)
@@ -201,14 +201,14 @@ class ProductsViewModel(
     }
 
     private fun updateCartQuantity(productUiModel: ProductUiModel) {
-        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
+        val cartTotalCount = cartRepository.syncGetTotalQuantity()
         val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
 
         if (cartItem == null) {
             addCartItem(productUiModel.productId)
             return
         }
-        cartRepository.setCartItemQuantity(
+        cartRepository.changeQuantity(
             cartItem.id,
             productUiModel.quantity,
             object : DataCallback<Unit> {
