@@ -38,7 +38,7 @@ class ProductsViewModel(
 
     init {
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({ loadPage() }, 1000)
+        handler.postDelayed({ loadPage() }, 500)
         loadRecentProducts()
     }
 
