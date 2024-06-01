@@ -1,9 +1,6 @@
 package woowacourse.shopping.data.database
 
 import android.util.Base64
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -12,9 +9,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.domain.service.RetrofitService
 
 object ProductClient {
+    private const val BASE_URL = "http://54.180.95.212:8080"
     val client: Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://54.180.95.212:8080")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(provideOkHttpClient(AppInterceptor()))
             .build()
@@ -32,27 +30,13 @@ object ProductClient {
         private val password = "password"
 
         override fun intercept(chain: Interceptor.Chain): Response {
-            var response: Response? = null
-
-            CoroutineScope(Dispatchers.IO).launch {
-                response =
-                    with(chain) {
-                        val headString = createAuthorizationHeaderString(email, password)
-                        val request =
-                            request().newBuilder().addHeader(
-                                AUTHORIZATION_HEADER,
-                                headString,
-                            ).build()
-                        proceed(request)
-                    }
-            }
-
-            while (response == null) {
-                // Wait for the response to be available
-                Thread.sleep(100)
-            }
-
-            return response!!
+            val headString = createAuthorizationHeaderString(email, password)
+            val request =
+                chain.request()
+                    .newBuilder()
+                    .addHeader(AUTHORIZATION_HEADER, headString)
+                    .build()
+            return chain.proceed(request)
         }
 
         private fun createAuthorizationHeaderString(
