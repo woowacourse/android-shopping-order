@@ -33,9 +33,9 @@ class ProductHistoryRepositoryImpl(
 
     override fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
         val recentHistory =
-            productHistoryDataSource.getProductHistory(1).getOrNull() ?: return Result.success(
-                emptyList(),
-            )
+            productHistoryDataSource.getProductHistory(1).getOrThrow()
+
+        if (recentHistory.isEmpty()) return Result.success(emptyList())
 
         return productHistoryDataSource.getProductHistoriesByCategory(category = recentHistory.first().category)
             .mapCatching { result ->
@@ -52,7 +52,9 @@ class ProductHistoryRepositoryImpl(
         productHistoryDataSource.getProductHistory(size = size)
             .mapCatching { result -> result.map { it.toDomain() } }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.deleteProductHistory(productId = productId)
+    override fun deleteProductHistory(productId: Long): Result<Unit> =
+        productHistoryDataSource.deleteProductHistory(productId = productId)
 
-    override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
+    override fun deleteAllProductHistory(): Result<Unit> =
+        productHistoryDataSource.deleteAllProductHistory()
 }
