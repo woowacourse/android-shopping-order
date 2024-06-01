@@ -16,60 +16,13 @@
             type="woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler" />
 
         <variable
-            name = "clickListener"
-            type = "woowacourse.shopping.presentation.ui.cart.selection.SelectionClickListener" />
+            name="clickListener"
+            type="woowacourse.shopping.presentation.ui.cart.selection.SelectionClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--            android:id="@+id/page_layout"-->
-<!--            android:layout_width="129dp"-->
-<!--            android:layout_height="42dp"-->
-<!--            android:layout_marginBottom="50dp"-->
-<!--            android:visibility="@{viewModel.isPageControlVisible ? View.VISIBLE : View.GONE}"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent">-->
-
-<!--            <androidx.appcompat.widget.AppCompatButton-->
-<!--                android:id="@+id/btn_before"-->
-<!--                android:layout_width="42dp"-->
-<!--                android:layout_height="42dp"-->
-<!--                android:background="@drawable/ic_before_selector"-->
-<!--                android:onClick="@{() -> viewModel.loadPreviousPage()}"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:selected="@{!viewModel.isFirstPage}" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/tv_page"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@{String.valueOf(viewModel.currentPage + 1)}"-->
-<!--                android:textColor="@color/gray_500"-->
-<!--                android:textSize="22dp"-->
-<!--                android:textStyle="bold"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toStartOf="@id/btn_next"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/btn_before"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--            <androidx.appcompat.widget.AppCompatButton-->
-<!--                android:id="@+id/btn_next"-->
-<!--                android:layout_width="42dp"-->
-<!--                android:layout_height="42dp"-->
-<!--                android:background="@drawable/ic_next_selector"-->
-<!--                android:onClick="@{() -> viewModel.loadNextPage()}"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:selected="@{!viewModel.isLastPage()}" />-->
-
-<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
 
         <TextView
             android:id="@+id/tv_empty_cart"
@@ -136,11 +89,11 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <CheckBox
-                android:onClick="@{() -> clickListener.onSelectAllClick()}"
                 android:id="@+id/checkbox_select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
+                android:onClick="@{() -> clickListener.onSelectAllClick()}"
                 android:text="@string/checkbox_select_total_text"
                 android:textColor="@color/white"
                 android:textSize="12sp"
@@ -153,13 +106,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
+                android:text="@{@string/price_format(viewModel.totalPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/button_make_order"
                 app:layout_constraintTop_toTopOf="parent"
-                app:price="@{viewModel.totalPrice}"
                 tools:text="30,000원" />
 
             <TextView
@@ -168,15 +121,15 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/selector_make_order_button"
                 android:gravity="center"
+                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
                 android:paddingHorizontal="16dp"
+                android:text="@{@string/make_order_with_total_quantity(viewModel.totalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
-                app:orderWithQuantityText="@{viewModel.totalQuantity}"
                 tools:text="주문하기(3)" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

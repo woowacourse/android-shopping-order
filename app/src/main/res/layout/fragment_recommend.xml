@@ -9,7 +9,7 @@
 
         <variable
             name="clickListener"
-            type= "woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationClickListener"/>
+            type="woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationClickListener" />
 
         <variable
             name="viewModel"
@@ -42,8 +42,8 @@
                 android:id="@+id/textview_recommendation_explanation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:layout_marginStart="20dp"
+                android:layout_marginTop="4dp"
                 android:text="@string/recommendation_explanation"
                 android:textColor="@color/gray_500"
                 android:textSize="12sp"
@@ -62,13 +62,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="20dp"
-                    android:paddingHorizontal="4dp"
                     android:clipToPadding="false"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="4dp">
 
                     <include layout="@layout/item_shimmer_product" />
+
                     <include layout="@layout/item_shimmer_product" />
+
                     <include layout="@layout/item_shimmer_product" />
+
                     <include layout="@layout/item_shimmer_product" />
 
                 </LinearLayout>
@@ -80,9 +83,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:paddingHorizontal="4dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:paddingHorizontal="4dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_recommendation_explanation"
@@ -104,13 +107,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
+                android:text="@{@string/price_format(viewModel.totalOrderPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/button_make_order"
                 app:layout_constraintTop_toTopOf="parent"
-                app:price="@{viewModel.totalOrderPrice}"
                 tools:text="30,000원" />
 
             <TextView
@@ -119,12 +122,12 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/selector_make_order_button"
                 android:gravity="center"
+                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
                 android:paddingHorizontal="16dp"
+                android:text="@{@string/make_order_with_total_quantity(viewModel.totalOrderQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:onClick="@{() -> clickListener.onMakeOrderClick()}"
-                app:orderWithQuantityText="@{viewModel.totalOrderQuantity}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
