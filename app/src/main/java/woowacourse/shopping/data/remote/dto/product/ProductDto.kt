@@ -14,3 +14,4 @@ data class ProductDto(
     @SerializedName("price")
     val price: Int,
 )
+

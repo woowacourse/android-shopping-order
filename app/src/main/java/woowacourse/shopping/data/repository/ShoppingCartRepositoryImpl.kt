@@ -24,7 +24,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
             val addedCartItemId =
                 cartItemDao.saveCartItem(CartItem(product = product).toCartItemEntity())
             if (addedCartItemId == ERROR_DATA_ID) throw NoSuchDataException()
-        }
+        }.join()
     }
 
     override fun loadPagingCartItems(

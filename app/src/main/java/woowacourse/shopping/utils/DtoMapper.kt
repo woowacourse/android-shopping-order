@@ -11,7 +11,7 @@ import woowacourse.shopping.domain.model.ItemSelector
 import woowacourse.shopping.domain.model.Product
 
 object DtoMapper {
-    fun CartItemResponse.toCartItemList(): List<CartItem> {
+    fun CartItemResponse.toCartItems(): List<CartItem> {
         return cartItemDto.map { it.toCartItem() }
     }
 
@@ -26,7 +26,7 @@ object DtoMapper {
         return quantity
     }
 
-    fun ProductResponse.toProductList(): List<Product> {
+    fun ProductResponse.toProducts(): List<Product> {
         return productDto.map { it.toProduct() }
     }
 

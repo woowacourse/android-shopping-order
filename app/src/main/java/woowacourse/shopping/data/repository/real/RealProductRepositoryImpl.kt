@@ -5,6 +5,7 @@ import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.DtoMapper.toProduct
+import woowacourse.shopping.utils.DtoMapper.toProducts
 import woowacourse.shopping.utils.exception.LatchUtils.awaitOrThrow
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import java.util.concurrent.CountDownLatch
@@ -24,7 +25,7 @@ class RealProductRepositoryImpl(
                 val response =
                     productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
                 if (response.isSuccessful && response.body() != null) {
-                    products = response.body()?.productDto?.map { it.toProduct() }
+                    products = response.body()?.toProducts()
                 }
             } catch (e: Exception) {
                 exception = e
@@ -54,7 +55,7 @@ class RealProductRepositoryImpl(
                         category = category,
                     ).execute()
                 if (response.isSuccessful && response.body() != null) {
-                    products = response.body()?.productDto?.map { it.toProduct() }
+                    products = response.body()?.toProducts()
                 }
             } catch (e: Exception) {
                 exception = e

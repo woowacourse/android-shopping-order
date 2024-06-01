@@ -11,6 +11,8 @@ import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.DtoMapper.toCartItem
+import woowacourse.shopping.utils.DtoMapper.toCartItems
+import woowacourse.shopping.utils.DtoMapper.toQuantity
 import woowacourse.shopping.utils.exception.LatchUtils.awaitOrThrow
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
@@ -58,7 +60,7 @@ class RealShoppingCartRepositoryImpl(
             val response =
                 cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
             if (response.isSuccessful) {
-                cartItems = response.body()?.cartItemDto?.map { it.toCartItem() }
+                cartItems = response.body()?.toCartItems()
             }
         }
         if (cartItems.isNullOrEmpty()) throw NoSuchDataException()
@@ -79,26 +81,12 @@ class RealShoppingCartRepositoryImpl(
         executeWithLatch {
             val response = cartItemDataSource.loadCartItems().execute()
             cartItem =
-                response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }
-                    ?.toCartItem()
+                response.body()?.toCartItems()?.find { it.product.id == productId }
         }
         return CartItemResult(
             cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
             counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
         )
-    }
-
-    private fun updateCartCount(cartItemResult: CartItemResult) {
-        executeWithLatch {
-            val response =
-                cartItemDataSource.updateCartItem(
-                    id = cartItemResult.cartItemId.toInt(),
-                    quantity = cartItemResult.counter.itemCount,
-                ).execute()
-            if (!response.isSuccessful) {
-                throw NoSuchDataException()
-            }
-        }
     }
 
     override fun updateCartItem(
@@ -161,12 +149,25 @@ class RealShoppingCartRepositoryImpl(
         updateCartCount(cartItemResult)
     }
 
+    private fun updateCartCount(cartItemResult: CartItemResult) {
+        executeWithLatch {
+            val response =
+                cartItemDataSource.updateCartItem(
+                    id = cartItemResult.cartItemId.toInt(),
+                    quantity = cartItemResult.counter.itemCount,
+                ).execute()
+            if (!response.isSuccessful) {
+                throw NoSuchDataException()
+            }
+        }
+    }
+
     override fun getTotalCartItemCount(): Int {
         var cartItemCount: Int = ERROR_QUANTITY_SIZE
         executeWithLatch {
             val response = cartItemDataSource.loadCartItemCount().execute()
             if (response.isSuccessful && response.body() != null) {
-                cartItemCount = response.body()?.quantity ?: ERROR_QUANTITY_SIZE
+                cartItemCount = response.body()?.toQuantity() ?: ERROR_QUANTITY_SIZE
             } else {
                 throw NoSuchDataException()
             }
