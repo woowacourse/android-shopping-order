@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.detail
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -42,8 +43,11 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         viewModel.product.observe(this) { state ->
             when (state) {
                 is UiState.Loading -> {
+                    binding.layoutShimmer.root.isVisible = true
                 }
+
                 is UiState.Success -> {
+                    binding.layoutShimmer.root.isVisible = false
                     binding.detailCartProduct = state.data
                 }
             }

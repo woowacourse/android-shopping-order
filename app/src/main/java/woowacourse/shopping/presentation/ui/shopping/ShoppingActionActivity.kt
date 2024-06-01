@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -71,15 +72,13 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         binding.shoppingActionHandler = viewModel
         viewModel.cartProducts.observe(this) {
             when (it) {
-                is UiState.Loading -> {}
+                is UiState.Loading -> {
+                    binding.layoutShimmer.isVisible = true
+                }
+
                 is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500)
-                        runOnUiThread {
-                            binding.layoutShimmer.isVisible = false
-                            shoppingAdapter.submitList(it.data)
-                        }
-                    }
+                    binding.layoutShimmer.isVisible = false
+                    shoppingAdapter.submitList(it.data)
                 }
             }
         }
@@ -111,6 +110,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                             ProductDetailActivity.createIntent(this, it.cartProduct),
                         )
                     }
+
                     is NavigateUiState.ToCart -> {
                         resultLauncher.launch(
                             CartActivity.createIntent(this),

@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.cart
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -65,26 +66,24 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private fun initObserver() {
         viewModel.carts.observe(this) {
             when (it) {
-                is UiState.Loading -> {}
+                is UiState.Loading -> {
+                    binding.layoutShimmer.isVisible = true
+                }
+
                 is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500)
-                        runOnUiThread {
-                            binding.layoutShimmer.isVisible = false
-                            binding.tvOrderCount.text =
-                                it.data.filter {
-                                    it.isChecked
-                                }.sumOf { it.cartProduct.quantity }.toString()
-                            binding.tvPrice.text =
-                                getString(
-                                    R.string.won,
-                                    it.data.sumOf {
-                                        it.cartProduct.quantity * it.cartProduct.price
-                                    },
-                                )
-                            cartAdapter.submitList(it.data)
-                        }
-                    }
+                    binding.layoutShimmer.isVisible = false
+                    binding.tvOrderCount.text =
+                        it.data.filter {
+                            it.isChecked
+                        }.sumOf { it.cartProduct.quantity }.toString()
+                    binding.tvPrice.text =
+                        getString(
+                            R.string.won,
+                            it.data.sumOf {
+                                it.cartProduct.quantity * it.cartProduct.price
+                            },
+                        )
+                    cartAdapter.submitList(it.data)
                 }
             }
         }
