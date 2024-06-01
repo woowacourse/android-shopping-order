@@ -48,7 +48,7 @@
             app:layout_constraintStart_toEndOf="@id/btn_back"
             app:layout_constraintTop_toTopOf="@id/btn_back" />
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/tv_subject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -61,18 +61,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tv_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
             android:textColor="@color/gray_5"
             android:textSize="12dp"
-            app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintStart_toStartOf="@+id/tv_subject"
+            app:layout_constraintTop_toBottomOf="@+id/tv_subject" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/rv_recommend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="29dp"
@@ -80,11 +80,11 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_content"
             tools:listitem="@layout/item_product" />
 
         <View
-            android:id="@+id/view2"
+            android:id="@+id/bottom_view"
             android:layout_width="match_parent"
             android:layout_height="78dp"
             android:background="@color/gray_5"
@@ -103,9 +103,9 @@
             android:textColor="@color/white"
             android:textSize="18dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/view2"
+            app:layout_constraintBottom_toBottomOf="@+id/bottom_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/view2" />
+            app:layout_constraintTop_toTopOf="@+id/bottom_view" />
 
         <TextView
             android:id="@+id/tv_total_price"
@@ -118,7 +118,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_order"
-            app:layout_constraintTop_toTopOf="@+id/view2"
+            app:layout_constraintTop_toTopOf="@+id/bottom_view"
             tools:text="12,000원" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
