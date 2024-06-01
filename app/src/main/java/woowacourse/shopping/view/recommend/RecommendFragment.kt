@@ -78,7 +78,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
                 onClickProducts = this,
                 onClickCartItemCounter = this,
             )
-        binding.recyclerView.adapter = adapter
+        binding.rvRecommend.adapter = adapter
         observeData()
         loadCheckedShoppingCart()
     }

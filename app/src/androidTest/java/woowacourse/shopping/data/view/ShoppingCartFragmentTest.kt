@@ -58,13 +58,13 @@ class ShoppingCartFragmentTest {
             .check(matches(isDisplayed()))
     }
 
-//    @Test
-//    fun `장바구니에_담은_상품_이름을_보여준다`() {
-//        onView(withId(R.id.tv_cart_item_name)).check(matches(isDisplayed()))
-//    }
-//
-//    @Test
-//    fun `장바구니에_담은_상품_가격을_보여준다`() {
-//        onView(withId(R.id.tv_cart_item_price)).check(matches(isDisplayed()))
-//    }
+    @Test
+    fun `장바구니에_담은_상품_이름을_보여준다`() {
+        onView(withId(R.id.tv_cart_item_name)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun `장바구니에_담은_상품_가격을_보여준다`() {
+        onView(withId(R.id.tv_cart_item_price)).check(matches(isDisplayed()))
+    }
 }
