@@ -48,7 +48,7 @@ class ProductDetailActivity :
                     showToastMessage(message.getMessage(this))
 
                 is ProductDetailMessage.AddToCartSuccessMessage ->
-                    showSnackbar(message.getMessage(this)) {
+                    showSnackBar(message.getMessage(this)) {
                         anchorView = binding.tvAddToCart
                     }
             }

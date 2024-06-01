@@ -6,6 +6,7 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.ViewModel
 import com.google.android.material.snackbar.Snackbar
 
 abstract class BaseActivity<T : ViewDataBinding>(
@@ -15,15 +16,20 @@ abstract class BaseActivity<T : ViewDataBinding>(
     val binding get() = requireNotNull(_binding)
 
     private var toast: Toast? = null
-    private var snackbar: Snackbar? = null
+    private var snackBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding =
-            DataBindingUtil.setContentView<T>(this, layoutResourceId).apply {
-                lifecycleOwner = this@BaseActivity
-            }
+        _binding = DataBindingUtil.setContentView(this, layoutResourceId)
+        binding.lifecycleOwner = this@BaseActivity
         initCreateView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+        toast = null
+        snackBar = null
     }
 
     abstract fun initCreateView()
@@ -34,19 +40,12 @@ abstract class BaseActivity<T : ViewDataBinding>(
         toast?.show()
     }
 
-    fun showSnackbar(
+    fun showSnackBar(
         message: String,
         action: Snackbar.() -> Unit = {},
     ) {
-        snackbar?.dismiss()
-        snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply { action() }
-        snackbar?.show()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-        toast = null
-        snackbar = null
+        snackBar?.dismiss()
+        snackBar = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply { action() }
+        snackBar?.show()
     }
 }
