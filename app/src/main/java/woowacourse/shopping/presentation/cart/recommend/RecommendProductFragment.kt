@@ -22,17 +22,18 @@ import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 import woowacourse.shopping.presentation.util.parcelable
+import woowacourse.shopping.presentation.util.showToast
 
-class RecommendCartProductFragment :
+class RecommendProductFragment :
     BindingFragment<FragmentRecommendCartProductBinding>(R.layout.fragment_recommend_cart_product) {
-    private val viewModel by viewModels<RecommendCartProductViewModel> {
+    private val viewModel by viewModels<RecommendProductViewModel> {
         val orders: List<CartProductUi> =
             arguments?.parcelable<RecommendNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
                 ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
         val shoppingRepository =
             ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
-        RecommendCartProductViewModel.factory(
+        RecommendProductViewModel.factory(
             orders,
             cartRepository,
             RecommendProductsUseCase(
@@ -58,6 +59,7 @@ class RecommendCartProductFragment :
         initAppBar()
         initViews()
         initObserver()
+        initErrorEvent()
     }
 
     private fun initViews() {
@@ -122,8 +124,30 @@ class RecommendCartProductFragment :
             .show()
     }
 
+    private fun initErrorEvent() {
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            when (it) {
+                RecommendProductEvent.OrderProducts -> {
+                    showToast(R.string.error_msg_order_products)
+                }
+
+                RecommendProductEvent.DeleteCartProduct -> {
+                    showToast(R.string.error_msg_delete_cart_product)
+                }
+
+                RecommendProductEvent.IncreaseCartProduct -> {
+                    showToast(R.string.error_msg_increase_cart_count)
+                }
+
+                RecommendProductEvent.DecreaseCartProduct -> {
+                    showToast(R.string.error_msg_decrease_cart_count)
+                }
+            }
+        }
+    }
+
     companion object {
-        val TAG: String? = RecommendCartProductFragment::class.java.canonicalName
+        val TAG: String? = RecommendProductFragment::class.java.canonicalName
 
         private const val ORDERED_PRODUCTS_KEY = "ORDERED_PRODUCTS_KEY"
 

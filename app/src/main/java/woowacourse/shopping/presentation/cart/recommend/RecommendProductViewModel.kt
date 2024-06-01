@@ -7,16 +7,17 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.RecommendProductsUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
+import woowacourse.shopping.presentation.cart.CartErrorEvent
 import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.shopping.toCartUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 
-class RecommendCartProductViewModel(
+class RecommendProductViewModel(
     orders: List<CartProductUi>,
     private val cartRepository: CartRepository,
-    private val recommendProductsUseCase: RecommendProductsUseCase,
+    recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel(), CartItemListener {
     private val _uiState = MutableLiveData(RecommendOrderUiState(orders))
     val uiState: LiveData<RecommendOrderUiState> get() = _uiState
@@ -26,6 +27,8 @@ class RecommendCartProductViewModel(
     val showOrderDialogEvent: SingleLiveData<Unit> get() = _showOrderDialogEvent
     private val _finishOrderEvent = MutableSingleLiveData<Unit>()
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
+    private val _errorEvent = MutableSingleLiveData<RecommendProductEvent>()
+    val errorEvent: SingleLiveData<RecommendProductEvent> get() = _errorEvent
 
     init {
         val uiState = _uiState.value
@@ -47,6 +50,8 @@ class RecommendCartProductViewModel(
             .onSuccess {
                 _updateCartEvent.setValue(Unit)
                 _finishOrderEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(RecommendProductEvent.OrderProducts)
             }
     }
 
@@ -58,6 +63,8 @@ class RecommendCartProductViewModel(
                 _uiState.value =
                     uiState.increaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(RecommendProductEvent.IncreaseCartProduct)
             }
     }
 
@@ -71,15 +78,19 @@ class RecommendCartProductViewModel(
                         INCREMENT_AMOUNT,
                     )
                 _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(RecommendProductEvent.DeleteCartProduct)
             }
             return
         }
-        val product = uiState.findProduct(id) ?: return
+        val product = uiState.findProduct(id) ?: return _updateCartEvent.setValue(Unit)
         cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
             .onSuccess {
                 _uiState.value =
                     uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(RecommendProductEvent.DecreaseCartProduct)
             }
     }
 
@@ -92,7 +103,7 @@ class RecommendCartProductViewModel(
             recommendProductsUseCase: RecommendProductsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                RecommendCartProductViewModel(
+                RecommendProductViewModel(
                     orders,
                     cartRepository,
                     recommendProductsUseCase,

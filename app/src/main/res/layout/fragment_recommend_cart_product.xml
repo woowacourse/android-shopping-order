@@ -7,7 +7,7 @@
 
         <variable
             name="vm"
-            type="woowacourse.shopping.presentation.cart.recommend.RecommendCartProductViewModel" />
+            type="woowacourse.shopping.presentation.cart.recommend.RecommendProductViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
