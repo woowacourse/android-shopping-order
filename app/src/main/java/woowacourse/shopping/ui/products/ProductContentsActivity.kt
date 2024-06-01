@@ -1,12 +1,9 @@
 package woowacourse.shopping.ui.products
 
 import android.os.Bundle
-import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
@@ -24,7 +21,6 @@ import woowacourse.shopping.ui.products.adapter.ProductAdapter
 import woowacourse.shopping.ui.products.adapter.RecentProductAdapter
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModelFactory
-import woowacourse.shopping.ui.utils.urlToImage
 
 class ProductContentsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductContentsBinding
@@ -114,13 +110,3 @@ class ProductContentsActivity : AppCompatActivity() {
 }
 
 fun List<ProductUiModel>.isLoading() = this + LoadingUiModel + LoadingUiModel
-
-@BindingAdapter("imageUrl")
-fun ImageView.bindUrlToImage(imageUrl: String?) {
-    urlToImage(context, imageUrl)
-}
-
-@BindingAdapter("isVisible")
-fun View.setIsVisible(isVisible: Boolean) {
-    visibility = if (isVisible) View.VISIBLE else View.GONE
-}
