@@ -21,7 +21,7 @@ class MockProductService : ProductService {
         val serverUrl = server.url("/").toString()
         val request =
             Request.Builder()
-                .url("$serverUrl/products/size")
+                .url("$serverUrl$MOCK_SERVER_URL/size")
                 .build()
 
         val response: Response = client.newCall(request).execute()
@@ -50,7 +50,7 @@ class MockProductService : ProductService {
         val serverUrl = server.url("/").toString()
         val request =
             Request.Builder()
-                .url("$serverUrl/products/$productId")
+                .url("$serverUrl$MOCK_SERVER_URL/$productId")
                 .build()
 
         val response: Response = client.newCall(request).execute()
