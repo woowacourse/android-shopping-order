@@ -7,15 +7,12 @@ data class CartUiState(
     val canLoadPrevPage: Boolean = false,
     val canLoadNextPage: Boolean = false,
 ) {
-    val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
-
-    val totalProductCount get() = totalProducts.sumOf { it.count }
+    private val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
 
     val currentPageProducts get() = pagingProducts[currentPage] ?: emptyList()
     val orderedProducts: List<CartProductUi> get() = totalProducts.filter { it.isSelected }
-
+    val orderedProductCount get() = orderedProducts.sumOf { it.count }
     val isTotalProductsOrdered get() = (orderedProducts.size == totalProducts.size)
-
     val orderPrice: Int get() = orderedProducts.sumOf { it.totalPrice }
 
     fun toggleProductSelected(productId: Long): CartUiState {
@@ -38,9 +35,9 @@ data class CartUiState(
         val newPagingProducts =
             pagingProducts.map {
                 it.key to
-                    it.value.map { cartProductUi ->
-                        cartProductUi.copy(isSelected = !isSelectedAll)
-                    }
+                        it.value.map { cartProductUi ->
+                            cartProductUi.copy(isSelected = !isSelectedAll)
+                        }
             }.toMap()
         return copy(
             pagingProducts = newPagingProducts,
@@ -124,5 +121,6 @@ data class CartUiState(
         return product.count > countLimit
     }
 
-    fun findProductAtCurrentPage(productId: Long): CartProductUi? = currentPageProducts.find { it.product.id == productId }
+    fun findProductAtCurrentPage(productId: Long): CartProductUi? =
+        currentPageProducts.find { it.product.id == productId }
 }
