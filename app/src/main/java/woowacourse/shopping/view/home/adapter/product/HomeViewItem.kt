@@ -1,8 +1,10 @@
 package woowacourse.shopping.view.home.adapter.product
 
+import woowacourse.shopping.data.model.Product
+
 sealed class HomeViewItem(open val viewType: Int) {
     data class ProductViewItem(
-        val product: woowacourse.shopping.data.model.Product,
+        val product: Product,
         private var _quantity: Int = DEFAULT_SHOPPING_QUANTITY,
         override val viewType: Int = PRODUCT_VIEW_TYPE,
     ) : HomeViewItem(viewType) {

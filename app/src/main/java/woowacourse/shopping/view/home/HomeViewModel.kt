@@ -35,10 +35,6 @@ class HomeViewModel(
         recentProductsValue.isEmpty()
     }
 
-    private val _loadedProductViewItems = MutableLiveData<List<ProductViewItem>>(emptyList())
-    val loadedProductViewItems: LiveData<List<ProductViewItem>>
-        get() = _loadedProductViewItems
-
     private val _canLoadMore = MutableLiveData(false)
     val canLoadMore: LiveData<Boolean>
         get() = _canLoadMore
@@ -56,6 +52,7 @@ class HomeViewModel(
         get() = _navigateToCart
 
     private var page = 0
+    private val loadedProductViewItems: MutableList<ProductViewItem> = mutableListOf()
     private var cartItems: List<CartItem> = emptyList()
 
     init {
@@ -91,8 +88,8 @@ class HomeViewModel(
                 ProductViewItem(product, quantity)
             }
             _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
-            _loadedProductViewItems.value = loadedProductViewItems.value?.plus(productViewItems)
-            _homeUiState.value = UiState.Success(loadedProductViewItems.value ?: emptyList())
+            loadedProductViewItems.addAll(productViewItems)
+            _homeUiState.value = UiState.Success(loadedProductViewItems)
         }.onFailure {
             _homeUiState.value = UiState.Error(it)
         }
@@ -117,21 +114,21 @@ class HomeViewModel(
         }
 
         updatedProductViewItems.forEach { updatedProductViewItem ->
-            val position = loadedProductViewItems.value?.indexOfFirst { loadedProductViewItem ->
+            val position = loadedProductViewItems.indexOfFirst { loadedProductViewItem ->
                 loadedProductViewItem.product.productId == updatedProductViewItem.product.productId
-            } ?: -1
+            }
             if (position != -1) {
-                (loadedProductViewItems.value as MutableList)[position] = updatedProductViewItem
+                loadedProductViewItems[position] = updatedProductViewItem
             }
         }
 
-        loadedProductViewItems.value?.forEachIndexed { index, loadedProductViewItem ->
+        loadedProductViewItems.forEachIndexed { index, loadedProductViewItem ->
             if (isCartItemDeleted(loadedProductViewItem)) {
                 val deletedProductViewItem = ProductViewItem(loadedProductViewItem.product, 0)
-                (loadedProductViewItems.value as MutableList)[index] = deletedProductViewItem
+                loadedProductViewItems[index] = deletedProductViewItem
             }
         }
-        _loadedProductViewItems.value = loadedProductViewItems.value?.toList()
+        _homeUiState.value = UiState.Success(loadedProductViewItems)
     }
 
     private fun isCartItemDeleted(loadedProductViewItem: ProductViewItem): Boolean {
@@ -144,11 +141,10 @@ class HomeViewModel(
     ) {
         val updatedProductViewItem = ProductViewItem(product, quantity)
         val position =
-            _loadedProductViewItems.value?.indexOfFirst { loadedProductViewItem -> loadedProductViewItem.product.productId == product.productId }
-                ?: -1
+            loadedProductViewItems.indexOfFirst { loadedProductViewItem -> loadedProductViewItem.product.productId == product.productId }
         if (position != -1) {
-            (loadedProductViewItems.value as MutableList)[position] = updatedProductViewItem
-            _loadedProductViewItems.value = loadedProductViewItems.value?.toList()
+            loadedProductViewItems[position] = updatedProductViewItem
+            _homeUiState.value = UiState.Success(loadedProductViewItems)
         }
     }
 

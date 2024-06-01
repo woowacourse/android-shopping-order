@@ -149,7 +149,6 @@
                     app:layout_constraintTop_toBottomOf="@id/cl_recent_viewed_products"
                     app:spanCount="2"
                     tools:itemCount="20"
-                    tools:layout_editor_absoluteX="0dp"
                     tools:listitem="@layout/item_product" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -75,7 +75,7 @@ class HomeActivity : AppCompatActivity() {
         viewModel.homeUiState.observe(this) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
-                is UiState.Loading -> return@observe
+                is UiState.Loading -> showData(emptyList())
                 is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
@@ -85,13 +85,6 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.recentProducts.observe(this) { recentProducts ->
             recentProductAdapter.loadData(recentProducts)
-        }
-
-        viewModel.loadedProductViewItems.observe(this) {
-            productAdapter.submitProductItems(
-                viewModel.loadedProductViewItems.value ?: emptyList(),
-                viewModel.canLoadMore.value ?: false
-            )
         }
 
         viewModel.navigateToDetail.observe(this) { navigateToDetail ->
@@ -109,7 +102,6 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showData(data: List<ProductViewItem>) {
         productAdapter.submitProductItems(data, viewModel.canLoadMore.value ?: false)
-//        productAdapter.loadData(data, viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {
