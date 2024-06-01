@@ -52,4 +52,8 @@ class DefaultCartItemRepository(
     ) {
         cartItemDataSource.minusProductsIdCount(id, quantity)
     }
+
+    override fun increaseCartItem(cartItemId: Long, quantity: Int) {
+        cartItemDataSource.plusProductsIdCount(cartItemId, quantity)
+    }
 }

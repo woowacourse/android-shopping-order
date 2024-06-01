@@ -21,4 +21,9 @@ interface CartItemRepository {
         id: Long,
         quantity: Int,
     )
+
+    fun increaseCartItem(
+        cartItemId: Long,
+        quantity: Int,
+    )
 }

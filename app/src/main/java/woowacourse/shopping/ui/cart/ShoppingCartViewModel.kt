@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -89,11 +90,11 @@ class ShoppingCartViewModel(
     }
 
     override fun onIncrease(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.increaseCartProduct(productId, quantity)
+            cartItemRepository.increaseCartItem(cartItemId, quantity)
             val currentItems = cartItemRepository.loadPagedCartItem()
             uiHandler.post {
                 updateCartItems(currentItems)
@@ -103,11 +104,11 @@ class ShoppingCartViewModel(
     }
 
     override fun onDecrease(
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.decreaseCartProduct(productId, quantity)
+            cartItemRepository.decreaseCartProduct(cartItemId, quantity)
             val currentItems = cartItemRepository.loadPagedCartItem()
             uiHandler.post {
                 updateCartItems(currentItems)
