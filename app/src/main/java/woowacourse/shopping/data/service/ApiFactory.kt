@@ -43,6 +43,11 @@ object ApiFactory {
         size: Int,
     ): ResponseProductsGetDto? = productService.getProductsByOffset(page = page, size = size).execute().body()
 
+    fun getProductsByCategory(
+        category: String,
+        page: Int,
+    ): ResponseProductsGetDto? = productService.getProductsByCategory(category = category, page = page).execute().body()
+
     fun getProductsById(id: Long): ResponseProductIdGetDto? = productService.getProductsById(id = id).execute().body()
 
     fun getCartItems(

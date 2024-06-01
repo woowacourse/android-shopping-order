@@ -21,10 +21,10 @@ interface ProductService {
     ): Call<ResponseProductsGetDto>
 
     @GET("/products")
-    fun getProducts(
+    fun getProductsByCategory(
         @Header("accept") accept: String = "*/*",
-        @Header("Username") userName: String = "namyunsuk",
-        @Header("Password") password: String = "password",
+        @Query("category") category: String? = null,
+        @Query("page") page: Int,
     ): Call<ResponseProductsGetDto>
 
     @POST("/products")

@@ -17,15 +17,7 @@ class ProductRepositoryImpl : ProductRepository {
                 productsDto = ApiFactory.getProductsByOffset(page, size)
             }.join()
             val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
-            products.content.map { product ->
-                Product(
-                    id = product.id,
-                    imageUrl = product.imageUrl,
-                    name = product.name,
-                    price = product.price,
-                    category = product.category,
-                )
-            }
+            products.toProduct()
         }
 
     override fun find(id: Long): Result<Product> =
@@ -44,14 +36,14 @@ class ProductRepositoryImpl : ProductRepository {
             )
         }
 
-    override fun productsByCategory(category: String): Result<List<Product>> =
+    override fun getProductsByCategory(category: String): Result<List<Product>> =
         runCatching {
             var page = 0
             val products = mutableListOf<Product>()
             var loadedProducts: List<Product>
-            while (true) {
+            while (page < MAX_PAGE) {
                 loadedProducts =
-                    getProducts(page, 20).getOrThrow().filter { it.category == category }
+                    productsWithCategory(category, page).getOrThrow()
                         .toMutableList()
                 if (loadedProducts.isEmpty()) break
                 products.addAll(loadedProducts)
@@ -59,4 +51,32 @@ class ProductRepositoryImpl : ProductRepository {
             }
             products
         }
+
+    private fun productsWithCategory(
+        category: String,
+        page: Int,
+    ): Result<List<Product>> =
+        runCatching {
+            var productsDto: ResponseProductsGetDto? = null
+            thread {
+                productsDto = ApiFactory.getProductsByCategory(category, page)
+            }.join()
+            val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
+            products.toProduct()
+        }
+
+    private fun ResponseProductsGetDto.toProduct() =
+        this.content.map { product ->
+            Product(
+                id = product.id,
+                imageUrl = product.imageUrl,
+                name = product.name,
+                price = product.price,
+                category = product.category,
+            )
+        }
+
+    companion object {
+        private const val MAX_PAGE = 100
+    }
 }

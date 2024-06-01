@@ -101,7 +101,7 @@ class CartViewModel(
     }
 
     private fun setRecommendProducts(it: Product) {
-        productRepository.productsByCategory(it.category).onSuccess {
+        productRepository.getProductsByCategory(it.category).onSuccess {
             _products.value =
                 it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
                     .map { ProductWithQuantity(product = it) }

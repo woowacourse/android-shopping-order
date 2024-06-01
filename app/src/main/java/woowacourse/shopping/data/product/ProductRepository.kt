@@ -10,5 +10,5 @@ interface ProductRepository {
 
     fun find(id: Long): Result<Product>
 
-    fun productsByCategory(category: String): Result<List<Product>>
+    fun getProductsByCategory(category: String): Result<List<Product>>
 }
