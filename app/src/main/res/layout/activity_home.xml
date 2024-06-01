@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UiState" />
-
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.home.HomeViewModel" />
@@ -85,8 +83,9 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/cl_recent_viewed_products"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:viewVisibility="@{!(viewModel.homeUiState instanceof UiState.Loading)}">
+                    android:layout_height="220dp"
+                    app:layout_constraintBottom_toTopOf="@id/rv_product_list"
+                    app:recentProductsVisibility="@{viewModel.homeUiState}">
 
                     <TextView
                         android:id="@+id/tv_recent_products_title"
@@ -110,6 +109,7 @@
                         android:orientation="horizontal"
                         android:overScrollMode="never"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@id/tv_recent_products_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_recent_products_title"
                         tools:listitem="@layout/item_recent_product"
@@ -146,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:layout_constraintTop_toBottomOf="@id/cl_recent_viewed_products"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:spanCount="2"
                     tools:itemCount="20"
                     tools:listitem="@layout/item_product" />

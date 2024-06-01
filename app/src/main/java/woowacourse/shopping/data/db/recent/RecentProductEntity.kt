@@ -12,7 +12,7 @@ data class RecentProductEntity(
     val productName: String,
     val imageUrl: String,
     val dateTime: String,
-    val category: String?,
+    val category: String,
 )
 
 fun RecentProductEntity.toRecentProduct(): RecentProduct {

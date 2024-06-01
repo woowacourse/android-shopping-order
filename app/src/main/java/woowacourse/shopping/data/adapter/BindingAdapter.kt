@@ -46,6 +46,15 @@ fun setTotalQuantityVisibility(
     textView.visibility = if (totalQuantity > 0) View.VISIBLE else View.GONE
 }
 
+@BindingAdapter("app:recentProductsVisibility")
+fun <T> setRecentProductsVisibility(
+    view: View,
+    state: UiState<T>,
+) {
+    view.visibility =
+        if (state is UiState.Success) View.VISIBLE else View.GONE
+}
+
 @BindingAdapter("app:isEmpty", "app:state", requireAll = true)
 fun <T> setEmptyCartVisibility(
     textView: TextView,

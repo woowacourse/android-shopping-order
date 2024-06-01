@@ -84,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         viewModel.recentProducts.observe(this) { recentProducts ->
-            recentProductAdapter.loadData(recentProducts)
+            recentProductAdapter.submitList(recentProducts)
         }
 
         viewModel.navigateToDetail.observe(this) { navigateToDetail ->
