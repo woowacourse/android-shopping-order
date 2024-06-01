@@ -130,8 +130,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         val state = uiState.value ?: return
-        state.cart?.let { product ->
-            _uiState.value = state.copy(cart = product.copy(quantity = product.quantity + 1))
+        state.cart?.let { cart ->
+            _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity + 1))
         }
     }
 
@@ -140,8 +140,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         val state = uiState.value ?: return
-        state.cart?.let { product ->
-            _uiState.value = state.copy(cart = product.copy(quantity = product.quantity - 1))
+        state.cart?.let { cart ->
+            _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity - 1))
         }
     }
 
