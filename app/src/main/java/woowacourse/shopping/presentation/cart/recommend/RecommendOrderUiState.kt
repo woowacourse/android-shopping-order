@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.cart.recommend
 import woowacourse.shopping.presentation.cart.CartProductUi
 
 data class RecommendOrderUiState(
-    val orderedProducts: List<CartProductUi> = emptyList(),
+    private val orderedProducts: List<CartProductUi> = emptyList(),
     val recommendProducts: List<CartProductUi> = emptyList(),
 ) {
     private val totalProducts
