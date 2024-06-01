@@ -36,7 +36,7 @@ class CartViewModel(
 
     private val cartItemSelectedCount = MutableLiveData<Int>(0)
     val cartItemAllSelected: LiveData<Boolean> =
-        cartItemSelectedCount.map { it > 0 && it == cartUiModels()?.size }
+        cartItemSelectedCount.map { it > 0 && it == findCartUiModelsOrNull()?.size }
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
@@ -47,7 +47,8 @@ class CartViewModel(
     private val _navigateEvent = MutableLiveData<Event<Unit>>()
     val navigateEvent: LiveData<Event<Unit>> get() = _navigateEvent
 
-    val checkboxVisibility: LiveData<Boolean> = _navigateEvent.map { false }
+    private val _visibleAllToggleView = MutableLiveData(true)
+    val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
 
     private val _totalQuantity = MutableLiveData<Int>()
     val totalQuantity: LiveData<Int> get() = _totalQuantity
@@ -78,7 +79,7 @@ class CartViewModel(
     }
 
     private fun updateTotalQuantity() {
-        val cartUiModels = cartUiModels() ?: emptyList()
+        val cartUiModels = findCartUiModelsOrNull() ?: emptyList()
         val totalQuantity =
             cartUiModels
                 .filter { it.isSelected }
@@ -87,7 +88,7 @@ class CartViewModel(
     }
 
     private fun updateTotalPrice() {
-        val uiModels = cartUiModels() ?: emptyList()
+        val uiModels = findCartUiModelsOrNull() ?: emptyList()
         val totalPrice =
             uiModels
                 .filter { it.isSelected }
@@ -123,8 +124,9 @@ class CartViewModel(
         product: Product,
         cartItem: CartItem,
     ) {
-        val oldCartUiModels = cartUiModels() ?: emptyList()
-        val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
+        val oldCartUiModels = findCartUiModelsOrNull() ?: emptyList()
+        val oldCartUiModel =
+            findCartUiModelByProductId(product.id) ?: CartUiModel.from(product, cartItem)
 
         var newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
 
@@ -153,7 +155,7 @@ class CartViewModel(
 
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
-        val cartUiModel = cartUiModel(productId) ?: return
+        val cartUiModel = findCartUiModelByProductId(productId) ?: return
         cartRepository.delete(
             cartUiModel.cartItemId,
             object : DataCallback<Unit> {
@@ -172,7 +174,7 @@ class CartViewModel(
     }
 
     private fun updateDeletedCart(deletedCartUiModel: CartUiModel) {
-        val newCartUiModels = cartUiModels()?.toMutableList() ?: return
+        val newCartUiModels = findCartUiModelsOrNull()?.toMutableList() ?: return
         newCartUiModels.remove(deletedCartUiModel)
         _cartUiState.value = Event(CartUiState.Success(newCartUiModels))
         loadAllCartItems()
@@ -182,25 +184,25 @@ class CartViewModel(
     override fun increaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
-        val cartUiModel = cartUiModel(productId)
+        val cartUiModel = findCartUiModelByProductId(productId)
         if (cartUiModel == null) {
             addCartItem(productId)
             return
         }
         var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel, ++newQuantity)
+        changeQuantity(cartUiModel, ++newQuantity)
     }
 
     override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
 
-        val cartUiModel = cartUiModel(productId) ?: return
+        val cartUiModel = findCartUiModelByProductId(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(productId)
             return
         }
         var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel, --newQuantity)
+        changeQuantity(cartUiModel, --newQuantity)
     }
 
     private fun isRecommendProduct(productId: Int): Boolean {
@@ -225,8 +227,8 @@ class CartViewModel(
         productId: Int,
         isSelected: Boolean,
     ) {
-        val oldCartUiModels = cartUiModels() ?: emptyList()
-        val oldCartUiModel = cartUiModel(productId) ?: return
+        val oldCartUiModels = findCartUiModelsOrNull() ?: emptyList()
+        val oldCartUiModel = findCartUiModelByProductId(productId) ?: return
         if (oldCartUiModel.isSelected == isSelected) return
 
         val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
@@ -239,12 +241,12 @@ class CartViewModel(
     }
 
     private fun updateCartSelectedCount() {
-        val uiModels = cartUiModels() ?: emptyList()
+        val uiModels = findCartUiModelsOrNull() ?: emptyList()
         val cartSelectedCount = uiModels.count { it.isSelected }
         this.cartItemSelectedCount.value = cartSelectedCount
     }
 
-    private fun setQuantity(
+    private fun changeQuantity(
         cartUiModel: CartUiModel,
         quantity: Quantity,
     ) {
@@ -267,20 +269,21 @@ class CartViewModel(
         )
     }
 
-    override fun selectAllCartItem(isChecked: Boolean) {
-        if (cartItemAllSelected.value == true && isChecked) return
-        cartUiModels()?.forEach {
-            selectCartItem(it.productId, isSelected = isChecked)
+    override fun toggleAllCartItem(isSelected: Boolean) {
+        if (cartItemAllSelected.value == true && isSelected) return
+        findCartUiModelsOrNull()?.forEach {
+            selectCartItem(it.productId, isSelected = isSelected)
         }
     }
 
     fun navigateCartRecommend() {
         _navigateEvent.postValue(Event(Unit))
+        _visibleAllToggleView.value = false
     }
 
-    fun loadRecommendProductUiModels() {
+    fun loadRecommendProducts() {
         val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
-        val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
+        val cartItems = findCartUiModelsOrNull()?.map { it.toCartItem() } ?: return
 
         productRepository.findRecommendProducts(
             recentProductCategory,
@@ -318,14 +321,14 @@ class CartViewModel(
     }
 
     fun createOrder() {
-        val cartUiModels = cartUiModels() ?: return
+        val cartUiModels = findCartUiModelsOrNull() ?: return
         val cartItemIds = cartUiModels.filter { it.isSelected }.map { it.cartItemId }
         orderRepository.createOrder(
             cartItemIds,
             object : DataCallback<Unit> {
                 override fun onSuccess(result: Unit) {
                     _isSuccessCreateOrder.value = Event(true)
-                    deleteCartItemIds(cartItemIds)
+                    deleteCartItems(cartItemIds)
                 }
 
                 override fun onFailure(t: Throwable) {
@@ -335,7 +338,7 @@ class CartViewModel(
         )
     }
 
-    private fun deleteCartItemIds(cartItemIds: List<Int>) {
+    private fun deleteCartItems(cartItemIds: List<Int>) {
         _changedCartEvent.value = Event(Unit)
         cartItemIds.forEach {
             cartRepository.delete(
@@ -357,11 +360,11 @@ class CartViewModel(
         _cartUiState.value = Event(CartUiState.Failure)
     }
 
-    private fun cartUiModel(productId: Int): CartUiModel? {
-        return cartUiModels()?.find { it.productId == productId }
+    private fun findCartUiModelByProductId(productId: Int): CartUiModel? {
+        return findCartUiModelsOrNull()?.find { it.productId == productId }
     }
 
-    private fun cartUiModels(): List<CartUiModel>? {
+    private fun findCartUiModelsOrNull(): List<CartUiModel>? {
         val cartUiState = cartUiState.value?.peekContent()
         if (cartUiState is CartUiState.Success) {
             return cartUiState.cartUiModels

@@ -12,5 +12,5 @@ interface CartListener {
         isSelected: Boolean,
     )
 
-    fun selectAllCartItem(isChecked: Boolean)
+    fun toggleAllCartItem(isSelected: Boolean)
 }

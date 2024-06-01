@@ -43,10 +43,10 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                setVisibility="@{viewModel.checkboxVisibility}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:visibility="@{viewModel.visibleAllToggleView}">
 
                 <CheckBox
                     android:id="@+id/cb_select_order"
@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="전체"
+                    android:text="@string/all_cart_selection"
                     android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@id/cb_select_order"
@@ -88,13 +88,13 @@
                 android:layout_width="122dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/selector_add_cart_button"
+                android:enabled="@{viewModel.isEnabledOrder}"
                 android:gravity="center"
-                setEnable="@{viewModel.isEnabledOrder}"
+                android:onClick="@{() ->viewModel.navigateCartRecommend()}"
                 android:text="@{@string/order_button_title(viewModel.totalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:onClick="@{() ->viewModel.navigateCartRecommend()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="주문하기(4)" />
 
