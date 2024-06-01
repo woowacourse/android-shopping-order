@@ -2,7 +2,7 @@ package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.data.service.ApiFactory
+import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.model.Product
 import kotlin.concurrent.thread
 
@@ -14,7 +14,7 @@ class ProductRepositoryImpl : ProductRepository {
         runCatching {
             var productsDto: ResponseProductsGetDto? = null
             thread {
-                productsDto = ApiFactory.getProductsByOffset(page, size)
+                productsDto = NetworkModule.getProductsByOffset(page, size)
             }.join()
             val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
             products.toProduct()
@@ -24,7 +24,7 @@ class ProductRepositoryImpl : ProductRepository {
         runCatching {
             var productDto: ResponseProductIdGetDto? = null
             thread {
-                productDto = ApiFactory.getProductsById(id)
+                productDto = NetworkModule.getProductsById(id)
             }.join()
             val product = productDto ?: error("$id 에 해당하는 productId가 없습니다")
             Product(
@@ -59,7 +59,7 @@ class ProductRepositoryImpl : ProductRepository {
         runCatching {
             var productsDto: ResponseProductsGetDto? = null
             thread {
-                productsDto = ApiFactory.getProductsByCategory(category, page)
+                productsDto = NetworkModule.getProductsByCategory(category, page)
             }.join()
             val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
             products.toProduct()

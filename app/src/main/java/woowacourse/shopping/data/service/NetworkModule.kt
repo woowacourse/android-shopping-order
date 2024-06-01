@@ -6,13 +6,10 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
-import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
-import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 
-object ApiFactory {
+object NetworkModule {
     private val client =
         OkHttpClient.Builder().addInterceptor(DefaultInterceptor("namyunsuk", "password")).build()
 
@@ -29,7 +26,7 @@ object ApiFactory {
 
     private val productService = retrofit.create(ProductService::class.java)
 
-    private val cartItemService = tokenRetrofit.create(CartItemService::class.java)
+    val cartItemService = tokenRetrofit.create(CartItemService::class.java)
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
@@ -49,20 +46,4 @@ object ApiFactory {
     ): ResponseProductsGetDto? = productService.getProductsByCategory(category = category, page = page).execute().body()
 
     fun getProductsById(id: Long): ResponseProductIdGetDto? = productService.getProductsById(id = id).execute().body()
-
-    fun getCartItems(
-        page: Int,
-        size: Int,
-    ): ResponseCartItemsGetDto? = cartItemService.getCartItems(page = page, size = size).execute().body()
-
-    fun postCartItems(request: RequestCartItemPostDto) = cartItemService.postCartItem(request = request).execute().body()
-
-    fun deleteCartItems(id: Long) = cartItemService.deleteCartItem(id = id).execute().body()
-
-    fun patchCartItems(
-        id: Long,
-        request: RequestCartItemsPatchDto,
-    ) = cartItemService.patchCartItem(id = id, request = request).execute().body()
-
-    fun getCartItemCounts() = cartItemService.getCartItemCounts().execute().body()
 }
