@@ -1,56 +1,32 @@
 package woowacourse.shopping.data.recentproduct
 
+import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
-class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
+class RecentProductRepositoryImpl private constructor(private val recentProductLocalDataSource: RecentProductLocalDataSource) :
     RecentProductRepository {
         override fun insert(productId: Long): Result<Long> =
-            runCatching {
-                var id = -1L
-                thread {
-                    id =
-                        recentProductDao.insert(
-                            RecentProduct(
-                                productId = productId,
-                                recentTime = LocalDateTime.now(),
-                            ),
-                        )
-                }.join()
-                id
-            }
+            recentProductLocalDataSource.insert(
+                RecentProduct(
+                    productId = productId,
+                    recentTime = LocalDateTime.now(),
+                ),
+            )
 
-        override fun findMostRecentProduct(): Result<RecentProduct> =
-            runCatching {
-                var recentProduct: RecentProduct? = null
-                thread {
-                    recentProduct = recentProductDao.findMostRecentProduct()
-                }.join()
-                recentProduct ?: error("최근 본 상품 정보를 불러오지 못했습니다")
-            }
+        override fun findMostRecentProduct(): Result<RecentProduct> = recentProductLocalDataSource.findMostRecentProduct()
 
-        override fun findAll(): Result<List<RecentProduct>> =
-            runCatching {
-                var recentProducts = emptyList<RecentProduct>()
-                thread {
-                    recentProducts = recentProductDao.findAll()
-                }.join()
-                recentProducts
-            }
+        override fun findAll(): Result<List<RecentProduct>> = recentProductLocalDataSource.findAll()
 
-        override fun deleteAll(): Result<Unit> =
-            runCatching {
-                thread {
-                    recentProductDao.deleteAll()
-                }.join()
-            }
+        override fun deleteAll(): Result<Unit> = recentProductLocalDataSource.deleteAll()
 
         companion object {
             private var instance: RecentProductRepository? = null
 
-            fun get(recentProductDao: RecentProductDao): RecentProductRepository {
+            fun get(recentProductLocalDataSource: RecentProductLocalDataSource): RecentProductRepository {
                 return instance ?: synchronized(this) {
-                    instance ?: RecentProductRepositoryImpl(recentProductDao).also { instance = it }
+                    instance ?: RecentProductRepositoryImpl(recentProductLocalDataSource).also {
+                        instance = it
+                    }
                 }
             }
         }

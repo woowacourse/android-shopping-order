@@ -12,6 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -32,7 +33,11 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             ProductRepositoryImpl(ProductRemoteDataSourceImpl(NetworkModule.productService)),
             CartRepositoryImpl(CartRemoteDataSourceImpl(NetworkModule.cartItemService)),
-            RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
+            RecentProductRepositoryImpl.get(
+                RecentProductLocalDataSourceImpl(
+                    RecentProductDatabase.database().recentProductDao(),
+                ),
+            ),
         )
     }
 
