@@ -118,13 +118,13 @@ private fun RecommendOrderUiState.increaseProductCount(
 ): RecommendOrderUiState =
     copy(
         recommendProducts =
-        recommendProducts.map {
-            if (it.product.id == productId) {
-                it.copy(count = it.count + amount)
-            } else {
-                it
-            }
-        },
+            recommendProducts.map {
+                if (it.product.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
     )
 
 private fun RecommendOrderUiState.decreaseProductCount(
@@ -147,5 +147,4 @@ private fun RecommendOrderUiState.shouldDeleteFromCart(productId: Long): Boolean
     return product.count <= 1
 }
 
-private fun RecommendOrderUiState.findProduct(productId: Long): CartProductUi? =
-    recommendProducts.find { it.product.id == productId }
+private fun RecommendOrderUiState.findProduct(productId: Long): CartProductUi? = recommendProducts.find { it.product.id == productId }

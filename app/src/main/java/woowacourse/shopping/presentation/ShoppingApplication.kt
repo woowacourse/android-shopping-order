@@ -17,7 +17,7 @@ class ShoppingApplication : Application() {
                     override fun createStackElementTag(element: StackTraceElement): String {
                         return "${element.fileName} : ${element.lineNumber} - ${element.methodName}"
                     }
-                }
+                },
             )
         }
     }

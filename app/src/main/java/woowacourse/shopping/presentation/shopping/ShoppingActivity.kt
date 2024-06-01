@@ -8,8 +8,8 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.cart.CartFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
-import woowacourse.shopping.presentation.cart.recommend.RecommendProductFragment
 import woowacourse.shopping.presentation.cart.recommend.RecommendNavArgs
+import woowacourse.shopping.presentation.cart.recommend.RecommendProductFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment

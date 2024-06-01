@@ -11,6 +11,7 @@ data class ProductDetailUiState(
         get() =
             (recentProduct != null) &&
                 (cartProduct.product.id != recentProduct.id)
+
     companion object {
         fun init(): ProductDetailUiState =
             ProductDetailUiState(

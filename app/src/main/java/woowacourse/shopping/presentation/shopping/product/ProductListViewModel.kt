@@ -133,12 +133,12 @@ private fun ProductListUiState.addProducts(
 private fun ProductListUiState.updateCartProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
     return copy(
         totalProducts =
-        products.map { originalProduct ->
-            val newProduct =
-                newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
-                    ?: return@map originalProduct.copy(count = 0)
-            originalProduct.copy(count = newProduct.count)
-        } + loadMoreModels,
+            products.map { originalProduct ->
+                val newProduct =
+                    newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
+                        ?: return@map originalProduct.copy(count = 0)
+                originalProduct.copy(count = newProduct.count)
+            } + loadMoreModels,
     )
 }
 
@@ -148,13 +148,13 @@ private fun ProductListUiState.increaseProductCount(
 ): ProductListUiState =
     copy(
         totalProducts =
-        totalProducts.map {
-            if (it is ShoppingUiModel.Product && it.id == productId) {
-                it.copy(count = it.count + amount)
-            } else {
-                it
-            }
-        },
+            totalProducts.map {
+                if (it is ShoppingUiModel.Product && it.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
     )
 
 private fun ProductListUiState.decreaseProductCount(

@@ -15,6 +15,7 @@ data class RecommendOrderUiState(
         get() = totalProducts.sumOf { it.count }
 
     val totalPrice
-        get() = totalProducts
-            .sumOf { it.totalPrice }
+        get() =
+            totalProducts
+                .sumOf { it.totalPrice }
 }

@@ -175,9 +175,9 @@ private fun CartUiState.toggleTotalOrderProducts(): CartUiState {
     val newPagingProducts =
         pagingProducts.map {
             it.key to
-                    it.value.map { cartProductUi ->
-                        cartProductUi.copy(isSelected = !isSelectedAll)
-                    }
+                it.value.map { cartProductUi ->
+                    cartProductUi.copy(isSelected = !isSelectedAll)
+                }
         }.toMap()
     return copy(
         pagingProducts = newPagingProducts,
@@ -261,5 +261,4 @@ private fun CartUiState.canDecreaseProductCount(
     return product.count > countLimit
 }
 
-private fun CartUiState.findProductAtCurrentPage(productId: Long): CartProductUi? =
-    currentPageProducts.find { it.product.id == productId }
+private fun CartUiState.findProductAtCurrentPage(productId: Long): CartProductUi? = currentPageProducts.find { it.product.id == productId }
