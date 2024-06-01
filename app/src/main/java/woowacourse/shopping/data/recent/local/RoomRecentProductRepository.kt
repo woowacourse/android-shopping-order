@@ -28,7 +28,7 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
 
     override fun save(product: Product) {
         thread {
-            if (recentProductDao.findOrNull(product.id) == null) {
+            if (recentProductDao.findOrNullByProductId(product.id) == null) {
                 recentProductDao.insert(
                     RecentProductEntity(
                         product = product.toProductEntity(),

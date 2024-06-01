@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 @Dao
 interface RecentProductDao {
     @Query("SELECT * FROM recent_products WHERE productId = :productId")
-    fun findOrNull(productId: Int): RecentProductEntity?
+    fun findOrNullByProductId(productId: Int): RecentProductEntity?
 
     @Query("SELECT * FROM recent_products ORDER BY seen_date_time DESC LIMIT :size")
     fun findRange(size: Int): List<RecentProductEntity>
@@ -23,7 +23,4 @@ interface RecentProductDao {
         productId: Int,
         seenDateTime: LocalDateTime,
     )
-
-    @Query("SELECT * FROM recent_products WHERE category = :category ORDER BY seen_date_time DESC")
-    fun findCategory(category: String): List<RecentProductEntity>
 }
