@@ -1,38 +1,27 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
+import woowacourse.shopping.data.datasource.ProductRemoteDataSource
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.model.Product
-import kotlin.concurrent.thread
 
-class ProductRepositoryImpl : ProductRepository {
+class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDataSource) :
+    ProductRepository {
     override fun getProducts(
         page: Int,
         size: Int,
     ): Result<List<Product>> =
-        runCatching {
-            var productsDto: ResponseProductsGetDto? = null
-            thread {
-                productsDto = NetworkModule.getProductsByOffset(page, size)
-            }.join()
-            val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
-            products.toProduct()
+        productRemoteDataSource.getProductsByOffset(page, size).mapCatching {
+            it.toProduct()
         }
 
     override fun find(id: Long): Result<Product> =
-        runCatching {
-            var productDto: ResponseProductIdGetDto? = null
-            thread {
-                productDto = NetworkModule.getProductsById(id)
-            }.join()
-            val product = productDto ?: error("$id 에 해당하는 productId가 없습니다")
+        productRemoteDataSource.getProductsById(id).mapCatching {
             Product(
-                id = product.id,
-                imageUrl = product.imageUrl,
-                name = product.name,
-                price = product.price,
-                category = product.category,
+                id = it.id,
+                imageUrl = it.imageUrl,
+                name = it.name,
+                price = it.price,
+                category = it.category,
             )
         }
 
@@ -56,13 +45,8 @@ class ProductRepositoryImpl : ProductRepository {
         category: String,
         page: Int,
     ): Result<List<Product>> =
-        runCatching {
-            var productsDto: ResponseProductsGetDto? = null
-            thread {
-                productsDto = NetworkModule.getProductsByCategory(category, page)
-            }.join()
-            val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
-            products.toProduct()
+        productRemoteDataSource.getProductsByCategory(category, page).mapCatching {
+            it.toProduct()
         }
 
     private fun ResponseProductsGetDto.toProduct() =

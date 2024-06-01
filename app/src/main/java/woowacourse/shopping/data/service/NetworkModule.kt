@@ -6,8 +6,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
-import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 
 object NetworkModule {
     private val client =
@@ -24,7 +22,7 @@ object NetworkModule {
         retrofitBuilder(tokenClient)
     }
 
-    private val productService = retrofit.create(ProductService::class.java)
+    val productService = retrofit.create(ProductService::class.java)
 
     val cartItemService = tokenRetrofit.create(CartItemService::class.java)
 
@@ -34,16 +32,4 @@ object NetworkModule {
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .build()
-
-    fun getProductsByOffset(
-        page: Int,
-        size: Int,
-    ): ResponseProductsGetDto? = productService.getProductsByOffset(page = page, size = size).execute().body()
-
-    fun getProductsByCategory(
-        category: String,
-        page: Int,
-    ): ResponseProductsGetDto? = productService.getProductsByCategory(category = category, page = page).execute().body()
-
-    fun getProductsById(id: Long): ResponseProductIdGetDto? = productService.getProductsById(id = id).execute().body()
 }

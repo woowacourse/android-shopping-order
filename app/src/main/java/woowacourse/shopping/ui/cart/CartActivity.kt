@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -29,7 +30,7 @@ class CartActivity : AppCompatActivity() {
     private lateinit var recommendProductAdapter: RecommendProductAdapter
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
-            ProductRepositoryImpl(),
+            ProductRepositoryImpl(ProductRemoteDataSourceImpl(NetworkModule.productService)),
             CartRepositoryImpl(CartRemoteDataSourceImpl(NetworkModule.cartItemService)),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
         )
