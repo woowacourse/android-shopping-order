@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty_shopping_cart_title"
-            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() &amp;&amp; vm.loading != LoadingProvider.SKELETON_LOADING ? View.VISIBLE : View.GONE }"
+            android:visibility="@{vm.uiState.pagingCartProduct.cartProducts.isEmpty() &amp;&amp; vm.loading != LoadingProvider.SKELETON_LOADING ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toTopOf="@+id/tv_page"
             app:layout_constraintEnd_toEndOf="@+id/rv_cart_products"
             app:layout_constraintStart_toStartOf="@+id/rv_cart_products"
@@ -147,6 +147,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginBottom="25dp"
             android:backgroundTint="@color/green"
+            android:visibility="@{vm.uiState.pagingCartProduct.cartProducts.size() == 0 ? View.GONE : View.VISIBLE}"
             android:checked="@{vm.uiState.isAllChecked}"
             android:onClick="@{() -> vm.checkAllCartProduct()}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -154,6 +155,7 @@
 
         <TextView
             android:id="@+id/tv_all"
+            android:visibility="@{vm.uiState.pagingCartProduct.cartProducts.size() == 0 ? View.GONE : View.VISIBLE}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="-8dp"

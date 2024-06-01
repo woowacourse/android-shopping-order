@@ -40,7 +40,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
 
     private fun initObserve() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            adapter.submitList(uiState.pagingCartProduct.cartList)
+            adapter.submitList(uiState.pagingCartProduct.cartProducts)
         }
 
         viewModel.message.observeEvent(viewLifecycleOwner) { message ->

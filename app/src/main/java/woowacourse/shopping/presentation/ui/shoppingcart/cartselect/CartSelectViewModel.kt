@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -42,31 +43,7 @@ class CartSelectViewModel(
 
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
-
-                val carts = shoppingRepository.getAllCarts().getOrNull()
-
-                val cartIdList =
-                    uiState.value?.orderCarts?.map { it.id } ?: emptyList()
-
-                val newCartList =
-                    pagingCartProduct.cartList.map { cart ->
-                        if (cart.cart.id in cartIdList) {
-                            cart.copy(isChecked = true)
-                        } else {
-                            cart.copy(isChecked = false)
-                        }
-                    }
-
-                val newPagingCartProduct = pagingCartProduct.copy(cartList = newCartList)
-
-                _uiState.value?.let { state ->
-                    _uiState.postValue(
-                        state.copy(
-                            pagingCartProduct = newPagingCartProduct,
-                            totalElements = carts?.totalElements ?: 0,
-                        ),
-                    )
-                }
+                loadedCartProducts(pagingCartProduct)
             }.onFailure { e ->
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
@@ -76,8 +53,34 @@ class CartSelectViewModel(
         }
     }
 
+    private fun loadedCartProducts(pagingCartProduct: PagingCartProduct) {
+        val state = uiState.value ?: return
+        val carts = shoppingRepository.getAllCarts().getOrNull()
+
+        val cartIdList = state.orderCarts.map { it.id }
+
+        val newCartList =
+            pagingCartProduct.cartProducts.map { cart ->
+                if (cart.cart.id in cartIdList) {
+                    cart.copy(isChecked = true)
+                } else {
+                    cart.copy(isChecked = false)
+                }
+            }
+
+        val newPagingCartProduct = pagingCartProduct.copy(cartProducts = newCartList)
+        val totalElements = carts?.totalElements ?: 0
+
+        _uiState.postValue(
+            state.copy(
+                pagingCartProduct = newPagingCartProduct,
+                totalElements = totalElements,
+            ),
+        )
+    }
+
     override fun retry() {
-        _uiState.value?.let { state ->
+        uiState.value?.let { state ->
             loadCartProducts(state.pagingCartProduct.currentPage)
         }
     }
@@ -100,17 +103,16 @@ class CartSelectViewModel(
         productId: Long,
         increment: Boolean,
     ) {
-        var state = _uiState.value ?: return
-        val updatedProductList =
-            state.pagingCartProduct.cartList.map { cartProduct ->
+        var state = uiState.value ?: return
+        val updatedCartProducts =
+            state.pagingCartProduct.cartProducts.map { cartProduct ->
                 if (cartProduct.cart.product.id == productId) {
-                    val updateProduct = cartProduct.updateProduct(increment)
+                    val updateProduct = updateProduct(cartProduct, increment)
                     val orderCartIds = state.orderCarts.map { it.product.id }
                     if (productId in orderCartIds) {
                         state = state.copy(orderCarts = state.orderCarts - cartProduct.cart)
                         state = state.copy(orderCarts = state.orderCarts + updateProduct.cart)
                     }
-
                     updateProduct
                 } else {
                     cartProduct
@@ -118,23 +120,41 @@ class CartSelectViewModel(
             }
         val pagingCartProduct =
             PagingCartProduct(
-                cartList = updatedProductList,
+                cartProducts = updatedCartProducts,
                 currentPage = state.pagingCartProduct.currentPage,
                 last = state.pagingCartProduct.last,
             )
-        _uiState.postValue(
-            state.copy(pagingCartProduct = pagingCartProduct),
-        )
+
+        _uiState.value = state.copy(pagingCartProduct = pagingCartProduct)
     }
 
-    private fun CartProduct.updateProduct(increment: Boolean): CartProduct {
-        val updatedQuantity = if (increment) this.cart.quantity + 1 else this.cart.quantity - 1
-        when {
-            this.cart.quantity == 0 -> insertCartProduct(this.cart.product, updatedQuantity)
-            updatedQuantity == 0 -> deleteCartProduct(this.cart.id)
-            else -> updateCartProduct(this.cart.id, updatedQuantity)
+    private fun updateProduct(
+        cartProduct: CartProduct,
+        increment: Boolean,
+    ): CartProduct {
+        val updatedQuantity = calculateUpdatedQuantity(cartProduct.cart.quantity, increment)
+        calculatedUpdateCart(cartProduct.cart, updatedQuantity)
+        return cartProduct.copy(cart = cartProduct.cart.copy(quantity = updatedQuantity))
+    }
+
+    private fun calculateUpdatedQuantity(
+        currentQuantity: Int,
+        increment: Boolean,
+    ): Int {
+        return if (increment) currentQuantity + 1 else currentQuantity - 1
+    }
+
+    private fun calculatedUpdateCart(
+        cart: Cart,
+        updatedQuantity: Int,
+    ) {
+        if (cart.quantity == Cart.INIT_QUANTITY_NUM) {
+            insertCartProduct(cart.product, updatedQuantity)
+        } else if (updatedQuantity == Cart.INIT_QUANTITY_NUM) {
+            deleteCartProduct(cart.id)
+        } else {
+            updateCartProduct(cart.id, updatedQuantity)
         }
-        return this.copy(cart = this.cart.copy(quantity = updatedQuantity))
     }
 
     private fun insertCartProduct(
@@ -169,7 +189,7 @@ class CartSelectViewModel(
     }
 
     override fun checkCartProduct(cartProduct: CartProduct) {
-        var state = _uiState.value ?: return
+        var state = uiState.value ?: return
         state =
             if (cartProduct.isChecked) {
                 state.copy(orderCarts = state.orderCarts - cartProduct.cart)
@@ -179,7 +199,7 @@ class CartSelectViewModel(
 
         val cartIds = state.orderCarts.map { it.id }
         val newPagingCartProduct =
-            state.pagingCartProduct.cartList.map { newCartProduct ->
+            state.pagingCartProduct.cartProducts.map { newCartProduct ->
                 if (newCartProduct.cart.id in cartIds) {
                     newCartProduct.copy(isChecked = true)
                 } else {
@@ -188,48 +208,28 @@ class CartSelectViewModel(
             }
 
         _uiState.value =
-            state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct))
+            state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartProducts = newPagingCartProduct))
     }
 
     override fun checkAllCartProduct() {
         thread {
             shoppingRepository.getAllCarts().onSuccess { carts ->
                 hideError()
+                val state = uiState.value ?: return@onSuccess
 
-                if (carts.totalElements == _uiState.value?.orderCarts?.size) {
-                    _uiState.value?.let { state ->
-
-                        val newPagingCartProduct =
-                            state.pagingCartProduct.cartList.map { cartProduct ->
-                                cartProduct.copy(isChecked = false)
-                            }
-
-                        _uiState.postValue(
-                            state.copy(
-                                orderCarts = emptyList(),
-                                pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
-                            ),
-                        )
+                val newPagingCartProduct =
+                    state.pagingCartProduct.cartProducts.map { cartProduct ->
+                        cartProduct.copy(isChecked = !state.isAllChecked)
                     }
-                } else {
-                    _uiState.value?.let { state ->
-                        val newPagingCartProduct =
-                            state.pagingCartProduct.cartList.map { cartProduct ->
-                                cartProduct.copy(isChecked = true)
-                            }
 
-//                        val orderCartList =
-//                            carts.content.map { it.toCartProduct(isChecked = true) }
-//                                .associateBy { cartProduct -> cartProduct.cart.id }.toMutableMap()
+                val orderCarts = if (state.isAllChecked) emptyList() else carts.content
 
-                        _uiState.postValue(
-                            state.copy(
-                                orderCarts = carts.content,
-                                pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
-                            ),
-                        )
-                    }
-                }
+                _uiState.postValue(
+                    state.copy(
+                        orderCarts = orderCarts,
+                        pagingCartProduct = state.pagingCartProduct.copy(cartProducts = newPagingCartProduct),
+                    ),
+                )
             }.onFailure { e ->
                 showError(e)
             }

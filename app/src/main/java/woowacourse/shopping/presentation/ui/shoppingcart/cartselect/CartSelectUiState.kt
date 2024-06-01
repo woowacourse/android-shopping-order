@@ -17,7 +17,7 @@ data class CartSelectUiState(
 }
 
 data class PagingCartProduct(
-    val cartList: List<CartProduct> = emptyList(),
+    val cartProducts: List<CartProduct> = emptyList(),
     val currentPage: Int = 0,
     val last: Boolean = true,
 )
