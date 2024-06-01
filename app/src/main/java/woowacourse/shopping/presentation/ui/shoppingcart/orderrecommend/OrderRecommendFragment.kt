@@ -10,9 +10,8 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.observeEvent
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.adapter.RecommendAdapter
 
-class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
-    override val layoutResourceId: Int get() = R.layout.fragment_order_recommend
-
+class OrderRecommendFragment :
+    BaseFragment<FragmentOrderRecommendBinding>(R.layout.fragment_order_recommend) {
     private val viewModel: OrderRecommendViewModel by viewModels {
         OrderRecommendViewModel.factory(
             (requireContext().applicationContext as ShoppingApplication).productHistoryRepository,
@@ -41,10 +40,7 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
     }
 
     private fun initDataBinding() {
-        binding.apply {
-            vm = viewModel
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding.vm = viewModel
     }
 
     private fun initAdapter() {

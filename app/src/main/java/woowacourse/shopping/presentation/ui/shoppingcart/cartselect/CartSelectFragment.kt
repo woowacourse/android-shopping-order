@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
 import android.os.Bundle
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication
@@ -13,9 +12,7 @@ import woowacourse.shopping.presentation.base.observeEvent
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.CartProductsAdapter
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendFragment
 
-class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
-    override val layoutResourceId: Int get() = R.layout.fragment_cart_select
-
+class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>(R.layout.fragment_cart_select) {
     private val viewModel: CartSelectViewModel by viewModels {
         CartSelectViewModel.factory(
             (requireContext().applicationContext as ShoppingApplication).shoppingCartRepository,
@@ -31,10 +28,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
     }
 
     private fun initDataBinding() {
-        binding.apply {
-            vm = viewModel
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding.vm = viewModel
     }
 
     private fun initAdapter() {
@@ -48,7 +42,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
 
         viewModel.message.observeEvent(viewLifecycleOwner) { message ->
             when (message) {
-                is MessageProvider.DefaultErrorMessage -> showSnackbar(message.getMessage(this.requireContext()))
+                is MessageProvider.DefaultErrorMessage -> showSnackBar(message.getMessage(this.requireContext()))
             }
         }
 

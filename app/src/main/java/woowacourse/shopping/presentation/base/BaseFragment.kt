@@ -5,18 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 
-abstract class BaseFragment<T : ViewDataBinding> : Fragment() {
-    abstract val layoutResourceId: Int
+abstract class BaseFragment<T : ViewDataBinding>(
+    @LayoutRes private val layoutResourceId: Int,
+) : Fragment() {
     private var _binding: T? = null
     val binding get() = requireNotNull(_binding)
 
     private var toast: Toast? = null
-    private var snackbar: Snackbar? = null
+    private var snackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,6 +26,7 @@ abstract class BaseFragment<T : ViewDataBinding> : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = DataBindingUtil.inflate(inflater, layoutResourceId, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -43,19 +46,19 @@ abstract class BaseFragment<T : ViewDataBinding> : Fragment() {
         toast?.show()
     }
 
-    fun showSnackbar(
+    fun showSnackBar(
         message: String,
         action: Snackbar.() -> Unit = {},
     ) {
-        snackbar?.dismiss()
-        snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply { action() }
-        snackbar?.show()
+        snackBar?.dismiss()
+        snackBar = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply { action() }
+        snackBar?.show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
         toast = null
-        snackbar = null
+        snackBar = null
     }
 }
