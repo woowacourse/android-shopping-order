@@ -4,7 +4,7 @@ import woowacourse.shopping.data.model.CartQuantity
 import woowacourse.shopping.data.model.CartResponse
 
 interface CartRepository {
-    fun getCartItems(
+    fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,

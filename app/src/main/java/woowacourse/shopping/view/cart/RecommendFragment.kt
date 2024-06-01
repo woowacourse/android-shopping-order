@@ -32,8 +32,9 @@ class RecommendFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         adapter = ProductAdapter(viewModel, viewModel)
-        binding.rvRecommend.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.rvRecommend.adapter = adapter
+
 
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
             when (state) {

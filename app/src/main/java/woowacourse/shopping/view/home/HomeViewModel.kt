@@ -97,7 +97,7 @@ class HomeViewModel(
 
     private fun loadCartItems() {
         runCatching {
-            cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
+            cartRepository.getCartResponse(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
         }.onSuccess { cartResponse ->
             cartItems = cartResponse.getOrNull()?.cartItems ?: emptyList()
             _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity

@@ -32,8 +32,16 @@ class DetailViewModel(
     val mostRecentProduct: LiveData<RecentProduct?>
         get() = _mostRecentProduct
 
-    private val _isMostRecentProductVisible = MutableLiveData<Boolean>()
+    private val _quantity = MutableLiveData(1)
+    val quantity: LiveData<Int>
+        get() = _quantity
 
+    val totalPrice: LiveData<Int> =
+        quantity.map { quantityValue ->
+            product.value?.price?.times(quantityValue) ?: 0
+        }
+
+    private val _isMostRecentProductVisible = MutableLiveData<Boolean>()
     val isMostRecentProductVisible: LiveData<Boolean>
         get() = _isMostRecentProductVisible
 
@@ -49,50 +57,8 @@ class DetailViewModel(
     val isFinishButtonClicked: LiveData<Event<Boolean>>
         get() = _isFinishButtonClicked
 
-    private var _quantity = MutableLiveData(1)
-    val quantity: LiveData<Int>
-        get() = _quantity
-
-    val totalPrice: LiveData<Int> =
-        quantity.map { quantityValue ->
-            product.value?.price?.times(quantityValue) ?: 0
-        }
-
-    private val totalQuantity: Int =
-        cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
-
     init {
         loadProduct()
-    }
-
-    private fun loadProduct() {
-        try {
-            val productData = productRepository.getProductById(productId).getOrNull() ?: return
-            _product.value = productData
-            _detailUiState.value = UiState.Success(productData)
-        } catch (e: Exception) {
-            _detailUiState.value = UiState.Error(e)
-        }
-    }
-
-    fun saveCartItem() {
-        val state = detailUiState.value
-        if (state is UiState.Success) {
-            val cartResponse =
-                cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER).getOrNull()
-            val cartItems = cartResponse?.cartItems
-            val cartItemId =
-                cartItems?.firstOrNull { it.product.productId == productId }?.cartItemId
-            val currentQuantity =
-                cartItems?.firstOrNull { it.cartItemId == cartItemId }?.quantity ?: 0
-            val quantity = quantity.value ?: 0
-
-            if (cartItemId == null) {
-                cartRepository.addCartItem(productId, quantity)
-            } else {
-                cartRepository.updateCartItem(cartItemId, quantity + currentQuantity)
-            }
-        }
     }
 
     fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
@@ -109,6 +75,38 @@ class DetailViewModel(
             } else {
                 !isMostRecentProductClicked
             }
+    }
+
+    private fun loadProduct() {
+        runCatching {
+            productRepository.getProductById(productId)
+        }.onSuccess { productResult ->
+            val product = productResult.getOrNull() ?: return
+            _product.value = product
+            _detailUiState.value = UiState.Success(product)
+        }.onFailure {
+            _detailUiState.value = UiState.Error(it)
+        }
+    }
+
+    private fun saveCartItem() {
+        if (detailUiState.value is UiState.Success) {
+            runCatching {
+                val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
+                cartRepository.getCartResponse(0, totalQuantity, DESCENDING_SORT_ORDER)
+            }.onSuccess { cartResponse ->
+                val cartItems = cartResponse.getOrNull()?.cartItems
+                val cartItem = cartItems?.firstOrNull { it.product.productId == productId }
+                val currentQuantity = cartItem?.quantity ?: 0
+                val quantity = quantity.value ?: 0
+
+                if (cartItem == null) {
+                    cartRepository.addCartItem(productId, quantity)
+                } else {
+                    cartRepository.updateCartItem(cartItem.cartItemId, quantity + currentQuantity)
+                }
+            }
+        }
     }
 
     override fun onPutCartButtonClick() {

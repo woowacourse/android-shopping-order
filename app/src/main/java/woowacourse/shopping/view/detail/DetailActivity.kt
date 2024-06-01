@@ -56,27 +56,29 @@ class DetailActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.detailUiState.observe(this) { state ->
-            if (state is UiState.Error) {
-                showError(
+            when (state) {
+                is UiState.Error -> showError(
                     state.exception.message ?: getString(R.string.unknown_error),
                 )
+
+                else -> return@observe
             }
         }
 
-        viewModel.navigateToCart.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.navigateToCart.observe(this) { navigateToCart ->
+            navigateToCart.getContentIfNotHandled()?.let {
                 putCartItem()
             }
         }
 
-        viewModel.navigateToRecentDetail.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.navigateToRecentDetail.observe(this) { navigateToRecentDetail ->
+            navigateToRecentDetail.getContentIfNotHandled()?.let {
                 navigateToDetail()
             }
         }
 
-        viewModel.isFinishButtonClicked.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.isFinishButtonClicked.observe(this) { finish ->
+            finish.getContentIfNotHandled()?.let {
                 finish()
             }
         }
@@ -84,6 +86,11 @@ class DetailActivity : AppCompatActivity() {
 
     private fun showError(errorMessage: String) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun putCartItem() {
+        Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
+        startActivity(CartActivity.createIntent(context = this))
     }
 
     private fun navigateToDetail() {
@@ -97,15 +104,10 @@ class DetailActivity : AppCompatActivity() {
         )
     }
 
-    private fun putCartItem() {
-        Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
-        startActivity(CartActivity.createIntent(context = this))
-    }
-
     companion object {
-        private const val PUR_CART_MESSAGE = "장바구니에 상품이 추가되었습니다!"
         const val PRODUCT_ID = "product_id"
         const val INVALID_PRODUCT_ID = -1
+        private const val PUR_CART_MESSAGE = "장바구니에 상품이 추가되었습니다!"
         private const val IS_MOST_RECENT_PRODUCT_CLICKED = "is_most_recent_product_clicked"
         private const val DEFAULT_IS_MOST_RECENT_PRODUCT_CLICKED = false
 

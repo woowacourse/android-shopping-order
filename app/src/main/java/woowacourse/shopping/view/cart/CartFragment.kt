@@ -34,8 +34,8 @@ class CartFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setUpAdapter()
-        binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
         viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {

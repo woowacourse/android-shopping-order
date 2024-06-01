@@ -97,7 +97,7 @@ class CartViewModel(
         runCatching {
             val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
             val cartItemResponse =
-                cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER)
+                cartRepository.getCartResponse(0, totalQuantity, DESCENDING_SORT_ORDER)
                     .getOrNull()
             val cartViewItems = (cartItemResponse?.cartItems?.map(::CartViewItem) ?: emptyList())
             cartItems.addAll(cartViewItems)

@@ -10,7 +10,7 @@ import kotlin.concurrent.thread
 class CartRepositoryImpl(
     private val remoteCartDataSource: RemoteCartDataSource,
 ) : CartRepository {
-    override fun getCartItems(
+    override fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,
