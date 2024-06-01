@@ -15,33 +15,33 @@ import woowacourse.shopping.data.remote.dto.response.CartResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface CartItemApi {
-    @GET("/cart-items")
+    @GET("cart-items")
     fun getCartItems(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
     ): Call<CartResponse>
 
-    @POST("/cart-items")
+    @POST("cart-items")
     fun postCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItemRequest: CartItemRequest,
     ): Call<Unit>
 
-    @DELETE("/cart-items/{id}")
+    @DELETE("cart-items/{id}")
     fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
     ): Call<Unit>
 
-    @PATCH("/cart-items/{id}")
+    @PATCH("cart-items/{id}")
     fun patchCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
         @Body quantityRequest: QuantityRequest,
     ): Call<Unit>
 
-    @GET("/cart-items/counts")
+    @GET("cart-items/counts")
     fun getCartItemsCounts(
         @Header("accept") accept: String = "*/*",
     ): Call<QuantityResponse>

@@ -65,6 +65,6 @@ class RetrofitDataSource(
     }
 
     override fun postOrders(orderRequest: OrderRequest): Response<Unit> {
-        return orderApi.postOrders(orderRequest = orderRequest).execute()
+        return orderApi.submitOrders(orderRequest = orderRequest).execute()
     }
 }

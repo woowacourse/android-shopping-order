@@ -7,8 +7,8 @@ import retrofit2.http.POST
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 
 interface OrderApi {
-    @POST("/orders")
-    fun postOrders(
+    @POST("orders")
+    fun submitOrders(
         @Header("accept") accept: String = "*/*",
         @Body orderRequest: OrderRequest,
     ): Call<Unit>
