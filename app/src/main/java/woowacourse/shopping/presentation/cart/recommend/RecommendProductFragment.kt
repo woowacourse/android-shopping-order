@@ -127,19 +127,19 @@ class RecommendProductFragment :
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) {
             when (it) {
-                RecommendProductEvent.OrderProducts -> {
+                RecommendProductErrorEvent.OrderProducts -> {
                     showToast(R.string.error_msg_order_products)
                 }
 
-                RecommendProductEvent.DeleteCartProduct -> {
+                RecommendProductErrorEvent.DeleteCartProduct -> {
                     showToast(R.string.error_msg_delete_cart_product)
                 }
 
-                RecommendProductEvent.IncreaseCartProduct -> {
+                RecommendProductErrorEvent.IncreaseCartProduct -> {
                     showToast(R.string.error_msg_increase_cart_count)
                 }
 
-                RecommendProductEvent.DecreaseCartProduct -> {
+                RecommendProductErrorEvent.DecreaseCartProduct -> {
                     showToast(R.string.error_msg_decrease_cart_count)
                 }
             }

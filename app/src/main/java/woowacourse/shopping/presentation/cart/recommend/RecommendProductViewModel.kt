@@ -26,8 +26,8 @@ class RecommendProductViewModel(
     val showOrderDialogEvent: SingleLiveData<Unit> get() = _showOrderDialogEvent
     private val _finishOrderEvent = MutableSingleLiveData<Unit>()
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
-    private val _errorEvent = MutableSingleLiveData<RecommendProductEvent>()
-    val errorEvent: SingleLiveData<RecommendProductEvent> get() = _errorEvent
+    private val _errorEvent = MutableSingleLiveData<RecommendProductErrorEvent>()
+    val errorEvent: SingleLiveData<RecommendProductErrorEvent> get() = _errorEvent
 
     init {
         val uiState = _uiState.value
@@ -50,7 +50,7 @@ class RecommendProductViewModel(
                 _updateCartEvent.setValue(Unit)
                 _finishOrderEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductEvent.OrderProducts)
+                _errorEvent.setValue(RecommendProductErrorEvent.OrderProducts)
             }
     }
 
@@ -63,7 +63,7 @@ class RecommendProductViewModel(
                     uiState.increaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductEvent.IncreaseCartProduct)
+                _errorEvent.setValue(RecommendProductErrorEvent.IncreaseCartProduct)
             }
     }
 
@@ -78,7 +78,7 @@ class RecommendProductViewModel(
                     )
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductEvent.DeleteCartProduct)
+                _errorEvent.setValue(RecommendProductErrorEvent.DeleteCartProduct)
             }
             return
         }
@@ -89,7 +89,7 @@ class RecommendProductViewModel(
                     uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(RecommendProductEvent.DecreaseCartProduct)
+                _errorEvent.setValue(RecommendProductErrorEvent.DecreaseCartProduct)
             }
     }
 
