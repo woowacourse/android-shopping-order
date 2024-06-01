@@ -89,9 +89,12 @@ class CartViewModel(
     }
 
     fun loadRecommendProducts() {
-        recentProductRepository.findMostRecentProduct().onSuccess {
-            productRepository.find(it.id).onSuccess {
-                setRecommendProducts(it)
+        recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
+            productRepository.find(recentProduct.id).onSuccess { product ->
+                if (!requireNotNull(isRecommendPage.value)) {
+                    isRecommendPage.value = true
+                }
+                setRecommendProducts(product)
             }.onFailure {
                 error.setValue(it)
             }

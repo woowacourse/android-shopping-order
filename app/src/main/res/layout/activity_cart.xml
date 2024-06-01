@@ -48,8 +48,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="추천 상품이 없습니다."
             android:layout_marginStart="20dp"
+            android:text="추천 상품이 없습니다."
             android:textSize="20dp"
             app:isVisible="@{vm.noRecommendProductState}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -81,7 +81,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:productCount="@{vm.checkedItemCount + vm.cartOfRecommendProductCount}"
-            app:totalPrice="@{vm.totalPrice}" />
+            app:totalPrice="@{vm.totalPrice}"
+            app:vm="@{vm}" />
 
         <CheckBox
             android:id="@+id/cb_cart_item_total"
@@ -92,6 +93,7 @@
             android:background="@drawable/checkbox"
             android:button="@android:color/transparent"
             android:checked="@{vm.isTotalChbChecked}"
+            android:onCheckedChanged="@{(buttonView, isChecked) -> vm.totalCheckBoxCheck(isChecked)}"
             app:isVisible="@{!vm.isRecommendPage}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
