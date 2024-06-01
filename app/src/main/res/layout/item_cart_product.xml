@@ -75,7 +75,7 @@
                 tools:background="@color/black" />
 
             <include
-                layout="@layout/item_cart_counter"
+                layout="@layout/include_cart_counter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
