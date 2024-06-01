@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.konan.properties.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,6 +21,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        val property = Properties()
+        property.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String","BASE_URL",property.getProperty("BASE_URL"))
+        buildConfigField("String","USER_ID",property.getProperty("USER_ID"))
+        buildConfigField("String","USER_PW",property.getProperty("USER_PW"))
     }
 
     buildTypes {
@@ -44,6 +53,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
 }
 
