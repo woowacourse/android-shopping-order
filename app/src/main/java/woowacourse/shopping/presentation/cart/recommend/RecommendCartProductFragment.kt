@@ -45,18 +45,6 @@ class RecommendCartProductFragment :
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private lateinit var adapter: RecommendProductsAdapter
-    private val orderDialog by lazy {
-        AlertDialog.Builder(requireContext())
-            .setTitle("주문하기")
-            .setMessage("상품 주문 하시겠습니까?")
-            .setPositiveButton("네") { _, _ ->
-                viewModel.orderProducts()
-            }
-            .setNegativeButton("아니요") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-    }
 
     override fun onViewCreated(
         view: View,
@@ -115,8 +103,22 @@ class RecommendCartProductFragment :
             navigator.popBackStack(destination, inclusive = false)
         }
         viewModel.showOrderDialogEvent.observe(viewLifecycleOwner) {
-            orderDialog.show()
+            showOrderDialog()
         }
+    }
+
+    private fun showOrderDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.order_dialog_title))
+            .setMessage(getString(R.string.order_dialog_message))
+            .setPositiveButton(getString(R.string.order_dialog_positiveBtn)) { _, _ ->
+                viewModel.orderProducts()
+            }
+            .setNegativeButton(getString(R.string.order_dialog_negativeBtn)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     companion object {

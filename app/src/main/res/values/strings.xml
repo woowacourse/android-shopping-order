@@ -12,6 +12,11 @@
     <string name="increase_cart_part">+</string>
     <string name="load_more_products">더보기</string>
 
+    <!--    dialog msg-->
+    <string name="order_dialog_title">주문하기</string>
+    <string name="order_dialog_message">상품 주문 하시겠습니까?</string>
+    <string name="order_dialog_positiveBtn">네</string>
+    <string name="order_dialog_negativeBtn">아니오</string>
     <!--    error msg-->
     <string name="error_msg_load_recent_products">최근 본 상품을 불러오는데 실패했습니다.</string>
     <string name="error_msg_load_products">상품을 불러오는데 실패했습니다.</string>
