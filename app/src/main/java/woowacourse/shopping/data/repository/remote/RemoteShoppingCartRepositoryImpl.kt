@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.real
+package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
@@ -16,7 +16,7 @@ import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 
-class RealShoppingCartRepositoryImpl(
+class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
 

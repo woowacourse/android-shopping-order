@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -30,7 +30,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         val viewModelFactory =
             ViewModelFactory {
                 ShoppingCartViewModel(
-                    shoppingCartRepository = RealShoppingCartRepositoryImpl(),
+                    shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
                 )
             }
         viewModelFactory.create(ShoppingCartViewModel::class.java)

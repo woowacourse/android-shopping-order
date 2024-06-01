@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.real
+package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
@@ -9,7 +9,7 @@ import woowacourse.shopping.utils.DtoMapper.toProducts
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
 
-class RealProductRepositoryImpl(
+class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
     override fun loadPagingProducts(offset: Int): List<Product> {
