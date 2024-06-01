@@ -2,10 +2,10 @@ package woowacourse.shopping.domain.repository
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.cart.CartItemDataSource
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.product.DefaultProductRepository
+import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture

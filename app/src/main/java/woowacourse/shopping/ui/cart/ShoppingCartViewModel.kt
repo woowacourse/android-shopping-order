@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,8 +9,8 @@ import woowacourse.shopping.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.SingleLiveData
 import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener

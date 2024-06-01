@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +16,7 @@ import woowacourse.shopping.ui.cart.adapter.CartItemAdapter
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
-    private val binding
-        get() =
-            _binding
-                ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+    private val binding get() = _binding ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
 
@@ -84,7 +80,6 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeDeletedItem() {
         viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
-            Log.d("fragment", "$productId")
             viewModel.deleteItem(productId)
         }
     }
@@ -101,7 +96,6 @@ class ShoppingCartFragment : Fragment() {
     private fun observeOrderNavigation() {
         viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
             if (orderItemsIds.isNotEmpty()) {
-                Log.d(TAG, "observeOrderNavigation: orderItemsIds: $orderItemsIds")
                 (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderItemsIds)
             }
         }
