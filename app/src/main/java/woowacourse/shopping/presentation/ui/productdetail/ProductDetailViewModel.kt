@@ -37,13 +37,12 @@ class ProductDetailViewModel(
         thread {
             productRepository.findCartByProductId(id).onSuccess { cart ->
                 hideError()
-                _uiState.value?.let { state ->
-                    if (state.isLastProductPage) {
-                        _uiState.postValue(state.copy(cart = cart))
-                        insertProductHistory(cart.product)
-                    } else {
-                        getProductHistory(cart)
-                    }
+                val state = _uiState.value ?: return@onSuccess
+                if (state.isLastProductPage) {
+                    _uiState.postValue(state.copy(cart = cart))
+                    insertProductHistory(cart.product)
+                } else {
+                    getProductHistory(cart)
                 }
             }.onFailure { e ->
                 showError(e)
@@ -90,21 +89,17 @@ class ProductDetailViewModel(
     }
 
     fun addToCart() {
-        _uiState.value?.let { state ->
-            state.cart?.let { cart ->
-
-                thread {
-                    if (cart.id == Cart.DEFAULT_CART_ID) {
-                        insertCart(cart)
-                    } else {
-                        updateCart(cart)
-                    }
-                }
+        val cart = uiState.value?.cart ?: return
+        thread {
+            if (cart.id == Cart.EMPTY_CART_ID) {
+                insertCart(cart)
+            } else {
+                updateCart(cart)
             }
         }
     }
 
-    fun insertCart(cart: Cart) {
+    private fun insertCart(cart: Cart) {
         shoppingCartRepository.postCartItem(
             productId = cart.product.id,
             quantity = cart.quantity,
@@ -117,7 +112,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun updateCart(cart: Cart) {
+    private fun updateCart(cart: Cart) {
         shoppingCartRepository.patchCartItem(
             cartId = cart.id,
             quantity = cart.quantity,
@@ -134,10 +129,9 @@ class ProductDetailViewModel(
         productId: Long,
         position: Int,
     ) {
-        _uiState.value?.let { state ->
-            state.cart?.let { product ->
-                _uiState.value = state.copy(cart = product.copy(quantity = product.quantity + 1))
-            }
+        val state = uiState.value ?: return
+        state.cart?.let { product ->
+            _uiState.value = state.copy(cart = product.copy(quantity = product.quantity + 1))
         }
     }
 
@@ -145,10 +139,9 @@ class ProductDetailViewModel(
         productId: Long,
         position: Int,
     ) {
-        _uiState.value?.let { state ->
-            state.cart?.let { product ->
-                _uiState.value = state.copy(cart = product.copy(quantity = product.quantity - 1))
-            }
+        val state = uiState.value ?: return
+        state.cart?.let { product ->
+            _uiState.value = state.copy(cart = product.copy(quantity = product.quantity - 1))
         }
     }
 
@@ -170,11 +163,10 @@ class ProductDetailViewModel(
     }
 
     fun refresh(productId: Long) {
-        _uiState.value?.let { state ->
-            _uiState.value = state.copy(isLastProductPage = true)
-            id = productId
-            getProduct()
-        }
+        val state = uiState.value ?: return
+        _uiState.value = state.copy(isLastProductPage = true)
+        id = productId
+        getProduct()
     }
 
     companion object {

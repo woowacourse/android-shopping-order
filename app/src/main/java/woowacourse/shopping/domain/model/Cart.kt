@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Cart(
-    val id: Int = DEFAULT_CART_ID,
+    val id: Int = EMPTY_CART_ID,
     val quantity: Int = INIT_QUANTITY_NUM,
     val product: Product,
 ) : Parcelable {
@@ -13,7 +13,7 @@ data class Cart(
         get() = product.price * quantity
 
     companion object {
-        const val DEFAULT_CART_ID = -1
+        const val EMPTY_CART_ID = -1
         const val INIT_QUANTITY_NUM = 0
     }
 }
