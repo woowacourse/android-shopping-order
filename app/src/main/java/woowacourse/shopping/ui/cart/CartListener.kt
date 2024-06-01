@@ -13,6 +13,4 @@ interface CartListener {
     )
 
     fun selectAllCartItem(isChecked: Boolean)
-
-    fun navigateCartRecommend()
 }

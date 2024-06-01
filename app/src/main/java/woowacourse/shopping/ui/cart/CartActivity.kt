@@ -40,7 +40,6 @@ class CartActivity : AppCompatActivity() {
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.listener = viewModel
 
         cartSelectionFragment = createFragment(CartSelectionFragment::class)
         cartRecommendFragment = createFragment(CartRecommendFragment::class)

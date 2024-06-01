@@ -29,6 +29,8 @@ class CartViewModel(
     private val _totalPrice = MutableLiveData<Int>()
     val totalPrice: LiveData<Int> get() = _totalPrice
 
+    val isEnabledOrder: LiveData<Boolean> = _totalPrice.map { it != 0 }
+
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
@@ -45,11 +47,7 @@ class CartViewModel(
     private val _navigateEvent = MutableLiveData<Event<Unit>>()
     val navigateEvent: LiveData<Event<Unit>> get() = _navigateEvent
 
-    private val _checkboxVisibility = MutableLiveData<Boolean>(true)
-    val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
-
-    private val _orderButtonEnabled = MutableLiveData<Boolean>(false)
-    val orderButtonEnabled: LiveData<Boolean> get() = _orderButtonEnabled
+    val checkboxVisibility: LiveData<Boolean> = _navigateEvent.map { false }
 
     private val _totalQuantity = MutableLiveData<Int>()
     val totalQuantity: LiveData<Int> get() = _totalQuantity
@@ -95,7 +93,6 @@ class CartViewModel(
                 .filter { it.isSelected }
                 .sumOf { it.totalPrice() }
         _totalPrice.value = totalPrice
-        _orderButtonEnabled.value = totalPrice != 0
     }
 
     private fun loadProduct(cartItem: CartItem) {
@@ -277,9 +274,8 @@ class CartViewModel(
         }
     }
 
-    override fun navigateCartRecommend() {
+    fun navigateCartRecommend() {
         _navigateEvent.postValue(Event(Unit))
-        _checkboxVisibility.value = false
     }
 
     fun loadRecommendProductUiModels() {
