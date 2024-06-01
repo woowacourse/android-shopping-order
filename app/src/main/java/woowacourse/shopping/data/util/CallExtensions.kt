@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.util
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.HttpException
 import retrofit2.Response
+import timber.log.Timber
 
 /***
  * execute 함수를 호출하여 Call 객체를 Result 객체로 변환하는 확장 함수
@@ -30,12 +30,12 @@ inline fun <reified T> Call<T>.executeAsResult(): Result<T> {
     } catch (e: Exception) {
         when (e) {
             is HttpException -> {
-                Log.e("HttpException", e.message())
+                Timber.e("HttpException", e.message())
                 Result.failure(e)
             }
 
             else -> {
-                Log.e("UNKNOWNException", e.stackTraceToString())
+                Timber.e("UnKnownException", e.stackTraceToString())
                 Result.failure(e)
             }
         }
