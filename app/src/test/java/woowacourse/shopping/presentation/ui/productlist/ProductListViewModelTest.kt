@@ -8,14 +8,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.getOrAwaitValue
+import woowacourse.shopping.remote.api.DummyData.CARTS
+import woowacourse.shopping.remote.api.DummyData.PRODUCTS
 import woowacourse.shopping.remote.api.DummyData.PRODUCT_LIST
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @ExtendWith(MockKExtension::class, InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
@@ -33,11 +34,13 @@ class ProductListViewModelTest {
     @BeforeEach
     fun setUp() {
         every { productRepository.getPagingProduct(0, 20) } returns
-            Result.success(PRODUCT_LIST.subList(0, 20).map { it.toDomain() })
+            Result.success(PRODUCTS.copy(content = PRODUCTS.content.subList(0, 20)))
         every { productRepository.getPagingProduct(1, 20) } returns
-            Result.success(PRODUCT_LIST.subList(20, 40).map { it.toDomain() })
+            Result.success(PRODUCTS.copy(content = PRODUCTS.content.subList(20, 40)))
+
+        every { shoppingCartRepository.getAllCarts() } returns Result.success(CARTS)
         every { productHistoryRepository.getProductHistory(any()) } returns Result.success(emptyList())
-        every { shoppingCartRepository.getAllCartProducts() } returns Result.success(emptyList())
+        every { shoppingCartRepository.getCartItemsCount() } returns Result.success(0)
 
         viewModel =
             ProductListViewModel(
@@ -46,8 +49,7 @@ class ProductListViewModelTest {
                 productHistoryRepository,
             )
 
-        val latch = CountDownLatch(1)
-        latch.await(1, TimeUnit.SECONDS)
+        Thread.sleep(3000)
     }
 
     @Test
@@ -56,21 +58,20 @@ class ProductListViewModelTest {
         val actual = viewModel.uiState.getOrAwaitValue()
 
         assertThat(actual.pagingCart.cartList).isEqualTo(
-            PRODUCT_LIST.subList(0, 20).map { it.toDomain() },
+            PRODUCTS.content.subList(0, 20).map { Cart(product = it) },
         )
     }
 
     @Test
     fun `더보기 버튼을 눌렀을 때 상품을 더 불러온다`() {
         // when
-        every { shoppingCartRepository.getAllCartProducts() } returns Result.success(emptyList())
         viewModel.loadMoreProducts()
         Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
         assertThat(actual.pagingCart.cartList).isEqualTo(
-            PRODUCT_LIST.subList(0, 40).map { it.toDomain() },
+            PRODUCTS.content.subList(0, 40).map { Cart(product = it) },
         )
     }
 
@@ -86,5 +87,27 @@ class ProductListViewModelTest {
         val actual = viewModel.navigateAction.getOrAwaitValue()
         val expected = ProductListNavigateAction.NavigateToProductDetail(productList.first().id)
         assertThat(actual.value).isEqualTo(expected)
+    }
+
+    @Test
+    fun `상품을 장바구니에 추가한다`() {
+        // given
+        val productList = PRODUCT_LIST.subList(0, 20)
+        val cartItemId = CartItemId(1)
+
+        every {
+            shoppingCartRepository.postCartItem(
+                productList.first().id,
+                1,
+            )
+        } returns Result.success(cartItemId)
+
+        // when
+        viewModel.plusProductQuantity(productList.first().id, 0)
+        Thread.sleep(3000)
+
+        // then
+        val actual = viewModel.uiState.getOrAwaitValue()
+        assertThat(actual.pagingCart.cartList.first().id).isEqualTo(cartItemId.id)
     }
 }
