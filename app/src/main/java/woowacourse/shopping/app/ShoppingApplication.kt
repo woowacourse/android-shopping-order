@@ -62,12 +62,14 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         authProvider.apply {
-            name = "junjange"
-            password = "password"
+            name = NAME
+            password = PASSWORD
         }
     }
 
     companion object {
+        private const val NAME = "haeum808"
+        private const val PASSWORD = "password"
         const val BASE_URL = "http://54.180.95.212:8080"
     }
 }
