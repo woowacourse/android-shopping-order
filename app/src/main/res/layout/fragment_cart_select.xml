@@ -36,11 +36,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/holder_cart_product" />
 
-        <include
-            layout="@layout/include_skeleton_cart_product_list"
-            android:visibility="@{vm.loading == LoadingProvider.SKELETON_LOADING ? View.VISIBLE : View.GONE}"
-            tools:visibility="gone" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,7 +59,7 @@
             android:text="@string/tv_pre_page_title"
             android:textColor="@color/white"
             android:textSize="19dp"
-            android:visibility="@{vm.showPageIndicator() == true ? View.VISIBLE : View.GONE}"
+            android:visibility="@{vm.uiState.showPageIndicator == true ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="@+id/tv_page"
             app:layout_constraintEnd_toStartOf="@+id/tv_page"
@@ -79,7 +74,7 @@
             android:textColor="@color/gray5"
             android:textSize="22dp"
             android:textStyle="bold"
-            android:visibility="@{vm.showPageIndicator() == true ? View.VISIBLE : View.GONE}"
+            android:visibility="@{vm.uiState.showPageIndicator == true ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +82,7 @@
 
         <Button
             android:id="@+id/tv_next_page"
-            android:visibility="@{vm.showPageIndicator() == true ? View.VISIBLE : View.GONE}"
+            android:visibility="@{vm.uiState.showPageIndicator == true ? View.VISIBLE : View.GONE}"
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:layout_marginStart="16dp"
@@ -168,6 +163,10 @@
             app:layout_constraintTop_toBottomOf="@+id/cb_select_all" />
 
 
+        <include
+            layout="@layout/include_skeleton_cart_product_list"
+            android:visibility="@{vm.loading == LoadingProvider.SKELETON_LOADING ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

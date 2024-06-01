@@ -14,6 +14,8 @@ data class CartSelectUiState(
     val isAllChecked get() = totalElements == orderCarts.size
 
     val totalQuantity get() = orderCarts.sumOf { it.quantity }
+
+    val showPageIndicator: Boolean get() = !(pagingCartProduct.currentPage == 0 && pagingCartProduct.last)
 }
 
 data class PagingCartProduct(

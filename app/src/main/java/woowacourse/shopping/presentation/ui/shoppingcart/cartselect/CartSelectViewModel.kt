@@ -33,14 +33,16 @@ class CartSelectViewModel(
     private val shoppingCartPagingSource = ShoppingCartPagingSource(shoppingRepository)
 
     init {
-        loadCartProducts(INIT_PAGE)
+        thread {
+            showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
+            loadCartProducts(INIT_PAGE)
+            Thread.sleep(1000)
+            hideLoading()
+        }
     }
 
     private fun loadCartProducts(page: Int) {
         thread {
-            showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
-            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
-
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
                 loadedCartProducts(pagingCartProduct)
@@ -48,8 +50,6 @@ class CartSelectViewModel(
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
-
-            hideLoading()
         }
     }
 
@@ -269,15 +269,6 @@ class CartSelectViewModel(
             _navigateAction.emit(
                 CartSelectNavigateAction.NavigateToRecommend(orderCartProducts = state.orderCarts),
             )
-        }
-    }
-
-    fun showPageIndicator(): Boolean {
-        val state = uiState.value ?: return false
-        return if (loading.value == LoadingProvider.SKELETON_LOADING) {
-            false
-        } else {
-            !(state.pagingCartProduct.currentPage == 0 && state.pagingCartProduct.last)
         }
     }
 
