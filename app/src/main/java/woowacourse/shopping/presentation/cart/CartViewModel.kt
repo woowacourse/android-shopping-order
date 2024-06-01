@@ -27,8 +27,8 @@ class CartViewModel(
     }
 
     override fun increaseProductCount(id: Long) {
-        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
         val uiState = _uiState.value ?: return
+        val product = uiState.findProductAtCurrentPage(id) ?: return
         cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
             val newUiState = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
             updateUiState(newUiState)
