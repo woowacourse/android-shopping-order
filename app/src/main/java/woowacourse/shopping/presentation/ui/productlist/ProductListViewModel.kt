@@ -19,7 +19,7 @@ import woowacourse.shopping.presentation.ui.productlist.adapter.ProductListPagin
 import kotlin.concurrent.thread
 
 class ProductListViewModel(
-    private val productRepository: ProductRepository,
+    productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val productHistoryRepository: ProductHistoryRepository,
 ) : BaseViewModel(), ProductListActionHandler, ProductCountHandler {
@@ -107,31 +107,30 @@ class ProductListViewModel(
 
     fun updateProducts() {
         thread {
-            uiState.value?.let { state ->
-                val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
-                val updatedProductList =
-                    state.pagingCart.cartList.map { cart ->
-                        val matchingCartProduct =
-                            cartProducts?.content?.find { it.product.id == cart.product.id }
+            val state = uiState.value ?: return@thread
+            val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
+            val updatedProductList =
+                state.pagingCart.cartList.map { cart ->
+                    val matchingCartProduct =
+                        cartProducts?.content?.find { it.product.id == cart.product.id }
 
-                        cart.copy(
-                            id = matchingCartProduct?.id ?: 0,
-                            quantity = matchingCartProduct?.quantity ?: 0,
-                        )
-                    }
+                    cart.copy(
+                        id = matchingCartProduct?.id ?: 0,
+                        quantity = matchingCartProduct?.quantity ?: 0,
+                    )
+                }
 
-                val productHistories =
-                    productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = shoppingCartRepository.getCartItemsCount().getOrDefault(0)
+            val productHistories =
+                productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
+            val cartCount = shoppingCartRepository.getCartItemsCount().getOrDefault(0)
 
-                _uiState.postValue(
-                    state.copy(
-                        pagingCart = PagingCart(updatedProductList),
-                        productHistories = productHistories,
-                        cartQuantity = cartCount,
-                    ),
-                )
-            }
+            _uiState.postValue(
+                state.copy(
+                    pagingCart = PagingCart(updatedProductList),
+                    productHistories = productHistories,
+                    cartQuantity = cartCount,
+                ),
+            )
         }
     }
 
