@@ -2,19 +2,20 @@ package woowacourse.shopping.view.cart.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
 import woowacourse.shopping.view.cart.CartItemClickListener
 import woowacourse.shopping.view.cart.QuantityClickListener
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartPlaceHolderViewItem
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
 
 class CartAdapter(
     private val cartItemClickListener: CartItemClickListener,
     private val quantityClickListener: QuantityClickListener,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val cartItems: MutableList<ShoppingCartViewItem> =
-        MutableList(5) { ShoppingCartViewItem.CartPlaceHolderViewItem() }
+) : ListAdapter<ShoppingCartViewItem, RecyclerView.ViewHolder>(diffUtil) {
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -22,7 +23,7 @@ class CartAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return cartItems[position].viewType
+        return currentList[position].viewType
     }
 
     override fun onCreateViewHolder(
@@ -40,9 +41,7 @@ class CartAdapter(
         }
         return CartPlaceholderViewHolder(
             ItemCartPlaceholderBinding.inflate(
-                LayoutInflater.from(
-                    parent.context,
-                ),
+                LayoutInflater.from(parent.context),
                 parent,
                 false,
             ),
@@ -53,7 +52,7 @@ class CartAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        val cartViewItem = cartItems[position]
+        val cartViewItem = currentList[position]
         if (holder is CartViewHolder) {
             holder.bind(
                 cartViewItem as CartViewItem,
@@ -63,41 +62,32 @@ class CartAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return cartItems.size
+    fun submitCartViewItems(cartItems: List<CartViewItem>) {
+        val list = if (currentList.isEmpty()) {
+            List(5) { CartPlaceHolderViewItem() }
+        } else {
+            cartItems
+        }
+        super.submitList(list)
     }
 
-    fun loadData(cartItems: List<CartViewItem>) {
-        this.cartItems.clear()
-        this.cartItems.addAll(cartItems)
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
+            override fun areContentsTheSame(
+                oldItem: ShoppingCartViewItem,
+                newItem: ShoppingCartViewItem
+            ) = oldItem == newItem
 
-        notifyDataSetChanged()
-    }
-
-    fun updateCartItemQuantity(cartItem: woowacourse.shopping.data.model.CartItem) {
-        if (!isFirstLoad()) {
-            val position =
-                cartItems.indexOfFirst { (it as CartViewItem).cartItem.cartItemId == cartItem.cartItemId }
-            if (position != -1) {
-                cartItems[position] = CartViewItem(cartItem)
-
-                notifyItemChanged(position)
+            override fun areItemsTheSame(
+                oldItem: ShoppingCartViewItem,
+                newItem: ShoppingCartViewItem
+            ): Boolean {
+                return if (oldItem is CartViewItem && newItem is CartViewItem) {
+                    oldItem.cartItem.cartItemId == newItem.cartItem.cartItemId
+                } else {
+                    oldItem.viewType == newItem.viewType
+                }
             }
         }
     }
-
-    fun updateSelection(changedItemId: Int) {
-        val position =
-            cartItems.indexOfFirst {
-                if (it is CartViewItem) {
-                    it.cartItem.cartItemId == changedItemId
-                } else {
-                    false
-                }
-            }
-        (cartItems[position] as CartViewItem).select()
-        notifyDataSetChanged()
-    }
-
-    private fun isFirstLoad() = cartItems.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }
 }

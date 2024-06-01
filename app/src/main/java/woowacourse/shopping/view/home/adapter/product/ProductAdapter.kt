@@ -20,6 +20,11 @@ class ProductAdapter(
     private val homeClickListener: HomeClickListener,
     private val quantityClickListener: QuantityClickListener,
 ) : ListAdapter<HomeViewItem, RecyclerView.ViewHolder>(diffUtil) {
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerView.itemAnimator = null
+    }
+
     override fun getItemViewType(position: Int): Int {
         return currentList[position].viewType
     }
@@ -28,12 +33,11 @@ class ProductAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             PRODUCT_PLACEHOLDER_VIEW_TYPE -> {
                 ProductPlaceholderViewHolder(
                     ItemProductPlaceholderBinding.inflate(
-                        inflater,
+                        LayoutInflater.from(parent.context),
                         parent,
                         false,
                     ),
@@ -41,11 +45,23 @@ class ProductAdapter(
             }
 
             PRODUCT_VIEW_TYPE -> {
-                ProductViewHolder(ItemProductBinding.inflate(inflater, parent, false))
+                ProductViewHolder(
+                    ItemProductBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
             }
 
             else -> {
-                LoadMoreButtonViewHolder(ItemLoadMoreButtonBinding.inflate(inflater, parent, false))
+                LoadMoreButtonViewHolder(
+                    ItemLoadMoreButtonBinding.inflate(
+                        LayoutInflater.from(
+                            parent.context
+                        ), parent, false
+                    )
+                )
             }
         }
     }
@@ -63,11 +79,11 @@ class ProductAdapter(
         }
     }
 
-    fun submitProductItems(productItems: List<ProductViewItem>, canLoadMore: Boolean) {
+    fun submitProductViewItems(productViewItems: List<ProductViewItem>, canLoadMore: Boolean) {
         val list = if (currentList.isEmpty()) {
             List(20) { ProductPlaceHolderViewItem() }
         } else {
-            if (canLoadMore) productItems + LoadMoreViewItem() else productItems
+            if (canLoadMore) productViewItems + LoadMoreViewItem() else productViewItems
         }
         super.submitList(list)
     }

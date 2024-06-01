@@ -5,8 +5,8 @@ interface CartItemClickListener {
 
     fun onDeleteButtonClick(itemId: Int)
 
-    fun onSelectChanged(
+    fun onCheckBoxClick(
         itemId: Int,
-        isSelected: Boolean,
+        isChecked: Boolean,
     )
 }

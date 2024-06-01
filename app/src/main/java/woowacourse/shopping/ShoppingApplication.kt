@@ -17,7 +17,18 @@ import woowacourse.shopping.data.remote.RemoteProductDataSource
 class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        val retrofit = createRetrofit()
+        val productService = retrofit.create(ProductService::class.java)
+        val cartService = retrofit.create(CartService::class.java)
+        val orderService = retrofit.create(OrderService::class.java)
 
+        remoteCartDataSource = RemoteCartDataSource(cartService)
+        remoteProductDataSource = RemoteProductDataSource(productService)
+        remoteOrderDataSource = RemoteOrderDataSource(orderService)
+        recentProductDatabase = RecentProductDatabase.getInstance(this)
+    }
+
+    private fun createRetrofit(): Retrofit {
         val logging =
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
@@ -34,15 +45,7 @@ class ShoppingApplication : Application() {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
-
-        val productService = retrofit.create(ProductService::class.java)
-        val cartService = retrofit.create(CartService::class.java)
-        val orderService = retrofit.create(OrderService::class.java)
-
-        remoteCartDataSource = RemoteCartDataSource(cartService)
-        remoteProductDataSource = RemoteProductDataSource(productService)
-        remoteOrderDataSource = RemoteOrderDataSource(orderService)
-        recentProductDatabase = RecentProductDatabase.getInstance(this)
+        return retrofit
     }
 
     companion object {

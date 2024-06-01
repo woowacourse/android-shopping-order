@@ -64,11 +64,9 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         binding.rvProductList.layoutManager = layoutManager
-        binding.rvProductList.itemAnimator = null
 
         recentProductAdapter = RecentProductAdapter(viewModel)
         binding.rvRecentProducts.adapter = recentProductAdapter
-        binding.rvRecentProducts.itemAnimator = null
     }
 
     private fun observeViewModel() {
@@ -101,7 +99,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.submitProductItems(data, viewModel.canLoadMore.value ?: false)
+        productAdapter.submitProductViewItems(data.toList(), viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {

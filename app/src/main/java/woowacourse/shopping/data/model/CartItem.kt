@@ -7,6 +7,9 @@ data class CartItem(
     @SerializedName("quantity") val quantity: Int,
     @SerializedName("product") val product: Product,
 ) {
+    val totalPrice: Int
+        get() = product.price * quantity
+
     fun plusQuantity(): CartItem {
         return copy(quantity = quantity + 1)
     }
@@ -14,8 +17,6 @@ data class CartItem(
     fun minusQuantity(): CartItem {
         return copy(quantity = (this.quantity - 1).coerceAtLeast(DEFAULT_QUANTITY))
     }
-
-    fun totalPrice(): Int = product.price * quantity
 
     companion object {
         const val DEFAULT_QUANTITY = 1

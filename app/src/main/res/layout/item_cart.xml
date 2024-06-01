@@ -32,7 +32,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
-            android:onCheckedChanged="@{(view, isChecked) -> cartItemClickListener.onSelectChanged(cartViewItem.cartItem.cartItemId, isChecked)}"
+            android:onCheckedChanged="@{(view, isChecked) -> cartItemClickListener.onCheckBoxClick(cartViewItem.cartItem.cartItemId, isChecked)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:checked="true" />
@@ -41,7 +41,6 @@
             android:id="@+id/tv_product_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:layout_marginLeft="8dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -77,7 +76,7 @@
             android:textSize="16dp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_cart"
             app:layout_constraintEnd_toEndOf="parent"
-            app:price="@{cartViewItem.cartItem.totalPrice()}"
+            app:price="@{cartViewItem.cartItem.totalPrice}"
             tools:text="10,000원" />
 
         <include

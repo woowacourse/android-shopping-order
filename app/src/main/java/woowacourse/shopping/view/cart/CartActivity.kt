@@ -24,9 +24,9 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderRepository =
-                OrderRepositoryImpl(
-                    remoteOrderDataSource,
-                ),
+            OrderRepositoryImpl(
+                remoteOrderDataSource,
+            ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
         )
@@ -40,13 +40,7 @@ class CartActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-        replaceFragment(cartFragment)
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
-            replace(R.id.fragment_cart, fragment)
-        }
+        addFragment()
     }
 
     private fun setUpDataBinding() {
@@ -55,20 +49,32 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.isBackButtonClicked.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.isBackButtonClicked.observe(this) { back ->
+            back.getContentIfNotHandled()?.let {
                 finish()
             }
         }
-        viewModel.navigateBack.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.navigateToBack.observe(this) { navigateToBack ->
+            navigateToBack.getContentIfNotHandled()?.let {
                 finish()
             }
         }
-        viewModel.navigateToRecommend.observe(this) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.navigateToRecommend.observe(this) { navigateToRecommend ->
+            navigateToRecommend.getContentIfNotHandled()?.let {
                 replaceFragment(recommendFragment)
             }
+        }
+    }
+
+    private fun addFragment() {
+        supportFragmentManager.commit {
+            replace(R.id.fragment_cart, cartFragment)
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.commit {
+            replace(R.id.fragment_cart, fragment)
         }
     }
 

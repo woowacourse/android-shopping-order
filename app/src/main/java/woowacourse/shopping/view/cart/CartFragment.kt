@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.view.cart.adapter.CartAdapter
-import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem
+import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.state.UiState
 
@@ -40,7 +40,7 @@ class CartFragment : Fragment() {
         viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
-                is UiState.Loading -> return@observe
+                is UiState.Loading -> showData(emptyList())
                 is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
@@ -52,18 +52,11 @@ class CartFragment : Fragment() {
                 navigateToDetail(productId)
             }
         }
-        viewModel.updatedCartItem.observe(viewLifecycleOwner) { cartItem ->
-            adapter.updateCartItemQuantity(cartItem)
-        }
 
         viewModel.notifyDeletion.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let {
                 alertDeletion()
             }
-        }
-
-        viewModel.selectChangeId.observe(viewLifecycleOwner) {
-            adapter.updateSelection(it)
         }
     }
 
@@ -71,8 +64,8 @@ class CartFragment : Fragment() {
         startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    private fun showData(data: List<ShoppingCartViewItem.CartViewItem>) {
-        adapter.loadData(data)
+    private fun showData(cartViewItems: List<CartViewItem>) {
+        adapter.submitCartViewItems(cartViewItems.toList())
     }
 
     private fun showError(errorMessage: String) {
@@ -86,7 +79,6 @@ class CartFragment : Fragment() {
     private fun setUpAdapter() {
         adapter = CartAdapter(viewModel, viewModel)
         binding.rvCart.adapter = adapter
-        binding.rvCart.itemAnimator = null
     }
 
     companion object {

@@ -5,7 +5,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.model.CartItem
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -41,21 +40,13 @@ class CartViewModel(
     val navigateToRecommend: LiveData<Event<Unit>>
         get() = _navigateToRecommend
 
-    private val _navigateBack = MutableLiveData<Event<Unit>>()
-    val navigateBack: LiveData<Event<Unit>>
-        get() = _navigateBack
+    private val _navigateToBack = MutableLiveData<Event<Unit>>()
+    val navigateToBack: LiveData<Event<Unit>>
+        get() = _navigateToBack
 
     private val _notifyDeletion = MutableLiveData<Event<Boolean>>()
     val notifyDeletion: LiveData<Event<Boolean>>
         get() = _notifyDeletion
-
-    private val _updatedCartItem = MutableLiveData<CartItem>()
-    val updatedCartItem: LiveData<CartItem>
-        get() = _updatedCartItem
-
-    private val _selectChangeId = MutableLiveData<Int>()
-    val selectChangeId: LiveData<Int>
-        get() = _selectChangeId
 
     private val _totalPrice = MutableLiveData(0)
     val totalPrice: LiveData<Int>
@@ -116,7 +107,7 @@ class CartViewModel(
         _cartUiState.value = UiState.Success(cartItems)
         _totalPrice.value =
             selectedItems.value?.sumOf { item ->
-                item.cartItem.totalPrice()
+                item.cartItem.totalPrice
             }
     }
 
@@ -125,13 +116,13 @@ class CartViewModel(
             _selectedItems.value = cartItems
             _totalPrice.value =
                 selectedItems.value?.sumOf { item ->
-                    item.cartItem.totalPrice()
+                    item.cartItem.totalPrice
                 }
         } else {
             _selectedItems.value = mutableListOf()
             _totalPrice.value =
                 selectedItems.value?.sumOf { item ->
-                    item.cartItem.totalPrice()
+                    item.cartItem.totalPrice
                 }
         }
     }
@@ -149,27 +140,27 @@ class CartViewModel(
         _notifyDeletion.value = Event(true)
     }
 
-    override fun onSelectChanged(
+    override fun onCheckBoxClick(
         itemId: Int,
-        isSelected: Boolean,
+        isChecked: Boolean,
     ) {
         val cartItem = cartItems.firstOrNull { it.cartItem.cartItemId == itemId } ?: return
-        if (selectedItems.value?.contains(cartItem) == false && isSelected) {
+        cartItem.check()
+        if (selectedItems.value?.contains(cartItem) == false && isChecked) {
             _selectedItems.value = selectedItems.value?.plus(cartItem)
         } else {
             _selectedItems.value = selectedItems.value?.minus(cartItem)
         }
-        _selectChangeId.value = itemId
+        _cartUiState.value = UiState.Success(cartItems)
         _totalPrice.value =
             selectedItems.value?.sumOf { item ->
-                item.cartItem.totalPrice()
+                item.cartItem.totalPrice
             }
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
         var targetCartItem =
             cartItems.firstOrNull { it.cartItem.product.productId == productId } ?: return
-        // TODO
         targetCartItem =
             targetCartItem.copy(
                 cartItem = targetCartItem.cartItem.plusQuantity(),
@@ -187,10 +178,10 @@ class CartViewModel(
             targetCartItem.cartItem.cartItemId,
             targetCartItem.cartItem.quantity,
         )
-        _updatedCartItem.value = targetCartItem.cartItem
+        _cartUiState.value = UiState.Success(cartItems)
         _totalPrice.value =
             selectedItems.value?.sumOf { item ->
-                item.cartItem.totalPrice()
+                item.cartItem.totalPrice
             }
     }
 
@@ -214,10 +205,10 @@ class CartViewModel(
             targetCartItem.cartItem.cartItemId,
             targetCartItem.cartItem.quantity,
         )
-        _updatedCartItem.value = targetCartItem.cartItem
+        _cartUiState.value = UiState.Success(cartItems)
         _totalPrice.value =
             selectedItems.value?.sumOf { item ->
-                item.cartItem.totalPrice()
+                item.cartItem.totalPrice
             }
     }
 
@@ -233,7 +224,7 @@ class CartViewModel(
                         it.cartItem.cartItemId
                     } ?: emptyList(),
                 ).getOrNull()
-            if (result != null) _navigateBack.value = Event(Unit)
+            if (result != null) _navigateToBack.value = Event(Unit)
         }
     }
 
