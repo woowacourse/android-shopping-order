@@ -7,18 +7,28 @@
     android:layout_margin="12dp"
     android:background="@color/shimmer_background_color">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="150dp"
-        android:layout_height="18dp"
+    <View
+        android:id="@+id/shimmer_cart_item_checkbox"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_marginStart="12dp"
-        android:background="@color/shimmer_content_color"
         android:layout_marginTop="18dp"
+        android:background="@color/shimmer_content_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <TextView
+        android:id="@+id/shimmer_cart_item_product_name"
+        android:layout_width="100dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:background="@color/shimmer_content_color"
+        android:layout_marginTop="18dp"
+        app:layout_constraintStart_toEndOf="@id/shimmer_cart_item_checkbox"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/shimmer_item_product_image"
         android:layout_width="136dp"
         android:layout_height="72dp"
         android:layout_marginTop="20dp"
@@ -26,25 +36,25 @@
         android:background="@color/shimmer_content_color"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintStart_toStartOf="@+id/shimmer_cart_item_checkbox"
+        app:layout_constraintTop_toBottomOf="@+id/shimmer_cart_item_product_name" />
 
     <ImageView
-        android:id="@+id/btn_quantity"
+        android:id="@+id/shimmer_btn_quantity"
         android:layout_width="126dp"
         android:layout_height="42dp"
         android:background="@color/shimmer_content_color"
         android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@id/tv_item_cart_price"
-        app:layout_constraintEnd_toEndOf="@id/tv_item_cart_price" />
+        app:layout_constraintBottom_toTopOf="@id/shimmer_cart_item_price"
+        app:layout_constraintEnd_toEndOf="@id/shimmer_cart_item_price" />
 
     <TextView
-        android:id="@+id/tv_item_cart_price"
+        android:id="@+id/shimmer_cart_item_price"
         android:layout_width="80dp"
-        android:layout_height="16dp"
+        android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@color/shimmer_content_color"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintBottom_toBottomOf="@+id/shimmer_item_product_image"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
