@@ -11,13 +11,6 @@ data class ProductDetailUiState(
         get() =
             (recentProduct != null) &&
                 (cartProduct.product.id != recentProduct.id)
-
-    fun increaseProductCount(amount: Int): ProductDetailUiState = copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
-
-    fun decreaseProductCount(amount: Int): ProductDetailUiState = copy(cartProduct = cartProduct.copy(count = cartProduct.count - amount))
-
-    fun canDecreaseProductCount(): Boolean = cartProduct.count > 1
-
     companion object {
         fun init(): ProductDetailUiState =
             ProductDetailUiState(

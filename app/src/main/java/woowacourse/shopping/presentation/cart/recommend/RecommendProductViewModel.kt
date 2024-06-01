@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.RecommendProductsUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
-import woowacourse.shopping.presentation.cart.CartErrorEvent
 import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.shopping.toCartUiModel
@@ -112,3 +111,41 @@ class RecommendProductViewModel(
         }
     }
 }
+
+private fun RecommendOrderUiState.increaseProductCount(
+    productId: Long,
+    amount: Int,
+): RecommendOrderUiState =
+    copy(
+        recommendProducts =
+        recommendProducts.map {
+            if (it.product.id == productId) {
+                it.copy(count = it.count + amount)
+            } else {
+                it
+            }
+        },
+    )
+
+private fun RecommendOrderUiState.decreaseProductCount(
+    productId: Long,
+    amount: Int,
+): RecommendOrderUiState {
+    val newProducts =
+        recommendProducts.map {
+            if (it.product.id == productId) {
+                it.copy(count = it.count - amount)
+            } else {
+                it
+            }
+        }
+    return copy(recommendProducts = newProducts)
+}
+
+private fun RecommendOrderUiState.shouldDeleteFromCart(productId: Long): Boolean {
+    val product = findProduct(productId) ?: return false
+    return product.count <= 1
+}
+
+private fun RecommendOrderUiState.findProduct(productId: Long): CartProductUi? =
+    recommendProducts.find { it.product.id == productId }

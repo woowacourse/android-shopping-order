@@ -119,3 +119,11 @@ class ProductDetailViewModel(
         }
     }
 }
+
+private fun ProductDetailUiState.increaseProductCount(amount: Int): ProductDetailUiState =
+    copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
+
+private fun ProductDetailUiState.decreaseProductCount(amount: Int): ProductDetailUiState =
+    copy(cartProduct = cartProduct.copy(count = cartProduct.count - amount))
+
+private fun ProductDetailUiState.canDecreaseProductCount(): Boolean = cartProduct.count > 1
