@@ -85,7 +85,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun setCartAdapter() {
         binding.rvCart.itemAnimator = null
-        adapter = CartAdapter(viewModel)
+        adapter = CartAdapter(viewModel, viewModel)
         binding.rvCart.adapter = adapter
     }
 

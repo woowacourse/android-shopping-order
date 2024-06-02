@@ -4,11 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
+import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartUiModel
-import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 
 class CartAdapter(
-    private val viewModel: CartViewModel,
+    private val cartItemClickListener: CartItemClickListener,
+    private val countButtonClickListener: CountButtonClickListener,
 ) : ListAdapter<CartUiModel, CartViewHolder>(CartDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -17,7 +19,8 @@ class CartAdapter(
         val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CartViewHolder(
             binding,
-            viewModel,
+            cartItemClickListener,
+            countButtonClickListener,
         )
     }
 

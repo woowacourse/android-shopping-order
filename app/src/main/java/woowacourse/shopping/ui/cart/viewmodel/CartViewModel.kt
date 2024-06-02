@@ -13,6 +13,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
 import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
@@ -23,7 +24,7 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), CountButtonClickListener, AddCartClickListener {
+) : ViewModel(), CountButtonClickListener, AddCartClickListener, CartItemClickListener {
     private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
 
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
@@ -88,6 +89,24 @@ class CartViewModel(
         }
     }
 
+    override fun removeCartItem(productId: Long) {
+        cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
+            updateCartLiveData()
+        }.onFailure {
+            error.setValue(it)
+        }
+    }
+
+    override fun clickCheckBox(productId: Long) {
+        val checkedCart =
+            _cart.value?.cartItems?.firstOrNull { it.productId == productId }
+                ?: error("해당하는 카트 아이템이 없습니다.")
+        val currentList = requireNotNull(_cart.value?.cartItems?.toMutableList())
+        currentList[currentList.indexOf(checkedCart)] =
+            checkedCart.copy(isChecked = !checkedCart.isChecked)
+        _cart.value = CartItemsUiState(currentList, isLoading = false)
+    }
+
     fun loadRecommendProducts() {
         recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
             productRepository.find(recentProduct.id).onSuccess { product ->
@@ -120,24 +139,6 @@ class CartViewModel(
         val recommends =
             _products.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
         return carts + recommends
-    }
-
-    fun removeCartItem(productId: Long) {
-        cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
-            updateCartLiveData()
-        }.onFailure {
-            error.setValue(it)
-        }
-    }
-
-    fun clickCheckBox(productId: Long) {
-        val checkedCart =
-            _cart.value?.cartItems?.firstOrNull { it.productId == productId }
-                ?: error("해당하는 카트 아이템이 없습니다.")
-        val currentList = requireNotNull(_cart.value?.cartItems?.toMutableList())
-        currentList[currentList.indexOf(checkedCart)] =
-            checkedCart.copy(isChecked = !checkedCart.isChecked)
-        _cart.value = CartItemsUiState(currentList, isLoading = false)
     }
 
     fun totalCheckBoxCheck(isChecked: Boolean) {
