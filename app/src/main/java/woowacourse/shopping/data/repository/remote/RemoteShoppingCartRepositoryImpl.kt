@@ -13,8 +13,9 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.DtoMapper.toCartItems
 import woowacourse.shopping.utils.DtoMapper.toQuantity
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
+import woowacourse.shopping.view.model.event.ErrorEvent
 
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
@@ -28,7 +29,7 @@ class RemoteShoppingCartRepositoryImpl(
                     product.cartItemCounter.itemCount,
                 ).execute()
             if (!response.isSuccessful) {
-                throw NoSuchDataException()
+                throw OrderException(ErrorEvent.CartEvent.AddCartEvent)
             }
         }
     }
@@ -46,15 +47,15 @@ class RemoteShoppingCartRepositoryImpl(
                 cartItems = response.body()?.toCartItems()
             }
         }
-        if (cartItems.isNullOrEmpty()) throw NoSuchDataException()
-        return cartItems ?: throw NoSuchDataException()
+        if (cartItems.isNullOrEmpty()) throw OrderException(ErrorEvent.LoadEvent.MaxPagingDataEvent)
+        return cartItems ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
     }
 
     override fun deleteCartItem(itemId: Long) {
         executeWithLatch {
             val response = cartItemDataSource.deleteCartItem(itemId.toInt()).execute()
             if (!response.isSuccessful) {
-                throw NoSuchDataException()
+                throw OrderException(ErrorEvent.CartEvent.DeleteCartEvent)
             }
         }
     }
@@ -111,7 +112,7 @@ class RemoteShoppingCartRepositoryImpl(
                 }
             }
         }
-        return result ?: throw NoSuchDataException()
+        return result ?: throw OrderException(ErrorEvent.CartEvent.UpdateCartEvent)
     }
 
     private fun increaseItem(
@@ -131,7 +132,7 @@ class RemoteShoppingCartRepositoryImpl(
                     quantity = cartItemResult.counter.itemCount,
                 ).execute()
             if (!response.isSuccessful) {
-                throw NoSuchDataException()
+                throw OrderException()
             }
         }
     }
@@ -143,10 +144,10 @@ class RemoteShoppingCartRepositoryImpl(
             if (response.isSuccessful && response.body() != null) {
                 cartItemCount = response.body()?.toQuantity() ?: ERROR_QUANTITY_SIZE
             } else {
-                throw NoSuchDataException()
+                throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
             }
         }
-        if (cartItemCount == ERROR_QUANTITY_SIZE) throw NoSuchDataException()
+        if (cartItemCount == ERROR_QUANTITY_SIZE) throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
         return cartItemCount
     }
 

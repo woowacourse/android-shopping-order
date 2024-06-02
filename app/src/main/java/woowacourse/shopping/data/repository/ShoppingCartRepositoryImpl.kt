@@ -14,6 +14,7 @@ import woowacourse.shopping.utils.EntityMapper.toCartItem
 import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
 import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
+import woowacourse.shopping.view.model.event.ErrorEvent
 import kotlin.concurrent.thread
 
 class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
@@ -23,7 +24,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             val addedCartItemId =
                 cartItemDao.saveCartItem(CartItem(product = product).toCartItemEntity())
-            if (addedCartItemId == ERROR_DATA_ID) throw OrderException()
+            if (addedCartItemId == ERROR_DATA_ID) throw OrderException(ErrorEvent.CartEvent.AddCartEvent)
         }.join()
     }
 
@@ -35,7 +36,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             pagingData = cartItemDao.findPagingCartItem(offset, pagingSize).map { it.toCartItem() }
         }.join()
-        if (pagingData.isEmpty()) throw OrderException()
+        if (pagingData.isEmpty()) throw OrderException(ErrorEvent.LoadEvent.MaxPagingDataEvent)
         return pagingData
     }
 
@@ -44,7 +45,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             deleteId = cartItemDao.deleteCartItemById(itemId)
         }.join()
-        if (deleteId == ERROR_DELETE_DATA_ID) throw OrderException()
+        if (deleteId == ERROR_DELETE_DATA_ID) throw OrderException(ErrorEvent.CartEvent.DeleteCartEvent)
     }
 
     override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
@@ -90,7 +91,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     cartItemResult.counter.itemCount,
                 )
         }.join()
-        if (updateDataId == ERROR_UPDATE_DATA_ID) throw OrderException()
+        if (updateDataId == ERROR_UPDATE_DATA_ID) throw OrderException(ErrorEvent.CartEvent.UpdateCartEvent)
         return UpdateCartItemResult.UPDATED(cartItemResult)
     }
 

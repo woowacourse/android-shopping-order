@@ -7,7 +7,8 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.DtoMapper.toProduct
 import woowacourse.shopping.utils.DtoMapper.toProducts
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
+import woowacourse.shopping.view.model.event.ErrorEvent
 
 class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
@@ -22,7 +23,7 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw NoSuchDataException()
+        return products ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
     }
 
     override fun loadCategoryProducts(
@@ -41,7 +42,7 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw NoSuchDataException()
+        return products ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
     }
 
     override fun getProduct(productId: Long): Product {
@@ -52,7 +53,7 @@ class RemoteProductRepositoryImpl(
                 product = response.body()?.toProduct()
             }
         }
-        return product ?: throw NoSuchDataException()
+        return product ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
     }
 
     companion object {
