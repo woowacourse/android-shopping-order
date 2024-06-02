@@ -44,7 +44,7 @@ class DefaultShoppingRepository(
     }
 
     override fun productById(id: Long): Result<Product> {
-        val cachedProduct = cachedProductsById[id] ?: return productDataSource.productById(id)
+        val cachedProduct = cachedProductsById[id] ?: return productDataSource.getProductById(id)
         return Result.success(cachedProduct)
     }
 
@@ -64,7 +64,7 @@ class DefaultShoppingRepository(
             it.map { product ->
                 val cachedProduct = cachedProductsById[product.productId]
                 if (cachedProduct != null) return@map cachedProduct
-                val productResult = productDataSource.productById(product.productId)
+                val productResult = productDataSource.getProductById(product.productId)
                 if (productResult.isFailure) error("Product(id=${product.productId}) not found")
                 productResult.getOrThrow()
             }

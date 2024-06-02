@@ -51,7 +51,7 @@ class CartRepositoryImpl(
         if (count < 1) return Result.failure(IllegalArgumentException("Count(=$count) 는 0이상 이여야 합니다."))
         if (cartProductMapByProductId.containsKey(productId).not()) {
             // Create CartProduct
-            val product = productDataSource.productById(productId).getOrThrow()
+            val product = productDataSource.getProductById(productId).getOrThrow()
             return cartDataSource.createCartProduct(productId, count).onSuccess { cartId ->
                 cartProductMapByProductId[productId] = CartItemData(cartId, count, product)
             }.mapCatching { Unit }
