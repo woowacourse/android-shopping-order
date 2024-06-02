@@ -116,6 +116,7 @@ class ProductContentsViewModel(
     fun loadCartItems() {
         cartRepository.getAllCartItems().onSuccess {
             cart.value = it
+            productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
         }.onFailure {
             _error.setValue(it)
         }
@@ -134,7 +135,7 @@ class ProductContentsViewModel(
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
         productWithQuantity.value =
-            ProductWithQuantityUiState(updatedList.map { it.toUiModel() }, isLoading = true)
+            ProductWithQuantityUiState(updatedList.map { it.toUiModel() })
     }
 
     private fun getQuantity(productId: Long): Quantity {
