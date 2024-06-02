@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +12,9 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
 
+    val properties = Properties()
+    properties.load(rootProject.file("local.properties").inputStream())
+
     defaultConfig {
         applicationId = "woowacourse.shopping"
         minSdk = 26
@@ -17,9 +22,17 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "base_url", properties.getProperty("base_url"))
+        buildConfigField("String", "email", properties.getProperty("email"))
+        buildConfigField("String", "password", properties.getProperty("password"))
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     testOptions {

@@ -3,15 +3,15 @@ package woowacourse.shopping.data.database
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.domain.service.RetrofitService
-import java.util.Properties
 
 object ProductClient {
-    private val baseUrl = Properties().getProperty("base_url")
+    private const val BASE_URL = BuildConfig.base_url
 
     val client: Retrofit =
         Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(provideOkHttpClient(AppInterceptor()))
             .build()

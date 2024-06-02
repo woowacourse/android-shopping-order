@@ -3,11 +3,11 @@ package woowacourse.shopping.data.database
 import android.util.Base64
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.util.Properties
+import woowacourse.shopping.BuildConfig
 
 class AppInterceptor : Interceptor {
-    private val email = Properties().getProperty("email")
-    private val password = Properties().getProperty("password")
+    private val email = BuildConfig.email
+    private val password = BuildConfig.password
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val headString = createAuthorizationHeaderString(email, password)
