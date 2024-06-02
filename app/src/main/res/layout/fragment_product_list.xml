@@ -72,7 +72,7 @@
                 android:text="@{String.valueOf(vm.cartItemCount)}"
                 android:textColor="@color/white"
                 android:textSize="14sp"
-                android:visibility="@{vm.cartItemCount > 0 ? View.VISIBLE : View.GONE}"
+                app:visibleByItemCounter="@{vm.cartItemCount}"
                 tools:text="1" />
         </LinearLayout>
 
