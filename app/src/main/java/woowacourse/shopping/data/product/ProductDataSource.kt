@@ -9,5 +9,7 @@ interface ProductDataSource {
 
     fun isFinalPage(page: Int): Boolean
 
+    fun findByCategory(productId: Long): List<ProductData>
+
     fun shutDown(): Boolean
 }

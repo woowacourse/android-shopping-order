@@ -16,6 +16,8 @@ class OrderFragment : Fragment() {
     private lateinit var factory: UniversalViewModelFactory
     private lateinit var viewModel: OrderViewModel
 
+    private val recommendProductsAdapter: RecommendProductAdapter by lazy { RecommendProductAdapter() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -27,6 +29,11 @@ class OrderFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadRecommendedProducts()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,8 +42,15 @@ class OrderFragment : Fragment() {
         _binding = FragmentOrderBinding.inflate(inflater)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-
+        initRecommendProductsAdapter()
         return binding.root
+    }
+
+    private fun initRecommendProductsAdapter() {
+        binding.rvOrderRecommendProducts.adapter = recommendProductsAdapter
+        viewModel.recommendedProducts.observe(viewLifecycleOwner) { recommendProducts ->
+            recommendProductsAdapter.updateRecommendProducts(recommendProducts)
+        }
     }
 
     companion object {
