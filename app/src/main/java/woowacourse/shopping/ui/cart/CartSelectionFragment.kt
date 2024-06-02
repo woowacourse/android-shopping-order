@@ -23,33 +23,20 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
     ): View {
         _binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
 
-        binding.rvCart.itemAnimator = null
-        binding.rvCart.adapter = adapter
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         viewModel.loadAllCartItems()
+
         initializeView()
         return binding.root
     }
 
     private fun initializeView() {
+        binding.rvCart.itemAnimator = null
+        binding.rvCart.adapter = adapter
+
         viewModel.cartUiModels.observe(viewLifecycleOwner) {
-            if (it.isEmpty()) {
-                binding.layoutCartSkeleton.visibility = View.GONE
-                binding.rvCart.visibility = View.GONE
-                binding.tvEmptyCart.visibility = View.VISIBLE
-                return@observe
-            }
-
-            binding.layoutCartSkeleton.visibility = View.GONE
-            binding.rvCart.visibility = View.VISIBLE
-            binding.tvEmptyCart.visibility = View.GONE
             adapter.submitList(it.uiModels)
-        }
-
-        viewModel.cartLoadingEvent.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled() ?: return@observe
-            binding.layoutCartSkeleton.visibility = View.VISIBLE
-            binding.rvCart.visibility = View.GONE
-            binding.tvEmptyCart.visibility = View.GONE
         }
 
         viewModel.cartErrorEvent.observe(viewLifecycleOwner) {

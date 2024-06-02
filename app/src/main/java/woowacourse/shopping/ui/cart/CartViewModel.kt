@@ -23,8 +23,8 @@ class CartViewModel(
     private val _cartUiModels = MutableLiveData<CartUiModels>()
     val cartUiModels: LiveData<CartUiModels> get() = _cartUiModels
 
-    private val _cartLoadingEvent = MutableLiveData<Event<Unit>>()
-    val cartLoadingEvent: LiveData<Event<Unit>> get() = _cartLoadingEvent
+    private val _isLoadingCart = MutableLiveData<Boolean>()
+    val isLoadingCart: LiveData<Boolean> get() = _isLoadingCart
 
     private val _cartErrorEvent = MutableLiveData<Event<Unit>>()
     val cartErrorEvent: LiveData<Event<Unit>> get() = _cartErrorEvent
@@ -57,9 +57,10 @@ class CartViewModel(
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
     fun loadAllCartItems() {
-        _cartLoadingEvent.value = Event(Unit)
+        _isLoadingCart.value = true
         cartRepository.findAll {
             it.onSuccess { cartItems ->
+                _isLoadingCart.value = false
                 if (cartItems.isEmpty()) {
                     _cartUiModels.value = CartUiModels()
                     updateTotalQuantity()
@@ -68,6 +69,7 @@ class CartViewModel(
                 }
                 cartItems.forEach { cartItem -> loadProduct(cartItem) }
             }.onFailure {
+                _isLoadingCart.value = false
                 setError()
             }
         }

@@ -20,8 +20,8 @@ class ProductsViewModel(
     private val _productUiModels = MutableLiveData<List<ProductUiModel>>()
     val productUiModels: LiveData<List<ProductUiModel>> get() = _productUiModels
 
-    private val _productsLoadingEvent = MutableLiveData<Event<Unit>>()
-    val productsLoadingEvent: LiveData<Event<Unit>> get() = _productsLoadingEvent
+    private val _isLoadingProducts = MutableLiveData<Boolean>()
+    val isLoadingProducts: LiveData<Boolean> get() = _isLoadingProducts
 
     private val _productsErrorEvent = MutableLiveData<Event<Unit>>()
     val productsErrorEvent: LiveData<Event<Unit>> get() = _productsErrorEvent
@@ -45,17 +45,18 @@ class ProductsViewModel(
     }
 
     fun loadPage() {
-        _productsLoadingEvent.value = Event(Unit)
+        _isLoadingProducts.value = true
         productRepository.findPage(page, PAGE_SIZE) {
             it.onSuccess { products ->
+                _isLoadingProducts.value = false
                 val additionalProductUiModels = products.toProductUiModels()
-                val newProductUiModels =
-                    (productUiModels() ?: emptyList()) + additionalProductUiModels
+                val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
                 _productUiModels.value = newProductUiModels
                 updateTotalCount()
                 _showLoadMore.value = false
                 page++
             }.onFailure {
+                _isLoadingProducts.value = false
                 setError()
             }
         }
@@ -73,13 +74,14 @@ class ProductsViewModel(
     }
 
     fun loadProducts() {
-        _productsLoadingEvent.value = Event(Unit)
+        _isLoadingProducts.value = true
         val productUiModels = productUiModels()?.toMutableList() ?: return
 
         productUiModels.forEachIndexed { index, productUiModel ->
             val product = productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
             productUiModels[index] = product.toProductUiModel()
         }
+        _isLoadingProducts.value = false
         _productUiModels.value = productUiModels
         updateTotalCount()
     }

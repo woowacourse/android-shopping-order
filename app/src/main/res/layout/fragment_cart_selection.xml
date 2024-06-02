@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.ui.cart.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,6 +28,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibility="@{viewModel.cartUiModels.empty}"
             tools:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -40,6 +44,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibility="@{!viewModel.isLoadingCart || !viewModel.cartUiModels.empty}"
             tools:listitem="@layout/item_cart" />
 
         <LinearLayout
@@ -52,7 +57,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibility="@{viewModel.isLoadingCart}">
 
             <include layout="@layout/item_cart_skeleton" />
 

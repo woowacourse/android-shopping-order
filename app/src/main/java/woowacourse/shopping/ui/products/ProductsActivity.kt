@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.products
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -82,15 +81,7 @@ class ProductsActivity : AppCompatActivity() {
         initializePage()
 
         viewModel.productUiModels.observe(this) {
-            binding.layoutProductsSkeleton.visibility = View.GONE
-            binding.rvProducts.visibility = View.VISIBLE
             adapter.updateProducts(it)
-        }
-
-        viewModel.productsLoadingEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            binding.layoutProductsSkeleton.visibility = View.VISIBLE
-            binding.rvProducts.visibility = View.GONE
         }
 
         viewModel.productsErrorEvent.observe(this) {

@@ -82,6 +82,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_products"
+            app:visibility="@{!viewModel.isLoadingProducts}"
             tools:listitem="@layout/item_product" />
 
         <TableLayout
@@ -94,7 +95,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_products">
+            app:layout_constraintTop_toBottomOf="@id/toolbar_products"
+            app:visibility="@{viewModel.isLoadingProducts}">
 
             <TableRow android:padding="6dp">
 
