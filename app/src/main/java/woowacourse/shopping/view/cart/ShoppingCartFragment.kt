@@ -110,7 +110,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
         }
 
         shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { event ->
-            when(event){
+            when (event) {
                 LoadEvent.Loading -> adapter.setShowSkeleton(true)
                 else -> adapter.setShowSkeleton(false)
             }
@@ -118,7 +118,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(
-                errorState.receiveErrorMessage()
+                errorState.receiveErrorMessage(),
             )
         }
 

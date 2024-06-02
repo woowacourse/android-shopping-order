@@ -81,7 +81,7 @@ class ProductDetailFragment : Fragment(), OnClickDetail {
 
         productDetailViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(
-                errorState.receiveErrorMessage()
+                errorState.receiveErrorMessage(),
             )
         }
     }

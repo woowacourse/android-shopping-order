@@ -20,7 +20,6 @@ import woowacourse.shopping.view.model.event.ErrorEvent
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
-
     override fun addCartItem(product: Product) {
         executeWithLatch {
             val response =

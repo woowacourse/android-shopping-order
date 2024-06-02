@@ -1,25 +1,28 @@
 package woowacourse.shopping.view.model.event
 
 sealed interface ErrorEvent {
-    data object NotKnownError: ErrorEvent
+    data object NotKnownError : ErrorEvent
 
     sealed interface CartEvent : ErrorEvent {
         data object UpdateCartEvent : CartEvent
+
         data object DeleteCartEvent : CartEvent
+
         data object AddCartEvent : CartEvent
     }
 
-    sealed interface LoadEvent: ErrorEvent {
-        data object MaxPagingDataEvent: LoadEvent
-        data object LoadDataEvent: LoadEvent
+    sealed interface LoadEvent : ErrorEvent {
+        data object MaxPagingDataEvent : LoadEvent
+
+        data object LoadDataEvent : LoadEvent
     }
 
-    sealed interface OrderEvent: ErrorEvent{
-        data object OrderItemsEvent: OrderEvent
+    sealed interface OrderEvent : ErrorEvent {
+        data object OrderItemsEvent : OrderEvent
     }
 
-    fun receiveErrorMessage(): String{
-        return when(this){
+    fun receiveErrorMessage(): String {
+        return when (this) {
             CartEvent.AddCartEvent -> ERROR_ADD_CART_ITEM
             CartEvent.DeleteCartEvent -> ERROR_DELETE_CART_ITEM
             CartEvent.UpdateCartEvent -> ERROR_UPDATE_CART_ITEM

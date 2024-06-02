@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
@@ -24,9 +23,9 @@ android {
 
         val property = Properties()
         property.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField("String","BASE_URL",property.getProperty("BASE_URL"))
-        buildConfigField("String","USER_ID",property.getProperty("USER_ID"))
-        buildConfigField("String","USER_PW",property.getProperty("USER_PW"))
+        buildConfigField("String", "BASE_URL", property.getProperty("BASE_URL"))
+        buildConfigField("String", "USER_ID", property.getProperty("USER_ID"))
+        buildConfigField("String", "USER_PW", property.getProperty("USER_PW"))
     }
 
     buildTypes {

@@ -23,7 +23,7 @@ class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel() , OnClickCartItemCounter  {
+) : ViewModel(), OnClickCartItemCounter {
     private val _product: MutableLiveData<Product> = MutableLiveData(Product.defaultProduct)
     val product: LiveData<Product> get() = _product
     private var cartItemId: Long = DEFAULT_CART_ITEM_ID

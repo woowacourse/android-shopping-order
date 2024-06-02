@@ -11,13 +11,11 @@ import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductListBinding
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.products.adapter.ProductAdapter
@@ -119,7 +117,7 @@ class ProductsListFragment : Fragment(), OnClickProducts {
         }
         productListViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(
-                errorState.receiveErrorMessage()
+                errorState.receiveErrorMessage(),
             )
         }
         mainActivityListener?.observeProductList { updatedProducts ->

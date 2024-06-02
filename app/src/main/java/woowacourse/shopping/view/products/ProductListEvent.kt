@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.products
 
 sealed interface ProductListEvent {
-
     data object LoadProductEvent : ProductListEvent
 
     sealed interface UpdateProductEvent : ProductListEvent {
