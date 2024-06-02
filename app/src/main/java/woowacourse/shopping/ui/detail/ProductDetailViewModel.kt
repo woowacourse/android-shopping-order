@@ -56,7 +56,7 @@ class ProductDetailViewModel(
     private fun loadProduct() {
         productRepository.find(productId) {
             it.onSuccess { product ->
-                _productUiModel.postValue(product.toProductUiModel())
+                _productUiModel.value = product.toProductUiModel()
             }.onFailure {
                 setError()
             }
@@ -75,7 +75,7 @@ class ProductDetailViewModel(
         val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
         productRepository.find(lastRecentProduct.product.id) {
             it.onSuccess { product ->
-                _lastRecentProduct.postValue(LastRecentProductUiModel(product.id, product.name))
+                _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
             }.onFailure {
                 setError()
             }
@@ -104,8 +104,10 @@ class ProductDetailViewModel(
 
         val addCartCallback: (Result<Unit>) -> Unit = {
             it.onSuccess {
-                _isSuccessAddCart.postValue(Event(true))
-            }.onFailure { _isSuccessAddCart.postValue(Event(false)) }
+                _isSuccessAddCart.value = Event(true)
+            }.onFailure {
+                _isSuccessAddCart.value = Event(false)
+            }
         }
 
         if (cartItem == null) {
@@ -116,6 +118,6 @@ class ProductDetailViewModel(
     }
 
     private fun setError() {
-        _productLoadError.postValue(Event(Unit))
+        _productLoadError.value = Event(Unit)
     }
 }

@@ -51,7 +51,7 @@ class ProductsViewModel(
                 val additionalProductUiModels = products.toProductUiModels()
                 val newProductUiModels =
                     (productUiModels() ?: emptyList()) + additionalProductUiModels
-                _productUiModels.postValue(newProductUiModels)
+                _productUiModels.value = newProductUiModels
                 updateTotalCount()
                 _showLoadMore.value = false
                 page++
@@ -65,7 +65,7 @@ class ProductsViewModel(
     private fun loadIsPageLast() {
         productRepository.isLastPage(page, PAGE_SIZE) {
             it.onSuccess { isLastPage ->
-                this.isLastPage.postValue(isLastPage)
+                this.isLastPage.value = isLastPage
             }.onFailure {
                 setError()
             }
@@ -80,7 +80,7 @@ class ProductsViewModel(
             val product = productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
             productUiModels[index] = product.toProductUiModel()
         }
-        _productUiModels.postValue(productUiModels)
+        _productUiModels.value = productUiModels
         updateTotalCount()
     }
 
@@ -151,7 +151,7 @@ class ProductsViewModel(
                 val newProductUiModel = product.toProductUiModel()
                 val position = productUiModels.indexOfFirst { it.productId == productId }
                 productUiModels[position] = newProductUiModel
-                _productUiModels.postValue(productUiModels)
+                _productUiModels.value = productUiModels
                 updateTotalCount()
             }.onFailure {
                 setError()
@@ -162,7 +162,7 @@ class ProductsViewModel(
     private fun updateTotalCount() {
         cartRepository.getTotalQuantity {
             it.onSuccess { totalCount ->
-                _cartTotalCount.postValue(totalCount)
+                _cartTotalCount.value = totalCount
             }.onFailure {
                 setError()
             }

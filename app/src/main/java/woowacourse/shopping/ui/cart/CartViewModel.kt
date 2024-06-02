@@ -225,7 +225,7 @@ class CartViewModel(
     }
 
     fun navigateCartRecommend() {
-        _navigateEvent.postValue(Event(Unit))
+        _navigateEvent.value = Event(Unit)
         _visibleAllToggleView.value = false
     }
 
