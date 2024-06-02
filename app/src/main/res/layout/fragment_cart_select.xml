@@ -130,12 +130,13 @@
                 tools:text="10000원" />
 
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/tv_order"
+                setOrderButtonColor="@{vm.uiState.pagingCartProduct.cartList}"
+                setOrderButtonEnabled="@{vm.uiState.pagingCartProduct.cartList}"
                 android:layout_width="0dp"
                 android:layout_height="78dp"
                 android:layout_weight="1"
-                android:background="@color/green"
                 android:gravity="center"
                 android:onClick="@{() -> vm.navigateToRecommend()}"
                 android:text="@{@string/tv_order(vm.uiState.totalQuantity)}"
