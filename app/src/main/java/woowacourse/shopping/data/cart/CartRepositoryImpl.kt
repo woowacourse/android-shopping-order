@@ -1,13 +1,18 @@
 package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.datasource.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.OrderRemoteDataSource
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
+import woowacourse.shopping.data.dto.request.RequestOrdersPostDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Quantity
 
-class CartRepositoryImpl(private val cartRemoteDataSource: CartRemoteDataSource) : CartRepository {
+class CartRepositoryImpl(
+    private val cartRemoteDataSource: CartRemoteDataSource,
+    private val orderRemoteDataSource: OrderRemoteDataSource,
+) : CartRepository {
     override fun getCartItem(productId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching {
             it.firstOrNull { it.product.id == productId } ?: error("장바구니 정보를 불러올 수 없습니다.")
@@ -63,13 +68,16 @@ class CartRepositoryImpl(private val cartRemoteDataSource: CartRemoteDataSource)
         quantity: Int,
     ): Result<Unit> =
         runCatching {
-            val cart: Cart? = getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
+            val cart: Cart? =
+                getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
             if (cart == null) {
                 postCartItems(productId, quantity)
                 return@runCatching
             }
             patchCartItem(cart.id, cart.quantity.value + quantity)
         }
+
+    override fun order(cartItemIds: List<Long>) = orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
 
     private fun ResponseCartItemsGetDto.Product.toDomain() =
         Product(

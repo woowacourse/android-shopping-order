@@ -24,9 +24,11 @@ object NetworkModule {
         retrofitBuilder(tokenClient)
     }
 
-    val productService = retrofit.create(ProductService::class.java)
+    val productService: ProductService = retrofit.create(ProductService::class.java)
 
-    val cartItemService = tokenRetrofit.create(CartItemService::class.java)
+    val cartItemService: CartItemService = tokenRetrofit.create(CartItemService::class.java)
+
+    val orderService: OrderService = tokenRetrofit.create(OrderService::class.java)
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit =
         Retrofit.Builder()

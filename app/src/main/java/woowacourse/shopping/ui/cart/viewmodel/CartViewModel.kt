@@ -8,6 +8,7 @@ import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
@@ -19,6 +20,7 @@ import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
+import woowacourse.shopping.ui.utils.SingleLiveData
 
 class CartViewModel(
     private val productRepository: ProductRepository,
@@ -60,6 +62,9 @@ class CartViewModel(
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
     val error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
+
+    private val _order = MutableSingleLiveData<Unit>()
+    val order: SingleLiveData<Unit> = _order
 
     init {
         loadCartItems()
@@ -107,16 +112,25 @@ class CartViewModel(
         _cart.value = CartItemsUiState(currentList, isLoading = false)
     }
 
-    fun loadRecommendProducts() {
+    fun clickOrderButton() {
+        if (isRecommendPage.value == true) {
+            _cart.value?.cartItems?.let { cartRepository.order(it.map { it.id }) }
+            _order.setValue(Unit)
+            return
+        }
         recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
-            productRepository.find(recentProduct.productId).onSuccess { product ->
-                if (!requireNotNull(isRecommendPage.value)) {
-                    isRecommendPage.value = true
-                }
-                setRecommendProducts(product)
-            }.onFailure {
-                error.setValue(it)
+            setRecommendProducts(recentProduct)
+        }.onFailure {
+            error.setValue(it)
+        }
+    }
+
+    private fun setRecommendProducts(recentProduct: RecentProduct) {
+        productRepository.find(recentProduct.productId).onSuccess { product ->
+            if (isRecommendPage.value == false) {
+                isRecommendPage.value = true
             }
+            setRecommendProducts(product)
         }.onFailure {
             error.setValue(it)
         }
@@ -177,10 +191,11 @@ class CartViewModel(
             it.id,
             it.quantity.value.inc(),
         ).onSuccess {
-            if (!requireNotNull(isRecommendPage.value)) {
+            if (isRecommendPage.value == false) {
                 loadCartItems()
             } else {
                 changeRecommendProductCount(productId)
+                loadCartItems()
             }
         }.onFailure {
             error.setValue(it)
@@ -196,7 +211,7 @@ class CartViewModel(
                 it.id,
                 it.quantity.value.dec(),
             ).onSuccess {
-                if (!requireNotNull(isRecommendPage.value)) {
+                if (isRecommendPage.value == false) {
                     loadCartItems()
                 } else {
                     changeRecommendProductCount(productId)

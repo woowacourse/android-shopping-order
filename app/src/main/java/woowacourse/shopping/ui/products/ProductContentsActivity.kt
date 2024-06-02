@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
@@ -35,7 +36,10 @@ class ProductContentsActivity : AppCompatActivity() {
                     RecentProductDatabase.database().recentProductDao(),
                 ),
             ),
-            CartRepositoryImpl(CartRemoteDataSourceImpl(NetworkModule.cartItemService)),
+            CartRepositoryImpl(
+                CartRemoteDataSourceImpl(NetworkModule.cartItemService),
+                OrderRemoteDataSourceImpl(NetworkModule.orderService),
+            ),
         )
     }
 

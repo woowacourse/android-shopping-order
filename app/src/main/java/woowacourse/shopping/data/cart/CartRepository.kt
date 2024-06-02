@@ -25,4 +25,6 @@ interface CartRepository {
         productId: Long,
         quantity: Int,
     ): Result<Unit>
+
+    fun order(cartItemIds: List<Long>): Result<Unit>
 }

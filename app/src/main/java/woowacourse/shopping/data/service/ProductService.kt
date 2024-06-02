@@ -27,7 +27,7 @@ interface ProductService {
     @POST("/products")
     fun postProducts(
         @Body request: RequestProductsPostDto,
-    ): Call<RequestProductsPostDto>
+    ): Call<Unit>
 
     @GET("/products/{id}")
     fun getProductsById(
