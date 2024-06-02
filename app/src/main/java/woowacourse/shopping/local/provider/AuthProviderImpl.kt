@@ -6,7 +6,7 @@ import woowacourse.shopping.data.provider.AuthProvider
 
 class AuthProviderImpl(private val sharedPreferences: SharedPreferences) : AuthProvider() {
     override var name: String
-        get() = sharedPreferences.getString(KEY_AUTH_NAME, null) ?: ""
+        get() = sharedPreferences.getString(KEY_AUTH_NAME, "haeum808") ?: ""
         set(value) {
             sharedPreferences.edit(true) {
                 putString(KEY_AUTH_NAME, value)
@@ -14,7 +14,7 @@ class AuthProviderImpl(private val sharedPreferences: SharedPreferences) : AuthP
         }
 
     override var password: String
-        get() = sharedPreferences.getString(KEY_AUTH_PASSWORD, null) ?: ""
+        get() = sharedPreferences.getString(KEY_AUTH_PASSWORD, "password") ?: ""
         set(value) {
             sharedPreferences.edit(true) {
                 putString(KEY_AUTH_PASSWORD, value)
