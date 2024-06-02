@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,6 +12,9 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
 
+    val properties = Properties()
+    properties.load(FileInputStream(rootProject.file("local.properties")))
+
     defaultConfig {
         testInstrumentationRunnerArguments += mapOf()
         applicationId = "woowacourse.shopping"
@@ -17,8 +23,16 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "USER_NAME", properties.getProperty("username"))
+        buildConfigField("String", "PASSWORD", properties.getProperty("password"))
+        buildConfigField("String", "BASE_URL", properties.getProperty("baseUrl"))
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildFeatures {
+            buildConfig = true
+        }
     }
 
     buildTypes {
