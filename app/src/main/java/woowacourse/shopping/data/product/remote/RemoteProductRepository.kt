@@ -40,7 +40,7 @@ object RemoteProductRepository : ProductRepository {
         )
     }
 
-    override fun syncFind(id: Int): Product {
+    override fun syncFind(id: Int): Product? {
         var product: Product? = null
         thread {
             val response = retrofitApi.requestProduct(id = id).execute()
@@ -48,7 +48,7 @@ object RemoteProductRepository : ProductRepository {
             product = body?.toProduct()
         }.join()
 
-        return product!!
+        return product
     }
 
     override fun findPage(

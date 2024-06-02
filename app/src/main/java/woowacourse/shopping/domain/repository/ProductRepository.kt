@@ -9,7 +9,7 @@ interface ProductRepository {
         callback: (Result<Product>) -> Unit,
     )
 
-    fun syncFind(id: Int): Product
+    fun syncFind(id: Int): Product?
 
     fun findPage(
         page: Int,

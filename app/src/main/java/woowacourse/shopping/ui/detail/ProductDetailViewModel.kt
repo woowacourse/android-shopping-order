@@ -83,7 +83,7 @@ class ProductDetailViewModel(
     }
 
     private fun saveRecentProduct() {
-        val product = productRepository.syncFind(productId)
+        val product = productRepository.syncFind(productId) ?: return
         recentProductRepository.save(product)
     }
 

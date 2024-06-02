@@ -80,7 +80,7 @@ class ProductsViewModel(
         val productUiModels = productUiModels()?.toMutableList() ?: return
 
         productUiModels.forEachIndexed { index, productUiModel ->
-            val product = productRepository.syncFind(productUiModel.productId)
+            val product = productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
             productUiModels[index] = product.toProductUiModel()
         }
         _productUiModels.postValue(productUiModels)
@@ -112,7 +112,7 @@ class ProductsViewModel(
 
     private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
         return map {
-            val product = productRepository.syncFind(it.product.id)
+            val product = productRepository.syncFind(it.product.id) ?: return null
             RecentProductUiModel(
                 product.id,
                 product.imageUrl,
