@@ -65,23 +65,35 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         val cartItemResult = getCartItemResultFromProductId(product.id)
         when (updateCartItemType) {
             UpdateCartItemType.INCREASE -> {
-                if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
+                if (isValidCartId(cartItemResult.cartItemId)) {
                     return UpdateCartItemResult.ADD
                 } else {
                     cartItemResult.increaseCount()
                 }
             }
+
             UpdateCartItemType.DECREASE -> {
-                if (cartItemResult.decreaseCount() == ChangeCartItemResultState.Fail) {
+                if (isInValidDecreaseCount(cartItemResult.decreaseCount())) {
                     deleteCartItem(cartItemResult.cartItemId)
                     return UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
                 }
             }
 
-            is UpdateCartItemType.UPDATE -> {
-                cartItemResult.updateCount(updateCartItemType.count)
-            }
+            is UpdateCartItemType.UPDATE -> cartItemResult.updateCount(updateCartItemType.count)
         }
+        updateCartItemCount(cartItemResult)
+        return UpdateCartItemResult.UPDATED(cartItemResult)
+    }
+
+    private fun isValidCartId(id: Long): Boolean {
+        return id == DEFAULT_CART_ITEM_ID
+    }
+
+    private fun isInValidDecreaseCount(changeCartItemResultState: ChangeCartItemResultState): Boolean {
+        return changeCartItemResultState == ChangeCartItemResultState.Fail
+    }
+
+    private fun updateCartItemCount(cartItemResult: CartItemResult) {
         var updateDataId = ERROR_UPDATE_DATA_ID
         thread {
             updateDataId =
@@ -91,7 +103,6 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                 )
         }.join()
         if (updateDataId == ERROR_UPDATE_DATA_ID) throw ErrorEvent.UpdateCartEvent()
-        return UpdateCartItemResult.UPDATED(cartItemResult)
     }
 
     override fun getTotalCartItemCount(): Int {
