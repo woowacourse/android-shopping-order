@@ -1,6 +1,9 @@
 package woowacourse.shopping.data.view
 
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeUp
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -41,19 +44,13 @@ class ProductListFragmentTest {
             .check(matches(not(isDisplayed())))
     }
 
-    // TODO 스크롤 관련 테스트코드 학습 필
-//    @Test
-//    fun `더보기_버튼을_클릭하면_새로운_상품이_로드_되어야_한다`() {
-//        Thread.sleep(2000)
-//        onView(withId(R.id.rv_products))
-//            .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(18))
-//
-//        onView(withI요(R.id.btn_more_product)).perform(ViewActions.click())
-//
-//        onView(withId(R.id.rv_products)).check { view, _ ->
-//            val recyclerView = view as RecyclerView
-//            val itemCount = recyclerView.adapter?.itemCount ?: 0
-//            assertTrue(itemCount > 20)
-//        }
-//    }
+    @Test
+    fun `더보기_버튼을_클릭하면_새로운_상품이_로드_되어야_한다`() {
+        onView(withId(R.id.nest_view))
+            .perform(swipeUp())
+
+        Thread.sleep(1000)
+        onView(withId(R.id.btn_more_product)).perform(click())
+        onView(withId(R.id.btn_more_product)).check(matches(not(isDisplayed())))
+    }
 }
