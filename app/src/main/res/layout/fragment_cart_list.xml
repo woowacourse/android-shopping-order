@@ -6,8 +6,10 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
-            name="vm"
+            name="viewModel"
             type="woowacourse.shopping.ui.cart.ShoppingCartViewModel" />
     </data>
 
@@ -37,6 +39,7 @@
             android:layout_height="0dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:visibility="@{viewModel.isLoading ? View.GONE : View.VISIBLE}"
             app:layoutManager="LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/include_cart_list_order"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -50,6 +53,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginHorizontal="16dp"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -84,11 +88,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            bind:selectedItemsCount="@{vm.selectedCartItemsCount}"
-            bind:isAllSelected="@{vm.isAllSelected}"
-            bind:onAllCartItemSelectedListener="@{vm}"
-            bind:onNavigationOrderListener="@{vm}"
-            bind:selectedCartItemsTotalPrice="@{vm.selectedCartItemsTotalPrice}" />
+            bind:isAllSelected="@{viewModel.isAllSelected}"
+            bind:onAllCartItemSelectedListener="@{viewModel}"
+            bind:onNavigationOrderListener="@{viewModel}"
+            bind:selectedCartItemsTotalPrice="@{viewModel.selectedCartItemsTotalPrice}"
+            bind:selectedItemsCount="@{viewModel.selectedCartItemsCount}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

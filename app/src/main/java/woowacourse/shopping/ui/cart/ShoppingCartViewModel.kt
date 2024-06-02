@@ -47,6 +47,9 @@ class ShoppingCartViewModel(
     private var _navigationOrderEvent = MutableLiveData<List<Long>>(emptyList())
     val navigationOrderEvent: LiveData<List<Long>> get() = _navigationOrderEvent
 
+    private var _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     fun loadAll() {
         thread {
             val currentItems =
@@ -54,6 +57,7 @@ class ShoppingCartViewModel(
 
             uiHandler.post {
                 _cartItems.value = currentItems
+                _isLoading.value = false
             }
         }
     }

@@ -38,6 +38,7 @@ class ShoppingCartFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCartListBinding.inflate(inflater)
+        initBinding()
         binding.cartList.adapter = adapter
 
         return binding.root
@@ -49,11 +50,7 @@ class ShoppingCartFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.vm = viewModel
-        binding.lifecycleOwner = this
-
         initNavigation()
-        showSkeletonUi()
         observeDeletedItem()
         observeItemsInCurrentPage()
         observeOrderNavigation()
@@ -67,9 +64,9 @@ class ShoppingCartFragment : Fragment() {
         }
     }
 
-    private fun showSkeletonUi() {
-        binding.shimmerCartList.visibility = View.VISIBLE
-        binding.cartList.visibility = View.INVISIBLE
+    private fun initBinding() {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
     }
 
     private fun initNavigation() {
@@ -87,9 +84,7 @@ class ShoppingCartFragment : Fragment() {
     private fun observeItemsInCurrentPage() {
         viewModel.cartItems.observe(viewLifecycleOwner) { products ->
             adapter.updateData(products)
-            binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
-            binding.shimmerCartList.visibility = View.GONE
         }
     }
 
