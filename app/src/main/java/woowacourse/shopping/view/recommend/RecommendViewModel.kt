@@ -17,11 +17,12 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
+import woowacourse.shopping.view.model.event.ErrorEvent
 
 class RecommendViewModel(
     private val orderRepository: OrderRepository,
@@ -34,12 +35,12 @@ class RecommendViewModel(
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
 
-    private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> =
+    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
         MutableSingleLiveData()
-    val errorEvent: SingleLiveData<RecommendEvent.ErrorEvent> get() = _errorEvent
-    private val _recommendEvent: MutableSingleLiveData<RecommendEvent.SuccessEvent> =
+    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
+    private val _recommendEvent: MutableSingleLiveData<RecommendEvent> =
         MutableSingleLiveData()
-    val recommendEvent: SingleLiveData<RecommendEvent.SuccessEvent> get() = _recommendEvent
+    val recommendEvent: SingleLiveData<RecommendEvent> get() = _recommendEvent
 
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -73,17 +74,25 @@ class RecommendViewModel(
             _products.value = recommendData
             updateCheckItemData()
         } catch (e: Exception) {
-            _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            when (e) {
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
+            }
         }
     }
 
     fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         try {
-            orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
+            orderRepository.orderShoppingCart(ids ?: throw OrderException())
             _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
         } catch (e: Exception) {
-            _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
+            when (e) {
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
+            }
         }
     }
 
@@ -108,10 +117,9 @@ class RecommendViewModel(
             }
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -125,10 +133,9 @@ class RecommendViewModel(
             updateCheckItemData()
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -141,10 +148,9 @@ class RecommendViewModel(
             updateCheckItemData()
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
