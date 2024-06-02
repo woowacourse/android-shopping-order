@@ -35,9 +35,7 @@ object NetworkManager {
             .build().also { instance = it }
     }
 
-    fun productService(): ProductApiService = getRetrofit().create(ProductApiService::class.java)
-
-    fun cartService(): CartApiService = getRetrofit().create(CartApiService::class.java)
+    fun getApiClient(): ApiClient = RetrofitClient(getRetrofit())
 
     fun orderService(): OrderApiService = getRetrofit().create(OrderApiService::class.java)
 }

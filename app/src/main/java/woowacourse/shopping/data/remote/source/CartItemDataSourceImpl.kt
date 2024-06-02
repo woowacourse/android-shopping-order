@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.remote.source
 
 import retrofit2.Call
+import woowacourse.shopping.data.remote.api.ApiClient
 import woowacourse.shopping.data.remote.api.CartApiService
-import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.source.CartItemDataSource
 
-class CartItemDataSourceImpl(
-    private val cartApiService: CartApiService = NetworkManager.cartService(),
-) : CartItemDataSource {
+class CartItemDataSourceImpl(apiClient: ApiClient) : CartItemDataSource {
+    private val cartApiService: CartApiService = apiClient.createService(CartApiService::class.java)
+
     override fun loadCartItems(): Call<CartItemResponse> {
         return cartApiService.requestCartItems(
             page = DEFAULT_ITEM_OFFSET,
@@ -34,10 +34,10 @@ class CartItemDataSourceImpl(
     ): Call<Unit> {
         return cartApiService.insertCartItem(
             cartItemRequest =
-                CartItemRequest(
-                    productId = productId,
-                    quantity = quantity,
-                ),
+            CartItemRequest(
+                productId = productId,
+                quantity = quantity,
+            ),
         )
     }
 

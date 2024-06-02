@@ -1,15 +1,16 @@
 package woowacourse.shopping.data.remote.source
 
 import retrofit2.Call
-import woowacourse.shopping.data.remote.api.NetworkManager
+import woowacourse.shopping.data.remote.api.ApiClient
 import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.remote.dto.product.ProductDto
 import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.data.source.ProductDataSource
 
-class ProductDataSourceImpl(
-    private val productApiService: ProductApiService = NetworkManager.productService(),
-) : ProductDataSource {
+class ProductDataSourceImpl(apiClient: ApiClient) : ProductDataSource {
+    private val productApiService: ProductApiService =
+        apiClient.createService(ProductApiService::class.java)
+
     override fun loadProducts(
         page: Int,
         size: Int,

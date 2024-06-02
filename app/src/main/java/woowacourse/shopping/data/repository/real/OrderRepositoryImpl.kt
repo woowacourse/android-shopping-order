@@ -4,6 +4,7 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.source.OrderDataSourceImpl
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -12,7 +13,7 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import java.util.concurrent.CountDownLatch
 
 class OrderRepositoryImpl(
-    private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
+    private val orderDataSource: OrderDataSource = OrderDataSourceImpl(NetworkManager.getApiClient()),
 ) : OrderRepository {
     override fun orderShoppingCart(ids: List<Int>) {
         val latch = CountDownLatch(1)

@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.real
 
+import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
@@ -11,7 +12,7 @@ import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
 class RealProductRepositoryImpl(
-    private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
+    private val productDataSource: ProductDataSource = ProductDataSourceImpl(NetworkManager.getApiClient()),
 ) : ProductRepository {
     override fun loadPagingProducts(offset: Int): List<Product> {
         val latch = CountDownLatch(1)
