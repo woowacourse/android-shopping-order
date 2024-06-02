@@ -19,7 +19,7 @@ import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
-class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter {
+class ProductDetailFragment : Fragment(), OnClickDetail {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentProductDetailBinding? = null
     val binding: FragmentProductDetailBinding get() = _binding!!
@@ -126,7 +126,7 @@ class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter 
     private fun initView() {
         binding.vm = productDetailViewModel
         binding.onClickDetail = this
-        binding.onClickCartItemCounter = this
+        binding.onClickCartItemCounter = productDetailViewModel
         binding.lifecycleOwner = viewLifecycleOwner
     }
 
@@ -146,14 +146,6 @@ class ProductDetailFragment : Fragment(), OnClickDetail, OnClickCartItemCounter 
 
     override fun clickRecently(recentlyProduct: RecentlyProduct) {
         productDetailViewModel.updateRecentlyProduct(recentlyProduct)
-    }
-
-    override fun clickIncrease(product: Product) {
-        productDetailViewModel.increaseItemCounter()
-    }
-
-    override fun clickDecrease(product: Product) {
-        productDetailViewModel.decreaseItemCounter()
     }
 
     companion object {

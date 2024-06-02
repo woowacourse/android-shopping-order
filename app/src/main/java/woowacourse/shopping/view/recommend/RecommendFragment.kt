@@ -25,7 +25,7 @@ import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
-class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, OnClickProducts {
+class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentRecommendBinding? = null
     val binding: FragmentRecommendBinding get() = _binding!!
@@ -76,7 +76,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         adapter =
             RecommendAdapter(
                 onClickProducts = this,
-                onClickCartItemCounter = this,
+                onClickCartItemCounter = recommendViewModel,
             )
         binding.rvRecommend.adapter = adapter
         observeData()
@@ -108,14 +108,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
                 getString(R.string.error_default),
             )
         }
-    }
-
-    override fun clickIncrease(product: Product) {
-        recommendViewModel.increaseShoppingCart(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        recommendViewModel.decreaseShoppingCart(product)
     }
 
     override fun clickLoadPagingData() {}

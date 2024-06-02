@@ -42,7 +42,6 @@ class RecentlyAdapter(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun updateProducts(recentlyProducts: List<RecentlyProduct>) {
         submitList(recentlyProducts)
     }

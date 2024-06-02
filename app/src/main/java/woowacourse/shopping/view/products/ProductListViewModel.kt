@@ -18,12 +18,13 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel() {
+) : ViewModel(), OnClickCartItemCounter {
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
     private val _cartItemCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -74,14 +75,6 @@ class ProductListViewModel(
         } catch (e: Exception) {
             _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
         }
-    }
-
-    fun increaseShoppingCart(product: Product) {
-        updateCarItem(product, UpdateCartItemType.INCREASE)
-    }
-
-    fun decreaseShoppingCart(product: Product) {
-        updateCarItem(product, UpdateCartItemType.DECREASE)
     }
 
     private fun updateCarItem(
@@ -169,5 +162,13 @@ class ProductListViewModel(
             }
         }
         updateTotalCartItemCount()
+    }
+
+    override fun clickIncrease(product: Product) {
+        updateCarItem(product, UpdateCartItemType.INCREASE)
+    }
+
+    override fun clickDecrease(product: Product) {
+        updateCarItem(product, UpdateCartItemType.DECREASE)
     }
 }

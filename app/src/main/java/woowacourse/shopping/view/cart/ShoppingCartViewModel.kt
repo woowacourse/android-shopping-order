@@ -15,10 +15,11 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
+import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
-) : ViewModel() {
+) : ViewModel(), OnClickCartItemCounter {
     val shoppingCart = ShoppingCart()
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> =
@@ -134,14 +135,6 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun increaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.INCREASE)
-    }
-
-    fun decreaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.DECREASE)
-    }
-
     private fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
@@ -200,5 +193,13 @@ class ShoppingCartViewModel(
             it.cartItemSelector.isSelected
         } ?: DEFAULT_ITEM_SIZE
         setAllCheck()
+    }
+
+    override fun clickIncrease(product: Product) {
+        updateCartItem(product, UpdateCartItemType.INCREASE)
+    }
+
+    override fun clickDecrease(product: Product) {
+        updateCartItem(product, UpdateCartItemType.DECREASE)
     }
 }

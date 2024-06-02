@@ -21,7 +21,7 @@ import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.recommend.RecommendFragment
 
-class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCounter {
+class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentShoppingCartBinding? = null
     val binding: FragmentShoppingCartBinding get() = _binding!!
@@ -70,7 +70,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         adapter =
             ShoppingCartAdapter(
                 onClickShoppingCart = this,
-                onClickCartItemCounter = this,
+                onClickCartItemCounter = shoppingCartViewModel,
             )
         binding.rvShoppingCart.adapter = adapter
     }
@@ -197,13 +197,5 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     private fun updateRecyclerView(cartItems: List<CartItem>) {
         adapter.updateCartItems(cartItems)
-    }
-
-    override fun clickIncrease(product: Product) {
-        shoppingCartViewModel.increaseCartItem(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        shoppingCartViewModel.decreaseCartItem(product)
     }
 }

@@ -16,12 +16,13 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel() {
+) : ViewModel() , OnClickCartItemCounter  {
     private val _product: MutableLiveData<Product> = MutableLiveData(Product.defaultProduct)
     val product: LiveData<Product> get() = _product
     private var cartItemId: Long = DEFAULT_CART_ITEM_ID
@@ -115,7 +116,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun increaseItemCounter() {
+    private fun increaseItemCounter() {
         product.value?.cartItemCounter?.increase()
         _product.value =
             product.value?.cartItemCounter?.let {
@@ -125,7 +126,7 @@ class ProductDetailViewModel(
             }
     }
 
-    fun decreaseItemCounter() {
+    private fun decreaseItemCounter() {
         val productCount = product.value?.cartItemCounter?.itemCount ?: DEFAULT_ITEM_COUNT
         if (productCount > DEFAULT_ITEM_COUNT) {
             product.value?.cartItemCounter?.decrease()
@@ -197,5 +198,13 @@ class ProductDetailViewModel(
     private fun checkValidProduct(product: Product) {
         if (product.id == DEFAULT_PRODUCT_ID) throw NoSuchDataException()
         if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw NoSuchDataException()
+    }
+
+    override fun clickIncrease(product: Product) {
+        increaseItemCounter()
+    }
+
+    override fun clickDecrease(product: Product) {
+        decreaseItemCounter()
     }
 }
