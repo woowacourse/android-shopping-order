@@ -28,7 +28,7 @@ class ShoppingApplication : Application() {
         AuthProviderImpl(PreferenceManager.getDefaultSharedPreferences(applicationContext))
     }
 
-    private val networkModule by lazy { NetworkModule(authProvider = authProvider) }
+    private val networkModule by lazy { NetworkModule(authProvider = authProvider, BASE_URL) }
 
     private val shoppingRemoteCartDataSource: ShoppingRemoteCartDataSource by lazy {
         ShoppingRemoteCartDataSourceImpl(networkModule.cartService)
@@ -38,13 +38,19 @@ class ShoppingApplication : Application() {
     }
 
     private val productHistoryLocalDataSource: ProductHistoryLocalDataSource by lazy {
-        ProductHistoryLocalDataSourceImpl(ProductHistoryDatabase.getDatabase(applicationContext).dao())
+        ProductHistoryLocalDataSourceImpl(
+            ProductHistoryDatabase.getDatabase(applicationContext).dao(),
+        )
     }
     val productHistoryRepository: ProductHistoryRepository by lazy {
         ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRepository)
     }
 
-    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductRemoteDataSourceImpl(networkModule.productService) }
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy {
+        ProductRemoteDataSourceImpl(
+            networkModule.productService,
+        )
+    }
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
             productRemoteDataSource,
@@ -52,7 +58,11 @@ class ShoppingApplication : Application() {
         )
     }
 
-    private val orderRemoteDataSource: OrderRemoteDataSource by lazy { OrderRemoteDataSourceImpl(networkModule.orderService) }
+    private val orderRemoteDataSource: OrderRemoteDataSource by lazy {
+        OrderRemoteDataSourceImpl(
+            networkModule.orderService,
+        )
+    }
     val orderRepository: OrderRepository by lazy {
         OrderRepositoryImpl(
             orderRemoteDataSource,
