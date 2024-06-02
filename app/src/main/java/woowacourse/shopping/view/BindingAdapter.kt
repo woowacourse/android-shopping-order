@@ -19,6 +19,9 @@ fun setImageUrl(
 }
 
 @BindingAdapter("visibleByItemCounter")
-fun setVisibleByItemCounter(view: View, count: Int) {
+fun setVisibleByItemCounter(
+    view: View,
+    count: Int,
+) {
     view.visibility = if (count > DEFAULT_ITEM_COUNT) View.VISIBLE else View.GONE
 }

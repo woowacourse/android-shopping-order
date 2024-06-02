@@ -37,7 +37,7 @@ class ShoppingCartAdapter(
             VIEW_TYPE_CART_PRODUCT -> {
                 val view =
                     ItemShoppingCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart,onClickNavigateShoppingCart)
+                ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart, onClickNavigateShoppingCart)
             }
             else -> {
                 val view =

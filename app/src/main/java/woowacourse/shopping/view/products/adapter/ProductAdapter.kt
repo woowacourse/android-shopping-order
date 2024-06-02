@@ -9,9 +9,9 @@ import woowacourse.shopping.databinding.ItemProductSkeletonBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.products.OnClickProducts
-import woowacourse.shopping.view.products.model.ShoppingItem
 import woowacourse.shopping.view.products.adapter.viewholder.ProductViewHolder
 import woowacourse.shopping.view.products.adapter.viewholder.SkeletonViewHolder
+import woowacourse.shopping.view.products.model.ShoppingItem
 
 class ProductAdapter(
     private val onClickProducts: OnClickProducts,

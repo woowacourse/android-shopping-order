@@ -2,11 +2,17 @@ package woowacourse.shopping.view.model.event
 
 sealed class ErrorEvent : Exception() {
     class UpdateCartEvent : ErrorEvent()
+
     class DeleteCartEvent : ErrorEvent()
+
     class AddCartEvent : ErrorEvent()
+
     class LoadDataEvent : ErrorEvent()
+
     class MaxPagingDataEvent : ErrorEvent()
+
     class NotKnownError : ErrorEvent()
+
     class OrderItemsEvent : ErrorEvent()
 
     fun receiveErrorMessage(): String {
@@ -29,6 +35,5 @@ sealed class ErrorEvent : Exception() {
         private const val MAX_PAGING_DATA = "모든 데이터가 로드 되었습니다."
         private const val ERROR_NOT_KNOWN = "알 수 없는 에러가 발생했습니다.."
         private const val ERROR_ORDER = "주문에 실패하였습니다."
-
     }
 }

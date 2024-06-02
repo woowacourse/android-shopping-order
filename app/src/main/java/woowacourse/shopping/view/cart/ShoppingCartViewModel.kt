@@ -20,7 +20,7 @@ import woowacourse.shopping.view.model.event.LoadEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
-) : BaseViewModel(), OnClickCartItemCounter,OnClickShoppingCart {
+) : BaseViewModel(), OnClickCartItemCounter, OnClickShoppingCart {
     val shoppingCart = ShoppingCart()
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent> =
@@ -191,6 +191,7 @@ class ShoppingCartViewModel(
             addCheckedItem(cartItem)
         }
     }
+
     override fun clickCheckAll() {
         checkAllItems()
     }
