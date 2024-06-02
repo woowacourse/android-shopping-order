@@ -6,8 +6,4 @@ data class CartProduct(
     val id: Long = -1,
 ) {
     val totalPrice get(): Int = product.price * count
-
-    fun plusCount(): CartProduct = CartProduct(product, count + 1)
-
-    fun minusCount(): CartProduct = CartProduct(product, count - 1)
 }

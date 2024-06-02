@@ -17,7 +17,5 @@ sealed class ShoppingUiModel(val viewType: Int) {
     companion object {
         const val ITEM_VIEW_TYPE_PRODUCT = 1
         const val ITEM_VIEW_TYPE_PLUS = 2
-        const val PRODUCT_SPAN_COUNT = 1
-        const val PLUS_SPAN_COUNT = 2
     }
 }
