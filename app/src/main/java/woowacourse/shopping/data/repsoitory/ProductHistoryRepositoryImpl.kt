@@ -52,9 +52,7 @@ class ProductHistoryRepositoryImpl(
         productHistoryDataSource.getProductHistory(size = size)
             .mapCatching { result -> result.map { it.toDomain() } }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> =
-        productHistoryDataSource.deleteProductHistory(productId = productId)
+    override fun deleteProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.deleteProductHistory(productId = productId)
 
-    override fun deleteAllProductHistory(): Result<Unit> =
-        productHistoryDataSource.deleteAllProductHistory()
+    override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
 }

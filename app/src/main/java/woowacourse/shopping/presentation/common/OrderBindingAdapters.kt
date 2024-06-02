@@ -10,8 +10,12 @@ import woowacourse.shopping.domain.model.Cart
 fun AppCompatButton.setOrderButtonColor(carts: List<Cart>) {
     val isOrderEnabled = carts.count { it.isChecked } > 0
 
-    background = if (isOrderEnabled) ContextCompat.getDrawable(context, R.color.green)
-    else ContextCompat.getDrawable(context, R.color.gray6)
+    background =
+        if (isOrderEnabled) {
+            ContextCompat.getDrawable(context, R.color.green)
+        } else {
+            ContextCompat.getDrawable(context, R.color.gray6)
+        }
 }
 
 @BindingAdapter("setOrderButtonEnabled")
