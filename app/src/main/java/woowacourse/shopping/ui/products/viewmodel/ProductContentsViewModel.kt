@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.products.viewmodel
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +20,8 @@ import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
+import java.util.Timer
+import java.util.TimerTask
 
 class ProductContentsViewModel(
     private val productRepository: ProductRepository,
@@ -31,7 +31,6 @@ class ProductContentsViewModel(
     ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
     private val items = mutableListOf<Product>()
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
-
     private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
 
     val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
@@ -98,13 +97,16 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        val handler = Handler(Looper.getMainLooper())
         productRepository.getProducts(currentOffset++, 20).onSuccess {
             items.addAll(it)
             this.products.value = items
-            handler.postDelayed({
-                productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
-            }, 2000)
+            Timer().schedule(
+                object : TimerTask() {
+                    override fun run() {
+                    }
+                },
+                1000,
+            )
         }.onFailure {
             _error.setValue(it)
         }
@@ -131,7 +133,7 @@ class ProductContentsViewModel(
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
         productWithQuantity.value =
-            ProductWithQuantityUiState(updatedList.map { it.toUiModel() }, isLoading = false)
+            ProductWithQuantityUiState(updatedList.map { it.toUiModel() }, isLoading = true)
     }
 
     private fun getQuantity(productId: Long): Quantity {
