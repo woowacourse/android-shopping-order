@@ -14,10 +14,9 @@ import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductDetailFragment : Fragment(), OnClickDetail {
     private var mainActivityListener: MainActivityListener? = null
@@ -81,41 +80,21 @@ class ProductDetailFragment : Fragment(), OnClickDetail {
         }
 
         productDetailViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            when (errorState) {
-                ProductDetailEvent.AddShoppingCart.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.error_save_data),
-                    )
-
-                ProductDetailEvent.LoadProductItem.Fail -> {
-                    requireContext().makeToast(
-                        getString(R.string.error_data_load),
-                    )
-                    parentFragmentManager.popBackStack()
-                }
-
-                ProductDetailEvent.ErrorEvent.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-
-                ProductDetailEvent.UpdateRecentlyProductItem.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.error_recently_product_item),
-                    )
-            }
+            requireContext().makeToast(
+                errorState.receiveErrorMessage()
+            )
         }
     }
 
     private fun receiveId(): Long {
-        return arguments?.getLong(PRODUCT_ID) ?: throw NoSuchDataException()
+        return arguments?.getLong(PRODUCT_ID) ?: throw OrderException()
     }
 
     private fun loadProduct() {
         try {
             productDetailViewModel.loadProductItem(receiveId())
             productDetailViewModel
-        } catch (e: NoSuchDataException) {
+        } catch (e: OrderException) {
             requireContext().makeToast(
                 getString(R.string.error_data_load),
             )

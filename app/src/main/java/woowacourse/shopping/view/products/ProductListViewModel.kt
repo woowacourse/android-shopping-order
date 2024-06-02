@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.products
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,10 +13,12 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
+import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.view.model.event.LoadEvent
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -34,15 +34,17 @@ class ProductListViewModel(
         MutableLiveData(emptyList())
     val recentlyProducts: LiveData<List<RecentlyProduct>> get() = _recentlyProducts
 
-    private val _productListEvent: MutableSingleLiveData<ProductListEvent.SuccessEvent> =
+    private val _productListEvent: MutableSingleLiveData<ProductListEvent> =
         MutableSingleLiveData()
-    val productListEvent: SingleLiveData<ProductListEvent.SuccessEvent> get() = _productListEvent
-    private val _loadingEvent: MutableSingleLiveData<ProductListEvent.LoadProductEvent> =
+    val productListEvent: SingleLiveData<ProductListEvent> get() = _productListEvent
+
+    private val _loadingEvent: MutableSingleLiveData<LoadEvent> =
         MutableSingleLiveData()
-    val loadingEvent: SingleLiveData<ProductListEvent.LoadProductEvent> get() = _loadingEvent
-    private val _errorEvent: MutableSingleLiveData<ProductListEvent.ErrorEvent> =
+    val loadingEvent: SingleLiveData<LoadEvent> get() = _loadingEvent
+
+    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
         MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ProductListEvent.ErrorEvent> get() = _errorEvent
+    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
     init {
         updateTotalCartItemCount()
@@ -50,19 +52,20 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
+        _loadingEvent.setValue(LoadEvent.Loading)
 //        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             val pagingData = productRepository.loadPagingProducts(itemSize)
             _products.value = _products.value?.plus(pagingData)
 
-            _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-            _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+            _loadingEvent.setValue(LoadEvent.Success)
+            _productListEvent.setValue(ProductListEvent.LoadProductEvent)
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
-                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
 //        }, 1000)
@@ -73,7 +76,11 @@ class ProductListViewModel(
             val pagingData = recentlyProductRepository.getRecentlyProductList()
             _recentlyProducts.value = pagingData
         } catch (e: Exception) {
-            _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+            when (e) {
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
+            }
         }
     }
 
@@ -109,10 +116,9 @@ class ProductListViewModel(
             }
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ProductListEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -131,10 +137,9 @@ class ProductListViewModel(
             _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ProductListEvent.DeleteProductEvent.Fail)
-
-                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -144,7 +149,11 @@ class ProductListViewModel(
             val totalItemCount = shoppingCartRepository.getTotalCartItemCount()
             _cartItemCount.value = totalItemCount
         } catch (e: Exception) {
-            _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+            when (e) {
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
+            }
         }
     }
 

@@ -13,10 +13,11 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
+import woowacourse.shopping.view.model.event.ErrorEvent
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -31,12 +32,12 @@ class ProductDetailViewModel(
         MutableLiveData(RecentlyProduct.defaultRecentlyProduct)
     val recentlyProduct: LiveData<RecentlyProduct> get() = _recentlyProduct
 
-    private val _errorEvent: MutableSingleLiveData<ProductDetailEvent.ErrorEvent> =
+    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
         MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ProductDetailEvent.ErrorEvent> get() = _errorEvent
+    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
-    private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent.SuccessEvent>()
-    val productDetailEvent: SingleLiveData<ProductDetailEvent.SuccessEvent> = _productDetailEvent
+    private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent>()
+    val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
 
     fun addShoppingCartItem(product: Product) {
         try {
@@ -61,15 +62,9 @@ class ProductDetailViewModel(
             )
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.AddShoppingCart.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -84,15 +79,9 @@ class ProductDetailViewModel(
             _product.value = product
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.LoadProductItem.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -105,12 +94,9 @@ class ProductDetailViewModel(
             result.counter
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException -> CartItemCounter()
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
             CartItemCounter()
         }
@@ -166,15 +152,9 @@ class ProductDetailViewModel(
             _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.LoadProductItem.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
@@ -189,15 +169,16 @@ class ProductDetailViewModel(
             }
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException -> _errorEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Fail)
-                else -> _errorEvent.setValue(ProductDetailEvent.ErrorEvent.NotKnownError)
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
 
     private fun checkValidProduct(product: Product) {
-        if (product.id == DEFAULT_PRODUCT_ID) throw NoSuchDataException()
-        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw NoSuchDataException()
+        if (product.id == DEFAULT_PRODUCT_ID) throw OrderException()
+        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw OrderException()
     }
 
     override fun clickIncrease(product: Product) {

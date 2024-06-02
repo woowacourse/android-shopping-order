@@ -19,6 +19,7 @@ import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.products.adapter.ProductAdapter
 import woowacourse.shopping.view.products.adapter.RecentlyAdapter
 
@@ -93,7 +94,7 @@ class ProductsListFragment : Fragment(), OnClickProducts {
         }
         productListViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
             when (loadingState) {
-                is ProductListEvent.LoadProductEvent.Loading ->
+                is LoadEvent.Loading ->
                     productAdapter.setShowSkeleton(true)
                 else -> productAdapter.setShowSkeleton(false)
             }
@@ -111,34 +112,15 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                     productAdapter.updateProduct(productListEvent.productId)
                 }
 
-                ProductListEvent.LoadProductEvent.Success -> {
+                ProductListEvent.LoadProductEvent -> {
                     productAdapter.setShowSkeleton(false)
                 }
             }
         }
         productListViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            when (errorState) {
-                ProductListEvent.LoadProductEvent.Fail -> {
-                    requireContext().makeToast(
-                        getString(R.string.max_paging_data),
-                    )
-                    binding.btnMoreProduct.visibility = View.GONE
-                    productAdapter.setShowSkeleton(false)
-                }
-
-                ProductListEvent.ErrorEvent.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-
-                ProductListEvent.UpdateProductEvent.Fail,
-                ProductListEvent.DeleteProductEvent.Fail,
-                ->
-                    requireContext()
-                        .makeToast(
-                            getString(R.string.error_update_cart_item),
-                        )
-            }
+            requireContext().makeToast(
+                errorState.receiveErrorMessage()
+            )
         }
         mainActivityListener?.observeProductList { updatedProducts ->
             productListViewModel.updateProducts(updatedProducts)
