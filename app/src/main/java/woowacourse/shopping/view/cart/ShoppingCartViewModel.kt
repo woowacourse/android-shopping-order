@@ -11,28 +11,30 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
+import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.view.model.event.LoadEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel(), OnClickCartItemCounter {
     val shoppingCart = ShoppingCart()
 
-    private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> =
+    private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent> =
         MutableLiveData()
-    val shoppingCartEvent: LiveData<ShoppingCartEvent.SuccessEvent> get() = _shoppingCartEvent
+    val shoppingCartEvent: LiveData<ShoppingCartEvent> get() = _shoppingCartEvent
 
-    private val _errorEvent: MutableSingleLiveData<ShoppingCartEvent.ErrorState> =
+    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
         MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ShoppingCartEvent.ErrorState> get() = _errorEvent
+    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
-    private val _loadingEvent: MutableSingleLiveData<ShoppingCartEvent.LoadCartItemList> =
+    private val _loadingEvent: MutableSingleLiveData<LoadEvent> =
         MutableSingleLiveData()
-    val loadingEvent: SingleLiveData<ShoppingCartEvent.LoadCartItemList> get() = _loadingEvent
+    val loadingEvent: SingleLiveData<LoadEvent> get() = _loadingEvent
 
     val checkedShoppingCart = ShoppingCart()
 
@@ -55,21 +57,15 @@ class ShoppingCartViewModel(
             deleteCheckedItem(CartItem(cartItemId, product))
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ShoppingCartEvent.DeleteShoppingCart.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ShoppingCartEvent.ErrorState.NotKnownError,
-                    )
+                is OrderException ->
+                    _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }
 
     fun loadPagingCartItemList() {
-        _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Loading)
+        _loadingEvent.setValue(LoadEvent.Loading)
 //        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val pagingData =
@@ -77,18 +73,13 @@ class ShoppingCartViewModel(
                     LOAD_SHOPPING_ITEM_OFFSET,
                     LOAD_SHOPPING_ITEM_SIZE,
                 )
-            _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
+            _loadingEvent.setValue(LoadEvent.Success)
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
-
-                else ->
-                    _errorEvent.setValue(
-                        ShoppingCartEvent.ErrorState.NotKnownError,
-                    )
+                is OrderException -> _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
 //        }, 1000)
@@ -146,7 +137,7 @@ class ShoppingCartViewModel(
                     updateCartItemType,
                 )
             when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> throw NoSuchDataException()
+                UpdateCartItemResult.ADD -> throw OrderException()
                 is UpdateCartItemResult.DELETE ->
                     deleteShoppingCartItem(
                         updateCartItemResult.cartItemId,
@@ -164,10 +155,8 @@ class ShoppingCartViewModel(
             }
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ShoppingCartEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(ShoppingCartEvent.ErrorState.NotKnownError)
+                is OrderException -> _errorEvent.setValue(e.event)
+                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
             }
         }
     }

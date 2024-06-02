@@ -12,13 +12,12 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.recommend.RecommendFragment
 
 class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
@@ -110,36 +109,17 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
             }
         }
 
-        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) {
-            adapter.setShowSkeleton(true)
+        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { event ->
+            when(event){
+                LoadEvent.Loading -> adapter.setShowSkeleton(true)
+                else -> adapter.setShowSkeleton(false)
+            }
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            when (errorState) {
-                ShoppingCartEvent.DeleteShoppingCart.Fail ->
-                    requireContext().makeToast(
-                        getString(
-                            R.string.error_delete_data,
-                        ),
-                    )
-
-                ShoppingCartEvent.LoadCartItemList.Fail -> {
-                    requireContext().makeToast(
-                        getString(R.string.max_paging_data),
-                    )
-                    adapter.setShowSkeleton(false)
-                }
-
-                ShoppingCartEvent.ErrorState.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-
-                ShoppingCartEvent.UpdateProductEvent.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.error_update_cart_item),
-                    )
-            }
+            requireContext().makeToast(
+                errorState.receiveErrorMessage()
+            )
         }
 
         mainActivityListener?.observeCartItem {

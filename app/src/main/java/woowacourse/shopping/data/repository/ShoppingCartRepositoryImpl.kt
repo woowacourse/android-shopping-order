@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.EntityMapper.toCartItem
 import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
-import woowacourse.shopping.utils.exception.NoSuchDataException
+import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 import kotlin.concurrent.thread
 
@@ -23,7 +23,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             val addedCartItemId =
                 cartItemDao.saveCartItem(CartItem(product = product).toCartItemEntity())
-            if (addedCartItemId == ERROR_DATA_ID) throw NoSuchDataException()
+            if (addedCartItemId == ERROR_DATA_ID) throw OrderException()
         }.join()
     }
 
@@ -35,7 +35,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             pagingData = cartItemDao.findPagingCartItem(offset, pagingSize).map { it.toCartItem() }
         }.join()
-        if (pagingData.isEmpty()) throw NoSuchDataException()
+        if (pagingData.isEmpty()) throw OrderException()
         return pagingData
     }
 
@@ -44,7 +44,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         thread {
             deleteId = cartItemDao.deleteCartItemById(itemId)
         }.join()
-        if (deleteId == ERROR_DELETE_DATA_ID) throw NoSuchDataException()
+        if (deleteId == ERROR_DELETE_DATA_ID) throw OrderException()
     }
 
     override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
@@ -90,7 +90,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     cartItemResult.counter.itemCount,
                 )
         }.join()
-        if (updateDataId == ERROR_UPDATE_DATA_ID) throw NoSuchDataException()
+        if (updateDataId == ERROR_UPDATE_DATA_ID) throw OrderException()
         return UpdateCartItemResult.UPDATED(cartItemResult)
     }
 
