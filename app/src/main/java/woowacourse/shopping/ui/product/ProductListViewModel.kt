@@ -49,6 +49,9 @@ class ProductListViewModel(
     private var _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
 
+    private var _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     fun loadAll() {
         thread {
             val page = currentPage.value ?: currentPageIsNullException()
@@ -62,6 +65,7 @@ class ProductListViewModel(
                 _cartProductTotalCount.value = totalCartCount
                 _isLastPage.value = isLastPage
                 _productsHistory.value = productHistory
+                _isLoading.value = false
             }
         }
     }

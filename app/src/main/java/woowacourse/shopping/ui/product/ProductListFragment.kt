@@ -51,11 +51,6 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun showSkeletonUi() {
-        binding.shimmerProductList.visibility = View.VISIBLE
-        binding.productDetailList.visibility = View.GONE
-    }
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -64,7 +59,6 @@ class ProductListFragment : Fragment() {
 
         observeNavigationShoppingCart()
         observeDetailProductDestination()
-        showSkeletonUi()
         observeLoadedProducts()
         viewModel.productsHistory.observe(viewLifecycleOwner) {
             historyAdapter.update(it)
@@ -81,8 +75,6 @@ class ProductListFragment : Fragment() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
                 productsAdapter.updateAllLoadedProducts(products)
-                binding.productDetailList.visibility = View.VISIBLE
-                binding.shimmerProductList.visibility = View.GONE
                 binding.shimmerProductList.stopShimmer()
             }
         }

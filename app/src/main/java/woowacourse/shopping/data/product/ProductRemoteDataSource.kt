@@ -39,7 +39,8 @@ class ProductRemoteDataSource(
 
     override fun findByCategory(productId: Long): List<ProductData> {
         val category = productsApiService.requestProduct(productId.toInt()).execute().body()?.category
-        val response = productsApiService.requestProducts(category, page = 0, size = 10).execute().body()?.content
+        val response =
+            productsApiService.requestProducts(category).execute().body()?.content
                 ?: throw NoSuchElementException("there is no product with category: $category")
         return response.map {
             ProductData(
