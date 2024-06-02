@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.model
 
 import com.google.gson.annotations.SerializedName
+import woowacourse.shopping.domain.model.CartDomain
+import woowacourse.shopping.domain.model.CartItemDomain
 
 data class CartResponse(
     @SerializedName("content")
@@ -26,3 +28,15 @@ data class CartResponse(
     @SerializedName("totalPages")
     val totalPages: Int,
 )
+
+fun CartResponse.toCartDomain(): CartDomain =
+    CartDomain(
+        cartItems = cartItems.map(CartItem::toCartItemDomain)
+    )
+
+fun CartItem.toCartItemDomain(): CartItemDomain =
+    CartItemDomain(
+        cartItemId = cartItemId,
+        quantity = quantity,
+        product = product.toProductItemDomain()
+    )

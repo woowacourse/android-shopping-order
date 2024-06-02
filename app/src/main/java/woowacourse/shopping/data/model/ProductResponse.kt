@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.model
 
 import com.google.gson.annotations.SerializedName
+import woowacourse.shopping.domain.model.ProductDomain
+import woowacourse.shopping.domain.model.RemoteProductItemDomain
 
 data class ProductResponse(
     @SerializedName("content")
@@ -26,3 +28,18 @@ data class ProductResponse(
     @SerializedName("totalPages")
     val totalPages: Int,
 )
+
+fun ProductResponse.toProductDomain(): ProductDomain =
+    ProductDomain(
+        products = products.map(Product::toProductItemDomain),
+        last = last
+    )
+
+fun Product.toProductItemDomain(): RemoteProductItemDomain =
+    RemoteProductItemDomain(
+        category = category,
+        id = id,
+        imageUrl = imageUrl,
+        name = name,
+        price = price
+    )

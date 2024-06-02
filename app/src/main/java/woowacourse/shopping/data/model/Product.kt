@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.model
 
 import com.google.gson.annotations.SerializedName
-import woowacourse.shopping.data.db.recent.RecentProductEntity
+import woowacourse.shopping.data.local.database.RecentProductEntity
 import java.time.LocalDateTime
 
 data class Product(
