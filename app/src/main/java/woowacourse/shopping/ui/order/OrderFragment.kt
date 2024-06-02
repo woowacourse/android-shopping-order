@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
 
@@ -23,8 +22,7 @@ class OrderFragment : Fragment() {
             factory =
                 OrderViewModel.factory(
                     (it.getSerializable(ORDER_ITEM_ID) as LongArray).toList(),
-                    ShoppingApp.orderSource,
-                ) // arguemtn 가져오기
+                )
         }
         viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }

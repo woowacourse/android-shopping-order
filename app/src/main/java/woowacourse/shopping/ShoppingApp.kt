@@ -5,6 +5,7 @@ import woowacourse.shopping.data.cart.CartItemDataSource
 import woowacourse.shopping.data.cart.CartItemRemoteDataSource
 import woowacourse.shopping.data.history.ProductHistoryDataSource
 import woowacourse.shopping.data.history.ProductHistoryLocalDataSource
+import woowacourse.shopping.data.order.OrderRemoteDataSource
 import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.data.product.ProductRemoteDataSource
 import woowacourse.shopping.local.history.HistoryProductDao
@@ -12,7 +13,6 @@ import woowacourse.shopping.local.history.HistoryProductDatabase
 import woowacourse.shopping.remote.cart.CartItemApiService
 import woowacourse.shopping.remote.common.RetrofitService
 import woowacourse.shopping.remote.order.OrderApiService
-import woowacourse.shopping.remote.order.OrderRemoteDataSource
 import woowacourse.shopping.remote.product.ProductsApiService
 
 class ShoppingApp : Application() {
