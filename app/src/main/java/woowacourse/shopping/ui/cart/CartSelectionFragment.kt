@@ -22,9 +22,15 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
+
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
+        viewModel.loadAllCartItems()
+        initializeView()
+        return binding.root
+    }
 
+    private fun initializeView() {
         viewModel.cartUiModels.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 binding.layoutCartSkeleton.visibility = View.GONE
@@ -50,7 +56,6 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
             it.getContentIfNotHandled() ?: return@observe
             showToastCartFailure()
         }
-        return binding.root
     }
 
     private fun showToastCartFailure() {

@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.products
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -42,8 +40,7 @@ class ProductsViewModel(
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
 
     init {
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({ loadPage() }, 500)
+        loadPage()
         loadRecentProducts()
     }
 

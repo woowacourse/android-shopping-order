@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -58,16 +56,12 @@ class CartViewModel(
     private val _totalQuantity = MutableLiveData<Int>()
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
-    init {
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({ loadAllCartItems() }, 500)
-    }
-
-    private fun loadAllCartItems() {
+    fun loadAllCartItems() {
         _cartLoadingEvent.value = Event(Unit)
         cartRepository.findAll {
             it.onSuccess { cartItems ->
                 if (cartItems.isEmpty()) {
+                    _cartUiModels.value = emptyList()
                     updateTotalQuantity()
                     updateTotalPrice()
                     return@onSuccess

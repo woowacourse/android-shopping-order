@@ -27,7 +27,11 @@ class CartActivity : AppCompatActivity() {
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
             RemoteProductRepository,
-            RoomRecentProductRepository.getInstance(ShoppingCartDataBase.getInstance(applicationContext).recentProductDao()),
+            RoomRecentProductRepository.getInstance(
+                ShoppingCartDataBase.getInstance(
+                    applicationContext,
+                ).recentProductDao(),
+            ),
             RemoteCartRepository,
             RemoteOrderRepository,
         )
