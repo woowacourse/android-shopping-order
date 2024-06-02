@@ -2,7 +2,6 @@ package woowacourse.shopping.view.products
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.model.CartItemEntity.Companion.DEFAULT_CART_ITEM_COUNT
 import woowacourse.shopping.data.repository.ProductRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -13,12 +12,10 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.model.event.ErrorEvent
 import woowacourse.shopping.view.model.event.LoadEvent
 
 class ProductListViewModel(
@@ -138,11 +135,7 @@ class ProductListViewModel(
         products.value?.forEach { product ->
             val count = items[product.id]
             if (count != null) {
-                if (count == DEFAULT_ITEM_COUNT) {
-                    product.updateItemSelector(false)
-                } else {
-                    product.updateItemSelector(true)
-                }
+                product.updateItemSelector(count != DEFAULT_ITEM_COUNT)
                 product.updateCartItemCount(count)
                 _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
             }
