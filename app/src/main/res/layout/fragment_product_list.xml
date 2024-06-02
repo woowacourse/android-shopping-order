@@ -17,36 +17,30 @@
         android:layout_height="match_parent">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/product_list_toolbar"
+            android:id="@+id/toolbar_product_list"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:backgroundTint="@color/gray_500"
+            android:paddingEnd="20dp"
             app:layout_constraintBottom_toTopOf="@id/product_list_nested_scroll_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/shopping_description"
+            app:titleTextColor="@color/white">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="@string/shopping_description"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="end"
-                android:layout_marginEnd="20dp"
                 android:background="@drawable/circle_background"
                 android:gravity="center"
                 android:text="@{String.valueOf(vm.cartProductTotalCount > 99 ?  @string/greater_than_99: vm.cartProductTotalCount)}"
                 android:textColor="@color/white"
-                android:textSize="20dp"
+                android:textSize="14sp"
                 android:visibility="@{vm.cartProductTotalCount > 0 ? View.VISIBLE : View.GONE}"
                 tools:ignore="SpUsage"
                 tools:text="99" />
@@ -55,14 +49,11 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="end"
-                android:layout_marginEnd="10dp"
                 android:importantForAccessibility="no"
                 android:onClick="@{() -> vm.navigateToShoppingCart()}"
                 android:src="@drawable/ic_shopping_cart" />
 
-
         </androidx.appcompat.widget.Toolbar>
-
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/product_list_nested_scroll_view"
@@ -70,12 +61,13 @@
             android:layout_height="0dp"
             android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_list_toolbar">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_product_list">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
 
                 <TextView
                     android:id="@+id/product_latest_title"
@@ -158,7 +150,6 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
                     android:padding="14dp"
-                    android:visibility="invisible"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:layout_constraintBottom_toTopOf="@id/load_more_button"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -188,7 +179,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
