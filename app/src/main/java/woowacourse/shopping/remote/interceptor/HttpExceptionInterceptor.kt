@@ -5,6 +5,7 @@ import okhttp3.Response
 import java.io.IOException
 
 class HttpExceptionInterceptor : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
 
@@ -15,6 +16,13 @@ class HttpExceptionInterceptor : Interceptor {
         return response
     }
 
+    @Throws(
+        IllegalArgumentException::class,
+        SecurityException::class,
+        NoSuchElementException::class,
+        IOException::class,
+        Exception::class,
+    )
     private fun handleHttpException(code: Int) {
         when (code) {
             400 -> throw IllegalArgumentException("Bad Request (400)")
