@@ -74,8 +74,7 @@ class ProductContentsActivity : AppCompatActivity() {
 
     private fun setProductAdapter() {
         binding.rvProducts.itemAnimator = null
-        productAdapter =
-            ProductAdapter(viewModel)
+        productAdapter = ProductAdapter(viewModel, viewModel, viewModel)
         binding.rvProducts.adapter = productAdapter
     }
 

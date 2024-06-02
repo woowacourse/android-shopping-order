@@ -6,13 +6,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductSkeletonBinding
+import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.LoadingUiModel
+import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
-import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
+import woowacourse.shopping.ui.utils.AddCartClickListener
 
 class ProductAdapter(
-    private val viewModel: ProductContentsViewModel,
+    private val countButtonClickListener: CountButtonClickListener,
+    private val addCartClickListener: AddCartClickListener,
+    private val productItemClickListener: ProductItemClickListener,
 ) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -25,7 +29,14 @@ class ProductAdapter(
             ItemProductSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return when (ProductViewType.valueOfType(viewType)) {
-            ProductViewType.PRODUCT -> ProductViewHolder(itemProductBinding, viewModel)
+            ProductViewType.PRODUCT ->
+                ProductViewHolder(
+                    itemProductBinding,
+                    countButtonClickListener,
+                    addCartClickListener,
+                    productItemClickListener,
+                )
+
             ProductViewType.SKELETON -> ProductSkeletonViewHolder(itemProductSkeletonBinding)
         }
     }
