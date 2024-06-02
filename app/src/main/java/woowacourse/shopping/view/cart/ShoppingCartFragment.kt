@@ -20,7 +20,7 @@ import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.recommend.RecommendFragment
 
-class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
+class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentShoppingCartBinding? = null
     val binding: FragmentShoppingCartBinding get() = _binding!!
@@ -65,10 +65,10 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = shoppingCartViewModel
         shoppingCartViewModel.loadPagingCartItemList()
-        binding.onClickShoppingCart = this
+        binding.onClickNavigateShoppingCart = this
         adapter =
             ShoppingCartAdapter(
-                onClickShoppingCart = this,
+                onClickShoppingCart = shoppingCartViewModel,
                 onClickCartItemCounter = shoppingCartViewModel,
             )
         binding.rvShoppingCart.adapter = adapter
@@ -145,21 +145,6 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
         mainActivityListener?.changeFragment(productFragment)
     }
 
-    override fun clickRemoveCartItem(cartItem: CartItem) {
-        shoppingCartViewModel.deleteShoppingCartItem(
-            cartItemId = cartItem.id,
-            product = cartItem.product,
-        )
-    }
-
-    override fun clickCheckBox(cartItem: CartItem) {
-        if (cartItem.cartItemSelector.isSelected) {
-            shoppingCartViewModel.deleteCheckedItem(cartItem)
-        } else {
-            shoppingCartViewModel.addCheckedItem(cartItem)
-        }
-    }
-
     override fun clickOrder() {
         val recommendFragment =
             RecommendFragment().apply {
@@ -169,10 +154,6 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
                     )
             }
         mainActivityListener?.changeFragment(recommendFragment)
-    }
-
-    override fun clickCheckAll() {
-        shoppingCartViewModel.checkAllItems()
     }
 
     private fun updateRecyclerView(cartItems: List<CartItem>) {

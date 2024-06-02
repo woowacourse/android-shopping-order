@@ -20,7 +20,7 @@ import woowacourse.shopping.view.model.event.LoadEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
-) : BaseViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter,OnClickShoppingCart {
     val shoppingCart = ShoppingCart()
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent> =
@@ -77,7 +77,7 @@ class ShoppingCartViewModel(
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
     }
 
-    fun checkAllItems() {
+    private fun checkAllItems() {
         if (allCheck.value == true) {
             shoppingCart.cartItems.value?.forEach { cartItem ->
                 if (cartItem.cartItemSelector.isSelected) {
@@ -146,14 +146,14 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun addCheckedItem(cartItem: CartItem) {
+    private fun addCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.selectItem()
         checkedShoppingCart.addProduct(cartItem)
         checkedShoppingCart
         updateCheckItemData()
     }
 
-    fun deleteCheckedItem(cartItem: CartItem) {
+    private fun deleteCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.unSelectItem()
         checkedShoppingCart.deleteProduct(cartItem.id)
         updateCheckItemData()
@@ -175,5 +175,23 @@ class ShoppingCartViewModel(
 
     override fun clickDecrease(product: Product) {
         updateCartItem(product, UpdateCartItemType.DECREASE)
+    }
+
+    override fun clickRemoveCartItem(cartItem: CartItem) {
+        deleteShoppingCartItem(
+            cartItemId = cartItem.id,
+            product = cartItem.product,
+        )
+    }
+
+    override fun clickCheckBox(cartItem: CartItem) {
+        if (cartItem.cartItemSelector.isSelected) {
+            deleteCheckedItem(cartItem)
+        } else {
+            addCheckedItem(cartItem)
+        }
+    }
+    override fun clickCheckAll() {
+        checkAllItems()
     }
 }

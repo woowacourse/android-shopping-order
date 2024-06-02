@@ -2,6 +2,7 @@ package woowacourse.shopping
 
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
 import woowacourse.shopping.data.model.CartItemEntity
+import woowacourse.shopping.data.model.RecentlyProductEntity
 import woowacourse.shopping.domain.model.Product
 
 object TestFixture {
@@ -19,6 +20,15 @@ object TestFixture {
                     id = 0L,
                     category = "",
                 ),
+        )
+    }
+    fun makeRecentlyProductEntity(): RecentlyProductEntity {
+        return RecentlyProductEntity(
+            id = 2L,
+            productId = 2L,
+            imageUrl = "",
+            name = "",
+            category = "fashion",
         )
     }
 }

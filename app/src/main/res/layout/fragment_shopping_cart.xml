@@ -20,6 +20,9 @@
         <variable
             name="onClickShoppingCart"
             type="woowacourse.shopping.view.cart.OnClickShoppingCart" />
+        <variable
+            name="onClickNavigateShoppingCart"
+            type="woowacourse.shopping.view.cart.OnClickNavigateShoppingCart" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="27dp"
             android:background="@android:color/transparent"
-            android:onClick="@{() -> onClickShoppingCart.clickBack()}"
+            android:onClick="@{() -> onClickNavigateShoppingCart.clickBack()}"
             android:src="@drawable/ic_arrow_back"
             app:layout_constraintBottom_toBottomOf="@id/vw_cart_top_bar"
             app:layout_constraintStart_toStartOf="@id/vw_cart_top_bar"
@@ -89,7 +92,7 @@
             android:layout_height="78dp"
             android:background="@color/primary"
             android:gravity="center"
-            android:onClick="@{()->onClickShoppingCart.clickOrder()}"
+            android:onClick="@{()->onClickNavigateShoppingCart.clickOrder()}"
             android:text="@{@string/formatted_order(vm.totalCount)}"
             android:textColor="@color/white"
             android:textSize="18dp"
