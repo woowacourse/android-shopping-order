@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
+import woowacourse.shopping.RecyclerViewMatcher
 import woowacourse.shopping.TestFixture
 import woowacourse.shopping.data.db.cartItem.CartItemDao
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
@@ -60,11 +61,17 @@ class ShoppingCartFragmentTest {
 
     @Test
     fun `장바구니에_담은_상품_이름을_보여준다`() {
-        onView(withId(R.id.tv_cart_item_name)).check(matches(isDisplayed()))
+        onView(
+            RecyclerViewMatcher(R.id.rv_shopping_cart)
+                .atPositionOnView(0, R.id.tv_cart_item_name)
+        ).check(matches(isDisplayed()))
     }
 
     @Test
     fun `장바구니에_담은_상품_가격을_보여준다`() {
-        onView(withId(R.id.tv_cart_item_price)).check(matches(isDisplayed()))
+        onView(
+            RecyclerViewMatcher(R.id.rv_shopping_cart)
+                .atPositionOnView(0, R.id.tv_cart_item_price)
+        ).check(matches(isDisplayed()))
     }
 }
