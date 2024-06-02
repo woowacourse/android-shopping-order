@@ -28,16 +28,16 @@ class CartViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener, CartItemClickListener {
     private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
+    val cart: LiveData<CartItemsUiState> = _cart
 
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
+
     val products: LiveData<List<ProductWithQuantity>> = _products
 
     val cartOfRecommendProductCount: LiveData<Int> =
         _products.map {
             it.sumOf { it.quantity.value }
         }
-
-    val cart: LiveData<CartItemsUiState> = _cart
 
     val totalPrice: MediatorLiveData<Int> =
         MediatorLiveData<Int>().apply {
@@ -73,6 +73,7 @@ class CartViewModel(
     override fun addCart(productId: Long) {
         cartRepository.postCartItems(productId, 1).onSuccess {
             changeRecommendProductCount(productId)
+            loadCartItems()
         }.onFailure {
             error.setValue(it)
         }
@@ -148,7 +149,7 @@ class CartViewModel(
         }
     }
 
-    fun totalPrice(): Int {
+    private fun totalPrice(): Int {
         val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice } ?: 0
         val recommends =
             _products.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
