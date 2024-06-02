@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-class RecentProduct(
+data class RecentProduct(
     val productId: Long,
     val imageUrl: String,
     val productName: String,
