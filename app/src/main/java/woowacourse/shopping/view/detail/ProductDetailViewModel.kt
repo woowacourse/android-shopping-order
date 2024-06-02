@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.model.event.ErrorEvent
 
@@ -23,7 +24,7 @@ class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     private val _product: MutableLiveData<Product> = MutableLiveData(Product.defaultProduct)
     val product: LiveData<Product> get() = _product
     private var cartItemId: Long = DEFAULT_CART_ITEM_ID
@@ -31,10 +32,6 @@ class ProductDetailViewModel(
     private val _recentlyProduct: MutableLiveData<RecentlyProduct> =
         MutableLiveData(RecentlyProduct.defaultRecentlyProduct)
     val recentlyProduct: LiveData<RecentlyProduct> get() = _recentlyProduct
-
-    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
     private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent>()
     val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
@@ -61,11 +58,7 @@ class ProductDetailViewModel(
                 ),
             )
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -78,11 +71,7 @@ class ProductDetailViewModel(
             loadRecentlyProduct(product)
             _product.value = product
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -93,11 +82,7 @@ class ProductDetailViewModel(
             cartItemId = result.cartItemId
             result.counter
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
             CartItemCounter()
         }
     }
@@ -151,11 +136,7 @@ class ProductDetailViewModel(
             _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
             _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -168,11 +149,7 @@ class ProductDetailViewModel(
                 saveRecentlyProduct(product)
             }
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 

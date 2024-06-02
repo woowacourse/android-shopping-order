@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.model.event.ErrorEvent
@@ -21,16 +22,12 @@ import woowacourse.shopping.view.model.event.LoadEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     val shoppingCart = ShoppingCart()
 
     private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent> =
         MutableLiveData()
     val shoppingCartEvent: LiveData<ShoppingCartEvent> get() = _shoppingCartEvent
-
-    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
     private val _loadingEvent: MutableSingleLiveData<LoadEvent> =
         MutableSingleLiveData()
@@ -56,11 +53,7 @@ class ShoppingCartViewModel(
                 ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
             deleteCheckedItem(CartItem(cartItemId, product))
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -77,10 +70,7 @@ class ShoppingCartViewModel(
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
         } catch (e: Exception) {
-            when (e) {
-                is OrderException -> _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
 //        }, 1000)
     }
@@ -154,10 +144,7 @@ class ShoppingCartViewModel(
                 }
             }
         } catch (e: Exception) {
-            when (e) {
-                is OrderException -> _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 

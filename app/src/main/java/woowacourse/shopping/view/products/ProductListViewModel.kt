@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.model.event.ErrorEvent
 import woowacourse.shopping.view.model.event.LoadEvent
@@ -24,7 +25,7 @@ class ProductListViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
     private val _cartItemCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -42,10 +43,6 @@ class ProductListViewModel(
         MutableSingleLiveData()
     val loadingEvent: SingleLiveData<LoadEvent> get() = _loadingEvent
 
-    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
-
     init {
         updateTotalCartItemCount()
         loadPagingRecentlyProduct()
@@ -62,11 +59,7 @@ class ProductListViewModel(
             _loadingEvent.setValue(LoadEvent.Success)
             _productListEvent.setValue(ProductListEvent.LoadProductEvent)
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
 //        }, 1000)
     }
@@ -76,11 +69,7 @@ class ProductListViewModel(
             val pagingData = recentlyProductRepository.getRecentlyProductList()
             _recentlyProducts.value = pagingData
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -115,11 +104,7 @@ class ProductListViewModel(
                 }
             }
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -136,11 +121,7 @@ class ProductListViewModel(
             updateTotalCartItemCount()
             _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -149,11 +130,7 @@ class ProductListViewModel(
             val totalItemCount = shoppingCartRepository.getTotalCartItemCount()
             _cartItemCount.value = totalItemCount
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 

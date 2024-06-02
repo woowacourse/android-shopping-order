@@ -20,6 +20,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.model.event.ErrorEvent
@@ -29,15 +30,12 @@ class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     private var checkedShoppingCart = ShoppingCart()
 
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
 
-    private val _errorEvent: MutableSingleLiveData<ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
     private val _recommendEvent: MutableSingleLiveData<RecommendEvent> =
         MutableSingleLiveData()
     val recommendEvent: SingleLiveData<RecommendEvent> get() = _recommendEvent
@@ -74,11 +72,7 @@ class RecommendViewModel(
             _products.value = recommendData
             updateCheckItemData()
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -88,11 +82,7 @@ class RecommendViewModel(
             orderRepository.orderShoppingCart(ids ?: throw OrderException())
             _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -116,11 +106,7 @@ class RecommendViewModel(
                 }
             }
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -132,11 +118,7 @@ class RecommendViewModel(
             checkedShoppingCart.addProduct(CartItem(product = product))
             updateCheckItemData()
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
@@ -147,11 +129,7 @@ class RecommendViewModel(
             checkedShoppingCart.deleteProductFromProductId(product.id)
             updateCheckItemData()
         } catch (e: Exception) {
-            when (e) {
-                is OrderException ->
-                    _errorEvent.setValue(e.event)
-                else -> _errorEvent.setValue(ErrorEvent.NotKnownError)
-            }
+            handleException(e)
         }
     }
 
