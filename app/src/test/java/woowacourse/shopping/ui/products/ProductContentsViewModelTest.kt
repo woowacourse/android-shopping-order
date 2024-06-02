@@ -50,14 +50,14 @@ class ProductContentsViewModelTest {
     @Test
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // given
-        every { cartRepository.addProductToCart(0, 1) }
+        every { cartRepository.postCartItems(0L, 1).getOrThrow() } returns mockk()
         every { cartRepository.getAllCartItems().getOrThrow() } returns listOf(Cart(0L, 0L, Quantity(1)))
 
         // when
-        viewModel.addCart(0)
+        viewModel.addCart(0L)
         val actual = viewModel.productWithQuantity.getOrAwaitValue()
 
-        val actualProduct = (actual as List<ProductWithQuantityUiModel>)
+        val actualProduct = (actual.productWithQuantities as List<ProductWithQuantityUiModel>)
 
         // then
         assertThat(actualProduct.first { it.product.id == 0L }.quantity).isEqualTo(1)

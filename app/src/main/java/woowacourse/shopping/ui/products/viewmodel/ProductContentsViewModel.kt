@@ -100,13 +100,11 @@ class ProductContentsViewModel(
         productRepository.getProducts(currentOffset++, 20).onSuccess {
             items.addAll(it)
             this.products.value = items
-            Timer().schedule(
-                object : TimerTask() {
-                    override fun run() {
-                    }
-                },
-                1000,
-            )
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
+                }
+            }, 1000)
         }.onFailure {
             _error.setValue(it)
         }

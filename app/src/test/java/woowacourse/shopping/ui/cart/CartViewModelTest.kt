@@ -7,24 +7,24 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.cart.CartRepository
+import woowacourse.shopping.data.product.ProductRepository
+import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.ui.FakeRecentProductDao
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartViewModelTest {
     private lateinit var viewModel: CartViewModel
-    private lateinit var productRepository: ProductRepositoryImpl
-    private val recentProductRepository = RecentProductRepositoryImpl.get(FakeRecentProductDao)
-    private lateinit var cartRepository: CartRepositoryImpl
+    private lateinit var productRepository: ProductRepository
+    private lateinit var recentProductRepository: RecentProductRepository
+    private lateinit var cartRepository: CartRepository
 
     @BeforeEach
     fun setUp() {
-        productRepository = mockk<ProductRepositoryImpl>()
-        cartRepository = mockk<CartRepositoryImpl>()
+        productRepository = mockk<ProductRepository>()
+        recentProductRepository = mockk<RecentProductRepository>()
+        cartRepository = mockk<CartRepository>()
         every { cartRepository.getAllCartItemsWithProduct().getOrThrow() } returns emptyList()
         viewModel = CartViewModel(productRepository, cartRepository, recentProductRepository)
     }
