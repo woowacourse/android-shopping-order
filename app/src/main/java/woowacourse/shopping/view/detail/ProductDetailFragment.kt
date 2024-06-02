@@ -18,7 +18,7 @@ import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.model.event.ErrorEvent
 
-class ProductDetailFragment : Fragment(), OnClickDetail {
+class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentProductDetailBinding? = null
     val binding: FragmentProductDetailBinding get() = _binding!!
@@ -104,7 +104,8 @@ class ProductDetailFragment : Fragment(), OnClickDetail {
 
     private fun initView() {
         binding.vm = productDetailViewModel
-        binding.onClickDetail = this
+        binding.onClickNavigateDetail = this
+        binding.onClickDetail = productDetailViewModel
         binding.onClickCartItemCounter = productDetailViewModel
         binding.lifecycleOwner = viewLifecycleOwner
     }
@@ -117,14 +118,6 @@ class ProductDetailFragment : Fragment(), OnClickDetail {
 
     override fun clickClose() {
         mainActivityListener?.popFragment()
-    }
-
-    override fun clickAddCart(product: Product) {
-        productDetailViewModel.addShoppingCartItem(product)
-    }
-
-    override fun clickRecently(recentlyProduct: RecentlyProduct) {
-        productDetailViewModel.updateRecentlyProduct(recentlyProduct)
     }
 
     companion object {

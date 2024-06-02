@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 
 interface OnClickDetail {
-    fun clickClose()
 
     fun clickAddCart(product: Product)
 

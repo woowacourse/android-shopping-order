@@ -22,7 +22,7 @@ class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : BaseViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter, OnClickDetail {
     private val _product: MutableLiveData<Product> = MutableLiveData(Product.defaultProduct)
     val product: LiveData<Product> get() = _product
     private var cartItemId: Long = DEFAULT_CART_ITEM_ID
@@ -123,7 +123,7 @@ class ProductDetailViewModel(
         recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
     }
 
-    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
+    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
         try {
             deletePrevRecentlyProduct(recentlyProduct.id)
             val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
@@ -162,5 +162,13 @@ class ProductDetailViewModel(
 
     override fun clickDecrease(product: Product) {
         decreaseItemCounter()
+    }
+
+    override fun clickAddCart(product: Product) {
+        addShoppingCartItem(product)
+    }
+
+    override fun clickRecently(recentlyProduct: RecentlyProduct) {
+        updateRecentlyProduct(recentlyProduct)
     }
 }
