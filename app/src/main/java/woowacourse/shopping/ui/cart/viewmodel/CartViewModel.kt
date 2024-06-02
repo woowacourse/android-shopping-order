@@ -45,7 +45,7 @@ class CartViewModel(
 
     val isTotalChbChecked: LiveData<Boolean> =
         _cart.map {
-            it.cartItems.all { it.isChecked }
+            it.cartItems.all { it.isChecked } && it.cartItems.isNotEmpty()
         }
 
     val checkedItemCount: LiveData<Int> =
