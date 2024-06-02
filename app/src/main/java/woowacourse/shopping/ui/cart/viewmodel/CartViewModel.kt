@@ -155,12 +155,12 @@ class CartViewModel(
         return carts + recommends
     }
 
-    fun totalCheckBoxCheck(isChecked: Boolean) {
+    fun totalCheckBoxCheck() {
         val currentCarts = requireNotNull(_cart.value)
         _cart.value =
             CartItemsUiState(
                 currentCarts.cartItems.map {
-                    it.copy(isChecked = isChecked)
+                    it.copy(isChecked = !requireNotNull(isTotalChbChecked.value))
                 },
                 isLoading = false,
             )

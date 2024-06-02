@@ -93,7 +93,7 @@
             android:background="@drawable/checkbox"
             android:button="@android:color/transparent"
             android:checked="@{vm.isTotalChbChecked}"
-            android:onCheckedChanged="@{(buttonView, isChecked) -> vm.totalCheckBoxCheck(isChecked)}"
+            android:onClickListener="@{() -> vm.totalCheckBoxCheck()}"
             app:isVisible="@{!vm.isRecommendPage}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
