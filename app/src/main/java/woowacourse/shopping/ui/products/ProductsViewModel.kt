@@ -19,8 +19,14 @@ class ProductsViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _productsUiState = MutableLiveData<Event<ProductsUiState>>(Event(ProductsUiState()))
-    val productsUiState: LiveData<Event<ProductsUiState>> = _productsUiState
+    private val _productUiModels = MutableLiveData<List<ProductUiModel>>()
+    val productUiModels: LiveData<List<ProductUiModel>> get() = _productUiModels
+
+    private val _productsLoadingEvent = MutableLiveData<Event<Unit>>()
+    val productsLoadingEvent: LiveData<Event<Unit>> get() = _productsLoadingEvent
+
+    private val _productsErrorEvent = MutableLiveData<Event<Unit>>()
+    val productsErrorEvent: LiveData<Event<Unit>> get() = _productsErrorEvent
 
     private val _showLoadMore = MutableLiveData<Boolean>(false)
     val showLoadMore: LiveData<Boolean> get() = _showLoadMore
@@ -42,13 +48,13 @@ class ProductsViewModel(
     }
 
     fun loadPage() {
-        val productsUiState = _productsUiState.value?.peekContent() ?: return
-        _productsUiState.value = Event(productsUiState.copy(isLoading = true))
+        _productsLoadingEvent.value = Event(Unit)
         productRepository.findPage(page, PAGE_SIZE) {
             it.onSuccess { products ->
                 val additionalProductUiModels = products.toProductUiModels()
-                val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
-                _productsUiState.postValue(Event(ProductsUiState(productUiModels = newProductUiModels)))
+                val newProductUiModels =
+                    (productUiModels() ?: emptyList()) + additionalProductUiModels
+                _productUiModels.postValue(newProductUiModels)
                 updateTotalCount()
                 _showLoadMore.value = false
                 page++
@@ -70,15 +76,14 @@ class ProductsViewModel(
     }
 
     fun loadProducts() {
-        val productsUiState = _productsUiState.value?.peekContent() ?: return
-        _productsUiState.value = Event(productsUiState.copy(isLoading = true))
+        _productsLoadingEvent.value = Event(Unit)
         val productUiModels = productUiModels()?.toMutableList() ?: return
 
         productUiModels.forEachIndexed { index, productUiModel ->
             val product = productRepository.syncFind(productUiModel.productId)
             productUiModels[index] = product.toProductUiModel()
         }
-        _productsUiState.value = Event(ProductsUiState(productUiModels = productUiModels))
+        _productUiModels.postValue(productUiModels)
         updateTotalCount()
     }
 
@@ -152,7 +157,7 @@ class ProductsViewModel(
                 val newProductUiModel = product.toProductUiModel()
                 val position = productUiModels.indexOfFirst { it.productId == productId }
                 productUiModels[position] = newProductUiModel
-                _productsUiState.postValue(Event(ProductsUiState(productUiModels)))
+                _productUiModels.postValue(productUiModels)
                 updateTotalCount()
             }.onFailure {
                 setError()
@@ -188,10 +193,10 @@ class ProductsViewModel(
     }
 
     private fun setError() {
-        _productsUiState.postValue(Event(ProductsUiState(isError = true)))
+        _productsErrorEvent.value = Event(Unit)
     }
 
-    private fun productUiModels(): List<ProductUiModel>? = _productsUiState.value?.peekContent()?.productUiModels
+    private fun productUiModels(): List<ProductUiModel>? = _productUiModels.value
 
     companion object {
         private const val INITIALIZE_PAGE = 0

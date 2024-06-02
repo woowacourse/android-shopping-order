@@ -28,7 +28,11 @@ class ProductsActivity : AppCompatActivity() {
     private val viewModel by viewModels<ProductsViewModel> {
         ProductsViewModelFactory(
             RemoteProductRepository,
-            RoomRecentProductRepository.getInstance(ShoppingCartDataBase.getInstance(applicationContext).recentProductDao()),
+            RoomRecentProductRepository.getInstance(
+                ShoppingCartDataBase.getInstance(
+                    applicationContext,
+                ).recentProductDao(),
+            ),
             RemoteCartRepository,
         )
     }
@@ -76,23 +80,22 @@ class ProductsActivity : AppCompatActivity() {
         initializeProductAdapter()
         initializeToolbar()
         initializePage()
-        viewModel.productsUiState.observe(this) {
-            val productsUiState = it.getContentIfNotHandled() ?: return@observe
-            if (productsUiState.isLoading) {
-                binding.layoutProductsSkeleton.visibility = View.VISIBLE
-                binding.rvProducts.visibility = View.GONE
-                return@observe
-            }
-            if (productsUiState.productUiModels != null) {
-                binding.layoutProductsSkeleton.visibility = View.GONE
-                binding.rvProducts.visibility = View.VISIBLE
-                adapter.updateProducts(productsUiState.productUiModels)
-                return@observe
-            }
-            if (productsUiState.isError) {
-                Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
-                return@observe
-            }
+
+        viewModel.productUiModels.observe(this) {
+            binding.layoutProductsSkeleton.visibility = View.GONE
+            binding.rvProducts.visibility = View.VISIBLE
+            adapter.updateProducts(it)
+        }
+
+        viewModel.productsLoadingEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            binding.layoutProductsSkeleton.visibility = View.VISIBLE
+            binding.rvProducts.visibility = View.GONE
+        }
+
+        viewModel.productsErrorEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
         }
     }
 

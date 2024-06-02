@@ -22,8 +22,14 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
-    private val _cartUiState = MutableLiveData<Event<CartUiState>>()
-    val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
+    private val _cartUiModels = MutableLiveData<List<CartUiModel>>()
+    val cartUiModels: LiveData<List<CartUiModel>> get() = _cartUiModels
+
+    private val _cartLoadingEvent = MutableLiveData<Event<Unit>>()
+    val cartLoadingEvent: LiveData<Event<Unit>> get() = _cartLoadingEvent
+
+    private val _cartErrorEvent = MutableLiveData<Event<Unit>>()
+    val cartErrorEvent: LiveData<Event<Unit>> get() = _cartErrorEvent
 
     private val _totalPrice = MutableLiveData<Int>()
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -58,15 +64,15 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
+        _cartLoadingEvent.value = Event(Unit)
         cartRepository.findAll {
             it.onSuccess { cartItems ->
                 if (cartItems.isEmpty()) {
-                    _cartUiState.value = Event(CartUiState.Empty)
                     updateTotalQuantity()
                     updateTotalPrice()
                     return@onSuccess
                 }
-                cartItems.forEach { loadProduct(it) }
+                cartItems.forEach { cartItem -> loadProduct(cartItem) }
             }.onFailure {
                 setError()
             }
@@ -105,12 +111,12 @@ class CartViewModel(
         updatedProduct: Product,
         updatedCartItem: CartItem,
     ) {
-        updateCartUiState(updatedProduct, updatedCartItem)
+        updateCartUiModels(updatedProduct, updatedCartItem)
         updateTotalQuantity()
         updateTotalPrice()
     }
 
-    private fun updateCartUiState(
+    private fun updateCartUiModels(
         product: Product,
         cartItem: CartItem,
     ) {
@@ -125,8 +131,7 @@ class CartViewModel(
         }
 
         val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
-        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
-        _cartUiState.value = newCartUiState
+        _cartUiModels.value = newCartUiModels
     }
 
     private fun List<CartUiModel>.upsert(cartUiModel: CartUiModel): List<CartUiModel> {
@@ -161,7 +166,7 @@ class CartViewModel(
     private fun updateDeletedCart(deletedCartUiModel: CartUiModel) {
         val newCartUiModels = findCartUiModelsOrNull()?.toMutableList() ?: return
         newCartUiModels.remove(deletedCartUiModel)
-        _cartUiState.value = Event(CartUiState.Success(newCartUiModels))
+        _cartUiModels.value = newCartUiModels
         loadAllCartItems()
         updateCartSelectedCount()
     }
@@ -217,8 +222,7 @@ class CartViewModel(
         if (oldCartUiModel.isSelected == isSelected) return
 
         val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
-        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
-        _cartUiState.value = newCartUiState
+        _cartUiModels.value = newCartUiModels
 
         updateTotalPrice()
         updateTotalQuantity()
@@ -313,7 +317,7 @@ class CartViewModel(
     private fun CartUiModel.toCartItem() = CartItem(cartItemId, productId, quantity)
 
     private fun setError() {
-        _cartUiState.value = Event(CartUiState.Failure)
+        _cartErrorEvent.value = Event(Unit)
     }
 
     private fun findCartUiModelByProductId(productId: Int): CartUiModel? {
@@ -321,10 +325,6 @@ class CartViewModel(
     }
 
     private fun findCartUiModelsOrNull(): List<CartUiModel>? {
-        val cartUiState = cartUiState.value?.peekContent()
-        if (cartUiState is CartUiState.Success) {
-            return cartUiState.cartUiModels
-        }
-        return null
+        return cartUiModels.value
     }
 }

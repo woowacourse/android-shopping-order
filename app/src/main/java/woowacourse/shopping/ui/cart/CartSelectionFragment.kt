@@ -25,32 +25,30 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
 
-        viewModel.cartUiState.observe(viewLifecycleOwner) {
-            val cartUiState = it.getContentIfNotHandled() ?: return@observe
-            when (cartUiState) {
-                CartUiState.Failure -> {
-                    showToastCartFailure()
-                }
-
-                CartUiState.Loading -> {
-                    binding.layoutCartSkeleton.visibility = View.VISIBLE
-                    binding.rvCart.visibility = View.GONE
-                    binding.tvEmptyCart.visibility = View.GONE
-                }
-
-                CartUiState.Empty -> {
-                    binding.layoutCartSkeleton.visibility = View.GONE
-                    binding.rvCart.visibility = View.GONE
-                    binding.tvEmptyCart.visibility = View.VISIBLE
-                }
-
-                is CartUiState.Success -> {
-                    binding.layoutCartSkeleton.visibility = View.GONE
-                    binding.rvCart.visibility = View.VISIBLE
-                    binding.tvEmptyCart.visibility = View.GONE
-                    adapter.submitList(cartUiState.cartUiModels)
-                }
+        viewModel.cartUiModels.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                binding.layoutCartSkeleton.visibility = View.GONE
+                binding.rvCart.visibility = View.GONE
+                binding.tvEmptyCart.visibility = View.VISIBLE
+                return@observe
             }
+
+            binding.layoutCartSkeleton.visibility = View.GONE
+            binding.rvCart.visibility = View.VISIBLE
+            binding.tvEmptyCart.visibility = View.GONE
+            adapter.submitList(it)
+        }
+
+        viewModel.cartLoadingEvent.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled() ?: return@observe
+            binding.layoutCartSkeleton.visibility = View.VISIBLE
+            binding.rvCart.visibility = View.GONE
+            binding.tvEmptyCart.visibility = View.GONE
+        }
+
+        viewModel.cartErrorEvent.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled() ?: return@observe
+            showToastCartFailure()
         }
         return binding.root
     }
