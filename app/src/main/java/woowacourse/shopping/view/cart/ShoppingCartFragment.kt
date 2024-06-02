@@ -70,6 +70,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             ShoppingCartAdapter(
                 onClickShoppingCart = shoppingCartViewModel,
                 onClickCartItemCounter = shoppingCartViewModel,
+                onClickNavigateShoppingCart = this,
             )
         binding.rvShoppingCart.adapter = adapter
     }

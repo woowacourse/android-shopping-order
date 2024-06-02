@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartItemSkeletonBinding
 import woowacourse.shopping.databinding.ItemShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.view.cart.OnClickNavigateShoppingCart
 import woowacourse.shopping.view.cart.OnClickShoppingCart
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartSkeletonViewHolder
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartViewHolder
@@ -15,6 +16,7 @@ import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 class ShoppingCartAdapter(
     private val onClickShoppingCart: OnClickShoppingCart,
     private val onClickCartItemCounter: OnClickCartItemCounter,
+    private val onClickNavigateShoppingCart: OnClickNavigateShoppingCart,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var cartItems: MutableList<ShoppingCartItem> = mutableListOf()
     private var showSkeleton: Boolean = true
@@ -35,7 +37,7 @@ class ShoppingCartAdapter(
             VIEW_TYPE_CART_PRODUCT -> {
                 val view =
                     ItemShoppingCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart)
+                ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart,onClickNavigateShoppingCart)
             }
             else -> {
                 val view =
