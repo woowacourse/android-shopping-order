@@ -20,18 +20,7 @@ class OrderFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            factory =
-                OrderViewModel.factory(
-                    (it.getSerializable(ORDER_ITEM_ID) as LongArray).toList(),
-                )
-        }
-        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadRecommendedProducts()
+        initViewModel()
     }
 
     override fun onCreateView(
@@ -40,10 +29,40 @@ class OrderFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentOrderBinding.inflate(inflater)
+        initBinding()
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        initRecommendProductsAdapter()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadRecommendedProducts()
+    }
+
+    private fun initViewModel() {
+        getOrderIds()
+        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
+    }
+
+    private fun getOrderIds() {
+        arguments?.let {
+            factory =
+                OrderViewModel.factory(
+                    (it.getSerializable(ORDER_ITEM_ID) as LongArray).toList(),
+                )
+        }
+    }
+
+    private fun initBinding() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        initRecommendProductsAdapter()
-        return binding.root
     }
 
     private fun initRecommendProductsAdapter() {

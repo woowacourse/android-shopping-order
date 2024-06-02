@@ -36,11 +36,20 @@ class ProductListFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentProductListBinding.inflate(inflater)
-        binding.vm = viewModel
-        binding.lifecycleOwner = this
-        binding.productDetailList.adapter = productsAdapter
-        binding.productLatestList.adapter = historyAdapter
+        initBinding()
+        initRecyclerViewAdapter()
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        observeNavigationShoppingCart()
+        observeDetailProductDestination()
+        observeProductsHistory()
+        observeLoadedProducts()
     }
 
     override fun onResume() {
@@ -51,18 +60,14 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun initBinding() {
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
+    }
 
-        observeNavigationShoppingCart()
-        observeDetailProductDestination()
-        observeLoadedProducts()
-        viewModel.productsHistory.observe(viewLifecycleOwner) {
-            historyAdapter.update(it)
-        }
+    private fun initRecyclerViewAdapter() {
+        binding.productDetailList.adapter = productsAdapter
+        binding.productLatestList.adapter = historyAdapter
     }
 
     private fun observeNavigationShoppingCart() {
@@ -71,23 +76,14 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun observeLoadedProducts() {
-        viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
-            if (products.isNotEmpty()) {
-                productsAdapter.updateAllLoadedProducts(products)
-                binding.shimmerProductList.stopShimmer()
-            }
-        }
+    private fun navigateToShoppingCart() {
+        navigateToFragment(ShoppingCartFragment())
     }
 
     private fun observeDetailProductDestination() {
         viewModel.detailProductDestinationId.observe(viewLifecycleOwner) { productId ->
             navigateToProductDetail(productId)
         }
-    }
-
-    private fun navigateToShoppingCart() {
-        navigateToFragment(ShoppingCartFragment())
     }
 
     private fun navigateToProductDetail(id: Long) = navigateToFragment(ProductDetailFragment.newInstance(id))
@@ -97,6 +93,21 @@ class ProductListFragment : Fragment() {
             replace(R.id.container, fragment)
             addToBackStack(null)
             commit()
+        }
+    }
+
+    private fun observeProductsHistory() {
+        viewModel.productsHistory.observe(viewLifecycleOwner) {
+            historyAdapter.update(it)
+        }
+    }
+
+    private fun observeLoadedProducts() {
+        viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
+            if (products.isNotEmpty()) {
+                productsAdapter.updateAllLoadedProducts(products)
+                binding.shimmerProductList.stopShimmer()
+            }
         }
     }
 
