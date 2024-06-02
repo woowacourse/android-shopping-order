@@ -113,12 +113,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
             when (loadingState) {
                 ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
                 ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
-                ShoppingCartEvent.LoadCartItemList.Fail -> {
-                    adapter.setShowSkeleton(false)
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-                }
+                ShoppingCartEvent.LoadCartItemList.Fail -> adapter.setShowSkeleton(false)
             }
         }
 

@@ -80,6 +80,7 @@ class ShoppingCartViewModel(
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
         } catch (e: Exception) {
+            _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
             when (e) {
                 is NoSuchDataException ->
                     _errorEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
