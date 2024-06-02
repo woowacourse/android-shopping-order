@@ -38,7 +38,7 @@ class ProductDetailViewModelTest {
     @BeforeEach
     fun setUp() {
         every { productRepository.findProductById(productId) } returns Result.success(STUB_PRODUCT_A.toDomain())
-        every { productHistoryRepository.getProductHistory(any()) } returns Result.success(emptyList())
+        every { productHistoryRepository.getProductHistoriesBySize(any()) } returns Result.success(emptyList())
         every { shoppingCartRepository.getAllCartProducts() } returns Result.success(emptyList())
         every { shoppingCartRepository.findCartProduct(1L) } returns Result.success(STUB_PRODUCT_A.toDomain())
 

@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
+import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ProductHistoryRepositoryImpl(
-    private val productHistoryDataSource: ProductHistoryDataSource,
+    private val productHistoryLocalDataSource: ProductHistoryLocalDataSource,
     private val shoppingCartRepository: ShoppingCartRepository,
 ) :
     ProductHistoryRepository {
@@ -19,7 +19,7 @@ class ProductHistoryRepositoryImpl(
         category: String,
         imageUrl: String,
     ): Result<Unit> =
-        productHistoryDataSource.insertProductHistory(
+        productHistoryLocalDataSource.insertProductHistory(
             productId = productId,
             name = name,
             price = price,
@@ -27,17 +27,16 @@ class ProductHistoryRepositoryImpl(
             imageUrl = imageUrl,
         )
 
-    override fun findProductHistory(productId: Long): Result<Product> =
-        productHistoryDataSource.findProductHistory(productId = productId)
+    override fun getProductHistoryById(productId: Long): Result<Product> =
+        productHistoryLocalDataSource.getProductHistoryById(productId = productId)
             .mapCatching { it.toDomain() }
 
     override fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
-        val recentHistory =
-            productHistoryDataSource.getProductHistory(1).getOrThrow()
+        val recentHistory = productHistoryLocalDataSource.getProductHistoriesBySize(1).getOrThrow()
 
         if (recentHistory.isEmpty()) return Result.success(emptyList())
 
-        return productHistoryDataSource.getProductHistoriesByCategory(category = recentHistory.first().category)
+        return productHistoryLocalDataSource.getProductHistoriesByCategory(category = recentHistory.first().category)
             .mapCatching { result ->
                 val carts = shoppingCartRepository.getAllCarts().getOrNull()
 
@@ -48,11 +47,12 @@ class ProductHistoryRepositoryImpl(
             }
     }
 
-    override fun getProductHistory(size: Int): Result<List<Product>> =
-        productHistoryDataSource.getProductHistory(size = size)
+    override fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
+        productHistoryLocalDataSource.getProductHistoriesBySize(size = size)
             .mapCatching { result -> result.map { it.toDomain() } }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.deleteProductHistory(productId = productId)
+    override fun deleteProductHistoryById(productId: Long): Result<Unit> =
+        productHistoryLocalDataSource.deleteProductHistoryById(productId = productId)
 
-    override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
+    override fun deleteAllProductHistories(): Result<Unit> = productHistoryLocalDataSource.deleteAllProductHistories()
 }

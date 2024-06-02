@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.model.remote.CartsDto
 
-interface ShoppingCartDataSource {
+interface ShoppingRemoteCartDataSource {
     fun insertCartProduct(
         productId: Long,
         quantity: Int,
@@ -18,7 +18,7 @@ interface ShoppingCartDataSource {
         size: Int,
     ): Result<CartsDto>
 
-    fun getCartProductsTotal(): Result<Int>
+    fun getCartProductsQuantity(): Result<Int>
 
-    fun deleteCartProduct(cartId: Int): Result<Unit>
+    fun deleteCartProductById(cartId: Int): Result<Unit>
 }

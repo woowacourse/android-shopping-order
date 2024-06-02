@@ -1,13 +1,13 @@
 package woowacourse.shopping.local.datasource
 
-import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
+import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
 import woowacourse.shopping.data.model.local.ProductHistoryDto
 import woowacourse.shopping.local.dao.ProductHistoryDao
 import woowacourse.shopping.local.mapper.toData
 import woowacourse.shopping.local.model.ProductHistoryEntity
 import java.time.LocalDateTime
 
-class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : ProductHistoryDataSource {
+class ProductHistoryLocalDataSourceImpl(private val dao: ProductHistoryDao) : ProductHistoryLocalDataSource {
     override fun insertProductHistory(
         productId: Long,
         name: String,
@@ -29,7 +29,7 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
             dao.insertProductHistory(productHistoryEntity = productHistoryEntity)
         }
 
-    override fun findProductHistory(productId: Long): Result<ProductHistoryDto> =
+    override fun getProductHistoryById(productId: Long): Result<ProductHistoryDto> =
         runCatching {
             dao.findProductHistory(productId = productId).toData()
         }
@@ -39,17 +39,17 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
             dao.getProductHistoriesByCategory(category = category).map { it.toData() }
         }
 
-    override fun getProductHistory(size: Int): Result<List<ProductHistoryDto>> =
+    override fun getProductHistoriesBySize(size: Int): Result<List<ProductHistoryDto>> =
         runCatching {
             dao.getProductHistoryPaged(size = size).map { it.toData() }
         }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> =
+    override fun deleteProductHistoryById(productId: Long): Result<Unit> =
         runCatching {
             dao.deleteProductHistory(productId = -productId)
         }
 
-    override fun deleteAllProductHistory(): Result<Unit> =
+    override fun deleteAllProductHistories(): Result<Unit> =
         runCatching {
             dao.deleteAllProductHistory()
         }

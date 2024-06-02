@@ -2,10 +2,10 @@ package woowacourse.shopping.app
 
 import android.app.Application
 import androidx.preference.PreferenceManager
-import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
-import woowacourse.shopping.data.datasource.remote.OrderDataSource
-import woowacourse.shopping.data.datasource.remote.ProductDataSource
-import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
+import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
 import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
@@ -15,13 +15,13 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
+import woowacourse.shopping.local.datasource.ProductHistoryLocalDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
 import woowacourse.shopping.remote.api.NetworkModule
-import woowacourse.shopping.remote.datasource.OrderDataSourceImpl
-import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
-import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.OrderRemoteDataSourceImpl
+import woowacourse.shopping.remote.datasource.ProductRemoteDataSourceImpl
+import woowacourse.shopping.remote.datasource.ShoppingRemoteCartDataSourceImpl
 
 class ShoppingApplication : Application() {
     private val authProvider: AuthProvider by lazy {
@@ -30,32 +30,32 @@ class ShoppingApplication : Application() {
 
     private val networkModule by lazy { NetworkModule(authProvider = authProvider) }
 
-    private val shoppingCartDataSource: ShoppingCartDataSource by lazy {
-        ShoppingCartDataSourceImpl(networkModule.cartService)
+    private val shoppingRemoteCartDataSource: ShoppingRemoteCartDataSource by lazy {
+        ShoppingRemoteCartDataSourceImpl(networkModule.cartService)
     }
     val shoppingCartRepository: ShoppingCartRepository by lazy {
-        ShoppingCartRepositoryImpl(shoppingCartDataSource)
+        ShoppingCartRepositoryImpl(shoppingRemoteCartDataSource)
     }
 
-    private val productHistoryDataSource: ProductHistoryDataSource by lazy {
-        ProductHistoryDataSourceImpl(ProductHistoryDatabase.getDatabase(applicationContext).dao())
+    private val productHistoryLocalDataSource: ProductHistoryLocalDataSource by lazy {
+        ProductHistoryLocalDataSourceImpl(ProductHistoryDatabase.getDatabase(applicationContext).dao())
     }
     val productHistoryRepository: ProductHistoryRepository by lazy {
-        ProductHistoryRepositoryImpl(productHistoryDataSource, shoppingCartRepository)
+        ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRepository)
     }
 
-    private val productDataSource: ProductDataSource by lazy { ProductDataSourceImpl(networkModule.productService) }
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy { ProductRemoteDataSourceImpl(networkModule.productService) }
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
-            productDataSource,
-            shoppingCartDataSource,
+            productRemoteDataSource,
+            shoppingRemoteCartDataSource,
         )
     }
 
-    private val orderDataSource: OrderDataSource by lazy { OrderDataSourceImpl(networkModule.orderService) }
+    private val orderRemoteDataSource: OrderRemoteDataSource by lazy { OrderRemoteDataSourceImpl(networkModule.orderService) }
     val orderRepository: OrderRepository by lazy {
         OrderRepositoryImpl(
-            orderDataSource,
+            orderRemoteDataSource,
         )
     }
 

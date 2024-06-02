@@ -28,7 +28,7 @@ class ShoppingCartViewModelTest {
     fun setUp() {
         every { repository.getCartProductsPaged(0, 5) } returns Result.success(CART_PRODUCTS.subList(0, 5).map { it.toDomain() })
         every { repository.getCartProductsPaged(1, 5) } returns Result.success(CART_PRODUCTS.subList(5, 10).map { it.toDomain() })
-        every { repository.getCartProductsTotal() } returns Result.success(60)
+        every { repository.getCartProductsQuantity() } returns Result.success(60)
 
         viewModel = ShoppingCartViewModel(repository)
         val latch = CountDownLatch(1)
@@ -46,7 +46,7 @@ class ShoppingCartViewModelTest {
     fun `주문을 삭제하면 장바구니에 주문이 사라진다`() {
         // given
         val productIdSlot = slot<Long>()
-        every { repository.deleteCartProduct(capture(productIdSlot)) } returns Result.success(Unit)
+        every { repository.deleteCartProductById(capture(productIdSlot)) } returns Result.success(Unit)
         every { repository.getCartProductsPaged(0, 5) } returns Result.success(CART_PRODUCTS.subList(1, 5).map { it.toDomain() })
 
         // when
@@ -56,7 +56,7 @@ class ShoppingCartViewModelTest {
         val latch = CountDownLatch(1)
         latch.await(1, TimeUnit.SECONDS)
 
-        verify { repository.deleteCartProduct(CART_PRODUCTS.first().id) }
+        verify { repository.deleteCartProductById(CART_PRODUCTS.first().id) }
         assertThat(productIdSlot.captured).isEqualTo(CART_PRODUCTS.first().id)
 
         val actual = viewModel.uiState.getOrAwaitValue()

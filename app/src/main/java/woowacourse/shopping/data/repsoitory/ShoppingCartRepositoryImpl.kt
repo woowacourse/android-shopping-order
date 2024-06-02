@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
-class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource) :
+class ShoppingCartRepositoryImpl(private val dataSource: ShoppingRemoteCartDataSource) :
     ShoppingCartRepository {
     override fun insertCartProduct(
         productId: Long,
@@ -28,9 +28,9 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
         dataSource.getCartProductsPaged(page = page, size = size)
             .mapCatching { result -> result.toDomain() }
 
-    override fun getCartProductsTotal(): Result<Int> = dataSource.getCartProductsTotal()
+    override fun getCartProductsQuantity(): Result<Int> = dataSource.getCartProductsQuantity()
 
-    override fun deleteCartProduct(cartId: Int): Result<Unit> = dataSource.deleteCartProduct(cartId = cartId)
+    override fun deleteCartProductById(cartId: Int): Result<Unit> = dataSource.deleteCartProductById(cartId = cartId)
 
     override fun getAllCarts(): Result<Carts> {
         val totalElements =

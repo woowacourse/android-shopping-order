@@ -36,7 +36,7 @@ class ProductListViewModelTest {
             Result.success(PRODUCT_LIST.subList(0, 20).map { it.toDomain() })
         every { productRepository.getPagingProduct(1, 20) } returns
             Result.success(PRODUCT_LIST.subList(20, 40).map { it.toDomain() })
-        every { productHistoryRepository.getProductHistory(any()) } returns Result.success(emptyList())
+        every { productHistoryRepository.getProductHistoriesBySize(any()) } returns Result.success(emptyList())
         every { shoppingCartRepository.getAllCartProducts() } returns Result.success(emptyList())
 
         viewModel =

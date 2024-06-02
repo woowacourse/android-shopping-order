@@ -35,7 +35,7 @@ class ProductDetailViewModel(
 
     fun getProduct() {
         thread {
-            productRepository.findCartByProductId(id).onSuccess { cart ->
+            productRepository.getCartById(id).onSuccess { cart ->
                 hideError()
                 _uiState.value?.let { state ->
                     if (state.isLastProductPage) {
@@ -56,7 +56,7 @@ class ProductDetailViewModel(
     }
 
     private fun getProductHistory(cart: Cart) {
-        productHistoryRepository.getProductHistory(2).onSuccess { productHistories ->
+        productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
             hideError()
             val productHistory =
                 if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {

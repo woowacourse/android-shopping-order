@@ -150,7 +150,7 @@ class CartSelectViewModel(
 
     override fun deleteCartProduct(cartId: Int) {
         thread {
-            shoppingRepository.deleteCartProduct(cartId = cartId).onSuccess {
+            shoppingRepository.deleteCartProductById(cartId = cartId).onSuccess {
                 uiState.value?.let { state ->
                     loadCartProducts(state.pagingCartProduct.currentPage)
                 }

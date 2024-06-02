@@ -57,7 +57,7 @@ class OrderRecommendViewModel(
     fun order() {
         thread {
             _uiState.value?.let { state ->
-                orderRepository.insertOrder(state.orderCarts.keys.toList())
+                orderRepository.insertOrderByIds(state.orderCarts.keys.toList())
                     .onSuccess {
                         hideError()
                         _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
@@ -152,7 +152,7 @@ class OrderRecommendViewModel(
 
     private fun deleteCartProduct(cartId: Int) {
         thread {
-            shoppingCartRepository.deleteCartProduct(
+            shoppingCartRepository.deleteCartProductById(
                 cartId = cartId,
             ).onSuccess {
                 _uiState.value?.let { state ->

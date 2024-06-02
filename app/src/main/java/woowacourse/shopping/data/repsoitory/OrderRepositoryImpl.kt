@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.remote.OrderDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(
-    private val orderDataSource: OrderDataSource,
+    private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : OrderRepository {
-    override fun insertOrder(cartItemsIds: List<Int>): Result<Unit> =
+    override fun insertOrderByIds(cartItemsIds: List<Int>): Result<Unit> =
         runCatching {
-            orderDataSource.postOrder(cartItemsIds)
+            orderRemoteDataSource.postOrderByIds(cartItemsIds)
         }
 }

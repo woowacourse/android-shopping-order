@@ -12,13 +12,13 @@ interface ProductHistoryRepository {
         imageUrl: String,
     ): Result<Unit>
 
-    fun findProductHistory(productId: Long): Result<Product>
+    fun getProductHistoryById(productId: Long): Result<Product>
 
     fun getProductHistoriesByCategory(size: Int): Result<List<Cart>>
 
-    fun getProductHistory(size: Int): Result<List<Product>>
+    fun getProductHistoriesBySize(size: Int): Result<List<Product>>
 
-    fun deleteProductHistory(productId: Long): Result<Unit>
+    fun deleteProductHistoryById(productId: Long): Result<Unit>
 
-    fun deleteAllProductHistory(): Result<Unit>
+    fun deleteAllProductHistories(): Result<Unit>
 }

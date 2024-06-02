@@ -46,8 +46,8 @@ class ProductListViewModel(
             Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             productListPagingSource.load().mapCatching { pagingProduct ->
                 val productHistories =
-                    productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
+                    productHistoryRepository.getProductHistoriesBySize(10).getOrDefault(emptyList())
+                val cartCount = shoppingCartRepository.getCartProductsQuantity().getOrDefault(0)
 
                 ProductListUiState(
                     pagingCart = pagingProduct,
@@ -121,8 +121,8 @@ class ProductListViewModel(
                     }
 
                 val productHistories =
-                    productHistoryRepository.getProductHistory(10).getOrDefault(emptyList())
-                val cartCount = shoppingCartRepository.getCartProductsTotal().getOrDefault(0)
+                    productHistoryRepository.getProductHistoriesBySize(10).getOrDefault(emptyList())
+                val cartCount = shoppingCartRepository.getCartProductsQuantity().getOrDefault(0)
 
                 _uiState.postValue(
                     state.copy(
@@ -216,7 +216,7 @@ class ProductListViewModel(
 
     private fun deleteCartProduct(cartId: Int) {
         thread {
-            shoppingCartRepository.deleteCartProduct(
+            shoppingCartRepository.deleteCartProductById(
                 cartId = cartId,
             ).onFailure { e ->
                 showError(e)
