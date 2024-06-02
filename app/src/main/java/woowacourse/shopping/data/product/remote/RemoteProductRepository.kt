@@ -5,7 +5,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
@@ -16,7 +15,7 @@ object RemoteProductRepository : ProductRepository {
 
     override fun find(
         id: Int,
-        dataCallback: DataCallback<Product>,
+        callback: (Result<Product>) -> Unit,
     ) {
         retrofitApi.requestProduct(id = id).enqueue(
             object : Callback<Content> {
@@ -26,7 +25,8 @@ object RemoteProductRepository : ProductRepository {
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body() ?: return
-                        dataCallback.onSuccess(body.toProduct())
+                        val result = body.toProduct()
+                        callback(Result.success(result))
                     }
                 }
 
@@ -34,7 +34,7 @@ object RemoteProductRepository : ProductRepository {
                     content: Call<Content>,
                     t: Throwable,
                 ) {
-                    dataCallback.onFailure(t)
+                    callback(Result.failure(t))
                 }
             },
         )
@@ -54,7 +54,7 @@ object RemoteProductRepository : ProductRepository {
     override fun findPage(
         page: Int,
         pageSize: Int,
-        dataCallback: DataCallback<List<Product>>,
+        callback: (Result<List<Product>>) -> Unit,
     ) {
         retrofitApi.requestProducts(page = page, size = pageSize).enqueue(
             object : Callback<ProductResponse> {
@@ -64,7 +64,8 @@ object RemoteProductRepository : ProductRepository {
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body() ?: return
-                        dataCallback.onSuccess(body.toProductList())
+                        val result = body.toProductList()
+                        callback(Result.success(result))
                     }
                 }
 
@@ -72,16 +73,16 @@ object RemoteProductRepository : ProductRepository {
                     call: Call<ProductResponse>,
                     t: Throwable,
                 ) {
-                    dataCallback.onFailure(t)
+                    callback(Result.failure(t))
                 }
             },
         )
     }
 
-    override fun isPageLast(
+    override fun isLastPage(
         page: Int,
         pageSize: Int,
-        dataCallback: DataCallback<Boolean>,
+        callback: (Result<Boolean>) -> Unit,
     ) {
         retrofitApi.requestProducts(page = page, size = pageSize).enqueue(
             object : Callback<ProductResponse> {
@@ -91,7 +92,8 @@ object RemoteProductRepository : ProductRepository {
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body() ?: return
-                        dataCallback.onSuccess(body.last)
+                        val result = body.last
+                        callback(Result.success(result))
                     }
                 }
 
@@ -99,7 +101,7 @@ object RemoteProductRepository : ProductRepository {
                     call: Call<ProductResponse>,
                     t: Throwable,
                 ) {
-                    dataCallback.onFailure(t)
+                    callback(Result.failure(t))
                 }
             },
         )
@@ -108,29 +110,25 @@ object RemoteProductRepository : ProductRepository {
     override fun findRecommendProducts(
         category: String,
         cartItems: List<CartItem>,
-        dataCallback: DataCallback<List<Product>>,
+        callback: (Result<List<Product>>) -> Unit,
     ) {
-        findCategoryProducts(
-            category,
-            object : DataCallback<List<Product>> {
-                override fun onSuccess(result: List<Product>) {
-                    val recommendCategoryProducts =
-                        result
-                            .filter { product -> cartItems.none { it.productId == product.id } }
-                            .take(RECOMMEND_PRODUCTS_COUNT)
-                    dataCallback.onSuccess(recommendCategoryProducts)
-                }
+        findCategoryProducts(category) {
+            it.onSuccess { categoryProducts ->
+                val recommendCategoryProducts =
+                    categoryProducts
+                        .filter { product -> cartItems.none { it.productId == product.id } }
+                        .take(RECOMMEND_PRODUCTS_COUNT)
 
-                override fun onFailure(t: Throwable) {
-                    dataCallback.onFailure(t)
-                }
-            },
-        )
+                callback(Result.success(recommendCategoryProducts))
+            }.onFailure {
+                callback(Result.failure(it))
+            }
+        }
     }
 
     private fun findCategoryProducts(
         category: String,
-        dataCallback: DataCallback<List<Product>>,
+        callback: (Result<List<Product>>) -> Unit,
     ) {
         retrofitApi.requestProducts(category = category, page = 0, size = MAX_PRODUCT_COUNT)
             .enqueue(
@@ -141,7 +139,8 @@ object RemoteProductRepository : ProductRepository {
                     ) {
                         if (response.isSuccessful) {
                             val body = response.body() ?: return
-                            dataCallback.onSuccess(body.toProductList())
+                            val result = body.toProductList()
+                            callback(Result.success(result))
                         }
                     }
 
@@ -149,7 +148,7 @@ object RemoteProductRepository : ProductRepository {
                         call: Call<ProductResponse>,
                         t: Throwable,
                     ) {
-                        dataCallback.onFailure(t)
+                        callback(Result.failure(t))
                     }
                 },
             )

@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -45,42 +44,29 @@ class ProductsViewModel(
     fun loadPage() {
         val productsUiState = _productsUiState.value?.peekContent() ?: return
         _productsUiState.value = Event(productsUiState.copy(isLoading = true))
-        productRepository.findPage(
-            page,
-            PAGE_SIZE,
-            object : DataCallback<List<Product>> {
-                override fun onSuccess(result: List<Product>) {
-                    val additionalProductUiModels = result.toProductUiModels()
-                    val newProductUiModels =
-                        (productUiModels() ?: emptyList()) + additionalProductUiModels
-                    _productsUiState.postValue(Event(ProductsUiState(productUiModels = newProductUiModels)))
-                    updateTotalCount()
-                    _showLoadMore.value = false
-                    page++
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        productRepository.findPage(page, PAGE_SIZE) {
+            it.onSuccess { products ->
+                val additionalProductUiModels = products.toProductUiModels()
+                val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
+                _productsUiState.postValue(Event(ProductsUiState(productUiModels = newProductUiModels)))
+                updateTotalCount()
+                _showLoadMore.value = false
+                page++
+            }.onFailure {
+                setError()
+            }
+        }
         loadIsPageLast()
     }
 
     private fun loadIsPageLast() {
-        productRepository.isPageLast(
-            page,
-            PAGE_SIZE,
-            object : DataCallback<Boolean> {
-                override fun onSuccess(result: Boolean) {
-                    isLastPage.postValue(result)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        productRepository.isLastPage(page, PAGE_SIZE) {
+            it.onSuccess { isLastPage ->
+                this.isLastPage.postValue(isLastPage)
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     fun loadProducts() {
@@ -153,51 +139,35 @@ class ProductsViewModel(
     }
 
     private fun addCartItem(productId: Int) {
-        cartRepository.add(
-            productId = productId,
-            dataCallback =
-                object : DataCallback<Unit> {
-                    override fun onSuccess(result: Unit) {}
-
-                    override fun onFailure(t: Throwable) {
-                        setError()
-                    }
-                },
-        )
+        cartRepository.add(productId) {
+            it.onSuccess { }
+                .onFailure { setError() }
+        }
     }
 
     private fun updateProductUiModel(productId: Int) {
         val productUiModels = productUiModels()?.toMutableList() ?: return
-        productRepository.find(
-            productId,
-            object : DataCallback<Product> {
-                override fun onSuccess(result: Product) {
-                    val newProductUiModel = result.toProductUiModel()
-                    val position = productUiModels.indexOfFirst { it.productId == productId }
-                    productUiModels[position] = newProductUiModel
-                    _productsUiState.postValue(Event(ProductsUiState(productUiModels)))
-                    updateTotalCount()
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        productRepository.find(productId) {
+            it.onSuccess { product ->
+                val newProductUiModel = product.toProductUiModel()
+                val position = productUiModels.indexOfFirst { it.productId == productId }
+                productUiModels[position] = newProductUiModel
+                _productsUiState.postValue(Event(ProductsUiState(productUiModels)))
+                updateTotalCount()
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
-    fun updateTotalCount() {
-        cartRepository.getTotalQuantity(
-            object : DataCallback<Int> {
-                override fun onSuccess(result: Int) {
-                    _cartTotalCount.postValue(result)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+    private fun updateTotalCount() {
+        cartRepository.getTotalQuantity {
+            it.onSuccess { totalCount ->
+                _cartTotalCount.postValue(totalCount)
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun updateCartQuantity(productUiModel: ProductUiModel) {
@@ -208,19 +178,13 @@ class ProductsViewModel(
             addCartItem(productUiModel.productId)
             return
         }
-        cartRepository.changeQuantity(
-            cartItem.id,
-            productUiModel.quantity,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    updateProductUiModel(productUiModel.productId)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        cartRepository.changeQuantity(cartItem.id, productUiModel.quantity) {
+            it.onSuccess {
+                updateProductUiModel(productUiModel.productId)
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun setError() {

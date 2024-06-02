@@ -4,13 +4,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.repository.OrderRepository
 
 object RemoteOrderRepository : OrderRepository {
     override fun createOrder(
         cartItemIds: List<Int>,
-        dataCallback: DataCallback<Unit>,
+        callback: (Result<Unit>) -> Unit,
     ) {
         retrofitApi.requestCreateOrder(createOrderRequest = CreateOrderRequest(cartItemIds))
             .enqueue(
@@ -20,7 +19,7 @@ object RemoteOrderRepository : OrderRepository {
                         response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
-                            dataCallback.onSuccess(Unit)
+                            callback(Result.success(Unit))
                         }
                     }
 
@@ -28,7 +27,7 @@ object RemoteOrderRepository : OrderRepository {
                         call: Call<Unit>,
                         t: Throwable,
                     ) {
-                        dataCallback.onFailure(t)
+                        callback(Result.failure(t))
                     }
                 },
             )

@@ -1,14 +1,13 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Quantity
 
 interface CartRepository {
     fun findByProductId(
         productId: Int,
         totalItemCount: Int,
-        dataCallback: DataCallback<CartItem?>,
+        callback: (Result<CartItem?>) -> Unit,
     )
 
     fun syncFindByProductId(
@@ -16,26 +15,26 @@ interface CartRepository {
         totalItemCount: Int,
     ): CartItem?
 
-    fun findAll(dataCallback: DataCallback<List<CartItem>>)
+    fun findAll(callback: (Result<List<CartItem>>) -> Unit)
 
     fun delete(
         id: Int,
-        dataCallback: DataCallback<Unit>,
+        callback: (Result<Unit>) -> Unit,
     )
 
     fun add(
         productId: Int,
         quantity: Quantity = Quantity(1),
-        dataCallback: DataCallback<Unit>,
+        callback: (Result<Unit>) -> Unit,
     )
 
     fun changeQuantity(
         id: Int,
         quantity: Quantity,
-        dataCallback: DataCallback<Unit>,
+        callback: (Result<Unit>) -> Unit,
     )
 
-    fun getTotalQuantity(dataCallback: DataCallback<Int>)
+    fun getTotalQuantity(callback: (Result<Int>) -> Unit)
 
     fun syncGetTotalQuantity(): Int
 }

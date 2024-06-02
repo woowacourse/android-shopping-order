@@ -1,13 +1,12 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun find(
         id: Int,
-        dataCallback: DataCallback<Product>,
+        callback: (Result<Product>) -> Unit,
     )
 
     fun syncFind(id: Int): Product
@@ -15,18 +14,18 @@ interface ProductRepository {
     fun findPage(
         page: Int,
         pageSize: Int,
-        dataCallback: DataCallback<List<Product>>,
+        callback: (Result<List<Product>>) -> Unit,
     )
 
-    fun isPageLast(
+    fun isLastPage(
         page: Int,
         pageSize: Int,
-        dataCallback: DataCallback<Boolean>,
+        callback: (Result<Boolean>) -> Unit,
     )
 
     fun findRecommendProducts(
         category: String,
         cartItems: List<CartItem>,
-        dataCallback: DataCallback<List<Product>>,
+        callback: (Result<List<Product>>) -> Unit,
     )
 }

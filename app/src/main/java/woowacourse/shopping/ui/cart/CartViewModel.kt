@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.DataCallback
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
@@ -59,23 +58,19 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
-        cartRepository.findAll(
-            object : DataCallback<List<CartItem>> {
-                override fun onSuccess(result: List<CartItem>) {
-                    if (result.isEmpty()) {
-                        _cartUiState.value = Event(CartUiState.Empty)
-                        updateTotalQuantity()
-                        updateTotalPrice()
-                        return
-                    }
-                    result.forEach { loadProduct(it) }
+        cartRepository.findAll {
+            it.onSuccess { cartItems ->
+                if (cartItems.isEmpty()) {
+                    _cartUiState.value = Event(CartUiState.Empty)
+                    updateTotalQuantity()
+                    updateTotalPrice()
+                    return@onSuccess
                 }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+                cartItems.forEach { loadProduct(it) }
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun updateTotalQuantity() {
@@ -97,18 +92,13 @@ class CartViewModel(
     }
 
     private fun loadProduct(cartItem: CartItem) {
-        productRepository.find(
-            cartItem.productId,
-            object : DataCallback<Product> {
-                override fun onSuccess(result: Product) {
-                    updateCart(result, cartItem)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        productRepository.find(cartItem.productId) {
+            it.onSuccess { product ->
+                updateCart(product, cartItem)
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun updateCart(
@@ -156,21 +146,16 @@ class CartViewModel(
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         val cartUiModel = findCartUiModelByProductId(productId) ?: return
-        cartRepository.delete(
-            cartUiModel.cartItemId,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    updateDeletedCart(cartUiModel)
-                    if (isRecommendProduct(cartUiModel.productId)) {
-                        updateRecommendProducts(cartUiModel.productId, Quantity())
-                    }
+        cartRepository.delete(cartUiModel.cartItemId) {
+            it.onSuccess {
+                updateDeletedCart(cartUiModel)
+                if (isRecommendProduct(cartUiModel.productId)) {
+                    updateRecommendProducts(cartUiModel.productId, Quantity())
                 }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun updateDeletedCart(deletedCartUiModel: CartUiModel) {
@@ -250,23 +235,17 @@ class CartViewModel(
         cartUiModel: CartUiModel,
         quantity: Quantity,
     ) {
-        cartRepository.changeQuantity(
-            cartUiModel.cartItemId,
-            quantity,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    loadAllCartItems()
+        cartRepository.changeQuantity(cartUiModel.cartItemId, quantity) {
+            it.onSuccess {
+                loadAllCartItems()
 
-                    if (isRecommendProduct(cartUiModel.productId)) {
-                        updateRecommendProducts(cartUiModel.productId, quantity)
-                    }
+                if (isRecommendProduct(cartUiModel.productId)) {
+                    updateRecommendProducts(cartUiModel.productId, quantity)
                 }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     override fun toggleAllCartItem(isSelected: Boolean) {
@@ -285,72 +264,49 @@ class CartViewModel(
         val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
         val cartItems = findCartUiModelsOrNull()?.map { it.toCartItem() } ?: return
 
-        productRepository.findRecommendProducts(
-            recentProductCategory,
-            cartItems,
-            object : DataCallback<List<Product>> {
-                override fun onSuccess(result: List<Product>) {
-                    _recommendProductUiModels.value = result.map { ProductUiModel.from(it) }
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
+        productRepository.findRecommendProducts(recentProductCategory, cartItems) {
+            it.onSuccess { recommendProducts ->
+                _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     private fun addCartItem(productId: Int) {
-        cartRepository.add(
-            productId = productId,
-            dataCallback =
-                object : DataCallback<Unit> {
-                    override fun onSuccess(result: Unit) {
-                        loadAllCartItems()
+        cartRepository.add(productId) {
+            it.onSuccess {
+                loadAllCartItems()
 
-                        if (isRecommendProduct(productId)) {
-                            updateRecommendProducts(productId)
-                        }
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        setError()
-                    }
-                },
-        )
+                if (isRecommendProduct(productId)) {
+                    updateRecommendProducts(productId)
+                }
+            }.onFailure {
+                setError()
+            }
+        }
     }
 
     fun createOrder() {
         val cartUiModels = findCartUiModelsOrNull() ?: return
         val cartItemIds = cartUiModels.filter { it.isSelected }.map { it.cartItemId }
-        orderRepository.createOrder(
-            cartItemIds,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    _isSuccessCreateOrder.value = Event(true)
-                    deleteCartItems(cartItemIds)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    _isSuccessCreateOrder.value = Event(false)
-                }
-            },
-        )
+        orderRepository.createOrder(cartItemIds) {
+            it.onSuccess {
+                _isSuccessCreateOrder.value = Event(true)
+                deleteCartItems(cartItemIds)
+            }.onFailure {
+                _isSuccessCreateOrder.value = Event(false)
+            }
+        }
     }
 
     private fun deleteCartItems(cartItemIds: List<Int>) {
         _changedCartEvent.value = Event(Unit)
-        cartItemIds.forEach {
-            cartRepository.delete(
-                it,
-                object : DataCallback<Unit> {
-                    override fun onSuccess(result: Unit) {}
-
-                    override fun onFailure(t: Throwable) {
-                        setError()
-                    }
-                },
-            )
+        cartItemIds.forEach { cartItemId ->
+            cartRepository.delete(cartItemId) {
+                it.onSuccess { }
+                    .onFailure { setError() }
+            }
         }
     }
 
