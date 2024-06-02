@@ -2,7 +2,6 @@ package woowacourse.shopping.view.recommend
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
@@ -17,7 +16,6 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
@@ -79,7 +77,7 @@ class RecommendViewModel(
     fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         try {
-            orderRepository.orderShoppingCart(ids ?: throw OrderException())
+            orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
             _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
         } catch (e: Exception) {
             handleException(e)

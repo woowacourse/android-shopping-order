@@ -7,7 +7,6 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.DtoMapper.toProduct
 import woowacourse.shopping.utils.DtoMapper.toProducts
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.model.event.ErrorEvent
 
 class RemoteProductRepositoryImpl(
@@ -23,7 +22,7 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
+        return products ?: throw ErrorEvent.LoadDataEvent()
     }
 
     override fun loadCategoryProducts(
@@ -42,7 +41,7 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
+        return products ?: throw ErrorEvent.LoadDataEvent()
     }
 
     override fun getProduct(productId: Long): Product {
@@ -53,7 +52,7 @@ class RemoteProductRepositoryImpl(
                 product = response.body()?.toProduct()
             }
         }
-        return product ?: throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
+        return product ?: throw ErrorEvent.LoadDataEvent()
     }
 
     companion object {

@@ -2,7 +2,6 @@ package woowacourse.shopping.view.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -13,7 +12,6 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
@@ -154,8 +152,8 @@ class ProductDetailViewModel(
     }
 
     private fun checkValidProduct(product: Product) {
-        if (product.id == DEFAULT_PRODUCT_ID) throw OrderException()
-        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw OrderException()
+        if (product.id == DEFAULT_PRODUCT_ID) throw ErrorEvent.LoadDataEvent()
+        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw ErrorEvent.LoadDataEvent()
     }
 
     override fun clickIncrease(product: Product) {

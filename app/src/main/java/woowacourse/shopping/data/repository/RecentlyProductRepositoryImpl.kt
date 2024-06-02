@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProduct
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProductEntity
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.model.event.ErrorEvent
 import kotlin.concurrent.thread
 
@@ -48,7 +47,7 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
         thread {
             deleteId = recentlyProductDao.deleteRecentlyProductById(id)
         }.join()
-        if (deleteId == ERROR_DELETE_DATA_ID) throw OrderException(ErrorEvent.LoadEvent.LoadDataEvent)
+        if (deleteId == ERROR_DELETE_DATA_ID) throw ErrorEvent.LoadDataEvent()
     }
 
     companion object {

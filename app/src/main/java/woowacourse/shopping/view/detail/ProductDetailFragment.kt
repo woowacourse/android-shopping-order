@@ -14,9 +14,9 @@ import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
+import woowacourse.shopping.view.model.event.ErrorEvent
 
 class ProductDetailFragment : Fragment(), OnClickDetail {
     private var mainActivityListener: MainActivityListener? = null
@@ -87,14 +87,14 @@ class ProductDetailFragment : Fragment(), OnClickDetail {
     }
 
     private fun receiveId(): Long {
-        return arguments?.getLong(PRODUCT_ID) ?: throw OrderException()
+        return arguments?.getLong(PRODUCT_ID) ?: throw ErrorEvent.LoadDataEvent()
     }
 
     private fun loadProduct() {
         try {
             productDetailViewModel.loadProductItem(receiveId())
             productDetailViewModel
-        } catch (e: OrderException) {
+        } catch (e: ErrorEvent.LoadDataEvent) {
             requireContext().makeToast(
                 getString(R.string.error_data_load),
             )

@@ -15,12 +15,12 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.model.event.ErrorEvent
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
@@ -142,10 +142,10 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     private fun receiveCheckedShoppingCart(): ShoppingCart {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable(CHECKED_SHOPPING_CART, ShoppingCart::class.java)
-                ?: throw OrderException()
+                ?: throw ErrorEvent.LoadDataEvent()
         } else {
             arguments?.getSerializable(CHECKED_SHOPPING_CART) as? ShoppingCart
-                ?: throw OrderException()
+                ?: throw ErrorEvent.LoadDataEvent()
         }
     }
 

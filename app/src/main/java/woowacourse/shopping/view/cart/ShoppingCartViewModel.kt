@@ -2,7 +2,6 @@ package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
@@ -11,7 +10,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.OrderException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
@@ -127,7 +125,7 @@ class ShoppingCartViewModel(
                     updateCartItemType,
                 )
             when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> throw OrderException()
+                UpdateCartItemResult.ADD -> throw ErrorEvent.UpdateCartEvent()
                 is UpdateCartItemResult.DELETE ->
                     deleteShoppingCartItem(
                         updateCartItemResult.cartItemId,
