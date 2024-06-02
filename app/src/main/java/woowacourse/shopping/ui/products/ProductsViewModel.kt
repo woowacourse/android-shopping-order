@@ -124,10 +124,7 @@ class ProductsViewModel(
     }
 
     fun decreaseQuantity(productId: Int) {
-        val productUiModel =
-            productUiModels()?.find {
-                it.productId == productId
-            } ?: return
+        val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.dec())
         updateCartQuantity(newProductUiModel)
         updateProductUiModel(productId)

@@ -42,7 +42,7 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
             binding.layoutCartSkeleton.visibility = View.GONE
             binding.rvCart.visibility = View.VISIBLE
             binding.tvEmptyCart.visibility = View.GONE
-            adapter.submitList(it)
+            adapter.submitList(it.uiModels)
         }
 
         viewModel.cartLoadingEvent.observe(viewLifecycleOwner) {
