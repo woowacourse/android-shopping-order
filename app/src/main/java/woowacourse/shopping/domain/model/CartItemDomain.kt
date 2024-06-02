@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.model
 data class CartItemDomain(
     val cartItemId: Int,
     val quantity: Int,
-    val product: RemoteProductItemDomain,
+    val product: ProductItemDomain,
 ) {
     fun plusQuantity(): CartItemDomain {
         return copy(quantity = quantity + 1)

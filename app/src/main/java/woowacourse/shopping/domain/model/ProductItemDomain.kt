@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-data class RemoteProductItemDomain(
+data class ProductItemDomain(
     val category: String,
     val id: Int,
     val imageUrl: String,
