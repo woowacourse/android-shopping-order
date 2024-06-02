@@ -1,5 +1,6 @@
 package woowacourse.shopping.utils.exception
 
+import woowacourse.shopping.view.model.event.ErrorEvent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
@@ -27,7 +28,7 @@ object LatchUtils {
         try {
             this.await(WAIT_TIME_OUT, TimeUnit.SECONDS)
         } catch (e: InterruptedException) {
-            throw RuntimeException(ERROR_THREAD_WAIT_TIME, e)
+            throw OrderException()
         }
         exception?.let { throw it }
     }
