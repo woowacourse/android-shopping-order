@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="vm"
-            type="woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel" />
-
-        <variable
             name="product"
             type="woowacourse.shopping.model.Product" />
 
@@ -24,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
-        android:onClick="@{() -> vm.itemClickListener(product.id)}"
+        android:onClick="@{() -> productItemClickListener.itemClickListener(product.id)}"
         android:paddingHorizontal="8dp">
 
         <ImageView
