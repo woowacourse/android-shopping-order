@@ -25,7 +25,7 @@ class ProductDetailFragmentTest {
     fun setUp() {
         val productDetailFragment =
             ProductDetailFragment().apply {
-                arguments = ProductDetailFragment.createBundle(2L)
+                arguments = ProductDetailFragment.createBundle(3L)
             }
         activityRule.scenario.onActivity { activity ->
             activity.supportFragmentManager.beginTransaction()
