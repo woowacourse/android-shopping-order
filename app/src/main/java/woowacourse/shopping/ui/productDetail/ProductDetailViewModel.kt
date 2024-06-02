@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.productDetail
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,6 +40,9 @@ class ProductDetailViewModel(
     private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
 
+    private var _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     fun loadAll() {
         thread {
             val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
@@ -55,6 +57,7 @@ class ProductDetailViewModel(
                 _currentProduct.value = currentProduct
                 _productCount.value = 1
                 _latestProduct.value = latestProduct
+                _isLoading.value = false
             }
 
             productHistoryRepository.saveProductHistory(productId)
@@ -73,7 +76,6 @@ class ProductDetailViewModel(
         quantity: Int,
     ) {
         _productCount.value = _productCount.value?.plus(1)
-        Log.d(TAG, "onIncrease: productCount: ${productCount.value}")
     }
 
     override fun onDecrease(

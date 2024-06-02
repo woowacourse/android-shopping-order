@@ -22,33 +22,19 @@ class ProductDetailFragment : Fragment() {
     private lateinit var factory: UniversalViewModelFactory
     private lateinit var viewModel: ProductDetailViewModel
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initViewModel()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentProductDetailBinding.inflate(inflater)
-
-        initViewModel()
-
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.onItemChargeListener = viewModel
-        binding.onProductClickListener = viewModel
-
+        initBinding()
         return binding.root
-    }
-
-    private fun initViewModel() {
-        arguments?.let {
-            factory = ProductDetailViewModel.factory(productId = it.getLong(PRODUCT_ID))
-        }
-        viewModel = ViewModelProvider(this, factory)[ProductDetailViewModel::class.java]
-    }
-
-    private fun showSkeletonUi() {
-        binding.includeProductDetailShimmer.root.visibility = View.VISIBLE
-        binding.layoutProductDetail.visibility = View.GONE
     }
 
     override fun onViewCreated(
@@ -56,29 +42,31 @@ class ProductDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        showSkeletonUi()
-        lifecycleScope.launch {
-            delay(1000)
-            viewModel.loadAll()
-        }
-        observeCurrentProduct()
-        viewModel.detailProductDestinationId.observe(viewLifecycleOwner) {
-            navigateToProductDetail(it)
-        }
+        initToolbar()
+        loadProductDetail()
+        observeDetailProductDestinationId()
+    }
+
+    private fun getProductId() = arguments?.getLong(PRODUCT_ID)
+
+    private fun initViewModel() {
+        val productId = getProductId() ?: return
+        factory = ProductDetailViewModel.factory(productId)
+        viewModel = ViewModelProvider(this, factory)[ProductDetailViewModel::class.java]
+    }
+
+    private fun initBinding() {
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.onItemChargeListener = viewModel
+        binding.onProductClickListener = viewModel
+    }
+
+    private fun initToolbar() {
         binding.productDetailToolbar.setOnMenuItemClickListener {
             navigateToMenuItem(it)
         }
     }
-
-    private fun observeCurrentProduct() {
-        viewModel.currentProduct.observe(viewLifecycleOwner) {
-            binding.includeProductDetailShimmer.root.stopShimmer()
-            binding.includeProductDetailShimmer.root.visibility = View.GONE
-            binding.layoutProductDetail.visibility = View.VISIBLE
-        }
-    }
-
-    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
 
     private fun navigateToMenuItem(it: MenuItem) =
         when (it.itemId) {
@@ -86,9 +74,23 @@ class ProductDetailFragment : Fragment() {
                 (requireActivity() as? FragmentNavigator)?.navigateToProductList()
                 true
             }
-
             else -> false
         }
+
+    private fun loadProductDetail() {
+        lifecycleScope.launch {
+            delay(1000)
+            viewModel.loadAll()
+        }
+    }
+
+    private fun observeDetailProductDestinationId() {
+        viewModel.detailProductDestinationId.observe(viewLifecycleOwner) {
+            navigateToProductDetail(it)
+        }
+    }
+
+    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
 
     override fun onDestroyView() {
         super.onDestroyView()
