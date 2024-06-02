@@ -12,15 +12,21 @@ import woowacourse.shopping.domain.repository.order.OrderRepository
 import kotlin.concurrent.thread
 
 class OrderViewModel(
-    private val cartItemIds: List<Long>,
+    private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), OnOrderListener {
     private val _recommendProducts = MutableLiveData<List<Product>>(emptyList())
     val recommendedProducts: LiveData<List<Product>> get() = _recommendProducts
 
+    private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
+    val orderAmount: LiveData<Int> get() = _orderAmount
+
+    private val _ordersCount = MutableLiveData(orderInformation.ordersCount)
+    val ordersCount: LiveData<Int> get() = _ordersCount
+
     override fun createOrder() {
         thread {
-            orderRepository.order(cartItemIds)
+            orderRepository.order(orderInformation.cartItemIds)
         }
     }
 
@@ -34,7 +40,7 @@ class OrderViewModel(
         private const val TAG = "ProductDetailViewModel"
 
         fun factory(
-            cartItemIds: List<Long>,
+            orderInformation: OrderInformation,
             orderRepository: OrderRepository =
                 OrderRemoteRepository(
                     ShoppingApp.orderSource,
@@ -44,7 +50,7 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    cartItemIds,
+                    orderInformation,
                     orderRepository,
                 )
             }

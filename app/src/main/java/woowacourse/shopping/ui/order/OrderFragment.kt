@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
+import java.io.Serializable
 
 class OrderFragment : Fragment() {
     private var _binding: FragmentOrderBinding? = null
@@ -46,18 +48,18 @@ class OrderFragment : Fragment() {
         viewModel.loadRecommendedProducts()
     }
 
-    private fun initViewModel() {
-        getOrderIds()
-        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
+    private fun fetchOrderInformation() {
+        arguments?.let { bundle ->
+            val orderInformation =
+                bundle.bundleSerializable(ORDER_INFORMATION, OrderInformation::class.java)
+                    ?: throw NoSuchElementException()
+            factory = OrderViewModel.factory(orderInformation)
+        }
     }
 
-    private fun getOrderIds() {
-        arguments?.let {
-            factory =
-                OrderViewModel.factory(
-                    (it.getSerializable(ORDER_ITEM_ID) as LongArray).toList(),
-                )
-        }
+    private fun initViewModel() {
+        fetchOrderInformation()
+        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     private fun initBinding() {
@@ -72,8 +74,19 @@ class OrderFragment : Fragment() {
         }
     }
 
+    private fun <T : Serializable> Bundle.bundleSerializable(
+        key: String,
+        clazz: Class<T>,
+    ): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSerializable(key, clazz)
+        } else {
+            getSerializable(key) as? T
+        }
+    }
+
     companion object {
-        const val ORDER_ITEM_ID = "OrderItemId"
+        const val ORDER_INFORMATION = "OrderInformation"
         const val TAG = "OrderFragment"
     }
 }

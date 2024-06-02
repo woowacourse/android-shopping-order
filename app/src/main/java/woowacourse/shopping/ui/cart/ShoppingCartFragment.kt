@@ -89,9 +89,9 @@ class ShoppingCartFragment : Fragment() {
     }
 
     private fun observeOrderNavigation() {
-        viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
-            if (orderItemsIds.isNotEmpty()) {
-                (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderItemsIds)
+        viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderInformation ->
+            if (orderInformation != null) {
+                (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderInformation)
             }
         }
     }

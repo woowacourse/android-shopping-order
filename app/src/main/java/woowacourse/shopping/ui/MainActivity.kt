@@ -6,7 +6,8 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.order.OrderFragment
-import woowacourse.shopping.ui.order.OrderFragment.Companion.ORDER_ITEM_ID
+import woowacourse.shopping.ui.order.OrderFragment.Companion.ORDER_INFORMATION
+import woowacourse.shopping.ui.order.OrderInformation
 import woowacourse.shopping.ui.product.ProductListFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment.Companion.PRODUCT_ID
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         }
     }
 
-    override fun navigateToOrder(cartItems: List<Long>) {
+    override fun navigateToOrder(orderInformation: OrderInformation) {
         removeBackStack()
 
         supportFragmentManager.commit {
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
                 R.id.container,
                 OrderFragment::class.java,
                 Bundle().apply {
-                    putSerializable(ORDER_ITEM_ID, cartItems.toLongArray())
+                    putSerializable(ORDER_INFORMATION, orderInformation)
                 },
                 OrderFragment.TAG,
             )
@@ -91,5 +92,5 @@ interface FragmentNavigator {
 
     fun navigateToProductDetail(productId: Long)
 
-    fun navigateToOrder(cartItems: List<Long>)
+    fun navigateToOrder(orderInformation: OrderInformation)
 }

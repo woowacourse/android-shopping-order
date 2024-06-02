@@ -17,6 +17,7 @@ import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
 import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.order.OrderInformation
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
@@ -44,8 +45,8 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
 
-    private var _navigationOrderEvent = MutableLiveData<List<Long>>(emptyList())
-    val navigationOrderEvent: LiveData<List<Long>> get() = _navigationOrderEvent
+    private var _navigationOrderEvent = MutableLiveData<OrderInformation>()
+    val navigationOrderEvent: LiveData<OrderInformation> get() = _navigationOrderEvent
 
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -82,10 +83,15 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
+        val productIds = cartItems.value?.filter { it.checked }?.map { it.id } ?: return
+        val orderAmount = selectedCartItemsTotalPrice.value ?: return
+        val ordersCount = selectedCartItemsCount.value ?: return
         _navigationOrderEvent.value =
-            cartItems.value?.filter {
-                it.checked
-            }?.map { it.id }
+            OrderInformation(
+                productIds,
+                orderAmount,
+                ordersCount,
+            )
     }
 
     override fun onClick(productId: Long) {
@@ -122,10 +128,10 @@ class ShoppingCartViewModel(
     }
 
     private fun updateCartItems(currentItems: List<CartItem>) {
+        val cartItems = cartItems.value ?: return
         _cartItems.value =
             currentItems.map { cartItem ->
-                // TODO: 널 단언 제거하기
-                cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
+                cartItem.copy(checked = cartItems.first { it.id == cartItem.id }.checked)
             }
     }
 
