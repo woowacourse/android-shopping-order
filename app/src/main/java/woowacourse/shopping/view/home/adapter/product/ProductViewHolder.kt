@@ -2,18 +2,15 @@ package woowacourse.shopping.view.home.adapter.product
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.view.cart.QuantityClickListener
-import woowacourse.shopping.view.home.HomeClickListener
+import woowacourse.shopping.view.home.viewmodel.HomeViewModel
 
 class ProductViewHolder(private val binding: ItemProductBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
         productItem: HomeViewItem.ProductViewItem,
-        homeClickListener: HomeClickListener,
-        quantityClickListener: QuantityClickListener,
+        viewModel: HomeViewModel,
     ) {
         binding.productItem = productItem
-        binding.shoppingClickListener = homeClickListener
-        binding.quantityClickListener = quantityClickListener
+        binding.viewModel = viewModel
     }
 }

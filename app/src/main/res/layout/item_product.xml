@@ -6,22 +6,18 @@
     <data>
 
         <variable
-            name="shoppingClickListener"
-            type="woowacourse.shopping.view.home.HomeClickListener" />
-
-        <variable
-            name="quantityClickListener"
-            type="woowacourse.shopping.view.cart.QuantityClickListener" />
-
-        <variable
             name="productItem"
             type="woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> shoppingClickListener.onProductClick(productItem.product.productId)}"
+        android:onClick="@{() -> viewModel.onProductClick(productItem.product.productId)}"
         android:paddingBottom="12dp">
 
         <ImageView
@@ -42,7 +38,7 @@
             android:layout_height="48dp"
             android:layout_margin="8dp"
             android:background="@drawable/shape_circle"
-            android:onClick="@{() -> shoppingClickListener.onPlusButtonClick(productItem.product)}"
+            android:onClick="@{() -> viewModel.onPlusButtonClick(productItem.product)}"
             android:src="@drawable/ic_plus"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintRight_toRightOf="@id/iv_product"
@@ -53,10 +49,9 @@
             layout="@layout/btn_quantity_control"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:clickListener="@{quantityClickListener}"
+            app:clickListener="@{viewModel}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintRight_toRightOf="@id/iv_product"
             app:productId="@{productItem.product.productId}"

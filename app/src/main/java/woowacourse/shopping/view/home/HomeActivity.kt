@@ -19,6 +19,8 @@ import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOA
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
+import woowacourse.shopping.view.home.viewmodel.HomeViewModel
+import woowacourse.shopping.view.home.viewmodel.HomeViewModelFactory
 import woowacourse.shopping.view.state.UiState
 
 class HomeActivity : AppCompatActivity() {
@@ -53,7 +55,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setUpAdapter() {
-        productAdapter = ProductAdapter(viewModel, viewModel)
+        productAdapter = ProductAdapter(viewModel)
         binding.rvProductList.adapter = productAdapter
         val layoutManager = GridLayoutManager(this, 2)
         layoutManager.spanSizeLookup =
@@ -99,7 +101,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.submitProductViewItems(data.toList(), viewModel.canLoadMore.value ?: false)
+        productAdapter.submitProductViewItems(data, viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {

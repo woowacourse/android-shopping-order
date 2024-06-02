@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.CartViewModel" />
+            type="woowacourse.shopping.view.cart.viewmodel.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +25,7 @@
             android:textColor="@color/gray_500"
             android:textSize="100dp"
             android:textStyle="bold"
-            app:isEmpty="@{viewModel.isEmpty}"
+            app:isEmpty="@{viewModel.isCartEmpty}"
             app:state="@{viewModel.cartUiState}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            app:isEmpty="@{viewModel.isEmpty}"
+            app:isEmpty="@{viewModel.isCartEmpty}"
             app:state="@{viewModel.cartUiState}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"

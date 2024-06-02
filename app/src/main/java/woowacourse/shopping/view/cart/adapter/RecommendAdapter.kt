@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
-import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartPlaceHolderViewItem
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.view.cart.viewmodel.CartViewModel
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 
-class CartAdapter(
+class RecommendAdapter(
     private val viewModel: CartViewModel,
-) : ListAdapter<ShoppingCartViewItem, RecyclerView.ViewHolder>(diffUtil) {
+) : ListAdapter<ProductViewItem, RecyclerView.ViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.itemAnimator = null
@@ -58,34 +58,18 @@ class CartAdapter(
         }
     }
 
-    fun submitCartViewItems(cartItems: List<CartViewItem>) {
-        val list =
-            if (currentList.isEmpty()) {
-                List(5) { CartPlaceHolderViewItem() }
-            } else {
-                cartItems
-            }
-        super.submitList(list)
-    }
-
     companion object {
         val diffUtil =
-            object : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
+            object : DiffUtil.ItemCallback<ProductViewItem>() {
                 override fun areContentsTheSame(
-                    oldItem: ShoppingCartViewItem,
-                    newItem: ShoppingCartViewItem,
+                    oldItem: ProductViewItem,
+                    newItem: ProductViewItem,
                 ) = oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: ShoppingCartViewItem,
-                    newItem: ShoppingCartViewItem,
-                ): Boolean {
-                    return if (oldItem is CartViewItem && newItem is CartViewItem) {
-                        oldItem.cartItem.cartItemId == newItem.cartItem.cartItemId
-                    } else {
-                        oldItem.viewType == newItem.viewType
-                    }
-                }
+                    oldItem: ProductViewItem,
+                    newItem: ProductViewItem,
+                ) = oldItem.product.productId == newItem.product.productId
             }
     }
 }

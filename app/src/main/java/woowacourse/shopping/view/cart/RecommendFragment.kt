@@ -9,12 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.view.home.adapter.product.ProductAdapter
+import woowacourse.shopping.view.cart.adapter.RecommendAdapter
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem
 import woowacourse.shopping.view.state.UiState
 
 class RecommendFragment : Fragment() {
     private lateinit var binding: FragmentRecommendBinding
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: RecommendAdapter
     private val viewModel by activityViewModels<CartViewModel>()
 
     override fun onCreateView(
@@ -31,20 +33,36 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ProductAdapter(viewModel, viewModel)
-        binding.lifecycleOwner = viewLifecycleOwner
+        setUpAdapter()
+        setUpDataBinding()
+        observeViewModel()
+    }
+
+    private fun setUpAdapter() {
+        adapter = RecommendAdapter(viewModel)
         binding.rvRecommend.adapter = adapter
+    }
 
+    private fun setUpDataBinding() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+    }
 
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
+    private fun observeViewModel() {
+        viewModel.recommendUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UiState.Success -> adapter.submitProductViewItems(state.data, false)
-                is UiState.Loading -> return@observe
-                is UiState.Error -> showError(
-                    state.exception.message ?: getString(R.string.unknown_error)
-                )
+                is UiState.Success -> showData(state.data)
+                is UiState.Loading -> showData(emptyList())
+                is UiState.Error ->
+                    showError(
+                        state.exception.message ?: getString(R.string.unknown_error),
+                    )
             }
         }
+    }
+
+    private fun showData(productViewItems: List<HomeViewItem.ProductViewItem>) {
+        adapter.submitList(productViewItems)
     }
 
     private fun showError(errorMessage: String) {

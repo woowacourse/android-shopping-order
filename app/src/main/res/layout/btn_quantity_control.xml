@@ -5,7 +5,7 @@
 
         <variable
             name="clickListener"
-            type="woowacourse.shopping.view.cart.QuantityClickListener" />
+            type="woowacourse.shopping.view.cart.listener.QuantityClickListener" />
 
         <variable
             name="productId"

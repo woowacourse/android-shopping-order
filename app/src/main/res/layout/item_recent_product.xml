@@ -6,18 +6,18 @@
     <data>
 
         <variable
-            name="clickListener"
-            type="woowacourse.shopping.view.home.HomeClickListener" />
-
-        <variable
             name="recentProduct"
             type="woowacourse.shopping.domain.model.RecentProduct" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="106dp"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> clickListener.onProductClick(recentProduct.productId)}"
+        android:onClick="@{() -> viewModel.onProductClick(recentProduct.productId)}"
         android:paddingEnd="8dp"
         android:paddingBottom="12dp">
 

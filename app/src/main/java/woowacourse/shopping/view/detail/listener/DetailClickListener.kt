@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.detail
+package woowacourse.shopping.view.detail.listener
 
 interface DetailClickListener {
     fun onPutCartButtonClick()

@@ -2,18 +2,15 @@ package woowacourse.shopping.view.cart.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.view.cart.CartItemClickListener
-import woowacourse.shopping.view.cart.QuantityClickListener
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel
 
 class CartViewHolder(private val binding: ItemCartBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
         cartViewItem: ShoppingCartViewItem.CartViewItem,
-        cartItemClickListener: CartItemClickListener,
-        quantityClickListener: QuantityClickListener,
+        viewModel: CartViewModel,
     ) {
         binding.cartViewItem = cartViewItem
-        binding.cartItemClickListener = cartItemClickListener
-        binding.quantityClickListener = quantityClickListener
+        binding.viewModel = viewModel
     }
 }

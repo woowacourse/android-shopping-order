@@ -7,10 +7,17 @@ sealed class ShoppingCartViewItem(open val viewType: Int) {
         val cartItem: CartItem,
         val isChecked: Boolean = false,
         override val viewType: Int = CART_VIEW_TYPE,
-    ) :
-        ShoppingCartViewItem(viewType) {
-        fun check(): CartViewItem {
+    ) : ShoppingCartViewItem(viewType) {
+        fun toggleCheck(): CartViewItem {
             return this.copy(isChecked = !isChecked)
+        }
+
+        fun check(): CartViewItem {
+            return this.copy(isChecked = true)
+        }
+
+        fun unCheck(): CartViewItem {
+            return this.copy(isChecked = false)
         }
     }
 

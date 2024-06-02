@@ -11,6 +11,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.view.cart.adapter.CartAdapter
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.state.UiState
 
@@ -34,9 +35,21 @@ class CartFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setUpAdapter()
+        setUpDataBinding()
+        observeViewmodel()
+    }
+
+    private fun setUpAdapter() {
+        adapter = CartAdapter(viewModel)
+        binding.rvCart.adapter = adapter
+    }
+
+    private fun setUpDataBinding() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+    }
 
+    private fun observeViewmodel() {
         viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
@@ -47,21 +60,17 @@ class CartFragment : Fragment() {
                     )
             }
         }
-        viewModel.navigateToDetail.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { productId ->
+        viewModel.navigateToDetail.observe(viewLifecycleOwner) { navigateToDetail ->
+            navigateToDetail.getContentIfNotHandled()?.let { productId ->
                 navigateToDetail(productId)
             }
         }
 
-        viewModel.notifyDeletion.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let {
+        viewModel.notifyDeletion.observe(viewLifecycleOwner) { notifyDeletion ->
+            notifyDeletion.getContentIfNotHandled()?.let {
                 alertDeletion()
             }
         }
-    }
-
-    private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
     private fun showData(cartViewItems: List<CartViewItem>) {
@@ -72,13 +81,12 @@ class CartFragment : Fragment() {
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    private fun alertDeletion() {
-        Toast.makeText(requireContext(), DELETE_ITEM_MESSAGE, Toast.LENGTH_SHORT).show()
+    private fun navigateToDetail(productId: Int) {
+        startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    private fun setUpAdapter() {
-        adapter = CartAdapter(viewModel, viewModel)
-        binding.rvCart.adapter = adapter
+    private fun alertDeletion() {
+        Toast.makeText(requireContext(), DELETE_ITEM_MESSAGE, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

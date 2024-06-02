@@ -1,26 +1,23 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class CartViewModelFactory(
-    private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
-    private val recentProductRepository: RecentProductRepository,
+class HomeViewModelFactory(
     private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CartViewModel(
-                cartRepository = cartRepository,
-                orderRepository = orderRepository,
-                recentProductRepository = recentProductRepository,
+            return HomeViewModel(
                 productRepository = productRepository,
+                cartRepository = cartRepository,
+                recentProductRepository = recentProductRepository,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

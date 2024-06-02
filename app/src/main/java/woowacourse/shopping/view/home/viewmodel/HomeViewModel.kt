@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.home
+package woowacourse.shopping.view.home.viewmodel
 
 import android.os.Handler
 import android.os.Looper
@@ -13,27 +13,33 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
-import woowacourse.shopping.view.cart.CartViewModel.Companion.DESCENDING_SORT_ORDER
-import woowacourse.shopping.view.cart.QuantityClickListener
+import woowacourse.shopping.view.cart.listener.QuantityClickListener
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel.Companion.DESCENDING_SORT_ORDER
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
+import woowacourse.shopping.view.home.listener.HomeClickListener
+import woowacourse.shopping.view.home.listener.ProductClickListener
 import woowacourse.shopping.view.state.UiState
 
 class HomeViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), HomeClickListener, QuantityClickListener {
+) : ViewModel(), HomeClickListener, ProductClickListener, QuantityClickListener {
     private val _homeUiState = MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
     val homeUiState: LiveData<UiState<List<ProductViewItem>>>
         get() = _homeUiState
+
+    private val loadedProductViewItems: MutableList<ProductViewItem> = mutableListOf()
+    private var cartItems: List<CartItem> = emptyList()
 
     private val _recentProducts = MutableLiveData<List<RecentProduct>>()
     val recentProducts: LiveData<List<RecentProduct>>
         get() = _recentProducts
 
-    val isRecentProductsEmpty: LiveData<Boolean> = recentProducts.map { recentProductsValue ->
-        recentProductsValue.isEmpty()
-    }
+    val isRecentProductsEmpty: LiveData<Boolean> =
+        recentProducts.map { recentProductsValue ->
+            recentProductsValue.isEmpty()
+        }
 
     private val _canLoadMore = MutableLiveData(false)
     val canLoadMore: LiveData<Boolean>
@@ -52,8 +58,6 @@ class HomeViewModel(
         get() = _navigateToCart
 
     private var page = 0
-    private val loadedProductViewItems: MutableList<ProductViewItem> = mutableListOf()
-    private var cartItems: List<CartItem> = emptyList()
 
     init {
         Handler(Looper.getMainLooper()).postDelayed({
@@ -83,10 +87,11 @@ class HomeViewModel(
             )
         }.onSuccess { productResponse ->
             val products = productResponse.getOrNull()?.products ?: emptyList()
-            val productViewItems = products.map { product ->
-                val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
-                ProductViewItem(product, quantity)
-            }
+            val productViewItems =
+                products.map { product ->
+                    val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
+                    ProductViewItem(product, quantity)
+                }
             _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
             loadedProductViewItems.addAll(productViewItems)
             _homeUiState.value = UiState.Success(loadedProductViewItems)
@@ -109,14 +114,16 @@ class HomeViewModel(
     }
 
     private fun updateProductViewItems() {
-        val updatedProductViewItems = cartItems.map { cartItem ->
-            ProductViewItem(cartItem.product, cartItem.quantity)
-        }
+        val updatedProductViewItems =
+            cartItems.map { cartItem ->
+                ProductViewItem(cartItem.product, cartItem.quantity)
+            }
 
         updatedProductViewItems.forEach { updatedProductViewItem ->
-            val position = loadedProductViewItems.indexOfFirst { loadedProductViewItem ->
-                loadedProductViewItem.product.productId == updatedProductViewItem.product.productId
-            }
+            val position =
+                loadedProductViewItems.indexOfFirst { loadedProductViewItem ->
+                    loadedProductViewItem.product.productId == updatedProductViewItem.product.productId
+                }
             if (position != -1) {
                 loadedProductViewItems[position] = updatedProductViewItem
             }
@@ -148,16 +155,16 @@ class HomeViewModel(
         }
     }
 
-    override fun onProductClick(productId: Int) {
-        _navigateToDetail.value = Event(productId)
-    }
-
     override fun onLoadMoreButtonClick() {
         loadProductViewItems()
     }
 
     override fun onShoppingCartButtonClick() {
         _navigateToCart.value = Event(true)
+    }
+
+    override fun onProductClick(productId: Int) {
+        _navigateToDetail.value = Event(productId)
     }
 
     override fun onPlusButtonClick(product: Product) {

@@ -17,16 +17,15 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel
+import woowacourse.shopping.view.cart.viewmodel.CartViewModelFactory
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            orderRepository =
-            OrderRepositoryImpl(
-                remoteOrderDataSource,
-            ),
+            orderRepository = OrderRepositoryImpl(remoteOrderDataSource),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
         )

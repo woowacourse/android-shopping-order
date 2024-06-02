@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentProductBinding
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.view.home.HomeClickListener
+import woowacourse.shopping.view.home.viewmodel.HomeViewModel
 
-class RecentProductAdapter(private val clickListener: HomeClickListener) :
+class RecentProductAdapter(private val viewModel: HomeViewModel) :
     ListAdapter<RecentProduct, RecentProductViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -25,7 +25,7 @@ class RecentProductAdapter(private val clickListener: HomeClickListener) :
                 LayoutInflater.from(parent.context),
                 parent,
                 false,
-            )
+            ),
         )
     }
 
@@ -34,16 +34,21 @@ class RecentProductAdapter(private val clickListener: HomeClickListener) :
         position: Int,
     ) {
         val recentViewedProduct = currentList[position]
-        return holder.bind(recentViewedProduct, clickListener)
+        return holder.bind(recentViewedProduct, viewModel)
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<RecentProduct>() {
-            override fun areContentsTheSame(oldItem: RecentProduct, newItem: RecentProduct) =
-                oldItem == newItem
+        val diffUtil =
+            object : DiffUtil.ItemCallback<RecentProduct>() {
+                override fun areContentsTheSame(
+                    oldItem: RecentProduct,
+                    newItem: RecentProduct,
+                ) = oldItem == newItem
 
-            override fun areItemsTheSame(oldItem: RecentProduct, newItem: RecentProduct) =
-                oldItem.productId == newItem.productId
-        }
+                override fun areItemsTheSame(
+                    oldItem: RecentProduct,
+                    newItem: RecentProduct,
+                ) = oldItem.productId == newItem.productId
+            }
     }
 }

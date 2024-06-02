@@ -15,6 +15,8 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.cart.CartActivity
+import woowacourse.shopping.view.detail.viewmodel.DetailViewModel
+import woowacourse.shopping.view.detail.viewmodel.DetailViewModelFactory
 import woowacourse.shopping.view.state.UiState
 
 class DetailActivity : AppCompatActivity() {
@@ -57,9 +59,10 @@ class DetailActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.detailUiState.observe(this) { state ->
             when (state) {
-                is UiState.Error -> showError(
-                    state.exception.message ?: getString(R.string.unknown_error),
-                )
+                is UiState.Error ->
+                    showError(
+                        state.exception.message ?: getString(R.string.unknown_error),
+                    )
 
                 else -> return@observe
             }

@@ -6,17 +6,12 @@
     <data>
 
         <variable
-            name="cartItemClickListener"
-            type="woowacourse.shopping.view.cart.CartItemClickListener" />
-
-
-        <variable
-            name="quantityClickListener"
-            type="woowacourse.shopping.view.cart.QuantityClickListener" />
-
-        <variable
             name="cartViewItem"
             type="woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.cart.viewmodel.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:background="@drawable/shopping_cart_item_gridview"
-        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartViewItem.cartItem.product.productId)}">
+        android:onClick="@{() -> viewModel.onCartItemClick(cartViewItem.cartItem.product.productId)}">
 
         <CheckBox
             android:id="@+id/checkbox_cart"
@@ -32,9 +27,10 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
-            android:onCheckedChanged="@{(view, isChecked) -> cartItemClickListener.onCheckBoxClick(cartViewItem.cartItem.cartItemId, isChecked)}"
+            android:onClick="@{() -> viewModel.onCheckBoxClick(cartViewItem.cartItem.cartItemId)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:checked="@{cartViewItem.isChecked}"
             tools:checked="true" />
 
         <TextView
@@ -85,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="12dp"
-            app:clickListener="@{quantityClickListener}"
+            app:clickListener="@{viewModel}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -97,7 +93,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_margin="12dp"
-            android:onClick="@{() -> cartItemClickListener.onDeleteButtonClick(cartViewItem.cartItem.cartItemId)}"
+            android:onClick="@{() -> viewModel.onDeleteButtonClick(cartViewItem.cartItem.cartItemId)}"
             android:src="@drawable/ic_back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

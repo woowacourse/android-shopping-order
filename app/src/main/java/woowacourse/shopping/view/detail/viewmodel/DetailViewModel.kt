@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.detail
+package woowacourse.shopping.view.detail.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,8 +10,9 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
-import woowacourse.shopping.view.cart.CartViewModel.Companion.DESCENDING_SORT_ORDER
-import woowacourse.shopping.view.cart.QuantityClickListener
+import woowacourse.shopping.view.cart.listener.QuantityClickListener
+import woowacourse.shopping.view.cart.viewmodel.CartViewModel.Companion.DESCENDING_SORT_ORDER
+import woowacourse.shopping.view.detail.listener.DetailClickListener
 import woowacourse.shopping.view.state.UiState
 
 class DetailViewModel(
