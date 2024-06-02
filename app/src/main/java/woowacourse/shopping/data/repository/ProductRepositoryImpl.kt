@@ -25,7 +25,8 @@ class ProductRepositoryImpl : ProductRepository {
     ): List<Product> {
         var pagingData: List<Product> = listOf()
         thread {
-            pagingData = mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
+            pagingData =
+                mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
         }.join()
         if (pagingData.isEmpty()) throw NoSuchDataException()
         return pagingData.filter { product ->

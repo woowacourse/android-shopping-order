@@ -58,7 +58,11 @@ class ProductAdapter(
 
             else -> {
                 val view =
-                    ItemProductSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ItemProductSkeletonBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
                 SkeletonViewHolder(view)
             }
         }

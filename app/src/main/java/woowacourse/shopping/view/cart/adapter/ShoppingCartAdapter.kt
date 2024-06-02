@@ -34,12 +34,21 @@ class ShoppingCartAdapter(
         return when (viewType) {
             VIEW_TYPE_CART_PRODUCT -> {
                 val view =
-                    ItemShoppingCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ItemShoppingCartBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
                 ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart)
             }
+
             else -> {
                 val view =
-                    ItemCartItemSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ItemCartItemSkeletonBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
                 ShoppingCartSkeletonViewHolder(view)
             }
         }

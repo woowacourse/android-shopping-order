@@ -71,6 +71,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     cartItemResult.increaseCount()
                 }
             }
+
             UpdateCartItemType.DECREASE -> {
                 if (cartItemResult.decreaseCount() == ChangeCartItemResultState.Fail) {
                     deleteCartItem(cartItemResult.cartItemId)

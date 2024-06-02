@@ -11,9 +11,10 @@ class BasicAuthInterceptor(private val credentialsProvider: CredentialsProvider)
         val credentials =
             "Basic " + Base64.encodeToString("$username:$password".toByteArray(), Base64.NO_WRAP)
 
-        val request = chain.request().newBuilder()
-            .addHeader("Authorization", credentials)
-            .build()
+        val request =
+            chain.request().newBuilder()
+                .addHeader("Authorization", credentials)
+                .build()
 
         return chain.proceed(request)
     }

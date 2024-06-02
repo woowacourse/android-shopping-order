@@ -36,6 +36,5 @@ interface CartApiService {
     ): Call<Unit>
 
     @GET("/cart-items/counts")
-    fun requestCartItemCount(
-    ): Call<CartItemQuantityDto>
+    fun requestCartItemCount(): Call<CartItemQuantityDto>
 }

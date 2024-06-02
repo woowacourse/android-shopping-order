@@ -11,13 +11,18 @@ object NetworkManager {
     private var username: String = "ii2001"
     private var password: String = "password"
 
-    private val credentialsProvider = object : CredentialsProvider {
-        override fun getUsername(): String = username
-        override fun getPassword(): String = password
-    }
+    private val credentialsProvider =
+        object : CredentialsProvider {
+            override fun getUsername(): String = username
+
+            override fun getPassword(): String = password
+        }
 
     // 계정정보 업데이트시 호출
-    fun updateCredentials(newUsername: String, newPassword: String) {
+    fun updateCredentials(
+        newUsername: String,
+        newPassword: String,
+    ) {
         username = newUsername
         password = newPassword
         instance = null

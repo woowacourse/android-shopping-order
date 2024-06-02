@@ -19,20 +19,28 @@ class OrderRepositoryImpl(
         val latch = CountDownLatch(1)
         var exception: Exception? = null
 
-        orderDataSource.orderItems(ids = ids).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (!response.isSuccessful) {
-                    exception = NoSuchDataException()
+        orderDataSource.orderItems(ids = ids).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (!response.isSuccessful) {
+                        exception = NoSuchDataException()
+                    }
+                    Log.d("OrderRepositoryImpl", "orderShoppingCart: ${response.code()}")
+                    latch.countDown()
                 }
-                Log.d("OrderRepositoryImpl", "orderShoppingCart: ${response.code()}")
-                latch.countDown()
-            }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                exception = t as? Exception ?: Exception(t)
-                latch.countDown()
-            }
-        })
+                override fun onFailure(
+                    call: Call<Unit>,
+                    t: Throwable,
+                ) {
+                    exception = t as? Exception ?: Exception(t)
+                    latch.countDown()
+                }
+            },
+        )
 
         latch.awaitOrThrow(exception)
     }

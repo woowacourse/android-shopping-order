@@ -18,7 +18,8 @@ class RecentlyAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecentlyViewHolder {
-        val view = ItemRecentlyProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view =
+            ItemRecentlyProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RecentlyViewHolder(view, onClickProducts)
     }
 

@@ -95,6 +95,7 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
             when (loadingState) {
                 is ProductListEvent.LoadProductEvent.Loading ->
                     productAdapter.setShowSkeleton(true)
+
                 else -> productAdapter.setShowSkeleton(false)
             }
         }
