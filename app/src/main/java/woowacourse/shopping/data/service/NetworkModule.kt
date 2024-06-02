@@ -9,7 +9,9 @@ import woowacourse.shopping.BuildConfig
 
 object NetworkModule {
     private val client =
-        OkHttpClient.Builder().addInterceptor(DefaultInterceptor("namyunsuk", "password")).build()
+        OkHttpClient.Builder()
+            .addInterceptor(DefaultInterceptor(BuildConfig.USERNAME, BuildConfig.PASSWORD))
+            .build()
 
     private val tokenClient =
         OkHttpClient.Builder().addInterceptor(TokeInterceptor()).build()

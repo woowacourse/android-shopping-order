@@ -31,6 +31,8 @@ android {
 
         buildConfigField("String", "BASE_URL", properties["base_url"] as String)
         buildConfigField("String", "TOKEN", properties["token"] as String)
+        buildConfigField("String", "USERNAME", properties["user_name"] as String)
+        buildConfigField("String", "PASSWORD", properties["password"] as String)
     }
 
     dataBinding {
