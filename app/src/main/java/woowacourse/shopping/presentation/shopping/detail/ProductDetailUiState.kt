@@ -18,6 +18,8 @@ data class ProductDetailUiState(
 
     fun canDecreaseProductCount(): Boolean = cartProduct.count > 1
 
+    fun updateRecentProductWithFirstOf(products: List<Product>) = copy(recentProduct = products.first())
+
     companion object {
         fun init(): ProductDetailUiState =
             ProductDetailUiState(

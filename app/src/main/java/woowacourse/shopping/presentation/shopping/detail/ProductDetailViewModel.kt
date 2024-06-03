@@ -38,9 +38,9 @@ class ProductDetailViewModel(
 
     private fun loadRecentProduct() {
         shoppingRepository.recentProducts(1)
-            .onSuccess {
-                if (it.isEmpty()) return
-                _uiState.value = uiState.value?.copy(recentProduct = it.first())
+            .onSuccess { recentProducts ->
+                if (recentProducts.isEmpty()) return
+                _uiState.value = uiState.value?.updateRecentProductWithFirstOf(recentProducts)
             }.onFailure {
                 _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
             }
