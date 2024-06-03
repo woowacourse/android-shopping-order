@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
+import woowacourse.shopping.ui.model.CartItem
 import kotlin.concurrent.thread
 
 class OrderViewModel(
@@ -37,7 +38,11 @@ class OrderViewModel(
 
     override fun createOrder() {
         thread {
-            orderRepository.order(orderInformation.cartItemIds)
+            val recommendProducts: List<Product> = recommendProducts.value ?: return@thread
+            val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
+            val cartItems: List<CartItem> = cartItemRepository.loadPagedCartItem()
+            val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+            orderRepository.order(orderInformation.cartItemIds + cartItemIds)
         }
     }
 
