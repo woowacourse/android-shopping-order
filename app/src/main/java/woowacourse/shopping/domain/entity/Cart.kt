@@ -28,6 +28,10 @@ data class Cart(
 
     fun cartProducts(): List<CartProduct> =
         productMap.map { (product, count) ->
-            CartProduct(product, count)
+            CartProduct(product, count, PLACEHOLDER_ID)
         }
+
+    companion object {
+        private const val PLACEHOLDER_ID = -1L
+    }
 }
