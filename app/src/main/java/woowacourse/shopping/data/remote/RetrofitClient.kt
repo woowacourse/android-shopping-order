@@ -18,14 +18,14 @@ class RetrofitClient {
                 .addInterceptor(
                     BasicAuthInterceptor(
                         username = BuildConfig.USERNAME,
-                        password = BuildConfig.PASSWORD
-                    )
+                        password = BuildConfig.PASSWORD,
+                    ),
                 )
                 .addInterceptor(logging)
                 .build()
 
         fun getInstance(): Retrofit {
-            return  Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
+            return Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()

@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -63,6 +64,13 @@ class CartActivity : AppCompatActivity() {
                 replaceFragment(recommendFragment)
             }
         }
+
+        viewModel.notifyOrderCompleted.observe(this) { notifyOrderCompleted ->
+            notifyOrderCompleted.getContentIfNotHandled()?.let {
+                alertOrderCompleted()
+                finish()
+            }
+        }
     }
 
     private fun addFragment() {
@@ -77,7 +85,13 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
+    private fun alertOrderCompleted() {
+        Toast.makeText(this, ORDER_COMPLETED_MESSAGE, Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
+        private const val ORDER_COMPLETED_MESSAGE = "상품 주문이 완료되었습니다!"
+
         fun createIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

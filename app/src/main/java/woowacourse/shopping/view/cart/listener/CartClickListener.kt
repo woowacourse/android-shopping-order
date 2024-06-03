@@ -6,6 +6,4 @@ interface CartClickListener {
     fun onAllCheckBoxClick()
 
     fun onOrderButtonClick()
-
-    fun onFinalOrderButtonClick()
 }

@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.listener
+package woowacourse.shopping.view.home.listener
 
 interface QuantityClickListener {
     fun onQuantityPlusButtonClick(productId: Int)

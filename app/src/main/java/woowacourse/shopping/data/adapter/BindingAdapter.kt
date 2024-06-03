@@ -7,6 +7,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.view.state.OrderState
 import woowacourse.shopping.view.state.UiState
 
 @BindingAdapter("app:imageUrl")
@@ -73,4 +74,12 @@ fun <T> setCartVisibility(
 ) {
     recyclerView.visibility =
         if ((state is UiState.Success && !isEmpty) || state is UiState.Loading) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("app:allCheckBoxVisibility")
+fun setAllCheckBoxVisibility(
+    view: View,
+    state: OrderState,
+) {
+    view.visibility = if (state is OrderState.Cart) View.VISIBLE else View.GONE
 }
