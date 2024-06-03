@@ -42,9 +42,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         startActivity(intent)
     }
 
-    override fun observeProductList(products: (Map<Long, Int>) -> Unit) {
+    override fun observeProductList(onProductsUpdated: (Map<Long, Int>) -> Unit) {
         mainViewModel.updateProductEvent.observe(this) {
-            products(it)
+            onProductsUpdated(it)
         }
     }
 
@@ -55,9 +55,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         mainViewModel.saveUpdateProduct(mapOf(productId to count))
     }
 
-    override fun observeRecentlyProduct(reset: () -> Unit) {
+    override fun observeRecentlyProduct(onRecentlyProductReset: () -> Unit) {
         mainViewModel.updateRecentlyProductEvent.observe(this) {
-            reset()
+            onRecentlyProductReset()
         }
     }
 
@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         mainViewModel.saveUpdateRecentlyProduct()
     }
 
-    override fun observeCartItem(reset: () -> Unit) {
+    override fun observeCartItem(onCartItemUpdated: () -> Unit) {
         mainViewModel.updateCartItemEvent.observe(this) {
-            reset()
+            onCartItemUpdated()
         }
     }
 
