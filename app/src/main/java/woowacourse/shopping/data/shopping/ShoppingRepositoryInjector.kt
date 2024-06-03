@@ -12,7 +12,7 @@ object ShoppingRepositoryInjector {
 
     fun shoppingRepository(context: Context): ShoppingRepository =
         instance ?: synchronized(this) {
-            instance ?: DefaultShoppingRepository(
+            instance ?: ShoppingRepositoryImpl(
                 ProductDataSourceInjector.productDataSource(),
                 RecentProductDataSourceInjector.recentProductDataSource(context),
             ).also { instance = it }

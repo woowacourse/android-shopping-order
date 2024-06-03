@@ -10,7 +10,7 @@ object RecentProductDataSourceInjector {
 
     fun recentProductDataSource(context: Context): RecentProductDataSource =
         instance ?: synchronized(this) {
-            instance ?: DefaultRecentProductDataSource(
+            instance ?: RecentProductDataSourceImpl(
                 ioExecutor,
                 ShoppingDatabase.instance(context).recentProductDao(),
             ).also { instance = it }

@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.repository.ShoppingRepository
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-class DefaultShoppingRepository(
+class ShoppingRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val recentProductDataSource: RecentProductDataSource,
 ) : ShoppingRepository {
