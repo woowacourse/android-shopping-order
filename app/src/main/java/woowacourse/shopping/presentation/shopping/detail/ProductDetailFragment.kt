@@ -78,7 +78,7 @@ class ProductDetailFragment :
             eventBusViewModel.sendUpdateCartEvent()
         }
         eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {
-            viewModel.refreshCartProduct()
+            viewModel.refreshDetailProduct()
         }
     }
 

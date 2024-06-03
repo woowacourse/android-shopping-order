@@ -36,22 +36,30 @@ class ProductDetailViewModel(
         loadRecentProduct()
     }
 
-    fun loadCartProduct(id: Long) {
-        shoppingRepository.saveRecentProduct(id)
-        cartRepository.filterCartProducts(listOf(id)).onSuccess {
-            if (it.isEmpty()) {
-                return loadProduct(id)
+    private fun loadRecentProduct() {
+        shoppingRepository.recentProducts(1)
+            .onSuccess {
+                if (it.isEmpty()) return
+                _uiState.value = uiState.value?.copy(recentProduct = it.first())
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
             }
-            // TODO: Page가 0부터 시작인걸 알아야혀
-            _uiState.value = uiState.value?.copy(cartProduct = it.first().toUiModel())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
-        }
     }
 
-    fun refreshCartProduct() {
+    fun refreshDetailProduct() {
         val id = _uiState.value?.cartProduct?.product?.id ?: return
         loadCartProduct(id)
+        shoppingRepository.saveRecentProduct(id)
+    }
+
+    fun loadCartProduct(id: Long) {
+        cartRepository.filterCartProducts(listOf(id))
+            .onSuccess {
+                if (it.isEmpty()) return loadProduct(id)
+                _uiState.value = uiState.value?.copy(cartProduct = it.first().toUiModel())
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+            }
     }
 
     override fun increaseProductCount(id: Long) {
@@ -89,15 +97,6 @@ class ProductDetailViewModel(
     private fun loadProduct(id: Long) {
         shoppingRepository.productById(id).onSuccess {
             _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
-        }
-    }
-
-    private fun loadRecentProduct() {
-        shoppingRepository.recentProducts(1).onSuccess {
-            if (it.isEmpty()) return
-            _uiState.value = uiState.value?.copy(recentProduct = it.first())
         }.onFailure {
             _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
         }
