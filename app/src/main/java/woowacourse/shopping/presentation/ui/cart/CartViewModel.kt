@@ -234,19 +234,22 @@ class CartViewModel(
         }
     }
 
-    private fun modifyRecentProductQuantity(
-        cartId: Long,
-        selectedItem: ProductListItem.ShoppingProductItem,
-        resultQuantity: Int,
-    ) {
-        val recommended = recommendedProduct.value ?: emptyList()
-        val updated =
-            recommended.map {
-                if (it.id == selectedItem.id) {
-                    it.copy(cartId = cartId, quantity = resultQuantity)
-                } else {
-                    it
-                }
+    companion object {
+        class Factory(private val initialTotalCartItemCount: Int) : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
+                val cartDao = AppDatabase.instanceOrNull.cartDao()
+                return CartViewModel(
+                    cartRepository =
+                        CartRepositoryImpl(
+                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                            remoteCartDataSource = RemoteCartDataSource(),
+                        ),
+                    productRepository = ProductRepositoryImpl(),
+                    recentRepository = RecentProductRepositoryImpl(recentDao),
+                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSource()),
+                    initialTotalCartItemCount,
+                ) as T
             }
         _recommendedProduct.value = updated
     }

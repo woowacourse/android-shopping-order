@@ -18,10 +18,12 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_product_detail
 
-    private val viewModel: ProductDetailViewModel by viewModels { ViewModelFactory() }
-
-    private var productId by Delegates.notNull<Long>()
-    private var cartId by Delegates.notNull<Long>()
+    private val viewModel: ProductDetailViewModel by viewModels {
+        ProductDetailViewModel.Companion.Factory(
+            getProductId(),
+            checkIsLastViewedProduct(),
+        )
+    }
 
     override fun initStartView(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
@@ -56,14 +58,9 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         observeMoveEvent()
     }
 
-    private fun observeLastProductUpdates() {
-        viewModel.lastProduct.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> binding.lastProduct = it.data
-            }
-        }
-    }
+    private fun checkIsLastViewedProduct(): Boolean = intent.getBooleanExtra(EXTRA_IS_LAST_VIEWED_PRODUCT, false)
+
+    private fun getProductId(): Long = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
 
     private fun observeErrorEventUpdates() {
         viewModel.error.observe(

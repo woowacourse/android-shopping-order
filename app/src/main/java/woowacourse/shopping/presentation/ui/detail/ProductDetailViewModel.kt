@@ -122,10 +122,21 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        val updatedItem =
-            item?.let {
-                it.copy(quantity = it.quantity + 1)
+    companion object {
+        class Factory(private val productId: Long, private val isLastViewedItem: Boolean) : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
+                val cartDao = AppDatabase.instanceOrNull.cartDao()
+                return ProductDetailViewModel(
+                    ProductRepositoryImpl(),
+                    CartRepositoryImpl(
+                        localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                        remoteCartDataSource = RemoteCartDataSource(),
+                    ),
+                    RecentProductRepositoryImpl(recentDao),
+                    productId,
+                    isLastViewedItem,
+                ) as T
             }
         _product.value = updatedItem
     }

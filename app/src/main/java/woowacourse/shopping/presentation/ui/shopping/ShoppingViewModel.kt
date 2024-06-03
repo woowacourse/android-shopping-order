@@ -206,6 +206,22 @@ class ShoppingViewModel(
     }
 
     companion object {
-        const val PAGE_SIZE = 20
+        const val PRODUCT_PAGE_SIZE = 20
+
+        class Factory : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
+                val cartDao = AppDatabase.instanceOrNull.cartDao()
+                return ShoppingViewModel(
+                    productRepository = ProductRepositoryImpl(),
+                    recentRepository = RecentProductRepositoryImpl(recentDao),
+                    cartRepository =
+                        CartRepositoryImpl(
+                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                            remoteCartDataSource = RemoteCartDataSource(),
+                        ),
+                ) as T
+            }
+        }
     }
 }

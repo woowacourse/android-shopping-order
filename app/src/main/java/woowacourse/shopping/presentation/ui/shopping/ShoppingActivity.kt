@@ -23,7 +23,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_shopping
 
-    private val viewModel: ShoppingViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: ShoppingViewModel by viewModels { ShoppingViewModel.Companion.Factory() }
 
     private val adapter: ProductListAdapter by lazy {
         ProductListAdapter(viewModel)

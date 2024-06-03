@@ -19,7 +19,10 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_cart
 
-    private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: CartViewModel by viewModels {
+        val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
+        CartViewModel.Companion.Factory(initialItemQuantity)
+    }
 
     override fun initStartView(savedInstanceState: Bundle?) {
         val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
