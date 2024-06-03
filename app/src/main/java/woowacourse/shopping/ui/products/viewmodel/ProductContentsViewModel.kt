@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,12 +30,16 @@ class ProductContentsViewModel(
     private val cartRepository: CartRepository,
 ) :
     ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
-    private val items = mutableListOf<Product>()
+
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
 
     private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
 
-    val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
+    val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> =
+        MediatorLiveData<ProductWithQuantityUiState>().apply {
+            addSource(products) { value = updateProductWithQuantity() }
+            addSource(cart) { value = updateProductWithQuantity() }
+        }
 
     val isCartEmpty: LiveData<Boolean> =
         cart.map {
@@ -59,12 +64,26 @@ class ProductContentsViewModel(
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
-    private var currentOffset = 0
+    private fun currentProduct(): ProductWithQuantityUiState =
+        productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
 
     init {
-        productWithQuantity.addSource(products) { updateProductWithQuantity() }
-        productWithQuantity.addSource(cart) { updateProductWithQuantity() }
         loadProducts()
+    }
+
+    fun loadProducts() {
+        val handler = Handler(Looper.getMainLooper())
+        runCatching {
+            productWithQuantity.value = currentProduct().copy(isLoading = true)
+            productRepository.getProducts(
+                currentProduct().productWithQuantities.size / PAGE_SIZE,
+                PAGE_SIZE
+            )
+        }.onSuccess { loadedProducts ->
+            handler.postDelayed({
+                products.value = (products.value ?: emptyList()) + loadedProducts
+            }, 1000)
+        }
     }
 
     override fun plusCount(productId: Long) {
@@ -94,35 +113,33 @@ class ProductContentsViewModel(
         loadCartItems()
     }
 
-    fun loadProducts() {
+    fun loadCartItems() {
         val handler = Handler(Looper.getMainLooper())
         runCatching {
-            val products = productRepository.getProducts(currentOffset++, 20)
-            items.addAll(products)
-            this.products.value = items
-        }.onSuccess {
+            productWithQuantity.value = currentProduct().copy(isLoading = true)
+            cartRepository.getAllCartItems()
+        }.onSuccess { carts ->
             handler.postDelayed({
-                productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
-            }, 2000)
+                cart.value = carts
+            }, 1000)
         }
-    }
-
-    fun loadCartItems() {
-        cart.value = cartRepository.getAllCartItems()
     }
 
     fun loadRecentProducts() {
         _recentProducts.value = recentProductRepository.findAll()
     }
 
-    private fun updateProductWithQuantity() {
+    private fun updateProductWithQuantity(): ProductWithQuantityUiState {
         val currentProducts = products.value ?: emptyList()
         val updatedList =
             currentProducts.map { product ->
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
-        productWithQuantity.value =
-            ProductWithQuantityUiState(updatedList.map { it.toUiModel() }, isLoading = false)
+
+        return currentProduct().copy(
+            productWithQuantities = updatedList.map { it.toUiModel() },
+            isLoading = false
+        )
     }
 
     private fun getQuantity(productId: Long): Quantity {
@@ -149,5 +166,6 @@ class ProductContentsViewModel(
 
     companion object {
         private const val DEFAULT_CART_ITEMS_COUNT = 0
+        private const val PAGE_SIZE = 20
     }
 }

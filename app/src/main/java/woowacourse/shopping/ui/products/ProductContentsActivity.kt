@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.products
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -82,6 +83,7 @@ class ProductContentsActivity : AppCompatActivity() {
                 productAdapter.submitList(items)
                 return@observe
             }
+
             productAdapter.submitList(it.productWithQuantities)
         }
     }
