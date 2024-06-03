@@ -46,23 +46,11 @@ class ShoppingViewModel(
 
     val moveEvent: LiveData<Event<FromShoppingToScreen>> get() = _moveEvent
 
-    fun loadInitialShoppingItems() {
-        if (shoppingProducts.value !is UiState.Success<List<ProductListItem.ShoppingProductItem>>) {
-//            val handler = Handler(Looper.getMainLooper())
-            fetchInitialRecentProducts()
-//            handler.postDelayed({
-            fetchCartCount()
-            fetchInitialCartProducts()
-//            }, 1000)
-        }
-    }
+    private val shoppingProductsData
+        get() = (shoppingProducts.value as? UiState.Success)?.data ?: emptyList()
 
-    fun fetchInitialRecentProducts() {
-        recentRepository.loadAll().onSuccess {
-            _recentProducts.value = UiState.Success(it)
-        }.onFailure {
-            _error.value = Event(ShoppingError.RecentProductItemsNotFound)
-        }
+    val showSkeleton: LiveData<Boolean>
+        get() = shoppingProducts.switchMap { MutableLiveData(it is UiState.Loading) }
     }
 
     fun fetchCartCount() {

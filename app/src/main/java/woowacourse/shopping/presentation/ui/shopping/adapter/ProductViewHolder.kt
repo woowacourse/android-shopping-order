@@ -30,11 +30,7 @@ sealed class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    class ShoppingProductLoadingViewHolder(
-        binding: ItemShoppingSkelletonBinding,
-    ) : ProductViewHolder(binding.root)
-
-    class LoadViewHolder(
+    class LoadMoreViewHolder(
         private val binding: ItemLoadBinding,
         private val shoppingHandler: ShoppingHandler,
     ) : ProductViewHolder(binding.root) {

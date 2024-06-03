@@ -85,7 +85,6 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             override fun getSpanSize(position: Int): Int {
                 val viewTypeValue = adapter.getItemViewType(position)
                 return when (ShoppingViewType.of(viewTypeValue)) {
-                    ShoppingViewType.Loading -> ShoppingViewType.Loading.span
                     ShoppingViewType.RecentProduct -> ShoppingViewType.RecentProduct.span
                     ShoppingViewType.Product -> ShoppingViewType.Product.span
                     ShoppingViewType.LoadMore -> ShoppingViewType.LoadMore.span
@@ -114,7 +113,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                     adapter.updateProductItems(state.data)
                 }
 
-                UiState.Loading -> adapter.showSkeleton()
+                UiState.Loading -> {}
             }
         }
     }

@@ -49,9 +49,9 @@ fun View.setCartSkeletonVisibility(state: UiState<List<ProductListItem.ShoppingP
         }
 }
 
-@BindingAdapter("bindSetVisibility")
-fun View.setVisibility(visible: Boolean) {
-    visibility = if (visible) View.VISIBLE else View.GONE
+@BindingAdapter("app:visibility")
+fun View.setVisibility(isVisible: Boolean) {
+    visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
 @BindingAdapter("lastProduct", "currentProduct")

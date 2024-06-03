@@ -4,7 +4,6 @@ enum class ShoppingViewType(val value: Int, val span: Int) {
     RecentProduct(0, 2),
     Product(1, 1),
     LoadMore(2, 2),
-    Loading(3, 2),
     ;
 
     companion object {
@@ -13,7 +12,6 @@ enum class ShoppingViewType(val value: Int, val span: Int) {
                 0 -> RecentProduct
                 1 -> Product
                 2 -> LoadMore
-                3 -> Loading
                 else -> throw IllegalArgumentException("잘못된 viewType 입니다.")
             }
     }

@@ -21,14 +21,10 @@ class ProductListAdapter(
     private var isLoadingState = true
 
     override fun getItemViewType(position: Int): Int {
-        if (isLoadingState) {
-            return ShoppingViewType.Loading.value
-        } else {
-            return when (position) {
-                RECENT_PRODUCT_POSITION -> ShoppingViewType.RecentProduct.value
-                itemCount - LOAD_MORE_COUNT -> ShoppingViewType.LoadMore.value
-                else -> ShoppingViewType.Product.value
-            }
+        return when (position) {
+            RECENT_PRODUCT_POSITION -> ShoppingViewType.RecentProduct.value
+            itemCount - LOAD_MORE_COUNT -> ShoppingViewType.LoadMore.value
+            else -> ShoppingViewType.Product.value
         }
     }
 
@@ -38,11 +34,6 @@ class ProductListAdapter(
     ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (ShoppingViewType.of(viewType)) {
-            ShoppingViewType.Loading -> {
-                val loadBinding = ItemShoppingSkelletonBinding.inflate(inflater, parent, false)
-                ProductViewHolder.ShoppingProductLoadingViewHolder(loadBinding)
-            }
-
             ShoppingViewType.RecentProduct -> {
                 val binding = HolderRecentProductsBinding.inflate(inflater, parent, false)
                 ProductViewHolder.RecentlyViewedProductViewHolder(binding, shoppingHandler)
@@ -55,17 +46,12 @@ class ProductListAdapter(
 
             ShoppingViewType.LoadMore -> {
                 val binding = ItemLoadBinding.inflate(inflater, parent, false)
-                ProductViewHolder.LoadViewHolder(binding, shoppingHandler)
+                ProductViewHolder.LoadMoreViewHolder(binding, shoppingHandler)
             }
         }
     }
 
-    override fun getItemCount(): Int =
-        if (isLoadingState) {
-            SKELETON_COUNT
-        } else {
-            items.size + LOAD_MORE_COUNT
-        }
+    override fun getItemCount(): Int = items.size + LOAD_MORE_COUNT
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -74,8 +60,7 @@ class ProductListAdapter(
         when (holder) {
             is ProductViewHolder.RecentlyViewedProductViewHolder -> holder.bind(items[position] as ProductListItem.RecentProductItems)
             is ProductViewHolder.ShoppingProductViewHolder -> holder.bind(items[position] as ProductListItem.ShoppingProductItem)
-            is ProductViewHolder.LoadViewHolder -> holder.bind()
-            is ProductViewHolder.ShoppingProductLoadingViewHolder -> {}
+            is ProductViewHolder.LoadMoreViewHolder -> holder.bind()
         }
     }
 
@@ -84,13 +69,7 @@ class ProductListAdapter(
         notifyItemChanged(RECENT_PRODUCT_POSITION)
     }
 
-    fun showSkeleton() {
-        isLoadingState = true
-        notifyDataSetChanged()
-    }
-
     fun updateProductItems(newProductItems: List<ProductListItem.ShoppingProductItem>) {
-        isLoadingState = false
         val oldProductItems = items.filterIsInstance<ProductListItem.ShoppingProductItem>()
         if (oldProductItems.size == newProductItems.size) {
             updateSingleItem(
@@ -149,6 +128,5 @@ class ProductListAdapter(
     companion object {
         private const val RECENT_PRODUCT_POSITION = 0
         private const val LOAD_MORE_COUNT = 1
-        private const val SKELETON_COUNT = 1
     }
 }
