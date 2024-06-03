@@ -40,28 +40,28 @@ class MockProductRepository : ProductRepository {
             ),
         )
 
-    override fun loadPagingProducts(offset: Int): List<Product> {
+    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
         val products =
             listOf(
                 Product(id = 1, name = "Product 1", price = 1000, imageUrl = "", category = ""),
                 Product(id = 2, name = "Product 2", price = 2000, imageUrl = "", category = ""),
                 Product(id = 3, name = "Product 3", price = 3000, imageUrl = "", category = ""),
             )
-        return products.subList(0, 3)
+        return Result.success(products.subList(0, 3))
     }
 
     override fun loadCategoryProducts(
         size: Int,
         category: String,
-    ): List<Product> {
+    ): Result<List<Product>> {
         repeat(5) {
             products.addAll(products)
         }
-        return products.subList(size, 3)
+        return Result.success(products.subList(size, 3))
     }
 
-    override fun getProduct(productId: Long): Product {
-        return products.firstOrNull { it.id == productId } ?: defaultProduct
+    override fun getProduct(productId: Long): Result<Product> {
+        return Result.success(products.firstOrNull { it.id == productId } ?: defaultProduct)
     }
 
     companion object {

@@ -55,38 +55,40 @@ class MockShoppingCartRepository : ShoppingCartRepository {
             ),
         )
 
-    override fun addCartItem(product: Product) {
+    override fun addCartItem(product: Product): Result<Unit> {
         val cartItem = CartItem(3L, product)
         cartItems.add(cartItem)
+        return Result.success(Unit)
     }
 
     override fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): List<CartItem> {
+    ): Result<List<CartItem>> {
         return if (offset + pagingSize <= cartItems.size) {
-            cartItems.subList(offset, offset + pagingSize)
+            Result.success(cartItems.subList(offset, offset + pagingSize))
         } else {
-            cartItems.subList(offset, cartItems.size)
+            Result.success(cartItems.subList(offset, cartItems.size))
         }
     }
 
-    override fun deleteCartItem(itemId: Long) {
+    override fun deleteCartItem(itemId: Long): Result<Unit> {
         cartItems.removeIf { it.id == itemId }
+        return Result.success(Unit)
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
-        return CartItemResult(0, CartItemCounter())
+    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+        return Result.success(CartItemResult(0, CartItemCounter()))
     }
 
     override fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ): UpdateCartItemResult {
-        return UpdateCartItemResult.UPDATED(CartItemResult(0, CartItemCounter()))
+    ): Result<UpdateCartItemResult> {
+        return Result.success(UpdateCartItemResult.UPDATED(CartItemResult(0, CartItemCounter())))
     }
 
-    override fun getTotalCartItemCount(): Int {
-        return cartItems.size
+    override fun getTotalCartItemCount(): Result<Int> {
+        return Result.success(cartItems.size)
     }
 }
