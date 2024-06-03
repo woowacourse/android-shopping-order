@@ -21,7 +21,6 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.local.db.ShoppingCartDatabase
 import woowacourse.shopping.presentation.ui.utils.RecyclerViewItemCountAssertion
 import woowacourse.shopping.remote.api.DummyData.STUB_PRODUCT_A
 import kotlin.concurrent.thread
