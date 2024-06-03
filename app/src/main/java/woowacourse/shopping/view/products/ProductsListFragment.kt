@@ -73,7 +73,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 onClickProducts = this,
                 onClickCartItemCounter = productListViewModel,
             )
-        productAdapter.setShowSkeleton(true)
         binding.rvProducts.adapter = productAdapter
         loadPagingData()
         recentlyAdapter =
@@ -86,17 +85,12 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     private fun observeData() {
         productListViewModel.recentlyProducts.observe(viewLifecycleOwner) { recentlyData ->
             recentlyAdapter.updateProducts(recentlyData)
+            productAdapter.setShowSkeleton(false)
         }
         productListViewModel.products.observe(viewLifecycleOwner) { products ->
             productAdapter.updateProducts(addedProducts = products)
         }
-        productListViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
-            when (loadingState) {
-                is LoadEvent.Loading ->
-                    productAdapter.setShowSkeleton(true)
-                else -> productAdapter.setShowSkeleton(false)
-            }
-        }
+
         productListViewModel.productListEvent.observe(viewLifecycleOwner) { productListEvent ->
             when (productListEvent) {
                 is ProductListEvent.DeleteProductEvent.Success -> {
@@ -108,10 +102,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
 
                 is ProductListEvent.UpdateProductEvent.Success -> {
                     productAdapter.updateProduct(productListEvent.productId)
-                }
-
-                ProductListEvent.LoadProductEvent -> {
-                    productAdapter.setShowSkeleton(false)
                 }
             }
         }
@@ -148,7 +138,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     }
 
     override fun clickLoadPagingData() {
-        productAdapter.setShowSkeleton(true)
         loadPagingData()
     }
 
@@ -161,6 +150,7 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     }
 
     private fun loadPagingData() {
+        productAdapter.setShowSkeleton(true)
         productListViewModel.loadPagingProduct()
     }
 }

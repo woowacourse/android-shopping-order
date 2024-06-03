@@ -36,24 +36,16 @@ class ProductListViewModel(
         MutableSingleLiveData()
     val productListEvent: SingleLiveData<ProductListEvent> get() = _productListEvent
 
-    private val _loadingEvent: MutableSingleLiveData<LoadEvent> =
-        MutableSingleLiveData()
-    val loadingEvent: SingleLiveData<LoadEvent> get() = _loadingEvent
-
     init {
         updateTotalCartItemCount()
         loadPagingRecentlyProduct()
     }
 
     fun loadPagingProduct() {
-        _loadingEvent.setValue(LoadEvent.Loading)
         try {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             val pagingData = productRepository.loadPagingProducts(itemSize)
             _products.value = _products.value?.plus(pagingData)
-
-            _loadingEvent.setValue(LoadEvent.Success)
-            _productListEvent.setValue(ProductListEvent.LoadProductEvent)
         } catch (e: Exception) {
             handleException(e)
         }

@@ -1,8 +1,11 @@
 package woowacourse.shopping.view.products.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductSkeletonBinding
@@ -16,30 +19,41 @@ import woowacourse.shopping.view.products.model.ShoppingItem
 class ProductAdapter(
     private val onClickProducts: OnClickProducts,
     private val onClickCartItemCounter: OnClickCartItemCounter,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var products: MutableList<ShoppingItem> = mutableListOf()
-    private var showSkeleton: Boolean = true
-    private val productPosition: HashMap<Long, Int> = hashMapOf()
+) : ListAdapter<ShoppingItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateProducts(addedProducts: List<Product>) {
-        products.clear()
-        products.addAll(addedProducts.map { ShoppingItem.ProductItem(it) })
-        if (showSkeleton) {
-            products.addAll(List(SKELETON_COUNT) { ShoppingItem.SkeletonItem })
+    private var showSkeleton: Boolean = true
+
+    class DiffCallback : DiffUtil.ItemCallback<ShoppingItem>() {
+        override fun areItemsTheSame(oldItem: ShoppingItem, newItem: ShoppingItem): Boolean {
+            return if (oldItem is ShoppingItem.ProductItem && newItem is ShoppingItem.ProductItem) {
+                oldItem.product.id == newItem.product.id
+            } else {
+                oldItem == newItem
+            }
         }
-        notifyDataSetChanged()
+
+        override fun areContentsTheSame(oldItem: ShoppingItem, newItem: ShoppingItem): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    fun updateProducts(addedProducts: List<Product>) {
+        val updatedProducts = mutableListOf<ShoppingItem>()
+        updatedProducts.addAll(addedProducts.map { ShoppingItem.ProductItem(it) })
+        submitList(updatedProducts)
     }
 
     fun updateProduct(productId: Long) {
-        val position = productPosition[productId]
-        if (position != null) {
+        val position = currentList.indexOfFirst {
+            it is ShoppingItem.ProductItem && it.product.id == productId
+        }
+        if (position != -1) {
             notifyItemChanged(position)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (products[position]) {
+        return when (getItem(position)) {
             is ShoppingItem.ProductItem -> VIEW_TYPE_PRODUCT
             else -> VIEW_TYPE_SKELETON
         }
@@ -64,30 +78,26 @@ class ProductAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return products.size
-    }
-
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        if (holder is ProductViewHolder && position < products.size) {
-            val item = (products[position] as ShoppingItem.ProductItem).product
+        if (holder is ProductViewHolder) {
+            val item = (getItem(position) as ShoppingItem.ProductItem).product
             holder.bind(item)
-            productPosition[item.id] = position
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setShowSkeleton(show: Boolean) {
         showSkeleton = show
+        val currentListWithoutSkeletons = currentList.filter { it !is ShoppingItem.SkeletonItem }
         if (showSkeleton) {
-            products.addAll(List(SKELETON_COUNT) { ShoppingItem.SkeletonItem })
+            val newList = currentListWithoutSkeletons.toMutableList()
+            newList.addAll(List(SKELETON_COUNT) { ShoppingItem.SkeletonItem })
+            submitList(newList)
         } else {
-            products = products.filter { it !is ShoppingItem.SkeletonItem }.toMutableList()
+            submitList(currentListWithoutSkeletons)
         }
-        notifyDataSetChanged()
     }
 
     companion object {
@@ -96,3 +106,4 @@ class ProductAdapter(
         private const val SKELETON_COUNT = 10
     }
 }
+
