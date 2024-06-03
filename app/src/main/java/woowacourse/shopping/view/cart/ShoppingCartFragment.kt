@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
 import woowacourse.shopping.view.detail.ProductDetailFragment
-import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.recommend.RecommendFragment
 
 class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
@@ -64,7 +62,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = shoppingCartViewModel
-        shoppingCartViewModel.loadPagingCartItemList()
         binding.onClickNavigateShoppingCart = this
         adapter =
             ShoppingCartAdapter(
@@ -72,10 +69,11 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 onClickCartItemCounter = shoppingCartViewModel,
                 onClickNavigateShoppingCart = this,
             )
+        adapter.setShowSkeleton(true)
+        shoppingCartViewModel.loadPagingCartItemList()
         binding.rvShoppingCart.adapter = adapter
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
             adapter.setShowSkeleton(false)
@@ -107,13 +105,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 }
 
                 ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
-            }
-        }
-
-        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { event ->
-            when (event) {
-                LoadEvent.Loading -> adapter.setShowSkeleton(true)
-                else -> adapter.setShowSkeleton(false)
             }
         }
 

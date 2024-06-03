@@ -17,7 +17,6 @@ import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.detail.ProductDetailFragment
-import woowacourse.shopping.view.model.event.LoadEvent
 import woowacourse.shopping.view.products.adapter.ProductAdapter
 import woowacourse.shopping.view.products.adapter.RecentlyAdapter
 

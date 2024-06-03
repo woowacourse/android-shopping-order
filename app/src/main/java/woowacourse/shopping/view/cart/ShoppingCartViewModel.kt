@@ -10,13 +10,10 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.livedata.MutableSingleLiveData
-import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.model.event.ErrorEvent
-import woowacourse.shopping.view.model.event.LoadEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
@@ -27,10 +24,6 @@ class ShoppingCartViewModel(
         MutableLiveData()
     val shoppingCartEvent: LiveData<ShoppingCartEvent> get() = _shoppingCartEvent
 
-    private val _loadingEvent: MutableSingleLiveData<LoadEvent> =
-        MutableSingleLiveData()
-    val loadingEvent: SingleLiveData<LoadEvent> get() = _loadingEvent
-
     val checkedShoppingCart = ShoppingCart()
 
     private val _allCheck: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -40,30 +33,13 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun deleteShoppingCartItem(
-        cartItemId: Long,
-        product: Product,
-    ) {
-        try {
-            shoppingCartRepository.deleteCartItem(cartItemId)
-            shoppingCart.deleteProduct(cartItemId)
-            _shoppingCartEvent.value =
-                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
-            deleteCheckedItem(CartItem(cartItemId, product))
-        } catch (e: Exception) {
-            handleException(e)
-        }
-    }
-
     fun loadPagingCartItemList() {
-        _loadingEvent.setValue(LoadEvent.Loading)
         try {
             val pagingData =
                 shoppingCartRepository.loadPagingCartItems(
                     LOAD_SHOPPING_ITEM_OFFSET,
                     LOAD_SHOPPING_ITEM_SIZE,
                 )
-            _loadingEvent.setValue(LoadEvent.Success)
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
         } catch (e: Exception) {
@@ -149,6 +125,21 @@ class ShoppingCartViewModel(
         checkedShoppingCart.addProduct(cartItem)
         checkedShoppingCart
         updateCheckItemData()
+    }
+
+    private fun deleteShoppingCartItem(
+        cartItemId: Long,
+        product: Product,
+    ) {
+        try {
+            shoppingCartRepository.deleteCartItem(cartItemId)
+            shoppingCart.deleteProduct(cartItemId)
+            _shoppingCartEvent.value =
+                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
+            deleteCheckedItem(CartItem(cartItemId, product))
+        } catch (e: Exception) {
+            handleException(e)
+        }
     }
 
     private fun deleteCheckedItem(cartItem: CartItem) {

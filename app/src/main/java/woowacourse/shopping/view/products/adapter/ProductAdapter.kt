@@ -38,9 +38,7 @@ class ProductAdapter(
     }
 
     fun updateProducts(addedProducts: List<Product>) {
-        val updatedProducts = mutableListOf<ShoppingItem>()
-        updatedProducts.addAll(addedProducts.map { ShoppingItem.ProductItem(it) })
-        submitList(updatedProducts)
+        submitList(addedProducts.map { ShoppingItem.ProductItem(it) })
     }
 
     fun updateProduct(productId: Long) {
