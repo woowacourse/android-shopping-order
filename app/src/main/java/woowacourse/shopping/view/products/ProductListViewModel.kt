@@ -41,34 +41,40 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        try {
+        runCatching {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-            val pagingData = productRepository.loadPagingProducts(itemSize)
-            _products.value = _products.value?.plus(pagingData)
-        } catch (e: Exception) {
-            handleException(e)
+            productRepository.loadPagingProducts(itemSize).getOrThrow()
         }
+            .onSuccess {
+                _products.value = _products.value?.plus(it)
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     fun loadPagingRecentlyProduct() {
-        try {
-            val pagingData = recentlyProductRepository.getRecentlyProductList()
-            _recentlyProducts.value = pagingData
-        } catch (e: Exception) {
-            handleException(e)
+        runCatching {
+            recentlyProductRepository.getRecentlyProductList().getOrThrow()
         }
+            .onSuccess {
+                _recentlyProducts.value = it
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun updateCarItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
+        runCatching {
+            shoppingCartRepository.updateCartItem(
+                product,
+                updateCartItemType,
+            ).getOrThrow()
+        }.onSuccess {  updateCartItemResult->
             when (updateCartItemResult) {
                 UpdateCartItemResult.ADD -> addCartItem(product)
                 is UpdateCartItemResult.DELETE -> deleteCartItem(product)
@@ -89,8 +95,8 @@ class ProductListViewModel(
                     _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
                 }
             }
-        } catch (e: Exception) {
-            handleException(e)
+        }.onFailure {
+            handleException(it)
         }
     }
 
@@ -112,12 +118,15 @@ class ProductListViewModel(
     }
 
     private fun updateTotalCartItemCount() {
-        try {
-            val totalItemCount = shoppingCartRepository.getTotalCartItemCount()
-            _cartItemCount.value = totalItemCount
-        } catch (e: Exception) {
-            handleException(e)
+        runCatching {
+            shoppingCartRepository.getTotalCartItemCount().getOrThrow()
         }
+            .onSuccess {
+                _cartItemCount.value = it
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     fun updateProducts(items: Map<Long, Int>) {

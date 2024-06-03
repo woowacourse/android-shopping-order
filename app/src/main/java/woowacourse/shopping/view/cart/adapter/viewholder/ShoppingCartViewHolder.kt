@@ -14,6 +14,7 @@ class ShoppingCartViewHolder(
     private val onClickNavigateShoppingCart: OnClickNavigateShoppingCart,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(cartItem: CartItem) {
+        cartItem.product.updateItemSelector(true)
         binding.cartItem = cartItem
         binding.onClickCartItemCounter = onClickCartItemCounter
         binding.onClickShoppingCart = onClickShoppingCart

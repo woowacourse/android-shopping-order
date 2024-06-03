@@ -44,91 +44,106 @@ class RecommendViewModel(
     val totalCount: LiveData<Int> get() = _totalCount
 
     private fun loadRecentlyProduct(): RecentlyProduct {
-        return recentlyRepository.getMostRecentlyProduct()
+        return recentlyRepository.getMostRecentlyProduct().getOrThrow()
+    }
+
+    private fun loadCategoryProducts(category: String): List<Product> {
+        return productRepository.loadCategoryProducts(
+            size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+            category = category,
+        ).getOrThrow()
+    }
+
+    private fun loadMyCartItems(): List<CartItem> {
+        return shoppingCartRepository.loadPagingCartItems(
+            LOAD_SHOPPING_ITEM_OFFSET,
+            LOAD_SHOPPING_ITEM_SIZE,
+        ).getOrThrow()
     }
 
     fun loadRecommendData() {
-        try {
+        runCatching {
             val recentlyProduct = loadRecentlyProduct()
-            val myCartItems =
-                shoppingCartRepository.loadPagingCartItems(
-                    LOAD_SHOPPING_ITEM_OFFSET,
-                    LOAD_SHOPPING_ITEM_SIZE,
-                )
-
-            val loadData =
-                productRepository.loadCategoryProducts(
-                    size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-                    category = recentlyProduct.category,
-                )
-
+            val loadCategoryProducts = loadCategoryProducts(recentlyProduct.category)
+            val myCartItems = loadMyCartItems()
             val recommendData =
                 getFilteredRandomProducts(
                     myCartItems = myCartItems,
-                    loadData = loadData,
+                    loadData = loadCategoryProducts,
                 )
             _products.value = recommendData
             updateCheckItemData()
-        } catch (e: Exception) {
-            handleException(e)
         }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        try {
+        runCatching {
             orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
-            _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-        } catch (e: Exception) {
-            handleException(e)
         }
+            .onSuccess {
+                _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun updateCarItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> addCartItem(product)
-                is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-                    updateCheckItemData()
+        runCatching {
+            shoppingCartRepository.updateCartItem(
+                product,
+                updateCartItemType,
+            ).getOrThrow()
+        }
+            .onSuccess { updateCartItemResult ->
+                when (updateCartItemResult) {
+                    UpdateCartItemResult.ADD -> addCartItem(product)
+                    is UpdateCartItemResult.DELETE -> deleteCartItem(product)
+                    is UpdateCartItemResult.UPDATED -> {
+                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
+                        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+                        updateCheckItemData()
+                    }
                 }
             }
-        } catch (e: Exception) {
-            handleException(e)
-        }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun addCartItem(product: Product) {
-        try {
+        runCatching {
             product.updateCartItemCount(CartItemEntity.DEFAULT_CART_ITEM_COUNT)
-            product.updateItemSelector(true)
-            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-            checkedShoppingCart.addProduct(CartItem(product = product))
-            updateCheckItemData()
-        } catch (e: Exception) {
-            handleException(e)
         }
+            .onSuccess {
+                product.updateItemSelector(true)
+                _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+                checkedShoppingCart.addProduct(CartItem(product = product))
+                updateCheckItemData()
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun deleteCartItem(product: Product) {
-        try {
-            product.updateItemSelector(false)
-            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+        runCatching {
             checkedShoppingCart.deleteProductFromProductId(product.id)
-            updateCheckItemData()
-        } catch (e: Exception) {
-            handleException(e)
         }
+            .onSuccess {
+                product.updateItemSelector(false)
+                _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun getFilteredRandomProducts(

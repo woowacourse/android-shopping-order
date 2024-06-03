@@ -10,35 +10,38 @@ import kotlin.concurrent.thread
 class ProductRepositoryImpl : ProductRepository {
     private val mockProductService: ProductService = MockProductService()
 
-    override fun loadPagingProducts(offset: Int): List<Product> {
+    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
         var pagingData: List<Product> = listOf()
         thread {
             pagingData = mockProductService.findPagingProducts(offset, PRODUCT_LOAD_PAGING_SIZE)
         }.join()
         if (pagingData.isEmpty()) throw ErrorEvent.MaxPagingDataEvent()
-        return pagingData
+        return Result.success(pagingData)
     }
 
     override fun loadCategoryProducts(
         size: Int,
         category: String,
-    ): List<Product> {
+    ): Result<List<Product>> {
         var pagingData: List<Product> = listOf()
         thread {
-            pagingData = mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
+            pagingData =
+                mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
         }.join()
         if (pagingData.isEmpty()) throw ErrorEvent.MaxPagingDataEvent()
-        return pagingData.filter { product ->
-            product.category == category
-        }
+        return Result.success(
+            pagingData.filter { product ->
+                product.category == category
+            }
+        )
     }
 
-    override fun getProduct(productId: Long): Product {
+    override fun getProduct(productId: Long): Result<Product> {
         var product: Product? = null
         thread {
             product = mockProductService.findProductById(productId)
         }.join()
-        return product ?: throw ErrorEvent.LoadDataEvent()
+        return Result.success(product?: throw ErrorEvent.LoadDataEvent())
     }
 
     companion object {

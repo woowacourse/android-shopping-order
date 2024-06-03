@@ -34,17 +34,19 @@ class ShoppingCartViewModel(
     val totalCount: LiveData<Int> get() = _totalCount
 
     fun loadPagingCartItemList() {
-        try {
-            val pagingData =
-                shoppingCartRepository.loadPagingCartItems(
-                    LOAD_SHOPPING_ITEM_OFFSET,
-                    LOAD_SHOPPING_ITEM_SIZE,
-                )
-            shoppingCart.addProducts(synchronizeLoadingData(pagingData))
-            setAllCheck()
-        } catch (e: Exception) {
-            handleException(e)
+        runCatching {
+            shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            ).getOrThrow()
         }
+            .onSuccess { pagingData->
+                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+                setAllCheck()
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun setAllCheck() {
@@ -92,32 +94,34 @@ class ShoppingCartViewModel(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> throw ErrorEvent.UpdateCartEvent()
-                is UpdateCartItemResult.DELETE ->
-                    deleteShoppingCartItem(
-                        updateCartItemResult.cartItemId,
-                        product = product,
-                    )
-
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _shoppingCartEvent.value =
-                        ShoppingCartEvent.UpdateProductEvent.Success(
-                            productId = product.id,
-                            count = product.cartItemCounter.itemCount,
+        runCatching {
+            shoppingCartRepository.updateCartItem(
+                product,
+                updateCartItemType,
+            ).getOrThrow()
+        }
+            .onSuccess { updateCartItemResult ->
+                when (updateCartItemResult) {
+                    UpdateCartItemResult.ADD -> throw ErrorEvent.UpdateCartEvent()
+                    is UpdateCartItemResult.DELETE ->
+                        deleteShoppingCartItem(
+                            updateCartItemResult.cartItemId,
+                            product = product,
                         )
+
+                    is UpdateCartItemResult.UPDATED -> {
+                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
+                        _shoppingCartEvent.value =
+                            ShoppingCartEvent.UpdateProductEvent.Success(
+                                productId = product.id,
+                                count = product.cartItemCounter.itemCount,
+                            )
+                    }
                 }
             }
-        } catch (e: Exception) {
-            handleException(e)
-        }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun addCheckedItem(cartItem: CartItem) {

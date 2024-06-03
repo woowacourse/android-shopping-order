@@ -12,7 +12,7 @@ import woowacourse.shopping.view.model.event.ErrorEvent
 class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
-    override fun loadPagingProducts(offset: Int): List<Product> {
+    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
         var products: List<Product>? = null
         executeWithLatch {
             val page = offset / PRODUCT_LOAD_PAGING_SIZE
@@ -22,13 +22,13 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw ErrorEvent.LoadDataEvent()
+        return Result.success(products ?: throw ErrorEvent.LoadDataEvent())
     }
 
     override fun loadCategoryProducts(
         size: Int,
         category: String,
-    ): List<Product> {
+    ): Result<List<Product>> {
         var products: List<Product>? = null
         executeWithLatch {
             val response =
@@ -41,10 +41,10 @@ class RemoteProductRepositoryImpl(
                 products = response.body()?.toProducts()
             }
         }
-        return products ?: throw ErrorEvent.LoadDataEvent()
+        return Result.success(products ?: throw ErrorEvent.LoadDataEvent())
     }
 
-    override fun getProduct(productId: Long): Product {
+    override fun getProduct(productId: Long): Result<Product> {
         var product: Product? = null
         executeWithLatch {
             val response = productDataSource.loadProduct(productId.toInt()).execute()
@@ -52,7 +52,7 @@ class RemoteProductRepositoryImpl(
                 product = response.body()?.toProduct()
             }
         }
-        return product ?: throw ErrorEvent.LoadDataEvent()
+        return Result.success(product ?: throw ErrorEvent.LoadDataEvent())
     }
 
     companion object {

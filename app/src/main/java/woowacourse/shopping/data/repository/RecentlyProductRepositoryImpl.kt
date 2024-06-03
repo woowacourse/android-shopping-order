@@ -13,15 +13,16 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
     private val recentlyProductDao =
         RecentlyProductDatabase.getInstance(context).recentlyProductDao()
 
-    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {
+    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Unit> {
         thread {
             recentlyProductDao.addRecentlyProduct(
                 recentlyProduct.toRecentlyProductEntity(),
             )
         }.join()
+        return Result.success(Unit)
     }
 
-    override fun getMostRecentlyProduct(): RecentlyProduct {
+    override fun getMostRecentlyProduct(): Result<RecentlyProduct> {
         var recentlyProduct = RecentlyProduct.defaultRecentlyProduct
         thread {
             val firstProduct = recentlyProductDao.getMostRecentlyProduct()?.toRecentlyProduct()
@@ -29,25 +30,26 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
                 recentlyProduct = firstProduct
             }
         }.join()
-        return recentlyProduct
+        return Result.success(recentlyProduct)
     }
 
-    override fun getRecentlyProductList(): List<RecentlyProduct> {
+    override fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
         var pagingData = emptyList<RecentlyProduct>()
         thread {
             pagingData =
                 recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
                     .map { it.toRecentlyProduct() }
         }.join()
-        return pagingData
+        return Result.success(pagingData)
     }
 
-    override fun deleteRecentlyProduct(id: Long) {
+    override fun deleteRecentlyProduct(id: Long): Result<Unit> {
         var deleteId = ERROR_DELETE_DATA_ID
         thread {
             deleteId = recentlyProductDao.deleteRecentlyProductById(id)
         }.join()
         if (deleteId == ERROR_DELETE_DATA_ID) throw ErrorEvent.LoadDataEvent()
+        return Result.success(Unit)
     }
 
     companion object {

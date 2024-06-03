@@ -19,7 +19,7 @@ import woowacourse.shopping.view.model.event.ErrorEvent
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
-    override fun addCartItem(product: Product) {
+    override fun addCartItem(product: Product): Result<Unit> {
         executeWithLatch {
             val response =
                 cartItemDataSource.addCartItem(
@@ -30,12 +30,13 @@ class RemoteShoppingCartRepositoryImpl(
                 throw ErrorEvent.AddCartEvent()
             }
         }
+        return Result.success(Unit)
     }
 
     override fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): List<CartItem> {
+    ): Result<List<CartItem>> {
         var cartItems: List<CartItem>? = null
         executeWithLatch {
             val page = (offset + 1) / LOAD_SHOPPING_ITEM_SIZE
@@ -46,38 +47,41 @@ class RemoteShoppingCartRepositoryImpl(
             }
         }
         if (cartItems.isNullOrEmpty()) throw ErrorEvent.MaxPagingDataEvent()
-        return cartItems ?: throw ErrorEvent.LoadDataEvent()
+        return Result.success(cartItems ?: throw ErrorEvent.LoadDataEvent())
     }
 
-    override fun deleteCartItem(itemId: Long) {
+    override fun deleteCartItem(itemId: Long): Result<Unit> {
         executeWithLatch {
             val response = cartItemDataSource.deleteCartItem(itemId.toInt()).execute()
             if (!response.isSuccessful) {
                 throw ErrorEvent.DeleteCartEvent()
             }
         }
+        return Result.success(Unit)
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
+    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         var cartItem: CartItem? = null
         executeWithLatch {
             val response = cartItemDataSource.loadCartItems().execute()
             cartItem =
                 response.body()?.toCartItems()?.find { it.product.id == productId }
         }
-        return CartItemResult(
-            cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
-            counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
+        return Result.success(
+            CartItemResult(
+                cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
+                counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
+            )
         )
     }
 
     override fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ): UpdateCartItemResult {
+    ): Result<UpdateCartItemResult> {
         var result: UpdateCartItemResult? = null
         executeWithLatch {
-            val cartItemResult = getCartItemResultFromProductId(product.id)
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
             when (updateCartItemType) {
                 UpdateCartItemType.INCREASE -> {
                     result =
@@ -110,7 +114,7 @@ class RemoteShoppingCartRepositoryImpl(
                 }
             }
         }
-        return result ?: throw ErrorEvent.UpdateCartEvent()
+        return Result.success(result ?: throw ErrorEvent.UpdateCartEvent())
     }
 
     private fun increaseItem(
@@ -135,7 +139,7 @@ class RemoteShoppingCartRepositoryImpl(
         }
     }
 
-    override fun getTotalCartItemCount(): Int {
+    override fun getTotalCartItemCount(): Result<Int> {
         var cartItemCount: Int = ERROR_QUANTITY_SIZE
         executeWithLatch {
             val response = cartItemDataSource.loadCartItemCount().execute()
@@ -146,7 +150,7 @@ class RemoteShoppingCartRepositoryImpl(
             }
         }
         if (cartItemCount == ERROR_QUANTITY_SIZE) throw ErrorEvent.LoadDataEvent()
-        return cartItemCount
+        return Result.success(cartItemCount)
     }
 
     companion object {

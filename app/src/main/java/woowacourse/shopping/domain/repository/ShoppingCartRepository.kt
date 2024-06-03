@@ -7,21 +7,21 @@ import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 
 interface ShoppingCartRepository {
-    fun addCartItem(product: Product)
+    fun addCartItem(product: Product): Result<Unit>
 
     fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): List<CartItem>
+    ): Result<List<CartItem>>
 
-    fun deleteCartItem(itemId: Long)
+    fun deleteCartItem(itemId: Long): Result<Unit>
 
-    fun getCartItemResultFromProductId(productId: Long): CartItemResult
+    fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult>
 
     fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ): UpdateCartItemResult
+    ): Result<UpdateCartItemResult>
 
-    fun getTotalCartItemCount(): Int
+    fun getTotalCartItemCount(): Result<Int>
 }
