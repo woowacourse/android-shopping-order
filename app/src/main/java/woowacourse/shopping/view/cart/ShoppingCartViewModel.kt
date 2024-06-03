@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
@@ -68,7 +69,6 @@ class ShoppingCartViewModel(
             }
         }
         updateCheckItemData()
-        _shoppingCartEvent.value = ShoppingCartEvent.UpdateCheckItem.Success
     }
 
     private fun synchronizeLoadingData(pagingData: List<CartItem>): List<CartItem> {
@@ -187,5 +187,10 @@ class ShoppingCartViewModel(
 
     override fun clickCheckAll() {
         checkAllItems()
+    }
+
+    override fun clickOrder() {
+        Log.d("cartsfd",checkedShoppingCart.toString())
+        _shoppingCartEvent.value = ShoppingCartEvent.SendCartItem.Success(checkedShoppingCart)
     }
 }

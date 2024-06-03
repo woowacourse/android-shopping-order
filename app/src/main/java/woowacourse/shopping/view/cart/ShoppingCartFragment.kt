@@ -1,7 +1,9 @@
 package woowacourse.shopping.view.cart
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,7 @@ import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
+import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.recommend.RecommendFragment
 
@@ -63,6 +66,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = shoppingCartViewModel
         binding.onClickNavigateShoppingCart = this
+        binding.onClickShoppingCart = shoppingCartViewModel
         adapter =
             ShoppingCartAdapter(
                 onClickShoppingCart = shoppingCartViewModel,
@@ -74,6 +78,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         binding.rvShoppingCart.adapter = adapter
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
             adapter.setShowSkeleton(false)
@@ -103,8 +108,10 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                         ),
                     )
                 }
-
-                ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
+                is ShoppingCartEvent.SendCartItem.Success -> {
+                    Log.d("cartsfd",cartState.shoppingCart.toString())
+                    navigateOrder(cartState.shoppingCart)
+                }
             }
         }
 
@@ -137,13 +144,11 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         mainActivityListener?.changeFragment(productFragment)
     }
 
-    override fun clickOrder() {
+    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
         val recommendFragment =
             RecommendFragment().apply {
                 arguments =
-                    RecommendFragment.createBundle(
-                        shoppingCartViewModel.checkedShoppingCart,
-                    )
+                    RecommendFragment.createBundle(checkedShoppingCart)
             }
         mainActivityListener?.changeFragment(recommendFragment)
     }

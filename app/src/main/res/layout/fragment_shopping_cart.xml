@@ -92,7 +92,7 @@
             android:layout_height="78dp"
             android:background="@color/primary"
             android:gravity="center"
-            android:onClick="@{()->onClickNavigateShoppingCart.clickOrder()}"
+            android:onClick="@{()->onClickShoppingCart.clickOrder()}"
             android:text="@{@string/formatted_order(vm.totalCount)}"
             android:textColor="@color/white"
             android:textSize="18dp"
