@@ -47,7 +47,6 @@ class ProductListViewModel(
 
     fun loadPagingProduct() {
         _loadingEvent.setValue(LoadEvent.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             val pagingData = productRepository.loadPagingProducts(itemSize)
@@ -58,7 +57,6 @@ class ProductListViewModel(
         } catch (e: Exception) {
             handleException(e)
         }
-//        }, 1000)
     }
 
     fun loadPagingRecentlyProduct() {

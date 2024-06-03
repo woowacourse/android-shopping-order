@@ -57,7 +57,6 @@ class ShoppingCartViewModel(
 
     fun loadPagingCartItemList() {
         _loadingEvent.setValue(LoadEvent.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
         try {
             val pagingData =
                 shoppingCartRepository.loadPagingCartItems(
@@ -70,7 +69,6 @@ class ShoppingCartViewModel(
         } catch (e: Exception) {
             handleException(e)
         }
-//        }, 1000)
     }
 
     private fun setAllCheck() {
