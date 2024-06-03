@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -55,11 +54,9 @@ class CartSelectViewModel(
 
     private fun loadedCartProducts(pagingCartProduct: PagingCartProduct) {
         val state = uiState.value ?: return
-        val carts = shoppingRepository.getAllCarts().getOrNull()
-
         val cartIdList = state.orderCarts.map { it.id }
 
-        val newCartList =
+        val cartProducts =
             pagingCartProduct.cartProducts.map { cart ->
                 if (cart.cart.id in cartIdList) {
                     cart.copy(isChecked = true)
@@ -68,8 +65,8 @@ class CartSelectViewModel(
                 }
             }
 
-        val newPagingCartProduct = pagingCartProduct.copy(cartProducts = newCartList)
-        val totalElements = carts?.totalElements ?: 0
+        val newPagingCartProduct = pagingCartProduct.copy(cartProducts = cartProducts)
+        val totalElements = shoppingRepository.getAllCarts().getOrNull()?.totalElements ?: 0
 
         _uiState.postValue(
             state.copy(
@@ -103,38 +100,19 @@ class CartSelectViewModel(
         productId: Long,
         increment: Boolean,
     ) {
-        var state = uiState.value ?: return
-        val updatedCartProducts =
+        val state = uiState.value ?: return
+
+        val updateCartProducts =
             state.pagingCartProduct.cartProducts.map { cartProduct ->
                 if (cartProduct.cart.product.id == productId) {
-                    val updateProduct = updateProduct(cartProduct, increment)
-                    val orderCartIds = state.orderCarts.map { it.product.id }
-                    if (productId in orderCartIds) {
-                        state = state.copy(orderCarts = state.orderCarts - cartProduct.cart)
-                        state = state.copy(orderCarts = state.orderCarts + updateProduct.cart)
-                    }
-                    updateProduct
+                    val quantity = calculateUpdatedQuantity(cartProduct.cart.quantity, increment)
+                    calculatedUpdateCart(cartProduct, quantity)
+                    cartProduct.copy(cart = cartProduct.cart.copy(quantity = quantity))
                 } else {
                     cartProduct
                 }
             }
-        val pagingCartProduct =
-            PagingCartProduct(
-                cartProducts = updatedCartProducts,
-                currentPage = state.pagingCartProduct.currentPage,
-                last = state.pagingCartProduct.last,
-            )
-
-        _uiState.value = state.copy(pagingCartProduct = pagingCartProduct)
-    }
-
-    private fun updateProduct(
-        cartProduct: CartProduct,
-        increment: Boolean,
-    ): CartProduct {
-        val updatedQuantity = calculateUpdatedQuantity(cartProduct.cart.quantity, increment)
-        calculatedUpdateCart(cartProduct.cart, updatedQuantity)
-        return cartProduct.copy(cart = cartProduct.cart.copy(quantity = updatedQuantity))
+        _uiState.value = state.copy(pagingCartProduct = PagingCartProduct(updateCartProducts))
     }
 
     private fun calculateUpdatedQuantity(
@@ -145,45 +123,61 @@ class CartSelectViewModel(
     }
 
     private fun calculatedUpdateCart(
-        cart: Cart,
+        cartProduct: CartProduct,
         updatedQuantity: Int,
     ) {
-        if (cart.quantity == Cart.INIT_QUANTITY_NUM) {
-            insertCartProduct(cart.product, updatedQuantity)
-        } else if (updatedQuantity == Cart.INIT_QUANTITY_NUM) {
-            deleteCartProduct(cart.id)
+        if (updatedQuantity == Cart.INIT_QUANTITY_NUM) {
+            deleteCartProduct(cartProduct)
         } else {
-            updateCartProduct(cart.id, updatedQuantity)
+            updateCartProduct(cartProduct, updatedQuantity)
         }
     }
 
-    private fun insertCartProduct(
-        product: Product,
-        quantity: Int,
-    ) {
+    private fun containsProductIdInOrder(
+        productId: Long,
+        orderCartIds: List<Long>,
+    ): Boolean = productId in orderCartIds
+
+    override fun deleteCartProduct(cartProduct: CartProduct) {
         thread {
-            shoppingRepository.postCartItem(
-                productId = product.id,
-                quantity = quantity,
-            ).onSuccess {
+            shoppingRepository.deleteCartItem(cartId = cartProduct.cart.id).onSuccess {
+                val state = uiState.value ?: return@onSuccess
+                loadCartProducts(state.pagingCartProduct.currentPage)
+            }.onSuccess {
                 hideError()
+                var state = _uiState.value ?: return@onSuccess
+                val orderCartIds = state.orderCarts.map { it.product.id }
+                if (containsProductIdInOrder(cartProduct.cart.product.id, orderCartIds)) {
+                    state = state.copy(orderCarts = state.orderCarts - cartProduct.cart)
+                }
+                _uiState.postValue(state)
             }.onFailure { e ->
                 showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
             }
         }
     }
 
-    override fun deleteCartProduct(cartId: Int) {
+    private fun updateCartProduct(
+        cartProduct: CartProduct,
+        quantity: Int,
+    ) {
         thread {
-            shoppingRepository.deleteCartItem(cartId = cartId).onSuccess {
-                uiState.value?.let { state ->
-                    loadCartProducts(state.pagingCartProduct.currentPage)
-                }
-            }.onSuccess {
+            shoppingRepository.patchCartItem(
+                cartId = cartProduct.cart.id,
+                quantity = quantity,
+            ).onSuccess {
                 hideError()
+                var state = _uiState.value ?: return@onSuccess
+                val orderCartIds = state.orderCarts.map { it.product.id }
+                if (containsProductIdInOrder(cartProduct.cart.product.id, orderCartIds)) {
+                    state = state.copy(orderCarts = state.orderCarts - cartProduct.cart)
+                    state =
+                        state.copy(orderCarts = state.orderCarts + cartProduct.cart.copy(quantity = quantity))
+                }
+                _uiState.postValue(state)
             }.onFailure { e ->
                 showError(e)
-                showMessage(MessageProvider.DefaultErrorMessage)
             }
         }
     }
@@ -230,22 +224,6 @@ class CartSelectViewModel(
                         pagingCartProduct = state.pagingCartProduct.copy(cartProducts = newPagingCartProduct),
                     ),
                 )
-            }.onFailure { e ->
-                showError(e)
-            }
-        }
-    }
-
-    private fun updateCartProduct(
-        cartId: Int,
-        quantity: Int,
-    ) {
-        thread {
-            shoppingRepository.patchCartItem(
-                cartId = cartId,
-                quantity = quantity,
-            ).onSuccess {
-                hideError()
             }.onFailure { e ->
                 showError(e)
             }
