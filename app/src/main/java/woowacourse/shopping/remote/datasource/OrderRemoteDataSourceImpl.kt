@@ -9,7 +9,7 @@ class OrderRemoteDataSourceImpl(
 ) : OrderRemoteDataSource {
     override fun postOrderByIds(cartItemsIds: List<Int>): Result<Unit> =
         runCatching {
-            val body = PostOrderRequest(cartItemsIds = cartItemsIds)
+            val body = PostOrderRequest(cartItemIds = cartItemsIds)
             service.postOrder(body).execute()
         }
 }
