@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,6 +20,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "base_url", properties.getProperty("base.url"))
+        buildConfigField("String", "authorization_username", properties.getProperty("authorization.username"))
+        buildConfigField("String", "authorization_password", properties.getProperty("authorization.password"))
     }
 
     buildTypes {
@@ -44,6 +52,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -59,7 +68,6 @@ dependencies {
     implementation("androidx.activity:activity:1.8.0")
     implementation("androidx.test.espresso:espresso-contrib:3.5.1")
     implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.fragment:fragment-ktx:1.7.1")
