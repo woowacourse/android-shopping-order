@@ -6,8 +6,12 @@ import retrofit2.http.POST
 import woowacourse.shopping.remote.model.request.PostOrderRequest
 
 interface OrderService {
-    @POST(ApiClient.Order.POST_ORDER)
+    @POST(ORDER_BASE_URL)
     fun postOrder(
         @Body body: PostOrderRequest,
     ): Call<Unit>
+
+    companion object {
+        private const val ORDER_BASE_URL = "/orders"
+    }
 }

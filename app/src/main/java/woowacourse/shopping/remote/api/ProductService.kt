@@ -8,14 +8,18 @@ import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.remote.model.response.ProductsResponse
 
 interface ProductService {
-    @GET(ApiClient.Product.GET_PRODUCTS)
+    @GET(PRODUCT_BASE_URL)
     fun getProducts(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
     ): Call<ProductsResponse>
 
-    @GET(ApiClient.Product.GET_PRODUCTS_BY_ID)
+    @GET("${PRODUCT_BASE_URL}/{id}")
     fun getProductsById(
         @Path("id") id: Int,
     ): Call<ProductResponse>
+
+    companion object {
+        private const val PRODUCT_BASE_URL = "/products"
+    }
 }
