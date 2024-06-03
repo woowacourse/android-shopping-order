@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repsoitory
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
 import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 
@@ -31,7 +30,7 @@ class ProductHistoryRepositoryImpl(
         productHistoryDataSource.findProductHistory(productId = productId)
             .mapCatching { it.toDomain() }
 
-    override fun getRecommendedProducts(size: Int): Result<List<Cart>> {
+    override fun getRecommendedProducts(size: Int): Result<List<Product>> {
         val recentHistory =
             productHistoryDataSource.getProductHistory(1).getOrNull() ?: return Result.success(
                 emptyList(),
@@ -55,7 +54,7 @@ class ProductHistoryRepositoryImpl(
                 val productsId = carts.content.map { it.product.id }
                 result.filter {
                     it.productId !in productsId
-                }.map { Cart(product = it.toDomain()) }.take(size)
+                }.map { it.toDomain() }.take(size)
             }
     }
 

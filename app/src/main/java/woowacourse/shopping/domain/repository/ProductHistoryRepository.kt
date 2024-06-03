@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 
 interface ProductHistoryRepository {
@@ -14,7 +13,7 @@ interface ProductHistoryRepository {
 
     fun findProductHistory(productId: Long): Result<Product>
 
-    fun getRecommendedProducts(size: Int): Result<List<Cart>>
+    fun getRecommendedProducts(size: Int): Result<List<Product>>
 
     fun getProductHistory(size: Int): Result<List<Product>>
 

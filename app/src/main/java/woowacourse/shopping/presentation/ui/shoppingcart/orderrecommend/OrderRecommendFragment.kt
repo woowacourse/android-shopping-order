@@ -55,7 +55,7 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
 
     private fun initObserve() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.recommendCarts)
+            adapter.submitList(state.recommendProducts)
         }
 
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->

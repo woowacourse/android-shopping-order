@@ -1,9 +1,10 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 
 data class OrderRecommendUiState(
-    val recommendCarts: List<Cart> = emptyList(),
+    val recommendProducts: List<Product> = emptyList(),
     val orderCarts: List<Cart> = emptyList(),
 ) {
     val orderTotalPrice get() = orderCarts.sumOf { it.totalPrice }

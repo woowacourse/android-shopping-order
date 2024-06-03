@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderProductBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.presentation.common.ProductCountHandler
 
 class RecommendAdapter(
     private val productCountHandler: ProductCountHandler,
-) : ListAdapter<Cart, RecommendAdapter.RecommendViewHolder>(CartDiffCallback) {
+) : ListAdapter<Product, RecommendAdapter.RecommendViewHolder>(ProductDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -38,27 +38,27 @@ class RecommendAdapter(
         private val productCountHandler: ProductCountHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            cart: Cart,
+            product: Product,
             position: Int,
         ) {
-            binding.product = cart.product
+            binding.product = product
             binding.position = position
             binding.productCountHandler = productCountHandler
             binding.executePendingBindings()
         }
     }
 
-    object CartDiffCallback : DiffUtil.ItemCallback<Cart>() {
+    object ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: Product,
+            newItem: Product,
         ): Boolean {
-            return oldItem.product.id == newItem.product.id
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: Product,
+            newItem: Product,
         ): Boolean {
             return oldItem == newItem
         }

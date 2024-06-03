@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -58,7 +57,7 @@ class ProductListViewModelTest {
         val actual = viewModel.uiState.getOrAwaitValue()
 
         assertThat(actual.pagingProduct.products).isEqualTo(
-            PRODUCTS.content.subList(0, 20).map { Cart(product = it) },
+            PRODUCTS.content.subList(0, 20),
         )
     }
 
@@ -71,7 +70,7 @@ class ProductListViewModelTest {
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
         assertThat(actual.pagingProduct.products).isEqualTo(
-            PRODUCTS.content.subList(0, 40).map { Cart(product = it) },
+            PRODUCTS.content.subList(0, 40),
         )
     }
 
@@ -108,6 +107,6 @@ class ProductListViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingProduct.products.first().id).isEqualTo(cartItemId.id)
+        assertThat(actual.pagingProduct.products.first().id).isEqualTo(productList.first().id)
     }
 }

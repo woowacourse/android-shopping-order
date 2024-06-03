@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -16,6 +17,7 @@ import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendNavigateAction
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendViewModel
 import woowacourse.shopping.remote.api.DummyData.CARTS_PULL
+import woowacourse.shopping.remote.api.DummyData.PRODUCTS
 
 @ExtendWith(MockKExtension::class, InstantTaskExecutorExtension::class)
 class OrderRecommendViewModelTest {
@@ -30,7 +32,7 @@ class OrderRecommendViewModelTest {
     @MockK
     private lateinit var orderRepository: OrderRepository
 
-    val recommendCarts = CARTS_PULL.content.take(10)
+    val recommendCarts = PRODUCTS.content.take(10)
 
     @BeforeEach
     fun setUp() {
@@ -54,18 +56,20 @@ class OrderRecommendViewModelTest {
 
         every {
             shoppingCartRepository.postCartItem(
-                recommendCarts.first().product.id,
+                recommendCarts.first().id,
                 1,
             )
         } returns Result.success(cartItemId)
 
         // when
-        viewModel.plusProductQuantity(recommendCarts.first().product.id, 0)
+        viewModel.plusProductQuantity(recommendCarts.first().id, 0)
         Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.orderCarts).isEqualTo(listOf(recommendCarts.first().copy(quantity = 1)))
+        assertThat(actual.orderCarts).isEqualTo(
+            listOf(Cart(id = cartItemId.id, product = recommendCarts.first(), quantity = 1)),
+        )
     }
 
     @Test
