@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shopping
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -32,30 +33,32 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
             if (activityResult.resultCode == RESULT_OK) {
-                handleActivityResult(activityResult.data)
+                activityResult.data?.let {
+                    updateSingleProductQuantity(it)
+                    updateMultipleProductsQuantities(it)
+                }
             }
         }
-
-    private fun handleActivityResult(data: Intent?) {
-        data?.let {
-            updateSingleProductQuantity(it)
-            updateMultipleProductsQuantities(it)
-        }
-    }
 
     private fun updateSingleProductQuantity(intent: Intent) {
         val modifiedProductId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, -1L)
         val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, -1)
+
+        viewModel.fetchRecentProducts()
         if (modifiedProductId != -1L && newQuantity != -1) {
             viewModel.updateProductQuantity(modifiedProductId, newQuantity)
         }
     }
 
     private fun updateMultipleProductsQuantities(intent: Intent) {
-        val modifiedProductIds = intent.getLongArrayExtra(CartActivity.EXTRA_CHANGED_PRODUCT_IDS)
-        val newQuantities = intent.getIntArrayExtra(CartActivity.EXTRA_NEW_PRODUCT_QUANTITIES)
-        modifiedProductIds?.zip(newQuantities?.toList() ?: emptyList())?.forEach { (id, quantity) ->
-            viewModel.updateProductQuantity(id, quantity)
+        val updatedProducts: List<UpdatedProductData>? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableArrayExtra(EXTRA_UPDATED_PRODUCTS, UpdatedProductData::class.java)?.toList()
+            } else {
+                intent.getParcelableArrayExtra(EXTRA_UPDATED_PRODUCTS)?.filterIsInstance<UpdatedProductData>()
+            }
+        updatedProducts?.forEach { (productId, newQuantity) ->
+            viewModel.updateProductQuantity(productId, newQuantity)
         }
     }
 
@@ -136,13 +139,11 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                             this,
                             activityResultLauncher,
                             it.productId,
-                            it.cartId,
-                            it.quantity,
                         )
                     }
 
                     is FromShoppingToScreen.Cart ->
-                        CartActivity.startWithResult(
+                        CartActivity.startWithResultLauncher(
                             this,
                             cartItemQuantity = viewModel.cartItemQuantity.value ?: 0,
                             activityResultLauncher,
@@ -152,21 +153,16 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         )
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetchInitialRecentProducts()
-//        viewModel.fetchCartData()
-    }
-
     companion object {
         const val GRIDLAYOUT_COL = 2
         private const val EXTRA_PRODUCT_ID = "productId"
         private const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
+        private const val EXTRA_UPDATED_PRODUCTS = "updatedProductsData"
 
         fun startWithNewProductQuantity(
             context: Context,
-            productId: Long,
-            quantity: Int,
+            productId: Long = -1L,
+            quantity: Int = -1,
         ) {
             if (context is Activity) {
                 Intent(context, ShoppingActivity::class.java).apply {
@@ -174,8 +170,23 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                     putExtra(EXTRA_PRODUCT_ID, productId)
                     putExtra(EXTRA_NEW_PRODUCT_QUANTITY, quantity)
                     context.setResult(Activity.RESULT_OK, this)
-                    context.startActivity(this)
                 }
+            } else {
+                throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
+            }
+        }
+
+        fun startWithNewProductQuantities(
+            context: Context,
+            updatedItems: List<UpdatedProductData>,
+        ) {
+            if (context is Activity) {
+                val intent =
+                    Intent(context, ShoppingActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        putExtra(EXTRA_UPDATED_PRODUCTS, updatedItems.toTypedArray())
+                    }
+                context.setResult(Activity.RESULT_OK, intent)
             } else {
                 throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
             }

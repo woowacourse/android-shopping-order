@@ -99,7 +99,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         const val EXTRA_CHANGED_PRODUCT_IDS = "changedProductIds"
         const val EXTRA_NEW_PRODUCT_QUANTITIES = "newProductQuantities"
 
-        fun startWithResult(
+        fun startWithResultLauncher(
             context: Context,
             cartItemQuantity: Int,
             activityLauncher: ActivityResultLauncher<Intent>,
