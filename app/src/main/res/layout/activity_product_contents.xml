@@ -38,8 +38,8 @@
 
                 <ImageView
                     android:id="@+id/iv_cart"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/default_icon_size"
+                    android:layout_height="@dimen/default_icon_size"
                     android:layout_marginEnd="44dp"
                     android:background="@drawable/ic_shopping_cart"
                     app:layout_constraintBottom_toBottomOf="parent"

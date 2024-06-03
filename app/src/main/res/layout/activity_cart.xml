@@ -86,8 +86,8 @@
 
         <CheckBox
             android:id="@+id/cb_cart_item_total"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/default_icon_size"
+            android:layout_height="@dimen/default_icon_size"
             android:layout_marginStart="24dp"
             android:layout_marginBottom="25dp"
             android:background="@drawable/checkbox"
