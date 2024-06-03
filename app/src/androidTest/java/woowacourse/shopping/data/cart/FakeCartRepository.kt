@@ -14,18 +14,14 @@ class FakeCartRepository(
         currentPage: Int,
         pageSize: Int,
     ): Result<List<CartProduct>> {
-        if (canLoadMoreCartProducts(currentPage, pageSize).getOrThrow()
-                .not()
-        ) {
+        if (canLoadMoreCartProducts(currentPage, pageSize).getOrThrow().not()) {
             return Result.success(emptyList())
         }
         val startIndex = (currentPage) * pageSize
         val endIndex = (startIndex + pageSize).coerceAtMost(products.size)
 
         if (startIndex >= products.size) {
-            return Result.failure(
-                IllegalArgumentException("Invalid page"),
-            )
+            return Result.failure(IllegalArgumentException("Invalid page"))
         }
         return Result.success(products.subList(startIndex, endIndex))
     }
