@@ -30,8 +30,8 @@ class CartActivity : AppCompatActivity() {
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
         )
     }
-    private val cartFragment by lazy { CartFragment() }
-    private val recommendFragment by lazy { RecommendFragment() }
+    private val cartFragment by lazy { CartFragment.newInstance() }
+    private val recommendFragment by lazy { RecommendFragment.newInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

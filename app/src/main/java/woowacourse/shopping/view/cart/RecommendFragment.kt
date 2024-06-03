@@ -68,4 +68,10 @@ class RecommendFragment : Fragment() {
     private fun showError(errorMessage: String) {
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
+
+    companion object {
+        fun newInstance(): Fragment {
+            return RecommendFragment()
+        }
+    }
 }
