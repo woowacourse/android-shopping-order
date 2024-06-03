@@ -5,8 +5,11 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.cart.CartUiModel
+import woowacourse.shopping.ui.cart.CartUiModels
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 
 val imageUrl = "https://www.naver.com/"
@@ -16,9 +19,7 @@ val category = "food"
 
 fun product(id: Int) = Product(id = id, imageUrl = imageUrl, name = name, price = price, category = category)
 
-fun products(size: Int): List<Product> {
-    return List(size) { product(it) }
-}
+fun products(size: Int) = List(size) { product(it) }
 
 fun recentProduct(productId: Int) = RecentProduct(0, product(productId), LocalDateTime.now())
 
@@ -27,20 +28,9 @@ fun recentProducts(size: Int) = List(size) { recentProduct(it) }
 fun cartItem(
     id: Int,
     quantity: Int,
-): CartItem {
-    return CartItem(id, id, Quantity(quantity))
-}
+) = CartItem(id, id, Quantity(quantity))
 
-fun List<Product>.toProductUiModels(cartItems: List<CartItem>): List<ProductUiModel> {
-    return map { product ->
-        val cartItem = cartItems.firstOrNull { it.productId == product.id }
-        if (cartItem == null) {
-            ProductUiModel.from(product)
-        } else {
-            ProductUiModel.from(product, cartItem.quantity)
-        }
-    }
-}
+fun cartItems(size: Int) = List(size) { cartItem(it, 1) }
 
 fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<ProductUiModel> {
     return map { product ->
@@ -58,4 +48,14 @@ fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<Produc
 
 fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel> {
     return map { RecentProductUiModel(it.product.id, it.product.imageUrl, it.product.name) }
+}
+
+fun List<CartItem>.toCartUiModels(products: List<Product>): CartUiModels {
+    val uiModels =
+        map { cartItem ->
+            val product = products.find { it.id == cartItem.productId }
+            product ?: throw IllegalArgumentException()
+            CartUiModel.from(product, cartItem)
+        }
+    return CartUiModels(uiModels)
 }
