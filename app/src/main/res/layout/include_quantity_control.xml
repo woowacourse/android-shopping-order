@@ -6,8 +6,12 @@
     <data>
 
         <variable
-            name="product"
-            type="woowacourse.shopping.domain.ProductListItem.ShoppingProductItem" />
+            name="productId"
+            type="Long" />
+
+        <variable
+            name="count"
+            type="Integer" />
 
         <variable
             name="quantityHandler"
@@ -27,7 +31,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:onClick="@{()->quantityHandler.onDecreaseQuantity(product)}"
+            android:onClick="@{()->quantityHandler.onDecreaseQuantity(productId)}"
             android:text="-"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -40,7 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@{String.valueOf(product.quantity)}"
+            android:text="@{String.valueOf(count)}"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +59,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:onClick="@{()->quantityHandler.onIncreaseQuantity(product)}"
+            android:onClick="@{() -> quantityHandler.onIncreaseQuantity(productId)}"
             android:text="+"
             android:textSize="22sp"
             android:textStyle="bold"

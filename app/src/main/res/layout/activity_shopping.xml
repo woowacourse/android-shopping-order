@@ -5,17 +5,24 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel" />
-        />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".presentation.ui.shopping.ShoppingActivity">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -41,19 +48,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tv_cart_count"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/background_cart"
             android:backgroundTint="@color/teal_200"
             android:gravity="center"
             android:maxLines="1"
-            android:layout_marginStart="-10dp"
             android:text="@{String.valueOf(viewModel.cartItemQuantity)}"
             android:textColor="@color/white"
             android:textSize="14sp"
-            android:visibility="@{viewModel.cartItemQuantity == 0 ? 2 : 0}"
+            android:visibility="@{viewModel.cartItemQuantity == 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/iv_cart_count"
-            app:layout_constraintStart_toEndOf="@+id/iv_cart_count"
+            app:layout_constraintEnd_toEndOf="@id/gl_end"
             app:layout_constraintTop_toTopOf="@+id/iv_cart_count"
             tools:text="2" />
 
@@ -61,12 +69,11 @@
             android:id="@+id/iv_cart_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:onClick="@{() -> viewModel.onCartMenuItemClick()}"
-            android:padding="10dp"
+            android:padding="4dp"
             android:src="@drawable/ic_cart"
             app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintEnd_toStartOf="@+id/tv_cart_count"
             app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
         <androidx.recyclerview.widget.RecyclerView
