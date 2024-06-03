@@ -74,7 +74,7 @@ class ProductListViewModel(
                 product,
                 updateCartItemType,
             ).getOrThrow()
-        }.onSuccess {  updateCartItemResult->
+        }.onSuccess { updateCartItemResult ->
             when (updateCartItemResult) {
                 UpdateCartItemResult.ADD -> addCartItem(product)
                 is UpdateCartItemResult.DELETE -> deleteCartItem(product)

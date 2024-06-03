@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.products.adapter
 
-import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -20,11 +18,13 @@ class ProductAdapter(
     private val onClickProducts: OnClickProducts,
     private val onClickCartItemCounter: OnClickCartItemCounter,
 ) : ListAdapter<ShoppingItem, RecyclerView.ViewHolder>(DiffCallback()) {
-
     private var showSkeleton: Boolean = true
 
     class DiffCallback : DiffUtil.ItemCallback<ShoppingItem>() {
-        override fun areItemsTheSame(oldItem: ShoppingItem, newItem: ShoppingItem): Boolean {
+        override fun areItemsTheSame(
+            oldItem: ShoppingItem,
+            newItem: ShoppingItem,
+        ): Boolean {
             return if (oldItem is ShoppingItem.ProductItem && newItem is ShoppingItem.ProductItem) {
                 oldItem.product.id == newItem.product.id
             } else {
@@ -32,7 +32,10 @@ class ProductAdapter(
             }
         }
 
-        override fun areContentsTheSame(oldItem: ShoppingItem, newItem: ShoppingItem): Boolean {
+        override fun areContentsTheSame(
+            oldItem: ShoppingItem,
+            newItem: ShoppingItem,
+        ): Boolean {
             return oldItem == newItem
         }
     }
@@ -42,9 +45,10 @@ class ProductAdapter(
     }
 
     fun updateProduct(productId: Long) {
-        val position = currentList.indexOfFirst {
-            it is ShoppingItem.ProductItem && it.product.id == productId
-        }
+        val position =
+            currentList.indexOfFirst {
+                it is ShoppingItem.ProductItem && it.product.id == productId
+            }
         if (position != -1) {
             notifyItemChanged(position)
         }
@@ -104,4 +108,3 @@ class ProductAdapter(
         private const val SKELETON_COUNT = 10
     }
 }
-

@@ -32,7 +32,7 @@ class ProductRepositoryImpl : ProductRepository {
         return Result.success(
             pagingData.filter { product ->
                 product.category == category
-            }
+            },
         )
     }
 
@@ -41,7 +41,7 @@ class ProductRepositoryImpl : ProductRepository {
         thread {
             product = mockProductService.findProductById(productId)
         }.join()
-        return Result.success(product?: throw ErrorEvent.LoadDataEvent())
+        return Result.success(product ?: throw ErrorEvent.LoadDataEvent())
     }
 
     companion object {

@@ -71,7 +71,7 @@ class RemoteShoppingCartRepositoryImpl(
             CartItemResult(
                 cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
                 counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
-            )
+            ),
         )
     }
 

@@ -41,7 +41,7 @@ class ShoppingCartViewModel(
                 LOAD_SHOPPING_ITEM_SIZE,
             ).getOrThrow()
         }
-            .onSuccess { pagingData->
+            .onSuccess { pagingData ->
                 shoppingCart.addProducts(synchronizeLoadingData(pagingData))
                 setAllCheck()
             }
@@ -190,7 +190,7 @@ class ShoppingCartViewModel(
     }
 
     override fun clickOrder() {
-        Log.d("cartsfd",checkedShoppingCart.toString())
+        Log.d("cartsfd", checkedShoppingCart.toString())
         _shoppingCartEvent.value = ShoppingCartEvent.SendCartItem.Success(checkedShoppingCart)
     }
 }

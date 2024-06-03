@@ -58,7 +58,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
             CartItemResult(
                 cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
                 counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
-            )
+            ),
         )
     }
 
@@ -109,7 +109,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         if (updateDataId == ERROR_UPDATE_DATA_ID) throw ErrorEvent.UpdateCartEvent()
     }
 
-    override fun getTotalCartItemCount(): Result<Int>{
+    override fun getTotalCartItemCount(): Result<Int> {
         var totalCount = 0
         thread {
             totalCount = cartItemDao.getTotalItemCount()

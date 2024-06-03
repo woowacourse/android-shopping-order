@@ -109,7 +109,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                     )
                 }
                 is ShoppingCartEvent.SendCartItem.Success -> {
-                    Log.d("cartsfd",cartState.shoppingCart.toString())
+                    Log.d("cartsfd", cartState.shoppingCart.toString())
                     navigateOrder(cartState.shoppingCart)
                 }
             }

@@ -26,7 +26,7 @@ object TestFixture {
     fun makeRecentlyProductEntity(): RecentlyProductEntity {
         return RecentlyProductEntity(
             id = 2L,
-            productId = 2L,
+            productId = 999L,
             imageUrl = "",
             name = "",
             category = "fashion",

@@ -10,6 +10,6 @@ sealed interface ShoppingCartEvent {
     }
 
     sealed interface SendCartItem : ShoppingCartEvent {
-        data class Success(val shoppingCart: ShoppingCart): SendCartItem
+        data class Success(val shoppingCart: ShoppingCart) : SendCartItem
     }
 }

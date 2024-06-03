@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -14,18 +13,19 @@ import woowacourse.shopping.view.cart.OnClickShoppingCart
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartSkeletonViewHolder
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartViewHolder
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.products.model.ShoppingItem
 
 class ShoppingCartAdapter(
     private val onClickShoppingCart: OnClickShoppingCart,
     private val onClickCartItemCounter: OnClickCartItemCounter,
     private val onClickNavigateShoppingCart: OnClickNavigateShoppingCart,
 ) : ListAdapter<ShoppingCartItem, RecyclerView.ViewHolder>(ShoppingCartDiffCallback()) {
-
     private var showSkeleton: Boolean = true
 
     class ShoppingCartDiffCallback : DiffUtil.ItemCallback<ShoppingCartItem>() {
-        override fun areItemsTheSame(oldItem: ShoppingCartItem, newItem: ShoppingCartItem): Boolean {
+        override fun areItemsTheSame(
+            oldItem: ShoppingCartItem,
+            newItem: ShoppingCartItem,
+        ): Boolean {
             return if (oldItem is ShoppingCartItem.CartProductItem && newItem is ShoppingCartItem.CartProductItem) {
                 oldItem.cartItem.product.id == newItem.cartItem.product.id
             } else {
@@ -33,7 +33,10 @@ class ShoppingCartAdapter(
             }
         }
 
-        override fun areContentsTheSame(oldItem: ShoppingCartItem, newItem: ShoppingCartItem): Boolean {
+        override fun areContentsTheSame(
+            oldItem: ShoppingCartItem,
+            newItem: ShoppingCartItem,
+        ): Boolean {
             return oldItem == newItem
         }
     }
@@ -81,18 +84,20 @@ class ShoppingCartAdapter(
     }
 
     fun updateCartItem(productId: Long) {
-        val position = currentList.indexOfFirst {
-            it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
-        }
+        val position =
+            currentList.indexOfFirst {
+                it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
+            }
         if (position != -1) {
             notifyItemChanged(position)
         }
     }
 
     fun deleteCartItem(productId: Long) {
-        val position = currentList.indexOfFirst {
-            it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
-        }
+        val position =
+            currentList.indexOfFirst {
+                it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
+            }
         if (position != -1) {
             notifyItemRemoved(position)
         }
