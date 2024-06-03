@@ -13,6 +13,7 @@ import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.utils.toIdOrNull
 
 class RepositoryImpl(
     private val localDataSource: LocalDataSource,
@@ -70,7 +71,7 @@ class RepositoryImpl(
             val response = remoteDataSource.postCartItem(cartItemRequest)
             if (response.isSuccessful) {
                 return Result.success(
-                    response.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0,
+                    response.toIdOrNull() ?: 0
                 )
             }
             return Result.failure(Throwable(response.errorBody().toString()))
