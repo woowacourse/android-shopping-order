@@ -18,6 +18,7 @@ import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.adapter.RecommendProductAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
@@ -71,7 +72,8 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeError() {
         viewModel.error.observe(this) {
-            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
+            val errMsg = handleError(it)
+            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
             toast?.show()
         }
     }

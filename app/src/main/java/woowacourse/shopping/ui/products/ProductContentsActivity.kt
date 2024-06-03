@@ -16,6 +16,7 @@ import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.databinding.ActivityProductContentsBinding
+import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductAdapter
@@ -51,10 +52,7 @@ class ProductContentsActivity : AppCompatActivity() {
         initToolbar()
         observeProductItems()
         observeRecentProductItems()
-        viewModel.error.observe(this) {
-            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
-            toast?.show()
-        }
+        observeError()
         moveToProductDetailPage()
     }
 
@@ -62,6 +60,14 @@ class ProductContentsActivity : AppCompatActivity() {
         super.onResume()
         viewModel.loadCartItems()
         viewModel.loadRecentProducts()
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(this) {
+            val errMsg = handleError(it)
+            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
+            toast?.show()
+        }
     }
 
     private fun initToolbar() {

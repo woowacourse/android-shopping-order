@@ -3,6 +3,8 @@ package woowacourse.shopping.data.datasource.impl
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductDao
+import woowacourse.shopping.exception.ShoppingError
+import woowacourse.shopping.exception.ShoppingException
 import kotlin.concurrent.thread
 
 class RecentProductLocalDataSourceImpl(private val dao: RecentProductDao) :
@@ -22,7 +24,7 @@ class RecentProductLocalDataSourceImpl(private val dao: RecentProductDao) :
             thread {
                 recentProduct = dao.findMostRecentProduct()
             }.join()
-            recentProduct ?: error("최근 본 상품 정보를 불러오지 못했습니다")
+            recentProduct ?: throw ShoppingException(ShoppingError.RecentProductNotFound)
         }
 
     override fun findAll(): Result<List<RecentProduct>> =

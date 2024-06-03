@@ -28,9 +28,11 @@ class ProductDetailActivity :
     private lateinit var binding: ActivityProductDetailBinding
     private var toast: Toast? = null
     private val productId by lazy { productId() }
+    private val lastSeenProductState by lazy { lastSeenProductState() }
     private val viewModel: ProductDetailViewModel by viewModels {
         ProductDetailViewModelFactory(
             productId,
+            lastSeenProductState,
             ProductRepositoryImpl(ProductRemoteDataSourceImpl(NetworkModule.productService)),
             RecentProductRepositoryImpl.get(
                 RecentProductLocalDataSourceImpl(
@@ -43,7 +45,6 @@ class ProductDetailActivity :
             ),
         )
     }
-    private val lastSeenProductState by lazy { lastSeenProductState() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,6 @@ class ProductDetailActivity :
         initToolbar()
         setOnListener()
         observeErrorMessage()
-        addRecentProduct()
         observeAddCart()
     }
 
@@ -68,10 +68,6 @@ class ProductDetailActivity :
             toast = Toast.makeText(this, getString(R.string.add_cart_complete), Toast.LENGTH_SHORT)
             toast?.show()
         }
-    }
-
-    private fun addRecentProduct() {
-        viewModel.addToRecentProduct(lastSeenProductState)
     }
 
     private fun initToolbar() {
@@ -94,13 +90,10 @@ class ProductDetailActivity :
     }
 
     private fun observeErrorMessage() {
-        viewModel.errorMsg.observe(this) { event ->
-            event.getContentIfNotHandled()?.let {
-                if (it.isNotEmpty()) {
-                    toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
-                    toast?.show()
-                }
-            }
+        viewModel.errorMsg.observe(this) {
+//            val errMsg = handleError(it)
+            toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
+            toast?.show()
         }
     }
 

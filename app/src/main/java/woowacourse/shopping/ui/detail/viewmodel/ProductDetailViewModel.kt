@@ -10,12 +10,12 @@ import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.ui.CountButtonClickListener
-import woowacourse.shopping.ui.utils.Event
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 
 class ProductDetailViewModel(
     private val productId: Long,
+    private val lastSeenProductState: Boolean,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
@@ -23,8 +23,8 @@ class ProductDetailViewModel(
     private val _error: MutableLiveData<Boolean> = MutableLiveData(false)
     val error: LiveData<Boolean> get() = _error
 
-    private val _errorMsg: MutableLiveData<Event<String>> = MutableLiveData(Event(""))
-    val errorMsg: LiveData<Event<String>> get() = _errorMsg
+    private val _errorMsg = MutableSingleLiveData<String>()
+    val errorMsg: SingleLiveData<String> get() = _errorMsg
 
     private val _productWithQuantity: MutableLiveData<ProductWithQuantity> = MutableLiveData()
     val productWithQuantity: LiveData<ProductWithQuantity> get() = _productWithQuantity
@@ -45,6 +45,7 @@ class ProductDetailViewModel(
 
     init {
         loadProduct()
+        addToRecentProduct()
     }
 
     fun loadProduct() {
@@ -53,7 +54,7 @@ class ProductDetailViewModel(
             _productWithQuantity.value = ProductWithQuantity(product = it)
         }.onFailure {
             _error.value = true
-            _errorMsg.setErrorHandled(it.message.toString())
+            _errorMsg.setValue(it.toString())
         }
     }
 
@@ -80,15 +81,12 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addToRecentProduct(lastSeenProductState: Boolean) {
-        loadMostRecentProduct(productId, lastSeenProductState)
+    private fun addToRecentProduct() {
+        loadMostRecentProduct(productId)
         recentProductRepository.insert(productId)
     }
 
-    private fun loadMostRecentProduct(
-        productId: Long,
-        lastSeenProductState: Boolean,
-    ) {
+    private fun loadMostRecentProduct(productId: Long) {
         recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
             productRepository.find(recentProduct.productId).onSuccess { product ->
                 _error.value = false
@@ -98,7 +96,7 @@ class ProductDetailViewModel(
             }.onFailure {
                 _error.value = true
                 _mostRecentProductVisibility.value = false
-                _errorMsg.setErrorHandled(it.message.toString())
+                _errorMsg.setValue(it.toString())
             }
         }
     }
@@ -108,11 +106,5 @@ class ProductDetailViewModel(
         currentProductId: Long,
     ) {
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
-    }
-
-    private fun <T> MutableLiveData<Event<T>>.setErrorHandled(value: T?) {
-        if (this.value?.hasBeenHandled == false) {
-            value?.let { this.value = Event(it) }
-        }
     }
 }

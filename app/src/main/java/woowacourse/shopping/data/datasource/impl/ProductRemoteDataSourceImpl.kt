@@ -4,6 +4,8 @@ import woowacourse.shopping.data.datasource.ProductRemoteDataSource
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.exception.ShoppingError
+import woowacourse.shopping.exception.ShoppingException
 import kotlin.concurrent.thread
 
 class ProductRemoteDataSourceImpl(private val service: ProductService) : ProductRemoteDataSource {
@@ -16,7 +18,7 @@ class ProductRemoteDataSourceImpl(private val service: ProductService) : Product
             thread {
                 productsDto = service.getProductsByOffset(page = page, size = size).execute().body()
             }.join()
-            productsDto ?: error("상품 정보를 불러오지 못했습니다")
+            productsDto ?: throw ShoppingException(ShoppingError.ProductNotFound)
         }
 
     override fun getProductsByCategory(
@@ -29,7 +31,7 @@ class ProductRemoteDataSourceImpl(private val service: ProductService) : Product
                 productsDto =
                     service.getProductsByCategory(category = category, page = page).execute().body()
             }.join()
-            productsDto ?: error("상품 정보를 불러오지 못했습니다")
+            productsDto ?: throw ShoppingException(ShoppingError.ProductNotFound)
         }
 
     override fun getProductsById(id: Long): Result<ResponseProductIdGetDto> =
@@ -38,6 +40,6 @@ class ProductRemoteDataSourceImpl(private val service: ProductService) : Product
             thread {
                 productDto = service.getProductsById(id = id).execute().body()
             }.join()
-            productDto ?: error("$id 에 해당하는 productId가 없습니다")
+            productDto ?: throw ShoppingException(ShoppingError.ProductNotFoundWithId(id))
         }
 }

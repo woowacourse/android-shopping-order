@@ -6,6 +6,8 @@ import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.exception.ShoppingError
+import woowacourse.shopping.exception.ShoppingException
 import kotlin.concurrent.thread
 
 class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemoteDataSource {
@@ -18,7 +20,7 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
             thread {
                 cartsDto = service.getCartItems(page = page, size = size).execute().body()
             }.join()
-            cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
+            cartsDto ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
     override fun postCartItems(request: RequestCartItemPostDto): Result<Unit> =
@@ -50,8 +52,9 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
             var cartCountDto: ResponseCartItemCountsGetDto? = null
             thread {
                 cartCountDto =
-                    service.getCartItemCounts().execute().body() ?: error("장바구니 아이템 수량을 조회할 수 없습니다.")
+                    service.getCartItemCounts().execute().body()
+                        ?: throw ShoppingException(ShoppingError.CartItemCountConfirmError)
             }.join()
-            cartCountDto ?: error("장바구니 아이템 수량을 조회할 수 없습니다.")
+            cartCountDto ?: throw ShoppingException(ShoppingError.CartItemCountConfirmError)
         }
 }

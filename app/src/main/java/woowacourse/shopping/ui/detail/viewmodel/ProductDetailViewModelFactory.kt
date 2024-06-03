@@ -8,6 +8,7 @@ import woowacourse.shopping.data.recentproduct.RecentProductRepository
 
 class ProductDetailViewModelFactory(
     private val productId: Long,
+    private val lastSeenProductState: Boolean,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
@@ -15,6 +16,7 @@ class ProductDetailViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ProductDetailViewModel(
             productId,
+            lastSeenProductState,
             productRepository,
             recentProductRepository,
             cartRepository,

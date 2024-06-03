@@ -10,6 +10,8 @@ import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.exception.ShoppingError
+import woowacourse.shopping.exception.ShoppingException
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
@@ -256,7 +258,7 @@ class CartViewModel(
 
     private fun findCartIdByProductId(productId: Long): Long {
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
-            ?: error("일치하는 장바구니 아이템이 없습니다.")
+            ?: throw ShoppingException(ShoppingError.CartNotFound)
     }
 
     private fun CartWithProduct.toUiModel(isChecked: Boolean) =

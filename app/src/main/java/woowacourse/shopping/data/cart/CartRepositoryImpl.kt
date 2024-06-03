@@ -6,6 +6,8 @@ import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.request.RequestOrdersPostDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
+import woowacourse.shopping.exception.ShoppingError
+import woowacourse.shopping.exception.ShoppingException
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Quantity
 
@@ -15,7 +17,8 @@ class CartRepositoryImpl(
 ) : CartRepository {
     override fun getCartItem(productId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching {
-            it.firstOrNull { it.product.id == productId } ?: error("장바구니 정보를 불러올 수 없습니다.")
+            it.firstOrNull { it.product.id == productId }
+                ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
     override fun getAllCartItems(): Result<List<Cart>> {
