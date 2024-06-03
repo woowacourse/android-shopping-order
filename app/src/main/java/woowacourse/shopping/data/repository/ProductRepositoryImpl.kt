@@ -4,41 +4,36 @@ import woowacourse.shopping.data.db.product.MockProductService
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.service.ProductService
+import woowacourse.shopping.utils.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
-import kotlin.concurrent.thread
 
 class ProductRepositoryImpl : ProductRepository {
     private val mockProductService: ProductService = MockProductService()
 
-    override fun loadPagingProducts(offset: Int): List<Product> {
-        var pagingData: List<Product> = listOf()
-        thread {
-            pagingData = mockProductService.findPagingProducts(offset, PRODUCT_LOAD_PAGING_SIZE)
-        }.join()
-        if (pagingData.isEmpty()) throw NoSuchDataException()
-        return pagingData
+    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
+        return executeWithLatch {
+            val pagingData = mockProductService.findPagingProducts(offset, PRODUCT_LOAD_PAGING_SIZE)
+            if (pagingData.isEmpty()) throw NoSuchDataException()
+            pagingData
+        }
     }
 
     override fun loadCategoryProducts(
         size: Int,
         category: String,
-    ): List<Product> {
-        var pagingData: List<Product> = listOf()
-        thread {
-            pagingData = mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
-        }.join()
-        if (pagingData.isEmpty()) throw NoSuchDataException()
-        return pagingData.filter { product ->
-            product.category == category
+    ): Result<List<Product>> {
+        return executeWithLatch {
+            val pagingData = mockProductService.findPagingProducts(DEFAULT_ITEM_SIZE, PRODUCT_LOAD_PAGING_SIZE)
+            if (pagingData.isEmpty()) throw NoSuchDataException()
+            pagingData.filter { product -> product.category == category }
         }
     }
 
-    override fun getProduct(productId: Long): Product {
-        var product: Product? = null
-        thread {
-            product = mockProductService.findProductById(productId)
-        }.join()
-        return product ?: throw NoSuchDataException()
+    override fun getProduct(productId: Long): Result<Product> {
+        return executeWithLatch {
+            val product = mockProductService.findProductById(productId)
+            product ?: throw NoSuchDataException()
+        }
     }
 
     companion object {

@@ -6,48 +6,40 @@ import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProduct
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProductEntity
+import woowacourse.shopping.utils.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
-import kotlin.concurrent.thread
 
 class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepository {
     private val recentlyProductDao =
         RecentlyProductDatabase.getInstance(context).recentlyProductDao()
 
-    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        thread {
+    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Long> {
+        return executeWithLatch {
             recentlyProductDao.addRecentlyProduct(
                 recentlyProduct.toRecentlyProductEntity(),
             )
         }
     }
 
-    override fun getMostRecentlyProduct(): RecentlyProduct {
-        var recentlyProduct = RecentlyProduct.defaultRecentlyProduct
-        thread {
+    override fun getMostRecentlyProduct(): Result<RecentlyProduct> {
+        return executeWithLatch {
             val firstProduct = recentlyProductDao.getMostRecentlyProduct()?.toRecentlyProduct()
-            if (firstProduct != null) {
-                recentlyProduct = firstProduct
-            }
-        }.join()
-        return recentlyProduct
+            firstProduct ?: RecentlyProduct.defaultRecentlyProduct
+        }
     }
 
-    override fun getRecentlyProductList(): List<RecentlyProduct> {
-        var pagingData = emptyList<RecentlyProduct>()
-        thread {
-            pagingData =
-                recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
-                    .map { it.toRecentlyProduct() }
-        }.join()
-        return pagingData
+    override fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
+        return executeWithLatch {
+            recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
+                .map { it.toRecentlyProduct() }
+        }
     }
 
-    override fun deleteRecentlyProduct(id: Long) {
-        var deleteId = ERROR_DELETE_DATA_ID
-        thread {
-            deleteId = recentlyProductDao.deleteRecentlyProductById(id)
-        }.join()
-        if (deleteId == ERROR_DELETE_DATA_ID) throw NoSuchDataException()
+    override fun deleteRecentlyProduct(id: Long): Result<Unit> {
+        return executeWithLatch {
+            val deleteId = recentlyProductDao.deleteRecentlyProductById(id)
+            if (deleteId == ERROR_DELETE_DATA_ID) throw NoSuchDataException()
+        }
     }
 
     companion object {

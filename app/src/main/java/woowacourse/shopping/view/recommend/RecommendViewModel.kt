@@ -17,7 +17,6 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
@@ -33,126 +32,117 @@ class RecommendViewModel(
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
 
-    private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> =
-        MutableSingleLiveData()
+    private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> = MutableSingleLiveData()
     val errorEvent: SingleLiveData<RecommendEvent.ErrorEvent> get() = _errorEvent
-    private val _recommendEvent: MutableSingleLiveData<RecommendEvent.SuccessEvent> =
-        MutableSingleLiveData()
+
+    private val _recommendEvent: MutableSingleLiveData<RecommendEvent.SuccessEvent> = MutableSingleLiveData()
     val recommendEvent: SingleLiveData<RecommendEvent.SuccessEvent> get() = _recommendEvent
 
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
+
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private fun loadRecentlyProduct(): RecentlyProduct {
-        return recentlyRepository.getMostRecentlyProduct()
+    fun loadRecentlyProductToRecommend() {
+        recentlyRepository.getMostRecentlyProduct()
+            .onSuccess { recentlyProduct ->
+                loadRecommendData(recentlyProduct)
+            }
+            .onFailure {
+                _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            }
     }
 
-    fun loadRecommendData() {
+    private fun loadRecommendData(recentlyProduct: RecentlyProduct) {
         try {
-            val recentlyProduct = loadRecentlyProduct()
-            val myCartItems =
-                shoppingCartRepository.loadPagingCartItems(
-                    LOAD_SHOPPING_ITEM_OFFSET,
-                    LOAD_SHOPPING_ITEM_SIZE,
-                )
-
-            val loadData =
+            val myCartItemsResult = shoppingCartRepository.loadPagingCartItems(LOAD_SHOPPING_ITEM_OFFSET, LOAD_SHOPPING_ITEM_SIZE)
+            val loadDataResult =
                 productRepository.loadCategoryProducts(
                     size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
                     category = recentlyProduct.category,
                 )
 
-            val recommendData =
-                getFilteredRandomProducts(
-                    myCartItems = myCartItems,
-                    loadData = loadData,
-                )
-            _products.value = recommendData
-            updateCheckItemData()
+            myCartItemsResult.onSuccess { myCartItems ->
+                loadDataResult.onSuccess { loadData ->
+                    val recommendData = getFilteredRandomProducts(myCartItems, loadData)
+                    _products.value = recommendData
+                    updateCheckItemData()
+                }.onFailure {
+                    _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                }
+            }.onFailure {
+                _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            }
         } catch (e: Exception) {
             _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
         }
     }
 
     fun increaseShoppingCart(product: Product) {
-        updateCarItem(product, UpdateCartItemType.INCREASE)
+        updateCartItem(product, UpdateCartItemType.INCREASE)
     }
 
     fun decreaseShoppingCart(product: Product) {
-        updateCarItem(product, UpdateCartItemType.DECREASE)
+        updateCartItem(product, UpdateCartItemType.DECREASE)
     }
 
     fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        try {
-            orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
-            _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-        } catch (e: Exception) {
+        if (ids != null) {
+            orderRepository.orderShoppingCart(ids)
+                .onSuccess {
+                    _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
+                }
+                .onFailure {
+                    _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
+                }
+        } else {
             _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
         }
     }
 
-    private fun updateCarItem(
+    private fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> addCartItem(product)
-                is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-                    updateCheckItemData()
+        shoppingCartRepository.updateCartItem(product, updateCartItemType)
+            .onSuccess { updateCartItemResult ->
+                when (updateCartItemResult) {
+                    UpdateCartItemResult.ADD -> addCartItem(product)
+                    is UpdateCartItemResult.DELETE -> deleteCartItem(product)
+                    is UpdateCartItemResult.UPDATED -> {
+                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
+                        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+                        updateCheckItemData()
+                    }
                 }
             }
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            .onFailure {
+                _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
             }
-        }
     }
 
     private fun addCartItem(product: Product) {
         try {
             product.updateCartItemCount(CartItemEntity.DEFAULT_CART_ITEM_COUNT)
             product.updateItemSelector(true)
-            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             checkedShoppingCart.addProduct(CartItem(product = product))
+            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             updateCheckItemData()
         } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
-            }
+            _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
         }
     }
 
     private fun deleteCartItem(product: Product) {
         try {
             product.updateItemSelector(false)
-            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             checkedShoppingCart.deleteProductFromProductId(product.id)
+            _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             updateCheckItemData()
         } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
-            }
+            _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
         }
     }
 
@@ -162,7 +152,6 @@ class RecommendViewModel(
     ): List<Product> {
         val cartProductIds = myCartItems.map { it.product.id }.toSet()
         val filteredProducts = loadData.filter { it.id !in cartProductIds }
-
         return filteredProducts.shuffled().take(LOAD_RECOMMEND_ITEM_SIZE)
     }
 

@@ -72,7 +72,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = recommendViewModel
         binding.onClickRecommend = this
-        recommendViewModel.loadRecommendData()
+        recommendViewModel.loadRecentlyProductToRecommend()
         adapter =
             RecommendAdapter(
                 onClickProducts = this,

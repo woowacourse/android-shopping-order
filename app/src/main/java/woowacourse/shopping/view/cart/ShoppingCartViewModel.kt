@@ -46,13 +46,12 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         product: Product,
     ) {
-        try {
-            shoppingCartRepository.deleteCartItem(cartItemId)
+        shoppingCartRepository.deleteCartItem(cartItemId).onSuccess { _ ->
             shoppingCart.deleteProduct(cartItemId)
             _shoppingCartEvent.value =
                 ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
             deleteCheckedItem(CartItem(cartItemId, product))
-        } catch (e: Exception) {
+        }.onFailure { e ->
             when (e) {
                 is NoSuchDataException ->
                     _errorEvent.setValue(
@@ -69,17 +68,14 @@ class ShoppingCartViewModel(
 
     fun loadPagingCartItemList() {
         _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
-        try {
-            val pagingData =
-                shoppingCartRepository.loadPagingCartItems(
-                    LOAD_SHOPPING_ITEM_OFFSET,
-                    LOAD_SHOPPING_ITEM_SIZE,
-                )
+        shoppingCartRepository.loadPagingCartItems(
+            LOAD_SHOPPING_ITEM_OFFSET,
+            LOAD_SHOPPING_ITEM_SIZE,
+        ).onSuccess { pagingData ->
             _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
-        } catch (e: Exception) {
+        }.onFailure { e ->
             _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Fail)
             when (e) {
                 is NoSuchDataException ->
@@ -91,7 +87,6 @@ class ShoppingCartViewModel(
                     )
             }
         }
-//        }, 1000)
     }
 
     private fun setAllCheck() {
@@ -147,12 +142,10 @@ class ShoppingCartViewModel(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
+        shoppingCartRepository.updateCartItem(
+            product,
+            updateCartItemType,
+        ).onSuccess { updateCartItemResult ->
             when (updateCartItemResult) {
                 UpdateCartItemResult.ADD -> throw NoSuchDataException()
                 is UpdateCartItemResult.DELETE ->
@@ -170,7 +163,7 @@ class ShoppingCartViewModel(
                         )
                 }
             }
-        } catch (e: Exception) {
+        }.onFailure { e ->
             when (e) {
                 is NoSuchDataException ->
                     _errorEvent.setValue(ShoppingCartEvent.UpdateProductEvent.Fail)

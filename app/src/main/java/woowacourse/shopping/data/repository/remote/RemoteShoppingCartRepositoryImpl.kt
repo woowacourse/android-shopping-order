@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository.remote
 import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemResult
 import woowacourse.shopping.domain.model.Product
@@ -11,32 +10,15 @@ import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.DtoMapper.toCartItem
-import woowacourse.shopping.utils.exception.LatchUtils.awaitOrThrow
+import woowacourse.shopping.utils.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
-    private fun executeWithLatch(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        var exception: Exception? = null
-        thread {
-            try {
-                action()
-            } catch (e: Exception) {
-                exception = e
-            } finally {
-                latch.countDown()
-            }
-        }
-        latch.awaitOrThrow(exception)
-    }
-
-    override fun addCartItem(product: Product) {
-        executeWithLatch {
+    override fun addCartItem(product: Product): Result<Unit> {
+        return executeWithLatch {
             val response =
                 cartItemDataSource.addCartItem(
                     product.id.toInt(),
@@ -51,22 +33,20 @@ class RemoteShoppingCartRepositoryImpl(
     override fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): List<CartItem> {
-        var cartItems: List<CartItem>? = null
-        executeWithLatch {
+    ): Result<List<CartItem>> {
+        return executeWithLatch {
             val page = (offset + 1) / LOAD_SHOPPING_ITEM_SIZE
-            val response =
-                cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
+            val response = cartItemDataSource.loadCartItems(page = page, size = pagingSize).execute()
             if (response.isSuccessful) {
-                cartItems = response.body()?.cartItemDto?.map { it.toCartItem() }
+                response.body()?.cartItemDto?.map { it.toCartItem() } ?: emptyList()
+            } else {
+                throw NoSuchDataException()
             }
         }
-        if (cartItems.isNullOrEmpty()) throw NoSuchDataException()
-        return cartItems ?: throw NoSuchDataException()
     }
 
-    override fun deleteCartItem(itemId: Long) {
-        executeWithLatch {
+    override fun deleteCartItem(itemId: Long): Result<Unit> {
+        return executeWithLatch {
             val response = cartItemDataSource.deleteCartItem(itemId.toInt()).execute()
             if (!response.isSuccessful) {
                 throw NoSuchDataException()
@@ -74,22 +54,19 @@ class RemoteShoppingCartRepositoryImpl(
         }
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
-        var cartItem: CartItem? = null
-        executeWithLatch {
+    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+        return executeWithLatch {
             val response = cartItemDataSource.loadCartItems().execute()
-            cartItem =
-                response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }
-                    ?.toCartItem()
+            val cartItem = response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }?.toCartItem()
+            CartItemResult(
+                cartItemId = cartItem?.id ?: CartItem.DEFAULT_CART_ITEM_ID,
+                counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
+            )
         }
-        return CartItemResult(
-            cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
-            counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
-        )
     }
 
-    private fun updateCartCount(cartItemResult: CartItemResult) {
-        executeWithLatch {
+    private fun updateCartCount(cartItemResult: CartItemResult): Result<Unit> {
+        return executeWithLatch {
             val response =
                 cartItemDataSource.updateCartItem(
                     id = cartItemResult.cartItemId.toInt(),
@@ -104,52 +81,39 @@ class RemoteShoppingCartRepositoryImpl(
     override fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ): UpdateCartItemResult {
-        val latch = CountDownLatch(1)
-        var result: UpdateCartItemResult? = null
-        var exception: Exception? = null
-        thread {
-            try {
-                val cartItemResult = getCartItemResultFromProductId(product.id)
-                when (updateCartItemType) {
-                    UpdateCartItemType.INCREASE -> {
-                        result =
-                            if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
-                                increaseItem(cartItemResult, product)
-                                addCartItem(product)
-                                UpdateCartItemResult.ADD
-                            } else {
-                                increaseItem(cartItemResult, product)
-                                UpdateCartItemResult.UPDATED(cartItemResult)
-                            }
-                    }
-
-                    UpdateCartItemType.DECREASE -> {
-                        val changeCartItemResult = cartItemResult.decreaseCount()
-                        result =
-                            if (changeCartItemResult == ChangeCartItemResultState.Fail) {
-                                deleteCartItem(cartItemResult.cartItemId)
-                                UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-                            } else {
-                                updateCartCount(cartItemResult)
-                                UpdateCartItemResult.UPDATED(cartItemResult)
-                            }
-                    }
-
-                    is UpdateCartItemType.UPDATE -> {
-                        cartItemResult.updateCount(updateCartItemType.count)
-                        updateCartCount(cartItemResult)
-                        result = UpdateCartItemResult.UPDATED(cartItemResult)
+    ): Result<UpdateCartItemResult> {
+        return executeWithLatch {
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+            when (updateCartItemType) {
+                UpdateCartItemType.INCREASE -> {
+                    if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                        increaseItem(cartItemResult, product)
+                        addCartItem(product)
+                        UpdateCartItemResult.ADD
+                    } else {
+                        increaseItem(cartItemResult, product)
+                        UpdateCartItemResult.UPDATED(cartItemResult)
                     }
                 }
-            } catch (e: Exception) {
-                exception = e
-            } finally {
-                latch.countDown()
+
+                UpdateCartItemType.DECREASE -> {
+                    val changeCartItemResult = cartItemResult.decreaseCount()
+                    if (changeCartItemResult == ChangeCartItemResultState.Fail) {
+                        deleteCartItem(cartItemResult.cartItemId)
+                        UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
+                    } else {
+                        updateCartCount(cartItemResult)
+                        UpdateCartItemResult.UPDATED(cartItemResult)
+                    }
+                }
+
+                is UpdateCartItemType.UPDATE -> {
+                    cartItemResult.updateCount(updateCartItemType.count)
+                    updateCartCount(cartItemResult)
+                    UpdateCartItemResult.UPDATED(cartItemResult)
+                }
             }
         }
-        latch.awaitOrThrow(exception)
-        return result ?: throw NoSuchDataException()
     }
 
     private fun increaseItem(
@@ -161,18 +125,18 @@ class RemoteShoppingCartRepositoryImpl(
         updateCartCount(cartItemResult)
     }
 
-    override fun getTotalCartItemCount(): Int {
-        var cartItemCount: Int = ERROR_QUANTITY_SIZE
-        executeWithLatch {
+    override fun getTotalCartItemCount(): Result<Int> {
+        return executeWithLatch {
             val response = cartItemDataSource.loadCartItemCount().execute()
             if (response.isSuccessful && response.body() != null) {
-                cartItemCount = response.body()?.quantity ?: ERROR_QUANTITY_SIZE
+                response.body()?.quantity ?: ERROR_QUANTITY_SIZE
             } else {
                 throw NoSuchDataException()
             }
+        }.mapCatching {
+            if (it == ERROR_QUANTITY_SIZE) throw NoSuchDataException()
+            it
         }
-        if (cartItemCount == ERROR_QUANTITY_SIZE) throw NoSuchDataException()
-        return cartItemCount
     }
 
     companion object {
