@@ -9,8 +9,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="cart"
-            type="woowacourse.shopping.domain.model.Cart" />
+            name="product"
+            type="woowacourse.shopping.domain.model.Product" />
 
         <variable
             name="position"
@@ -31,11 +31,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:onClick="@{() -> actionHandler.navigateToProductDetail(cart.product.id)}">
+        android:onClick="@{() -> actionHandler.navigateToProductDetail(product.id)}">
 
         <ImageView
             android:id="@+id/iv_product_thumbnail"
-            urlToImage="@{cart.product.imageUrl}"
+            urlToImage="@{product.imageUrl}"
             android:layout_width="154dp"
             android:layout_height="154dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +52,7 @@
             android:layout_marginEnd="9dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cart.product.name}"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -64,7 +64,7 @@
 
         <TextView
             android:id="@+id/tv_product_price"
-            priceToCurrency="@{cart.product.price}"
+            priceToCurrency="@{product.price}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -79,12 +79,12 @@
         <include
             android:id="@+id/include_product_count"
             layout="@layout/include_product_count"
-            android:visibility="@{cart.quantity == 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{product.quantity == 0 ? View.GONE : View.VISIBLE}"
             app:actionHandler="@{productCountHandler}"
             app:layout_constraintBottom_toBottomOf="@+id/iv_product_thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:position="@{position}"
-            app:cart="@{cart}" />
+            app:product="@{product}" />
 
 
         <ImageButton
@@ -92,9 +92,9 @@
             android:layout_height="48dp"
             android:layout_margin="8dp"
             android:background="@drawable/bg_white_shape_oval"
-            android:onClick="@{() -> productCountHandler.plusProductQuantity(cart.product.id, position)}"
+            android:onClick="@{() -> productCountHandler.plusProductQuantity(product.id, position)}"
             android:src="@drawable/ic_plus"
-            android:visibility="@{cart.quantity == 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{product.quantity == 0 ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/iv_product_thumbnail"
             app:layout_constraintEnd_toEndOf="@+id/iv_product_thumbnail" />

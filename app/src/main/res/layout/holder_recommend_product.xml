@@ -79,7 +79,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/iv_product_thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:position="@{position}"
-            app:cart="@{cart}" />
+            app:product="@{cart.product}" />
 
 
         <ImageButton

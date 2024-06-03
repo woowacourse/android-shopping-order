@@ -68,7 +68,7 @@ class ProductListActivity :
         }
 
         viewModel.uiState.observe(this) { state ->
-            productListAdapter.updateProductList(state.pagingCart)
+            productListAdapter.updateProductList(state.pagingProduct)
 
             val layoutManager = binding.rvProductHistoryList.layoutManager as LinearLayoutManager
             scrollPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -89,6 +89,6 @@ class ProductListActivity :
 
     override fun onResume() {
         super.onResume()
-        viewModel.updateProducts()
+        viewModel.updatePagingProduct()
     }
 }

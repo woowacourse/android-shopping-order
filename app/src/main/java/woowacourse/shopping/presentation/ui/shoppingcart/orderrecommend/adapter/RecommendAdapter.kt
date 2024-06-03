@@ -41,7 +41,7 @@ class RecommendAdapter(
             cart: Cart,
             position: Int,
         ) {
-            binding.cart = cart
+            binding.product = cart.product
             binding.position = position
             binding.productCountHandler = productCountHandler
             binding.executePendingBindings()

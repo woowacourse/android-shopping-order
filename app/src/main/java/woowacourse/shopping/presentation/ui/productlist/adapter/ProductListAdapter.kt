@@ -8,15 +8,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderLoadMoreBinding
 import woowacourse.shopping.databinding.HolderProductBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.presentation.common.ProductCountHandler
-import woowacourse.shopping.presentation.ui.productlist.PagingCart
+import woowacourse.shopping.presentation.ui.productlist.PagingProduct
 import woowacourse.shopping.presentation.ui.productlist.ProductListActionHandler
 
 class ProductListAdapter(
     private val actionHandler: ProductListActionHandler,
     private val productCountHandler: ProductCountHandler,
-) : ListAdapter<Cart, ProductListAdapter.ProductListViewHolder>(CartDiffCallback) {
+) : ListAdapter<Product, ProductListAdapter.ProductListViewHolder>(ProductDiffCallback) {
     private var isLast: Boolean = false
 
     override fun getItemViewType(position: Int): Int {
@@ -59,10 +59,10 @@ class ProductListAdapter(
         }
     }
 
-    fun updateProductList(newPagingCart: PagingCart) {
+    fun updateProductList(newPagingCart: PagingProduct) {
         isLast = newPagingCart.last
         if (isLast) notifyItemChanged(currentList.size)
-        submitList(newPagingCart.cartList)
+        submitList(newPagingCart.products)
     }
 
     sealed class ProductListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -72,10 +72,10 @@ class ProductListAdapter(
             private val productCountHandler: ProductCountHandler,
         ) : ProductListViewHolder(binding.root) {
             fun bind(
-                cart: Cart,
+                product: Product,
                 position: Int,
             ) {
-                binding.cart = cart
+                binding.product = product
                 binding.position = position
                 binding.actionHandler = actionHandler
                 binding.productCountHandler = productCountHandler
@@ -95,17 +95,17 @@ class ProductListAdapter(
         }
     }
 
-    object CartDiffCallback : DiffUtil.ItemCallback<Cart>() {
+    object ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: Product,
+            newItem: Product,
         ): Boolean {
-            return oldItem.product.id == newItem.product.id
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Cart,
-            newItem: Cart,
+            oldItem: Product,
+            newItem: Product,
         ): Boolean {
             return oldItem == newItem
         }

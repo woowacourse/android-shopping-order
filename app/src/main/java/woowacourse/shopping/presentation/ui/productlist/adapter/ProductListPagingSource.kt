@@ -1,9 +1,8 @@
 package woowacourse.shopping.presentation.ui.productlist.adapter
 
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.presentation.ui.productlist.PagingCart
+import woowacourse.shopping.presentation.ui.productlist.PagingProduct
 
 class ProductListPagingSource(
     private val productRepository: ProductRepository,
@@ -12,29 +11,16 @@ class ProductListPagingSource(
     private var currentPage = INIT_PAGE_NUM
     private var last = false
 
-    fun load(): Result<PagingCart> {
+    fun load(): Result<PagingProduct> {
         if (last) return Result.failure(NoSuchElementException())
 
-        val result =
-            productRepository.getPagingProduct(page = currentPage, pageSize = PAGING_SIZE)
-                .mapCatching { products ->
-                    val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
-
-                    products.content.map { product ->
-                        val findCart = cartProducts?.content?.find { it.product.id == product.id }
-                        if (findCart == null) {
-                            Cart(product = product)
-                        } else {
-                            Cart(id = findCart.id, quantity = findCart.quantity, product = product)
-                        }
-                    }
-                }
+        val result = productRepository.getPagingProduct(page = currentPage, pageSize = PAGING_SIZE)
 
         return result.fold(
             onSuccess = { products ->
-                if (products.size < PAGING_SIZE) last = true
+                if (products.content.size < PAGING_SIZE) last = true
                 currentPage++
-                Result.success(PagingCart(products, last))
+                Result.success(PagingProduct(products.content, last))
             },
             onFailure = { e ->
                 Result.failure(e)

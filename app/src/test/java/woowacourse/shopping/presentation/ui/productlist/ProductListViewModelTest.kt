@@ -57,7 +57,7 @@ class ProductListViewModelTest {
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
 
-        assertThat(actual.pagingCart.cartList).isEqualTo(
+        assertThat(actual.pagingProduct.products).isEqualTo(
             PRODUCTS.content.subList(0, 20).map { Cart(product = it) },
         )
     }
@@ -70,7 +70,7 @@ class ProductListViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCart.cartList).isEqualTo(
+        assertThat(actual.pagingProduct.products).isEqualTo(
             PRODUCTS.content.subList(0, 40).map { Cart(product = it) },
         )
     }
@@ -108,6 +108,6 @@ class ProductListViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCart.cartList.first().id).isEqualTo(cartItemId.id)
+        assertThat(actual.pagingProduct.products.first().id).isEqualTo(cartItemId.id)
     }
 }

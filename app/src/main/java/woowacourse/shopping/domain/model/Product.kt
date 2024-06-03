@@ -10,4 +10,9 @@ data class Product(
     val price: Int,
     val category: String,
     val imageUrl: String,
-) : Parcelable
+    val quantity: Int = INIT_QUANTITY,
+) : Parcelable {
+    companion object {
+        const val INIT_QUANTITY = 0
+    }
+}
