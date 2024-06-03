@@ -32,17 +32,13 @@ class ShoppingCartActivity :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
-        return true
-    }
-
-    override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 1) {
             super.onBackPressed()
             supportFragmentManager.findFragmentById(R.id.fragment_container_view_main)
         } else {
             finish()
         }
+        return true
     }
 
     companion object {
