@@ -156,6 +156,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         this.cartProducts.postValue(UiState.Success(cartProducts))
+                        saveRecentProduct(cartProducts[index])
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -168,6 +169,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
+                        saveRecentProduct(cartProducts[index])
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -190,6 +192,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         this.cartProducts.postValue(UiState.Success(cartProducts))
+                        saveRecentProduct(cartProducts[index])
                         _cartCount.postValue(_cartCount.value?.minus(1))
                     }
                     .onFailure {
@@ -198,6 +201,7 @@ class ShoppingViewModel(private val repository: Repository) :
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     this.cartProducts.postValue(UiState.Success(cartProducts))
+                    saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -221,6 +225,26 @@ class ShoppingViewModel(private val repository: Repository) :
                 _recentProducts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.postValue(EventState("최근 아이템 로드 에러"))
+            }
+        }
+    }
+
+    fun saveRecentProduct(cartProduct: CartProduct) {
+        thread {
+            repository.saveRecentProduct(
+                RecentProduct(
+                    cartProduct.productId,
+                    cartProduct.name,
+                    cartProduct.imgUrl,
+                    cartProduct.quantity,
+                    cartProduct.price,
+                    System.currentTimeMillis(),
+                    category = cartProduct.category,
+                    cartId = cartProduct.cartId,
+                ),
+            ).onSuccess {
+            }.onFailure {
+                _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
             }
         }
     }

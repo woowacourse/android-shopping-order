@@ -13,20 +13,15 @@ import kotlin.math.min
 class FakeRepository : Repository {
     val carts = cartProducts.toMutableList()
 
-    override fun findProductByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> = Result.success(carts)
-
     override fun getProducts(
         category: String,
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?> {
+    ): Result<List<CartProduct>> {
         TODO("Not yet implemented")
     }
 
-    override fun getProductsByPaging(): Result<List<CartProduct>?> {
+    override fun getProductsByPaging(): Result<List<CartProduct>> {
         TODO("Not yet implemented")
     }
 
@@ -82,58 +77,13 @@ class FakeRepository : Repository {
         TODO("Not yet implemented")
     }
 
-    override fun findCartByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        Result.success(
-            carts.map {
-                CartProduct(
-                    productId = it.productId,
-                    name = "${it.productId}",
-                    imgUrl = "www.naver.com",
-                    price = 10000,
-                    quantity = it.quantity,
-                )
-            }.subList(offset * pageSize, min(offset * pageSize + pageSize, carts.size)),
-        )
-
     override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         Result.success(recentProducts)
 
     override fun findOne(): Result<RecentProduct?> = Result.success(recentProduct)
-
-    override fun findProductById(id: Long): Result<CartProduct?> =
-        Result.success(
-            cartProduct,
-        )
-
-    override fun saveCart(cart: Cart): Result<Long> =
-        runCatching {
-            carts.add(
-                CartProduct(
-                    productId = cart.productId,
-                    name = "${cart.productId}",
-                    imgUrl = "www.naver.com",
-                    price = 10000,
-                    quantity = cart.quantity,
-                ),
-            )
-            cart.productId
-        }
-
-    override fun saveRecent(recent: Recent): Result<Long> = Result.success(1)
-
     override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> {
         return Result.success(1L)
     }
-
-    override fun deleteCart(id: Long): Result<Long> = Result.success(1)
-
-    override fun getMaxCartCount(): Result<Int> =
-        runCatching {
-            carts.size
-        }
 
     override fun getCartItemsCounts(): Result<Int> {
         TODO("Not yet implemented")

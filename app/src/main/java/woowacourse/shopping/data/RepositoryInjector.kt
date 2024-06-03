@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.Repository
 object RepositoryInjector {
     var repository: Repository =
         RepositoryImpl(
-            RoomDataSource(AppDatabase.instance.cartProductDao(), AppDatabase.instance.recentProductDao()),
+            RoomDataSource(AppDatabase.instance.recentProductDao()),
             RetrofitDataSource(),
         )
         private set
