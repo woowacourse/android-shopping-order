@@ -8,4 +8,6 @@ interface ShoppingHandler : QuantityHandler {
     fun onLoadMoreClick()
 
     fun onCartMenuItemClick()
+
+    fun onPlusButtonClick(productId: Long)
 }

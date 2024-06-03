@@ -1,11 +1,11 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.RecentProductItem
+import woowacourse.shopping.domain.Product
 
 interface RecentRepository {
-    fun loadAll(): Result<List<RecentProductItem>>
+    fun loadAll(): Result<List<Product>>
 
-    fun loadMostRecent(): Result<RecentProductItem?>
+    fun loadMostRecent(): Result<Product?>
 
-    fun add(recentProduct: RecentProductItem): Result<Long>
+    fun add(recentProduct: Product): Result<Long>
 }

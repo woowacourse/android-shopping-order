@@ -6,20 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderRecentProductsBinding
 import woowacourse.shopping.databinding.ItemLoadBinding
 import woowacourse.shopping.databinding.ItemShoppingProductBinding
-import woowacourse.shopping.databinding.ItemShoppingSkelletonBinding
-import woowacourse.shopping.domain.ProductListItem
+import woowacourse.shopping.presentation.ui.model.ProductListItem
 import woowacourse.shopping.presentation.ui.shopping.ShoppingHandler
 
 class ProductListAdapter(
     private val shoppingHandler: ShoppingHandler,
-    private val items: MutableList<ProductListItem> =
-        mutableListOf(
-            ProductListItem.RecentProductItems(emptyList()),
-        ),
-) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var isLoadingState = true
-
+    private val items: MutableList<ProductListItem> = mutableListOf(ProductListItem.RecentProductItems(emptyList())),
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             RECENT_PRODUCT_POSITION -> ShoppingViewType.RecentProduct.value
@@ -84,17 +77,6 @@ class ProductListAdapter(
         }
     }
 
-    private fun getIntersectCount(
-        oldProductItems: List<ProductListItem.ShoppingProductItem>,
-        newProductItems: List<ProductListItem.ShoppingProductItem>,
-    ): Int {
-        val a =
-            oldProductItems.filter {
-                newProductItems.contains(it)
-            }
-        return a.size
-    }
-
     private fun updateSingleItem(
         newProductItems: List<ProductListItem.ShoppingProductItem>,
         oldProductItems: List<ProductListItem.ShoppingProductItem>,
@@ -105,6 +87,14 @@ class ProductListAdapter(
             }
         updateItems(newProductItems)
         notifyItemChanged(changedIndex + 1)
+    }
+
+    private fun getIntersectCount(
+        oldProductItems: List<ProductListItem.ShoppingProductItem>,
+        newProductItems: List<ProductListItem.ShoppingProductItem>,
+    ): Int {
+        val intersectedItems = oldProductItems.filter { newProductItems.contains(it) }
+        return intersectedItems.size
     }
 
     private fun addItem(

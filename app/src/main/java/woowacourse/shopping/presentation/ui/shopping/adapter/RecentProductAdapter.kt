@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentProductBinding
-import woowacourse.shopping.domain.RecentProductItem
+import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingHandler
 
 class RecentProductAdapter(
-    private val items: List<RecentProductItem>,
+    private val items: List<ProductModel>,
     private val shoppingHandler: ShoppingHandler,
-) :
-    RecyclerView.Adapter<RecentProductViewHolder>() {
+) : RecyclerView.Adapter<RecentProductViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

@@ -9,12 +9,12 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
-import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
+import woowacourse.shopping.presentation.ui.model.ProductListItem
+import woowacourse.shopping.presentation.ui.model.UpdatedProductData
 import woowacourse.shopping.presentation.ui.shopping.adapter.ProductListAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.presentation.util.EventObserver
@@ -63,9 +63,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         supportActionBar?.hide()
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        if (savedInstanceState == null) {
-            viewModel.loadInitialShoppingItems()
-        }
+
         initAdapter()
         observeRecentProductUpdates()
         observeProductUpdates()
@@ -95,12 +93,13 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     private fun observeRecentProductUpdates() {
         viewModel.recentProducts.observe(this) { state ->
             when (state) {
-                is UiState.Success ->
+                is UiState.Success -> {
                     adapter.updateRecentProductItems(
                         ProductListItem.RecentProductItems(state.data),
                     )
+                }
 
-                UiState.Loading -> {}
+                is UiState.Loading -> {}
             }
         }
     }
@@ -109,8 +108,8 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.shoppingProducts.observe(this) { state ->
             when (state) {
                 is UiState.Success -> {
-                    viewModel.fetchCartCount()
-                    adapter.updateProductItems(state.data)
+                    val products = state.data.map { ProductListItem.ShoppingProductItem(it) }
+                    adapter.updateProductItems(products)
                 }
 
                 UiState.Loading -> {}
