@@ -40,7 +40,7 @@ class DefaultProductDataSource(
         ).get()
     }
 
-    override fun getProductById(id: Long): Result<Product> {
+    override fun fetchProductById(id: Long): Result<Product> {
         return ioExecutor.submit(
             Callable {
                 productService.fetchDetailProduct(id)

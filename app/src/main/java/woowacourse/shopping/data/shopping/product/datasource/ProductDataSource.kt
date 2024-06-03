@@ -15,5 +15,5 @@ interface ProductDataSource {
         size: Int,
     ): Result<ProductPageData>
 
-    fun getProductById(id: Long): Result<Product>
+    fun fetchProductById(id: Long): Result<Product>
 }
