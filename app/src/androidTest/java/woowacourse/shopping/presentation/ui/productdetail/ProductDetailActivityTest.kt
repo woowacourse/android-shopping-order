@@ -24,7 +24,7 @@ class ProductDetailActivityTest {
                 ApplicationProvider.getApplicationContext(),
                 ProductDetailActivity::class.java,
             ).apply {
-                putExtra(ProductDetailActivity.PUT_EXTRA_PRODUCT_ID, 1L)
+                putExtra(ProductDetailActivity.PUT_EXTRA_PRODUCT_ID, 2L)
             },
         )
 
