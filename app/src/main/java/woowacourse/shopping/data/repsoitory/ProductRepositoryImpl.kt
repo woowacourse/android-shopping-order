@@ -20,8 +20,8 @@ class ProductRepositoryImpl(
                 .getOrNull()
 
         return productDataSource.findProductById(id).mapCatching { productDto ->
-            val cartProduct = cartsDto?.firstOrNull { it.productDto.id == productDto.id }
-            cartProduct?.toDomain() ?: Cart(
+            val cartDto = cartsDto?.firstOrNull { it.productDto.id == productDto.id }
+            cartDto?.toDomain() ?: Cart(
                 product = productDto.toDomain(),
                 quantity = INIT_QUANTITY,
             )
