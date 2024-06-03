@@ -8,9 +8,7 @@ data class ProductDetailUiState(
     val recentProduct: Product?,
 ) {
     val isRecentProductVisible: Boolean
-        get() =
-            (recentProduct != null) &&
-                (cartProduct.product.id != recentProduct.id)
+        get() = (recentProduct != null) && (cartProduct.product.id != recentProduct.id)
 
     fun increaseProductCount(amount: Int): ProductDetailUiState = copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
 
