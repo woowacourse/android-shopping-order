@@ -52,7 +52,7 @@
                     android:layout_marginEnd="22dp"
                     android:background="@drawable/shape_cart_count_text"
                     android:gravity="center"
-                    android:text="@{String.valueOf(viewModel.cartTotalCount)}"
+                    android:text="@{String.valueOf(viewModel.cartTotalQuantity)}"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:textStyle="bold"

@@ -53,7 +53,7 @@
                     android:layout_marginEnd="22dp"
                     android:background="@drawable/shape_cart_count_text"
                     android:gravity="center"
-                    android:text="@{String.valueOf(viewModel.cartTotalCount)}"
+                    android:text="@{String.valueOf(viewModel.cartTotalQuantity)}"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -62,7 +62,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/iv_products_cart"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:visibility="@{viewModel.cartTotalCount > 0}"
+                    app:visibility="@{viewModel.cartTotalQuantity > 0}"
                     tools:text="1" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

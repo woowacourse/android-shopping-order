@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.common.Event
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -33,8 +34,8 @@ class ProductsViewModel(
 
     private var page: Int = INITIALIZE_PAGE
 
-    private val _cartTotalCount: MutableLiveData<Int> = MutableLiveData()
-    val cartTotalCount: LiveData<Int> get() = _cartTotalCount
+    private val _cartTotalQuantity: MutableLiveData<Int> = MutableLiveData()
+    val cartTotalQuantity: LiveData<Int> get() = _cartTotalQuantity
 
     private val _recentProductUiModels = MutableLiveData<List<RecentProductUiModel>?>()
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
@@ -50,7 +51,8 @@ class ProductsViewModel(
             it.onSuccess { products ->
                 _isLoadingProducts.value = false
                 val additionalProductUiModels = products.toProductUiModels()
-                val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
+                val newProductUiModels =
+                    (productUiModels() ?: emptyList()) + additionalProductUiModels
                 _productUiModels.value = newProductUiModels
                 updateTotalCount()
                 _showLoadMore.value = false
@@ -78,7 +80,8 @@ class ProductsViewModel(
         val productUiModels = productUiModels()?.toMutableList() ?: return
 
         productUiModels.forEachIndexed { index, productUiModel ->
-            val product = productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
+            val product =
+                productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
             productUiModels[index] = product.toProductUiModel()
         }
         _isLoadingProducts.value = false
@@ -104,8 +107,7 @@ class ProductsViewModel(
     }
 
     fun loadRecentProducts() {
-        _recentProductUiModels.value =
-            recentProductRepository.findRecentProducts().toRecentProductUiModels()
+        _recentProductUiModels.value = recentProductRepository.findRecentProducts().toRecentProductUiModels()
     }
 
     private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
@@ -138,13 +140,6 @@ class ProductsViewModel(
         updateProductUiModel(productId)
     }
 
-    private fun addCartItem(productId: Int) {
-        cartRepository.add(productId) {
-            it.onSuccess { }
-                .onFailure { setError() }
-        }
-    }
-
     private fun updateProductUiModel(productId: Int) {
         val productUiModels = productUiModels()?.toMutableList() ?: return
         productRepository.find(productId) {
@@ -163,7 +158,7 @@ class ProductsViewModel(
     private fun updateTotalCount() {
         cartRepository.getTotalQuantity {
             it.onSuccess { totalCount ->
-                _cartTotalCount.value = totalCount
+                _cartTotalQuantity.value = totalCount
             }.onFailure {
                 setError()
             }
@@ -177,12 +172,26 @@ class ProductsViewModel(
             addCartItem(productUiModel.productId)
             return
         }
+
+        if (productUiModel.quantity.isMin()) {
+            deleteCartItem(cartItem)
+            return
+        }
+
         cartRepository.changeQuantity(cartItem.id, productUiModel.quantity) {
-            it.onSuccess {
-                updateProductUiModel(productUiModel.productId)
-            }.onFailure {
-                setError()
-            }
+            it.onFailure { setError() }
+        }
+    }
+
+    private fun addCartItem(productId: Int) {
+        cartRepository.add(productId) {
+            it.onFailure { setError() }
+        }
+    }
+
+    private fun deleteCartItem(cartItem: CartItem) {
+        cartRepository.delete(cartItem.id) {
+            it.onFailure { setError() }
         }
     }
 

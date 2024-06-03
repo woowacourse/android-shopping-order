@@ -274,8 +274,7 @@ class CartViewModel(
         _changedCartEvent.value = Event(Unit)
         cartItemIds.forEach { cartItemId ->
             cartRepository.delete(cartItemId) {
-                it.onSuccess { }
-                    .onFailure { setError() }
+                it.onFailure { setError() }
             }
         }
     }
