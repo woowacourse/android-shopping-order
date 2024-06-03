@@ -7,7 +7,7 @@ data class CartUiState(
     val canLoadPrevPage: Boolean = false,
     val canLoadNextPage: Boolean = false,
 ) {
-    val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
+    private val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
 
     val totalProductCount get() = totalProducts.sumOf { it.count }
 
@@ -49,8 +49,8 @@ data class CartUiState(
 
     fun updateTotalProducts(products: List<CartProductUi>): CartUiState {
         val newPagingProducts =
-            products.chunked(5).mapIndexed { index, chunkedProducts ->
-                (index + 1) to chunkedProducts
+            products.chunked(MAX_PRODUCTS_PER_PAGE).mapIndexed { index, chunkedProducts ->
+                (index + INDEX_OFFSET) to chunkedProducts
             }.toMap()
         return copy(
             pagingProducts = newPagingProducts,
@@ -125,4 +125,9 @@ data class CartUiState(
     }
 
     fun findProductAtCurrentPage(productId: Long): CartProductUi? = currentPageProducts.find { it.product.id == productId }
+
+    companion object {
+        private const val MAX_PRODUCTS_PER_PAGE = 5
+        private const val INDEX_OFFSET = 1
+    }
 }
