@@ -3,11 +3,7 @@ package woowacourse.shopping.presentation.util
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 
-class MutableSingleLiveData<T> : SingleLiveData<T> {
-    constructor() : super()
-
-    constructor(value: T) : super(value)
-
+class MutableSingleLiveData<T> : SingleLiveData<T>() {
     public override fun postValue(value: T) {
         super.postValue(value)
     }
@@ -41,13 +37,6 @@ abstract class SingleLiveData<T> {
         onResult: (T) -> Unit,
     ) {
         liveData.observe(owner) { it.getContentIfNotHandled()?.let(onResult) }
-    }
-
-    fun observePeek(
-        owner: LifecycleOwner,
-        onResult: (T) -> Unit,
-    ) {
-        liveData.observe(owner) { onResult(it.peekContent()) }
     }
 }
 
