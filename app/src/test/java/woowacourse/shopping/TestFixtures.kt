@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
+import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
 
 val imageUrl = "https://www.naver.com/"
 val name = "올리브"

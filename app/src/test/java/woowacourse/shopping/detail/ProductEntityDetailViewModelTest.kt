@@ -16,8 +16,8 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
+import woowacourse.shopping.presentation.detail.ProductDetailViewModel
 import woowacourse.shopping.products
-import woowacourse.shopping.ui.detail.ProductDetailViewModel
 import java.time.LocalDateTime
 
 @ExtendWith(InstantTaskExecutorExtension::class)

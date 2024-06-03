@@ -7,17 +7,17 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.ui.detail.ProductDetailViewModel" />
+            type="woowacourse.shopping.presentation.detail.ProductDetailViewModel" />
 
         <variable
             name="onClickLastRecentProductListener"
-            type="woowacourse.shopping.ui.detail.OnClickLastRecentProductListener" />
+            type="woowacourse.shopping.presentation.detail.OnClickLastRecentProductListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.detail.ProductDetailActivity">
+        tools:context=".presentation.detail.ProductDetailActivity">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_detail"

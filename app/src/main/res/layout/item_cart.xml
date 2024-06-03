@@ -7,11 +7,11 @@
 
         <variable
             name="cartUiModel"
-            type="woowacourse.shopping.ui.cart.CartUiModel" />
+            type="woowacourse.shopping.presentation.cart.CartUiModel" />
 
         <variable
             name="addCartQuantityBundle"
-            type="woowacourse.shopping.ui.utils.AddCartQuantityBundle" />
+            type="woowacourse.shopping.presentation.utils.AddCartQuantityBundle" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

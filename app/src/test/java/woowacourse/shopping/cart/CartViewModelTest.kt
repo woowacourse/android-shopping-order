@@ -17,9 +17,9 @@ import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
+import woowacourse.shopping.presentation.cart.CartViewModel
 import woowacourse.shopping.product
 import woowacourse.shopping.products
-import woowacourse.shopping.ui.cart.CartViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartViewModelTest {

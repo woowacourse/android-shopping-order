@@ -7,7 +7,7 @@
 
         <variable
             name="bundle"
-            type="woowacourse.shopping.ui.utils.AddCartQuantityBundle" />
+            type="woowacourse.shopping.presentation.utils.AddCartQuantityBundle" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

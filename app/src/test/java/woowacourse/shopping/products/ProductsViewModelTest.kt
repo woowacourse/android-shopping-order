@@ -20,8 +20,8 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
+import woowacourse.shopping.presentation.products.ProductsViewModel
 import woowacourse.shopping.products
-import woowacourse.shopping.ui.products.ProductsViewModel
 import java.lang.IllegalArgumentException
 
 @ExtendWith(InstantTaskExecutorExtension::class)
