@@ -80,7 +80,8 @@ class OrderViewModel(
     fun loadRecommendedProducts() {
         thread {
             _recommendProducts.postValue(
-                orderRepository.recommendedProducts().map { it.toDomain() })
+                orderRepository.recommendedProducts().map { it.toDomain() },
+            )
         }
     }
 
@@ -89,10 +90,11 @@ class OrderViewModel(
         variation: Int,
     ) {
         uiHandler.post {
-            _recommendProducts.value = recommendProducts.value?.map { product ->
-                product.takeIf { it.id == productId }?.copy(quantity = product.quantity + variation)
-                    ?: product
-            }
+            _recommendProducts.value =
+                recommendProducts.value?.map { product ->
+                    val quantity: Int = product.quantity + variation
+                    product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
+                }
         }
     }
 
@@ -117,18 +119,21 @@ class OrderViewModel(
 
         fun factory(
             orderInformation: OrderInformation,
-            orderRepository: OrderRepository = OrderRemoteRepository(
-                ShoppingApp.orderSource,
-                ShoppingApp.productSource,
-                ShoppingApp.historySource,
-            ),
-            cartItemRepository: CartItemRepository = DefaultCartItemRepository(
-                ShoppingApp.cartSource,
-            ),
-            productRepository: ProductRepository = DefaultProductRepository(
-                ShoppingApp.productSource,
-                ShoppingApp.cartSource,
-            ),
+            orderRepository: OrderRepository =
+                OrderRemoteRepository(
+                    ShoppingApp.orderSource,
+                    ShoppingApp.productSource,
+                    ShoppingApp.historySource,
+                ),
+            cartItemRepository: CartItemRepository =
+                DefaultCartItemRepository(
+                    ShoppingApp.cartSource,
+                ),
+            productRepository: ProductRepository =
+                DefaultProductRepository(
+                    ShoppingApp.productSource,
+                    ShoppingApp.cartSource,
+                ),
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
