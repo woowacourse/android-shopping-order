@@ -151,7 +151,7 @@ class ProductListViewModel(
             val cart = carts?.content?.find { it.product.id == product.id }
             if (cart == null) {
                 shoppingCart[ProductItemId(product.id)] = null
-                product
+                product.copy(quantity = 0)
             } else {
                 shoppingCart[ProductItemId(product.id)] = CartItemId(cart.id)
                 product.copy(quantity = cart.quantity)
