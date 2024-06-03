@@ -76,7 +76,7 @@ class CartRepositoryImpl(
         return cartDataSource.deleteCartProduct(cartId).onSuccess {
             cartProductMapByProductId.remove(productId)
             val totalPage = cartPageData?.totalPageSize ?: 0
-            cartPageData = cartPageData?.copy(totalProductSize = totalPage - 1)
+            cartPageData = cartPageData?.updateTotalPageSizeWith(totalPage - 1)
         }
     }
 

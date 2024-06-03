@@ -6,4 +6,8 @@ data class CartPageData(
     val totalPageSize: Int,
     val pageSize: Int,
     val totalProductSize: Int,
-)
+) {
+    fun updateTotalPageSizeWith(totalPage: Int): CartPageData {
+        return copy(totalPageSize = totalPage)
+    }
+}
