@@ -7,6 +7,8 @@ import woowacourse.shopping.data.model.entity.mapper
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class RecentProductRepositoryImpl(context: Context) : RecentProductRepository {
     private val dao = ShoppingDatabase.getInstance(context).recentProductDao()
@@ -43,8 +45,11 @@ class RecentProductRepositoryImpl(context: Context) : RecentProductRepository {
     }
 
     private fun threadAction(action: () -> Unit) {
-        val thread = Thread(action)
-        thread.start()
-        thread.join()
+        val latch = CountDownLatch(1)
+        thread {
+            action()
+            latch.countDown()
+        }
+        latch.await()
     }
 }

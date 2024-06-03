@@ -10,6 +10,8 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class CartRepositoryImpl(context: Context) : CartRepository {
     private val dao = ShoppingDatabase.getInstance(context).cartDao()
@@ -147,8 +149,11 @@ class CartRepositoryImpl(context: Context) : CartRepository {
     }
 
     private fun threadAction(action: () -> Unit) {
-        val thread = Thread(action)
-        thread.start()
-        thread.join()
+        val latch = CountDownLatch(1)
+        thread {
+            action()
+            latch.countDown()
+        }
+        latch.await()
     }
 }

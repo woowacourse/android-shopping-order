@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.database.product.ProductDatabase
 import woowacourse.shopping.data.mapper.toDomainModel
@@ -12,6 +9,8 @@ import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.domain.service.RetrofitService
 import java.lang.Thread.sleep
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class ShoppingItemsRepositoryImpl(
     productsRepository: ProductsRepository = ProductDatabase,
@@ -21,8 +20,7 @@ class ShoppingItemsRepositoryImpl(
     var products: List<Product>? = null
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
-
+        threadAction {
             productData = service.requestProducts().execute().body()
             products = productData?.content?.map { it.toDomainModel() }
         }
@@ -61,7 +59,7 @@ class ShoppingItemsRepositoryImpl(
         }
         return product*/
         var product: Product? = null
-        CoroutineScope(Dispatchers.IO).launch {
+        threadAction {
             product = service.requestProduct(id).execute().body()?.toDomainModel()
         }
         while (true) {
@@ -83,8 +81,11 @@ class ShoppingItemsRepositoryImpl(
     }
 
     private fun threadAction(action: () -> Unit) {
-        val thread = Thread(action)
-        thread.start()
-        thread.join()
+        val latch = CountDownLatch(1)
+        thread {
+            action()
+            latch.countDown()
+        }
+        latch.await()
     }
 }

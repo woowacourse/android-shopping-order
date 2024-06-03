@@ -1,20 +1,20 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import android.util.Log
 import retrofit2.Response
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.CartItemDto
 import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.Content
+import woowacourse.shopping.data.model.dto.ContentDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class RemoteCartRepositoryImpl : CartRepository {
     private val service = ProductClient.service
@@ -27,17 +27,11 @@ class RemoteCartRepositoryImpl : CartRepository {
 
     override fun updateCartItems() {
         var response: Response<CartItemDto>? = null
-        CoroutineScope(Dispatchers.IO).launch {
+        threadAction {
             response = service.requestCartItems().execute()
             cartItemData = (response as Response<CartItemDto>).body()
             cartItems = cartItemData?.content?.map { it.toDomainModel() }
-        }
-
-        while (true) {
-            Thread.sleep(1000)
-            if (cartItemData != null || response?.code() != 200) {
-                break
-            }
+            Log.d("crong", "Repository cartItems: $cartItems")
         }
     }
 
@@ -70,7 +64,9 @@ class RemoteCartRepositoryImpl : CartRepository {
         cartItemId: Long,
         quantity: Int,
     ) {
-        service.updateCartItemQuantity(cartItemId, quantity).execute()
+        threadAction {
+            service.updateCartItemQuantity(cartItemId, quantity).execute()
+        }
         updateCartItems()
     }
 
@@ -79,8 +75,7 @@ class RemoteCartRepositoryImpl : CartRepository {
         quantity: Int,
     ) {
         val contentId = findCartItemIdWithProductId(productId)
-        service.updateCartItemQuantity(contentId, quantity).execute()
-        updateCartItems()
+        updateQuantity(contentId, quantity)
     }
 
     private fun findCartItemIdWithProductId(productId: Long): Long {
@@ -119,14 +114,14 @@ class RemoteCartRepositoryImpl : CartRepository {
     }
 
     override fun findOrNullWithProductId(productId: Long): CartItem? {
-        var content: Content? = null
+        var contentDto: ContentDto? = null
         threadAction {
-            content =
+            contentDto =
                 service.requestCartItems().execute().body()?.content?.find {
                     it.product.id == productId
                 }
         }
-        return content?.toDomainModel()
+        return contentDto?.toDomainModel()
     }
 
     override fun findWithCartItemId(cartItemId: Long): CartItem {
@@ -190,8 +185,11 @@ class RemoteCartRepositoryImpl : CartRepository {
     }
 
     private fun threadAction(action: () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        val latch = CountDownLatch(1)
+        thread {
             action()
+            latch.countDown()
         }
+        latch.await()
     }
 }
