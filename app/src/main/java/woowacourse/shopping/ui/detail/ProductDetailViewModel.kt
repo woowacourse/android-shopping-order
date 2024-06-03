@@ -45,14 +45,15 @@ class ProductDetailViewModel(
         _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
 
     fun loadProductDetail() {
-        loadProduct()
         loadLastRecentProduct()
+        loadProduct()
     }
 
     private fun loadProduct() {
         productRepository.find(productId) {
             it.onSuccess { product ->
                 _productUiModel.value = product.toProductUiModel()
+                saveRecentProduct()
             }.onFailure {
                 setError()
             }
