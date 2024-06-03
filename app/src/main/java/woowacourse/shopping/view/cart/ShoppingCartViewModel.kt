@@ -189,10 +189,15 @@ class ShoppingCartViewModel(
     private fun updateCheckItemData() {
         _totalPrice.value = checkedShoppingCart.cartItems.value?.sumOf {
             it.product.cartItemCounter.itemCount * it.product.price
-        } ?: DEFAULT_ITEM_SIZE
+        } ?: DEFAULT_TOTAL_PRICE
         _totalCount.value = checkedShoppingCart.cartItems.value?.count {
             it.cartItemSelector.isSelected
-        } ?: DEFAULT_ITEM_SIZE
+        } ?: DEFAULT_TOTAL_COUNT
         setAllCheck()
+    }
+
+    companion object {
+        private const val DEFAULT_TOTAL_PRICE = 0
+        private const val DEFAULT_TOTAL_COUNT = 0
     }
 }
