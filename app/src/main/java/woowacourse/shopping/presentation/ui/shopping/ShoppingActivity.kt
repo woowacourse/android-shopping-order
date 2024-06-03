@@ -103,7 +103,7 @@ class ShoppingActivity : AppCompatActivity() {
         }
 
         viewModel.shoppingProducts.observe(this) {
-            shoppingAdapter.loadShoppingProductData(it)
+            shoppingAdapter.submitList(it)
         }
 
         viewModel.recentProducts.observe(this) {

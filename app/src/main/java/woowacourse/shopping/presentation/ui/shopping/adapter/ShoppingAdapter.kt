@@ -2,10 +2,10 @@ package woowacourse.shopping.presentation.ui.shopping.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler
 import woowacourse.shopping.presentation.ui.shopping.ShoppingItemCountHandler
@@ -14,10 +14,9 @@ import woowacourse.shopping.presentation.ui.shopping.adapter.viewholder.Shopping
 class ShoppingAdapter(
     private val shoppingEventHandler: ShoppingEventHandler,
     private val shoppingItemCountHandler: ShoppingItemCountHandler,
-) : RecyclerView.Adapter<ShoppingViewHolder>() {
+) : ListAdapter<ShoppingProduct, ShoppingViewHolder>(diffCallback) {
     private var products: List<Product> = emptyList()
     private var shoppingProducts: List<ShoppingProduct> = emptyList()
-    private var recentProducts: List<RecentProduct> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,9 +30,8 @@ class ShoppingAdapter(
         holder: ShoppingViewHolder,
         position: Int,
     ) {
-        val product = products[position]
         val shoppingProduct = shoppingProducts[position]
-        return holder.bind(product, shoppingProduct, shoppingEventHandler, shoppingItemCountHandler)
+        return holder.bind(shoppingProduct, shoppingEventHandler, shoppingItemCountHandler)
     }
 
     override fun getItemCount(): Int {
@@ -42,16 +40,28 @@ class ShoppingAdapter(
 
     fun loadData(products: List<Product>) {
         this.products = products
-        notifyDataSetChanged()
     }
 
     fun loadShoppingProductData(shoppingProducts: List<ShoppingProduct>) {
         this.shoppingProducts = shoppingProducts
-        notifyDataSetChanged()
     }
 
-    fun loadRecentProductData(recentProducts: List<RecentProduct>) {
-        this.recentProducts = recentProducts
-        notifyDataSetChanged()
+    companion object {
+        val diffCallback =
+            object : DiffUtil.ItemCallback<ShoppingProduct>() {
+                override fun areItemsTheSame(
+                    oldItem: ShoppingProduct,
+                    newItem: ShoppingProduct,
+                ): Boolean {
+                    return oldItem.product.id == newItem.product.id
+                }
+
+                override fun areContentsTheSame(
+                    oldItem: ShoppingProduct,
+                    newItem: ShoppingProduct,
+                ): Boolean {
+                    return oldItem == newItem
+                }
+            }
     }
 }

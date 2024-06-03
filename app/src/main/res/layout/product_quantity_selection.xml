@@ -39,7 +39,7 @@
             android:layout_height="42dp"
             android:background="@color/white"
             android:gravity="center"
-            android:text="@{String.valueOf(shoppingProduct.quantity)}"
+            android:text="@{String.valueOf(shoppingProduct.quantity())}"
             android:textSize="23dp"
             app:layout_constraintBottom_toBottomOf="@id/btn_minus"
             app:layout_constraintStart_toEndOf="@id/btn_minus"

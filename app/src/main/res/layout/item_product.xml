@@ -18,23 +18,19 @@
         <variable
             name="eventHandler"
             type="woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler" />
-
-        <variable
-            name="product"
-            type="woowacourse.shopping.domain.model.Product" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="166dp"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> eventHandler.onProductClick(product.id)}"
+        android:onClick="@{() -> eventHandler.onProductClick(shoppingProduct.product.id)}"
         android:padding="6dp">
 
         <ImageView
             android:id="@+id/iv_product"
             android:layout_width="154dp"
             android:layout_height="154dp"
-            app:imageUrl="@{product.imageUrl}"
+            app:imageUrl="@{shoppingProduct.product.imageUrl}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.25"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +55,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_plus"
-            android:onClick="@{() -> countHandler.increaseCount(product.id)}"
+            android:onClick="@{() -> countHandler.increaseCount(shoppingProduct.product.id)}"
             android:visibility="@{shoppingProduct.quantity == 0 ? View.VISIBLE : View.GONE}"
             android:layout_margin="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_product"
@@ -73,7 +69,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="6dp"
-            android:text="@{product.name}"
+            android:text="@{shoppingProduct.product.name}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -89,7 +85,7 @@
             android:layout_margin="6dp"
             android:ellipsize="end"
             android:maxLines="1"
-            app:price="@{product.price}"
+            app:price="@{shoppingProduct.product.price}"
             android:textSize="16dp"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
             app:layout_constraintTop_toBottomOf="@+id/tv_name"

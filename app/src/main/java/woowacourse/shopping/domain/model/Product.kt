@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-class Product(
+data class Product(
     val id: Long = -1L,
     val name: String,
     val price: Long,

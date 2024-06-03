@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -66,6 +67,7 @@ class ShoppingViewModel(
     fun reloadProducts() {
         cartItemsRepository.updateCartItems()
         _shoppingProducts.value = loadProducts(end = offset).mapperToShoppingProductList()
+        Log.d("crong", "reloadProducts: ${_shoppingProducts.value}")
         _cartCount.value = cartItemsRepository.sumOfQuantity()
     }
 
@@ -147,7 +149,9 @@ class ShoppingViewModel(
 
     private fun updateRecentProducts(product: Product) {
         recentProductRepository.save(product)
-        _recentProducts.value = recentProductRepository.loadLatestList()
+        val recentProducts = recentProductRepository.loadLatestList()
+        // _recentProducts.value = recentProducts
+        _recentProducts.postValue(recentProducts)
     }
 
     override fun updateCartCount() {
@@ -163,27 +167,28 @@ class ShoppingViewModel(
     }
 
     override fun increaseCount(productId: Long) {
-        val shoppingProduct = _shoppingProducts.value?.find { it.product.id == productId }
+        val shoppingProducts = _shoppingProducts.value?.map { it.copy() } ?: return
+        val shoppingProduct = shoppingProducts.find { it.product.id == productId }
         shoppingProduct?.increase()
         val product = shoppingItemsRepository.findProductItem(productId) ?: return
-
         cartItemsRepository.insert(product, shoppingProduct?.quantity() ?: 1)
-        _shoppingProducts.value = _shoppingProducts.value
+        _shoppingProducts.value = shoppingProducts
         updateCartCount()
     }
 
     override fun decreaseCount(productId: Long) {
-        val shoppingProduct = _shoppingProducts.value?.find { it.product.id == productId }
+        val shoppingProducts = _shoppingProducts.value?.map { it.copy() } ?: return
+        val shoppingProduct = shoppingProducts.find { it.product.id == productId }
         shoppingProduct?.decrease()
         val quantity = shoppingProduct?.quantity() ?: 0
+        Log.d("crong", "decreaseCount: $quantity")
 
         if (quantity > 0) {
-            cartItemsRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
-            _shoppingProducts.value = _shoppingProducts.value
+            cartItemsRepository.updateQuantityWithProductId(productId, quantity)
         } else {
             cartItemsRepository.deleteWithProductId(productId)
-            _shoppingProducts.value = _shoppingProducts.value
         }
+        _shoppingProducts.value = shoppingProducts
         updateCartCount()
     }
 
