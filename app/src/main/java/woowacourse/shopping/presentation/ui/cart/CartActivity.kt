@@ -26,7 +26,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
     private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }
 
-    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
     override fun initStartView() {
         initTitle()
@@ -37,27 +36,8 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
 
         initData()
         initObserver()
-        initBackPressed()
     }
 
-    private fun initBackPressed() {
-        onBackPressedCallback =
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    Intent().apply {
-                        putExtra(
-                            ShoppingActionActivity.EXTRA_UPDATED_PRODUCT,
-                            viewModel.updateUiModel,
-                        )
-                    }.run {
-                        setResult(RESULT_OK, this)
-                        finish()
-                    }
-                }
-            }
-        // 뒤로 가기 콜백을 추가
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-    }
 
     private fun initData() {
         viewModel.findCartByOffset()
@@ -125,23 +105,14 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             }
 
             else -> {
-                Intent().apply {
-                    putExtra(
-                        ShoppingActionActivity.EXTRA_UPDATED_PRODUCT,
-                        viewModel.updateUiModel,
-                    )
-                }.run {
-                    setResult(RESULT_OK, this)
-                    finish()
-                }
+                setResult(RESULT_OK)
+                finish()
             }
         }
         return true
     }
 
     companion object {
-        const val OFFSET_BASE = 1
-
         fun createIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

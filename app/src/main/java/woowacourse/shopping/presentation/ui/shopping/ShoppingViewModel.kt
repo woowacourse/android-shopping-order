@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -12,13 +15,11 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
     ViewModel(), ShoppingActionHandler {
-    private var offSet: Int = 0
 
     private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int> get() = _cartCount
@@ -83,7 +84,6 @@ class ShoppingViewModel(private val repository: Repository) :
                         )
                     }
                 }
-                offSet++
             }.onFailure {
                 _errorHandler.postValue(EventState(LOAD_ERROR))
             }
@@ -92,9 +92,9 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun loadCartByOffset() {
         thread {
-            repository.getCartItems(offSet, 2000).onSuccess {
+            repository.getCartItems(0, 2000).onSuccess {
                 if (it == null) {
-                    _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
+                    _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {
                     _carts.postValue(UiState.Success(it))
                 }
@@ -206,13 +206,11 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun updateCartProducts(updateUiModel: UpdateUiModel) {
-        val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
-        updateUiModel.updatedItems.forEach { updatedItem ->
-            val cartProductToUpdate = cartProducts.find { it.productId == updatedItem.key }
-            cartProductToUpdate?.quantity = updatedItem.value.quantity
+    fun syncProduct() {
+        viewModelScope.launch {
+            val loadCartJob = launch { loadCartByOffset() }
+            loadCartJob.job
         }
-        this.cartProducts.value = UiState.Success(cartProducts)
     }
 
     fun findAllRecent() {

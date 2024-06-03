@@ -60,7 +60,10 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     override fun onDelete(cartProductUiModel: CartProductUiModel) {
         thread {
-            updateUiModel.add(cartProductUiModel.cartProduct.productId, cartProductUiModel.cartProduct.copy(quantity = 0))
+            updateUiModel.add(
+                cartProductUiModel.cartProduct.productId,
+                cartProductUiModel.cartProduct.copy(quantity = 0)
+            )
             repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
                 updatedData.remove(cartProductUiModel)
@@ -83,11 +86,16 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 ),
             ).onSuccess {
                 val currentCarts = (_carts.value as UiState.Success).data
-                val filteredCarts = currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+                val filteredCarts =
+                    currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
 
-                val removedCarts = currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+                val removedCarts =
+                    currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
                 removedCarts.forEach { cartProduct ->
-                    updateUiModel.add(cartProduct.cartProduct.productId, cartProduct.cartProduct.copy(quantity = 0))
+                    updateUiModel.add(
+                        cartProduct.cartProduct.productId,
+                        cartProduct.cartProduct.copy(quantity = 0)
+                    )
                 }
 
                 _carts.postValue(UiState.Success(filteredCarts))
@@ -99,15 +107,10 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     }
 
     private fun getCheckedIds(): List<Int> {
-        return (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct.cartId.toInt() }
+        return (_carts.value as UiState.Success).data.filter { it.isChecked }
+            .map { it.cartProduct.cartId.toInt() }
     }
 
-    private fun updateCarts(productId: Int) {
-        val currentCartItems = (_carts.value as? UiState.Success)?.data
-        val updatedCartItems =
-            currentCartItems?.filterNot { it.cartProduct.productId.toInt() == productId }
-        _carts.postValue(UiState.Success(updatedCartItems ?: emptyList()))
-    }
 
     override fun onCheck(
         cartProduct: CartProductUiModel,
@@ -154,8 +157,10 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     override fun onPlus(cartProduct: CartProduct) {
         thread {
             Log.d("PlusClick", "PPPP")
-            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
-            val index = cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            val cartProducts =
+                (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val index =
+                cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
             cartProducts[index].cartProduct.plusQuantity()
 
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
@@ -176,8 +181,10 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     override fun onMinus(cartProduct: CartProduct) {
         if (cartProduct.quantity == 1) return
         thread {
-            val cartProducts = (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
-            val index = cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            val cartProducts =
+                (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val index =
+                cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
             cartProducts[index].cartProduct.minusQuantity()
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 

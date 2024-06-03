@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,15 +12,12 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
-import woowacourse.shopping.utils.getParcelableExtraCompat
-import kotlin.concurrent.thread
 
 class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
@@ -50,15 +46,10 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
-                        EXTRA_UPDATED_PRODUCT,
-                    )
-                        ?.let {
-                            viewModel.updateCartProducts(it)
-                        }
+                    viewModel.syncProduct()
                 }
                 viewModel.findAllRecent()
-                viewModel.getCartItemCounts()
+               viewModel.getCartItemCounts()
             }
     }
 
