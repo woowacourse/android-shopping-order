@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
@@ -24,9 +23,7 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingRemoteCartDataS
     override fun getCartProductsPaged(
         page: Int,
         size: Int,
-    ): Result<Carts> =
-        dataSource.getCartProductsPaged(page = page, size = size)
-            .mapCatching { result -> result.toDomain() }
+    ): Result<Carts> = dataSource.getCartProductsPaged(page = page, size = size)
 
     override fun getCartProductsQuantity(): Result<Int> = dataSource.getCartProductsQuantity()
 
@@ -37,13 +34,11 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingRemoteCartDataS
             dataSource.getCartProductsPaged(
                 page = ProductRepositoryImpl.FIRST_PAGE,
                 size = ProductRepositoryImpl.FIRST_SIZE,
-            )
-                .getOrThrow().totalElements
+            ).getOrThrow().totalElements
 
         return dataSource.getCartProductsPaged(
             page = ProductRepositoryImpl.FIRST_PAGE,
             size = totalElements,
         )
-            .mapCatching { it.toDomain() }
     }
 }

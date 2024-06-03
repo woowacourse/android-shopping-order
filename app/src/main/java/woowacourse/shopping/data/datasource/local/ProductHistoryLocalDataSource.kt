@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.local
 
-import woowacourse.shopping.data.model.local.ProductHistoryDto
+import woowacourse.shopping.domain.model.Product
 
 interface ProductHistoryLocalDataSource {
     fun insertProductHistory(
@@ -11,11 +11,11 @@ interface ProductHistoryLocalDataSource {
         imageUrl: String,
     ): Result<Unit>
 
-    fun getProductHistoryById(productId: Long): Result<ProductHistoryDto>
+    fun getProductHistoryById(productId: Long): Result<Product>
 
-    fun getProductHistoriesByCategory(category: String): Result<List<ProductHistoryDto>>
+    fun getProductHistoriesByCategory(category: String): Result<List<Product>>
 
-    fun getProductHistoriesBySize(size: Int): Result<List<ProductHistoryDto>>
+    fun getProductHistoriesBySize(size: Int): Result<List<Product>>
 
     fun deleteProductHistoryById(productId: Long): Result<Unit>
 

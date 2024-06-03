@@ -2,9 +2,9 @@ package woowacourse.shopping.remote.datasource
 
 import retrofit2.Response
 import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
-import woowacourse.shopping.data.model.remote.CartsDto
+import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.remote.api.CartService
-import woowacourse.shopping.remote.mapper.toData
+import woowacourse.shopping.remote.mapper.toDomain
 import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
 
@@ -34,9 +34,9 @@ class ShoppingRemoteCartDataSourceImpl(private val service: CartService) : Shopp
     override fun getCartProductsPaged(
         page: Int,
         size: Int,
-    ): Result<CartsDto> =
+    ): Result<Carts> =
         runCatching {
-            service.getCartItems(page = page, size = size).execute().body()?.toData()
+            service.getCartItems(page = page, size = size).execute().body()?.toDomain()
                 ?: throw IllegalArgumentException()
         }
 

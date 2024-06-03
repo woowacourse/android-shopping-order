@@ -1,9 +1,9 @@
 package woowacourse.shopping.local.datasource
 
 import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
-import woowacourse.shopping.data.model.local.ProductHistoryDto
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.local.dao.ProductHistoryDao
-import woowacourse.shopping.local.mapper.toData
+import woowacourse.shopping.local.mapper.toDomain
 import woowacourse.shopping.local.model.ProductHistoryEntity
 import java.time.LocalDateTime
 
@@ -29,19 +29,19 @@ class ProductHistoryLocalDataSourceImpl(private val dao: ProductHistoryDao) : Pr
             dao.insertProductHistory(productHistoryEntity = productHistoryEntity)
         }
 
-    override fun getProductHistoryById(productId: Long): Result<ProductHistoryDto> =
+    override fun getProductHistoryById(productId: Long): Result<Product> =
         runCatching {
-            dao.findProductHistory(productId = productId).toData()
+            dao.findProductHistory(productId = productId).toDomain()
         }
 
-    override fun getProductHistoriesByCategory(category: String): Result<List<ProductHistoryDto>> =
+    override fun getProductHistoriesByCategory(category: String): Result<List<Product>> =
         runCatching {
-            dao.getProductHistoriesByCategory(category = category).map { it.toData() }
+            dao.getProductHistoriesByCategory(category = category).map { it.toDomain() }
         }
 
-    override fun getProductHistoriesBySize(size: Int): Result<List<ProductHistoryDto>> =
+    override fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
         runCatching {
-            dao.getProductHistoryPaged(size = size).map { it.toData() }
+            dao.getProductHistoryPaged(size = size).map { it.toDomain() }
         }
 
     override fun deleteProductHistoryById(productId: Long): Result<Unit> =

@@ -1,16 +1,16 @@
 package woowacourse.shopping.remote.mapper
 
-import woowacourse.shopping.data.model.remote.ProductsDto
+import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.remote.model.response.ProductsResponse
 
-fun ProductsResponse.toData(): ProductsDto {
-    return ProductsDto(
-        content = this.content.map { it.toData() },
-        pageableDto = this.pageableResponse.toData(),
+fun ProductsResponse.toDomain(): Products {
+    return Products(
+        content = this.content.map { it.toDomain() },
+        pageable = this.pageableResponse.toDomain(),
         last = this.last,
         totalPages = this.totalPages,
         totalElements = this.totalElements,
-        sortDto = this.sortResponse.toData(),
+        sort = this.sortResponse.toDomain(),
         first = this.first,
         number = this.number,
         numberOfElements = this.numberOfElements,

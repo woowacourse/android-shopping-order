@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.remote.api.DummyData.STUB_PRODUCT_A
+import woowacourse.shopping.presentation.ui.DummyData.STUB_PRODUCT_A
 
 @ExtendWith(InstantTaskExecutorExtension::class, MockKExtension::class)
 class ProductDetailViewModelTest {

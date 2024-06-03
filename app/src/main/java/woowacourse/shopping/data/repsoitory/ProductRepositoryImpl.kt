@@ -2,7 +2,6 @@ package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -17,14 +16,16 @@ class ProductRepositoryImpl(
                 .getOrThrow().totalElements
 
         val cartsDto =
-            shoppingRemoteCartDataSource.getCartProductsPaged(page = FIRST_PAGE, size = totalElements)
+            shoppingRemoteCartDataSource.getCartProductsPaged(
+                page = FIRST_PAGE,
+                size = totalElements,
+            )
                 .map { cartDto -> cartDto.content.map { it } }
                 .getOrNull()
 
-        return productRemoteDataSource.findProductById(productId).mapCatching { productDto ->
-            val cartProduct = cartsDto?.firstOrNull { it.productDto.id == productDto.id }
-            cartProduct?.toDomain() ?: Cart(
-                product = productDto.toDomain(),
+        return productRemoteDataSource.findProductById(productId).mapCatching { product ->
+            cartsDto?.firstOrNull { it.product.id == product.id } ?: Cart(
+                product = product,
                 quantity = INIT_QUANTITY,
             )
         }
@@ -33,9 +34,7 @@ class ProductRepositoryImpl(
     override fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<Products> =
-        productRemoteDataSource.getPagingProduct(page, pageSize)
-            .mapCatching { result -> result.toDomain() }
+    ): Result<Products> = productRemoteDataSource.getPagingProduct(page, pageSize)
 
     companion object {
         const val FIRST_PAGE = 0

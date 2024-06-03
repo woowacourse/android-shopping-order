@@ -1,11 +1,11 @@
 package woowacourse.shopping.remote.mapper
 
-import woowacourse.shopping.data.model.remote.PageableDto
+import woowacourse.shopping.domain.model.Pageable
 import woowacourse.shopping.remote.model.response.PageableResponse
 
-fun PageableResponse.toData(): PageableDto {
-    return PageableDto(
-        sortDto = this.sortResponse.toData(),
+fun PageableResponse.toDomain(): Pageable {
+    return Pageable(
+        sort = this.sortResponse.toDomain(),
         pageNumber = this.pageNumber,
         pageSize = this.pageSize,
         offset = this.offset,

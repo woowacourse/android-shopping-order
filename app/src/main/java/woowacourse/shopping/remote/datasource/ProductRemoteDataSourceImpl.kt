@@ -1,24 +1,24 @@
 package woowacourse.shopping.remote.datasource
 
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.model.remote.ProductDto
-import woowacourse.shopping.data.model.remote.ProductsDto
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.remote.api.ProductService
-import woowacourse.shopping.remote.mapper.toData
+import woowacourse.shopping.remote.mapper.toDomain
 
 class ProductRemoteDataSourceImpl(private val productService: ProductService) : ProductRemoteDataSource {
-    override fun findProductById(id: Long): Result<ProductDto> =
+    override fun findProductById(id: Long): Result<Product> =
         runCatching {
-            productService.getProductsById(id = id.toInt()).execute().body()?.toData()
+            productService.getProductsById(id = id.toInt()).execute().body()?.toDomain()
                 ?: throw IllegalArgumentException()
         }
 
     override fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<ProductsDto> =
+    ): Result<Products> =
         runCatching {
-            productService.getProducts(page = page, size = pageSize).execute().body()?.toData()
+            productService.getProducts(page = page, size = pageSize).execute().body()?.toDomain()
                 ?: throw IllegalArgumentException()
         }
 }

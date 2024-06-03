@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.data.model.remote.ProductDto
-import woowacourse.shopping.data.model.remote.ProductsDto
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 
 interface ProductRemoteDataSource {
-    fun findProductById(id: Long): Result<ProductDto>
+    fun findProductById(id: Long): Result<Product>
 
     fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<ProductsDto>
+    ): Result<Products>
 }

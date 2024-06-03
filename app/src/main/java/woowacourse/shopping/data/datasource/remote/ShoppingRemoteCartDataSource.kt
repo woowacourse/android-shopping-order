@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.data.model.remote.CartsDto
+import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingRemoteCartDataSource {
     fun insertCartProduct(
@@ -16,7 +16,7 @@ interface ShoppingRemoteCartDataSource {
     fun getCartProductsPaged(
         page: Int,
         size: Int,
-    ): Result<CartsDto>
+    ): Result<Carts>
 
     fun getCartProductsQuantity(): Result<Int>
 

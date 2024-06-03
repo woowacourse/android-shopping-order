@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -29,7 +28,6 @@ class ProductHistoryRepositoryImpl(
 
     override fun getProductHistoryById(productId: Long): Result<Product> =
         productHistoryLocalDataSource.getProductHistoryById(productId = productId)
-            .mapCatching { it.toDomain() }
 
     override fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
         val recentHistory = productHistoryLocalDataSource.getProductHistoriesBySize(1).getOrThrow()
@@ -42,14 +40,13 @@ class ProductHistoryRepositoryImpl(
 
                 val productsId = carts?.content?.map { it.product.id } ?: emptyList()
                 result.filter {
-                    it.productId !in productsId
-                }.map { Cart(product = it.toDomain()) }.take(size)
+                    it.id !in productsId
+                }.map { Cart(product = it) }.take(size)
             }
     }
 
     override fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
         productHistoryLocalDataSource.getProductHistoriesBySize(size = size)
-            .mapCatching { result -> result.map { it.toDomain() } }
 
     override fun deleteProductHistoryById(productId: Long): Result<Unit> =
         productHistoryLocalDataSource.deleteProductHistoryById(productId = productId)
