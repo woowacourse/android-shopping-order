@@ -182,8 +182,8 @@ class CartViewModel(
     }
 
     private fun findIsCheckedByProductId(productId: Long): Boolean {
-        val current = requireNotNull(_cart.value)
-        return current.cartItems.first { it.productId == productId }.isChecked
+        val current = _cart.value ?: return false
+        return current.cartItems.firstOrNull { it.productId == productId }?.isChecked ?: false
     }
 
     private fun updateCountToPlus(
@@ -249,7 +249,11 @@ class CartViewModel(
 
     private fun loadCartItems() {
         cartRepository.getAllCartItemsWithProduct().onSuccess {
-            _cart.value = CartItemsUiState(it.map { it.toUiModel(false) }, isLoading = true)
+            _cart.value =
+                CartItemsUiState(
+                    it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                    isLoading = true,
+                )
             _cart.value = cart.value?.copy(isLoading = false)
         }.onFailure {
             error.setValue(it)
