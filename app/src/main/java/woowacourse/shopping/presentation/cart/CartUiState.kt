@@ -47,7 +47,7 @@ data class CartUiState(
         )
     }
 
-    fun updateTotalProducts(products: List<CartProductUi>): CartUiState {
+    fun updatePagingProducts(products: List<CartProductUi>): CartUiState {
         val newPagingProducts =
             products.chunked(MAX_PRODUCTS_PER_PAGE).mapIndexed { index, chunkedProducts ->
                 (index + INDEX_OFFSET) to chunkedProducts

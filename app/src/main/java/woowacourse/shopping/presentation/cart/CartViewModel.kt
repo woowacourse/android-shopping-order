@@ -120,7 +120,7 @@ class CartViewModel(
         _uiState.value = uiState.copy(isLoading = true)
         cartRepository.totalCartProducts().onSuccess { carts ->
             val newProducts = carts.map { it.toUiModel() }
-            val newUiState = uiState.updateTotalProducts(newProducts)
+            val newUiState = uiState.updatePagingProducts(newProducts)
             _uiState.value = newUiState.copy(isLoading = false)
             updateUiState(newUiState, currentPage = START_PAGE)
         }.onFailure {
