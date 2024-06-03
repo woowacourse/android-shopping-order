@@ -6,6 +6,8 @@
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.shopping.product.ProductListViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,6 +27,7 @@
             android:id="@+id/rv_product_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="@{vm.uiState.isLoading ? View.INVISIBLE : View.VISIBLE}"
             tools:itemCount="6"
             tools:listitem="@layout/item_product" />
 
