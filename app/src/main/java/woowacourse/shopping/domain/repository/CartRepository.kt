@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.model.Quantity
 interface CartRepository {
     fun findByProductId(
         productId: Int,
-        totalItemCount: Int,
         callback: (Result<CartItem?>) -> Unit,
     )
 

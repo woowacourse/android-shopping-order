@@ -1,69 +1,66 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.cart.local.entity.CartItemEntity
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import java.lang.IllegalArgumentException
-import kotlin.math.min
 
-class FakeCartRepository(savedCartItemEntities: List<CartItemEntity> = emptyList()) : CartRepository {
-    private val cart: MutableList<CartItemEntity> = savedCartItemEntities.toMutableList()
+class FakeCartRepository(savedCartItemEntities: List<CartItem> = emptyList()) : CartRepository {
+    private val cart: MutableList<CartItem> = savedCartItemEntities.toMutableList()
     private var id: Int = 0
 
-    override fun increaseQuantity(productId: Int) {
-        val oldCartItem = cart.find { it.productId == productId }
-        if (oldCartItem == null) {
-            cart.add(CartItemEntity(id++, productId, Quantity(1)))
-            return
-        }
-        cart.remove(oldCartItem)
-        var quantity = oldCartItem.quantity
-        cart.add(oldCartItem.copy(quantity = ++quantity))
+    override fun findByProductId(
+        productId: Int,
+        callback: (Result<CartItem?>) -> Unit,
+    ) {
+        val cartItem = cart.find { it.productId == productId }
+        callback(Result.success(cartItem))
     }
 
-    override fun decreaseQuantity(productId: Int) {
-        val oldCartItem = cart.find { it.productId == productId }
-        oldCartItem ?: throw IllegalArgumentException()
+    override fun syncFindByProductId(
+        productId: Int,
+        totalItemCount: Int,
+    ): CartItem? {
+        return cart.find { it.productId == productId }
+    }
 
-        cart.remove(oldCartItem)
-        if (oldCartItem.quantity.count == 1) {
-            return
-        }
-        var quantity = oldCartItem.quantity
-        cart.add(oldCartItem.copy(quantity = --quantity))
+    override fun findAll(callback: (Result<List<CartItem>>) -> Unit) {
+        callback(Result.success(cart))
+    }
+
+    override fun delete(
+        id: Int,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        cart.removeIf { it.id == id }
+        callback(Result.success(Unit))
+    }
+
+    override fun add(
+        productId: Int,
+        quantity: Quantity,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        val cartItem = CartItem(id++, productId, quantity)
+        cart.add(cartItem)
+        callback(Result.success(Unit))
     }
 
     override fun changeQuantity(
-        productId: Int,
+        id: Int,
         quantity: Quantity,
+        callback: (Result<Unit>) -> Unit,
     ) {
-        val oldCartItem = cart.find { it.productId == productId }
-        if (oldCartItem == null) {
-            cart.add(CartItemEntity(id++, productId, quantity))
-            return
-        }
-        cart.remove(oldCartItem)
-        cart.add(oldCartItem.copy(quantity = quantity))
+        val position = cart.indexOfFirst { it.id == id }
+        cart[position] = cart[position].copy(quantity = quantity)
+        callback(Result.success(Unit))
     }
 
-    override fun deleteCartItem(productId: Int) {
-        val deleteCartItem =
-            cart.find { it.productId == productId } ?: throw IllegalArgumentException()
-        cart.remove(deleteCartItem)
+    override fun getTotalQuantity(callback: (Result<Int>) -> Unit) {
+        val totalQuantity = cart.fold(0) { acc, cartItem -> acc + cartItem.quantity.count }
+        callback(Result.success(totalQuantity))
     }
 
-    override fun find(productId: Int): CartItemEntity {
-        return cart.find { it.productId == productId } ?: throw IllegalArgumentException()
+    override fun syncGetTotalQuantity(): Int {
+        return cart.fold(0) { acc, cartItem -> acc + cartItem.quantity.count }
     }
-
-    override fun findRange(
-        page: Int,
-        pageSize: Int,
-    ): List<CartItemEntity> {
-        val fromIndex = page * pageSize
-        val toIndex = min(fromIndex + pageSize, cart.size)
-        return cart.subList(fromIndex, toIndex)
-    }
-
-    override fun totalCartItemCount(): Int = cart.size
 }

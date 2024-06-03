@@ -14,10 +14,9 @@ object RemoteCartRepository : CartRepository {
 
     override fun findByProductId(
         productId: Int,
-        totalItemCount: Int,
         callback: (Result<CartItem?>) -> Unit,
     ) {
-        retrofitApi.requestCartItems(page = 0, size = totalItemCount)
+        retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
