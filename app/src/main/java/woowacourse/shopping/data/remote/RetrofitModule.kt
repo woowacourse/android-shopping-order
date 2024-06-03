@@ -13,12 +13,11 @@ import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
 
 object RetrofitModule {
-    private val contentType = "application/json".toMediaType()
-
-    private const val BASE_URL = "http://54.180.95.212:8080"
+    private const val BASE_URL = BuildConfig.BASE_URL
     private const val PRODUCT_BASE_URL = "${BASE_URL}/products/"
     private const val CART_ITEMS_BASE_URL = "${BASE_URL}/cart-items/"
     private const val ORDER_BASE_URL = "${BASE_URL}/orders/"
+    private val contentType = "application/json".toMediaType()
 
     private val basicAuthInterceptor =
         Interceptor { chain ->
@@ -37,7 +36,7 @@ object RetrofitModule {
             .addInterceptor(basicAuthInterceptor)
             .build()
 
-    val productApi =
+    val productApi: ProductApi =
         Retrofit.Builder()
             .baseUrl(PRODUCT_BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
@@ -45,7 +44,7 @@ object RetrofitModule {
             .build()
             .create(ProductApi::class.java)
 
-    val cartItemsApi =
+    val cartItemsApi: CartItemApi =
         Retrofit.Builder()
             .baseUrl(CART_ITEMS_BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
@@ -53,7 +52,7 @@ object RetrofitModule {
             .build()
             .create(CartItemApi::class.java)
 
-    val orderApi =
+    val orderApi: OrderApi =
         Retrofit.Builder()
             .baseUrl(ORDER_BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))

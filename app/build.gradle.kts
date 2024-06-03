@@ -34,6 +34,7 @@ android {
 
         buildConfigField("String", "USER", properties.getProperty("USER"))
         buildConfigField("String", "PASSWORD", properties.getProperty("PASSWORD"))
+        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
     }
 
     buildTypes {
