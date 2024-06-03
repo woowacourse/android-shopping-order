@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {

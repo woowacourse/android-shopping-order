@@ -5,13 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel" />
-
-        <variable
-            name="lastProduct"
-            type="woowacourse.shopping.domain.RecentProductItem" />
 
         <variable
             name="detailHandler"
@@ -26,17 +24,51 @@
         android:elevation="0dp"
         tools:context=".presentation.ui.detail.ProductDetailActivity">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_detail_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="26dp"
+            android:text="@string/detail_title"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintStart_toStartOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:onClick="@{() -> detailHandler.onCloseClick()}"
+            android:padding="4dp"
+            android:src="@drawable/ic_close_white"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintEnd_toEndOf="@id/toolbar"
+            app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
+
         <ImageView
             android:id="@+id/iv_product"
-            bindLoadImage="@{viewModel.product.imgUrl}"
+            bindLoadImage="@{viewModel.product.imageUrl}"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="360dp"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             tools:background="@drawable/ic_launcher_background" />
 
         <TextView
@@ -69,14 +101,15 @@
             android:layout_height="42dp"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="14dp"
+            app:count="@{viewModel.product.quantity}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/line"
-            app:product="@{viewModel.product}"
+            app:productId="@{viewModel.product.id}"
             app:quantityHandler="@{detailHandler}" />
 
         <TextView
             android:id="@+id/tv_price_value"
-            bindTextFormattedCurrency="@{viewModel.product.price*viewModel.product.quantity}"
+            bindTextFormattedCurrency="@{viewModel.product.calculatedPrice}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -86,30 +119,16 @@
             app:layout_constraintTop_toBottomOf="@id/line"
             tools:text="10000원" />
 
-        <TextView
-            android:id="@+id/tv_add_cart"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:background="#04C09E"
-            android:gravity="center"
-            android:onClick="@{()->detailHandler.onAddCartClick()}"
-            android:text="@string/add_cart"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
-            currentProduct="@{viewModel.product}"
-            lastProduct="@{lastProduct}"
+            currentProductId="@{viewModel.product.id}"
+            lastProduct="@{viewModel.lastProduct}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="29dp"
-            android:background="@drawable/radius_4_strock"
-            android:onClick="@{()->detailHandler.onLastProductClick(lastProduct)}"
+            android:background="@drawable/radius_4_stroke"
+            android:onClick="@{()->detailHandler.onLastProductClick(viewModel.lastProduct.id)}"
+            app:layout_constraintBottom_toTopOf="@id/tv_add_cart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_price_value">
@@ -135,7 +154,7 @@
                 android:layout_marginBottom="16dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@{lastProduct.name}"
+                android:text="@{viewModel.lastProduct.name}"
                 android:textColor="@color/dark_grey"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -143,6 +162,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_last_product" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_add_cart"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="#04C09E"
+            android:gravity="center"
+            android:onClick="@{()->detailHandler.onAddCartClick()}"
+            android:text="@string/add_cart"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
