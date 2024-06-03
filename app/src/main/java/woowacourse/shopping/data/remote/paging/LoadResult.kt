@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.remote.paging
 
 sealed interface LoadResult<out T : Any> {
     data class Page<out T : Any>(
@@ -8,6 +8,6 @@ sealed interface LoadResult<out T : Any> {
     ) : LoadResult<T>
 
     data class Error(
-        val message: String,
+        val errorType: LoadErrorType,
     ) : LoadResult<Nothing>
 }

@@ -21,7 +21,7 @@ interface RemoteDataSource {
 
     fun getProductById(id: Int): Response<Product>
 
-    fun deleteProducyById(id: Int): Response<Unit>
+    fun deleteProductById(id: Int): Response<Unit>
 
     fun getCartItems(
         page: Int = 0,

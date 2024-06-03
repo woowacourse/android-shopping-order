@@ -34,7 +34,7 @@ class RetrofitDataSource(
         return productApi.getProductById(id = id).execute()
     }
 
-    override fun deleteProducyById(id: Int): Response<Unit> {
+    override fun deleteProductById(id: Int): Response<Unit> {
         return productApi.deleteProductById(id = id).execute()
     }
 
