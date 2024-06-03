@@ -37,6 +37,8 @@ class ProductListActivityTest {
         // Given
         val recyclerView = onView(withId(R.id.rv_product_list))
 
+        Thread.sleep(2000)
+
         // When
         recyclerView.perform(scrollToPosition<ProductListAdapter.ProductListViewHolder>(20))
 
@@ -58,17 +60,17 @@ class ProductListActivityTest {
     fun `더_볼_상품_목록이_없을_때_더보기_버튼이_보이지_않는다`() {
         // Given
         val recyclerView = onView(withId(R.id.rv_product_list))
+
+        Thread.sleep(2000)
+
+        repeat(7) {
+            recyclerView.perform(scrollToPosition<ProductListAdapter.ProductListViewHolder>(20))
+            Thread.sleep(1000)
+            onView(withId(R.id.tv_show_more_products)).perform(scrollTo()).perform(click())
+        }
         recyclerView.perform(scrollToPosition<ProductListAdapter.ProductListViewHolder>(20))
         Thread.sleep(1000)
 
-        // When
-        onView(withId(R.id.tv_show_more_products)).perform(scrollTo()).perform(click())
-        recyclerView.perform(scrollToLastPosition<ProductListAdapter.ProductListViewHolder>())
-        Thread.sleep(1000)
-        onView(withId(R.id.tv_show_more_products)).perform(scrollTo()).perform(click())
-        recyclerView.perform(scrollToLastPosition<ProductListAdapter.ProductListViewHolder>())
-
-        Thread.sleep(1000)
         // then
         onView(withId(R.id.tv_show_more_products)).check(
             matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
