@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.cart.adapter.CartViewHolder
+import woowacourse.shopping.ui.cart.item.CartViewHolder
 
 @RunWith(AndroidJUnit4::class)
 class CartActivityTest {

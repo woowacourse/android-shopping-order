@@ -28,48 +28,13 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
-        <include
-            layout="@layout/layout_cart_skeleton"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fcv_cart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:isVisible="@{vm.cart.isLoading}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
-
-        <include
-            android:id="@+id/rv_recommend"
-            layout="@layout/layout_recommend_product"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:isVisible="@{vm.isRecommendPage}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="추천 상품이 없습니다."
-            android:layout_marginStart="20dp"
-            android:textSize="20dp"
-            app:isVisible="@{vm.noRecommendProductState}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_cart"
-            isVisible="@{!vm.cart.isLoading &amp; !vm.isRecommendPage}"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginHorizontal="18dp"
-            android:paddingBottom="60dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/layout_order"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
-            tools:listitem="@layout/item_cart"
-            tools:visibility="gone" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
 
         <include
             android:id="@+id/layout_order"

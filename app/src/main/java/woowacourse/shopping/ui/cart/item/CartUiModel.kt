@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.item
 
 import woowacourse.shopping.model.Quantity
 

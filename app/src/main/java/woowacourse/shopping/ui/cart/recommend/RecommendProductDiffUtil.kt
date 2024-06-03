@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.adapter
+package woowacourse.shopping.ui.cart.recommend
 
 import androidx.recyclerview.widget.DiffUtil
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel

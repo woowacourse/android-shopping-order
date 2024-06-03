@@ -7,22 +7,20 @@ import android.widget.CheckBox
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.ui.cart.adapter.CartAdapter
-import woowacourse.shopping.ui.cart.adapter.RecommendProductAdapter
+import woowacourse.shopping.ui.cart.item.CartItemFragment
+import woowacourse.shopping.ui.cart.recommend.RecommendFragment
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
-import woowacourse.shopping.ui.products.toUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    private lateinit var adapter: CartAdapter
-    private lateinit var recommendProductAdapter: RecommendProductAdapter
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(
             ProductRepositoryImpl(),
@@ -36,23 +34,16 @@ class CartActivity : AppCompatActivity() {
 
         initBinding()
         initToolbar()
-        setCartAdapter()
-        setRecommendProductAdapter()
-        observeCartItems()
-        binding.layoutOrder.btnOrder.setOnClickListener {
-            if (!requireNotNull(viewModel.isRecommendPage.value)) {
-                viewModel.isRecommendPage.value = true
-                viewModel.loadRecommendProducts()
-            }
-        }
+        initFragment()
 
-        viewModel.products.observe(this) {
-            recommendProductAdapter.submitList(it.map { it.toUiModel() })
-        }
+        onClickOrderBtn()
 
+        onClickTotalCheckBox()
+    }
 
-        binding.cbCartItemTotal.setOnClickListener {
-            viewModel.totalCheckBoxCheck((it as CheckBox).isChecked)
+    private fun initFragment() {
+        supportFragmentManager.findFragmentById(R.id.fcv_cart) ?: supportFragmentManager.commit {
+            replace(R.id.fcv_cart, CartItemFragment())
         }
     }
 
@@ -68,23 +59,24 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeCartItems() {
-        viewModel.cart.observe(this) {
-            adapter.submitList(it.cartItems)
+    private fun onClickOrderBtn() {
+        binding.layoutOrder.btnOrder.setOnClickListener {
+            if (supportFragmentManager.findFragmentById(R.id.fcv_cart) is CartItemFragment) {
+                supportFragmentManager.commit {
+                    add(R.id.fcv_cart, RecommendFragment())
+                    addToBackStack(null)
+                }
+            }
+
         }
     }
 
-    private fun setCartAdapter() {
-        binding.rvCart.itemAnimator = null
-        adapter = CartAdapter(viewModel)
-        binding.rvCart.adapter = adapter
+    private fun onClickTotalCheckBox() {
+        binding.cbCartItemTotal.setOnClickListener {
+            viewModel.totalCheckBoxCheck((it as CheckBox).isChecked)
+        }
     }
 
-    private fun setRecommendProductAdapter() {
-        binding.rvRecommend.rvRecommendProduct.itemAnimator = null
-        recommendProductAdapter = RecommendProductAdapter(viewModel)
-        binding.rvRecommend.rvRecommendProduct.adapter = recommendProductAdapter
-    }
 
     companion object {
         fun startActivity(context: Context) =
