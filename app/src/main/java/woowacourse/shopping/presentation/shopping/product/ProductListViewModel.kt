@@ -52,7 +52,7 @@ class ProductListViewModel(
         cartRepository.filterCartProducts(ids)
             .onSuccess { newCartProducts ->
                 val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
-                _uiState.value = uiState.updateCartProducts(newProducts)
+                _uiState.value = uiState.updateProducts(newProducts)
             }.onFailure {
                 _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
             }

@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.shopping.product
 
+import android.util.Log
 import woowacourse.shopping.presentation.shopping.detail.ProductUi
 
 data class ProductListUiState(
@@ -24,7 +25,8 @@ data class ProductListUiState(
         )
     }
 
-    fun updateCartProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
+    fun updateProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
+        Log.d("alsong", "$newCartProducts")
         return copy(
             totalProducts =
                 products.map { originalProduct ->
