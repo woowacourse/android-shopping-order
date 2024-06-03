@@ -37,7 +37,7 @@ class ProductDetailViewModel(
         thread {
             productRepository.findCartByProductId(id).onSuccess { cart ->
                 hideError()
-                val state = _uiState.value ?: return@onSuccess
+                val state = uiState.value ?: return@onSuccess
                 if (state.isLastProductPage) {
                     _uiState.postValue(state.copy(cart = cart))
                     insertProductHistory(cart.product)
@@ -57,6 +57,8 @@ class ProductDetailViewModel(
     private fun getProductHistory(cart: Cart) {
         productHistoryRepository.getProductHistory(2).onSuccess { productHistories ->
             hideError()
+            val state = uiState.value ?: return
+
             val productHistory =
                 if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
                     if (productHistories.size >= 2) productHistories[1] else null
@@ -71,15 +73,13 @@ class ProductDetailViewModel(
                     else -> false
                 }
 
-            uiState.value?.let { state ->
-                _uiState.postValue(
-                    state.copy(
-                        cart = cart,
-                        productHistory = productHistory,
-                        isLastProductPage = isLastProductPage,
-                    ),
-                )
-            }
+            _uiState.postValue(
+                state.copy(
+                    cart = cart,
+                    productHistory = productHistory,
+                    isLastProductPage = isLastProductPage,
+                ),
+            )
 
             insertProductHistory(cart.product)
         }.onFailure { e ->
@@ -91,13 +91,15 @@ class ProductDetailViewModel(
     fun addToCart() {
         val cart = uiState.value?.cart ?: return
         thread {
-            if (cart.id == Cart.EMPTY_CART_ID) {
+            if (shouldInsertCart(cart)) {
                 insertCart(cart)
             } else {
                 updateCart(cart)
             }
         }
     }
+
+    private fun shouldInsertCart(cart: Cart): Boolean = cart.id == Cart.EMPTY_CART_ID
 
     private fun insertCart(cart: Cart) {
         shoppingCartRepository.postCartItem(
@@ -130,9 +132,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         val state = uiState.value ?: return
-        state.cart?.let { cart ->
-            _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity + 1))
-        }
+        val cart = state.cart ?: return
+        _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity + 1))
     }
 
     override fun minusProductQuantity(
@@ -140,9 +141,8 @@ class ProductDetailViewModel(
         position: Int,
     ) {
         val state = uiState.value ?: return
-        state.cart?.let { cart ->
-            _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity - 1))
-        }
+        val cart = state.cart ?: return
+        _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity - 1))
     }
 
     private fun insertProductHistory(productValue: Product) {
