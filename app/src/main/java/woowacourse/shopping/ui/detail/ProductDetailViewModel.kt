@@ -44,10 +44,6 @@ class ProductDetailViewModel(
     val isVisibleLastRecentProduct: LiveData<Boolean> =
         _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
 
-    init {
-        saveRecentProduct()
-    }
-
     fun loadProductDetail() {
         loadProduct()
         loadLastRecentProduct()
@@ -81,11 +77,6 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentProduct() {
-        val product = productRepository.syncFind(productId) ?: return
-        recentProductRepository.save(product)
-    }
-
     private fun increaseQuantity() {
         var quantity = _productUiModel.value?.quantity ?: return
         _productUiModel.value = _productUiModel.value?.copy(quantity = ++quantity)
@@ -117,5 +108,15 @@ class ProductDetailViewModel(
 
     private fun setError() {
         _productLoadError.value = Event(Unit)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        saveRecentProduct()
+    }
+
+    private fun saveRecentProduct() {
+        val product = productRepository.syncFind(productId) ?: return
+        recentProductRepository.save(product)
     }
 }
