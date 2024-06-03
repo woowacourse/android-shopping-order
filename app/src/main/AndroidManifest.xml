@@ -24,7 +24,7 @@
             android:name=".presentation.ui.detail.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.ui.shopping.ShoppingActionActivity"
+            android:name=".presentation.ui.shopping.ShoppingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

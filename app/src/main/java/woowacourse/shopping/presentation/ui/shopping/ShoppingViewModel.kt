@@ -10,24 +10,23 @@ import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.toRecentProduct
+import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
-import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
     ViewModel(), ShoppingActionHandler {
-    private var offSet: Int = 0
-
     private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int> get() = _cartCount
 
     private val _recentProducts = MutableLiveData<UiState<List<RecentProduct>>>(UiState.Loading)
     val recentProducts: LiveData<UiState<List<RecentProduct>>> get() = _recentProducts
 
-    private val _errorHandler = MutableLiveData<EventState<String>>()
-    val errorHandler: LiveData<EventState<String>> get() = _errorHandler
+    private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
+    val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
 
     private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
     val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
@@ -69,54 +68,38 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun loadProductByOffset() {
+    fun loadProductsByOffset() =
         thread {
             repository.getProductsByPaging().onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
+                if (_products.value is UiState.Loading) {
+                    _products.postValue(UiState.Success(it))
                 } else {
-                    if (_products.value is UiState.Loading) {
-                        _products.postValue(UiState.Success(it))
-                    } else {
-                        _products.postValue(
-                            UiState.Success((_products.value as UiState.Success).data + it),
-                        )
-                    }
+                    _products.postValue(
+                        UiState.Success((_products.value as UiState.Success).data + it),
+                    )
                 }
-                offSet++
             }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
+                _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
             }
         }
-    }
 
-    fun loadCartByOffset() {
+    fun loadAllCart() =
         thread {
-            repository.getCartItems(offSet, 2000).onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
-                } else {
-                    _carts.postValue(UiState.Success(it))
-                }
+            repository.getCartItems(0, 5000).onSuccess {
+                _carts.postValue(UiState.Success(it))
             }.onFailure {
-                _errorHandler.value = EventState(CartViewModel.CART_LOAD_ERROR)
+                _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
             }
         }
-    }
 
-    fun getCartItemCounts() {
+    fun getCartItemCounts() =
         thread {
             repository.getCartItemsCounts().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
             }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
+                _errorHandler.postValue(EventState(ErrorType.ERROR_CART_COUNT_LOAD))
             }
         }
-    }
-
-    companion object {
-        const val LOAD_ERROR = "아이템을 끝까지 불러왔습니다"
-    }
 
     override fun onProductClick(cartProduct: CartProduct) {
         _navigateHandler.value = EventState(NavigateUiState.ToDetail(cartProduct))
@@ -136,7 +119,7 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     override fun loadMore() {
-        loadProductByOffset()
+        loadProductsByOffset()
     }
 
     override fun onPlus(cartProduct: CartProduct) {
@@ -160,7 +143,7 @@ class ShoppingViewModel(private val repository: Repository) :
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
                 repository.patchCartItem(
@@ -173,7 +156,7 @@ class ShoppingViewModel(private val repository: Repository) :
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             }
         }
@@ -196,7 +179,7 @@ class ShoppingViewModel(private val repository: Repository) :
                         _cartCount.postValue(_cartCount.value?.minus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
                     }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
@@ -204,7 +187,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
                 }
             }
         }
@@ -224,28 +207,19 @@ class ShoppingViewModel(private val repository: Repository) :
             repository.findByLimit(10).onSuccess {
                 _recentProducts.postValue(UiState.Success(it))
             }.onFailure {
-                _errorHandler.postValue(EventState("최근 아이템 로드 에러"))
+                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_LOAD))
             }
         }
     }
 
-    fun saveRecentProduct(cartProduct: CartProduct) {
+    private fun saveRecentProduct(cartProduct: CartProduct) =
         thread {
-            repository.saveRecentProduct(
-                RecentProduct(
-                    cartProduct.productId,
-                    cartProduct.name,
-                    cartProduct.imgUrl,
-                    cartProduct.quantity,
-                    cartProduct.price,
-                    System.currentTimeMillis(),
-                    category = cartProduct.category,
-                    cartId = cartProduct.cartId,
-                ),
-            ).onSuccess {
-            }.onFailure {
-                _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
+            repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
+                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
+
+    companion object {
+        const val LOAD_ERROR = "아이템을 끝까지 불러왔습니다"
     }
 }

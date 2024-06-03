@@ -14,7 +14,7 @@ inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(name: String
     }
 }
 
-inline fun <reified T: Any> Response<T>.toIdOrNull(): Int? {
+inline fun <reified T : Any> Response<T>.toIdOrNull(): Int? {
     return headers()["LOCATION"]?.substringAfterLast("/")
         ?.toIntOrNull()
 }

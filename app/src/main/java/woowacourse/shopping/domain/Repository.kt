@@ -16,7 +16,7 @@ interface Repository {
     fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?>
+    ): Result<List<CartProduct>>
 
     fun getProductById(id: Int): Result<CartProduct?>
 

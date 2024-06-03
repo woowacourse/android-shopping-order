@@ -3,12 +3,9 @@ package woowacourse.shopping.presentation.ui
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Recent
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
-import kotlin.math.min
 
 class FakeRepository : Repository {
     val carts = cartProducts.toMutableList()
@@ -28,7 +25,7 @@ class FakeRepository : Repository {
     override fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?> {
+    ): Result<List<CartProduct>> {
         return Result.success(carts)
     }
 
@@ -77,10 +74,10 @@ class FakeRepository : Repository {
         TODO("Not yet implemented")
     }
 
-    override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
-        Result.success(recentProducts)
+    override fun findByLimit(limit: Int): Result<List<RecentProduct>> = Result.success(recentProducts)
 
     override fun findOne(): Result<RecentProduct?> = Result.success(recentProduct)
+
     override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> {
         return Result.success(1L)
     }

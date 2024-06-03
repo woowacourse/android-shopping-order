@@ -3,13 +3,13 @@ package woowacourse.shopping.data
 import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
-import woowacourse.shopping.data.remote.paging.LoadResult
-import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.data.remote.RemoteDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.paging.LoadResult
+import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -71,7 +71,7 @@ class RepositoryImpl(
             val response = remoteDataSource.postCartItem(cartItemRequest)
             if (response.isSuccessful) {
                 return Result.success(
-                    response.toIdOrNull() ?: 0
+                    response.toIdOrNull() ?: 0,
                 )
             }
             return Result.failure(Throwable(response.errorBody().toString()))
@@ -106,6 +106,7 @@ class RepositoryImpl(
             }
             return Result.failure(Throwable(response.errorBody().toString()))
         }
+
     override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             localDataSource.findByLimit(limit).map { it.toDomain() }
@@ -120,6 +121,7 @@ class RepositoryImpl(
         runCatching {
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
+
     override fun getCartItemsCounts(): Result<Int> =
         runCatching {
             val response = remoteDataSource.getCartItemsCounts()

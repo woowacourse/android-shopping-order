@@ -4,7 +4,6 @@ import woowacourse.shopping.data.local.dao.RecentProductDao
 import woowacourse.shopping.data.local.entity.RecentProductEntity
 
 class RoomDataSource(private val recentProductDao: RecentProductDao) : LocalDataSource {
-
     override fun findByLimit(limit: Int): List<RecentProductEntity> {
         return recentProductDao.findByLimit(limit)
     }

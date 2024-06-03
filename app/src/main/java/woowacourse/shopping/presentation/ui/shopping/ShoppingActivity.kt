@@ -22,7 +22,7 @@ import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.utils.getParcelableExtraCompat
 import kotlin.concurrent.thread
 
-class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
+class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_shopping
 
@@ -45,36 +45,31 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         supportActionBar?.hide()
     }
 
-    private fun initLauncher() {
-        resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
-                        EXTRA_UPDATED_PRODUCT,
-                    )
-                        ?.let {
-                            viewModel.updateCartProducts(it)
-                        }
-                }
-                viewModel.findAllRecent()
-                viewModel.getCartItemCounts()
-            }
+    private fun initAdapter() {
+        val layoutManager = GridLayoutManager(this, GRIDLAYOUT_COL)
+        layoutManager.spanSizeLookup = spanManager
+        binding.rvShopping.layoutManager = layoutManager
+        binding.rvShopping.adapter = shoppingAdapter
+        binding.rvRecents.adapter = recentAdapter
     }
 
     private fun initData() {
-        viewModel.loadProductByOffset()
-        viewModel.loadCartByOffset()
+        viewModel.loadProductsByOffset()
+        viewModel.loadAllCart()
         viewModel.findAllRecent()
     }
 
     private fun initObserver() {
         binding.shoppingActionHandler = viewModel
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+
         viewModel.cartProducts.observe(this) {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
                     thread {
-                        Thread.sleep(500)
+                        Thread.sleep(500) // Skeleton ui display time
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
                             shoppingAdapter.submitList(it.data)
@@ -82,9 +77,6 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                     }
                 }
             }
-        }
-        viewModel.cartCount.observe(this) {
-            binding.tvCartCount.text = it.toString()
         }
         viewModel.recentProducts.observe(this) {
             when (it) {
@@ -99,7 +91,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.errorHandler.observe(
             this,
             EventObserver {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             },
         )
         viewModel.navigateHandler.observe(
@@ -121,12 +113,20 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
         )
     }
 
-    private fun initAdapter() {
-        val layoutManager = GridLayoutManager(this, GRIDLAYOUT_COL)
-        layoutManager.spanSizeLookup = spanManager
-        binding.rvShopping.layoutManager = layoutManager
-        binding.rvShopping.adapter = shoppingAdapter
-        binding.rvRecents.adapter = recentAdapter
+    private fun initLauncher() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.getParcelableExtraCompat<UpdateUiModel>(
+                        EXTRA_UPDATED_PRODUCT,
+                    )
+                        ?.let {
+                            viewModel.updateCartProducts(it)
+                        }
+                }
+                viewModel.findAllRecent()
+                viewModel.getCartItemCounts()
+            }
     }
 
     private val spanManager =
