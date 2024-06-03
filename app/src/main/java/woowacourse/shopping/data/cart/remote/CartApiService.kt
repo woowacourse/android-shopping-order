@@ -17,7 +17,6 @@ import woowacourse.shopping.data.dto.response.CartResponse
 interface CartApiService {
     @GET("/cart-items")
     fun requestCartItems(
-        @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Call<CartResponse>

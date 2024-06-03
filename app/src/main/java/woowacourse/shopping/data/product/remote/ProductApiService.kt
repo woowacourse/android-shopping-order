@@ -11,14 +11,12 @@ import woowacourse.shopping.data.dto.response.ProductResponse
 interface ProductApiService {
     @GET("/products")
     fun requestProducts(
-        @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Call<ProductResponse>
 
     @GET("/products")
     fun requestProductsWithCategory(
-        @Header("accept") accept: String = "*/*",
         @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
