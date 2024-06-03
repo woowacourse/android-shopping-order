@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.presentation.ui.DummyData.STUB_PRODUCT_A
+import woowacourse.shopping.remote.api.DummyData.STUB_CART_A
 
 @ExtendWith(InstantTaskExecutorExtension::class, MockKExtension::class)
 class ProductDetailViewModelTest {
@@ -37,10 +36,8 @@ class ProductDetailViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        every { productRepository.findProductById(productId) } returns Result.success(STUB_PRODUCT_A.toDomain())
+        every { productRepository.getCartById(productId) } returns Result.success(STUB_CART_A)
         every { productHistoryRepository.getProductHistoriesBySize(any()) } returns Result.success(emptyList())
-        every { shoppingCartRepository.getAllCartProducts() } returns Result.success(emptyList())
-        every { shoppingCartRepository.findCartProduct(1L) } returns Result.success(STUB_PRODUCT_A.toDomain())
 
         val initialState = mapOf(ProductDetailActivity.PUT_EXTRA_PRODUCT_ID to productId)
         savedStateHandle = SavedStateHandle(initialState)
@@ -58,27 +55,14 @@ class ProductDetailViewModelTest {
         // then
         Thread.sleep(3000)
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.cart).isEqualTo(STUB_PRODUCT_A.toDomain())
+        assertThat(actual.cart).isEqualTo(STUB_CART_A)
     }
 
     @Test
     fun `선택한 상품을 장바구니에 추가한다`() {
         // given
         val productIdSlot = CapturingSlot<Long>()
-        val nameSlot = CapturingSlot<String>()
-        val priceSlot = CapturingSlot<Int>()
         val quantitySlot = CapturingSlot<Int>()
-        val imageUrlSlot = CapturingSlot<String>()
-
-        every {
-            shoppingCartRepository.insertCartProduct(
-                capture(productIdSlot),
-                capture(nameSlot),
-                capture(priceSlot),
-                capture(quantitySlot),
-                capture(imageUrlSlot),
-            )
-        } returns Result.success(Unit)
 
         every {
             productHistoryRepository.insertProductHistory(
@@ -86,19 +70,24 @@ class ProductDetailViewModelTest {
                 any(),
                 any(),
                 any(),
+                any(),
             )
         } returns Result.success(Unit)
+
+        every {
+            shoppingCartRepository.insertCartProduct(
+                capture(productIdSlot),
+                capture(quantitySlot),
+            )
+        } returns Result.success(1)
 
         // when
         viewModel.addToCart()
 
         // then
         assertAll(
-            { assertThat(productIdSlot.captured).isEqualTo(STUB_PRODUCT_A.id) },
-            { assertThat(nameSlot.captured).isEqualTo(STUB_PRODUCT_A.name) },
-            { assertThat(priceSlot.captured).isEqualTo(STUB_PRODUCT_A.price) },
-            { assertThat(quantitySlot.captured).isEqualTo(0) },
-            { assertThat(imageUrlSlot.captured).isEqualTo(STUB_PRODUCT_A.imageUrl) },
+            { assertThat(productIdSlot.captured).isEqualTo(STUB_CART_A.product.id) },
+            { assertThat(quantitySlot.captured).isEqualTo(STUB_CART_A.quantity) },
         )
     }
 }
