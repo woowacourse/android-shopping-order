@@ -72,11 +72,12 @@ class ProductDetailViewModel(
     fun addProductToCart() {
         _productWithQuantity.value?.let { productWithQuantity ->
             with(productWithQuantity) {
-                cartRepository.addProductToCart(this.product.id, this.quantity.value)
+                cartRepository.addProductToCart(this.product.id, this.quantity.value).onSuccess {
+                    loadProduct()
+                    _addCartComplete.setValue(Unit)
+                }
             }
-            loadProduct()
         }
-        _addCartComplete.setValue(Unit)
     }
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {

@@ -66,16 +66,13 @@ class CartRepositoryImpl(
     override fun addProductToCart(
         productId: Long,
         quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            val cart: Cart? =
-                getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
-            if (cart == null) {
-                postCartItems(productId, quantity)
-                return@runCatching
-            }
-            patchCartItem(cart.id, cart.quantity.value + quantity)
+    ): Result<Unit> {
+        val cart: Cart? = getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
+        if (cart == null) {
+            return postCartItems(productId, quantity)
         }
+        return patchCartItem(cart.id, cart.quantity.value + quantity)
+    }
 
     override fun order(cartItemIds: List<Long>) = orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
 
