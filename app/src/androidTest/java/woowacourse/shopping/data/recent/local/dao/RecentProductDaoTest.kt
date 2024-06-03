@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.recent.dao
+package woowacourse.shopping.data.recent.local.dao
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -9,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.data.local.ShoppingCartDataBase
-import woowacourse.shopping.data.recent.local.dao.RecentProductDao
 import woowacourse.shopping.data.recent.local.entity.ProductEntity
 import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
 import java.time.LocalDateTime
