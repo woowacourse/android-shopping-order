@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 interface CartListener {
-    fun deleteCartItem(productId: Int)
+    fun deleteCartItem(cartItemId: Int)
 
     fun increaseQuantity(productId: Int)
 

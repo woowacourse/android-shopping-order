@@ -16,7 +16,7 @@ import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 
 class CartViewModel(
     private val productRepository: ProductRepository,
-    private val recentRepository: RecentProductRepository,
+    private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
@@ -121,9 +121,9 @@ class CartViewModel(
         _cartUiModels.value = newCartUiModels
     }
 
-    override fun deleteCartItem(productId: Int) {
+    override fun deleteCartItem(cartItemId: Int) {
         _changedCartEvent.value = Event(Unit)
-        val cartUiModel = cartUiModels().findByProductId(productId) ?: return
+        val cartUiModel = cartUiModels().find(cartItemId) ?: return
 
         cartRepository.delete(cartUiModel.cartItemId) {
             it.onSuccess {
@@ -160,7 +160,7 @@ class CartViewModel(
 
         val cartUiModel = cartUiModels().findByProductId(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
-            deleteCartItem(productId)
+            deleteCartItem(cartUiModel.cartItemId)
             return
         }
         var newQuantity = cartUiModel.quantity
@@ -232,8 +232,9 @@ class CartViewModel(
     }
 
     fun loadRecommendProducts() {
-        val recentProductCategory = recentRepository.findLastOrNull()?.product?.category ?: return
-        val cartItems = cartUiModels()?.toCartItems() ?: return
+        val recentProductCategory =
+            recentProductRepository.findLastOrNull()?.product?.category ?: return
+        val cartItems = cartUiModels().toCartItems()
 
         productRepository.findRecommendProducts(recentProductCategory, cartItems) {
             it.onSuccess { recommendProducts ->
@@ -274,9 +275,14 @@ class CartViewModel(
         _changedCartEvent.value = Event(Unit)
         cartItemIds.forEach { cartItemId ->
             cartRepository.delete(cartItemId) {
-                it.onFailure { setError() }
+                it.onSuccess {
+                    deleteCartItem(cartItemId)
+                }.onFailure {
+                    setError()
+                }
             }
         }
+        loadAllCartItems()
     }
 
     private fun setError() {

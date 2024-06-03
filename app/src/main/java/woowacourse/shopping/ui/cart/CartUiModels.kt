@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
-class CartUiModels(val uiModels: List<CartUiModel> = emptyList()) {
+data class CartUiModels(val uiModels: List<CartUiModel> = emptyList()) {
     val size: Int get() = uiModels.size
 
     fun isEmpty() = uiModels.isEmpty()
@@ -11,6 +11,8 @@ class CartUiModels(val uiModels: List<CartUiModel> = emptyList()) {
     fun toCartItems(): List<CartItem> {
         return uiModels.map { CartItem(it.cartItemId, it.productId, it.quantity) }
     }
+
+    fun find(cartItemId: Int) = uiModels.find { it.cartItemId == cartItemId }
 
     fun selectedTotalCount(): Int {
         return uiModels.count { it.isSelected }
