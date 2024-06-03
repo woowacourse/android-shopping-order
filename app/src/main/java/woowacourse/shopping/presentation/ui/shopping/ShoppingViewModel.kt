@@ -71,8 +71,8 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     fun loadProductByOffset() {
-        thread {
-            repository.getProductsByPaging().onSuccess {
+        repository.getProductsByPaging { result ->
+            result.onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {
@@ -91,26 +91,23 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     fun loadCartByOffset() {
-        thread {
-            repository.getCartItems(0, 2000).onSuccess {
+        repository.getCartItems(0, 2000) { result ->
+            result.onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(LOAD_ERROR))
                 } else {
                     _carts.postValue(UiState.Success(it))
                 }
             }.onFailure {
-                _errorHandler.value = EventState(CartViewModel.CART_LOAD_ERROR)
+                _errorHandler.postValue(EventState(CartViewModel.CART_LOAD_ERROR))
             }
         }
     }
 
     fun getCartItemCounts() {
-        thread {
-            repository.getCartItemsCounts().onSuccess { maxCount ->
-                _cartCount.postValue(maxCount)
-            }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
-            }
+        repository.getCartItemsCounts { result ->
+            result.onSuccess { _cartCount.postValue(it.quantity) }
+                .onFailure { _errorHandler.postValue(EventState(LOAD_ERROR)) }
         }
     }
 

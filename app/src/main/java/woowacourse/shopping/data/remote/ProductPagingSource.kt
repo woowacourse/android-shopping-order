@@ -9,21 +9,27 @@ class ProductPagingSource(
     var offset: Int = 0
     val pageSize: Int = 20
 
-    fun load(offsetInput: Int = offset): LoadResult<List<CartProduct>> {
-        val response = remoteDataSource.getProducts(page = offset, size = pageSize)
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body == null) {
-                return LoadResult.Error("")
+    fun load(
+        offsetInput: Int = offset,
+        callback: (LoadResult<List<CartProduct>>) -> Unit,
+    ) {
+        remoteDataSource.getProducts(page = offset, size = pageSize) {
+            if (it.isSuccess) {
+                val body = it.getOrNull()
+                if (body == null) {
+                    callback(LoadResult.Error(""))
+                } else {
+                    offset++
+                    callback(
+                        LoadResult.Page(
+                            offset = offsetInput,
+                            data = body.content.map { it.toDomain() },
+                        )
+                    )
+                }
             } else {
-                offset++
-                LoadResult.Page(
-                    offset = offsetInput,
-                    data = body.content.map { it.toDomain() },
-                )
+                callback(LoadResult.Error(""))
             }
-        } else {
-            LoadResult.Error("")
         }
     }
 }

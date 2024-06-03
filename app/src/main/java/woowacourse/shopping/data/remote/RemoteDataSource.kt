@@ -15,18 +15,20 @@ interface RemoteDataSource {
         category: String? = null,
         page: Int = 0,
         size: Int = 20,
-    ): Response<ProductResponse>
+        callback: (Result<ProductResponse>) -> Unit
+    )
 
     fun addProduct(productRequest: ProductRequest): Response<Unit>
 
     fun getProductById(id: Int): Response<Product>
 
-    fun deleteProducyById(id: Int): Response<Unit>
+    fun deleteProductById(id: Int): Response<Unit>
 
     fun getCartItems(
         page: Int = 0,
         size: Int = 20,
-    ): Response<CartResponse>
+        callback: (Result<CartResponse>) -> Unit,
+    )
 
     fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit>
 
@@ -36,8 +38,7 @@ interface RemoteDataSource {
         id: Int,
         quantityRequest: QuantityRequest,
     ): Response<Unit>
-
-    fun getCartItemsCounts(): Response<QuantityResponse>
+    fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit)
 
     fun postOrders(orderRequest: OrderRequest): Response<Unit>
 }

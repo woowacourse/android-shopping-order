@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.remote
 
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
@@ -22,8 +24,25 @@ class RetrofitDataSource(
         category: String?,
         page: Int,
         size: Int,
-    ): Response<ProductResponse> {
-        return productApi.getProducts(category = category, page = page, size = size).execute()
+        callback: (Result<ProductResponse>) -> Unit
+    ) {
+        productApi.getProducts(category = category, page = page, size = size)
+            .enqueue(object : Callback<ProductResponse> {
+                override fun onResponse(
+                    call: Call<ProductResponse>,
+                    response: Response<ProductResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { callback(Result.success(it)) }
+                    } else {
+                        callback(Result.failure(Exception("Error: ${response.code()}")))
+                    }
+                }
+
+                override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                    callback(Result.failure(t))
+                }
+            })
     }
 
     override fun addProduct(productRequest: ProductRequest): Response<Unit> {
@@ -34,15 +53,28 @@ class RetrofitDataSource(
         return productApi.getProductById(id = id).execute()
     }
 
-    override fun deleteProducyById(id: Int): Response<Unit> {
+    override fun deleteProductById(id: Int): Response<Unit> {
         return productApi.deleteProductById(id = id).execute()
     }
 
     override fun getCartItems(
         page: Int,
         size: Int,
-    ): Response<CartResponse> {
-        return cartItemApi.getCartItems(page = page, size = size).execute()
+        callback: (Result<CartResponse>) -> Unit,
+    ) {
+        cartItemApi.getCartItems(page = page, size = size).enqueue(object : Callback<CartResponse> {
+            override fun onResponse(call: Call<CartResponse>, response: Response<CartResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { callback(Result.success(it)) }
+                } else {
+                    callback(Result.failure(Exception("Error: ${response.code()}")))
+                }
+            }
+
+            override fun onFailure(call: Call<CartResponse>, t: Throwable) {
+                callback(Result.failure(t))
+            }
+        })
     }
 
     override fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit> {
@@ -60,8 +92,23 @@ class RetrofitDataSource(
         return cartItemApi.patchCartItem(id = id, quantityRequest = quantityRequest).execute()
     }
 
-    override fun getCartItemsCounts(): Response<QuantityResponse> {
-        return cartItemApi.getCartItemsCounts().execute()
+    override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
+        cartItemApi.getCartItemsCounts().enqueue(object : Callback<QuantityResponse> {
+            override fun onResponse(
+                call: Call<QuantityResponse>,
+                response: Response<QuantityResponse>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { callback(Result.success(it)) }
+                } else {
+                    callback(Result.failure(Exception("Error: ${response.code()}")))
+                }
+            }
+
+            override fun onFailure(call: Call<QuantityResponse>, t: Throwable) {
+                callback(Result.failure(t))
+            }
+        })
     }
 
     override fun postOrders(orderRequest: OrderRequest): Response<Unit> {

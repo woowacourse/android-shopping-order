@@ -10,6 +10,7 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -34,24 +35,24 @@ class RepositoryImpl(
         category: String,
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?> =
-        runCatching {
-            val response = remoteDataSource.getProducts(category, page, size)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.content?.map { it.toDomain() })
-            }
-            return Result.failure(Throwable())
+        callback: (Result<List<CartProduct>?>) -> Unit
+    ) {
+        remoteDataSource.getProducts(category, page, size) { result ->
+            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
+                .onFailure { callback(Result.failure(it)) }
         }
+    }
 
-    override fun getProductsByPaging(): Result<List<CartProduct>?> {
-        val data = productPagingSource.load()
-        return when (data) {
-            is LoadResult.Page -> {
-                Result.success(data.data)
-            }
+    override fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit) {
+        productPagingSource.load { result ->
+            when (result) {
+                is LoadResult.Page -> {
+                    callback(Result.success(result.data))
+                }
 
-            is LoadResult.Error -> {
-                Result.failure(Throwable(data.message))
+                is LoadResult.Error -> {
+                    callback(Result.failure(Throwable(result.message)))
+                }
             }
         }
     }
@@ -59,14 +60,13 @@ class RepositoryImpl(
     override fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?> =
-        runCatching {
-            val response = remoteDataSource.getCartItems(page, size)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.content?.map { it.toDomain() })
-            }
-            return Result.failure(Throwable())
+        callback: (Result<List<CartProduct>?>) -> Unit
+    ) {
+        remoteDataSource.getCartItems { result ->
+            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
+                .onFailure { callback(Result.failure(it)) }
         }
+    }
 
     override fun getProductById(id: Int): Result<CartProduct?> =
         runCatching {
@@ -166,47 +166,44 @@ class RepositoryImpl(
             localDataSource.getMaxCartCount()
         }
 
-    override fun getCartItemsCounts(): Result<Int> =
-        runCatching {
-            val response = remoteDataSource.getCartItemsCounts()
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.quantity ?: 0)
-            }
-            return Result.failure(Throwable())
-        }
 
-    override fun getCuration(): Result<List<CartProduct>> {
+    override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
+        remoteDataSource.getCartItemsCounts { result ->
+            callback(result)
+        }
+    }
+
+    override fun getCuration(callback: (Result<List<CartProduct>>) -> Unit) {
         localDataSource.findOne()?.toDomain()?.let {
-            val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
-            val cartResponse = remoteDataSource.getCartItems(0, 1000)
+            remoteDataSource.getProducts(it.category, 0, 10) { productResult ->
+                productResult.onSuccess { products ->
+                    remoteDataSource.getCartItems(0, 1000) { cartResult ->
+                        cartResult.onSuccess { cartItems ->
+                            val cartProductIds = cartItems.content.map { it.product.id }.toSet()
 
-            if (productResponse.isSuccessful && cartResponse.isSuccessful) {
-                val products = productResponse.body()?.content ?: emptyList()
-                val cartItems = cartResponse.body()?.content ?: emptyList()
+                            val filteredProducts =
+                                products.content.filter { product -> product.id !in cartProductIds }
 
-                val cartProductIds = cartItems.map { it.product.id }.toSet()
+                            val cartProducts =
+                                filteredProducts.map { product ->
+                                    val cart =
+                                        cartItems.content.find { it.product.id == product.id }
 
-                val filteredProducts = products.filter { product -> product.id !in cartProductIds }
-
-                val cartProducts =
-                    filteredProducts.map { product ->
-                        val cart = cartItems.find { it.product.id == product.id }
-
-                        CartProduct(
-                            productId = product.id.toLong(),
-                            name = product.name,
-                            imgUrl = product.imageUrl,
-                            price = product.price.toLong(),
-                            category = product.category,
-                            cartId = cart?.id?.toLong() ?: 0,
-                            quantity = cart?.quantity ?: 0,
-                        )
+                                    CartProduct(
+                                        productId = product.id.toLong(),
+                                        name = product.name,
+                                        imgUrl = product.imageUrl,
+                                        price = product.price.toLong(),
+                                        category = product.category,
+                                        cartId = cart?.id?.toLong() ?: 0,
+                                        quantity = cart?.quantity ?: 0,
+                                    )
+                                }
+                            callback(Result.success(cartProducts))
+                        }
                     }
-                return Result.success(cartProducts)
-            } else {
-                return Result.failure(Throwable())
+                }
             }
         }
-        return Result.failure(Throwable())
     }
 }

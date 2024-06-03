@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,8 +36,8 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     val isAllChecked: LiveData<Boolean> get() = _isAllChecked
 
     fun findCartByOffset() {
-        thread {
-            repository.getCartItems(offSet, 1000).onSuccess {
+        repository.getCartItems(offSet, 1000) { result ->
+            result.onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
                 } else {
@@ -156,7 +155,6 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     override fun onPlus(cartProduct: CartProduct) {
         thread {
-            Log.d("PlusClick", "PPPP")
             val cartProducts =
                 (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index =

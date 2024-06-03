@@ -3,6 +3,7 @@ package woowacourse.shopping.domain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface Repository {
     fun findProductByPaging(
@@ -14,14 +15,18 @@ interface Repository {
         category: String,
         page: Int = 0,
         size: Int = 20,
-    ): Result<List<CartProduct>?>
+        callback: (Result<List<CartProduct>?>) -> Unit,
+    )
 
-    fun getProductsByPaging(): Result<List<CartProduct>?>
+
+    fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit)
+
 
     fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?>
+        callback: (Result<List<CartProduct>?>) -> Unit,
+    )
 
     fun getProductById(id: Int): Result<CartProduct?>
 
@@ -57,7 +62,9 @@ interface Repository {
 
     fun getMaxCartCount(): Result<Int>
 
-    fun getCartItemsCounts(): Result<Int>
 
-    fun getCuration(): Result<List<CartProduct>>
+    fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit)
+
+
+    fun getCuration(callback: (Result<List<CartProduct>>) -> Unit)
 }

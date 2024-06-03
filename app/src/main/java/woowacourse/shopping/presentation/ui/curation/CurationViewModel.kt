@@ -27,10 +27,12 @@ class CurationViewModel(
 
     init {
         thread {
-            repository.getCuration().onSuccess {
-                _cartProducts.postValue(UiState.Success(it))
-            }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
+            repository.getCuration { result ->
+                if (result.isSuccess) {
+                    _cartProducts.postValue(UiState.Success(result.getOrNull() ?: emptyList()))
+                } else {
+                    _errorHandler.postValue(EventState(LOAD_ERROR))
+                }
             }
         }
     }
