@@ -14,13 +14,13 @@ class ProductMockWebServer : ProductServerApi {
 
     override fun start() {
         mockWebServer.dispatcher = ProductMockWebServerDispatcher
-        mockWebServer.start(12345)
+        mockWebServer.start(ProductMockWebServerPath.BASE_PORT)
     }
 
     override fun find(id: Long): Product {
         val request =
             Request.Builder()
-                .url("http://localhost:12345/products/find/%d".format(id))
+                .url(ProductMockWebServerPath.FIND_PRODUCT_URL.format(id))
                 .build()
         val response = client.newCall(request).execute()
         val responseBody = response.body?.string()
@@ -30,7 +30,7 @@ class ProductMockWebServer : ProductServerApi {
     override fun findAll(): List<Product> {
         val request =
             Request.Builder()
-                .url("http://localhost:12345/products")
+                .url(ProductMockWebServerPath.FIND_PRODUCTS_URL)
                 .build()
         val response = client.newCall(request).execute()
         val responseBody = response.body?.string()
@@ -40,7 +40,7 @@ class ProductMockWebServer : ProductServerApi {
     override fun getProducts(): List<Product> {
         val request =
             Request.Builder()
-                .url("http://localhost:12345/products/paging")
+                .url(ProductMockWebServerPath.FIND_PRODUCT_PAGE_URL)
                 .build()
 
         val response = client.newCall(request).execute()
