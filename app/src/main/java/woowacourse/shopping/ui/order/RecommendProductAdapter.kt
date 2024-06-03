@@ -6,8 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderProductBinding
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.ui.OnItemQuantityChangeListener
 
-class RecommendProductAdapter : RecyclerView.Adapter<RecommendProductViewHolder>() {
+class RecommendProductAdapter(
+    private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
+) : RecyclerView.Adapter<RecommendProductViewHolder>() {
     private val recommendProducts = mutableListOf<Product>()
 
     override fun onCreateViewHolder(
@@ -16,7 +19,7 @@ class RecommendProductAdapter : RecyclerView.Adapter<RecommendProductViewHolder>
     ): RecommendProductViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = HolderProductBinding.inflate(inflater, parent, false)
-        return RecommendProductViewHolder(binding)
+        return RecommendProductViewHolder(binding, onItemQuantityChangeListener)
     }
 
     override fun getItemCount(): Int {
