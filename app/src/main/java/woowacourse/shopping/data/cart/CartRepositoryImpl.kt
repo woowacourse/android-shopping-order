@@ -63,7 +63,7 @@ class CartRepositoryImpl(
             )
         val cartId = cartDetailData.cartId
         return cartDataSource.updateCartCount(cartId, count).onSuccess {
-            cartProductMapByProductId[productId] = cartDetailData.copy(count = count)
+            cartProductMapByProductId[productId] = cartDetailData.updateCountWith(count)
         }
     }
 

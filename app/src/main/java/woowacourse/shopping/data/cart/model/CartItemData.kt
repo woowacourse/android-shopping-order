@@ -6,4 +6,6 @@ data class CartItemData(
     val cartId: Long,
     val count: Int,
     val product: Product,
-)
+) {
+    fun updateCountWith(newCount: Int) = copy(count = newCount)
+}
