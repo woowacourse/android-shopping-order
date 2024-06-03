@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.order
 
 import android.content.Context
 import android.content.Intent
@@ -17,14 +17,14 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.view.cart.viewmodel.CartViewModel
-import woowacourse.shopping.view.cart.viewmodel.CartViewModelFactory
+import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.view.order.viewmodel.OrderViewModel
+import woowacourse.shopping.view.order.viewmodel.OrderViewModelFactory
 
-class CartActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityCartBinding
-    private val viewModel: CartViewModel by viewModels {
-        CartViewModelFactory(
+class OrderActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityOrderBinding
+    private val viewModel: OrderViewModel by viewModels {
+        OrderViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderRepository = OrderRepositoryImpl(remoteOrderDataSource),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
@@ -36,7 +36,7 @@ class CartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCartBinding.inflate(layoutInflater)
+        binding = ActivityOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
@@ -93,7 +93,7 @@ class CartActivity : AppCompatActivity() {
         private const val ORDER_COMPLETED_MESSAGE = "상품 주문이 완료되었습니다!"
 
         fun createIntent(context: Context): Intent {
-            return Intent(context, CartActivity::class.java)
+            return Intent(context, OrderActivity::class.java)
         }
     }
 }

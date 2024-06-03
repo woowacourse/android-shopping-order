@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.viewmodel.CartViewModel" />
+            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +18,7 @@
             android:id="@+id/tv_recommend_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="16dp"
             android:layout_marginBottom="4dp"
             android:text="이런 상품은 어떠세요?"
             android:textColor="@color/black"
@@ -46,7 +46,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_product" />
+            tools:listitem="@layout/item_recommend" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

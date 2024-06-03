@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.viewmodel
+package woowacourse.shopping.view.order.viewmodel
 
 import android.os.Handler
 import android.os.Looper
@@ -11,23 +11,25 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
-import woowacourse.shopping.view.cart.listener.CartClickListener
-import woowacourse.shopping.view.cart.listener.CartItemClickListener
-import woowacourse.shopping.view.cart.listener.RecommendClickListener
 import woowacourse.shopping.view.event.Event
-import woowacourse.shopping.view.home.adapter.product.HomeViewItem
+import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
+import woowacourse.shopping.view.home.viewmodel.HomeViewModel.Companion.ASCENDING_SORT_ORDER
+import woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.order.listener.CartItemClickListener
+import woowacourse.shopping.view.order.listener.OrderClickListener
+import woowacourse.shopping.view.order.listener.RecommendClickListener
 import woowacourse.shopping.view.state.OrderState
 import woowacourse.shopping.view.state.UiState
+import kotlin.math.min
 
-class CartViewModel(
+class OrderViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel(),
     CartItemClickListener,
-    CartClickListener,
+    OrderClickListener,
     RecommendClickListener {
     private val _cartUiState =
         MutableLiveData<UiState<List<CartViewItem>>>(UiState.Loading)
@@ -51,8 +53,8 @@ class CartViewModel(
             }
 
     private val _recommendUiState =
-        MutableLiveData<UiState<List<HomeViewItem.ProductViewItem>>>(UiState.Loading)
-    val recommendUiState: LiveData<UiState<List<HomeViewItem.ProductViewItem>>>
+        MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
+    val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
         get() = _recommendUiState
 
     private val selectedCartViewItems = MutableLiveData<List<CartViewItem>>(mutableListOf())
@@ -64,10 +66,6 @@ class CartViewModel(
                     selectedCartViewItem.cartItem.quantity
                 }
             }
-
-    private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
-    val orderState: LiveData<OrderState>
-        get() = _orderState
 
     val allCheckBoxChecked: LiveData<Boolean>
         get() =
@@ -107,10 +105,40 @@ class CartViewModel(
     val notifyOrderCompleted: LiveData<Event<Boolean>>
         get() = _notifyOrderCompleted
 
+    private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
+    val orderState: LiveData<OrderState>
+        get() = _orderState
+
     init {
         Handler(Looper.getMainLooper()).postDelayed({
             loadCartViewItems()
         }, 1000)
+    }
+
+    fun generateRecommendProductViewItems() {
+        runCatching {
+            val mostRecentProduct = recentProductRepository.findMostRecentProduct()
+            productRepository.getProductResponse(
+                mostRecentProduct?.category,
+                0,
+                Int.MAX_VALUE,
+                ASCENDING_SORT_ORDER,
+            )
+        }.onSuccess { productResponse ->
+            val selectedProducts =
+                selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
+                    ?: return@onSuccess
+            var sameCategoryProducts = productResponse.getOrNull()?.products ?: return@onSuccess
+            sameCategoryProducts =
+                sameCategoryProducts.filter { sameCategoryProduct ->
+                    !selectedProducts.contains(sameCategoryProduct)
+                }.shuffled()
+
+            val numberOfRecommend = min(DEFAULT_NUMBER_OF_RECOMMEND, sameCategoryProducts.size)
+            val recommendProductViewItems =
+                sameCategoryProducts.subList(0, numberOfRecommend).map(::ProductViewItem)
+            _recommendUiState.value = UiState.Success(recommendProductViewItems)
+        }
     }
 
     private fun loadCartViewItems() {
@@ -153,7 +181,7 @@ class CartViewModel(
         val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
         newCartViewItems[position] = updatedCartItem
         cartViewItems.value = newCartViewItems
-        selectedCartViewItems.value = selectedCartViewItems.value // Trigger LiveData update
+        selectedCartViewItems.value = selectedCartViewItems.value
         _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
     }
 
@@ -213,6 +241,22 @@ class CartViewModel(
             }
 
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+
+            val recommendState = recommendUiState.value
+            if (recommendState is UiState.Success) {
+                val recommendProductViewItems = recommendState.data
+                val recommendPosition =
+                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
+                        recommendProductViewItem.product.productId == updatedCartItem.cartItem.product.productId
+                    }
+                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
+                newRecommendProductViewItems[recommendPosition] =
+                    ProductViewItem(
+                        updatedCartItem.cartItem.product,
+                        updatedCartItem.cartItem.quantity,
+                    )
+                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+            }
         }
     }
 
@@ -244,6 +288,22 @@ class CartViewModel(
             }
 
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+
+            val recommendState = recommendUiState.value
+            if (recommendState is UiState.Success) {
+                val recommendProductViewItems = recommendState.data
+                val recommendPosition =
+                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
+                        recommendProductViewItem.product.productId == updatedCartItem.cartItem.product.productId
+                    }
+                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
+                newRecommendProductViewItems[recommendPosition] =
+                    ProductViewItem(
+                        updatedCartItem.cartItem.product,
+                        updatedCartItem.cartItem.quantity,
+                    )
+                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+            }
         }
     }
 
@@ -294,10 +354,49 @@ class CartViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        cartRepository.addCartItem(product.productId, 1).getOrNull()
+        runCatching {
+            val cartTotalQuantity =
+                cartRepository.getCartTotalQuantity().getOrNull()?.quantity?.plus(1) ?: 0
+            cartRepository.addCartItem(product.productId, 1)
+            cartRepository.getCartResponse(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
+        }.onSuccess { cartResponse ->
+            cartViewItems.value = cartResponse.getOrNull()?.cartItems?.map(::CartViewItem)
+            val updatedCartItem = getCartViewItemByProductId(product.productId) ?: return
+            val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
+            val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+            newCartViewItems[position] = updatedCartItem
+            cartViewItems.value = newCartViewItems
+
+            val selectedPosition =
+                selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
+                    selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
+                } ?: return
+            val newSelectedCatViewItems =
+                selectedCartViewItems.value?.toMutableList() ?: return
+            if (selectedPosition != -1) {
+                newSelectedCatViewItems[selectedPosition] = updatedCartItem
+            } else {
+                newSelectedCatViewItems.add(updatedCartItem)
+            }
+            selectedCartViewItems.value = newSelectedCatViewItems
+            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+
+            val recommendState = recommendUiState.value
+            if (recommendState is UiState.Success) {
+                val recommendProductViewItems = recommendState.data
+                val recommendPosition =
+                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
+                        recommendProductViewItem.product.productId == product.productId
+                    }
+                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
+                newRecommendProductViewItems[recommendPosition] = ProductViewItem(product, 1)
+                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+            }
+        }
     }
 
     companion object {
         const val DESCENDING_SORT_ORDER = "desc"
+        const val DEFAULT_NUMBER_OF_RECOMMEND = 10
     }
 }

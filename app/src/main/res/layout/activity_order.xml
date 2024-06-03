@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.viewmodel.CartViewModel" />
+            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,7 +51,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_cart"
-            android:name="woowacourse.shopping.view.cart.CartFragment"
+            android:name="woowacourse.shopping.view.order.CartFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"

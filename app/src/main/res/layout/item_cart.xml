@@ -7,11 +7,11 @@
 
         <variable
             name="cartViewItem"
-            type="woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem" />
+            type="woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartViewItem" />
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.viewmodel.CartViewModel" />
+            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

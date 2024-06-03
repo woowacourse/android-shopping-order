@@ -1,14 +1,14 @@
-package woowacourse.shopping.view.cart.adapter
+package woowacourse.shopping.view.order.adapter.cart
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.view.cart.viewmodel.CartViewModel
+import woowacourse.shopping.view.order.viewmodel.OrderViewModel
 
 class CartViewHolder(private val binding: ItemCartBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
         cartViewItem: ShoppingCartViewItem.CartViewItem,
-        viewModel: CartViewModel,
+        viewModel: OrderViewModel,
     ) {
         binding.cartViewItem = cartViewItem
         binding.viewModel = viewModel

@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.listener
+package woowacourse.shopping.view.order.listener
 
 import woowacourse.shopping.view.home.listener.QuantityClickListener
 

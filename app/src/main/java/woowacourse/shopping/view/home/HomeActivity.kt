@@ -13,7 +13,6 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
-import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
@@ -21,6 +20,7 @@ import woowacourse.shopping.view.home.adapter.product.ProductAdapter
 import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
 import woowacourse.shopping.view.home.viewmodel.HomeViewModel
 import woowacourse.shopping.view.home.viewmodel.HomeViewModelFactory
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.state.UiState
 
 class HomeActivity : AppCompatActivity() {
@@ -113,6 +113,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun navigateToCart() {
-        startActivity(CartActivity.createIntent(this))
+        startActivity(OrderActivity.createIntent(this))
     }
 }

@@ -1,6 +1,6 @@
-package woowacourse.shopping.view.cart.listener
+package woowacourse.shopping.view.order.listener
 
-interface CartClickListener {
+interface OrderClickListener {
     fun onBackButtonClick()
 
     fun onAllCheckBoxClick()

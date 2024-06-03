@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.order
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,16 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.view.cart.adapter.CartAdapter
-import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
-import woowacourse.shopping.view.cart.viewmodel.CartViewModel
 import woowacourse.shopping.view.detail.DetailActivity
+import woowacourse.shopping.view.order.adapter.cart.CartAdapter
+import woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.order.viewmodel.OrderViewModel
 import woowacourse.shopping.view.state.UiState
 
 class CartFragment : Fragment() {
     private lateinit var binding: FragmentCartBinding
     private lateinit var adapter: CartAdapter
-    private val viewModel by activityViewModels<CartViewModel>()
+    private val viewModel by activityViewModels<OrderViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,

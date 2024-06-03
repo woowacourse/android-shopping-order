@@ -19,6 +19,6 @@ data class CartItem(
     }
 
     companion object {
-        const val DEFAULT_QUANTITY = 1
+        const val DEFAULT_QUANTITY = 0
     }
 }

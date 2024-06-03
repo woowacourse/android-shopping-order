@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.adapter
+package woowacourse.shopping.view.order.adapter.cart
 
 import woowacourse.shopping.data.model.CartItem
 

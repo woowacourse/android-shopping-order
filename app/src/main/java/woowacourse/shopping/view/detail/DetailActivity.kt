@@ -14,9 +14,9 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.view.detail.viewmodel.DetailViewModelFactory
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.state.UiState
 
 class DetailActivity : AppCompatActivity() {
@@ -93,7 +93,7 @@ class DetailActivity : AppCompatActivity() {
 
     private fun putCartItem() {
         Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
-        startActivity(CartActivity.createIntent(context = this))
+        startActivity(OrderActivity.createIntent(context = this))
     }
 
     private fun navigateToDetail() {

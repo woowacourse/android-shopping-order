@@ -7,10 +7,10 @@ import woowacourse.shopping.view.home.viewmodel.HomeViewModel
 class ProductViewHolder(private val binding: ItemProductBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
-        productItem: HomeViewItem.ProductViewItem,
+        productViewItem: HomeViewItem.ProductViewItem,
         viewModel: HomeViewModel,
     ) {
-        binding.productItem = productItem
+        binding.productViewItem = productViewItem
         binding.viewModel = viewModel
     }
 }

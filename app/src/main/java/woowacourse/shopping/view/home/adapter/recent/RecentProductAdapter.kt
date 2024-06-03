@@ -33,8 +33,7 @@ class RecentProductAdapter(private val viewModel: HomeViewModel) :
         holder: RecentProductViewHolder,
         position: Int,
     ) {
-        val recentViewedProduct = currentList[position]
-        return holder.bind(recentViewedProduct, viewModel)
+        return holder.bind(currentList[position], viewModel)
     }
 
     companion object {

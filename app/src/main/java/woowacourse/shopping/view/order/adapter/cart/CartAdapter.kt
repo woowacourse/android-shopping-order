@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.adapter
+package woowacourse.shopping.view.order.adapter.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
-import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
-import woowacourse.shopping.view.cart.viewmodel.CartViewModel
-import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
+import woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartPlaceHolderViewItem
+import woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.order.viewmodel.OrderViewModel
 
-class RecommendAdapter(
-    private val viewModel: CartViewModel,
-) : ListAdapter<ProductViewItem, RecyclerView.ViewHolder>(diffUtil) {
+class CartAdapter(
+    private val viewModel: OrderViewModel,
+) : ListAdapter<ShoppingCartViewItem, RecyclerView.ViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.itemAnimator = null
@@ -58,18 +58,34 @@ class RecommendAdapter(
         }
     }
 
+    fun submitCartViewItems(cartItems: List<CartViewItem>) {
+        val list =
+            if (currentList.isEmpty()) {
+                List(5) { CartPlaceHolderViewItem() }
+            } else {
+                cartItems
+            }
+        super.submitList(list)
+    }
+
     companion object {
         val diffUtil =
-            object : DiffUtil.ItemCallback<ProductViewItem>() {
+            object : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
                 override fun areContentsTheSame(
-                    oldItem: ProductViewItem,
-                    newItem: ProductViewItem,
+                    oldItem: ShoppingCartViewItem,
+                    newItem: ShoppingCartViewItem,
                 ) = oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: ProductViewItem,
-                    newItem: ProductViewItem,
-                ) = oldItem.product.productId == newItem.product.productId
+                    oldItem: ShoppingCartViewItem,
+                    newItem: ShoppingCartViewItem,
+                ): Boolean {
+                    return if (oldItem is CartViewItem && newItem is CartViewItem) {
+                        oldItem.cartItem.cartItemId == newItem.cartItem.cartItemId
+                    } else {
+                        oldItem.viewType == newItem.viewType
+                    }
+                }
             }
     }
 }

@@ -9,10 +9,9 @@
             name="productViewItem"
             type="woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem" />
 
-
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
+            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,7 +25,7 @@
             android:layout_width="162dp"
             android:layout_height="162dp"
             android:layout_marginVertical="12dp"
-            android:layout_marginLeft="24dp"
+            android:layout_marginLeft="16dp"
             app:imageUrl="@{productViewItem.product.imageUrl}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

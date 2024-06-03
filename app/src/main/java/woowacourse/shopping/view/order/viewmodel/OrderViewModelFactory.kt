@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.viewmodel
+package woowacourse.shopping.view.order.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,16 +7,16 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class CartViewModelFactory(
+class OrderViewModelFactory(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(OrderViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CartViewModel(
+            return OrderViewModel(
                 cartRepository = cartRepository,
                 orderRepository = orderRepository,
                 recentProductRepository = recentProductRepository,
