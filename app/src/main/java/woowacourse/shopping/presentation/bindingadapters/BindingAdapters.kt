@@ -7,9 +7,9 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
+import woowacourse.shopping.presentation.ui.shopping.adapter.RecentProductAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 
 @BindingAdapter("app:imageUrl")
@@ -23,16 +23,6 @@ fun loadImage(
             .placeholder(R.drawable.ic_launcher_background)
             .error(R.drawable.ic_launcher_background)
             .into(view)
-    }
-}
-
-@BindingAdapter("app:product")
-fun setShoppingItems(
-    recyclerView: RecyclerView,
-    products: List<Product>?,
-) {
-    products?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadData(it)
     }
 }
 
@@ -52,7 +42,7 @@ fun setRecentProductItems(
     recentProducts: List<RecentProduct>?,
 ) {
     recentProducts?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadRecentProductData(it)
+        (recyclerView.adapter as? RecentProductAdapter)?.loadRecentProductData(it)
     }
 }
 
