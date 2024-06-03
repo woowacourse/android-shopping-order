@@ -23,7 +23,7 @@ import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.model.event.ErrorEvent
 import woowacourse.shopping.view.products.OnClickProducts
 
-class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
+class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentRecommendBinding? = null
     val binding: FragmentRecommendBinding get() = _binding!!
@@ -69,7 +69,8 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = recommendViewModel
-        binding.onClickRecommend = this
+        binding.onClickRecommend = recommendViewModel
+        binding.onClickNavigateRecommend = this
         recommendViewModel.loadRecommendData()
         adapter =
             RecommendAdapter(
@@ -123,10 +124,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     override fun clickShoppingCart() {
         val shoppingCartFragment = ShoppingCartFragment()
         mainActivityListener?.changeFragment(shoppingCartFragment)
-    }
-
-    override fun clickOrder() {
-        recommendViewModel.orderItems()
     }
 
     override fun clickBack() {

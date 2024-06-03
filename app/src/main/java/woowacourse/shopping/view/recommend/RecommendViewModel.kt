@@ -28,7 +28,7 @@ class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
-) : BaseViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter, OnClickRecommend {
     private var checkedShoppingCart = ShoppingCart()
 
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
@@ -79,7 +79,7 @@ class RecommendViewModel(
             }
     }
 
-    fun orderItems() {
+    private fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         runCatching {
             orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
@@ -176,5 +176,9 @@ class RecommendViewModel(
 
     override fun clickDecrease(product: Product) {
         updateCarItem(product, UpdateCartItemType.DECREASE)
+    }
+
+    override fun clickOrder() {
+        orderItems()
     }
 }
