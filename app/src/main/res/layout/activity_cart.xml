@@ -110,7 +110,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="@{@string/order_format(viewModel.selectedCartViewItems.size)}"
+                android:text="@{@string/order_format(viewModel.selectedCartViewItemSize)}"
                 android:textColor="@color/white"
                 android:textSize="18dp"
                 android:textStyle="bold"

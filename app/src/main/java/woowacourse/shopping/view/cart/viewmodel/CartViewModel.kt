@@ -92,6 +92,13 @@ class CartViewModel(
     val selectedCartViewItems: LiveData<List<CartViewItem>>
         get() = _selectedCartViewItems
 
+    val selectedCartViewItemSize: LiveData<Int>
+        get() = selectedCartViewItems.map { selectedCartViewItemsValue ->
+            selectedCartViewItemsValue.sumOf { selectedCartViewItem ->
+                selectedCartViewItem.cartItem.quantity
+            }
+        }
+
     init {
         Handler(Looper.getMainLooper()).postDelayed({
             loadCartViewItems()
@@ -159,7 +166,8 @@ class CartViewModel(
                 selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem -> selectedCartViewItem.cartItem.cartItemId == cartItemId }
                     ?: return
             if (selectedPosition != -1) {
-                val newSelectedCatViewItems = _selectedCartViewItems.value?.toMutableList() ?: return
+                val newSelectedCatViewItems =
+                    _selectedCartViewItems.value?.toMutableList() ?: return
                 newSelectedCatViewItems.removeAt(selectedPosition)
                 _selectedCartViewItems.value = newSelectedCatViewItems
             }
