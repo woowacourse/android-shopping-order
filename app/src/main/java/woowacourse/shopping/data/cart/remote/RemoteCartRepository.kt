@@ -40,13 +40,10 @@ object RemoteCartRepository : CartRepository {
             )
     }
 
-    override fun syncFindByProductId(
-        productId: Int,
-        totalItemCount: Int,
-    ): CartItem? {
+    override fun syncFindByProductId(productId: Int): CartItem? {
         var cartItem: CartItem? = null
         thread {
-            val response = retrofitApi.requestCartItems(page = 0, size = totalItemCount).execute()
+            val response = retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT).execute()
             val body = response.body()
             cartItem = body?.toCartItems()?.firstOrNull { productId == it.productId }
         }.join()
@@ -185,15 +182,5 @@ object RemoteCartRepository : CartRepository {
                 }
             },
         )
-    }
-
-    override fun syncGetTotalQuantity(): Int {
-        var cartQuantityCount = 0
-        thread {
-            val response = retrofitApi.requestCartQuantityCount().execute()
-            val body = response.body()?.quantity
-            cartQuantityCount = body ?: 0
-        }.join()
-        return cartQuantityCount
     }
 }

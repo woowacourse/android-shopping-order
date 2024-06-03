@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.fake
 
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity
@@ -16,10 +16,7 @@ class FakeCartRepository(savedCartItemEntities: List<CartItem> = emptyList()) : 
         callback(Result.success(cartItem))
     }
 
-    override fun syncFindByProductId(
-        productId: Int,
-        totalItemCount: Int,
-    ): CartItem? {
+    override fun syncFindByProductId(productId: Int): CartItem? {
         return cart.find { it.productId == productId }
     }
 
@@ -58,9 +55,5 @@ class FakeCartRepository(savedCartItemEntities: List<CartItem> = emptyList()) : 
     override fun getTotalQuantity(callback: (Result<Int>) -> Unit) {
         val totalQuantity = cart.fold(0) { acc, cartItem -> acc + cartItem.quantity.count }
         callback(Result.success(totalQuantity))
-    }
-
-    override fun syncGetTotalQuantity(): Int {
-        return cart.fold(0) { acc, cartItem -> acc + cartItem.quantity.count }
     }
 }

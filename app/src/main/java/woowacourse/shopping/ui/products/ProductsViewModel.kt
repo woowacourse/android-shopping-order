@@ -95,8 +95,7 @@ class ProductsViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        val cartTotalCount = cartRepository.syncGetTotalQuantity()
-        val cartItem = cartRepository.syncFindByProductId(id, cartTotalCount)
+        val cartItem = cartRepository.syncFindByProductId(id)
         return if (cartItem == null) {
             ProductUiModel.from(this@toProductUiModel)
         } else {
@@ -172,8 +171,7 @@ class ProductsViewModel(
     }
 
     private fun updateCartQuantity(productUiModel: ProductUiModel) {
-        val cartTotalCount = cartRepository.syncGetTotalQuantity()
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
+        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId)
 
         if (cartItem == null) {
             addCartItem(productUiModel.productId)

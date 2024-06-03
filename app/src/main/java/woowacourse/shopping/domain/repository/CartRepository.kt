@@ -9,10 +9,7 @@ interface CartRepository {
         callback: (Result<CartItem?>) -> Unit,
     )
 
-    fun syncFindByProductId(
-        productId: Int,
-        totalItemCount: Int,
-    ): CartItem?
+    fun syncFindByProductId(productId: Int): CartItem?
 
     fun findAll(callback: (Result<List<CartItem>>) -> Unit)
 
@@ -34,6 +31,4 @@ interface CartRepository {
     )
 
     fun getTotalQuantity(callback: (Result<Int>) -> Unit)
-
-    fun syncGetTotalQuantity(): Int
 }

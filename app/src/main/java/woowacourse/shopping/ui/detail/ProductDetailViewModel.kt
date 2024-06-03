@@ -64,9 +64,8 @@ class ProductDetailViewModel(
     }
 
     private fun Product.toProductUiModel(): ProductUiModel {
-        val totalQuantityCount = cartRepository.syncGetTotalQuantity()
         val cartItem =
-            cartRepository.syncFindByProductId(id, totalQuantityCount)
+            cartRepository.syncFindByProductId(id)
                 ?: return ProductUiModel.from(this)
         return ProductUiModel.from(this, cartItem.quantity)
     }
@@ -99,8 +98,7 @@ class ProductDetailViewModel(
 
     fun addCartProduct() {
         val productUiModel = _productUiModel.value ?: return
-        val cartTotalCount = cartRepository.syncGetTotalQuantity()
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
+        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId)
 
         val addCartCallback: (Result<Unit>) -> Unit = {
             it.onSuccess {
