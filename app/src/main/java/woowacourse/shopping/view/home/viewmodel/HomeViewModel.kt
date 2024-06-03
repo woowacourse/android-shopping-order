@@ -12,9 +12,9 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.listener.QuantityClickListener
 import woowacourse.shopping.view.cart.viewmodel.CartViewModel.Companion.DESCENDING_SORT_ORDER
+import woowacourse.shopping.view.event.Event
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.listener.HomeClickListener
 import woowacourse.shopping.view.home.listener.ProductClickListener

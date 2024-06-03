@@ -15,17 +15,20 @@ class RetrofitClient {
 
         private val client =
             OkHttpClient.Builder()
-                .addInterceptor(BasicAuthInterceptor(username = "dpcks0509", password = "password"))
+                .addInterceptor(
+                    BasicAuthInterceptor(
+                        username = BuildConfig.USERNAME,
+                        password = BuildConfig.PASSWORD
+                    )
+                )
                 .addInterceptor(logging)
                 .build()
 
         fun getInstance(): Retrofit {
-            val retrofit =
-                Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(client)
-                    .build()
-            return retrofit
+            return  Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build()
         }
     }
 }

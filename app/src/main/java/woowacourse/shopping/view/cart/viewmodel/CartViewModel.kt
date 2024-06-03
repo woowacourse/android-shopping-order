@@ -11,12 +11,12 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.view.cart.listener.CartClickListener
 import woowacourse.shopping.view.cart.listener.CartItemClickListener
 import woowacourse.shopping.view.cart.listener.QuantityClickListener
 import woowacourse.shopping.view.cart.listener.RecommendClickListener
+import woowacourse.shopping.view.event.Event
 import woowacourse.shopping.view.home.adapter.product.HomeViewItem
 import woowacourse.shopping.view.state.UiState
 
@@ -158,9 +158,12 @@ class CartViewModel(
             val selectedPosition =
                 selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem -> selectedCartViewItem.cartItem.cartItemId == cartItemId }
                     ?: return
-            val newSelectedCatViewItems = _selectedCartViewItems.value?.toMutableList() ?: return
-            newSelectedCatViewItems.removeAt(selectedPosition)
-            _selectedCartViewItems.value = newSelectedCatViewItems
+            if (selectedPosition != -1) {
+                val newSelectedCatViewItems = _selectedCartViewItems.value?.toMutableList() ?: return
+                newSelectedCatViewItems.removeAt(selectedPosition)
+                _selectedCartViewItems.value = newSelectedCatViewItems
+            }
+
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
             _notifyDeletion.value = Event(true)
         }
