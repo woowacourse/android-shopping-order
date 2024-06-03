@@ -94,7 +94,7 @@ class ProductDetailViewModel(
             state.cart?.let { cart ->
 
                 thread {
-                    if (cart.id == Cart.DEFAULT_CART_ID) {
+                    if (cart.id == Cart.EMPTY_CART_ID) {
                         insertCart(cart)
                     } else {
                         updateCart(cart)
