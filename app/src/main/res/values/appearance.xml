@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="H1">
+    <style name="Header_24sp">
         <item name="android:fontFamily">@font/roboto_bold</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">24sp</item>
@@ -10,7 +10,7 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="H2">
+    <style name="Header_22sp">
         <item name="android:fontFamily">@font/roboto_bold</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">22dp</item>
@@ -19,14 +19,14 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="B1">
+    <style name="Body_18sp">
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="B2">
+    <style name="Body_16sp">
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">16sp</item>

@@ -42,7 +42,7 @@
                     android:layout_marginStart="18dp"
                     android:layout_marginTop="16dp"
                     android:text="@{vm.uiState.cartProduct.product.name}"
-                    android:theme="@style/H1"
+                    android:theme="@style/Header_24sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/iv_product"
@@ -64,7 +64,7 @@
                     android:layout_marginTop="33dp"
                     android:text="@{@string/price_format(vm.uiState.cartProduct.totalPrice)}"
                     android:textSize="20sp"
-                    android:theme="@style/B2"
+                    android:theme="@style/Body_16sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_product_title"
                     tools:text="2,000원" />
@@ -106,7 +106,7 @@
                         android:text="@string/recent_product_title"
                         android:textColor="@color/mint"
                         android:textSize="12sp"
-                        android:theme="@style/B1" />
+                        android:theme="@style/Body_18sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
             android:text="@string/btn_product_cart"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:theme="@style/B1"
+            android:theme="@style/Body_18sp"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

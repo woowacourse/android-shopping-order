@@ -18,7 +18,7 @@
             android:layout_marginStart="20dp"
             android:paddingBottom="8dp"
             android:text="@string/recent_product_header"
-            android:theme="@style/H1"
+            android:theme="@style/Header_24sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

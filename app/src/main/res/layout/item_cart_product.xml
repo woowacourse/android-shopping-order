@@ -47,7 +47,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@{cartProduct.product.name}"
-                android:theme="@style/H2"
+                android:theme="@style/Header_22sp"
                 android:layout_marginStart="4dp"
                 app:layout_constraintEnd_toStartOf="@id/iv_shooping_cart_delete"
                 app:layout_constraintStart_toEndOf="@id/cb_product"
@@ -91,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{@string/price_format(cartProduct.totalPrice)}"
-                android:theme="@style/B2"
+                android:theme="@style/Body_16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="30_000원" />

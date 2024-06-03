@@ -21,7 +21,7 @@
             android:text="@string/load_more_products"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:theme="@style/H1" />
+            android:theme="@style/Header_24sp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
