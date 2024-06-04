@@ -11,19 +11,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
-import woowacourse.shopping.presentation.ui.detail.DetailViewModel
-import woowacourse.shopping.presentation.ui.detail.DetailViewModelFactory
 
 @RunWith(AndroidJUnit4::class)
 class DetailActivityTest {
-    private val mockViewModel: DetailViewModel = mock(DetailViewModel::class.java)
-    private val mockViewModelFactory: DetailViewModelFactory =
-        mock(DetailViewModelFactory::class.java).apply {
-            `when`(create(DetailViewModel::class.java)).thenReturn(mockViewModel)
-        }
+    // private val mockViewModel: DetailViewModel = mock(DetailViewModel::class.java)
+
+//    @InjectMocks private val mockViewModelFactory: DetailViewModelFactory =
+//        mock(DetailViewModelFactory::class.java).apply {
+//            `when`(create(DetailViewModel::class.java)).thenReturn(mockViewModel)
+//        }
 
     private val intent =
         DetailActivity.createIntent(
