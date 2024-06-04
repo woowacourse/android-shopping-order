@@ -9,9 +9,9 @@ import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
-import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.fragment.CartListFragment
 import woowacourse.shopping.presentation.ui.cart.fragment.RecommendFragment
+import woowacourse.shopping.presentation.ui.model.UpdatedProductData
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
 
@@ -25,20 +25,21 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     override fun initStartView(savedInstanceState: Bundle?) {
-        val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
-        if (savedInstanceState == null) {
-            viewModel.loadAllCartItems(initialItemQuantity)
-        }
         binding.cartHandler = viewModel
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
+
         initActionBarTitle()
-        observeChangedCartProducts()
         observeOrderEvent()
         supportFragmentManager.beginTransaction().replace(
             R.id.fragment_container,
             CartListFragment(),
         ).commit()
+    }
+
+    private fun initActionBarTitle() {
+        title = getString(R.string.cart_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeOrderEvent() {
@@ -47,7 +48,10 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             EventObserver {
                 when (it) {
                     OrderEvent.CompleteOrder -> {
-                        viewModel.completeOrder()
+                        showToast("상품이 성공적으로 주문되었습니다!")
+                        val updatedProducts = generateUpdateProducts()
+                        ShoppingActivity.startWithNewProductQuantities(this, updatedProducts)
+                        finish()
                     }
 
                     OrderEvent.MoveToRecommend -> {
@@ -56,48 +60,28 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                             RecommendFragment(),
                         ).addToBackStack(null).commit()
                     }
-
-                    OrderEvent.FinishOrder -> {
-                        showToast("상품 주문 성공")
-                        finish()
-                    }
                 }
             },
         )
     }
 
-    private fun observeChangedCartProducts() {
-        viewModel.changedCartProducts.observe(this) { carts ->
-            carts?.let {
-                Intent(applicationContext, ShoppingActivity::class.java).apply {
-                    putExtra(
-                        EXTRA_CHANGED_PRODUCT_IDS,
-                        it.map { it.product.id }.toLongArray(),
-                    )
-                    putExtra(
-                        EXTRA_NEW_PRODUCT_QUANTITIES,
-                        it.map { it.quantity }.toIntArray(),
-                    )
-                    setResult(RESULT_OK, this)
-                }
-            }
-        }
-    }
-
-    private fun initActionBarTitle() {
-        title = getString(R.string.cart_title)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val updatedProducts = generateUpdateProducts()
+        ShoppingActivity.startWithNewProductQuantities(this, updatedProducts)
         finish()
         return true
     }
 
+    private fun generateUpdateProducts(): List<UpdatedProductData> {
+        val updatedProducts =
+            viewModel.changedCartProducts.entries.map { (productId, quantity) ->
+                UpdatedProductData(productId, quantity)
+            }
+        return updatedProducts
+    }
+
     companion object {
         private const val EXTRA_CART_ITEM_QUANTITY = "cartItemQuantity"
-        const val EXTRA_CHANGED_PRODUCT_IDS = "changedProductIds"
-        const val EXTRA_NEW_PRODUCT_QUANTITIES = "newProductQuantities"
 
         fun startWithResultLauncher(
             context: Context,
