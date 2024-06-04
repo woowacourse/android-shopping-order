@@ -11,18 +11,16 @@ import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductListBinding
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.adapter.ProductAdapter
 import woowacourse.shopping.view.products.adapter.RecentlyAdapter
 
-class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter {
+class ProductsListFragment : Fragment(), OnClickProducts {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentProductListBinding? = null
     val binding: FragmentProductListBinding get() = _binding!!
@@ -72,7 +70,7 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
         productAdapter =
             ProductAdapter(
                 onClickProducts = this,
-                onClickCartItemCounter = this,
+                onClickCartItemCounter = productListViewModel,
             )
         productAdapter.setShowSkeleton(true)
         binding.rvProducts.adapter = productAdapter
@@ -182,13 +180,5 @@ class ProductsListFragment : Fragment(), OnClickProducts, OnClickCartItemCounter
 
     private fun loadPagingData() {
         productListViewModel.loadPagingProduct()
-    }
-
-    override fun clickIncrease(product: Product) {
-        productListViewModel.increaseShoppingCart(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        productListViewModel.decreaseShoppingCart(product)
     }
 }
