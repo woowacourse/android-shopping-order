@@ -56,7 +56,7 @@ fun setPrice(
 
 @BindingAdapter("app:visibility")
 fun setLoadMoreBtnVisibility(
-    view: TextView,
+    view: View,
     isVisible: Boolean?,
 ) {
     if (isVisible == true) {

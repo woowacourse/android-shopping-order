@@ -98,17 +98,20 @@ class RemoteCartRepositoryImpl : CartRepository {
 
     override fun sumOfQuantity(): Int {
         var quantity: Int = 0
-        var response: Int = -1
+        var responseCode: Int = -1
 
         threadAction {
-            quantity = service.requestCartItemsCount().execute().body()?.quantity ?: -1
+            val response = service.requestCartItemsCount().execute()
+            responseCode = response.code()
+            quantity = response.body()?.quantity ?: -1
         }
         while (true) {
             Thread.sleep(1000)
-            if (quantity != -1 || response != -1) {
+            if (quantity != -1 || responseCode != -1) {
                 break
             }
         }
+        // if (quantity != -1 || responseCode != -1) throw IllegalStateException("Failed to get quantity")
 
         return quantity
     }
@@ -136,8 +139,6 @@ class RemoteCartRepositoryImpl : CartRepository {
         page: Int,
         pageSize: Int,
     ): ShoppingCart {
-        val offset = page * pageSize
-        val limit = pageSize
         var cartItems: List<CartItem> = emptyList()
         var response: Int = -1
         threadAction {
@@ -146,12 +147,8 @@ class RemoteCartRepositoryImpl : CartRepository {
             } ?: emptyList()
             response = service.requestCartItems(page, pageSize).execute().code()
         }
-        while (true) {
-            Thread.sleep(1000)
-            if (cartItems.isNotEmpty() || response != -1) {
-                break
-            }
-        }
+
+        if (cartItems.isEmpty() && response == -1) throw IllegalStateException("Failed to get cart items")
 
         return ShoppingCart(cartItems)
     }

@@ -11,9 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.database.OrderDatabase
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
-import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
@@ -26,8 +24,6 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     private val viewModel: SelectionViewModel by lazy {
         val viewModelFactory =
             SelectionViewModelFactory(
-                shoppingRepository = RemoteShoppingRepositoryImpl(),
-                recentProductRepository = RecentProductRepositoryImpl(requireContext()),
                 cartRepository = RemoteCartRepositoryImpl(),
             )
         viewModelFactory.create(SelectionViewModel::class.java)
@@ -125,13 +121,11 @@ class SelectionFragment : Fragment(), SelectionClickListener {
 
     private fun showCartData(isLoading: Boolean) {
         if (isLoading) {
+            viewModel.onLoading()
             binding.shimmerCartList.startShimmer()
-            binding.shimmerCartList.visibility = View.VISIBLE
-            binding.recyclerView.visibility = View.GONE
         } else {
+            viewModel.onLoaded()
             binding.shimmerCartList.stopShimmer()
-            binding.shimmerCartList.visibility = View.GONE
-            binding.recyclerView.visibility = View.VISIBLE
         }
     }
 

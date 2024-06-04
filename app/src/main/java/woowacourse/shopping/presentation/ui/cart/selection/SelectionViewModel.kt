@@ -7,14 +7,10 @@ import androidx.lifecycle.switchMap
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
 
 class SelectionViewModel(
-    private val shoppingRepository: ShoppingItemsRepository,
-    private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(),
     SelectionEventHandler,
@@ -23,6 +19,10 @@ class SelectionViewModel(
 
     private val _currentPage = MutableLiveData(DEFAULT_PAGE)
     val currentPage: LiveData<Int> = _currentPage
+
+    private val _loading = MutableLiveData<Boolean>(true)
+    val loading: LiveData<Boolean>
+        get() = _loading
 
     private val _order = MutableLiveData<Order>(Order())
     val order: LiveData<Order>
@@ -99,6 +99,14 @@ class SelectionViewModel(
 
     fun isCartEmpty() {
         _isEmpty.postValue(true)
+    }
+
+    fun onLoading() {
+        _loading.postValue(true)
+    }
+
+    fun onLoaded() {
+        _loading.postValue(false)
     }
 
     override fun onCheckItem(itemId: Long) {

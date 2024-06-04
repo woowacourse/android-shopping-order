@@ -35,6 +35,10 @@ class RecommendViewModel(
     val totalOrderQuantity: LiveData<Int>
         get() = _totalOrderQuantity
 
+    private val _loading = MutableLiveData<Boolean>(true)
+    val loading: LiveData<Boolean>
+        get() = _loading
+
     private val _isEmpty = MutableLiveData<Boolean>(false)
     val isEmpty: LiveData<Boolean>
         get() = _isEmpty
@@ -83,6 +87,14 @@ class RecommendViewModel(
         } else {
             UIState.Success(items)
         }
+    }
+
+    fun onLoading() {
+        _loading.postValue(true)
+    }
+
+    fun onLoaded() {
+        _loading.postValue(false)
     }
 
     private fun List<Product>.mapperToShoppingProductList(): List<ShoppingProduct> {

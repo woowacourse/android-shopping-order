@@ -20,7 +20,7 @@ import woowacourse.shopping.presentation.state.UIState
 class RecommendationFragment : Fragment(), RecommendationClickListener {
     private lateinit var binding: FragmentRecommendBinding
     private lateinit var recommendAdapter: RecommendAdapter
-    private val recommendViewModel: RecommendViewModel by lazy {
+    private val viewModel: RecommendViewModel by lazy {
         val viewModelFactory =
             RecommendViewModelFactory(
                 cartRepository = RemoteCartRepositoryImpl(),
@@ -45,7 +45,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = recommendViewModel
+        binding.viewModel = viewModel
         binding.clickListener = this
         loadRecommendItems()
     }
@@ -62,12 +62,10 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
     private fun showSkeletonUI(isLoading: Boolean) {
         if (isLoading) {
             binding.shimmerRecommendationList.startShimmer()
-            binding.shimmerRecommendationList.visibility = View.VISIBLE
-            binding.recyclerviewRecommendationList.visibility = View.GONE
+            viewModel.onLoading()
         } else {
             binding.shimmerRecommendationList.stopShimmer()
-            binding.shimmerRecommendationList.visibility = View.GONE
-            binding.recyclerviewRecommendationList.visibility = View.VISIBLE
+            viewModel.onLoaded()
         }
     }
 
@@ -77,7 +75,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
 
     private fun setUpUIState() {
         setUpRecyclerViewAdapter()
-        recommendViewModel.recommendItemsState.observe(viewLifecycleOwner) { state ->
+        viewModel.recommendItemsState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UIState.Success -> showData(state.data)
                 is UIState.Empty -> {}
@@ -90,7 +88,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
     }
 
     private fun setUpRecyclerViewAdapter() {
-        recommendAdapter = RecommendAdapter(recommendViewModel)
+        recommendAdapter = RecommendAdapter(viewModel)
         binding.recyclerviewRecommendationList.adapter = recommendAdapter
     }
 
@@ -103,7 +101,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
     }
 
     override fun onMakeOrderClick() {
-        recommendViewModel.completeOrder()
+        viewModel.completeOrder()
         requireActivity().finish()
     }
 }
