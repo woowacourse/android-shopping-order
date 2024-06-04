@@ -17,24 +17,24 @@ interface CartApiService {
     fun requestCartItems(
         @Query("page") page: Int = 0,
         @Query("size") size: Int,
-    ): Call<CartItemResponse>
+    ): CartItemResponse
 
     @POST("/cart-items")
     fun insertCartItem(
         @Body cartItemRequest: CartItemRequest,
-    ): Call<Unit>
+    )
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Path("id") id: Int,
-    ): Call<Unit>
+    )
 
     @PATCH("/cart-items/{id}")
     fun updateCartItem(
         @Path("id") id: Int,
         @Body quantity: CartItemQuantityDto,
-    ): Call<Unit>
+    )
 
     @GET("/cart-items/counts")
-    fun requestCartItemCount(): Call<CartItemQuantityDto>
+    fun requestCartItemCount(): CartItemQuantityDto
 }

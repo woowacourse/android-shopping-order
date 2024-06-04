@@ -91,7 +91,6 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private fun loadProduct() {
         try {
             productDetailViewModel.loadProductItem(receiveId())
-            productDetailViewModel
         } catch (e: ErrorEvent.LoadDataEvent) {
             requireContext().makeToast(
                 getString(R.string.error_data_load),

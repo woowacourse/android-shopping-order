@@ -42,10 +42,8 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        runCatching {
-            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-            productRepository.loadPagingProducts(itemSize).getOrThrow()
-        }
+        val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+        productRepository.loadPagingProducts(itemSize)
             .onSuccess {
                 _products.value = _products.value?.plus(it)
             }
@@ -55,14 +53,12 @@ class ProductListViewModel(
     }
 
     fun loadPagingRecentlyProduct() {
-        runCatching {
-            recentlyProductRepository.getRecentlyProductList().getOrThrow()
-        }
+        recentlyProductRepository.getRecentlyProductList()
             .onSuccess {
                 _recentlyProducts.value = it
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 
@@ -70,35 +66,44 @@ class ProductListViewModel(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        runCatching {
-            shoppingCartRepository.updateCartItem(
-                product,
-                updateCartItemType,
-            ).getOrThrow()
-        }.onSuccess { updateCartItemResult ->
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> addCartItem(product)
-                is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    when (updateCartItemType) {
-                        UpdateCartItemType.DECREASE -> {
-                            updateTotalCartItemCount()
-                        }
-
-                        UpdateCartItemType.INCREASE -> {
-                            product.updateItemSelector(true)
-                            updateTotalCartItemCount()
-                        }
-
-                        is UpdateCartItemType.UPDATE -> {}
-                    }
-                    _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
+        shoppingCartRepository.updateCartItem(
+            product,
+            updateCartItemType,
+        )
+            .onSuccess { updateCartItemResult ->
+                when (updateCartItemResult) {
+                    UpdateCartItemResult.ADD -> addCartItem(product)
+                    is UpdateCartItemResult.DELETE -> deleteCartItem(product)
+                    is UpdateCartItemResult.UPDATED -> updateCartItem(
+                        product = product,
+                        itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
+                        updateCartItemType = updateCartItemType,
+                    )
                 }
+            }.onFailure {
+                handleException(ErrorEvent.UpdateCartEvent())
             }
-        }.onFailure {
-            handleException(it)
+    }
+
+    private fun updateCartItem(
+        product: Product,
+        itemCount: Int,
+        updateCartItemType: UpdateCartItemType,
+    ) {
+        product.updateCartItemCount(itemCount)
+        when (updateCartItemType) {
+            UpdateCartItemType.DECREASE -> {
+                updateTotalCartItemCount()
+            }
+
+            UpdateCartItemType.INCREASE -> {
+                product.updateItemSelector(true)
+                updateTotalCartItemCount()
+            }
+
+            is UpdateCartItemType.UPDATE -> {}
         }
+        _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
     }
 
     private fun addCartItem(product: Product) {
@@ -109,24 +114,18 @@ class ProductListViewModel(
     }
 
     private fun deleteCartItem(product: Product) {
-        try {
-            product.updateItemSelector(false)
-            updateTotalCartItemCount()
-            _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
-        } catch (e: Exception) {
-            handleException(e)
-        }
+        product.updateItemSelector(false)
+        updateTotalCartItemCount()
+        _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
     }
 
     private fun updateTotalCartItemCount() {
-        runCatching {
-            shoppingCartRepository.getTotalCartItemCount().getOrThrow()
-        }
+        shoppingCartRepository.getTotalCartItemCount()
             .onSuccess {
                 _cartItemCount.value = it
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 

@@ -91,7 +91,7 @@ class RecommendViewModel(
                 _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.OrderItemsEvent())
             }
     }
 
@@ -99,26 +99,32 @@ class RecommendViewModel(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ) {
-        runCatching {
-            shoppingCartRepository.updateCartItem(
-                product,
-                updateCartItemType,
-            ).getOrThrow()
-        }
+        shoppingCartRepository.updateCartItem(
+            product,
+            updateCartItemType,
+        )
             .onSuccess { updateCartItemResult ->
                 when (updateCartItemResult) {
                     UpdateCartItemResult.ADD -> addCartItem(product)
                     is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                    is UpdateCartItemResult.UPDATED -> {
-                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-                        updateCheckItemData()
-                    }
+                    is UpdateCartItemResult.UPDATED -> updateCartItem(
+                        product = product,
+                        itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
+                    )
                 }
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.UpdateCartEvent())
             }
+    }
+
+    private fun updateCartItem(
+        product: Product,
+        itemCount : Int,
+    ){
+        product.updateCartItemCount(itemCount)
+        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+        updateCheckItemData()
     }
 
     private fun addCartItem(product: Product) {
@@ -132,7 +138,7 @@ class RecommendViewModel(
                 updateCheckItemData()
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.AddCartEvent())
             }
     }
 
@@ -145,7 +151,7 @@ class RecommendViewModel(
                 _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.DeleteCartEvent())
             }
     }
 

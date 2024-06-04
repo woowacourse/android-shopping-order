@@ -17,7 +17,6 @@ sealed class ErrorEvent : Exception() {
 
     class LoadCouponEvent : ErrorEvent()
 
-
     fun receiveErrorMessage(): String {
         return when (this) {
             is AddCartEvent -> ERROR_ADD_CART_ITEM

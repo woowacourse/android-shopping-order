@@ -1,62 +1,92 @@
 package woowacourse.shopping.data.remote.source
 
-import retrofit2.Call
 import woowacourse.shopping.data.remote.api.CartApiService
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.source.CartItemDataSource
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.CartItemCounter
+import woowacourse.shopping.domain.model.CartItemResult
+import woowacourse.shopping.utils.DtoMapper.toCartItems
+import woowacourse.shopping.utils.DtoMapper.toQuantity
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class CartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
-    override fun loadCartItems(): Call<CartItemResponse> {
-        return cartApiService.requestCartItems(
-            page = DEFAULT_ITEM_OFFSET,
-            size = MAX_CART_ITEM_SIZE,
-        )
+    override fun loadCartItems(): Result<CartItemResponse> {
+        return runCatching {
+            cartApiService.requestCartItems(
+                page = DEFAULT_ITEM_OFFSET,
+                size = MAX_CART_ITEM_SIZE,
+            )
+        }
     }
 
     override fun loadCartItems(
         page: Int,
         size: Int,
-    ): Call<CartItemResponse> {
-        return cartApiService.requestCartItems(
-            page = page,
-            size = size,
-        )
+    ): Result<List<CartItem>> {
+        return runCatching {
+            cartApiService.requestCartItems(
+                page = page,
+                size = size,
+            ).toCartItems()
+        }
+    }
+
+    override fun loadCartItemResult(productId: Long): Result<CartItemResult> {
+        return runCatching {
+            val cartItem = cartApiService.requestCartItems(
+                page = DEFAULT_ITEM_OFFSET,
+                size = MAX_CART_ITEM_SIZE,
+            ).toCartItems().find { it.product.id == productId } ?: throw ErrorEvent.LoadDataEvent()
+            CartItemResult(
+                cartItemId = cartItem.id,
+                counter = cartItem.product.cartItemCounter,
+            )
+        }
     }
 
     override fun addCartItem(
         productId: Int,
         quantity: Int,
-    ): Call<Unit> {
-        return cartApiService.insertCartItem(
-            cartItemRequest =
+    ): Result<Unit> {
+        return runCatching {
+            cartApiService.insertCartItem(
+                cartItemRequest =
                 CartItemRequest(
                     productId = productId,
                     quantity = quantity,
                 ),
-        )
+            )
+        }
     }
 
-    override fun deleteCartItem(id: Int): Call<Unit> {
-        return cartApiService.deleteCartItem(id = id)
+    override fun deleteCartItem(id: Int): Result<Unit> {
+        return runCatching {
+            cartApiService.deleteCartItem(id = id)
+        }
     }
 
     override fun updateCartItem(
         id: Int,
         quantity: Int,
-    ): Call<Unit> {
-        return cartApiService.updateCartItem(
-            id = id,
-            quantity = CartItemQuantityDto(quantity),
-        )
+    ): Result<Unit> {
+        return runCatching {
+            cartApiService.updateCartItem(
+                id = id,
+                quantity = CartItemQuantityDto(quantity),
+            )
+        }
     }
 
-    override fun loadCartItemCount(): Call<CartItemQuantityDto> {
-        return cartApiService.requestCartItemCount()
+    override fun loadCartItemCount(): Result<Int> {
+        return runCatching {
+            cartApiService.requestCartItemCount().toQuantity()
+        }
     }
 
     companion object {

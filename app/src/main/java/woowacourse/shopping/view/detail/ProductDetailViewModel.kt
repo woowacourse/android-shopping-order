@@ -35,36 +35,58 @@ class ProductDetailViewModel(
     val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
 
     fun addShoppingCartItem(product: Product) {
-        runCatching {
-            checkValidProduct(product)
-            when (cartItemId) {
-                DEFAULT_CART_ITEM_ID -> {
-                    shoppingCartRepository.addCartItem(product)
-                }
+        checkValidProduct(product)
+        when (cartItemId) {
+            DEFAULT_CART_ITEM_ID -> {
+                shoppingCartRepository.addCartItem(product)
+                    .onSuccess {
+                        _productDetailEvent.setValue(
+                            ProductDetailEvent.AddShoppingCart.Success(
+                                productId = product.id,
+                                count = product.cartItemCounter.itemCount,
+                            ),
+                        )
+                    }
+                    .onFailure {
+                        handleException(ErrorEvent.AddCartEvent())
+                    }
+            }
 
-                else -> {
-                    shoppingCartRepository.updateCartItem(
-                        product = product,
-                        UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
-                    )
-                }
+            else -> {
+                shoppingCartRepository.updateCartItem(
+                    product = product,
+                    UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
+                )
+                    .onSuccess {
+                        _productDetailEvent.setValue(
+                            ProductDetailEvent.AddShoppingCart.Success(
+                                productId = product.id,
+                                count = product.cartItemCounter.itemCount,
+                            ),
+                        )
+                    }
+                    .onFailure {
+                        handleException(ErrorEvent.UpdateCartEvent())
+                    }
             }
         }
-            .onSuccess {
-                _productDetailEvent.setValue(
-                    ProductDetailEvent.AddShoppingCart.Success(
-                        productId = product.id,
-                        count = product.cartItemCounter.itemCount,
-                    ),
-                )
+    }
+
+
+    fun loadProductItem(productId: Long) {
+        loadProductItemCount(productId)
+            .onSuccess { loadItemCounter ->
+                updateLoadProduct(productId, loadItemCounter)
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 
-    fun loadProductItem(productId: Long) {
-        val loadItemCounter = loadProductItemCount(productId)
+    private fun updateLoadProduct(
+        productId: Long,
+        loadItemCounter: CartItemCounter
+    ) {
         productRepository.getProduct(productId)
             .onSuccess { product ->
                 product.updateItemSelector(true)
@@ -77,16 +99,13 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun loadProductItemCount(productId: Long): CartItemCounter {
-        return try {
-            val result =
-                shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
-                    .getOrThrow()
-            cartItemId = result.cartItemId
-            result.counter
-        } catch (e: Exception) {
-            handleException(e)
-            CartItemCounter()
+    private fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
+        return runCatching {
+            shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
+                .mapCatching { result ->
+                    cartItemId = result.cartItemId
+                    result.counter
+                }.getOrDefault(CartItemCounter())
         }
     }
 
@@ -114,19 +133,14 @@ class ProductDetailViewModel(
     }
 
     private fun saveRecentlyProduct(product: Product) {
-        runCatching {
-            recentlyProductRepository.addRecentlyProduct(
-                RecentlyProduct(
-                    productId = product.id,
-                    imageUrl = product.imageUrl,
-                    name = product.name,
-                    category = product.category,
-                ),
-            )
-        }
-            .onFailure {
-                handleException(it)
-            }
+        recentlyProductRepository.addRecentlyProduct(
+            RecentlyProduct(
+                productId = product.id,
+                imageUrl = product.imageUrl,
+                name = product.name,
+                category = product.category,
+            ),
+        )
     }
 
     private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
@@ -137,7 +151,19 @@ class ProductDetailViewModel(
         deletePrevRecentlyProduct(recentlyProduct.id)
         productRepository.getProduct(recentlyProduct.productId)
             .onSuccess { product ->
-                val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
+                updateLoadRecentlyProduct(recentlyProduct, product)
+            }
+            .onFailure {
+                handleException(ErrorEvent.LoadDataEvent())
+            }
+    }
+
+    private fun updateLoadRecentlyProduct(
+        recentlyProduct: RecentlyProduct,
+        product: Product,
+    ) {
+        loadProductItemCount(recentlyProduct.productId)
+            .onSuccess { loadItemCounter ->
                 product.updateItemSelector(true)
                 product.updateCartItemCount(loadItemCounter.itemCount)
                 _product.value = product
@@ -145,23 +171,18 @@ class ProductDetailViewModel(
                 _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.UpdateCartEvent())
             }
     }
 
     private fun loadRecentlyProduct(product: Product) {
-        runCatching {
-            recentlyProductRepository.getMostRecentlyProduct().getOrThrow()
-        }
+        recentlyProductRepository.getMostRecentlyProduct()
             .onSuccess { recentlyProduct ->
                 _recentlyProduct.value = recentlyProduct
                 _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
                 if (recentlyProduct.productId != product.id) {
                     saveRecentlyProduct(product)
                 }
-            }
-            .onFailure {
-                handleException(it)
             }
     }
 
