@@ -12,8 +12,6 @@ interface ShoppingProductsRepository {
 
     fun isFinalPage(page: Int): Boolean
 
-    fun isCartFinalPage(page: Int): Boolean
-
     fun shoppingCartProductQuantity(): Int
 
     fun increaseShoppingCartProduct(

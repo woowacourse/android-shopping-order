@@ -20,20 +20,9 @@ class DefaultProductHistoryRepository(
         }
     }
 
-    override fun loadProductHistory(productId: Long): Product {
-        val id =
-            productHistoryDataSource.loadProductHistory(productId)
-                ?: throw NoSuchElementException("there is no product history with id $productId")
-        return productDataSource.findById(id).toDomain(quantity = 0)
-    }
-
     override fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
         return productDataSource.findById(productId).toDomain(quantity = 0)
-    }
-
-    override fun deleteAllProductHistory() {
-        productHistoryDataSource.deleteAllProductHistory()
     }
 
     companion object {

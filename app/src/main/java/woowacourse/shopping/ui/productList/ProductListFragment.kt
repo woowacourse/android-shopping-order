@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment

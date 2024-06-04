@@ -1,18 +1,14 @@
 package woowacourse.shopping.ui.order
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
-import woowacourse.shopping.databinding.FragmentProductDetailBinding
-import kotlin.math.log
 
 class OrderFragment : Fragment() {
     private var _binding: FragmentOrderBinding? = null

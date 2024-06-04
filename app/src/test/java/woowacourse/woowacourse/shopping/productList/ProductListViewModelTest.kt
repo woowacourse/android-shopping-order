@@ -16,7 +16,7 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -26,14 +26,14 @@ import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
 import woowacourse.shopping.source.FakeProductDataSource
 import woowacourse.shopping.source.FakeProductHistorySource
-import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
+import woowacourse.shopping.source.FakeShoppingCartDataSource
 import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 import woowacourse.shopping.ui.productList.ProductListViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
     private lateinit var productSource: ProductDataSource
-    private lateinit var cartSource: ShoppingCartProductIdDataSource
+    private lateinit var cartSource: ShoppingCartDataSource
     private lateinit var historyDataSource: ProductHistoryDataSource
 
     private lateinit var shoppingProductRepository: ShoppingProductsRepository
@@ -62,7 +62,7 @@ class ProductListViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(60).toMutableList(),
             )
-        cartSource = FakeShoppingCartProductIdDataSource()
+        cartSource = FakeShoppingCartDataSource()
         historyDataSource = FakeProductHistorySource()
 
         shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
@@ -194,7 +194,7 @@ class ProductListViewModelTest {
     fun `장바구니에 담긴 상품들의 개수를 로드`() {
         // given
         productSource = FakeProductDataSource(allProducts = productsTestFixture(21).toMutableList())
-        cartSource = FakeShoppingCartProductIdDataSource(data = productsIdCountDataTestFixture(10).toMutableList())
+        cartSource = FakeShoppingCartDataSource(data = productsIdCountDataTestFixture(10).toMutableList())
         shoppingProductRepository = DefaultShoppingProductRepository(productSource, cartSource)
         historyRepository = DefaultProductHistoryRepository(historyDataSource, productSource)
 
@@ -215,7 +215,7 @@ class ProductListViewModelTest {
                 allProducts = productsTestFixture(21).toMutableList(),
             )
         cartSource =
-            FakeShoppingCartProductIdDataSource(
+            FakeShoppingCartDataSource(
                 data = productsIdCountDataTestFixture(5).toMutableList(),
             )
         shoppingProductRepository =

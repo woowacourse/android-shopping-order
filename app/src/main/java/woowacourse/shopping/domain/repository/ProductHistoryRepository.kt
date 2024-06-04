@@ -7,9 +7,5 @@ interface ProductHistoryRepository {
 
     fun loadAllProductHistory(): List<Product>
 
-    fun loadProductHistory(productId: Long): Product
-
     fun loadLatestProduct(): Product
-
-    fun deleteAllProductHistory()
 }

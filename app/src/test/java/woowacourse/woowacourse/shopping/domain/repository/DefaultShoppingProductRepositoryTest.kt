@@ -4,16 +4,16 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
 import woowacourse.shopping.source.FakeProductDataSource
-import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
+import woowacourse.shopping.source.FakeShoppingCartDataSource
 import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 
 class DefaultShoppingProductRepositoryTest {
     lateinit var productDataSource: ProductDataSource
-    lateinit var shoppingCartProductIdDataSource: ShoppingCartProductIdDataSource
+    lateinit var shoppingCartDataSource: ShoppingCartDataSource
     lateinit var repository: ShoppingProductsRepository
 
     @Test
@@ -23,14 +23,14 @@ class DefaultShoppingProductRepositoryTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(count = 100).toMutableList(),
             )
-        shoppingCartProductIdDataSource =
-            FakeShoppingCartProductIdDataSource(
+        shoppingCartDataSource =
+            FakeShoppingCartDataSource(
                 data = productsIdCountDataTestFixture(dataCount = 10, 2).toMutableList(),
             )
         repository =
             DefaultShoppingProductRepository(
                 productsSource = productDataSource,
-                cartSource = shoppingCartProductIdDataSource,
+                cartSource = shoppingCartDataSource,
             )
 
         // when

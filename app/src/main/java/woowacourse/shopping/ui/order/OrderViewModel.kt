@@ -2,8 +2,8 @@ package woowacourse.shopping.ui.order
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.remote.OrderRemoteDataSource
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
+import woowacourse.shopping.remote.source.OrderRemoteDataSource
 
 class OrderViewModel(
     private val cartItemIds: List<Long>,

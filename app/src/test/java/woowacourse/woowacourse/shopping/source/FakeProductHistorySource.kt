@@ -17,16 +17,10 @@ class FakeProductHistorySource(
         history.add(productId)
     }
 
-    override fun loadProductHistory(productId: Long): Long? = history.find { it == productId }
-
     override fun loadLatestProduct(): Long = history.last()
 
     override fun loadAllProductHistory(): List<Long> {
         return history
-    }
-
-    override fun deleteAllProductHistory() {
-        history.clear()
     }
 
     companion object {

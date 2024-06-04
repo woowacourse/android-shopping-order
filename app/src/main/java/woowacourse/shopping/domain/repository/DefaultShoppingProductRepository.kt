@@ -3,14 +3,14 @@ package woowacourse.shopping.domain.repository
 import android.util.Log
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.data.source.ShoppingCartProductIdDataSource
+import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingProductRepository(
     private val productsSource: ProductDataSource,
-    private val cartSource: ShoppingCartProductIdDataSource,
+    private val cartSource: ShoppingCartDataSource,
 ) : ShoppingProductsRepository {
     override fun loadAllProducts(page: Int): List<Product> {
         val productsData = productsSource.findByPaged(page)
@@ -34,9 +34,7 @@ class DefaultShoppingProductRepository(
 
     override fun isFinalPage(page: Int): Boolean = productsSource.isFinalPage(page)
 
-    override fun isCartFinalPage(page: Int): Boolean = cartSource.isFinalPage(page)
-
-    override fun shoppingCartProductQuantity(): Int = cartSource.loadAll().sumOf { it.quantity }
+    override fun shoppingCartProductQuantity(): Int = cartSource.loadAllCartItems().sumOf { it.quantity }
 
     private fun productQuantity(productId: Long): Int {
         return cartSource.findByProductId(productId)?.quantity ?: 0
