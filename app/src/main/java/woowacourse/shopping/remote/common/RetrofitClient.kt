@@ -7,9 +7,30 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.remote.cart.CartItemApiService
+import woowacourse.shopping.remote.order.OrderApiService
+import woowacourse.shopping.remote.product.ProductsApiService
 import java.lang.reflect.Type
 
-object RetrofitService {
+object RetrofitClient {
+    val productsApi: ProductsApiService by lazy {
+        buildRetrofitService(BASE_URL).create(
+            ProductsApiService::class.java,
+        )
+    }
+
+    val cartItemApi: CartItemApiService by lazy {
+        buildRetrofitService(BASE_URL).create(
+            CartItemApiService::class.java,
+        )
+    }
+
+    val orderApi: OrderApiService by lazy {
+        buildRetrofitService(BASE_URL).create(
+            OrderApiService::class.java,
+        )
+    }
+
     private val logging =
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -38,9 +59,11 @@ object RetrofitService {
             }
         }
 
-    val retrofitService: Retrofit =
+    private const val BASE_URL = "http://54.180.95.212:8080"
+
+    private fun buildRetrofitService(baseUrl: String): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://54.180.95.212:8080")
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(nullOnEmptyConverterFactory)
             .addConverterFactory(GsonConverterFactory.create())
