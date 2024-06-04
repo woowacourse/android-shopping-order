@@ -182,7 +182,7 @@ class CartSelectViewModel(
         }
     }
 
-    override fun checkCartProduct(cartProduct: CartProduct) {
+    override fun updateCheckState(cartProduct: CartProduct) {
         var state = uiState.value ?: return
         state =
             if (cartProduct.isChecked) {
