@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.shopping
 
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.presentation.base.CartCountHandler
 import woowacourse.shopping.presentation.base.ProductActionHandler
 
 interface ShoppingActionHandler : ProductActionHandler {

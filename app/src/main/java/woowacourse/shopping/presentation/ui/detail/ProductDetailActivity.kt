@@ -44,7 +44,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         viewModel.findOneRecentProduct()
     }
 
-
     private fun initObserver() {
         binding.detailActionHandler = viewModel
         binding.lifecycleOwner = this

@@ -37,22 +37,24 @@ class ProductDetailViewModel(
 
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    fun setCartProduct(cartProduct: CartProduct) = thread {
-        saveRecentProduct(cartProduct)
-        _cartProduct.postValue(UiState.Success(DetailCartProduct.fromCartProduct(cartProduct)))
-    }
-
-    fun findOneRecentProduct() = thread {
-        repository.findOneRecent().onSuccess {
-            if (it == null) {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
-            } else {
-                _recentProduct.postValue(UiState.Success(it))
-            }
-        }.onFailure {
-            _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
+    fun setCartProduct(cartProduct: CartProduct) =
+        thread {
+            saveRecentProduct(cartProduct)
+            _cartProduct.postValue(UiState.Success(DetailCartProduct.fromCartProduct(cartProduct)))
         }
-    }
+
+    fun findOneRecentProduct() =
+        thread {
+            repository.findOneRecent().onSuccess {
+                if (it == null) {
+                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
+                } else {
+                    _recentProduct.postValue(UiState.Success(it))
+                }
+            }.onFailure {
+                _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
+            }
+        }
 
     override fun onAddToCart(detailCartProduct: DetailCartProduct) {
         thread {
@@ -70,9 +72,10 @@ class ProductDetailViewModel(
                 false -> {
                     repository.patchCartItem(
                         id = detailCartProduct.cartProduct.cartId.toInt(),
-                        quantityRequest = QuantityRequest(
-                            detailCartProduct.cartProduct.quantity,
-                        ),
+                        quantityRequest =
+                            QuantityRequest(
+                                detailCartProduct.cartProduct.quantity,
+                            ),
                     ).onSuccess {
                         _cartProduct.postValue(UiState.Success(detailCartProduct))
                         saveRecentProduct(detailCartProduct.cartProduct)
@@ -82,7 +85,8 @@ class ProductDetailViewModel(
                 }
             }
             updateUiModel.add(
-                detailCartProduct.cartProduct.productId, detailCartProduct.cartProduct
+                detailCartProduct.cartProduct.productId,
+                detailCartProduct.cartProduct,
             )
             _cartHandler.postValue(EventState(updateUiModel))
         }

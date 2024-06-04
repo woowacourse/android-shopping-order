@@ -16,7 +16,6 @@ import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 import kotlin.concurrent.thread
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
-
     private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
 
     val carts: LiveData<UiState<List<CartProductUiModel>>> get() = _carts
@@ -32,27 +31,28 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     private var _isAllChecked = MutableLiveData<Boolean>(true)
     val isAllChecked: LiveData<Boolean> get() = _isAllChecked
 
-    fun findCartByOffset() = thread {
-        repository.getCartItems(0, 1000).onSuccess {
-            _carts.postValue(
-                UiState.Success(
-                    it.map { cartProduct ->
-                        CartProductUiModel(
-                            cartProduct,
-                        )
-                    },
-                ),
-            )
-        }.onFailure {
-            _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
+    fun findCartByOffset() =
+        thread {
+            repository.getCartItems(0, 1000).onSuccess {
+                _carts.postValue(
+                    UiState.Success(
+                        it.map { cartProduct ->
+                            CartProductUiModel(
+                                cartProduct,
+                            )
+                        },
+                    ),
+                )
+            }.onFailure {
+                _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
+            }
         }
-    }
 
     override fun onDelete(cartProductUiModel: CartProductUiModel) {
         thread {
             updateUiModel.add(
                 cartProductUiModel.cartProduct.productId,
-                cartProductUiModel.cartProduct.copy(quantity = 0)
+                cartProductUiModel.cartProduct.copy(quantity = 0),
             )
             repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
@@ -84,7 +84,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 removedCarts.forEach { cartProduct ->
                     updateUiModel.add(
                         cartProduct.cartProduct.productId,
-                        cartProduct.cartProduct.copy(quantity = 0)
+                        cartProduct.cartProduct.copy(quantity = 0),
                     )
                 }
 

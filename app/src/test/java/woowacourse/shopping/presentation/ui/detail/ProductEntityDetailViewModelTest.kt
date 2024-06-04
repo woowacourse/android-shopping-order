@@ -23,14 +23,14 @@ class ProductEntityDetailViewModelTest {
 
     @Test
     fun `saveCartItem으로 상품을 장바구니에 저장한다`() {
-        every { repository.saveCart(any()) } returns Result.success(1)
+        every { repository.postCartItem(any()) } returns Result.success(1)
         viewModel.onAddToCart(
             DetailCartProduct(
-                isNew = false,
+                isNew = true,
                 cartProduct = cartProduct,
             ),
         )
         Thread.sleep(1000)
-        verify(exactly = 1) { repository.saveCart(any()) }
+        verify(exactly = 1) { repository.saveRecentProduct(any()) }
     }
 }

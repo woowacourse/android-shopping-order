@@ -7,7 +7,6 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -59,14 +58,14 @@ class CurationViewModel(
     }
 
     override fun onProductClick(cartProduct: CartProduct) {
-
     }
 
-    private fun getOrderCartIds() = (_cartProducts.value as UiState.Success).data.filter {
-        it.quantity > 0
-    }.map {
-        it.cartId.toInt()
-    }
+    private fun getOrderCartIds() =
+        (_cartProducts.value as UiState.Success).data.filter {
+            it.quantity > 0
+        }.map {
+            it.cartId.toInt()
+        }
 
     override fun onPlus(cartProduct: CartProduct) {
         thread {
@@ -113,7 +112,7 @@ class CurationViewModel(
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
-                    )
+                )
                     .onSuccess {
                         _cartProducts.postValue(UiState.Success(cartProducts))
                     }

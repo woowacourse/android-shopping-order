@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.launch
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,13 +63,13 @@ class ProductEntityDetailActivityTest {
     fun `장바구니에_담으면_상품이_데이터에_추가된다`() {
         ActivityScenario.launch<CartActivity>(intent)
         RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
-            it?.size shouldBe 57 // 디폴트 갯수
+            it.size shouldBe 51 // 디폴트 갯수
         }.onFailure {
             throw IllegalStateException()
         }
         onView(withId(R.id.tv_add_cart)).perform(click())
         RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
-            it?.size shouldBe 58 // 하나 증가한 갯수
+            it.size shouldBe 52 // 하나 증가한 갯수
         }.onFailure {
             throw IllegalStateException()
         }

@@ -11,7 +11,7 @@ import woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler
 sealed class ShoppingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     class ProductViewHolder(
         private val binding: ItemProductBinding,
-        private val productActionHandler: ProductActionHandler
+        private val productActionHandler: ProductActionHandler,
     ) :
         ShoppingViewHolder(binding.root) {
         fun bind(item: CartProduct) {

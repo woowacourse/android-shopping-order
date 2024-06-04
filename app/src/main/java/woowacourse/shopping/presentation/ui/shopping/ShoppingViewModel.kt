@@ -215,6 +215,7 @@ class ShoppingViewModel(private val repository: Repository) :
             }
         }
     }
+
     companion object {
         const val FIRST_UPDATE = 1
     }
