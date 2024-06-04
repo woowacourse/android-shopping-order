@@ -60,10 +60,10 @@ class ProductListViewModel(
             val isLastPage = productsRepository.isFinalPage(page)
             val productHistory = productHistoryRepository.loadAllProductHistory()
 
+            _isLastPage.postValue(isLastPage)
             uiHandler.post {
                 _loadedProducts.value = result
                 _cartProductTotalCount.value = totalCartCount
-                _isLastPage.value = isLastPage
                 _productsHistory.value = productHistory
                 _isLoading.value = false
             }
@@ -79,9 +79,9 @@ class ProductListViewModel(
             val result = productsRepository.loadAllProducts(nextPage)
             val totalCount = productsRepository.shoppingCartProductQuantity()
 
+            _currentPage.postValue(nextPage)
+            _isLastPage.postValue(isLastPage)
             uiHandler.post {
-                _currentPage.value = nextPage
-                _isLastPage.value = isLastPage
                 _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(result) }
                 _cartProductTotalCount.value = totalCount
             }

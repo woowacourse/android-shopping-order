@@ -53,8 +53,7 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         thread {
-            val currentItems =
-                cartItemRepository.loadPagedCartItem()
+            val currentItems = cartItemRepository.loadPagedCartItem()
 
             uiHandler.post {
                 _cartItems.value = currentItems
