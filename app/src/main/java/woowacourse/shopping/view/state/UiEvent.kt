@@ -32,4 +32,6 @@ sealed interface RecommendListUiEvent {
         val productId: Int,
         val lastlyViewed: Boolean,
     ) : RecommendListUiEvent
+
+    data object NavigateBackToHome : RecommendListUiEvent
 }

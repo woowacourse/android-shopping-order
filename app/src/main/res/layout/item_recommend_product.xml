@@ -49,20 +49,6 @@
             app:layout_constraintRight_toRightOf="@id/iv_product"
             app:viewVisibility="@{!productItem.quantityControlVisible}" />
 
-        <include
-            android:id="@+id/btn_quantity_control"
-            layout="@layout/btn_quantity_control"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:clickListener="@{quantityClickListener}"
-            app:layout_constraintBottom_toBottomOf="@id/iv_product"
-            app:layout_constraintLeft_toLeftOf="@id/iv_product"
-            app:layout_constraintRight_toRightOf="@id/iv_product"
-            app:itemId="@{productItem.product.id}"
-            app:quantity="@{productItem.quantity}"
-            app:viewVisibility="@{productItem.quantityControlVisible}" />
-
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"

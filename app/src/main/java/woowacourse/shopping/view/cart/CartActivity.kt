@@ -18,7 +18,6 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.view.cart.list.CartFragment
-import woowacourse.shopping.view.cart.list.CartViewModel
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.state.CartListUiEvent
@@ -95,7 +94,13 @@ class CartActivity : AppCompatActivity() {
                         ),
                     )
                 }
+
+                RecommendListUiEvent.NavigateBackToHome -> finish()
             }
+        }
+
+        viewModel.navigateBackToHome.observe(this) {
+            if (it.getContentIfNotHandled() != null) finish()
         }
     }
 

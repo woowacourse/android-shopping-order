@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.view.cart.list.CartViewModel
+import woowacourse.shopping.view.cart.CartViewModel
 
 class RecommendFragment : Fragment() {
     private var _binding: FragmentRecommendBinding? = null

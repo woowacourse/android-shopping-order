@@ -42,6 +42,7 @@ data class CartUiState(
     val isEntireCheckboxSelected: Boolean = false,
     val totalPrice: Int = 0,
     val isActivated: Boolean = false,
+    val selectedCartItemIds: List<Int> = emptyList()
 )
 
 data class CartListUiState(

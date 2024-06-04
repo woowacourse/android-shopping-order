@@ -1,19 +1,20 @@
-package woowacourse.shopping.view.cart.list
+package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
-import woowacourse.shopping.view.cart.CurrentScreen
-import woowacourse.shopping.view.cart.QuantityEventListener
+import woowacourse.shopping.view.cart.list.CartItemClickListener
 import woowacourse.shopping.view.cart.list.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.view.cart.recommend.RecommendProductEventListener
 import woowacourse.shopping.view.home.product.HomeViewItem
+import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.state.CartListUiEvent
 import woowacourse.shopping.view.state.CartListUiState
 import woowacourse.shopping.view.state.CartUiState
@@ -37,6 +38,10 @@ class CartViewModel(
     val cartUiState: LiveData<CartUiState>
         get() = _cartUiState
 
+    private val _navigateBackToHome: MutableLiveData<Event<Unit>> = MutableLiveData()
+    val navigateBackToHome: LiveData<Event<Unit>>
+        get() = _navigateBackToHome
+
     private val _cartListUiState: MutableLiveData<CartListUiState> =
         MutableLiveData(CartListUiState())
     val cartListUiState: LiveData<CartListUiState>
@@ -56,7 +61,7 @@ class CartViewModel(
     val recommendListUiEvent: LiveData<Event<RecommendListUiEvent>>
         get() = _recommendListUiEvent
 
-    private var selectedCartItemIds: List<Int> = emptyList()
+//    private var selectedCartItemIds: List<Int> = emptyList()
 
     init {
         loadCartItems()
@@ -77,9 +82,9 @@ class CartViewModel(
 
     private fun makeOrder() {
         orderRepository.postOrder(
-            selectedCartItemIds,
+            cartItemIds = cartUiState.value?.selectedCartItemIds ?: return,
             onSuccess = {
-                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToCartList)
+                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
             },
             onFailure = {
             },
@@ -90,29 +95,37 @@ class CartViewModel(
         val cartListUiState = cartListUiState.value ?: return
         _cartListUiState.value = cartListUiState.copy(isLoading = true)
         println(cartListUiState.currentPageIndex)
-        cartRepository.getCartItems(
-            page = cartListUiState.currentPageIndex,
-            size = 5,
-            sort = "asc",
-            onSuccess = { cart ->
-                println("previous enabled : ${cart.first.not()}")
-                println("next enabled : ${cart.last.not()}")
-                _cartListUiState.value =
-                    cartListUiState.copy(
-                        isLoading = false,
-                        cartViewItems =
-                            cart.cartItems.map { cartItem ->
-                                CartViewItem(
-                                    cartItem,
-                                    cartUiState.value?.isEntireCheckboxSelected == true || cartItem.cartItemId in selectedCartItemIds,
-                                )
-                            },
-                        previousPageEnabled = cart.first.not(),
-                        nextPageEnabled = cart.last.not(),
-                    )
+        cartRepository.getCartTotalQuantity(
+            onSuccess = { totalQuantity ->
+                cartRepository.getCartItems(
+                    page = cartListUiState.currentPageIndex,
+                    size = totalQuantity,
+                    sort = "desc",
+                    onSuccess = { cart ->
+                        println("previous enabled : ${cart.first.not()}")
+                        println("next enabled : ${cart.last.not()}")
+                        _cartListUiState.value =
+                            cartListUiState.copy(
+                                isLoading = false,
+                                cartViewItems =
+                                cart.cartItems.map { cartItem ->
+                                    CartViewItem(
+                                        cartItem,
+                                        cartUiState.value?.isEntireCheckboxSelected == true || cartItem.cartItemId in (cartUiState.value?.selectedCartItemIds
+                                            ?: return@getCartItems),
+                                    )
+                                },
+                                previousPageEnabled = cart.first.not(),
+                                nextPageEnabled = cart.last.not(),
+                            )
+                    },
+                    onFailure = {
+                    },
+                )
             },
             onFailure = {
-            },
+
+            }
         )
     }
 
@@ -126,11 +139,9 @@ class CartViewModel(
             onSuccess = { productData ->
                 val cartItems = cartListUiState.value?.cartViewItems ?: return@getProducts
                 val products =
-                    productData.products.shuffled().take(10).map { productItem ->
-                        val quantity =
-                            cartItems.firstOrNull { it.cartItem.product.id == productItem.id }?.cartItem?.quantity
-                        HomeViewItem.ProductViewItem(productItem, quantity ?: 0)
-                    }
+                    productData.products.shuffled().take(10).filter { productItem ->
+                        productItem.id !in cartItems.map { it.cartItem.product.id }
+                    }.map(::ProductViewItem)
                 _recommendedListUiState.value =
                     recommendedListUiState.value?.copy(
                         isLoading = false,
@@ -143,8 +154,6 @@ class CartViewModel(
     }
 
     fun navigateToPreviousPage() {
-        println("navigate to previous page")
-
         _cartListUiState.value =
             cartListUiState.value?.copy(
                 currentPageIndex = cartListUiState.value?.currentPageIndex?.minus(1) ?: return,
@@ -153,7 +162,6 @@ class CartViewModel(
     }
 
     fun navigateToNextPage() {
-        println("navigate to next page")
         _cartListUiState.value =
             cartListUiState.value?.copy(
                 currentPageIndex = cartListUiState.value?.currentPageIndex?.plus(1) ?: return,
@@ -176,7 +184,9 @@ class CartViewModel(
         cartRepository.deleteCartItem(
             cartItemId = itemId,
             onSuccess = {
-                selectedCartItemIds = selectedCartItemIds.filter { it != itemId }
+                _cartUiState.value = cartUiState.value?.copy(
+                    selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.filter { it != itemId } ?: return@deleteCartItem
+                )
                 loadCartItems()
             },
             onFailure = {
@@ -191,42 +201,30 @@ class CartViewModel(
         _cartListUiState.value =
             cartListUiState.value?.copy(
                 cartViewItems =
-                    cartListUiState.value?.cartViewItems?.map {
-                        if (it.cartItem.cartItemId == itemId) {
-                            it.copy(isSelected = isSelected)
-                        } else {
-                            it
-                        }
-                    } ?: return,
+                cartListUiState.value?.cartViewItems?.map {
+                    if (it.cartItem.cartItemId == itemId) {
+                        it.copy(isSelected = isSelected)
+                    } else {
+                        it
+                    }
+                } ?: return,
             )
         val cartItem =
             cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == itemId }
                 ?: return
         if (isSelected) {
-            selectedCartItemIds += itemId
+//            selectedCartItemIds += itemId
+            _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
+                itemId
+            ) ?: return)
             addTotalPrice(cartItem.cartItem.totalPrice())
         } else {
-            selectedCartItemIds -= itemId
+            _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.minus(
+                itemId
+            ) ?: return)
             subtractTotalPrice(cartItem.cartItem.totalPrice())
         }
     }
-
-//    override fun addCartQuantity(cartItemId: Int) {
-//        val cartViewItem =
-//            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-//                ?: return
-//        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
-//        addTotalPrice(changedItem.cartItem.product.price)
-//    }
-//
-//    override fun subtractCartQuantity(cartItemId: Int) {
-//        val cartViewItem =
-//            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-//                ?: return
-//        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
-//        subtractTotalPrice(changedItem.cartItem.product.price)
-//        updateCartQuantity(cartItemId, changedItem)
-//    }
 
     private fun updateCartQuantity(
         cartItemId: Int,
@@ -276,28 +274,26 @@ class CartViewModel(
             onSuccess = {
                 cartRepository.getCartItems(
                     page = 0,
-                    size = 1,
-                    sort = "desc",
+                    size = cartListUiState.value?.cartViewItems?.size ?: 0,
+                    sort = "asc",
                     onSuccess = { cartDomain ->
+                        println(cartDomain.cartItems.map(CartItemDomain::cartItemId))
                         val products = recommendedListUiState.value?.recommendedProducts
-                        val target =
-                            products?.firstOrNull { it.product.id == product.id }?.increase()
-                                ?: return@getCartItems
-                        println(target)
-                        val updatedProducts =
-                            products.map {
-                                if (it.product.id == product.id) {
-                                    target
-                                } else {
-                                    it
-                                }
-                            }
+                        val target = products?.firstOrNull {
+                            it.product.id == product.id
+                        }?.increase() ?: return@getCartItems
+                        val updatedProducts = products.map {
+                            if (it.product.id == target.product.id) target else it
+                        }
                         _recommendedListUiState.value =
                             recommendedListUiState.value?.copy(
                                 recommendedProducts = updatedProducts,
                             )
-                        selectedCartItemIds += cartDomain.cartItems.firstOrNull()?.cartItemId
-                            ?: return@getCartItems
+                        val cartItemId = cartDomain.cartItems.firstOrNull { it.product.id == product.id }?.cartItemId ?: return@getCartItems
+                        _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
+                            cartItemId
+                        ) ?: return@getCartItems)
+//                        selectedCartItemIds += cartItemId ?: return@getCartItems
                     },
                     onFailure = {
                     },
@@ -309,98 +305,22 @@ class CartViewModel(
     }
 
     override fun addQuantity(cartItemId: Int) {
-        println("cartItemId : $cartItemId")
-        when (currentScreen.value ?: return) {
-            CurrentScreen.CART -> {
-                val cartViewItem =
-                    cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-                        ?: return
-                val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
-                addTotalPrice(changedItem.cartItem.product.price)
-                updateCartQuantity(cartItemId, changedItem)
-            }
-
-            CurrentScreen.RECOMMEND -> {
-                println("recommend")
-                println(cartListUiState.value?.cartViewItems)
-                val targetCartItem =
-                    cartListUiState.value?.cartViewItems?.firstOrNull {
-                        it.cartItem.product.id == cartItemId
-                    }?.increment() ?: return
-                println(targetCartItem)
-                updateRecommendedProducts(targetCartItem, cartItemId)
-            }
-        }
+        val cartViewItem =
+            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
+                ?: return
+        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
+        addTotalPrice(changedItem.cartItem.product.price)
+        updateCartQuantity(cartItemId, changedItem)
     }
 
     override fun subtractQuantity(cartItemId: Int) {
-        when (currentScreen.value ?: return) {
-            CurrentScreen.CART -> {
-                val cartViewItem =
-                    cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-                        ?: return
-                val changedItem =
-                    cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
-                subtractTotalPrice(changedItem.cartItem.product.price)
-                updateCartQuantity(cartItemId, changedItem)
-            }
-
-            CurrentScreen.RECOMMEND -> {
-                val targetCartItem =
-                    cartListUiState.value?.cartViewItems?.firstOrNull {
-                        it.cartItem.product.id == cartItemId
-                    }?.decrement() ?: return
-                if (targetCartItem.cartItem.quantity == 0) {
-                    cartRepository.deleteCartItem(
-                        cartItemId = targetCartItem.cartItem.cartItemId,
-                        onSuccess = {
-                            selectedCartItemIds -= targetCartItem.cartItem.cartItemId
-                            val updatedProducts =
-                                recommendedListUiState.value?.recommendedProducts?.map {
-                                    if (it.product.id == cartItemId) {
-                                        it.copy(_quantity = targetCartItem.cartItem.quantity)
-                                    } else {
-                                        it
-                                    }
-                                } ?: return@deleteCartItem
-                            _recommendedListUiState.value =
-                                recommendedListUiState.value?.copy(
-                                    recommendedProducts = updatedProducts,
-                                )
-                        },
-                        onFailure = {
-                        },
-                    )
-                }
-                updateRecommendedProducts(targetCartItem, cartItemId)
-            }
-        }
-    }
-
-    private fun updateRecommendedProducts(
-        targetCartItem: CartViewItem,
-        productId: Int,
-    ) {
-        cartRepository.updateCartItem(
-            cartItemId = targetCartItem.cartItem.cartItemId,
-            quantity = targetCartItem.cartItem.quantity,
-            onSuccess = {
-                val updatedProducts =
-                    recommendedListUiState.value?.recommendedProducts?.map {
-                        if (it.product.id == productId) {
-                            it.copy(_quantity = targetCartItem.cartItem.quantity)
-                        } else {
-                            it
-                        }
-                    } ?: return@updateCartItem
-                _recommendedListUiState.value =
-                    recommendedListUiState.value?.copy(
-                        recommendedProducts = updatedProducts,
-                    )
-            },
-            onFailure = {
-            },
-        )
+        val cartViewItem =
+            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
+                ?: return
+        val changedItem =
+            cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
+        subtractTotalPrice(changedItem.cartItem.product.price)
+        updateCartQuantity(cartItemId, changedItem)
     }
 
     fun updateEntireCheck(isSelected: Boolean) {
@@ -422,13 +342,13 @@ class CartViewModel(
             cartUiState.value?.copy(
                 isEntireCheckboxSelected = isSelected,
                 totalPrice =
-                    updatedCartViewItems.sumOf {
-                        if (it.isSelected) {
-                            it.cartItem.totalPrice()
-                        } else {
-                            0
-                        }
-                    },
+                updatedCartViewItems.sumOf {
+                    if (it.isSelected) {
+                        it.cartItem.totalPrice()
+                    } else {
+                        0
+                    }
+                },
             )
     }
 
@@ -446,5 +366,9 @@ class CartViewModel(
             cartUiState.copy(
                 totalPrice = cartUiState.totalPrice - subtractPrice,
             )
+    }
+
+    fun navigateBackToHome() {
+        _navigateBackToHome.value = Event(Unit)
     }
 }

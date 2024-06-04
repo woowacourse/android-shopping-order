@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.databinding.FragmentCartBinding
+import woowacourse.shopping.view.cart.CartViewModel
 
 class CartFragment : Fragment() {
     private var _binding: FragmentCartBinding? = null

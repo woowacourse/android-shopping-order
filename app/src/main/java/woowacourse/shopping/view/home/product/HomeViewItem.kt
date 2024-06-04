@@ -7,7 +7,6 @@ sealed class HomeViewItem(open val viewType: Int) {
         val product: ProductItemDomain,
         private var _quantity: Int = DEFAULT_SHOPPING_QUANTITY,
         override val viewType: Int = PRODUCT_VIEW_TYPE,
-        val cartItemId: Int? = null,
     ) : HomeViewItem(viewType) {
         val quantity: Int
             get() = _quantity

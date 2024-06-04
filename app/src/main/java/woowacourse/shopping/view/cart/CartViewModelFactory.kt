@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.view.cart.list.CartViewModel
 
 class CartViewModelFactory(
     private val cartRepository: CartRepository,
