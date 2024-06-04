@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -51,6 +52,7 @@ class ShoppingCartViewModel(
 
     private fun setAllCheck() {
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
+        _shoppingCartEvent.value = ShoppingCartEvent.UpdateCheckBox.Success
     }
 
     private fun checkAllItems() {

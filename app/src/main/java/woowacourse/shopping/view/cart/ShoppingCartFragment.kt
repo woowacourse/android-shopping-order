@@ -108,8 +108,11 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                     )
                 }
                 is ShoppingCartEvent.SendCartItem.Success -> {
-                    Log.d("cartsfd", cartState.shoppingCart.toString())
                     navigateOrder(cartState.shoppingCart)
+                }
+
+                ShoppingCartEvent.UpdateCheckBox.Success -> {
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
