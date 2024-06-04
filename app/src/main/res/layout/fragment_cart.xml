@@ -15,40 +15,74 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.CartViewModel" />
+            type="woowacourse.shopping.view.cart.list.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <TextView
-            android:id="@+id/tv_empty_cart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="텅!"
-            android:textColor="@color/gray_500"
-            android:textSize="100dp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="@{viewModel.cartUiState instanceof UIState.Success ? View.GONE : View.VISIBLE}" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            android:visibility="@{viewModel.cartUiState instanceof UIState.Success ? View.VISIBLE : View.GONE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/ll_page_navigation"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             tools:itemCount="5"
             tools:listitem="@layout/item_cart" />
+
+        <LinearLayout
+            android:id="@+id/ll_page_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_previous_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/teal_200"
+                android:enabled="@{viewModel.cartListUiState.previousPageEnabled}"
+                android:onClick="@{() -> viewModel.navigateToPreviousPage()}"
+                android:text="@string/button_previous_page"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_current_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@{String.valueOf(viewModel.cartListUiState.currentPageIndex + 1)}"
+                android:textColor="@color/gray_500"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:text="1" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_next_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/teal_200"
+                android:enabled="@{viewModel.cartListUiState.nextPageEnabled}"
+                android:onClick="@{() -> viewModel.navigateToNextPage()}"
+                android:textColor="@color/white"
+                android:text="@string/button_next_page"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

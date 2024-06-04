@@ -1,13 +1,20 @@
-package woowacourse.shopping.view.home.adapter.product
+package woowacourse.shopping.view.home.product
+
+import woowacourse.shopping.domain.model.ProductItemDomain
 
 sealed class HomeViewItem(open val viewType: Int) {
     data class ProductViewItem(
-        val product: woowacourse.shopping.data.model.Product,
+        val product: ProductItemDomain,
         private var _quantity: Int = DEFAULT_SHOPPING_QUANTITY,
         override val viewType: Int = PRODUCT_VIEW_TYPE,
+        val cartItemId: Int? = null,
     ) : HomeViewItem(viewType) {
         val quantity: Int
             get() = _quantity
+
+        fun increase(): ProductViewItem = copy(_quantity = quantity + 1)
+
+        fun decrease(): ProductViewItem = copy(_quantity = quantity - 1)
 
         fun isQuantityControlVisible(): Boolean = quantity >= 1
 

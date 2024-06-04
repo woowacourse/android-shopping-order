@@ -7,9 +7,11 @@
 
         <import type="android.view.View"/>
 
+        <import type="woowacourse.shopping.view.cart.CurrentScreen"/>
+
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.CartViewModel" />
+            type="woowacourse.shopping.view.cart.list.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +33,6 @@
                 android:layout_height="24dp"
                 android:layout_marginLeft="12dp"
                 android:backgroundTint="@android:color/transparent"
-                android:onClick="@{() -> viewModel.onBackButtonClick()}"
                 android:src="@drawable/ic_back_vector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -53,7 +54,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_cart"
-            android:name="woowacourse.shopping.view.cart.CartFragment"
+            android:name="woowacourse.shopping.view.cart.list.CartFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -75,9 +76,9 @@
                 android:layout_height="24dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:checked="@{viewModel.isEntireCheckboxSelected}"
-                android:onCheckedChanged="@{(view, isChecked) -> viewModel.selectAll(isChecked)}"
-                android:visibility="@{viewModel.isCartScreen ? View.VISIBLE : View.GONE}"
+                android:checked="@{viewModel.cartUiState.entireCheckboxSelected}"
+                android:onCheckedChanged="@{(view, isChecked) -> viewModel.updateEntireCheck(isChecked)}"
+                android:visibility="@{viewModel.currentScreen == CurrentScreen.CART ? View.VISIBLE : View.GONE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:checked="true" />
@@ -88,7 +89,7 @@
                 android:text="전체"
                 android:textColor="@color/white"
                 android:textSize="12dp"
-                android:visibility="@{viewModel.isCartScreen ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.currentScreen == CurrentScreen.CART ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="@id/checkbox_cart_all"
                 app:layout_constraintStart_toStartOf="@id/checkbox_cart_all"
                 app:layout_constraintTop_toBottomOf="@id/checkbox_cart_all" />
@@ -103,7 +104,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/btn_cart_order"
                 app:layout_constraintTop_toTopOf="parent"
-                app:price="@{viewModel.totalPrice}"
+                app:price="@{viewModel.cartUiState.totalPrice}"
                 tools:text="184,200원" />
 
             <TextView
@@ -114,8 +115,8 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="@{@string/order_format(viewModel.selectedItems.size)}"
-                android:onClick="@{() -> viewModel.onNextButtonClick()}"
+                android:text="@{@string/order_format(viewModel.cartListUiState.cartViewItems.size)}"
+                android:onClick="@{() -> viewModel.navigate()}"
                 android:textColor="@color/white"
                 android:textSize="18dp"
                 android:textStyle="bold"

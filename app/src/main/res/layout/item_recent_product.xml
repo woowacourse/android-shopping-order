@@ -7,7 +7,7 @@
 
         <variable
             name="clickListener"
-            type="woowacourse.shopping.view.home.HomeClickListener" />
+            type="woowacourse.shopping.view.home.HomeEventListener" />
 
         <variable
             name="recentProduct"
@@ -17,7 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="106dp"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> clickListener.onProductClick(recentProduct.productId)}"
+        android:onClick="@{() -> clickListener.navigateToDetail(recentProduct.productId)}"
         android:paddingEnd="8dp"
         android:paddingBottom="12dp">
 

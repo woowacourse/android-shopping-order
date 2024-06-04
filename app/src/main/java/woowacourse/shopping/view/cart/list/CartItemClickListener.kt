@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.cart.list
 
 interface CartItemClickListener {
     fun onCartItemClick(productId: Int)

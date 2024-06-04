@@ -3,200 +3,234 @@ package woowacourse.shopping.view.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.data.model.toProduct
+import woowacourse.shopping.domain.model.CartItemDomain
+import woowacourse.shopping.domain.model.ProductDomain
+import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
-import woowacourse.shopping.view.cart.QuantityClickListener
-import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.cart.QuantityEventListener
+import woowacourse.shopping.view.home.product.HomeViewItem
+import woowacourse.shopping.view.state.HomeProductUiState
+import woowacourse.shopping.view.state.HomeUiEvent
+import woowacourse.shopping.view.state.RecentProductUiState
 
 class HomeViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), HomeClickListener, QuantityClickListener {
-    private var pageNumber = 0
+) : ViewModel(), HomeEventListener, QuantityEventListener {
+    private val _homeProductUiState: MutableLiveData<HomeProductUiState> =
+        MutableLiveData(HomeProductUiState())
+    val homeProductUiState: LiveData<HomeProductUiState>
+        get() = _homeProductUiState
 
-    private val _shoppingUiState = MutableLiveData<UIState<List<ProductViewItem>>>(UIState.Loading)
-    val shoppingUiState: LiveData<UIState<List<ProductViewItem>>>
-        get() = _shoppingUiState
+    private val _recentProductUiState: MutableLiveData<RecentProductUiState> =
+        MutableLiveData(RecentProductUiState())
+    val recentProductUiState: LiveData<RecentProductUiState>
+        get() = _recentProductUiState
 
-    private val _recentProducts = MutableLiveData<List<RecentProduct>>()
-    val recentProducts: LiveData<List<RecentProduct>>
-        get() = _recentProducts
-
-    val isRecentProductsEmpty: LiveData<Boolean> =
-        recentProducts.map { recentProductsValue ->
-            recentProductsValue.isEmpty()
-        }
-
-    private val _canLoadMore = MutableLiveData(false)
-    val canLoadMore: LiveData<Boolean>
-        get() = _canLoadMore
-
-    private val _totalQuantity = MutableLiveData(0)
-    val totalQuantity: LiveData<Int>
-        get() = _totalQuantity
-
-    private val _updatedProductItem = MutableLiveData<ProductViewItem>()
-    val updatedProductItem: LiveData<ProductViewItem>
-        get() = _updatedProductItem
-
-    private val _navigateToDetail = MutableLiveData<Event<Int>>()
-    val navigateToDetail: LiveData<Event<Int>>
-        get() = _navigateToDetail
-
-    private val _navigateToCart = MutableLiveData<Event<Boolean>>()
-    val navigateToCart: LiveData<Event<Boolean>>
-        get() = _navigateToCart
-
-    private val _loadedProductItems = MutableLiveData<List<ProductViewItem>>(emptyList())
-    val loadedProductItems: LiveData<List<ProductViewItem>>
-        get() = _loadedProductItems
-
-    private var currentCartItems: List<CartItem> = emptyList()
+    private val _homeUiEvent: MutableLiveData<Event<HomeUiEvent>> = MutableLiveData()
+    val homeUiEvent: LiveData<Event<HomeUiEvent>>
+        get() = _homeUiEvent
 
     init {
-        loadRecentProducts()
+        loadRecentItems()
         loadProducts()
-        loadTotalQuantity()
     }
 
-    private fun loadRecentProducts() {
-        _recentProducts.value = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+    override fun addQuantity(cartItemId: Int) {
+        val targetCartItem =
+            homeProductUiState.value?.cartItems?.firstOrNull { it.product.id == cartItemId }
+                ?: return
+        val updatedQuantity = targetCartItem.quantity + 1
+        updateQuantity(targetCartItem, updatedQuantity, cartItemId)
+    }
+
+    override fun subtractQuantity(cartItemId: Int) {
+        val targetCartItem =
+            homeProductUiState.value?.cartItems?.firstOrNull { it.product.id == cartItemId }
+                ?: return
+        val updatedQuantity = targetCartItem.quantity - 1
+        if (updatedQuantity == 0) {
+            cartRepository.deleteCartItem(
+                cartItemId = targetCartItem.cartItemId,
+                onSuccess = {
+                    val cartItems = homeProductUiState.value?.cartItems?.filter {
+                        it.product.id != cartItemId
+                    } ?: return@deleteCartItem
+
+                    val productItems = homeProductUiState.value?.productItems?.map {
+                        if (it.product.id == cartItemId) {
+                            it.copy(_quantity = updatedQuantity)
+                        } else it
+                    } ?: return@deleteCartItem
+
+                    _homeProductUiState.value = homeProductUiState.value?.copy(
+                        productItems = productItems,
+                        cartItems = cartItems,
+                        totalCartQuantity = cartItems.sumOf { it.quantity }
+                    )
+                },
+                onFailure = {
+
+                },
+            )
+        } else {
+            updateQuantity(targetCartItem, updatedQuantity, cartItemId)
+        }
+    }
+
+    private fun updateQuantity(
+        targetCartItem: CartItemDomain,
+        updatedQuantity: Int,
+        productId: Int
+    ) {
+        println("$targetCartItem : $updatedQuantity")
+        cartRepository.updateCartItem(
+            cartItemId = targetCartItem.cartItemId,
+            quantity = updatedQuantity,
+            onSuccess = {
+                println("successful - $targetCartItem : $updatedQuantity")
+                val cartItems = homeProductUiState.value?.cartItems?.map {
+                    if (it.product.id == productId) {
+                        it.copy(quantity = updatedQuantity)
+                    } else it
+                } ?: return@updateCartItem
+
+                val productItems = homeProductUiState.value?.productItems?.map {
+                    if (it.product.id == productId) {
+                        it.copy(_quantity = updatedQuantity)
+                    } else it
+                } ?: return@updateCartItem
+
+                _homeProductUiState.value = homeProductUiState.value?.copy(
+                    productItems = productItems,
+                    cartItems = cartItems,
+                    totalCartQuantity = cartItems.sumOf { it.quantity }
+                )
+            },
+            onFailure = {
+
+            },
+        )
+    }
+
+    override fun navigateToDetail(productId: Int) {
+        recentProductRepository.save(
+            homeProductUiState.value?.productItems?.firstOrNull { it.product.id == productId }?.product?.toProduct()
+                ?: return
+        )
+        _homeUiEvent.value = Event(HomeUiEvent.NavigateToDetail(productId))
+    }
+
+    override fun navigateToCart() {
+        _homeUiEvent.value = Event(HomeUiEvent.NavigateToCart)
+    }
+
+    override fun loadMore() {
+        loadProducts()
+    }
+
+    override fun addToCart(product: ProductItemDomain) {
+        cartRepository.addCartItem(
+            productId = product.id,
+            quantity = 1,
+            onSuccess = {
+                cartRepository.getCartItems(
+                    0,
+                    homeProductUiState.value?.totalCartQuantity?.plus(1) ?: return@addCartItem,
+                    DEFAULT_SORT_ORDER,
+                    onSuccess = { cart ->
+                        val cartItem = cart.cartItems.firstOrNull { it.product.id == product.id }
+                            ?: return@getCartItems
+                        val productItems = homeProductUiState.value?.productItems?.map {
+                            if (it.product.id == cartItem.product.id) {
+                                it.copy(_quantity = 1)
+                            } else {
+                                it
+                            }
+                        } ?: return@getCartItems
+                        _homeProductUiState.value = homeProductUiState.value?.copy(
+                            totalCartQuantity = homeProductUiState.value?.totalCartQuantity?.plus(1)
+                                ?: return@getCartItems,
+                            cartItems = cart.cartItems,
+                            productItems = productItems
+                        )
+                    },
+                    onFailure = {
+
+                    },
+                )
+            },
+            onFailure = {
+
+            },
+        )
+    }
+
+    fun loadRecentItems() {
+        val recentProductItems = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+        _recentProductUiState.value = recentProductUiState.value?.copy(
+            isLoading = false,
+            isEmpty = recentProductItems.isEmpty(),
+            productItems = recentProductItems
+        )
     }
 
     private fun loadProducts() {
-        val productResponse =
-            productRepository.getProducts(
-                category = CATEGORY_UNDEFINED,
-                page = pageNumber++,
-                size = PAGE_SIZE,
-                sort = DEFAULT_SORT_ORDER,
-            )
+        productRepository.getProducts(
+            page = homeProductUiState.value?.currentPageNumber ?: 0,
+            size = PAGE_SIZE,
+            category = CATEGORY_UNDEFINED,
+            sort = DEFAULT_SORT_ORDER,
+            onSuccess = ::addProductsWithQuantity,
+            onFailure = {
 
-        val products = productResponse.getOrNull()?.products ?: emptyList()
-        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc")
-            .getOrNull()?.cartItems ?: emptyList()
-
-        val newItems =
-            products.map { product ->
-                val quantity =
-                    currentCartItems.firstOrNull { it.product.id == product.id }?.quantity ?: 0
-                ProductViewItem(product, quantity)
             }
-        _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
-
-        _loadedProductItems.value = loadedProductItems.value?.plus(newItems)
-        _shoppingUiState.value = UIState.Success(loadedProductItems.value ?: emptyList())
+        )
     }
 
-    fun updateData() {
-        loadRecentProducts()
+    private fun addProductsWithQuantity(productDomain: ProductDomain) {
+        cartRepository.getCartTotalQuantity(
+            onSuccess = { totalQuantity ->
+                placeQuantitiesToProductItem(productDomain, totalQuantity)
+            },
+            onFailure = {
 
-        currentCartItems =
-            cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
-                ?: emptyList()
-        _totalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
-
-        val updatedProductItems =
-            currentCartItems.map { cartItem ->
-                ProductViewItem(cartItem.product, cartItem.quantity)
             }
+        )
+    }
 
-        loadedProductItems.value?.forEachIndexed { index, loadedItem ->
-            if (loadedItem.quantity > 0 && currentCartItems.firstOrNull { it.product.id == loadedItem.product.id } == null) {
-                val productItem = ProductViewItem(loadedItem.product, 0)
-                (loadedProductItems.value as MutableList)[index] = productItem
-            }
-        }
-
-        updatedProductItems.forEach { updatedItem ->
-            val position =
-                loadedProductItems.value?.indexOfFirst { loadedItem ->
-                    loadedItem.product.id == updatedItem.product.id
+    private fun placeQuantitiesToProductItem(productDomain: ProductDomain, totalQuantity: Int) {
+        cartRepository.getCartItems(
+            0,
+            totalQuantity,
+            DEFAULT_SORT_ORDER,
+            onSuccess = { cart ->
+                val productItems = productDomain.products.map { product ->
+                    val quantity =
+                        cart.cartItems.firstOrNull { it.product.id == product.id }?.quantity ?: 0
+                    HomeViewItem.ProductViewItem(product, quantity)
                 }
-            if (position != -1 && position != null) {
-                (loadedProductItems.value as MutableList)[position] = updatedItem
-            }
-        }
-        _loadedProductItems.value = loadedProductItems.value?.toList()
-    }
+                _homeProductUiState.value =
+                    homeProductUiState.value?.copy(
+                        isLoading = false,
+                        totalCartQuantity = totalQuantity,
+                        currentPageNumber = homeProductUiState.value?.currentPageNumber?.plus(1)
+                            ?: return@getCartItems,
+                        productItems = homeProductUiState.value?.productItems?.plus(productItems)
+                            ?: return@getCartItems,
+                        cartItems = cart.cartItems,
+                        loadMoreAvailable = productDomain.last.not()
+                    )
+            },
+            onFailure = {
 
-    private fun loadTotalQuantity() {
-        _totalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
-    }
-
-    override fun onLoadMoreButtonClick() {
-        loadProducts()
-    }
-
-    override fun onShoppingCartButtonClick() {
-        _navigateToCart.value = Event(true)
-    }
-
-    override fun onPlusButtonClick(product: Product) {
-        _totalQuantity.value = totalQuantity.value?.plus(1)
-        cartRepository.addCartItem(product.id, 1).getOrNull()
-        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
-            ?: emptyList()
-
-        updateLoadedProductQuantity(product, 1)
-    }
-
-    private fun updateLoadedProductQuantity(
-        product: Product,
-        quantity: Int,
-    ) {
-        val productItem = ProductViewItem(product, quantity)
-        _updatedProductItem.value = productItem
-
-        val position = _loadedProductItems.value?.indexOfFirst { it.product.id == product.id }
-        if (position != null) {
-            (loadedProductItems.value as MutableList)[position] = productItem
-        }
-    }
-
-    override fun onProductClick(productId: Int) {
-        _navigateToDetail.value = Event(productId)
-    }
-
-    override fun onQuantityPlusButtonClick(productId: Int) {
-        val product = productRepository.getProductById(productId).getOrNull() ?: return
-        val currentCartItem = currentCartItems.firstOrNull { it.product.id == product.id }
-        val quantity = currentCartItem?.quantity ?: 0
-        val cartItemId = currentCartItem?.cartItemId ?: return
-        _totalQuantity.value = totalQuantity.value?.plus(1)
-        cartRepository.updateCartItem(cartItemId, quantity + 1).getOrNull()
-
-        currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
-            ?: emptyList()
-        updateLoadedProductQuantity(product, quantity + 1)
-    }
-
-    override fun onQuantityMinusButtonClick(productId: Int) {
-        val product = productRepository.getProductById(productId).getOrNull() ?: return
-        val currentCartItem = currentCartItems.firstOrNull { it.product.id == product.id }
-        val quantity = currentCartItem?.quantity ?: 0
-        val cartItemId = currentCartItem?.cartItemId ?: return
-        val position = currentCartItems.indexOfFirst { it.cartItemId == cartItemId }
-        _totalQuantity.value = totalQuantity.value?.minus(1)?.coerceAtLeast(0)
-        if (quantity == 1) {
-            val result = cartRepository.deleteCartItem(cartItemId).getOrNull()
-            currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
-                ?: emptyList()
-        } else {
-            cartRepository.updateCartItem(cartItemId, quantity - 1).getOrNull()
-            currentCartItems = cartRepository.getCartItems(0, totalQuantity.value ?: 0, "asc").getOrNull()?.cartItems
-                ?: emptyList()
-        }
-
-        updateLoadedProductQuantity(product, quantity - 1)
+            },
+        )
     }
 
     companion object {

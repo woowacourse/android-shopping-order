@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.cart.CartViewModel" />
+            type="woowacourse.shopping.view.cart.list.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

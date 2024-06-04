@@ -5,10 +5,10 @@
 
         <variable
             name="clickListener"
-            type="woowacourse.shopping.view.cart.QuantityClickListener" />
+            type="woowacourse.shopping.view.cart.QuantityEventListener" />
 
         <variable
-            name="productId"
+            name="itemId"
             type="Integer" />
 
         <variable
@@ -27,7 +27,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:backgroundTint="@android:color/transparent"
-            android:onClick="@{() -> clickListener.onQuantityMinusButtonClick(productId)}"
+            android:onClick="@{() -> clickListener.subtractQuantity(itemId)}"
             android:src="@drawable/ic_minus" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:backgroundTint="@android:color/transparent"
-            android:onClick="@{() -> clickListener.onQuantityPlusButtonClick(productId)}"
+            android:onClick="@{() -> clickListener.addQuantity(itemId)}"
             android:src="@drawable/ic_plus" />
     </LinearLayout>
 </layout>

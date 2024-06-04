@@ -17,6 +17,12 @@ import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.view.cart.list.CartFragment
+import woowacourse.shopping.view.cart.list.CartViewModel
+import woowacourse.shopping.view.cart.recommend.RecommendFragment
+import woowacourse.shopping.view.detail.DetailActivity
+import woowacourse.shopping.view.state.CartListUiEvent
+import woowacourse.shopping.view.state.RecommendListUiEvent
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -24,9 +30,9 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderRepository =
-                OrderRepositoryImpl(
-                    remoteOrderDataSource,
-                ),
+            OrderRepositoryImpl(
+                remoteOrderDataSource,
+            ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
         )
@@ -57,19 +63,38 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.isBackButtonClicked.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                finish()
+        viewModel.cartListUiEvent.observe(this) {
+            val event = it.getContentIfNotHandled() ?: return@observe
+            when (event) {
+                is CartListUiEvent.NavigateToRecommendList -> replaceFragment(recommendFragment)
+                is CartListUiEvent.NavigateToProductDetail -> {
+                    startActivity(
+                        DetailActivity.createIntent(
+                            this,
+                            event.productId,
+                            event.lastlyViewed,
+                        )
+                    )
+                }
+
+                is CartListUiEvent.NavigateBack -> finish()
             }
         }
-        viewModel.navigateBack.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                finish()
-            }
-        }
-        viewModel.navigateToRecommend.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                replaceFragment(recommendFragment)
+
+        viewModel.recommendListUiEvent.observe(this) {
+            val event = it.getContentIfNotHandled() ?: return@observe
+            when (event) {
+                is RecommendListUiEvent.NavigateBackToCartList -> replaceFragment(cartFragment)
+
+                is RecommendListUiEvent.NavigateToProductDetail -> {
+                    startActivity(
+                        DetailActivity.createIntent(
+                            this,
+                            event.productId,
+                            event.lastlyViewed,
+                        )
+                    )
+                }
             }
         }
     }

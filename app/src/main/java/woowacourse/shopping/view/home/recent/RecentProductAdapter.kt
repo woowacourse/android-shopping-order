@@ -1,13 +1,13 @@
-package woowacourse.shopping.view.home.adapter.recent
+package woowacourse.shopping.view.home.recent
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentProductBinding
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.view.home.HomeClickListener
+import woowacourse.shopping.view.home.HomeEventListener
 
-class RecentProductAdapter(private val clickListener: HomeClickListener) :
+class RecentProductAdapter(private val clickListener: HomeEventListener) :
     RecyclerView.Adapter<RecentProductViewHolder>() {
     private var recentProducts: List<RecentProduct> = emptyList()
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.cart.recommend
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,17 +7,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.view.home.adapter.product.ProductAdapter
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.cart.list.CartViewModel
 
 class RecommendFragment : Fragment() {
     private var _binding: FragmentRecommendBinding? = null
     private val binding: FragmentRecommendBinding
         get() = _binding!!
 
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: RecommendProductAdapter
     private val viewModel by activityViewModels<CartViewModel>()
 
     override fun onCreateView(
@@ -34,15 +32,11 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ProductAdapter(viewModel, viewModel)
+        adapter = RecommendProductAdapter(viewModel, viewModel)
         binding.rvRecommend.adapter = adapter
-
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UIState.Success -> adapter.loadData(state.data, false)
-                is UIState.Loading -> return@observe
-                is UIState.Error -> showError(state.exception.message ?: getString(R.string.unknown_error))
-            }
+        viewModel.loadRecommendedItems()
+        viewModel.recommendedListUiState.observe(viewLifecycleOwner) { state ->
+            adapter.loadData(state.recommendedProducts)
         }
     }
 

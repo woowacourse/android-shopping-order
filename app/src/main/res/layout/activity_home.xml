@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.home.HomeViewModel" />
@@ -41,7 +43,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:backgroundTint="@android:color/transparent"
-                android:onClick="@{() -> viewModel.onShoppingCartButtonClick()}"
+                android:onClick="@{() -> viewModel.navigateToCart()}"
                 android:src="@drawable/ic_cart"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/shopping_cart_count"
@@ -54,15 +56,15 @@
                 android:background="@drawable/shape_circle"
                 android:backgroundTint="@color/teal_200"
                 android:gravity="center"
-                android:onClick="@{() -> viewModel.onShoppingCartButtonClick()}"
-                android:text="@{String.valueOf(viewModel.totalQuantity)}"
+                android:onClick="@{() -> viewModel.navigateToCart()}"
+                android:text="@{String.valueOf(viewModel.homeProductUiState.totalCartQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="14dp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:totalQuantityVisibility="@{viewModel.totalQuantity}"
+                app:totalQuantityVisibility="@{viewModel.homeProductUiState.totalCartQuantity}"
                 tools:text="2"
                 tools:visibility="visible" />
 
@@ -109,7 +111,7 @@
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintStart_toStartOf="@id/tv_recent_products_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_recent_products_title"
-                        app:viewVisibility="@{!viewModel.isRecentProductsEmpty}"
+                        android:visibility="@{viewModel.recentProductUiState.isEmpty ? View.GONE : View.VISIBLE}"
                         tools:listitem="@layout/item_recent_product"
                         tools:visibility="visible" />
 
@@ -126,7 +128,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@id/tv_recent_products_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_recent_products_title"
-                        app:viewVisibility="@{viewModel.isRecentProductsEmpty}"
+                        app:viewVisibility="@{viewModel.recentProductUiState.productItems.empty}"
                         tools:visibility="gone" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -141,14 +143,12 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_product_list"
                     android:layout_width="match_parent"
-                    android:layout_marginLeft="16dp"
                     android:layout_height="wrap_content"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:layout_constraintTop_toBottomOf="@id/divider"
                     app:spanCount="2"
                     tools:itemCount="20"
-
                     tools:layout_editor_absoluteX="0dp"
                     tools:listitem="@layout/item_product" />
 

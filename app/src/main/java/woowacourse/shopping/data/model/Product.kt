@@ -2,6 +2,8 @@ package woowacourse.shopping.data.model
 
 import com.google.gson.annotations.SerializedName
 import woowacourse.shopping.data.local.database.RecentProductEntity
+import woowacourse.shopping.domain.model.ProductDomain
+import woowacourse.shopping.domain.model.ProductItemDomain
 import java.time.LocalDateTime
 
 data class Product(
@@ -22,3 +24,14 @@ fun Product.toRecentProductEntity(): RecentProductEntity {
         category = this.category,
     )
 }
+
+fun ProductItemDomain.toProduct(): Product {
+    return Product(
+        category = category,
+        id = id,
+        imageUrl = imageUrl,
+        name = name,
+        price = price
+    )
+}
+

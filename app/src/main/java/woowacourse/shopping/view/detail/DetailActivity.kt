@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
@@ -15,7 +14,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.cart.CartActivity
-import woowacourse.shopping.view.state.UIState
+import woowacourse.shopping.view.state.DetailUiEvent
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
@@ -41,13 +40,13 @@ class DetailActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-        viewModel.saveRecentProduct(isMostRecentProductClicked)
+//        viewModel.saveRecentProduct(isMostRecentProductClicked)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        viewModel.updateRecentProductVisible(isMostRecentProductClicked)
-    }
+//    override fun onRestart() {
+//        super.onRestart()
+//        viewModel.updateRecentProductVisible(isMostRecentProductClicked)
+//    }
 
     private fun setUpDataBinding() {
         binding.lifecycleOwner = this
@@ -55,29 +54,40 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.detailUiState.observe(this) { state ->
-            if (state is UIState.Error) {
-                showError(
-                    state.exception.message ?: getString(R.string.unknown_error),
-                )
-            }
-        }
+//        viewModel.detailUiState.observe(this) { state ->
+//            if (state is UIState.Error) {
+//                showError(
+//                    state.exception.message ?: getString(R.string.unknown_error),
+//                )
+//            }
+//        }
+//
+//        viewModel.navigateToCart.observe(this) {
+//            it.getContentIfNotHandled()?.let {
+//                putCartItem()
+//            }
+//        }
+//
+//        viewModel.navigateToRecentDetail.observe(this) {
+//            it.getContentIfNotHandled()?.let {
+//                navigateToDetail()
+//            }
+//        }
+//
+//        viewModel.isFinishButtonClicked.observe(this) {
+//            it.getContentIfNotHandled()?.let {
+//                finish()
+//            }
+//        }
+//        viewModel.productDetailUiState.observe(this) {
+//
+//        }
 
-        viewModel.navigateToCart.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                putCartItem()
-            }
-        }
-
-        viewModel.navigateToRecentDetail.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                navigateToDetail()
-            }
-        }
-
-        viewModel.isFinishButtonClicked.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                finish()
+        viewModel.detailUiEvent.observe(this) {
+            when (val event = it.getContentIfNotHandled() ?: return@observe) {
+                is DetailUiEvent.NavigateToCart -> navigateToCart()
+                is DetailUiEvent.NavigateToRecentProduct -> navigateToDetail(event.productId)
+                is DetailUiEvent.NavigateBack -> finish()
             }
         }
     }
@@ -86,18 +96,17 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun navigateToDetail() {
-        val recentProduct = viewModel.mostRecentProduct.value ?: return
+    private fun navigateToDetail(productId: Int) {
         startActivity(
             createIntent(
                 this,
-                recentProduct.productId,
+                productId,
                 true,
             ),
         )
     }
 
-    private fun putCartItem() {
+    private fun navigateToCart() {
         Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
         startActivity(CartActivity.createIntent(context = this))
     }

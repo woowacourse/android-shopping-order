@@ -7,7 +7,7 @@
 
         <variable
             name="clickListener"
-            type="woowacourse.shopping.view.home.HomeClickListener" />
+            type="woowacourse.shopping.view.home.HomeEventListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +20,7 @@
             android:layout_height="50dp"
             android:background="@color/purple_200"
             android:gravity="center"
-            android:onClick="@{() -> clickListener.onLoadMoreButtonClick()}"
+            android:onClick="@{() -> clickListener.loadMore()}"
             android:text="Load More"
             android:textColor="@color/white"
             android:textSize="20dp"

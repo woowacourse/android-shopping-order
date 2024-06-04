@@ -15,10 +15,12 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
-import woowacourse.shopping.view.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
-import woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.view.home.adapter.product.ProductAdapter
-import woowacourse.shopping.view.home.adapter.recent.RecentProductAdapter
+import woowacourse.shopping.view.home.product.HomeViewItem
+import woowacourse.shopping.view.home.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
+import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
+import woowacourse.shopping.view.home.product.ProductAdapter
+import woowacourse.shopping.view.home.recent.RecentProductAdapter
+import woowacourse.shopping.view.state.HomeUiEvent
 import woowacourse.shopping.view.state.UIState
 
 class HomeActivity : AppCompatActivity() {
@@ -44,7 +46,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        viewModel.updateData()
+        viewModel.loadRecentItems()
     }
 
     private fun setUpDataBinding() {
@@ -71,44 +73,28 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.shoppingUiState.observe(this) { state ->
-            when (state) {
-                is UIState.Success -> showData(state.data)
-                is UIState.Loading -> return@observe
-                is UIState.Error ->
-                    showError(
-                        state.exception.message ?: getString(R.string.unknown_error),
-                    )
+        viewModel.recentProductUiState.observe(this) { recentProductState ->
+            if (!recentProductState.isLoading) {
+                recentProductAdapter.loadData(recentProductState.productItems)
             }
         }
 
-        viewModel.recentProducts.observe(this) {
-            recentProductAdapter.loadData(it)
-        }
-
-        viewModel.updatedProductItem.observe(this) {
-            productAdapter.updateProductQuantity(it)
-        }
-
-        viewModel.loadedProductItems.observe(this) {
-            productAdapter.updateData(it)
-        }
-
-        viewModel.navigateToDetail.observe(this) {
-            it.getContentIfNotHandled()?.let { productId ->
-                navigateToDetail(productId)
+        viewModel.homeProductUiState.observe(this) { homeProductState ->
+            if (!homeProductState.isLoading) {
+                showData(homeProductState.productItems)
             }
         }
 
-        viewModel.navigateToCart.observe(this) {
-            it.getContentIfNotHandled()?.let {
-                navigateToCart()
+        viewModel.homeUiEvent.observe(this) { homeUiEvent ->
+            when (val event = homeUiEvent.getContentIfNotHandled() ?: return@observe) {
+                is HomeUiEvent.NavigateToCart -> navigateToCart()
+                is HomeUiEvent.NavigateToDetail -> navigateToDetail(event.productId)
             }
         }
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.loadData(data, viewModel.canLoadMore.value ?: false)
+        productAdapter.loadData(data, viewModel.homeProductUiState.value?.loadMoreAvailable ?: false)
     }
 
     private fun showError(errorMessage: String) {
