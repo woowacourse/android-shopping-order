@@ -87,7 +87,7 @@ class CartViewModel(
         loadAllCartItems(initialTotalCartItemCount)
     }
 
-    fun loadAllCartItems(pageSize: Int) {
+    private fun loadAllCartItems(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
             cartRepository.load(
@@ -144,12 +144,12 @@ class CartViewModel(
 
     override fun onOrderClicked() {
         when (orderState.value ?: return) {
-            is OrderState.CartList -> {
+            OrderState.CartList -> {
                 if (totalCount.value == 0) return
                 _orderEvent.value = Event(OrderEvent.MoveToRecommend)
             }
 
-            is OrderState.Recommend -> {
+            OrderState.Recommend -> {
                 val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
                 if (cartItemIds.isNotEmpty()) {
                     orderRepository.completeOrder(cartItemIds, onSuccess = {

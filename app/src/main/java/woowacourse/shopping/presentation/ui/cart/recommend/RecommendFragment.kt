@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.cart.OrderState
-import woowacourse.shopping.presentation.util.EventObserver
 
 class RecommendFragment : Fragment() {
     lateinit var binding: FragmentRecommendBinding
@@ -31,7 +30,6 @@ class RecommendFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         initCartAdapter()
-        observeErrorEventUpdates()
         observeRecommendedUpdates()
         viewModel.buildRecommendProducts()
     }
@@ -47,16 +45,8 @@ class RecommendFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.setOrderState(OrderState.Recommend)
-    }
-
-    private fun observeErrorEventUpdates() {
-        viewModel.error.observe(
-            viewLifecycleOwner,
-            EventObserver {
-            },
-        )
     }
 }

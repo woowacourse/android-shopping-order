@@ -10,7 +10,6 @@ import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.cart.OrderState
-import woowacourse.shopping.presentation.util.EventObserver
 
 class CartListFragment : Fragment() {
     lateinit var binding: FragmentCartListBinding
@@ -23,30 +22,26 @@ class CartListFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentCartListBinding.inflate(inflater)
-
-        binding.lifecycleOwner = viewLifecycleOwner
-        initCartAdapter()
-        observeErrorEventUpdates()
-        observeCartUpdates()
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
+        initCartAdapter()
+        observeCartUpdates()
+    }
+
+    override fun onStart() {
+        super.onStart()
         viewModel.setOrderState(OrderState.CartList)
-        viewModel.loadAllCartItems(50)
     }
 
     private fun initCartAdapter() {
         binding.rvCarts.adapter = cartAdapter
-    }
-
-    private fun observeErrorEventUpdates() {
-        viewModel.error.observe(
-            viewLifecycleOwner,
-            EventObserver {
-            },
-        )
     }
 
     private fun observeCartUpdates() {

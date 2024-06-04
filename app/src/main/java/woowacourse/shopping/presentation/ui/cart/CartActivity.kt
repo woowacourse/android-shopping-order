@@ -80,6 +80,14 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         return updatedProducts
     }
 
+    private fun observeErrorEventUpdates() {
+        viewModel.error.observe(
+            this,
+            EventObserver {
+            },
+        )
+    }
+
     companion object {
         private const val EXTRA_CART_ITEM_QUANTITY = "cartItemQuantity"
 
