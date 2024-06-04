@@ -10,7 +10,6 @@ class RecommendViewHolder(private val binding: ItemProductBinding) :
         shoppingProduct: ShoppingProduct,
         recommendItemCountHandler: RecommendItemCountHandler,
     ) {
-        binding.product = shoppingProduct.product
         binding.shoppingProduct = shoppingProduct
         binding.countHandler = recommendItemCountHandler
     }

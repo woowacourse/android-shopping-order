@@ -106,12 +106,6 @@ class ShoppingActivity : AppCompatActivity() {
             shoppingAdapter.submitList(it)
         }
 
-        /*viewModel.recentProducts.observe(this) {
-            Log.d("crong", "observeViewModel: ${it.size}")
-            recentProductAdapter.submitList(it) {
-                binding.horizontalView.rvRecentProduct.scrollToPosition(0)
-            }
-        }*/
         viewModel.recentProducts.observe(this) { recentProducts ->
             recentProductAdapter.submitList(recentProducts) {
                 binding.horizontalView.rvRecentProduct.scrollToPosition(0)
