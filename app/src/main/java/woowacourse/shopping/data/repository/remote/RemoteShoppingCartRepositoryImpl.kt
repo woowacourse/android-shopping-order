@@ -70,7 +70,7 @@ class RemoteShoppingCartRepositoryImpl(
                 }
             }
             .recoverCatching {
-                throw ErrorEvent.AddCartEvent()
+                throw ErrorEvent.UpdateCartEvent()
             }
     }
 
