@@ -1,17 +1,19 @@
 package woowacourse.shopping.data.recent
 
-import woowacourse.shopping.data.recent.RecentProductEntity.Companion.toEntity
-import woowacourse.shopping.domain.RecentProductItem
+import woowacourse.shopping.data.recent.RecentProductEntity.Companion.toRecentProductEntity
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.RecentRepository
+import java.time.LocalDateTime
 import kotlin.concurrent.thread
 
 class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentRepository {
-    override fun loadAll(): Result<List<RecentProductItem>> {
-        var result: Result<List<RecentProductItem>>? = null
+    override fun loadAll(): Result<List<Product>> {
+        var result: Result<List<Product>>? = null
         thread {
             result =
                 runCatching {
-                    dao.loadAll().map { entity ->
+                    val recentViewed = dao.loadAll()
+                    recentViewed.map { entity ->
                         entity.toDomain()
                     }
                 }
@@ -19,8 +21,8 @@ class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentRep
         return result ?: throw NoSuchElementException()
     }
 
-    override fun loadMostRecent(): Result<RecentProductItem?> {
-        var result: Result<RecentProductItem?>? = null
+    override fun loadMostRecent(): Result<Product?> {
+        var result: Result<Product?>? = null
         thread {
             result =
                 runCatching {
@@ -31,10 +33,10 @@ class RecentProductRepositoryImpl(private val dao: RecentProductDao) : RecentRep
         return result ?: throw NoSuchElementException()
     }
 
-    override fun add(recentProduct: RecentProductItem): Result<Long> {
+    override fun add(recentProduct: Product): Result<Long> {
         return runCatching {
             dao.insert(
-                recentProduct.toEntity(),
+                recentProduct.toRecentProductEntity(LocalDateTime.now()),
             )
         }
     }
