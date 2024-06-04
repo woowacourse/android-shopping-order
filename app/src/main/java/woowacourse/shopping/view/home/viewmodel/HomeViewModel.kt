@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.toCartItem
-import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.data.mapper.toCartItem
+import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -54,8 +54,8 @@ class HomeViewModel(
     val navigateToDetail: LiveData<Event<Int>>
         get() = _navigateToDetail
 
-    private val _navigateToCart = MutableLiveData<Event<Boolean>>()
-    val navigateToCart: LiveData<Event<Boolean>>
+    private val _navigateToCart = MutableLiveData<Event<Unit>>()
+    val navigateToCart: LiveData<Event<Unit>>
         get() = _navigateToCart
 
     private var page = 0
@@ -163,7 +163,7 @@ class HomeViewModel(
     }
 
     override fun onShoppingCartButtonClick() {
-        _navigateToCart.value = Event(true)
+        _navigateToCart.value = Event(Unit)
     }
 
     override fun onProductClick(productId: Int) {

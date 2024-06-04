@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.db.recent.RecentProductEntity
 import woowacourse.shopping.data.dto.CartItemDto

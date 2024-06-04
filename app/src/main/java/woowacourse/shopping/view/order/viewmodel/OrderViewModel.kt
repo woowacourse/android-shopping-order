@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.toCartViewItem
-import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.data.mapper.toCartViewItem
+import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -87,24 +87,24 @@ class OrderViewModel(
     val navigateToDetail: LiveData<Event<Int>>
         get() = _navigateToDetail
 
-    private val _navigateToRecommend = MutableLiveData<Event<Boolean>>()
-    val navigateToRecommend: LiveData<Event<Boolean>>
+    private val _navigateToRecommend = MutableLiveData<Event<Unit>>()
+    val navigateToRecommend: LiveData<Event<Unit>>
         get() = _navigateToRecommend
 
-    private val _navigateToBack = MutableLiveData<Event<Boolean>>()
-    val navigateToBack: LiveData<Event<Boolean>>
+    private val _navigateToBack = MutableLiveData<Event<Unit>>()
+    val navigateToBack: LiveData<Event<Unit>>
         get() = _navigateToBack
 
-    private val _notifyDeletion = MutableLiveData<Event<Boolean>>()
-    val notifyDeletion: LiveData<Event<Boolean>>
+    private val _notifyDeletion = MutableLiveData<Event<Unit>>()
+    val notifyDeletion: LiveData<Event<Unit>>
         get() = _notifyDeletion
 
-    private val _notifyCanNotOrder = MutableLiveData<Event<Boolean>>()
-    val notifyCanNotOrder: LiveData<Event<Boolean>>
+    private val _notifyCanNotOrder = MutableLiveData<Event<Unit>>()
+    val notifyCanNotOrder: LiveData<Event<Unit>>
         get() = _notifyCanNotOrder
 
-    private val _notifyOrderCompleted = MutableLiveData<Event<Boolean>>()
-    val notifyOrderCompleted: LiveData<Event<Boolean>>
+    private val _notifyOrderCompleted = MutableLiveData<Event<Unit>>()
+    val notifyOrderCompleted: LiveData<Event<Unit>>
         get() = _notifyOrderCompleted
 
     private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
@@ -214,7 +214,7 @@ class OrderViewModel(
             }
 
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
-            _notifyDeletion.value = Event(true)
+            _notifyDeletion.value = Event(Unit)
         }
     }
 
@@ -335,11 +335,11 @@ class OrderViewModel(
 
     override fun onOrderButtonClick() {
         if (selectedCartViewItemSize.value == 0) {
-            _notifyCanNotOrder.value = Event(true)
+            _notifyCanNotOrder.value = Event(Unit)
         } else {
             if (orderState.value is OrderState.Cart) {
                 _orderState.value = OrderState.Recommend
-                _navigateToRecommend.value = Event(true)
+                _navigateToRecommend.value = Event(Unit)
             } else {
                 runCatching {
                     val selectedCartItemIds =
@@ -348,7 +348,7 @@ class OrderViewModel(
                         } ?: return
                     orderRepository.postOrder(selectedCartItemIds)
                 }.onSuccess {
-                    _notifyOrderCompleted.value = Event(true)
+                    _notifyOrderCompleted.value = Event(Unit)
                 }
             }
         }

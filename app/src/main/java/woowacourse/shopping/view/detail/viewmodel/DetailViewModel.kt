@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -47,16 +47,16 @@ class DetailViewModel(
     val isMostRecentProductVisible: LiveData<Boolean>
         get() = _isMostRecentProductVisible
 
-    private val _navigateToCart = MutableLiveData<Event<Boolean>>()
-    val navigateToCart: LiveData<Event<Boolean>>
+    private val _navigateToCart = MutableLiveData<Event<Unit>>()
+    val navigateToCart: LiveData<Event<Unit>>
         get() = _navigateToCart
 
-    private val _navigateToRecentDetail = MutableLiveData<Event<Boolean>>()
-    val navigateToRecentDetail: LiveData<Event<Boolean>>
+    private val _navigateToRecentDetail = MutableLiveData<Event<Unit>>()
+    val navigateToRecentDetail: LiveData<Event<Unit>>
         get() = _navigateToRecentDetail
 
-    private val _isFinishButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isFinishButtonClicked: LiveData<Event<Boolean>>
+    private val _isFinishButtonClicked = MutableLiveData<Event<Unit>>()
+    val isFinishButtonClicked: LiveData<Event<Unit>>
         get() = _isFinishButtonClicked
 
     init {
@@ -113,12 +113,12 @@ class DetailViewModel(
 
     override fun onPutCartButtonClick() {
         saveCartItem()
-        _navigateToCart.value = Event(true)
+        _navigateToCart.value = Event(Unit)
     }
 
     override fun onRecentProductClick() {
         _isMostRecentProductVisible.value = false
-        _navigateToRecentDetail.value = Event(true)
+        _navigateToRecentDetail.value = Event(Unit)
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
@@ -130,6 +130,6 @@ class DetailViewModel(
     }
 
     override fun onFinishButtonClick() {
-        _isFinishButtonClicked.value = Event(true)
+        _isFinishButtonClicked.value = Event(Unit)
     }
 }
