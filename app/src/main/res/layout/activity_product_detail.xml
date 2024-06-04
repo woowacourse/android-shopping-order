@@ -138,7 +138,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/space_mid"
                 app:layout_constraintTop_toTopOf="@id/tv_price_value"
-                app:shoppingActionHandler="@{detailActionHandler}" />
+                app:cartCountHandler="@{detailActionHandler}" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <include
             android:id="@+id/layout_shimmer"

@@ -130,17 +130,12 @@ class ShoppingViewModel(private val repository: Repository) :
 
             cartProducts[index].plusQuantity()
 
-            if (cartProducts[index].quantity == 1) {
-                repository.postCartItem(
-                    CartItemRequest(
-                        productId = cartProducts[index].productId.toInt(),
-                        quantity = cartProducts[index].quantity,
-                    ),
-                )
+            if (cartProducts[index].quantity == FIRST_UPDATE) {
+                repository.postCartItem(CartItemRequest.fromCartProduct(cartProduct))
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
                         saveRecentProduct(cartProducts[index])
+                        this.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -152,8 +147,8 @@ class ShoppingViewModel(private val repository: Repository) :
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
                         saveRecentProduct(cartProducts[index])
+                        this.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -219,5 +214,8 @@ class ShoppingViewModel(private val repository: Repository) :
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
+    }
+    companion object {
+        const val FIRST_UPDATE = 1
     }
 }

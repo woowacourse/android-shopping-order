@@ -18,29 +18,24 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     private val curationAdapter: CurationAdapter by lazy { CurationAdapter(viewModel) }
 
     override fun initStartView() {
-        title = "Curation"
+        initTitle()
+        initObserver()
+    }
 
+    private fun initTitle() {
+        title = getString(R.string.curation_title)
+    }
+
+    private fun initObserver() {
         binding.rvCurations.adapter = curationAdapter
         binding.curationActionHandler = viewModel
+        binding.lifecycleOwner = this
 
         viewModel.cartProducts.observe(this) {
             when (it) {
-                is UiState.Loading -> {
-                }
+                is UiState.Loading -> {}
                 is UiState.Success -> {
                     curationAdapter.submitList(it.data)
-                    binding.tvPrice.text =
-                        getString(
-                            R.string.won,
-                            it.data.sumOf {
-                                it.quantity * it.price
-                            },
-                        )
-
-                    binding.tvOrderCount.text =
-                        it.data.sumOf {
-                            it.quantity
-                        }.toString()
                 }
             }
         }

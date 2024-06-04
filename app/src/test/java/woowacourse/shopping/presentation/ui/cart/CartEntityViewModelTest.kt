@@ -15,6 +15,7 @@ import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartViewModel.Companion.CART_DELETE_ERROR
 import woowacourse.shopping.presentation.ui.cart.CartViewModel.Companion.CART_LOAD_ERROR
+import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 @ExtendWith(MockKExtension::class)

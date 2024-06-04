@@ -14,6 +14,8 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import kotlin.concurrent.thread
@@ -29,14 +31,14 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
 
     override fun initStartView() {
         initTitle()
-        binding.rvCarts.adapter = cartAdapter
-        binding.cartActionHandler = viewModel
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
+        initAdapter()
         initData()
         initObserver()
         initBackPressed()
+    }
+
+    private fun initAdapter() {
+        binding.rvCarts.adapter = cartAdapter
     }
 
     private fun initBackPressed() {
@@ -63,6 +65,9 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     private fun initObserver() {
+        binding.cartActionHandler = viewModel
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         viewModel.carts.observe(this) {
             when (it) {
                 is UiState.Loading -> {}
@@ -71,30 +76,12 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                         Thread.sleep(500)
                         runOnUiThread {
                             binding.layoutShimmer.isVisible = false
-                            binding.tvOrderCount.text =
-                                it.data.filter {
-                                    it.isChecked
-                                }.sumOf { it.cartProduct.quantity }.toString()
-                            binding.tvPrice.text =
-                                getString(
-                                    R.string.won,
-                                    it.data.sumOf {
-                                        it.cartProduct.quantity * it.cartProduct.price
-                                    },
-                                )
                             cartAdapter.submitList(it.data)
                         }
                     }
                 }
             }
         }
-
-        viewModel.errorHandler.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { message ->
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         viewModel.eventHandler.observe(
             this,
             EventObserver {
@@ -141,8 +128,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     companion object {
-        const val OFFSET_BASE = 1
-
         fun createIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

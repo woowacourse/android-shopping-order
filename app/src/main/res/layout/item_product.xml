@@ -10,15 +10,15 @@
             type="woowacourse.shopping.domain.CartProduct" />
 
         <variable
-            name="shoppingActionHandler"
-            type="woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler" />
+            name="productActionHandler"
+            type="woowacourse.shopping.presentation.base.ProductActionHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:onClick="@{() -> shoppingActionHandler.onProductClick(cartProduct)}">
+        android:onClick="@{() -> productActionHandler.onProductClick(cartProduct)}">
 
         <ImageView
             android:id="@+id/img_item"
@@ -36,7 +36,7 @@
             android:layout_width="154dp"
             android:layout_height="wrap_content"
             app:cartProduct="@{cartProduct}"
-            app:shoppingActionHandler="@{shoppingActionHandler}"
+            app:cartCountHandler="@{productActionHandler}"
             android:visibility="@{cartProduct.quantity > 0 ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="@id/img_item"
             app:layout_constraintRight_toRightOf="@id/img_item"/>
@@ -51,7 +51,7 @@
             app:layout_constraintRight_toRightOf="@id/img_item"
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="2dp"
-            android:onClick="@{() -> shoppingActionHandler.onPlus(cartProduct)}"
+            android:onClick="@{() -> productActionHandler.onPlus(cartProduct)}"
             android:visibility="@{cartProduct.quantity == 0 ? View.VISIBLE : View.GONE }"
             />
 
