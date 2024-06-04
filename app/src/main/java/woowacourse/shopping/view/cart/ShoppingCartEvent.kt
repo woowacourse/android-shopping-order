@@ -1,33 +1,15 @@
 package woowacourse.shopping.view.cart
 
+import woowacourse.shopping.view.cart.model.ShoppingCart
+
 sealed interface ShoppingCartEvent {
-    sealed interface ErrorState {
-        data object NotKnownError : ErrorState
-    }
-
-    sealed interface SuccessEvent : ShoppingCartEvent
-
     sealed interface UpdateProductEvent : ShoppingCartEvent {
-        data class Success(val productId: Long, val count: Int) : UpdateProductEvent, SuccessEvent
+        data class Success(val productId: Long, val count: Int) : UpdateProductEvent
 
-        data object Fail : UpdateProductEvent, ErrorState
-
-        data class DELETE(val productId: Long) : UpdateProductEvent, SuccessEvent
+        data class DELETE(val productId: Long) : UpdateProductEvent
     }
 
-    sealed interface DeleteShoppingCart : ShoppingCartEvent {
-        data object Fail : DeleteShoppingCart, ErrorState
-    }
-
-    sealed interface LoadCartItemList : ShoppingCartEvent {
-        data object Success : LoadCartItemList
-
-        data object Loading : LoadCartItemList
-
-        data object Fail : LoadCartItemList, ErrorState
-    }
-
-    sealed interface UpdateCheckItem : ShoppingCartEvent {
-        data object Success : UpdateCheckItem, SuccessEvent
+    sealed interface SendCartItem : ShoppingCartEvent {
+        data class Success(val shoppingCart: ShoppingCart) : SendCartItem
     }
 }

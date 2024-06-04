@@ -3,7 +3,6 @@ package woowacourse.shopping.view.cart
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,16 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
+import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.recommend.RecommendFragment
 
-class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
+class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentShoppingCartBinding? = null
     val binding: FragmentShoppingCartBinding get() = _binding!!
@@ -63,59 +64,59 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = shoppingCartViewModel
-        shoppingCartViewModel.loadPagingCartItemList()
-        binding.onClickShoppingCart = this
+        binding.onClickNavigateShoppingCart = this
+        binding.onClickShoppingCart = shoppingCartViewModel
         adapter =
             ShoppingCartAdapter(
-                onClickShoppingCart = this,
+                onClickShoppingCart = shoppingCartViewModel,
                 onClickCartItemCounter = shoppingCartViewModel,
+                onClickNavigateShoppingCart = this,
             )
+        adapter.setShowSkeleton(true)
+        shoppingCartViewModel.loadPagingCartItemList()
         binding.rvShoppingCart.adapter = adapter
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            Log.d("ShoppingCartFragment", "observeData: ${cartItems.size}")
-            adapter.submitList(cartItems)
+            adapter.setShowSkeleton(false)
+            updateRecyclerView(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
+                    adapter.updateCartItem(cartState.productId)
                     mainActivityListener?.saveUpdateProduct(
                         cartState.productId,
                         cartState.count,
                     )
                 }
-                is ShoppingCartEvent.UpdateProductEvent.DELETE -> {}
-                ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
+
+                is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
+                    adapter.deleteCartItem(cartState.productId)
+
+                    mainActivityListener?.saveUpdateProduct(
+                        cartState.productId,
+                        DEFAULT_ITEM_COUNT,
+                    )
+
+                    requireContext().makeToast(
+                        getString(
+                            R.string.delete_cart_item,
+                        ),
+                    )
+                }
+                is ShoppingCartEvent.SendCartItem.Success -> {
+                    navigateOrder(cartState.shoppingCart)
+                }
             }
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            when (errorState) {
-                ShoppingCartEvent.DeleteShoppingCart.Fail ->
-                    requireContext().makeToast(
-                        getString(
-                            R.string.error_delete_data,
-                        ),
-                    )
-
-                ShoppingCartEvent.LoadCartItemList.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.max_paging_data),
-                    )
-
-                ShoppingCartEvent.ErrorState.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-
-                ShoppingCartEvent.UpdateProductEvent.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.error_update_cart_item),
-                    )
-            }
+            requireContext().makeToast(
+                errorState.receiveErrorMessage(),
+            )
         }
 
         mainActivityListener?.observeCartItem {
@@ -141,30 +142,16 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
         mainActivityListener?.changeFragment(productFragment)
     }
 
-    override fun clickRemoveCartItem(cartItem: CartItem) {
-        shoppingCartViewModel.deleteShoppingCartItem(cartItem)
-    }
-
-    override fun clickCheckBox(cartItem: CartItem) {
-        if (cartItem.cartItemSelector.isSelected) {
-            shoppingCartViewModel.deleteCheckedItem(cartItem)
-        } else {
-            shoppingCartViewModel.addCheckedItem(cartItem)
-        }
-    }
-
-    override fun clickOrder() {
+    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
         val recommendFragment =
             RecommendFragment().apply {
                 arguments =
-                    RecommendFragment.createBundle(
-                        shoppingCartViewModel.checkedShoppingCart,
-                    )
+                    RecommendFragment.createBundle(checkedShoppingCart)
             }
         mainActivityListener?.changeFragment(recommendFragment)
     }
 
-    override fun clickCheckAll() {
-        shoppingCartViewModel.checkAllItems()
+    private fun updateRecyclerView(cartItems: List<CartItem>) {
+        adapter.updateCartItems(cartItems)
     }
 }
