@@ -36,6 +36,14 @@ class DefaultShoppingProductRepository(
 
     override fun shoppingCartProductQuantity(): Int = cartSource.loadAllCartItems().sumOf { it.quantity }
 
+    override fun increaseInShoppingCart(cartItemId: Long, quantity: Int) {
+        cartSource.plusProductsIdCount(cartItemId, quantity)
+    }
+
+    override fun decreaseInShoppingCart(cartItemId: Long, quantity: Int) {
+        cartSource.minusProductsIdCount(cartItemId, quantity)
+    }
+
     private fun productQuantity(productId: Long): Int {
         return cartSource.findByProductId(productId)?.quantity ?: 0
     }
@@ -68,7 +76,6 @@ class DefaultShoppingProductRepository(
             return
         }
 
-        Log.d(TAG, "addShoppingCartProduct: 기존 quantity: ${cartItem.quantity} 추가 quantity: $quantity,")
         cartSource.plusProductsIdCount(cartItem.id, quantity = cartItem.quantity + quantity)
     }
 
@@ -77,7 +84,6 @@ class DefaultShoppingProductRepository(
     }
 
     companion object {
-        private const val FIRST_QUANTITY = 1
         private const val TAG = "DefaultShoppingProductR"
     }
 }

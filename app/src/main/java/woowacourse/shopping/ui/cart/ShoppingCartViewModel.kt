@@ -89,7 +89,8 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
+//            shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
+            shoppingProductsRepository.increaseInShoppingCart(productId, quantity)
             val currentItems = shoppingProductsRepository.loadPagedCartItem()
             uiHandler.post {
                 updateCartItems(currentItems)

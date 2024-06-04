@@ -14,6 +14,16 @@ interface ShoppingProductsRepository {
 
     fun shoppingCartProductQuantity(): Int
 
+    fun increaseInShoppingCart(
+        cartItemId: Long,
+        quantity: Int,
+    )
+
+    fun decreaseInShoppingCart(
+        cartItemId: Long,
+        quantity: Int
+    )
+
     fun increaseShoppingCartProduct(
         id: Long,
         quantity: Int,
