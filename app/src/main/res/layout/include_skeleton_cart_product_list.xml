@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <include layout="@layout/include_skeleton_cart_product" />
+
+        <include layout="@layout/include_skeleton_cart_product" />
+
+        <include layout="@layout/include_skeleton_cart_product" />
+
+        <include layout="@layout/include_skeleton_cart_product" />
+
+        <include layout="@layout/include_skeleton_cart_product" />
+
+    </LinearLayout>
+
+</layout>

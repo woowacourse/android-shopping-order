@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="java.util.List" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.ui.shoppingcart.cartselect.CartSelectViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_cart_products"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="71dp"
+            android:orientation="vertical"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/tv_page"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/holder_cart_product" />
+
+        <include
+            layout="@layout/include_skeleton_cart_product_list"
+            android:visibility="@{vm.loading ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_shopping_cart_title"
+            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() &amp;&amp; !vm.loading ? View.VISIBLE : View.GONE }"
+            app:layout_constraintBottom_toTopOf="@+id/tv_page"
+            app:layout_constraintEnd_toEndOf="@+id/rv_cart_products"
+            app:layout_constraintStart_toStartOf="@+id/rv_cart_products"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <Button
+            android:id="@+id/tv_pre_page"
+            currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
+            last="@{vm.uiState.pagingCartProduct.last}"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/selector_pre_page_btn"
+            android:enabled="@{vm.uiState.pagingCartProduct.currentPage != 0}"
+            android:gravity="center"
+            android:onClick="@{() -> vm.loadPreviousPage()}"
+            android:text="@string/tv_pre_page_title"
+            android:textColor="@color/white"
+            android:textSize="19dp"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_page"
+            app:layout_constraintEnd_toStartOf="@+id/tv_page"
+            app:layout_constraintTop_toTopOf="@+id/tv_page" />
+
+        <TextView
+            android:id="@+id/tv_page"
+            currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
+            last="@{vm.uiState.pagingCartProduct.last}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            android:text="@{String.valueOf(vm.uiState.pagingCartProduct.currentPage + 1)}"
+            android:textColor="@color/gray5"
+            android:textSize="22dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="1" />
+
+        <Button
+            android:id="@+id/tv_next_page"
+            currentPage="@{vm.uiState.pagingCartProduct.currentPage}"
+            isLoading="@{vm.loading}"
+            last="@{vm.uiState.pagingCartProduct.last}"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/selector_next_page_btn"
+            android:enabled="@{vm.uiState.pagingCartProduct.last != true}"
+            android:gravity="center"
+            android:onClick="@{() -> vm.loadNextPage()}"
+            android:text="@string/tv_next_page_title"
+            android:textColor="@color/white"
+            android:textSize="19dp"
+            android:visibility="@{vm.loading ? View.GONE : View.VISIBLE }"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_page"
+            app:layout_constraintStart_toEndOf="@+id/tv_page"
+            app:layout_constraintTop_toTopOf="@+id/tv_page" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tv_total_order_price"
+                priceToCurrency="@{vm.uiState.orderTotalPrice}"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="2"
+                android:background="@color/gray5"
+                android:gravity="end|center"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                tools:text="10000원" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/tv_order"
+                setOrderButtonColor="@{vm.uiState.pagingCartProduct.cartList}"
+                setOrderButtonEnabled="@{vm.uiState.pagingCartProduct.cartList}"
+                android:layout_width="0dp"
+                android:layout_height="78dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:onClick="@{() -> vm.navigateToRecommend()}"
+                android:text="@{@string/tv_order(vm.uiState.totalQuantity)}"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                tools:text="주문하기(2)" />
+        </LinearLayout>
+
+
+        <CheckBox
+            android:id="@+id/cb_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="25dp"
+            android:backgroundTint="@color/green"
+            android:checked="@{vm.uiState.isAllChecked}"
+            android:onClick="@{() -> vm.checkAllCartProduct()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:text="전체"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/cb_select_all"
+            app:layout_constraintStart_toStartOf="@+id/cb_select_all"
+            app:layout_constraintTop_toBottomOf="@+id/cb_select_all" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
