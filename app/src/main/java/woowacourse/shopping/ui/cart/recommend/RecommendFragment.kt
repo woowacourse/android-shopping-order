@@ -45,16 +45,22 @@ class RecommendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setRecommendProductAdapter()
+        initSetting()
+        setRecommendProduct()
 
+    }
+
+    private fun initSetting() {
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel.loadRecommendProducts()
         viewModel.isRecommendPage.value = true
+    }
 
+    private fun setRecommendProduct() {
+        viewModel.loadRecommendProducts()
         viewModel.products.observe(viewLifecycleOwner) {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
-
     }
 
     private fun setRecommendProductAdapter() {

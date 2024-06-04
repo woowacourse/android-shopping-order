@@ -14,4 +14,6 @@
     <string name="recent_product_comment">최근 본 상품</string>
     <string name="last_seen_product_comment">마지막으로 본 상품</string>
     <string name="order">주문하기(%d)</string>
+    <string name="order_success_message">주문에 성공했습니다.</string>
+    <string name="order_fail_message">주문에 실패했습니다.</string>
 </resources>

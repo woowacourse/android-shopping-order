@@ -40,17 +40,9 @@ class CartActivity : AppCompatActivity() {
         initFragment()
 
         onClickOrderBtn()
-
         onClickTotalCheckBox()
 
-        viewModel.isOrderSuccess.observe(this) { isSuccess ->
-            if (isSuccess) {
-                Toast.makeText(this, "주문에 성공했습니다.",Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                Toast.makeText(this, "주문에 실패했습니다.",Toast.LENGTH_SHORT).show()
-            }
-        }
+        observeIsOrder()
     }
 
     private fun initFragment() {
@@ -82,6 +74,19 @@ class CartActivity : AppCompatActivity() {
                 viewModel.order()
             }
 
+        }
+    }
+
+    private fun observeIsOrder() {
+        viewModel.isOrderSuccess.observe(this) { isSuccess ->
+            if (isSuccess) {
+                Toast.makeText(this, getString(R.string.order_success_message), Toast.LENGTH_SHORT)
+                    .show()
+                finish()
+            } else {
+                Toast.makeText(this, getString(R.string.order_fail_message), Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
