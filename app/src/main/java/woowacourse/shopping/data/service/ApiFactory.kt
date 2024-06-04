@@ -16,7 +16,7 @@ import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 
 object ApiFactory {
     private val client =
-        OkHttpClient.Builder().addInterceptor(DefaultInterceptor("namyunsuk", "password")).build()
+        OkHttpClient.Builder().addInterceptor(DefaultInterceptor("gaeun5744", "password")).build()
 
     private val tokenClient =
         OkHttpClient.Builder().addInterceptor(TokeInterceptor()).build()
