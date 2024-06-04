@@ -22,8 +22,7 @@ class OrderFragment : Fragment() {
         arguments?.let {
             factory = OrderViewModel.factory(
                 (it.getSerializable(ORDER_ITEM_ID) as LongArray).toList(),
-                ShoppingApp.orderSource
-            ) // arguemtn 가져오기
+            )
         }
         viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }

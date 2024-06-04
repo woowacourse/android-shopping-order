@@ -1,6 +1,7 @@
 package woowacourse.shopping
 
 import android.app.Application
+import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.local.source.LocalHistoryProductDataSource
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
@@ -47,7 +48,7 @@ class ShoppingApp : Application() {
         lateinit var historySource: ProductHistoryDataSource
             private set
 
-        lateinit var orderSource: OrderRemoteDataSource
+        lateinit var orderSource: OrderDataSource
             private set
     }
 }

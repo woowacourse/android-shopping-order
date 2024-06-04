@@ -3,7 +3,7 @@ package woowacourse.shopping.remote.service
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
-import woowacourse.shopping.remote.source.OrderRequest
+import woowacourse.shopping.remote.model.OrderRequest
 
 interface OrderApiService {
     @POST("/orders")
