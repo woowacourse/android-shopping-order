@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.cart.fragment
+package woowacourse.shopping.presentation.ui.cart.cartList
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,6 @@ import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.cart.OrderState
-import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.util.EventObserver
 
 class CartListFragment : Fragment() {

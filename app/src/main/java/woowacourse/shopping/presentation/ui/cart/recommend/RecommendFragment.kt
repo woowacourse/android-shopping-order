@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.cart.fragment
+package woowacourse.shopping.presentation.ui.cart.recommend
 
 import android.os.Bundle
 import android.view.LayoutInflater

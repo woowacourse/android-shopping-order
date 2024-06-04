@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.cart.fragment
+package woowacourse.shopping.presentation.ui.cart.recommend
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendBinding

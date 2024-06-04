@@ -19,7 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.cart.fragment.CartListFragment">
+        tools:context=".presentation.ui.cart.cartList.CartListFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_carts"
