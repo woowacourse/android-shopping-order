@@ -43,9 +43,9 @@ class ProductDetailViewModel(
                 DetailCartProduct(
                     isNew = cartProduct.quantity == 0,
                     cartProduct =
-                        cartProduct.copy(
-                            quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
-                        ),
+                    cartProduct.copy(
+                        quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
+                    ),
                 )
             _product.value = UiState.Success(detailCartProduct)
         }
@@ -67,7 +67,10 @@ class ProductDetailViewModel(
 
     override fun onAddToCart(detailCartProduct: DetailCartProduct) {
         thread {
-            updateUiModel.add(detailCartProduct.cartProduct.productId, detailCartProduct.cartProduct)
+            updateUiModel.add(
+                detailCartProduct.cartProduct.productId,
+                detailCartProduct.cartProduct
+            )
 
             if (detailCartProduct.isNew) {
                 repository.postCartItem(
@@ -76,6 +79,7 @@ class ProductDetailViewModel(
                         quantity = detailCartProduct.cartProduct.quantity,
                     ),
                 ).onSuccess {
+                    detailCartProduct.cartProduct.cartId = it.toLong()
                     _product.postValue(UiState.Success(detailCartProduct))
                     saveRecentProduct(detailCartProduct.cartProduct)
                 }.onFailure {
@@ -85,9 +89,9 @@ class ProductDetailViewModel(
                 repository.patchCartItem(
                     id = detailCartProduct.cartProduct.cartId.toInt(),
                     quantityRequest =
-                        QuantityRequest(
-                            detailCartProduct.cartProduct.quantity,
-                        ),
+                    QuantityRequest(
+                        detailCartProduct.cartProduct.quantity,
+                    ),
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
                     saveRecentProduct(detailCartProduct.cartProduct)
@@ -127,7 +131,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun saveRecentProduct(cartProduct: CartProduct) {
+    private fun saveRecentProduct(cartProduct: CartProduct) {
         thread {
             repository.saveRecentProduct(
                 RecentProduct(

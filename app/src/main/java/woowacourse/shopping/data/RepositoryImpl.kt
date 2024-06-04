@@ -156,6 +156,10 @@ class RepositoryImpl(
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
+    override fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+        localDataSource.updateRecentProduct(productId, quantity, cartId)
+    }
+
     override fun deleteCart(id: Long): Result<Long> =
         runCatching {
             localDataSource.deleteCart(id)

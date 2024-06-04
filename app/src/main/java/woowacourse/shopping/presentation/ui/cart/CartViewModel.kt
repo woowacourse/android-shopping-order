@@ -69,6 +69,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 _carts.postValue(
                     UiState.Success(updatedData.toList()),
                 )
+                updateRecentProduct(cartProductUiModel.cartProduct.productId, 0, 0)
             }.onFailure {
                 _errorHandler.postValue(EventState(CART_DELETE_ERROR))
             }
@@ -169,6 +170,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
+                    updateRecentProduct(
+                        cartProducts[index].cartProduct.productId,
+                        cartProducts[index].cartProduct.quantity,
+                        cartProducts[index].cartProduct.cartId
+                    )
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -192,6 +198,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
+                    updateRecentProduct(
+                        cartProducts[index].cartProduct.productId,
+                        cartProducts[index].cartProduct.quantity,
+                        cartProducts[index].cartProduct.cartId
+                    )
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -199,10 +210,12 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
     }
 
+    private fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+        repository.updateRecentProduct(productId, quantity, cartId)
+    }
+
     companion object {
         const val CART_LOAD_ERROR = "LOAD ERROR"
         const val CART_DELETE_ERROR = "DELETE ERROR"
-        const val PAGE_SIZE = 5
-        const val PAGE_UPPER_BOUND = 4
     }
 }

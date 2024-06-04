@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -52,20 +53,23 @@ val fakeRepository =
             category: String,
             page: Int,
             size: Int,
-        ): Result<List<CartProduct>?> {
+            callback: (Result<List<CartProduct>?>) -> Unit
+        ) {
             TODO("Not yet implemented")
         }
 
-        override fun getProductsByPaging(): Result<List<CartProduct>?> {
+        override fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit) {
             TODO("Not yet implemented")
         }
 
         override fun getCartItems(
             page: Int,
             size: Int,
-        ): Result<List<CartProduct>?> {
-            return Result.success(carts)
+            callback: (Result<List<CartProduct>?>) -> Unit
+        ) {
+            TODO("Not yet implemented")
         }
+
 
         override fun getProductById(id: Int): Result<CartProduct?> {
             TODO("Not yet implemented")
@@ -157,6 +161,10 @@ val fakeRepository =
             return Result.success(1L)
         }
 
+        override fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+            TODO("Not yet implemented")
+        }
+
         override fun deleteCart(id: Long): Result<Long> = Result.success(1)
 
         override fun getMaxCartCount(): Result<Int> =
@@ -164,11 +172,11 @@ val fakeRepository =
                 carts.size
             }
 
-        override fun getCartItemsCounts(): Result<Int> {
+        override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
             TODO("Not yet implemented")
         }
 
-        override fun getCuration(): Result<List<CartProduct>> {
+        override fun getCuration(callback: (Result<List<CartProduct>>) -> Unit) {
             TODO("Not yet implemented")
         }
     }

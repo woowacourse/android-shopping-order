@@ -31,4 +31,6 @@ interface LocalDataSource {
     fun getMaxCartCount(): Int
 
     fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long
+
+    fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long)
 }

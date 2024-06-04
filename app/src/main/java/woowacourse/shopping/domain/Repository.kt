@@ -58,6 +58,8 @@ interface Repository {
 
     fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
 
+    fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long)
+
     fun deleteCart(id: Long): Result<Long>
 
     fun getMaxCartCount(): Result<Int>
