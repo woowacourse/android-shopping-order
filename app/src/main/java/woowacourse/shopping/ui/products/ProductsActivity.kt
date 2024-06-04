@@ -76,21 +76,13 @@ class ProductsActivity : AppCompatActivity() {
     }
 
     private fun initializeView() {
-        initializeProductAdapter()
+        initializeProductList()
         initializeToolbar()
         initializePage()
-
-        viewModel.productUiModels.observe(this) {
-            adapter.updateProducts(it)
-        }
-
-        viewModel.productsErrorEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
-        }
+        observeData()
     }
 
-    private fun initializeProductAdapter() {
+    private fun initializeProductList() {
         binding.rvProducts.itemAnimator = null
         binding.rvProducts.layoutManager =
             GridLayoutManager(this, PRODUCT_LIST_SPAN_SIZE).apply {
@@ -102,11 +94,6 @@ class ProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToProductDetailView(productId: Int) {
-        val intent = ProductDetailActivity.newIntent(this, productId)
-        productDetailActivityResultLauncher.launch(intent)
-    }
-
     private fun initializeToolbar() {
         binding.ivProductsCart.setOnClickListener { navigateToCartView() }
         binding.tvProductsCartCount.setOnClickListener { navigateToCartView() }
@@ -115,6 +102,11 @@ class ProductsActivity : AppCompatActivity() {
     private fun navigateToCartView() {
         val intent = Intent(this, CartActivity::class.java)
         cartActivityResultLauncher.launch(intent)
+    }
+
+    private fun navigateToProductDetailView(productId: Int) {
+        val intent = ProductDetailActivity.newIntent(this, productId)
+        productDetailActivityResultLauncher.launch(intent)
     }
 
     private fun initializePage() {
@@ -132,6 +124,16 @@ class ProductsActivity : AppCompatActivity() {
                 }
             }
         binding.rvProducts.addOnScrollListener(onScrollListener)
+    }
+
+    private fun observeData() {
+        viewModel.productUiModels.observe(this) {
+            adapter.updateProducts(it)
+        }
+        viewModel.productsErrorEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
+        }
     }
 
     companion object {

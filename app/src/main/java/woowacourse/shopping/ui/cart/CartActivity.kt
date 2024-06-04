@@ -59,26 +59,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun initializeView() {
         initializeToolbar()
-        viewModel.changedCartEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            setResult(Activity.RESULT_OK)
-        }
-        viewModel.orderEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            if (isVisibleCartSelectionFragment()) {
-                addFragment(cartRecommendFragment)
-            } else {
-                viewModel.createOrder()
-            }
-        }
-        viewModel.isSuccessCreateOrder.observe(this) {
-            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
-            if (isSuccessCreateOrder) {
-                showDialogSuccessCreateOrder()
-            } else {
-                showToastFailureCreateOrder()
-            }
-        }
+        observeData()
     }
 
     private fun initializeToolbar() {
@@ -98,6 +79,29 @@ class CartActivity : AppCompatActivity() {
     private fun removeLastFragment() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack()
+        }
+    }
+
+    private fun observeData() {
+        viewModel.changedCartEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            setResult(Activity.RESULT_OK)
+        }
+        viewModel.orderEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            if (isVisibleCartSelectionFragment()) {
+                addFragment(cartRecommendFragment)
+            } else {
+                viewModel.createOrder()
+            }
+        }
+        viewModel.isSuccessCreateOrder.observe(this) {
+            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
+            if (isSuccessCreateOrder) {
+                showDialogSuccessCreateOrder()
+            } else {
+                showToastFailureCreateOrder()
+            }
         }
     }
 

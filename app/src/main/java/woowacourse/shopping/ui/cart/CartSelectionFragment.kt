@@ -25,20 +25,27 @@ class CartSelectionFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCartSelectionBinding.inflate(inflater, container, false)
-
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+
         viewModel.loadAllCartItems()
         viewModel.navigateCartSelection()
-
         initializeView()
+
         return binding.root
     }
 
     private fun initializeView() {
+        initializeCartList()
+        observeData()
+    }
+
+    private fun initializeCartList() {
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
+    }
 
+    private fun observeData() {
         viewModel.cartUiModels.observe(viewLifecycleOwner) {
             adapter.submitList(it.uiModels)
         }

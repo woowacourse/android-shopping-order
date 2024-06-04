@@ -32,14 +32,22 @@ class CartRecommendFragment : Fragment() {
 
         viewModel.loadRecommendProducts()
         viewModel.navigateCartRecommend()
-
         initializeView()
+
         return binding.root
     }
 
     private fun initializeView() {
+        initializeRecommendProductList()
+        observeData()
+    }
+
+    private fun initializeRecommendProductList() {
         binding.rvRecommendProduct.itemAnimator = null
         binding.rvRecommendProduct.adapter = adapter
+    }
+
+    private fun observeData() {
         viewModel.recommendProductUiModels.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
