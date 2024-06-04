@@ -99,3 +99,23 @@ classDiagram
 
 #### Dynamic
 
+```mermaid
+---
+title: 주문하기
+---
+flowchart LR
+    ProductListActivity["ProductListActivity"]
+    CartSelectFragment["CartSelectFragment"]
+    OrderRecommendFragment["OrderRecommendFragment"]
+    ProductListActivity-- navigateToShoppingCart() -->CartSelectFragment -- NavigateToRecommend() -->OrderRecommendFragment
+```
+
+```mermaid
+---
+title: 장바구니 담기
+---
+flowchart LR
+    ProductListActivity["ProductListActivity"]
+    ProductDetailActivity["ProductDetailActivity"]
+    ProductListActivity-- navigateToProductDetail() -->ProductDetailActivity
+```
