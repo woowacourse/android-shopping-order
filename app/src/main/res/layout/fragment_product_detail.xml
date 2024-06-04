@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.detail.ProductDetailViewModel" />
+
+        <variable
+            name="onClickDetail"
+            type="woowacourse.shopping.view.detail.OnClickDetail" />
+
+        <variable
+            name="onClickNavigateDetail"
+            type="woowacourse.shopping.view.detail.OnClickNavigateDetail" />
+
+        <variable
+            name="onClickCartItemCounter"
+            type="woowacourse.shopping.view.cartcounter.OnClickCartItemCounter" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clickable="true"
+        tools:context=".view.detail.ProductDetailFragment">
+
+        <View
+            android:id="@+id/vw_detail_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/gray_5"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:onClick="@{()->onClickNavigateDetail.clickClose()}"
+            android:src="@drawable/ic_close_24"
+            app:layout_constraintBottom_toBottomOf="@id/vw_detail_top_bar"
+            app:layout_constraintEnd_toEndOf="@id/vw_detail_top_bar"
+            app:layout_constraintTop_toTopOf="@id/vw_detail_top_bar"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/iv_detail"
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            app:bindingImageUrl="@{vm.product.imageUrl}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vw_detail_top_bar" />
+
+        <TextView
+            android:id="@+id/tv_detail_product_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@{vm.product.name}"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_detail"
+            tools:text="상품 이름" />
+
+        <View
+            android:id="@+id/vw_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="18dp"
+            android:background="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_detail_product_name" />
+
+        <TextView
+            android:id="@+id/tv_detail_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@{@string/formatted_price(vm.product.price* vm.product.cartItemCounter.itemCount)}"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vw_divider"
+            tools:text="10,000원" />
+
+        <include
+            layout="@layout/product_quantity_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_detail_product_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_detail_product_price"
+            app:onClickCartItemCounter="@{onClickCartItemCounter}"
+            app:product="@{vm.product}" />
+
+        <LinearLayout
+            android:onClick="@{()->onClickDetail.clickRecently(vm.recentlyProduct)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btn_add_cart"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_product_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:background="@drawable/shape_border"
+            android:orientation="vertical"
+            android:paddingHorizontal="18dp"
+            android:paddingVertical="16dp"
+            android:visibility="@{vm.recentlyProduct.productId != -1L ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/last_view_subject"
+                android:textColor="@color/primary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.recentlyProduct.name}"
+                tools:text="PET보틀-정사각형(500ml)" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_cart"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="@color/primary"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:onClick="@{()->onClickDetail.clickAddCart(vm.product)}"
+            android:padding="0dp"
+            android:text="@string/add_cart_text"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
