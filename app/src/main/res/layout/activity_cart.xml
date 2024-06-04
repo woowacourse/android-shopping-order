@@ -90,7 +90,7 @@
                 android:background="@drawable/selector_add_cart_button"
                 android:enabled="@{viewModel.isEnabledOrder}"
                 android:gravity="center"
-                android:onClick="@{() ->viewModel.navigateCartRecommend()}"
+                android:onClick="@{() ->viewModel.order()}"
                 android:text="@{@string/order_button_title(viewModel.totalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"

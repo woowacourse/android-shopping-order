@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.product.remote
 
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -55,7 +56,7 @@ object RemoteProductRepository : ProductRepository {
         page: Int,
         pageSize: Int,
         callback: (Result<List<Product>>) -> Unit,
-    ) {
+    ) = runBlocking {
         retrofitApi.requestProducts(page = page, size = pageSize).enqueue(
             object : Callback<ProductResponse> {
                 override fun onResponse(
@@ -83,7 +84,7 @@ object RemoteProductRepository : ProductRepository {
         page: Int,
         pageSize: Int,
         callback: (Result<Boolean>) -> Unit,
-    ) {
+    ) = runBlocking {
         retrofitApi.requestProducts(page = page, size = pageSize).enqueue(
             object : Callback<ProductResponse> {
                 override fun onResponse(
@@ -129,7 +130,7 @@ object RemoteProductRepository : ProductRepository {
     private fun findCategoryProducts(
         category: String,
         callback: (Result<List<Product>>) -> Unit,
-    ) {
+    ) = runBlocking {
         retrofitApi.requestProducts(category = category, page = 0, size = MAX_PRODUCT_COUNT)
             .enqueue(
                 object : Callback<ProductResponse> {

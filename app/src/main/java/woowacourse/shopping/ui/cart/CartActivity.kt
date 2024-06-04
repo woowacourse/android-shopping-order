@@ -75,20 +75,20 @@ class CartActivity : AppCompatActivity() {
             it.getContentIfNotHandled() ?: return@observe
             setResult(Activity.RESULT_OK)
         }
+        viewModel.orderEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            if (isVisibleCartSelectionFragment()) {
+                addFragment(cartRecommendFragment)
+            } else {
+                viewModel.createOrder()
+            }
+        }
         viewModel.isSuccessCreateOrder.observe(this) {
             val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
             if (isSuccessCreateOrder) {
                 showDialogSuccessCreateOrder()
             } else {
                 showToastFailureCreateOrder()
-            }
-        }
-        viewModel.navigateEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            if (isVisibleCartSelectionFragment()) {
-                addFragment(cartRecommendFragment)
-            } else {
-                viewModel.createOrder()
             }
         }
     }

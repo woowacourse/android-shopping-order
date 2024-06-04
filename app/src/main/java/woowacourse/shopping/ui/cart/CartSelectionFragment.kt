@@ -26,6 +26,7 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         viewModel.loadAllCartItems()
+        viewModel.navigateCartSelection()
 
         initializeView()
         return binding.root

@@ -26,7 +26,10 @@ class CartRecommendFragment(val viewModel: CartViewModel) : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCartRecommendBinding.inflate(inflater, container, false)
+
         viewModel.loadRecommendProducts()
+        viewModel.navigateCartRecommend()
+
         initializeView()
         return binding.root
     }

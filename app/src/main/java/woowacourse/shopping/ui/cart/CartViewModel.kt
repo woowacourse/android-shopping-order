@@ -47,8 +47,8 @@ class CartViewModel(
     private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
     val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
 
-    private val _navigateEvent = MutableLiveData<Event<Unit>>()
-    val navigateEvent: LiveData<Event<Unit>> get() = _navigateEvent
+    private val _orderEvent = MutableLiveData<Event<Unit>>()
+    val orderEvent: LiveData<Event<Unit>> get() = _orderEvent
 
     private val _visibleAllToggleView = MutableLiveData(true)
     val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
@@ -230,9 +230,16 @@ class CartViewModel(
         updateCart()
     }
 
+    fun order() {
+        _orderEvent.value = Event(Unit)
+    }
+
     fun navigateCartRecommend() {
-        _navigateEvent.value = Event(Unit)
         _visibleAllToggleView.value = false
+    }
+
+    fun navigateCartSelection() {
+        _visibleAllToggleView.value = true
     }
 
     fun loadRecommendProducts() {
