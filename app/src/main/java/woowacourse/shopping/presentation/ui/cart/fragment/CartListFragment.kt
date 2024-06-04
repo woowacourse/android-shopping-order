@@ -16,7 +16,7 @@ import woowacourse.shopping.presentation.util.EventObserver
 class CartListFragment : Fragment() {
     lateinit var binding: FragmentCartListBinding
     private val viewModel: CartViewModel by activityViewModels()
-    private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }
+    private val cartAdapter: CartAdapter by lazy { CartAdapter(cartHandler = viewModel) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,6 +24,8 @@ class CartListFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentCartListBinding.inflate(inflater)
+
+        binding.lifecycleOwner = viewLifecycleOwner
         initCartAdapter()
         observeErrorEventUpdates()
         observeCartUpdates()
@@ -49,7 +51,7 @@ class CartListFragment : Fragment() {
     }
 
     private fun observeCartUpdates() {
-        viewModel.shoppingProducts.observe(viewLifecycleOwner) {
+        viewModel.cartItems.observe(viewLifecycleOwner) {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
@@ -57,9 +59,5 @@ class CartListFragment : Fragment() {
                 }
             }
         }
-    }
-
-    companion object {
-        fun newInstance() = CartListFragment()
     }
 }
