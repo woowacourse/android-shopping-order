@@ -43,6 +43,30 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         }
     }
 
+    override fun increaseCartItem(product: Product): Result<Unit> {
+        return executeWithLatch {
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+            if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                addCartItem(product).getOrThrow()
+            } else {
+                cartItemResult.increaseCount()
+            }
+        }
+    }
+
+    override fun decreaseCartItem(product: Product): Result<Unit> {
+        return executeWithLatch {
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+            if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                throw NoSuchDataException()
+            } else {
+                if (cartItemResult.decreaseCount() == ChangeCartItemResultState.Fail) {
+                    deleteCartItem(cartItemResult.cartItemId).getOrThrow()
+                }
+            }
+        }
+    }
+
     override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         return executeWithLatch {
             val cartItem = cartItemDao.findCartItemByProductId(productId)?.toCartItem()
@@ -53,6 +77,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         }
     }
 
+    // Todo: Refactor this function
     override fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,

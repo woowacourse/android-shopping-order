@@ -65,6 +65,35 @@ class RemoteShoppingCartRepositoryImpl(
         }
     }
 
+    override fun increaseCartItem(product: Product): Result<Unit> {
+        return executeWithLatch {
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+
+            if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                addCartItem(product).getOrThrow()
+            } else {
+                cartItemResult.increaseCount()
+                product.updateCartItemCount(cartItemResult.counter.itemCount)
+                updateCartCount(cartItemResult).getOrThrow()
+            }
+        }
+    }
+
+    override fun decreaseCartItem(product: Product): Result<Unit> {
+        return executeWithLatch {
+            val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+            if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                throw NoSuchDataException()
+            } else {
+                if (cartItemResult.decreaseCount() == ChangeCartItemResultState.Fail) {
+                    deleteCartItem(cartItemResult.cartItemId).getOrThrow()
+                } else {
+                    updateCartCount(cartItemResult).getOrThrow()
+                }
+            }
+        }
+    }
+
     private fun updateCartCount(cartItemResult: CartItemResult): Result<Unit> {
         return executeWithLatch {
             val response =

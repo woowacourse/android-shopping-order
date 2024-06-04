@@ -14,9 +14,13 @@ interface ShoppingCartRepository {
         pagingSize: Int,
     ): Result<List<CartItem>>
 
+    fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult>
+
     fun deleteCartItem(itemId: Long): Result<Unit>
 
-    fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult>
+    fun increaseCartItem(product: Product): Result<Unit>
+
+    fun decreaseCartItem(product: Product): Result<Unit>
 
     fun updateCartItem(
         product: Product,
