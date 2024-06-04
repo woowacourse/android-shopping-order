@@ -12,17 +12,17 @@ interface ProductApiService {
     fun requestProducts(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 0,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
     @GET("/products")
     fun requestCategoryProducts(
         @Query("page") page: Int = 0,
         @Query("category") category: String,
         @Query("size") size: Int = 0,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
     @GET("/products/{id}")
     fun requestProduct(
         @Path("id") id: Int,
-    ): Call<ProductDto>
+    ): ProductDto
 }

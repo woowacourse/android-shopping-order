@@ -9,7 +9,6 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -43,39 +42,45 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private fun loadRecentlyProduct(): RecentlyProduct {
-        return recentlyRepository.getMostRecentlyProduct().getOrThrow()
+    fun loadRecommendData() {
+        recentlyRepository.getMostRecentlyProduct()
+            .onSuccess { recentlyProduct ->
+                loadCategoryProducts(recentlyProduct.category)
+            }
+            .onFailure {
+                handleException(ErrorEvent.LoadDataEvent())
+            }
     }
 
-    private fun loadCategoryProducts(category: String): List<Product> {
-        return productRepository.loadCategoryProducts(
-            size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-            category = category,
-        ).getOrThrow()
-    }
-
-    private fun loadMyCartItems(): List<CartItem> {
-        return shoppingCartRepository.loadPagingCartItems(
+    private fun loadMyCartItems(categoryProducts: List<Product>) {
+        shoppingCartRepository.loadPagingCartItems(
             LOAD_SHOPPING_ITEM_OFFSET,
             LOAD_SHOPPING_ITEM_SIZE,
-        ).getOrThrow()
+        )
+            .onSuccess { myCartItems ->
+                val recommendData =
+                    getFilteredRandomProducts(
+                        myCartItems = myCartItems,
+                        loadData = categoryProducts,
+                    )
+                _products.value = recommendData
+                updateCheckItemData()
+            }
+            .onFailure {
+                handleException(ErrorEvent.LoadDataEvent())
+            }
     }
 
-    fun loadRecommendData() {
-        runCatching {
-            val recentlyProduct = loadRecentlyProduct()
-            val loadCategoryProducts = loadCategoryProducts(recentlyProduct.category)
-            val myCartItems = loadMyCartItems()
-            val recommendData =
-                getFilteredRandomProducts(
-                    myCartItems = myCartItems,
-                    loadData = loadCategoryProducts,
-                )
-            _products.value = recommendData
-            updateCheckItemData()
-        }
+    private fun loadCategoryProducts(category: String) {
+        productRepository.loadCategoryProducts(
+            size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+            category = category,
+        )
+            .onSuccess { categoryProducts ->
+                loadMyCartItems(categoryProducts)
+            }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 

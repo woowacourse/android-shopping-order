@@ -6,6 +6,9 @@ import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.remote.dto.product.ProductDto
 import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.data.source.ProductDataSource
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.utils.DtoMapper.toProduct
+import woowacourse.shopping.utils.DtoMapper.toProducts
 
 class ProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),
@@ -13,26 +16,32 @@ class ProductDataSourceImpl(
     override fun loadProducts(
         page: Int,
         size: Int,
-    ): Call<ProductResponse> {
-        return productApiService.requestProducts(
-            page = page,
-            size = size,
-        )
+    ): Result<List<Product>> {
+        return runCatching {
+            productApiService.requestProducts(
+                page = page,
+                size = size,
+            ).toProducts()
+        }
     }
 
     override fun loadCategoryProducts(
         page: Int,
         size: Int,
         category: String,
-    ): Call<ProductResponse> {
-        return productApiService.requestCategoryProducts(
-            page = page,
-            size = size,
-            category = category,
-        )
+    ): Result<List<Product>> {
+        return runCatching {
+            productApiService.requestCategoryProducts(
+                page = page,
+                size = size,
+                category = category,
+            ).toProducts()
+        }
     }
 
-    override fun loadProduct(id: Int): Call<ProductDto> {
-        return productApiService.requestProduct(id = id)
+    override fun loadProduct(id: Int): Result<Product> {
+        return runCatching {
+            productApiService.requestProduct(id = id).toProduct()
+        }
     }
 }

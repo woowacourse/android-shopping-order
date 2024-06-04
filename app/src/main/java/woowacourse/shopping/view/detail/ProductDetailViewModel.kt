@@ -12,11 +12,11 @@ import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.utils.exception.ErrorEvent
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -65,16 +65,15 @@ class ProductDetailViewModel(
 
     fun loadProductItem(productId: Long) {
         val loadItemCounter = loadProductItemCount(productId)
-        runCatching {
-            productRepository.getProduct(productId).getOrThrow()
-        }.onSuccess { product ->
-            product.updateItemSelector(true)
-            product.updateCartItemCount(loadItemCounter.itemCount)
-            loadRecentlyProduct(product)
-            _product.value = product
-        }
+        productRepository.getProduct(productId)
+            .onSuccess { product ->
+                product.updateItemSelector(true)
+                product.updateCartItemCount(loadItemCounter.itemCount)
+                loadRecentlyProduct(product)
+                _product.value = product
+            }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 
@@ -135,10 +134,8 @@ class ProductDetailViewModel(
     }
 
     private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        runCatching {
-            deletePrevRecentlyProduct(recentlyProduct.id)
-            productRepository.getProduct(recentlyProduct.productId).getOrThrow()
-        }
+        deletePrevRecentlyProduct(recentlyProduct.id)
+        productRepository.getProduct(recentlyProduct.productId)
             .onSuccess { product ->
                 val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
                 product.updateItemSelector(true)
