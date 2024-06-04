@@ -5,15 +5,15 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.datasource.DefaultRemoteCartDataSource
+import woowacourse.shopping.data.datasource.DefaultRemoteOrderDataSource
+import woowacourse.shopping.data.datasource.DefaultRemoteProductDataSource
 import woowacourse.shopping.data.local.database.RecentProductDatabase
 import woowacourse.shopping.data.local.preferences.ShoppingPreferencesManager
 import woowacourse.shopping.data.remote.BasicAuthInterceptor
 import woowacourse.shopping.data.remote.CartService
 import woowacourse.shopping.data.remote.OrderService
 import woowacourse.shopping.data.remote.ProductService
-import woowacourse.shopping.data.datasource.DefaultRemoteCartDataSource
-import woowacourse.shopping.data.datasource.DefaultRemoteOrderDataSource
-import woowacourse.shopping.data.datasource.DefaultRemoteProductDataSource
 
 class ShoppingApplication : Application() {
     private val shoppingPreferencesManager: ShoppingPreferencesManager by lazy {
@@ -22,26 +22,33 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val username = when (val name =
-            shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_USERNAME)) {
-            null -> shoppingPreferencesManager.setString(
-                ShoppingPreferencesManager.KEY_USERNAME,
-                BuildConfig.USER_NAME
-            )
+        val username =
+            when (
+                val name =
+                    shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_USERNAME)
+            ) {
+                null ->
+                    shoppingPreferencesManager.setString(
+                        ShoppingPreferencesManager.KEY_USERNAME,
+                        BuildConfig.USER_NAME,
+                    )
 
-            else -> name
-        }
+                else -> name
+            }
 
-        val password = when (val pwd =
-            shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_PASSWORD)) {
-            null ->
-                shoppingPreferencesManager.setString(
-                    ShoppingPreferencesManager.KEY_PASSWORD,
-                    BuildConfig.PASSWORD
-                )
+        val password =
+            when (
+                val pwd =
+                    shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_PASSWORD)
+            ) {
+                null ->
+                    shoppingPreferencesManager.setString(
+                        ShoppingPreferencesManager.KEY_PASSWORD,
+                        BuildConfig.PASSWORD,
+                    )
 
-            else -> pwd
-        }
+                else -> pwd
+            }
 
         val client =
             OkHttpClient.Builder()
@@ -49,7 +56,7 @@ class ShoppingApplication : Application() {
                 .addInterceptor(
                     HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY
-                    }
+                    },
                 )
                 .build()
 

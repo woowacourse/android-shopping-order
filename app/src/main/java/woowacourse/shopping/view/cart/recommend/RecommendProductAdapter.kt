@@ -39,8 +39,8 @@ class RecommendProductAdapter(
                     ItemRecommendProductBinding.inflate(
                         inflater,
                         parent,
-                        false
-                    )
+                        false,
+                    ),
                 )
             }
 
@@ -69,7 +69,7 @@ class RecommendProductAdapter(
             holder.bind(
                 (shoppingItem as HomeViewItem.ProductViewItem),
                 productClickListener,
-                quantityClickListener
+                quantityClickListener,
             )
         }
     }
@@ -78,9 +78,7 @@ class RecommendProductAdapter(
         return currentList.size
     }
 
-    fun loadData(
-        productItems: List<HomeViewItem.ProductViewItem>,
-    ) {
+    fun loadData(productItems: List<HomeViewItem.ProductViewItem>) {
         if (isFirstLoad()) {
             submitList(null)
         }

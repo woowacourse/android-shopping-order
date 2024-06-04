@@ -58,24 +58,28 @@ class HomeViewModel(
             cartRepository.deleteCartItem(
                 cartItemId = targetCartItem.cartItemId,
                 onSuccess = {
-                    val cartItems = homeProductUiState.value?.cartItems?.filter {
-                        it.product.id != cartItemId
-                    } ?: return@deleteCartItem
+                    val cartItems =
+                        homeProductUiState.value?.cartItems?.filter {
+                            it.product.id != cartItemId
+                        } ?: return@deleteCartItem
 
-                    val productItems = homeProductUiState.value?.productItems?.map {
-                        if (it.product.id == cartItemId) {
-                            it.copy(_quantity = updatedQuantity)
-                        } else it
-                    } ?: return@deleteCartItem
+                    val productItems =
+                        homeProductUiState.value?.productItems?.map {
+                            if (it.product.id == cartItemId) {
+                                it.copy(_quantity = updatedQuantity)
+                            } else {
+                                it
+                            }
+                        } ?: return@deleteCartItem
 
-                    _homeProductUiState.value = homeProductUiState.value?.copy(
-                        productItems = productItems,
-                        cartItems = cartItems,
-                        totalCartQuantity = cartItems.sumOf { it.quantity }
-                    )
+                    _homeProductUiState.value =
+                        homeProductUiState.value?.copy(
+                            productItems = productItems,
+                            cartItems = cartItems,
+                            totalCartQuantity = cartItems.sumOf { it.quantity },
+                        )
                 },
                 onFailure = {
-
                 },
             )
         } else {
@@ -86,7 +90,7 @@ class HomeViewModel(
     private fun updateQuantity(
         targetCartItem: CartItemDomain,
         updatedQuantity: Int,
-        productId: Int
+        productId: Int,
     ) {
         println("$targetCartItem : $updatedQuantity")
         cartRepository.updateCartItem(
@@ -94,26 +98,32 @@ class HomeViewModel(
             quantity = updatedQuantity,
             onSuccess = {
                 println("successful - $targetCartItem : $updatedQuantity")
-                val cartItems = homeProductUiState.value?.cartItems?.map {
-                    if (it.product.id == productId) {
-                        it.copy(quantity = updatedQuantity)
-                    } else it
-                } ?: return@updateCartItem
+                val cartItems =
+                    homeProductUiState.value?.cartItems?.map {
+                        if (it.product.id == productId) {
+                            it.copy(quantity = updatedQuantity)
+                        } else {
+                            it
+                        }
+                    } ?: return@updateCartItem
 
-                val productItems = homeProductUiState.value?.productItems?.map {
-                    if (it.product.id == productId) {
-                        it.copy(_quantity = updatedQuantity)
-                    } else it
-                } ?: return@updateCartItem
+                val productItems =
+                    homeProductUiState.value?.productItems?.map {
+                        if (it.product.id == productId) {
+                            it.copy(_quantity = updatedQuantity)
+                        } else {
+                            it
+                        }
+                    } ?: return@updateCartItem
 
-                _homeProductUiState.value = homeProductUiState.value?.copy(
-                    productItems = productItems,
-                    cartItems = cartItems,
-                    totalCartQuantity = cartItems.sumOf { it.quantity }
-                )
+                _homeProductUiState.value =
+                    homeProductUiState.value?.copy(
+                        productItems = productItems,
+                        cartItems = cartItems,
+                        totalCartQuantity = cartItems.sumOf { it.quantity },
+                    )
             },
             onFailure = {
-
             },
         )
     }
@@ -121,7 +131,7 @@ class HomeViewModel(
     override fun navigateToDetail(productId: Int) {
         recentProductRepository.save(
             homeProductUiState.value?.productItems?.firstOrNull { it.product.id == productId }?.product?.toProduct()
-                ?: return
+                ?: return,
         )
         _homeUiEvent.value = Event(HomeUiEvent.NavigateToDetail(productId))
     }
@@ -144,40 +154,43 @@ class HomeViewModel(
                     homeProductUiState.value?.totalCartQuantity?.plus(1) ?: return@addCartItem,
                     DEFAULT_SORT_ORDER,
                     onSuccess = { cart ->
-                        val cartItem = cart.cartItems.firstOrNull { it.product.id == product.id }
-                            ?: return@getCartItems
-                        val productItems = homeProductUiState.value?.productItems?.map {
-                            if (it.product.id == cartItem.product.id) {
-                                it.copy(_quantity = 1)
-                            } else {
-                                it
-                            }
-                        } ?: return@getCartItems
-                        _homeProductUiState.value = homeProductUiState.value?.copy(
-                            totalCartQuantity = homeProductUiState.value?.totalCartQuantity?.plus(1)
-                                ?: return@getCartItems,
-                            cartItems = cart.cartItems,
-                            productItems = productItems
-                        )
+                        val cartItem =
+                            cart.cartItems.firstOrNull { it.product.id == product.id }
+                                ?: return@getCartItems
+                        val productItems =
+                            homeProductUiState.value?.productItems?.map {
+                                if (it.product.id == cartItem.product.id) {
+                                    it.copy(_quantity = 1)
+                                } else {
+                                    it
+                                }
+                            } ?: return@getCartItems
+                        _homeProductUiState.value =
+                            homeProductUiState.value?.copy(
+                                totalCartQuantity =
+                                    homeProductUiState.value?.totalCartQuantity?.plus(1)
+                                        ?: return@getCartItems,
+                                cartItems = cart.cartItems,
+                                productItems = productItems,
+                            )
                     },
                     onFailure = {
-
                     },
                 )
             },
             onFailure = {
-
             },
         )
     }
 
     fun loadRecentItems() {
         val recentProductItems = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
-        _recentProductUiState.value = recentProductUiState.value?.copy(
-            isLoading = false,
-            isEmpty = recentProductItems.isEmpty(),
-            productItems = recentProductItems
-        )
+        _recentProductUiState.value =
+            recentProductUiState.value?.copy(
+                isLoading = false,
+                isEmpty = recentProductItems.isEmpty(),
+                productItems = recentProductItems,
+            )
     }
 
     private fun loadProducts() {
@@ -188,8 +201,7 @@ class HomeViewModel(
             sort = DEFAULT_SORT_ORDER,
             onSuccess = ::addProductsWithQuantity,
             onFailure = {
-
-            }
+            },
         )
     }
 
@@ -199,36 +211,40 @@ class HomeViewModel(
                 placeQuantitiesToProductItem(productDomain, totalQuantity)
             },
             onFailure = {
-
-            }
+            },
         )
     }
 
-    private fun placeQuantitiesToProductItem(productDomain: ProductDomain, totalQuantity: Int) {
+    private fun placeQuantitiesToProductItem(
+        productDomain: ProductDomain,
+        totalQuantity: Int,
+    ) {
         cartRepository.getCartItems(
             0,
             totalQuantity,
             DEFAULT_SORT_ORDER,
             onSuccess = { cart ->
-                val productItems = productDomain.products.map { product ->
-                    val quantity =
-                        cart.cartItems.firstOrNull { it.product.id == product.id }?.quantity ?: 0
-                    HomeViewItem.ProductViewItem(product, quantity)
-                }
+                val productItems =
+                    productDomain.products.map { product ->
+                        val quantity =
+                            cart.cartItems.firstOrNull { it.product.id == product.id }?.quantity ?: 0
+                        HomeViewItem.ProductViewItem(product, quantity)
+                    }
                 _homeProductUiState.value =
                     homeProductUiState.value?.copy(
                         isLoading = false,
                         totalCartQuantity = totalQuantity,
-                        currentPageNumber = homeProductUiState.value?.currentPageNumber?.plus(1)
-                            ?: return@getCartItems,
-                        productItems = homeProductUiState.value?.productItems?.plus(productItems)
-                            ?: return@getCartItems,
+                        currentPageNumber =
+                            homeProductUiState.value?.currentPageNumber?.plus(1)
+                                ?: return@getCartItems,
+                        productItems =
+                            homeProductUiState.value?.productItems?.plus(productItems)
+                                ?: return@getCartItems,
                         cartItems = cart.cartItems,
-                        loadMoreAvailable = productDomain.last.not()
+                        loadMoreAvailable = productDomain.last.not(),
                     )
             },
             onFailure = {
-
             },
         )
     }

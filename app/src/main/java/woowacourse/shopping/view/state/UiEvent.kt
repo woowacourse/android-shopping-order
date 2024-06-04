@@ -17,7 +17,7 @@ sealed interface DetailUiEvent {
 sealed interface CartListUiEvent {
     data class NavigateToProductDetail(
         val productId: Int,
-        val lastlyViewed: Boolean
+        val lastlyViewed: Boolean,
     ) : CartListUiEvent
 
     data object NavigateToRecommendList : CartListUiEvent
@@ -30,6 +30,6 @@ sealed interface RecommendListUiEvent {
 
     data class NavigateToProductDetail(
         val productId: Int,
-        val lastlyViewed: Boolean
+        val lastlyViewed: Boolean,
     ) : RecommendListUiEvent
 }

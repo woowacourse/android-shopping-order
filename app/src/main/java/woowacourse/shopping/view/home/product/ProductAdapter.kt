@@ -9,10 +9,8 @@ import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductPlaceholderBinding
 import woowacourse.shopping.view.cart.QuantityEventListener
 import woowacourse.shopping.view.home.HomeEventListener
-import woowacourse.shopping.view.home.HomeQuantityEventListener
 import woowacourse.shopping.view.home.product.HomeViewItem.Companion.PRODUCT_PLACEHOLDER_VIEW_TYPE
 import woowacourse.shopping.view.home.product.HomeViewItem.Companion.PRODUCT_VIEW_TYPE
-import woowacourse.shopping.view.home.product.HomeViewItem.LoadMoreViewItem
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 
 class ProductAdapter(
@@ -107,5 +105,3 @@ class ProductAdapter(
 
     private fun isFirstLoad() = currentList.all { it.viewType == PRODUCT_PLACEHOLDER_VIEW_TYPE }
 }
-
-

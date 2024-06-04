@@ -22,7 +22,7 @@ data class ProductResponse(
 fun ProductResponse.toProductDomain(): ProductDomain =
     ProductDomain(
         products = products.map(Product::toProductItemDomain),
-        last = last
+        last = last,
     )
 
 fun Product.toProductItemDomain(): ProductItemDomain =
@@ -31,5 +31,5 @@ fun Product.toProductItemDomain(): ProductItemDomain =
         id = id,
         imageUrl = imageUrl,
         name = name,
-        price = price
+        price = price,
     )

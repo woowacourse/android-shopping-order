@@ -1,7 +1,5 @@
 package woowacourse.shopping.view.home
 
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.domain.model.ProductDomain
 import woowacourse.shopping.domain.model.ProductItemDomain
 
 interface HomeEventListener {

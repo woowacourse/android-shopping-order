@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
@@ -15,13 +14,11 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
-import woowacourse.shopping.view.home.product.HomeViewItem
 import woowacourse.shopping.view.home.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.product.ProductAdapter
 import woowacourse.shopping.view.home.recent.RecentProductAdapter
 import woowacourse.shopping.view.state.HomeUiEvent
-import woowacourse.shopping.view.state.UIState
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding

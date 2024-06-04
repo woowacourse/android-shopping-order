@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 object CartDiffUtil : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
     override fun areItemsTheSame(
         oldItem: ShoppingCartViewItem,
-        newItem: ShoppingCartViewItem
+        newItem: ShoppingCartViewItem,
     ): Boolean {
         if (oldItem is ShoppingCartViewItem.CartViewItem && newItem is ShoppingCartViewItem.CartViewItem) {
             return oldItem.cartItem.cartItemId == newItem.cartItem.cartItemId
@@ -15,7 +15,7 @@ object CartDiffUtil : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
 
     override fun areContentsTheSame(
         oldItem: ShoppingCartViewItem,
-        newItem: ShoppingCartViewItem
+        newItem: ShoppingCartViewItem,
     ): Boolean {
         return oldItem == newItem
     }

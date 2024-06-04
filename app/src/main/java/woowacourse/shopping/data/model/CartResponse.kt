@@ -25,12 +25,12 @@ fun CartResponse.toCartDomain(): CartDomain =
         empty = empty,
         first = first,
         last = last,
-        totalPages = totalPages
+        totalPages = totalPages,
     )
 
 fun CartItem.toCartItemDomain(): CartItemDomain =
     CartItemDomain(
         cartItemId = cartItemId,
         quantity = quantity,
-        product = product.toProductItemDomain()
+        product = product.toProductItemDomain(),
     )

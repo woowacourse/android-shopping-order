@@ -32,15 +32,17 @@ class DetailViewModel(
     }
 
     override fun addQuantity(cartItemId: Int) {
-        _productDetailUiState.value = productDetailUiState.value?.copy(
-            quantity = productDetailUiState.value?.quantity?.plus(1) ?: return
-        )
+        _productDetailUiState.value =
+            productDetailUiState.value?.copy(
+                quantity = productDetailUiState.value?.quantity?.plus(1) ?: return,
+            )
     }
 
     override fun subtractQuantity(cartItemId: Int) {
-        _productDetailUiState.value = productDetailUiState.value?.copy(
-            quantity = productDetailUiState.value?.quantity?.minus(1) ?: return
-        )
+        _productDetailUiState.value =
+            productDetailUiState.value?.copy(
+                quantity = productDetailUiState.value?.quantity?.minus(1) ?: return,
+            )
     }
 
     override fun addToCart() {
@@ -55,7 +57,6 @@ class DetailViewModel(
                     _detailUiEvent.value = Event(DetailUiEvent.NavigateToCart)
                 },
                 onFailure = {
-
                 },
             )
             return
@@ -68,17 +69,17 @@ class DetailViewModel(
                 _detailUiEvent.value = Event(DetailUiEvent.NavigateToCart)
             },
             onFailure = {
-
             },
         )
     }
 
     override fun navigateToRecentProduct() {
-        _detailUiEvent.value = Event(
-            DetailUiEvent.NavigateToRecentProduct(
-                productDetailUiState.value?.lastlyViewedProduct?.productId ?: return
+        _detailUiEvent.value =
+            Event(
+                DetailUiEvent.NavigateToRecentProduct(
+                    productDetailUiState.value?.lastlyViewedProduct?.productId ?: return,
+                ),
             )
-        )
     }
 
     override fun navigateBackToHome() {
@@ -90,7 +91,6 @@ class DetailViewModel(
             id = productId,
             onSuccess = ::loadCartDataToProduct,
             onFailure = {
-
             },
         )
     }
@@ -103,21 +103,20 @@ class DetailViewModel(
                     size = totalQuantity,
                     sort = "asc",
                     onSuccess = { cart ->
-                        _productDetailUiState.value = productDetailUiState.value?.copy(
-                            isLoading = false,
-                            product = productItem,
-                            lastlyViewedProduct = recentProductRepository.findMostRecentProduct(),
-                            quantity = 1,
-                            cartItems = cart.cartItems
-                        )
+                        _productDetailUiState.value =
+                            productDetailUiState.value?.copy(
+                                isLoading = false,
+                                product = productItem,
+                                lastlyViewedProduct = recentProductRepository.findMostRecentProduct(),
+                                quantity = 1,
+                                cartItems = cart.cartItems,
+                            )
                     },
                     onFailure = {
-
                     },
                 )
             },
             onFailure = {
-
             },
         )
     }

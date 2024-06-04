@@ -30,9 +30,9 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderRepository =
-            OrderRepositoryImpl(
-                remoteOrderDataSource,
-            ),
+                OrderRepositoryImpl(
+                    remoteOrderDataSource,
+                ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
         )
@@ -73,7 +73,7 @@ class CartActivity : AppCompatActivity() {
                             this,
                             event.productId,
                             event.lastlyViewed,
-                        )
+                        ),
                     )
                 }
 
@@ -92,7 +92,7 @@ class CartActivity : AppCompatActivity() {
                             this,
                             event.productId,
                             event.lastlyViewed,
-                        )
+                        ),
                     )
                 }
             }

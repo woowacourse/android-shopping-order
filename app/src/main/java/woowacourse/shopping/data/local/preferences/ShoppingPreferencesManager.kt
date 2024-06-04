@@ -7,11 +7,17 @@ import android.content.SharedPreferences
 class ShoppingPreferencesManager(context: Context) {
     private val shoppingPreferences = getShoppingPreferencesManager(context)
 
-    fun getString(key: String, defaultValue: String? = DEFAULT_VALUE): String? {
+    fun getString(
+        key: String,
+        defaultValue: String? = DEFAULT_VALUE,
+    ): String? {
         return shoppingPreferences?.getString(key, defaultValue)
     }
 
-    fun setString(key: String, newValue: String): String {
+    fun setString(
+        key: String,
+        newValue: String,
+    ): String {
         shoppingPreferences?.edit()?.putString(key, newValue)?.apply()
         return newValue
     }
@@ -25,7 +31,7 @@ class ShoppingPreferencesManager(context: Context) {
         private fun getShoppingPreferencesManager(context: Context): SharedPreferences? {
             return context.applicationContext.getSharedPreferences(
                 SHOPPING_PREFERENCES,
-                MODE_PRIVATE
+                MODE_PRIVATE,
             )
         }
     }

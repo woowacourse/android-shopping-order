@@ -1,7 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
 import woowacourse.shopping.domain.model.CartDomain
 
 interface CartRepository {

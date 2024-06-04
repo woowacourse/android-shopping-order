@@ -12,11 +12,11 @@ sealed class ShoppingCartViewItem(open val viewType: Int) {
             return this.copy(isSelected = !isSelected)
         }
 
-        fun increment() : CartViewItem {
+        fun increment(): CartViewItem {
             return this.copy(cartItem = cartItem.copy(quantity = cartItem.quantity + 1))
         }
 
-        fun decrement() : CartViewItem {
+        fun decrement(): CartViewItem {
             return this.copy(cartItem = cartItem.copy(quantity = cartItem.quantity - 1))
         }
     }
