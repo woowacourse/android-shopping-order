@@ -1,9 +1,10 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.NetworkResult
+
 interface OrderRepository {
     fun completeOrder(
         cartItemIds: List<Long>,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit,
+        callBack: (result: NetworkResult<Unit>) -> Unit,
     )
 }
