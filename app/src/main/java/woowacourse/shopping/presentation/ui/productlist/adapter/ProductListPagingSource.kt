@@ -1,13 +1,9 @@
 package woowacourse.shopping.presentation.ui.productlist.adapter
 
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.ui.productlist.PagingProduct
 
-class ProductListPagingSource(
-    private val productRepository: ProductRepository,
-    private val shoppingCartRepository: ShoppingCartRepository,
-) {
+class ProductListPagingSource(private val productRepository: ProductRepository) {
     private var currentPage = INIT_PAGE_NUM
     private var last = false
 

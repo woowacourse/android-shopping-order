@@ -41,13 +41,13 @@ class ProductHistoryRepositoryImpl(
 
                 val totalElements =
                     shoppingCartDataSource.getCartProductsPaged(
-                        page = ProductRepositoryImpl.FIRST_PAGE,
-                        size = ProductRepositoryImpl.FIRST_SIZE,
+                        page = FIRST_PAGE,
+                        size = FIRST_SIZE,
                     ).getOrThrow().totalElements
 
                 val carts =
                     shoppingCartDataSource.getCartProductsPaged(
-                        page = ProductRepositoryImpl.FIRST_PAGE,
+                        page = FIRST_PAGE,
                         size = totalElements,
                     ).getOrThrow().toDomain()
 
@@ -67,6 +67,9 @@ class ProductHistoryRepositoryImpl(
     override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
 
     companion object {
+        private const val FIRST_PAGE = 0
+        private const val FIRST_SIZE = 1
+
         private var instance: ProductHistoryRepositoryImpl? = null
 
         fun setInstance(
