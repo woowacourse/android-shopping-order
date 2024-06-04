@@ -21,14 +21,4 @@ class ProductDataSourceImpl(private val productService: ProductService) : Produc
             productService.getProducts(page = page, size = pageSize).execute().body()?.toData()
                 ?: throw IllegalArgumentException()
         }
-
-    companion object {
-        private var instance: ProductDataSourceImpl? = null
-
-        fun setInstance(productService: ProductService) {
-            instance = ProductDataSourceImpl(productService = productService)
-        }
-
-        fun getInstance(): ProductDataSourceImpl = requireNotNull(instance)
-    }
 }

@@ -36,10 +36,7 @@ class ProductListViewModel(
     private val shoppingCart: MutableMap<ProductItemId, CartItemId?> = mutableMapOf()
 
     private val productListPagingSource =
-        ProductListPagingSource(
-            productRepository = productRepository,
-            shoppingCartRepository = shoppingCartRepository,
-        )
+        ProductListPagingSource(productRepository = productRepository)
 
     init {
         initLoad()

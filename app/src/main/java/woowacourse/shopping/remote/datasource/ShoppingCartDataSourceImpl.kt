@@ -60,13 +60,5 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
     companion object {
         const val FIRST_PAGE = 0
         const val FIRST_SIZE = 1
-
-        private var instance: ShoppingCartDataSourceImpl? = null
-
-        fun setInstance(cartService: CartService) {
-            instance = ShoppingCartDataSourceImpl(service = cartService)
-        }
-
-        fun getInstance(): ShoppingCartDataSourceImpl = requireNotNull(instance)
     }
 }

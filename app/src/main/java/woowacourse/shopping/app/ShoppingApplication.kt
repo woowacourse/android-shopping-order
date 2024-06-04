@@ -2,10 +2,17 @@ package woowacourse.shopping.app
 
 import android.app.Application
 import androidx.preference.PreferenceManager
+import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
+import woowacourse.shopping.data.datasource.remote.OrderDataSource
+import woowacourse.shopping.data.datasource.remote.ProductDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
+import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
-import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
@@ -25,39 +32,60 @@ class ShoppingApplication : Application() {
     }
 
     private fun initAuthProvider() {
-        AuthProviderImpl.setInstance(
-            sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(applicationContext),
-        )
+        val preferenceManager = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val authProviderImpl = AuthProviderImpl(preferenceManager)
+        authProviderImpl.apply {
+            name = "junjange"
+            password = "password"
+        }
+        AuthProvider.setInstance(authProviderImpl)
     }
 
     private fun initNetworkModule() {
         NetworkModule.setInstance(
             baseUrl = BaseUrl(BASE_URL),
-            authProvider = AuthProviderImpl.getInstance(),
+            authProvider = AuthProvider.getInstance(),
         )
     }
 
     private fun initDataSources() {
-        ShoppingCartDataSourceImpl.setInstance(cartService = NetworkModule.getInstance().cartService)
-        ProductDataSourceImpl.setInstance(productService = NetworkModule.getInstance().productService)
-        OrderDataSourceImpl.setInstance(orderService = NetworkModule.getInstance().orderService)
-        ProductHistoryDataSourceImpl.setInstance(
-            productHistoryDao = ProductHistoryDatabase.getDatabase(applicationContext).dao(),
-        )
+        val shoppingCartDataSourceImpl =
+            ShoppingCartDataSourceImpl(service = NetworkModule.getInstance().cartService)
+        ShoppingCartDataSource.setInstance(shoppingCartDataSourceImpl)
+
+        val productDataSourceImpl =
+            ProductDataSourceImpl(productService = NetworkModule.getInstance().productService)
+        ProductDataSource.setInstance(productDataSourceImpl)
+
+        val orderDataSourceImpl =
+            OrderDataSourceImpl(service = NetworkModule.getInstance().orderService)
+        OrderDataSource.setInstance(orderDataSourceImpl)
+
+        val productHistoryDataSourceImpl =
+            ProductHistoryDataSourceImpl(
+                dao = ProductHistoryDatabase.getDatabase(applicationContext).dao(),
+            )
+        ProductHistoryDataSource.setInstance(productHistoryDataSourceImpl)
     }
 
     private fun initRepositories() {
-        ShoppingCartRepositoryImpl.setInstance(dataSource = ShoppingCartDataSourceImpl.getInstance())
-        ProductRepositoryImpl.setInstance(
-            productDataSource = ProductDataSourceImpl.getInstance(),
-            shoppingCartDataSource = ShoppingCartDataSourceImpl.getInstance(),
-        )
-        OrderRepositoryImpl.setInstance(orderDataSource = OrderDataSourceImpl.getInstance())
-        ProductHistoryRepositoryImpl.setInstance(
-            productHistoryDataSource = ProductHistoryDataSourceImpl.getInstance(),
-            shoppingCartDataSource = ShoppingCartDataSourceImpl.getInstance(),
-        )
+        val productRepositoryImpl =
+            ProductRepositoryImpl(
+                productDataSource = ProductDataSource.getInstance(),
+                shoppingCartDataSource = ShoppingCartDataSource.getInstance(),
+            )
+        ProductRepository.setInstance(productRepositoryImpl)
+
+        val orderRepositoryImpl =
+            OrderRepositoryImpl(orderDataSource = OrderDataSource.getInstance())
+        OrderRepository.setInstance(orderRepositoryImpl)
+
+        val productHistoryRepositoryImpl =
+            ProductHistoryRepositoryImpl(
+                productHistoryDataSource = ProductHistoryDataSource.getInstance(),
+                shoppingCartDataSource = ShoppingCartDataSource.getInstance(),
+            )
+        ProductHistoryRepository.setInstance(productHistoryRepositoryImpl)
     }
 
     companion object {

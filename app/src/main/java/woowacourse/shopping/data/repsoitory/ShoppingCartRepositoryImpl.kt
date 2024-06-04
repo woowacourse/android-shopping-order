@@ -45,14 +45,4 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
             size = totalElements,
         ).mapCatching { it.toDomain() }
     }
-
-    companion object {
-        private var instance: ShoppingCartRepositoryImpl? = null
-
-        fun setInstance(dataSource: ShoppingCartDataSource) {
-            instance = ShoppingCartRepositoryImpl(dataSource = dataSource)
-        }
-
-        fun getInstance(): ShoppingCartRepositoryImpl = requireNotNull(instance)
-    }
 }

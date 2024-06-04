@@ -53,14 +53,4 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
         runCatching {
             dao.deleteAllProductHistory()
         }
-
-    companion object {
-        private var instance: ProductHistoryDataSourceImpl? = null
-
-        fun setInstance(productHistoryDao: ProductHistoryDao) {
-            instance = ProductHistoryDataSourceImpl(dao = productHistoryDao)
-        }
-
-        fun getInstance(): ProductHistoryDataSourceImpl = requireNotNull(instance)
-    }
 }

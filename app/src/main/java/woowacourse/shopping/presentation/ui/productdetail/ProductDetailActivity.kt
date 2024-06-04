@@ -6,10 +6,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
-import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
-import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseActivity
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
@@ -18,9 +18,9 @@ class ProductDetailActivity :
     BaseActivity<ActivityProductDetailBinding>(R.layout.activity_product_detail) {
     private val viewModel: ProductDetailViewModel by viewModels {
         ProductDetailViewModel.factory(
-            ProductRepositoryImpl.getInstance(),
-            ShoppingCartRepositoryImpl.getInstance(),
-            ProductHistoryRepositoryImpl.getInstance(),
+            ProductRepository.getInstance(),
+            ShoppingCartRepository.getInstance(),
+            ProductHistoryRepository.getInstance(),
         )
     }
 

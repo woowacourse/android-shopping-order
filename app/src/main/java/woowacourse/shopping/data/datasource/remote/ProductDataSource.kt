@@ -10,4 +10,14 @@ interface ProductDataSource {
         page: Int,
         pageSize: Int,
     ): Result<ProductsDto>
+
+    companion object {
+        private var instance: ProductDataSource? = null
+
+        fun setInstance(productDataSource: ProductDataSource) {
+            instance = productDataSource
+        }
+
+        fun getInstance(): ProductDataSource = requireNotNull(instance)
+    }
 }

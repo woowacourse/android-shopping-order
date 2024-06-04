@@ -69,20 +69,5 @@ class ProductHistoryRepositoryImpl(
     companion object {
         private const val FIRST_PAGE = 0
         private const val FIRST_SIZE = 1
-
-        private var instance: ProductHistoryRepositoryImpl? = null
-
-        fun setInstance(
-            productHistoryDataSource: ProductHistoryDataSource,
-            shoppingCartDataSource: ShoppingCartDataSource,
-        ) {
-            instance =
-                ProductHistoryRepositoryImpl(
-                    productHistoryDataSource = productHistoryDataSource,
-                    shoppingCartDataSource = shoppingCartDataSource,
-                )
-        }
-
-        fun getInstance(): ProductHistoryRepositoryImpl = requireNotNull(instance)
     }
 }

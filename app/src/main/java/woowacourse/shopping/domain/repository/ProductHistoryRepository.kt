@@ -20,4 +20,14 @@ interface ProductHistoryRepository {
     fun deleteProductHistory(productId: Long): Result<Unit>
 
     fun deleteAllProductHistory(): Result<Unit>
+
+    companion object {
+        private var instance: ProductHistoryRepository? = null
+
+        fun setInstance(productHistoryRepository: ProductHistoryRepository) {
+            instance = productHistoryRepository
+        }
+
+        fun getInstance(): ProductHistoryRepository = requireNotNull(instance)
+    }
 }

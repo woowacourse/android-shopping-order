@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartSelectBinding
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
@@ -16,7 +16,7 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
     override val layoutResourceId: Int get() = R.layout.fragment_cart_select
 
     private val viewModel: CartSelectViewModel by viewModels {
-        CartSelectViewModel.factory(ShoppingCartRepositoryImpl.getInstance())
+        CartSelectViewModel.factory(ShoppingCartRepository.getInstance())
     }
 
     private val adapter: CartProductsAdapter by lazy { CartProductsAdapter(viewModel, viewModel) }

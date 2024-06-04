@@ -10,14 +10,4 @@ class OrderRepositoryImpl(
         runCatching {
             orderDataSource.postOrder(cartItemsIds)
         }
-
-    companion object {
-        private var instance: OrderRepositoryImpl? = null
-
-        fun setInstance(orderDataSource: OrderDataSource) {
-            instance = OrderRepositoryImpl(orderDataSource = orderDataSource)
-        }
-
-        fun getInstance(): OrderRepositoryImpl = requireNotNull(instance)
-    }
 }

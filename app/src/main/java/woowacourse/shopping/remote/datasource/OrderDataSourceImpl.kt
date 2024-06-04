@@ -12,14 +12,4 @@ class OrderDataSourceImpl(
             val body = PostOrderRequest(cartItemIds = cartItemsIds)
             service.postOrder(body).execute()
         }
-
-    companion object {
-        private var instance: OrderDataSourceImpl? = null
-
-        fun setInstance(orderService: OrderService) {
-            instance = OrderDataSourceImpl(service = orderService)
-        }
-
-        fun getInstance(): OrderDataSourceImpl = requireNotNull(instance)
-    }
 }

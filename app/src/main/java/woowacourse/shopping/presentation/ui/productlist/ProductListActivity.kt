@@ -4,10 +4,10 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
-import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
-import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductListBinding
+import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseActivity
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
@@ -22,9 +22,9 @@ class ProductListActivity :
     BaseActivity<ActivityProductListBinding>(R.layout.activity_product_list) {
     private val viewModel: ProductListViewModel by viewModels {
         ProductListViewModel.factory(
-            ProductRepositoryImpl.getInstance(),
-            ShoppingCartRepositoryImpl.getInstance(),
-            ProductHistoryRepositoryImpl.getInstance(),
+            ProductRepository.getInstance(),
+            ShoppingCartRepository.getInstance(),
+            ProductHistoryRepository.getInstance(),
         )
     }
 

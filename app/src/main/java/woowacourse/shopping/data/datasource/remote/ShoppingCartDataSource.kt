@@ -24,4 +24,14 @@ interface ShoppingCartDataSource {
     fun getCartItemsCount(): Result<Int>
 
     fun deleteCartItem(cartId: Int): Result<Unit>
+
+    companion object {
+        private var instance: ShoppingCartDataSource? = null
+
+        fun setInstance(shoppingCartDataSource: ShoppingCartDataSource) {
+            instance = shoppingCartDataSource
+        }
+
+        fun getInstance(): ShoppingCartDataSource = requireNotNull(instance)
+    }
 }

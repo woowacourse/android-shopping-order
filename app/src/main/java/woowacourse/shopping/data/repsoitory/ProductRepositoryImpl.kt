@@ -39,20 +39,5 @@ class ProductRepositoryImpl(
         const val FIRST_PAGE = 0
         const val FIRST_SIZE = 1
         const val INIT_QUANTITY = 1
-
-        private var instance: ProductRepositoryImpl? = null
-
-        fun setInstance(
-            productDataSource: ProductDataSource,
-            shoppingCartDataSource: ShoppingCartDataSource,
-        ) {
-            instance =
-                ProductRepositoryImpl(
-                    productDataSource = productDataSource,
-                    shoppingCartDataSource = shoppingCartDataSource,
-                )
-        }
-
-        fun getInstance(): ProductRepositoryImpl = requireNotNull(instance)
     }
 }

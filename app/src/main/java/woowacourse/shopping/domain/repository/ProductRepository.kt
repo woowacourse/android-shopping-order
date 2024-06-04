@@ -10,4 +10,14 @@ interface ProductRepository {
         page: Int,
         pageSize: Int,
     ): Result<Products>
+
+    companion object {
+        private var instance: ProductRepository? = null
+
+        fun setInstance(productRepository: ProductRepository) {
+            instance = productRepository
+        }
+
+        fun getInstance(): ProductRepository = requireNotNull(instance)
+    }
 }
