@@ -15,13 +15,16 @@ class ShoppingCart : Serializable {
 
     fun addProduct(cartItem: CartItem) {
         _cartItems.value = _cartItems.value?.plus(cartItem)
+        _cartItems.postValue(_cartItems.value)
     }
 
     fun deleteProduct(itemId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.id != itemId }
+        _cartItems.postValue(_cartItems.value)
     }
 
     fun deleteProductFromProductId(productId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.product.id != productId }
+        _cartItems.postValue(_cartItems.value)
     }
 }

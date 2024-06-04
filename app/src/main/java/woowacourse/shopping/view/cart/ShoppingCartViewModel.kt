@@ -1,36 +1,33 @@
 package woowacourse.shopping.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
+import woowacourse.shopping.data.repository.ProductRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
+import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
-) : ViewModel() {
+) : ViewModel(), OnClickCartItemCounter {
     val shoppingCart = ShoppingCart()
 
-    private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> =
-        MutableLiveData()
+    private val _shoppingCartEvent: MutableLiveData<ShoppingCartEvent.SuccessEvent> = MutableLiveData()
     val shoppingCartEvent: LiveData<ShoppingCartEvent.SuccessEvent> get() = _shoppingCartEvent
 
-    private val _errorEvent: MutableSingleLiveData<ShoppingCartEvent.ErrorState> =
-        MutableSingleLiveData()
+    private val _errorEvent: MutableSingleLiveData<ShoppingCartEvent.ErrorState> = MutableSingleLiveData()
     val errorEvent: SingleLiveData<ShoppingCartEvent.ErrorState> get() = _errorEvent
 
-    private val _loadingEvent: MutableSingleLiveData<ShoppingCartEvent.LoadCartItemList> =
-        MutableSingleLiveData()
+    private val _loadingEvent: MutableSingleLiveData<ShoppingCartEvent.LoadCartItemList> = MutableSingleLiveData()
     val loadingEvent: SingleLiveData<ShoppingCartEvent.LoadCartItemList> get() = _loadingEvent
 
     val checkedShoppingCart = ShoppingCart()
@@ -42,15 +39,10 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun deleteShoppingCartItem(
-        cartItemId: Long,
-        product: Product,
-    ) {
-        shoppingCartRepository.deleteCartItem(cartItemId).onSuccess { _ ->
-            shoppingCart.deleteProduct(cartItemId)
-            _shoppingCartEvent.value =
-                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
-            deleteCheckedItem(CartItem(cartItemId, product))
+    fun deleteShoppingCartItem(cartItem: CartItem) {
+        shoppingCartRepository.deleteCartItem(cartItem.id).onSuccess { _ ->
+            shoppingCart.deleteProduct(cartItem.id)
+            deleteCheckedItem(CartItem(cartItem.id, cartItem.product))
         }.onFailure { e ->
             when (e) {
                 is NoSuchDataException ->
@@ -72,7 +64,6 @@ class ShoppingCartViewModel(
             LOAD_SHOPPING_ITEM_OFFSET,
             LOAD_SHOPPING_ITEM_SIZE,
         ).onSuccess { pagingData ->
-            _loadingEvent.setValue(ShoppingCartEvent.LoadCartItemList.Success)
             shoppingCart.addProducts(synchronizeLoadingData(pagingData))
             setAllCheck()
         }.onFailure { e ->
@@ -130,53 +121,9 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun increaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.INCREASE)
-    }
-
-    fun decreaseCartItem(product: Product) {
-        updateCartItem(product, UpdateCartItemType.DECREASE)
-    }
-
-    private fun updateCartItem(
-        product: Product,
-        updateCartItemType: UpdateCartItemType,
-    ) {
-        shoppingCartRepository.updateCartItem(
-            product,
-            updateCartItemType,
-        ).onSuccess { updateCartItemResult ->
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> throw NoSuchDataException()
-                is UpdateCartItemResult.DELETE ->
-                    deleteShoppingCartItem(
-                        updateCartItemResult.cartItemId,
-                        product = product,
-                    )
-
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _shoppingCartEvent.value =
-                        ShoppingCartEvent.UpdateProductEvent.Success(
-                            productId = product.id,
-                            count = product.cartItemCounter.itemCount,
-                        )
-                }
-            }
-        }.onFailure { e ->
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(ShoppingCartEvent.UpdateProductEvent.Fail)
-
-                else -> _errorEvent.setValue(ShoppingCartEvent.ErrorState.NotKnownError)
-            }
-        }
-    }
-
     fun addCheckedItem(cartItem: CartItem) {
         cartItem.cartItemSelector.selectItem()
         checkedShoppingCart.addProduct(cartItem)
-        checkedShoppingCart
         updateCheckItemData()
     }
 
@@ -194,6 +141,51 @@ class ShoppingCartViewModel(
             it.cartItemSelector.isSelected
         } ?: DEFAULT_TOTAL_COUNT
         setAllCheck()
+    }
+
+    override fun clickIncrease(product: Product) {
+        shoppingCartRepository.increaseCartItem(product).onSuccess {
+            shoppingCart.cartItems.value?.find { it.product.id == product.id }?.let { cartItem ->
+                cartItem.product.cartItemCounter.increase()
+                Log.d("ShoppingCartViewModel", "clickIncrease: ${cartItem.product.cartItemCounter.itemCount}")
+            }
+
+//
+//            _shoppingCartEvent.value =
+//                shoppingCart.cartItems.value?.let {
+//                    ShoppingCartEvent.UpdateProductEvent.Success(it)
+//                }
+        }.onFailure { e ->
+            when (e) {
+                is NoSuchDataException ->
+                    _errorEvent.setValue(ShoppingCartEvent.UpdateProductEvent.Fail)
+
+                else ->
+                    _errorEvent.setValue(ShoppingCartEvent.ErrorState.NotKnownError)
+            }
+        }
+    }
+
+    override fun clickDecrease(product: Product) {
+        shoppingCartRepository.decreaseCartItem(product).onSuccess {
+            shoppingCart.cartItems.value?.find { it.product.id == product.id }?.let { cartItem ->
+                cartItem.product.cartItemCounter.decrease()
+//                Log.d("ShoppingCartViewModel", "clickDecrease: ${cartItem.product.cartItemCounter.itemCount})")
+            }
+
+//            _shoppingCartEvent.value =
+//                shoppingCart.cartItems.value?.let {
+//                    ShoppingCartEvent.UpdateProductEvent.Success(it)
+//                }
+        }.onFailure {
+            when (it) {
+                is NoSuchDataException ->
+                    _errorEvent.setValue(ShoppingCartEvent.UpdateProductEvent.Fail)
+
+                else ->
+                    _errorEvent.setValue(ShoppingCartEvent.ErrorState.NotKnownError)
+            }
+        }
     }
 
     companion object {

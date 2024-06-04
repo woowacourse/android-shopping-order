@@ -25,7 +25,7 @@
             android:layout_width="126dp"
             android:layout_height="wrap_content"
             android:background="@drawable/shape_border_not_line"
-            android:visibility="@{product.itemSelector.isSelected ? View.VISIBLE : View.GONE}"
+            android:visibility="@{product.cartItemCounter.itemCount > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
                 android:layout_height="42dp"
                 android:gravity="center"
                 android:onClick="@{()->onClickCartItemCounter.clickDecrease(product)}"
-                android:text="-"
+                android:text="−"
                 android:textColor="@color/gray_5"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -75,7 +75,7 @@
                 android:layout_margin="8dp"
                 android:onClick="@{()->onClickCartItemCounter.clickIncrease(product)}"
                 android:src="@drawable/ic_plus_cart"
-                android:visibility="@{product.itemSelector.isSelected ? View.GONE : View.VISIBLE}"
+                android:visibility="@{product.cartItemCounter.itemCount > 0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

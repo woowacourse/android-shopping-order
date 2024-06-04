@@ -11,17 +11,14 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.recommend.RecommendFragment
 
-class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCounter {
+class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentShoppingCartBinding? = null
     val binding: FragmentShoppingCartBinding get() = _binding!!
@@ -70,7 +67,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         adapter =
             ShoppingCartAdapter(
                 onClickShoppingCart = this,
-                onClickCartItemCounter = this,
+                onClickCartItemCounter = shoppingCartViewModel,
             )
         binding.rvShoppingCart.adapter = adapter
     }
@@ -78,42 +75,18 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            updateRecyclerView(cartItems)
+            adapter.submitList(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
-                    adapter.updateCartItem(cartState.productId)
                     mainActivityListener?.saveUpdateProduct(
                         cartState.productId,
                         cartState.count,
                     )
                 }
-
-                is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
-                    adapter.deleteCartItem(cartState.productId)
-
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        DEFAULT_ITEM_COUNT,
-                    )
-
-                    requireContext().makeToast(
-                        getString(
-                            R.string.delete_cart_item,
-                        ),
-                    )
-                }
-
+                is ShoppingCartEvent.UpdateProductEvent.DELETE -> {}
                 ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
-            }
-        }
-
-        shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
-            when (loadingState) {
-                ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
-                ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
-                ShoppingCartEvent.LoadCartItemList.Fail -> adapter.setShowSkeleton(false)
             }
         }
 
@@ -167,10 +140,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
     }
 
     override fun clickRemoveCartItem(cartItem: CartItem) {
-        shoppingCartViewModel.deleteShoppingCartItem(
-            cartItemId = cartItem.id,
-            product = cartItem.product,
-        )
+        shoppingCartViewModel.deleteShoppingCartItem(cartItem)
     }
 
     override fun clickCheckBox(cartItem: CartItem) {
@@ -194,17 +164,5 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
 
     override fun clickCheckAll() {
         shoppingCartViewModel.checkAllItems()
-    }
-
-    private fun updateRecyclerView(cartItems: List<CartItem>) {
-        adapter.updateCartItems(cartItems)
-    }
-
-    override fun clickIncrease(product: Product) {
-        shoppingCartViewModel.increaseCartItem(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        shoppingCartViewModel.decreaseCartItem(product)
     }
 }
