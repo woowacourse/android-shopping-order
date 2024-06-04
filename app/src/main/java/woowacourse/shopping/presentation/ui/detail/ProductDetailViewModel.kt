@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
@@ -38,6 +39,8 @@ class ProductDetailViewModel(
 
     private val _moveEvent = MutableLiveData<Event<FromDetailToScreen>>()
     val moveEvent: LiveData<Event<FromDetailToScreen>> get() = _moveEvent
+
+    val showLastProduct: LiveData<Boolean> = lastProduct.map { it != ProductModel.INVALID_PRODUCT_MODEL && it.id != productId }
 
     init {
         fetchInitialData()

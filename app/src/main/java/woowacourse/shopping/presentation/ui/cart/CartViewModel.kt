@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
@@ -76,12 +76,9 @@ class CartViewModel(
             )
         }
 
-    val totalCount: LiveData<Int> =
-        selectedCartItems.switchMap {
-            MutableLiveData(
-                it.sumOf { it.quantity },
-            )
-        }
+    val showSkeleton: LiveData<Boolean> = cartItems.map { it is UiState.Loading }
+
+    val showTotalCheckBox: LiveData<Boolean> = orderState.map { it is OrderState.CartList }
 
     init {
         loadAllCartItems(initialTotalCartItemCount)

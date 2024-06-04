@@ -59,13 +59,12 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/tv_selected_total_price"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_selected_total_price" />
 
         <CheckBox
             android:id="@+id/total_check_box"
-            bindSetCartCheckBoxVisibility="@{viewModel.orderState}"
             bindTotalCheckBox="@{cartHandler}"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -74,20 +73,21 @@
             android:layout_marginBottom="33dp"
             android:checked="@{viewModel.isAllCartItemsSelected}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_selected_total_price" />
+            app:layout_constraintTop_toTopOf="@id/tv_selected_total_price"
+            app:visibility="@{viewModel.showTotalCheckBox}" />
 
         <TextView
-            bindSetCartCheckBoxVisibility="@{viewModel.orderState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/whole"
             android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="@id/total_check_box"
             app:layout_constraintStart_toStartOf="@id/total_check_box"
-            app:layout_constraintTop_toBottomOf="@id/total_check_box" />
+            app:layout_constraintTop_toBottomOf="@id/total_check_box"
+            app:visibility="@{viewModel.showTotalCheckBox}" />
 
         <include
-            android:id="@+id/cart_skelleton"
-            app:bindSetCartSkeletonVisibility="@{viewModel.cartItems}"
+            android:id="@+id/cart_skeleton"
             layout="@layout/item_cart_skeleton"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -95,6 +95,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibility="@{viewModel.showSkeleton}"
             tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
@@ -52,8 +52,7 @@ class ShoppingViewModel(
     private val shoppingProductsData
         get() = (shoppingProducts.value as? UiState.Success)?.data ?: emptyList()
 
-    val showSkeleton: LiveData<Boolean>
-        get() = shoppingProducts.switchMap { MutableLiveData(it is UiState.Loading) }
+    val showSkeleton: LiveData<Boolean> = shoppingProducts.map { it is UiState.Loading }
 
     init {
         fetchCartCount()

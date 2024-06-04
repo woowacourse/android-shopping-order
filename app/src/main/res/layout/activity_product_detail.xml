@@ -120,8 +120,6 @@
             tools:text="10000원" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            currentProductId="@{viewModel.product.id}"
-            lastProduct="@{viewModel.lastProduct}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
@@ -131,7 +129,8 @@
             app:layout_constraintBottom_toTopOf="@id/tv_add_cart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_price_value">
+            app:layout_constraintTop_toBottomOf="@id/tv_price_value"
+            app:visibility="@{viewModel.showLastProduct}">
 
             <TextView
                 android:id="@+id/tv_last_product"
