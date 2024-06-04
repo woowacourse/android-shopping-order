@@ -6,6 +6,6 @@ import woowacourse.shopping.domain.model.Products
 fun ProductsDto.toDomain(): Products {
     return Products(
         content = this.content.map { it.toDomain() },
-        pageable = this.pageableDto.toDomain(),
+        pageable = this.pageable.toDomain(),
     )
 }

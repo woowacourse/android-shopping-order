@@ -5,7 +5,7 @@ import woowacourse.shopping.remote.model.response.PageableResponse
 
 fun PageableResponse.toData(): PageableDto {
     return PageableDto(
-        sortDto = this.sortResponse.toData(),
+        sort = this.sort.toData(),
         pageNumber = this.pageNumber,
         pageSize = this.pageSize,
         offset = this.offset,

@@ -6,6 +6,6 @@ import woowacourse.shopping.remote.model.response.ProductsResponse
 fun ProductsResponse.toData(): ProductsDto {
     return ProductsDto(
         content = this.content.map { it.toData() },
-        pageableDto = this.pageableResponse.toData(),
+        pageable = this.pageable.toData(),
     )
 }

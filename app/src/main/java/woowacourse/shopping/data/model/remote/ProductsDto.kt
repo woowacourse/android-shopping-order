@@ -2,5 +2,5 @@ package woowacourse.shopping.data.model.remote
 
 data class ProductsDto(
     val content: List<ProductDto>,
-    val pageableDto: PageableDto,
+    val pageable: PageableDto,
 )

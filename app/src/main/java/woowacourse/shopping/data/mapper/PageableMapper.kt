@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Pageable
 
 fun PageableDto.toDomain(): Pageable {
     return Pageable(
-        sort = this.sortDto.toDomain(),
+        sort = this.sort.toDomain(),
         pageNumber = this.pageNumber,
         pageSize = this.pageSize,
         offset = this.offset,

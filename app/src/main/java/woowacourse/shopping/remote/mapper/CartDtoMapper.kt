@@ -7,6 +7,6 @@ fun CartResponse.toData(): CartDto {
     return CartDto(
         id = this.id,
         quantity = this.quantity,
-        productDto = this.productResponse.toData(),
+        product = this.product.toData(),
     )
 }

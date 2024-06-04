@@ -7,6 +7,6 @@ fun CartDto.toDomain(): Cart {
     return Cart(
         id = this.id,
         quantity = this.quantity,
-        product = this.productDto.toDomain(),
+        product = this.product.toDomain(),
     )
 }

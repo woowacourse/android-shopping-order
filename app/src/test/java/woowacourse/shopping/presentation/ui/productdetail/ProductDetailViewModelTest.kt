@@ -89,7 +89,7 @@ class ProductDetailViewModelTest {
 
         // then
         assertAll(
-            { assertThat(productIdSlot.captured).isEqualTo(STUB_CART_A.productDto.id) },
+            { assertThat(productIdSlot.captured).isEqualTo(STUB_CART_A.product.id) },
             { assertThat(quantitySlot.captured).isEqualTo(STUB_CART_A.quantity) },
         )
     }
