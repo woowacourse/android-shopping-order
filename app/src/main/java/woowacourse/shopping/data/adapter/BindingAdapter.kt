@@ -32,50 +32,10 @@ fun setPrice(
     view.text = view.context.getString(R.string.price_format, price)
 }
 
-@BindingAdapter("app:selectedBasedOn")
-fun setSelectedBasedOn(
-    button: AppCompatButton,
-    isSelected: Boolean,
-) {
-    button.isSelected = isSelected
-}
-
 @BindingAdapter("app:viewVisibility")
 fun setViewVisibility(
     view: View,
     isVisible: Boolean,
 ) {
     view.visibility = if (isVisible) View.VISIBLE else View.GONE
-}
-
-@BindingAdapter("app:totalQuantityVisibility")
-fun setTotalQuantityVisibility(
-    textView: TextView,
-    totalQuantity: Int,
-) {
-    textView.visibility = if (totalQuantity > 0) View.VISIBLE else View.GONE
-}
-
-@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
-fun <T> setEmptyCartVisibility(
-    textView: TextView,
-    isEmpty: Boolean,
-    state: UIState<T>,
-) {
-    textView.visibility =
-        if (state is UIState.Success && isEmpty) View.VISIBLE else View.GONE
-}
-
-@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
-fun <T> setCartVisibility(
-    view: RecyclerView,
-    isEmpty: Boolean,
-    state: UIState<T>,
-) {
-    view.visibility =
-        if (state is UIState.Success && !isEmpty || state is UIState.Loading) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
 }

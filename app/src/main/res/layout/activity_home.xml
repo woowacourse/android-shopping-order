@@ -64,7 +64,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:totalQuantityVisibility="@{viewModel.homeProductUiState.totalCartQuantity}"
+                app:viewVisibility="@{viewModel.homeProductUiState.totalCartQuantity > 0}"
                 tools:text="2"
                 tools:visibility="visible" />
 
@@ -103,15 +103,15 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_recent_products"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="369dp"
+                        android:layout_height="152dp"
                         android:layout_marginTop="8dp"
                         android:orientation="horizontal"
                         android:overScrollMode="never"
+                        android:visibility="@{viewModel.recentProductUiState.isEmpty ? View.GONE : View.VISIBLE}"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintStart_toStartOf="@id/tv_recent_products_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_recent_products_title"
-                        android:visibility="@{viewModel.recentProductUiState.isEmpty ? View.GONE : View.VISIBLE}"
                         tools:listitem="@layout/item_recent_product"
                         tools:visibility="visible" />
 
