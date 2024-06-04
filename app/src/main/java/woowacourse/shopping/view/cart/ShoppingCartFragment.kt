@@ -95,7 +95,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 }
 
                 is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
-                    adapter.deleteCartItem(cartState.productId)
 
                     mainActivityListener?.saveUpdateProduct(
                         cartState.productId,

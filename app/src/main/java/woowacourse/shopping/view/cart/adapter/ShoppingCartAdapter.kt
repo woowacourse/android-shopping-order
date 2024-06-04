@@ -93,16 +93,6 @@ class ShoppingCartAdapter(
         }
     }
 
-    fun deleteCartItem(productId: Long) {
-        val position =
-            currentList.indexOfFirst {
-                it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
-            }
-        if (position != -1) {
-            notifyItemRemoved(position)
-        }
-    }
-
     fun setShowSkeleton(show: Boolean) {
         showSkeleton = show
         val currentListWithoutSkeletons = currentList.filter { it !is ShoppingCartItem.SkeletonItem }
