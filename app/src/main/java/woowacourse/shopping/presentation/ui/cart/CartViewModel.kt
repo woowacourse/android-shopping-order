@@ -96,9 +96,7 @@ class CartViewModel(
 
     override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
         cartRepository.deleteExistCartItem(product.cartId, onSuccess = { cartId, newQuantity ->
-            val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
-            _changedCartProducts.value =
-                originalChangedCartProducts.plus(Cart(cartId, product.toProduct(), newQuantity))
+            addChangedCartProducts(cartId, product, newQuantity)
             val newShoppingProduct =
                 (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.filter { it.id != product.id }
             _shoppingProducts.value = UiState.Success(newShoppingProduct)
@@ -183,16 +181,16 @@ class CartViewModel(
     override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
         val updatedQuantity = item?.let { it.quantity - 1 } ?: 1
         if (updatedQuantity > 0) {
-            item?.let { item ->
+            item?.let {
                 cartRepository.updateDecrementQuantity(
-                    item.cartId,
-                    item.id,
+                    it.cartId,
+                    it.id,
                     1,
-                    item.quantity,
+                    it.quantity,
                     onSuccess = { cartId, resultQuantity ->
-//                        modifyShoppingProductQuantity(item, resultQuantity)
+                        addChangedCartProducts(cartId, it, resultQuantity)
                         val orderState = orderState.value ?: throw IllegalStateException()
-                        handleQuantity(orderState, item, resultQuantity, cartId)
+                        handleQuantity(orderState, it, resultQuantity, cartId)
                     },
                     onFailure = {},
                 )
@@ -201,19 +199,30 @@ class CartViewModel(
     }
 
     override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let { item ->
+        item?.let {
             cartRepository.updateIncrementQuantity(
-                item.cartId,
-                item.id,
+                it.cartId,
+                it.id,
                 1,
-                item.quantity,
+                it.quantity,
                 onSuccess = { cartId, resultQuantity ->
+                    addChangedCartProducts(cartId, it, resultQuantity)
                     val orderState = orderState.value ?: throw IllegalStateException()
-                    handleQuantity(orderState, item, resultQuantity, cartId)
+                    handleQuantity(orderState, it, resultQuantity, cartId)
                 },
                 onFailure = {},
             )
         }
+    }
+
+    private fun addChangedCartProducts(
+        cartId: Long,
+        item: ProductListItem.ShoppingProductItem,
+        resultQuantity: Int,
+    ) {
+        val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
+        _changedCartProducts.value =
+            originalChangedCartProducts.plus(Cart(cartId, item.toProduct(), resultQuantity))
     }
 
     private fun handleQuantity(
