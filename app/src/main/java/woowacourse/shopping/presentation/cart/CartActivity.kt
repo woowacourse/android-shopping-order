@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.common.observeEvent
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.order.remote.RemoteOrderRepository
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultOrderRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -24,10 +24,10 @@ class CartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
-            RemoteProductRepository(),
+            DefaultProductRepository(),
             RecentProductRepository.getInstance(),
-            RemoteCartRepository(),
-            RemoteOrderRepository(),
+            DefaultCartRepository(),
+            DefaultOrderRepository(),
         )
     }
 

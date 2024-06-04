@@ -8,10 +8,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.FakeCartRepository
 import woowacourse.shopping.FakeRecentProductRepository
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.product.remote.mock.MockWebProductServer
-import woowacourse.shopping.data.product.remote.mock.MockWebProductServerDispatcher
-import woowacourse.shopping.data.product.remote.mock.MockWebServerProductRepository
-import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
+import woowacourse.shopping.data.datasource.local.room.entity.recentproduct.RecentProductEntity
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServer
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServerDispatcher
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebServerProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository

@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.recent
 
-import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
+import woowacourse.shopping.data.datasource.local.room.entity.recentproduct.RecentProductEntity
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
 

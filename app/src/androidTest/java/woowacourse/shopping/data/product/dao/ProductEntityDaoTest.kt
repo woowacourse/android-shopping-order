@@ -8,9 +8,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.local.ShoppingCartDataBase
-import woowacourse.shopping.data.product.local.dao.ProductDao
-import woowacourse.shopping.data.product.local.entity.ProductEntity
+import woowacourse.shopping.data.datasource.local.room.ShoppingCartDataBase
+import woowacourse.shopping.data.datasource.local.room.dao.ProductDao
+import woowacourse.shopping.data.datasource.local.room.entity.product.ProductEntity
 import woowacourse.shopping.imageUrl
 import woowacourse.shopping.price
 import woowacourse.shopping.title

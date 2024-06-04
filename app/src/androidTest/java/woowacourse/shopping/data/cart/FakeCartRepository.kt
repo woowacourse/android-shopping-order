@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.cart
 
-import woowacourse.shopping.data.cart.local.entity.CartItemEntity
+import woowacourse.shopping.data.datasource.local.room.entity.cart.CartItemEntity
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import java.lang.IllegalArgumentException

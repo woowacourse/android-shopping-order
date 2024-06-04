@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.product.remote.retrofit.DataCallback
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.repository.DataCallback
+import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
@@ -15,9 +15,9 @@ import woowacourse.shopping.presentation.utils.AddCartQuantityBundle
 
 class ProductDetailViewModel(
     private val productId: Int,
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: DefaultProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: RemoteCartRepository,
+    private val cartRepository: DefaultCartRepository,
     private val lastSeenProductVisible: Boolean,
 ) : ViewModel() {
     private val _productUiModel = MutableLiveData<ProductUiModel>()

@@ -8,9 +8,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.local.ShoppingCartDataBase
-import woowacourse.shopping.data.recent.local.dao.RecentProductDao
-import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
+import woowacourse.shopping.data.datasource.local.room.ShoppingCartDataBase
+import woowacourse.shopping.data.datasource.local.room.dao.RecentProductDao
+import woowacourse.shopping.data.datasource.local.room.entity.recentproduct.RecentProductEntity
 import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)

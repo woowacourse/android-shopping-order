@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.FakeCartRepository
-import woowacourse.shopping.data.product.local.entity.ProductEntity
+import woowacourse.shopping.data.datasource.local.room.entity.product.ProductEntity
 import woowacourse.shopping.data.recent.FakeRecentProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository

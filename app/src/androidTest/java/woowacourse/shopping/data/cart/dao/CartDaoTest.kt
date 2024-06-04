@@ -9,9 +9,9 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.cart.local.dao.CartDao
-import woowacourse.shopping.data.cart.local.entity.CartItemEntity
-import woowacourse.shopping.data.local.ShoppingCartDataBase
+import woowacourse.shopping.data.datasource.local.room.ShoppingCartDataBase
+import woowacourse.shopping.data.datasource.local.room.dao.CartDao
+import woowacourse.shopping.data.datasource.local.room.entity.cart.CartItemEntity
 import woowacourse.shopping.domain.model.Quantity
 import java.lang.IllegalArgumentException
 

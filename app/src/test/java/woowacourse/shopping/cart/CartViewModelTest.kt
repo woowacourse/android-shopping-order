@@ -9,9 +9,9 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItem
 import woowacourse.shopping.cartItems
 import woowacourse.shopping.convertProductUiModel
-import woowacourse.shopping.data.product.remote.mock.MockWebProductServer
-import woowacourse.shopping.data.product.remote.mock.MockWebProductServerDispatcher
-import woowacourse.shopping.data.product.remote.mock.MockWebServerProductRepository
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServer
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServerDispatcher
+import woowacourse.shopping.data.datasource.remote.mockk.MockWebServerProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository

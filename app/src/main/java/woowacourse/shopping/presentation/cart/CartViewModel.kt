@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.cart.remote.RemoteCartRepository
-import woowacourse.shopping.data.order.remote.RemoteOrderRepository
-import woowacourse.shopping.data.product.remote.retrofit.DataCallback
-import woowacourse.shopping.data.product.remote.retrofit.RemoteProductRepository
+import woowacourse.shopping.data.repository.DataCallback
+import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultOrderRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
@@ -16,10 +16,10 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
 
 class CartViewModel(
-    private val productRepository: RemoteProductRepository,
+    private val productRepository: DefaultProductRepository,
     private val recommendRepository: RecentProductRepository,
-    private val cartRepository: RemoteCartRepository,
-    private val orderRepository: RemoteOrderRepository,
+    private val cartRepository: DefaultCartRepository,
+    private val orderRepository: DefaultOrderRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiState = MutableLiveData<Event<CartUiState>>()
     val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
