@@ -4,7 +4,7 @@ import retrofit2.Call
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.ProductResponse
 
-interface ProductDataSource {
+interface RemoteProductDataSource {
     fun getProducts(
         category: String?,
         page: Int,

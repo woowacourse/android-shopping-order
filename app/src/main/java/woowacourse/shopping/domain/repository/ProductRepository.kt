@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.domain.model.ProductDomain
+import woowacourse.shopping.domain.model.ProductItemDomain
 
 interface ProductRepository {
     fun getProducts(
@@ -8,7 +9,13 @@ interface ProductRepository {
         page: Int,
         size: Int,
         sort: String,
-    ): Result<ProductResponse>
+        onSuccess: (ProductDomain) -> Unit,
+        onFailure: (Throwable) -> Unit,
+    )
 
-    fun getProductById(id: Int): Result<woowacourse.shopping.data.model.Product>
+    fun getProductById(
+        id: Int,
+        onSuccess: (ProductItemDomain) -> Unit,
+        onFailure: (Throwable) -> Unit,
+    )
 }

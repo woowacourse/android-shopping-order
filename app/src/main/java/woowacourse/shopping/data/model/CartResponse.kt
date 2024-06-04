@@ -21,7 +21,11 @@ data class CartResponse(
 
 fun CartResponse.toCartDomain(): CartDomain =
     CartDomain(
-        cartItems = cartItems.map(CartItem::toCartItemDomain)
+        cartItems = cartItems.map(CartItem::toCartItemDomain),
+        empty = empty,
+        first = first,
+        last = last,
+        totalPages = totalPages
     )
 
 fun CartItem.toCartItemDomain(): CartItemDomain =

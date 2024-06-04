@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.datasource
 
 import retrofit2.Call
-import woowacourse.shopping.data.datasource.OrderDataSource
 import woowacourse.shopping.data.model.CartItemIds
+import woowacourse.shopping.data.remote.OrderService
 
-class RemoteOrderDataSource(
+class DefaultRemoteOrderDataSource(
     private val orderService: OrderService,
-) : OrderDataSource {
+) : RemoteOrderDataSource {
     override fun postOrder(cartItemIds: CartItemIds): Call<Unit> {
         return orderService.postOrder(cartItemIds)
     }

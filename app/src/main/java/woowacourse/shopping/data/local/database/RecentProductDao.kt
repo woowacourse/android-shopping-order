@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.db.recent
+package woowacourse.shopping.data.local.database
 
 import androidx.room.Dao
 import androidx.room.Insert

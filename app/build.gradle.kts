@@ -33,6 +33,11 @@ android {
         buildFeatures {
             buildConfig = true
         }
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
