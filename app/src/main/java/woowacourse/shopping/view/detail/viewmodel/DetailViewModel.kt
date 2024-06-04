@@ -98,7 +98,7 @@ class DetailViewModel(
                 cartRepository.getCartResponse(0, totalQuantity, DESCENDING_SORT_ORDER)
             }.onSuccess { cartResponse ->
                 val cartItems = cartResponse.getOrNull()?.cartItems
-                val cartItem = cartItems?.firstOrNull { it.product.productId == productId }
+                val cartItem = cartItems?.firstOrNull { it.productDto.productId == productId }
                 val currentQuantity = cartItem?.quantity ?: 0
                 val quantity = quantity.value ?: 0
 

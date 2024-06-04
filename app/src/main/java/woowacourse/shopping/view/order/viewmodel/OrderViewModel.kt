@@ -164,7 +164,10 @@ class OrderViewModel(
     }
 
     private fun getCartViewItemByProductId(productId: Int): CartViewItem? {
-        return cartViewItems.value?.firstOrNull { cartViewItem -> cartViewItem.cartItem.product.productId == productId }
+
+        return cartViewItems.value?.firstOrNull { cartViewItem ->
+            cartViewItem.cartItem.product.productId == productId
+        }
     }
 
     private fun getCartViewItemPosition(cartItemId: Int): Int? {
@@ -236,8 +239,7 @@ class OrderViewModel(
             val selectedPosition =
                 selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
                     selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
-                }
-                    ?: return
+                } ?: return
             if (selectedPosition != -1) {
                 val newSelectedCatViewItems =
                     selectedCartViewItems.value?.toMutableList() ?: return
@@ -270,14 +272,23 @@ class OrderViewModel(
         updatedCartItem = updatedCartItem.copy(cartItem = updatedCartItem.cartItem.minusQuantity())
 
         runCatching {
-            cartRepository.updateCartItem(
-                updatedCartItem.cartItem.cartItemId,
-                updatedCartItem.cartItem.quantity,
-            )
+            if (updatedCartItem.cartItem.quantity == 0) {
+                cartRepository.deleteCartItem(updatedCartItem.cartItem.cartItemId)
+            } else {
+                cartRepository.updateCartItem(
+                    updatedCartItem.cartItem.cartItemId,
+                    updatedCartItem.cartItem.quantity,
+                )
+            }
         }.onSuccess {
             val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
             val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
-            newCartViewItems[position] = updatedCartItem
+            if (updatedCartItem.cartItem.quantity == 0) {
+                newCartViewItems.removeAt(position)
+                _notifyDeletion.value = Event(Unit)
+            } else {
+                newCartViewItems[position] = updatedCartItem
+            }
             cartViewItems.value = newCartViewItems
 
             val selectedPosition =

@@ -29,7 +29,7 @@ fun ProductDto.toProduct(): Product {
 }
 
 fun CartItemDto.toCartItem(): CartItem {
-    return CartItem(cartItemId, quantity, product)
+    return CartItem(cartItemId, quantity, productDto.toProduct())
 }
 
 fun CartItemDto.toCartViewItem(): CartViewItem {
