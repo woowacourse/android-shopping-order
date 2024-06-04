@@ -15,14 +15,14 @@ import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
-    override fun addCartItem(product: Product): Result<Unit> {
+    override suspend fun addCartItem(product: Product): Result<Unit> {
         return cartItemDataSource.addCartItem(
             product.id.toInt(),
             product.cartItemCounter.itemCount,
         )
     }
 
-    override fun loadPagingCartItems(
+    override suspend fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
     ): Result<List<CartItem>> {
@@ -30,15 +30,15 @@ class RemoteShoppingCartRepositoryImpl(
         return cartItemDataSource.loadCartItems(page = page, size = pagingSize)
     }
 
-    override fun deleteCartItem(itemId: Long): Result<Unit> {
+    override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
         return cartItemDataSource.deleteCartItem(itemId.toInt())
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         return cartItemDataSource.loadCartItemResult(productId)
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ): Result<UpdateCartItemResult> {
@@ -74,7 +74,7 @@ class RemoteShoppingCartRepositoryImpl(
             }
     }
 
-    private fun addCartItemResult(
+    private suspend fun addCartItemResult(
         cartItemResult: CartItemResult,
         product: Product,
     ): UpdateCartItemResult {
@@ -96,7 +96,7 @@ class RemoteShoppingCartRepositoryImpl(
         product.updateCartItemCount(cartItemResult.counter.itemCount)
     }
 
-    private fun updateCartCountResult(cartItemResult: CartItemResult): UpdateCartItemResult {
+    private suspend fun updateCartCountResult(cartItemResult: CartItemResult): UpdateCartItemResult {
         return cartItemDataSource.updateCartItem(
             id = cartItemResult.cartItemId.toInt(),
             quantity = cartItemResult.counter.itemCount,
@@ -109,7 +109,7 @@ class RemoteShoppingCartRepositoryImpl(
             }.getOrThrow()
     }
 
-    private fun deleteCartItemResult(cartItemResult: CartItemResult):UpdateCartItemResult {
+    private suspend fun deleteCartItemResult(cartItemResult: CartItemResult):UpdateCartItemResult {
         return deleteCartItem(cartItemResult.cartItemId)
             .mapCatching {
                 UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
@@ -119,7 +119,7 @@ class RemoteShoppingCartRepositoryImpl(
             }.getOrThrow()
     }
 
-    override fun getTotalCartItemCount(): Result<Int> {
+    override suspend fun getTotalCartItemCount(): Result<Int> {
         return cartItemDataSource.loadCartItemCount()
     }
 

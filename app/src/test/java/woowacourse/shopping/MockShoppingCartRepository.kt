@@ -55,13 +55,13 @@ class MockShoppingCartRepository : ShoppingCartRepository {
             ),
         )
 
-    override fun addCartItem(product: Product): Result<Unit> {
+    override suspend fun addCartItem(product: Product): Result<Unit> {
         val cartItem = CartItem(3L, product)
         cartItems.add(cartItem)
         return Result.success(Unit)
     }
 
-    override fun loadPagingCartItems(
+    override suspend fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
     ): Result<List<CartItem>> {
@@ -72,23 +72,23 @@ class MockShoppingCartRepository : ShoppingCartRepository {
         }
     }
 
-    override fun deleteCartItem(itemId: Long): Result<Unit> {
+    override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
         cartItems.removeIf { it.id == itemId }
         return Result.success(Unit)
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         return Result.success(CartItemResult(0, CartItemCounter()))
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ): Result<UpdateCartItemResult> {
         return Result.success(UpdateCartItemResult.UPDATED(CartItemResult(0, CartItemCounter())))
     }
 
-    override fun getTotalCartItemCount(): Result<Int> {
+    override suspend fun getTotalCartItemCount(): Result<Int> {
         return Result.success(cartItems.size)
     }
 }

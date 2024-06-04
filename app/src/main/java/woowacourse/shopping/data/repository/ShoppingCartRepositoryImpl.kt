@@ -19,41 +19,41 @@ import kotlin.concurrent.thread
 class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     private val cartItemDao = CartItemDatabase.getInstance(context).cartItemDao()
 
-    override fun addCartItem(product: Product): Result<Unit> {
+    override suspend fun addCartItem(product: Product): Result<Unit> {
         thread {
             val addedCartItemId =
                 cartItemDao.saveCartItem(CartItem(product = product).toCartItemEntity())
             if (addedCartItemId == ERROR_DATA_ID) throw ErrorEvent.AddCartEvent()
-        }.join()
+        }
         return Result.success(Unit)
     }
 
-    override fun loadPagingCartItems(
+    override suspend fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
     ): Result<List<CartItem>> {
         var pagingData = emptyList<CartItem>()
         thread {
             pagingData = cartItemDao.findPagingCartItem(offset, pagingSize).map { it.toCartItem() }
-        }.join()
+        }
         if (pagingData.isEmpty()) throw ErrorEvent.MaxPagingDataEvent()
         return Result.success(pagingData)
     }
 
-    override fun deleteCartItem(itemId: Long): Result<Unit> {
+    override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
         var deleteId = ERROR_DELETE_DATA_ID
         thread {
             deleteId = cartItemDao.deleteCartItemById(itemId)
-        }.join()
+        }
         if (deleteId == ERROR_DELETE_DATA_ID) throw ErrorEvent.DeleteCartEvent()
         return Result.success(Unit)
     }
 
-    override fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         var cartItem: CartItem? = null
         thread {
             cartItem = cartItemDao.findCartItemByProductId(productId)?.toCartItem()
-        }.join()
+        }
         return Result.success(
             CartItemResult(
                 cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
@@ -62,7 +62,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         )
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ): Result<UpdateCartItemResult> {
@@ -109,11 +109,11 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         if (updateDataId == ERROR_UPDATE_DATA_ID) throw ErrorEvent.UpdateCartEvent()
     }
 
-    override fun getTotalCartItemCount(): Result<Int> {
+    override suspend fun getTotalCartItemCount(): Result<Int> {
         var totalCount = 0
         thread {
             totalCount = cartItemDao.getTotalItemCount()
-        }.join()
+        }
         return Result.success(totalCount)
     }
 

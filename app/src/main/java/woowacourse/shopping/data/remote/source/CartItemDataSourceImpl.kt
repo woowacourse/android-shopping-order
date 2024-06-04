@@ -16,7 +16,7 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 class CartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
-    override fun loadCartItems(): Result<CartItemResponse> {
+    override suspend fun loadCartItems(): Result<CartItemResponse> {
         return runCatching {
             cartApiService.requestCartItems(
                 page = DEFAULT_ITEM_OFFSET,
@@ -25,7 +25,7 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override fun loadCartItems(
+    override suspend fun loadCartItems(
         page: Int,
         size: Int,
     ): Result<List<CartItem>> {
@@ -37,7 +37,7 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override fun loadCartItemResult(productId: Long): Result<CartItemResult> {
+    override suspend fun loadCartItemResult(productId: Long): Result<CartItemResult> {
         return runCatching {
             val cartItem = cartApiService.requestCartItems(
                 page = DEFAULT_ITEM_OFFSET,
@@ -50,7 +50,7 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override fun addCartItem(
+    override suspend fun addCartItem(
         productId: Int,
         quantity: Int,
     ): Result<Unit> {
@@ -65,13 +65,13 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override fun deleteCartItem(id: Int): Result<Unit> {
+    override suspend fun deleteCartItem(id: Int): Result<Unit> {
         return runCatching {
             cartApiService.deleteCartItem(id = id)
         }
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         id: Int,
         quantity: Int,
     ): Result<Unit> {
@@ -83,7 +83,7 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override fun loadCartItemCount(): Result<Int> {
+    override suspend fun loadCartItemCount(): Result<Int> {
         return runCatching {
             cartApiService.requestCartItemCount().toQuantity()
         }

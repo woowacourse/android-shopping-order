@@ -6,7 +6,7 @@ import woowacourse.shopping.data.remote.dto.cart.CartOrderRequest
 
 interface OrderApiService {
     @POST("/orders")
-    fun orderItems(
+    suspend fun orderItems(
         @Body cartItemIds: CartOrderRequest,
     )
 }

@@ -8,12 +8,12 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
-    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
+    override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
         val page = offset / PRODUCT_LOAD_PAGING_SIZE
         return productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE)
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         size: Int,
         category: String,
     ): Result<List<Product>> {
@@ -24,7 +24,7 @@ class RemoteProductRepositoryImpl(
         )
     }
 
-    override fun getProduct(productId: Long): Result<Product> {
+    override suspend fun getProduct(productId: Long): Result<Product> {
         return productDataSource.loadProduct(productId.toInt())
     }
 

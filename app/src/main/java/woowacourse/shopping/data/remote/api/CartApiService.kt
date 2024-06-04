@@ -14,27 +14,27 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 
 interface CartApiService {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Query("page") page: Int = 0,
         @Query("size") size: Int,
     ): CartItemResponse
 
     @POST("/cart-items")
-    fun insertCartItem(
+    suspend fun insertCartItem(
         @Body cartItemRequest: CartItemRequest,
     )
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") id: Int,
     )
 
     @PATCH("/cart-items/{id}")
-    fun updateCartItem(
+    suspend fun updateCartItem(
         @Path("id") id: Int,
         @Body quantity: CartItemQuantityDto,
     )
 
     @GET("/cart-items/counts")
-    fun requestCartItemCount(): CartItemQuantityDto
+    suspend fun requestCartItemCount(): CartItemQuantityDto
 }

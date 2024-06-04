@@ -9,20 +9,20 @@ import woowacourse.shopping.data.remote.dto.product.ProductResponse
 
 interface ProductApiService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 0,
     ): ProductResponse
 
     @GET("/products")
-    fun requestCategoryProducts(
+    suspend fun requestCategoryProducts(
         @Query("page") page: Int = 0,
         @Query("category") category: String,
         @Query("size") size: Int = 0,
     ): ProductResponse
 
     @GET("/products/{id}")
-    fun requestProduct(
+    suspend fun requestProduct(
         @Path("id") id: Int,
     ): ProductDto
 }
