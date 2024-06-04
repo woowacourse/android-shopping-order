@@ -70,7 +70,7 @@ class ShoppingCartFragment : Fragment() {
     }
 
     private fun initNavigation() {
-        binding.productDetailToolbar.setNavigationOnClickListener {
+        binding.toolbarCartList.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
     }

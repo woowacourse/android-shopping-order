@@ -18,7 +18,7 @@
         android:layout_height="match_parent">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/product_detail_toolbar"
+            android:id="@+id/toolbar_cart_list"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -43,7 +43,7 @@
             app:layoutManager="LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/include_cart_list_order"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_toolbar"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart_list"
             tools:context=".ui.cart.ShoppingCartFragment"
             tools:itemCount="3"
             tools:listitem="@layout/holder_cart" />
@@ -57,7 +57,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/product_detail_toolbar"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart_list"
             app:shimmer_auto_start="true"
             app:shimmer_base_alpha="0.5">
 
