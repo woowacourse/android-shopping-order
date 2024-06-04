@@ -21,8 +21,7 @@ class CartRepositoryImpl(
         onFailure: () -> Unit,
     ) {
         remoteCartDataSource.load(startPage, pageSize).enqueue(
-            object :
-                Callback<CartResponse> {
+            object : Callback<CartResponse> {
                 override fun onResponse(
                     call: Call<CartResponse>,
                     response: Response<CartResponse>,
@@ -48,106 +47,14 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun updateIncrementQuantity(
-        cartId: Long,
+    override fun saveNewCartItem(
         productId: Long,
         incrementAmount: Int,
-        quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        if (cartId == -1L) {
-            saveNewCartItem(productId, incrementAmount, onSuccess, onFailure)
-        } else {
-            updateExistCartItem(cartId, quantity + incrementAmount, onSuccess, onFailure)
-        }
-    }
-
-    override fun updateDecrementQuantity(
-        cartId: Long,
-        productId: Long,
-        decrementAmount: Int,
-        quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        if (cartId == -1L) {
-            throw IllegalArgumentException()
-        }
-        val resultQuantity = quantity - decrementAmount
-        if (resultQuantity == 0) {
-            deleteExistCartItem(
-                cartId,
-                onSuccess,
-                onFailure,
-            )
-        } else {
-            updateExistCartItem(cartId, quantity - decrementAmount, onSuccess, onFailure)
-        }
-    }
-
-    override fun deleteExistCartItem(
-        cartId: Long,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.delete(cartId).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) {
-                        onSuccess(cartId, 0)
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
-    }
-
-    private fun updateExistCartItem(
-        cartId: Long,
-        resultQuantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.update(cartId, resultQuantity).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) onSuccess(cartId, resultQuantity)
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
-    }
-
-    private fun saveNewCartItem(
-        productId: Long,
-        incrementAmount: Int,
-        onSuccess: (Long, Int) -> Unit,
+        onSuccess: (cartId: Long, newQuantity: Int) -> Unit,
         onFailure: () -> Unit,
     ) {
         remoteCartDataSource.save(productId, incrementAmount).enqueue(
-            object :
-                Callback<Unit> {
+            object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
                     response: Response<Unit>,
@@ -172,13 +79,76 @@ class CartRepositoryImpl(
         )
     }
 
+    override fun updateCartItemQuantity(
+        cartId: Long,
+        newQuantity: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        if (newQuantity == 0) {
+            deleteCartItem(cartId, onSuccess, onFailure)
+        } else {
+            updateQuantity(cartId, newQuantity, onSuccess, onFailure)
+        }
+    }
+
+    private fun updateQuantity(
+        cartId: Long,
+        newQuantity: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        remoteCartDataSource.update(cartId, newQuantity).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) onSuccess(cartId, newQuantity)
+                }
+
+                override fun onFailure(
+                    call: Call<Unit>,
+                    t: Throwable,
+                ) {
+                    onFailure()
+                }
+            },
+        )
+    }
+
+    override fun deleteCartItem(
+        cartId: Long,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        remoteCartDataSource.delete(cartId).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) {
+                        onSuccess(cartId, 0)
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit>,
+                    t: Throwable,
+                ) {
+                    onFailure()
+                }
+            },
+        )
+    }
+
     override fun getCount(
         onSuccess: (Int) -> Unit,
         onFailure: () -> Unit,
     ) {
         remoteCartDataSource.getCount().enqueue(
-            object :
-                Callback<CartQuantityResponse> {
+            object : Callback<CartQuantityResponse> {
                 override fun onResponse(
                     call: Call<CartQuantityResponse>,
                     response: Response<CartQuantityResponse>,
