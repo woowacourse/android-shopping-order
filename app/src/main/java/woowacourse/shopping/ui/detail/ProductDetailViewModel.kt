@@ -44,12 +44,11 @@ class ProductDetailViewModel(
     val isVisibleLastRecentProduct: LiveData<Boolean> =
         _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
 
-    fun loadProductDetail() {
+    init {
         loadLastRecentProduct()
-        loadProduct()
     }
 
-    private fun loadProduct() {
+    fun loadProduct() {
         productRepository.find(productId) {
             it.onSuccess { product ->
                 _productUiModel.value = product.toProductUiModel()

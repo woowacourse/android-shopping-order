@@ -47,7 +47,7 @@ class ProductDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
     }
 
     private fun initializeView() {
