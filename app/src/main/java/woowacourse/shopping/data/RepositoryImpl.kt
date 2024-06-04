@@ -112,7 +112,7 @@ class RepositoryImpl(
             localDataSource.findByLimit(limit).map { it.toDomain() }
         }
 
-    override fun findOne(): Result<RecentProduct?> =
+    override fun findOneRecent(): Result<RecentProduct?> =
         runCatching {
             localDataSource.findOne()?.toDomain()
         }

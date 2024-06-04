@@ -12,4 +12,6 @@ interface ShoppingActionHandler : CartCountHandler {
     fun onCartClick()
 
     fun loadMore()
+
+    fun saveRecentProduct(cartProduct: CartProduct)
 }

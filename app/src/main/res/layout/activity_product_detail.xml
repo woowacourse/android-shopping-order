@@ -151,7 +151,7 @@
 
         <variable
             name="detailCartProduct"
-            type="woowacourse.shopping.presentation.ui.detail.DetailCartProduct" />
+            type="woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct" />
 
         <variable
             name="recentProduct"

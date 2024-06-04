@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 @ExtendWith(MockKExtension::class)

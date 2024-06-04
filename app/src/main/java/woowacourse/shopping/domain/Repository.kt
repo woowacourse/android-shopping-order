@@ -33,7 +33,7 @@ interface Repository {
 
     fun findByLimit(limit: Int): Result<List<RecentProduct>>
 
-    fun findOne(): Result<RecentProduct?>
+    fun findOneRecent(): Result<RecentProduct?>
 
     fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
 

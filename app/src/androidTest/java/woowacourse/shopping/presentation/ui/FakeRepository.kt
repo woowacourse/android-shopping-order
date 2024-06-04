@@ -76,7 +76,7 @@ class FakeRepository : Repository {
 
     override fun findByLimit(limit: Int): Result<List<RecentProduct>> = Result.success(recentProducts)
 
-    override fun findOne(): Result<RecentProduct?> = Result.success(recentProduct)
+    override fun findOneRecent(): Result<RecentProduct?> = Result.success(recentProduct)
 
     override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> {
         return Result.success(1L)

@@ -16,6 +16,7 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity.Companion.EXTRA_UPDATED_PRODUCT
 import woowacourse.shopping.utils.getParcelableExtraCompat
+import kotlin.concurrent.thread
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
@@ -25,12 +26,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
 
     override fun initStartView() {
         initTitle()
-
-        binding.detailActionHandler = viewModel
-        binding.lifecycleOwner = this
-
-        val cartProduct = intent.getParcelableExtraCompat<CartProduct>(EXTRA_CART_PRODUCT)
-        initData(cartProduct)
+        initData()
         initObserver()
     }
 
@@ -38,32 +34,47 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         title = getString(R.string.detail_title)
     }
 
+    private fun initData() {
+        intent.getParcelableExtraCompat<CartProduct>(EXTRA_CART_PRODUCT)?.let {
+            viewModel.setCartProduct(it)
+        } ?: run {
+            Toast.makeText(this, "데이터가 없습니다", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+        viewModel.findOneRecentProduct()
+    }
+
+
     private fun initObserver() {
-        viewModel.product.observe(this) { state ->
+        binding.detailActionHandler = viewModel
+        binding.lifecycleOwner = this
+        viewModel.cartProduct.observe(this) { state ->
             when (state) {
-                is UiState.Loading -> {
-                }
+                is UiState.Loading -> {}
                 is UiState.Success -> {
-                    binding.detailCartProduct = state.data
+                    thread {
+                        Thread.sleep(500)
+                        runOnUiThread {
+                            binding.layoutShimmer.root.isVisible = false
+                            binding.detailCartProduct = state.data
+                        }
+                    }
                 }
             }
         }
-
         viewModel.recentProduct.observe(this) { state ->
             when (state) {
-                is UiState.Loading -> {
-                }
-
+                is UiState.Loading -> {}
                 is UiState.Success -> {
-                    binding.recentProduct = state.data
                     binding.layoutRecent.isVisible = !(intent.getBooleanExtra(EXTRA_OVERLAY, false))
+                    binding.recentProduct = state.data
                 }
             }
         }
         viewModel.errorHandler.observe(
             this,
             EventObserver {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             },
         )
         viewModel.cartHandler.observe(
@@ -88,12 +99,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                 }
             },
         )
-    }
-
-    private fun initData(cartProduct: CartProduct?) {
-        binding.layoutShimmer.root.isVisible = false
-        viewModel.setCartProduct(cartProduct)
-        viewModel.findOneRecentProduct()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -19,6 +19,7 @@ import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
+import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 import woowacourse.shopping.utils.getParcelableExtraCompat
 import kotlin.concurrent.thread
 

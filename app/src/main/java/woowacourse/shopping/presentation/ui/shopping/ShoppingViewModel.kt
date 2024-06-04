@@ -15,6 +15,7 @@ import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
+import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
@@ -212,14 +213,11 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    private fun saveRecentProduct(cartProduct: CartProduct) =
+    override fun saveRecentProduct(cartProduct: CartProduct) {
         thread {
             repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
-
-    companion object {
-        const val LOAD_ERROR = "아이템을 끝까지 불러왔습니다"
     }
 }
