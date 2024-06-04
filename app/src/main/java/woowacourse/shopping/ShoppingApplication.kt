@@ -1,7 +1,7 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.data.db.recent.RecentProductDatabase
+import woowacourse.shopping.data.local.recent.RecentProductDatabase
 import woowacourse.shopping.data.remote.CartService
 import woowacourse.shopping.data.remote.OrderService
 import woowacourse.shopping.data.remote.ProductService

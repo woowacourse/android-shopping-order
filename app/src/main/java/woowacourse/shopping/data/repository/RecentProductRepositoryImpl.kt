@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.db.recent.RecentProductDatabase
-import woowacourse.shopping.data.db.recent.RecentProductEntity
-import woowacourse.shopping.data.db.recent.toRecentProduct
+import woowacourse.shopping.data.local.recent.RecentProductDatabase
+import woowacourse.shopping.data.local.recent.RecentProductEntity
+import woowacourse.shopping.data.local.recent.toRecentProduct
 import woowacourse.shopping.data.mapper.toRecentProductEntity
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct

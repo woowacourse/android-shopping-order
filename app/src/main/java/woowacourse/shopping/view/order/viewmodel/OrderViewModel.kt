@@ -164,7 +164,6 @@ class OrderViewModel(
     }
 
     private fun getCartViewItemByProductId(productId: Int): CartViewItem? {
-
         return cartViewItems.value?.firstOrNull { cartViewItem ->
             cartViewItem.cartItem.product.productId == productId
         }
