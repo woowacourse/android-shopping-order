@@ -31,6 +31,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
 
         initActionBarTitle()
         observeOrderEvent()
+        observeErrorEventUpdates()
         supportFragmentManager.beginTransaction().replace(
             R.id.fragment_container,
             CartListFragment(),
@@ -84,6 +85,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         viewModel.error.observe(
             this,
             EventObserver {
+                showToast(it.message)
             },
         )
     }

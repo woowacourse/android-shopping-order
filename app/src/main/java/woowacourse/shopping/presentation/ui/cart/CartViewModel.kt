@@ -54,27 +54,20 @@ class CartViewModel(
         get() = (cartItems.value as? UiState.Success)?.data ?: emptyList()
 
     val isAllCartItemsSelected: LiveData<Boolean> =
-        cartItems.switchMap {
-            MutableLiveData(
-                if (cartItemsData.isNotEmpty()) {
-                    cartItemsData.all { it.isChecked }
-                } else {
-                    false
-                },
-            )
+        cartItems.map {
+            if (cartItemsData.isNotEmpty()) {
+                cartItemsData.all { it.isChecked }
+            } else {
+                false
+            }
         }
 
     private val selectedCartItems: LiveData<List<CartModel>> =
-        cartItems.switchMap {
-            MutableLiveData(cartItemsData.filter { it.isChecked })
-        }
+        cartItems.map { cartItemsData.filter { it.isChecked } }
 
-    val totalPrice: LiveData<Long> =
-        selectedCartItems.switchMap {
-            MutableLiveData(
-                it.sumOf { it.price * it.quantity },
-            )
-        }
+    val totalPrice: LiveData<Long> = selectedCartItems.map { it.sumOf { it.price * it.quantity } }
+
+    val totalCount: LiveData<Int> = selectedCartItems.map { it.sumOf { it.quantity } }
 
     val showSkeleton: LiveData<Boolean> = cartItems.map { it is UiState.Loading }
 
@@ -118,7 +111,7 @@ class CartViewModel(
 
                 updateDeletedCartItem(deletedCartId)
             },
-            onFailure = {},
+            onFailure = { _error.value = Event(CartError.CartItemNotDeleted) },
         )
     }
 
@@ -177,7 +170,7 @@ class CartViewModel(
 
                 updateRecommendedProducts(productId, resultQuantity)
             },
-            onFailure = {},
+            onFailure = { _error.value = Event(CartError.CartItemsNotModified) },
         )
     }
 
@@ -194,7 +187,7 @@ class CartViewModel(
 
                 updateRecommendedProducts(productId, resultQuantity)
             },
-            onFailure = {},
+            onFailure = { _error.value = Event(CartError.CartItemsNotModified) },
         )
     }
 
@@ -260,7 +253,7 @@ class CartViewModel(
 
                 _changedCartProducts[productId] = savedQuantity
             },
-            onFailure = {},
+            onFailure = { _error.value = Event(CartError.CartItemsNotModified) },
         )
     }
 
