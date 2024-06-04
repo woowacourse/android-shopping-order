@@ -58,7 +58,7 @@ class ProductDetailViewModelTest {
         setUpViewModel(productId = 0)
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         val actual = viewModel.productUiModel.getOrAwaitValue()
@@ -78,7 +78,7 @@ class ProductDetailViewModelTest {
             )
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         assertThat(viewModel.productLoadError.isInitialized).isTrue
@@ -89,7 +89,7 @@ class ProductDetailViewModelTest {
     fun `상품을 장바구니에 담는다`() {
         // given
         setUpViewModel(productId = 0)
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // when
         viewModel.addCartProduct()
@@ -112,7 +112,7 @@ class ProductDetailViewModelTest {
         setUpViewModel(productId = 0, recentProductId = 3)
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         val actual = viewModel.lastRecentProduct.getOrAwaitValue()
@@ -125,7 +125,7 @@ class ProductDetailViewModelTest {
         setUpViewModel(productId = 0)
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         val actual = viewModel.lastRecentProduct.isInitialized
@@ -138,7 +138,7 @@ class ProductDetailViewModelTest {
         setUpViewModel(productId = 3, recentProductId = 3)
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         val actual = viewModel.isVisibleLastRecentProduct.getOrAwaitValue()
@@ -151,7 +151,7 @@ class ProductDetailViewModelTest {
         setUpViewModel(productId = 0, recentProductId = 3, lastSeenProductVisible = true)
 
         // when
-        viewModel.loadProductDetail()
+        viewModel.loadProduct()
 
         // then
         val actual = viewModel.isVisibleLastRecentProduct.getOrAwaitValue()
