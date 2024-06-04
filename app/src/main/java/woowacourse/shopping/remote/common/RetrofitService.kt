@@ -6,6 +6,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 import java.lang.reflect.Type
 
 object RetrofitService {
@@ -16,7 +17,7 @@ object RetrofitService {
 
     private val okHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(BasicAuthInterceptor("hxeyexn", "password"))
+            .addInterceptor(BasicAuthInterceptor(BuildConfig.USERNAME, BuildConfig.PASSWORD))
             .addInterceptor(logging)
             .build()
 
