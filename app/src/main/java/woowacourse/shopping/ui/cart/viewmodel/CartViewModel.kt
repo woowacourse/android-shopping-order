@@ -116,8 +116,6 @@ class CartViewModel(
                         .map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
                     isLoading = false,
                 )
-        }.onFailure {
-            Log.d("테스트", "$it")
         }
     }
 
