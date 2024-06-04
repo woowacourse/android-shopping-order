@@ -53,7 +53,7 @@ class ShoppingCartViewModel(
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
     }
 
-    private fun checkAllItems() {
+    private fun toggleAllItems() {
         if (allCheck.value == true) {
             shoppingCart.cartItems.value?.forEach { cartItem ->
                 if (cartItem.cartItemSelector.isSelected) {
@@ -180,7 +180,7 @@ class ShoppingCartViewModel(
     }
 
     override fun clickCheckAll() {
-        checkAllItems()
+        toggleAllItems()
     }
 
     override fun clickOrder() {
