@@ -24,7 +24,7 @@ class ProductPagingSource(
                         LoadResult.Page(
                             offset = offsetInput,
                             data = body.content.map { it.toDomain() },
-                        )
+                        ),
                     )
                 }
             } else {

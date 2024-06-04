@@ -20,7 +20,6 @@ import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
     ViewModel(), ShoppingActionHandler {
-
     private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int> get() = _cartCount
 

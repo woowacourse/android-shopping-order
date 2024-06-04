@@ -13,15 +13,17 @@ object RetrofitModule {
     private val contentType = "application/json".toMediaType()
     private const val BASE_URL = "http://54.180.95.212:8080/"
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(AuthInterceptor.basicAuth)
-        .build()
+    private val okHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor.basicAuth)
+            .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(Json.asConverterFactory(contentType))
-        .client(okHttpClient)
-        .build()
+    private val retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .client(okHttpClient)
+            .build()
 
     val productApi: ProductApi = retrofit.create(ProductApi::class.java)
     val cartItemsApi: CartItemApi = retrofit.create(CartItemApi::class.java)

@@ -18,9 +18,7 @@ interface Repository {
         callback: (Result<List<CartProduct>?>) -> Unit,
     )
 
-
     fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit)
-
 
     fun getCartItems(
         page: Int,
@@ -58,15 +56,17 @@ interface Repository {
 
     fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
 
-    fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long)
+    fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    )
 
     fun deleteCart(id: Long): Result<Long>
 
     fun getMaxCartCount(): Result<Int>
 
-
     fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit)
-
 
     fun getCuration(callback: (Result<List<CartProduct>>) -> Unit)
 }

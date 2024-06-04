@@ -35,7 +35,7 @@ class RepositoryImpl(
         category: String,
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit
+        callback: (Result<List<CartProduct>?>) -> Unit,
     ) {
         remoteDataSource.getProducts(category, page, size) { result ->
             result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
@@ -60,7 +60,7 @@ class RepositoryImpl(
     override fun getCartItems(
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit
+        callback: (Result<List<CartProduct>?>) -> Unit,
     ) {
         remoteDataSource.getCartItems { result ->
             result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
@@ -156,7 +156,11 @@ class RepositoryImpl(
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
-    override fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+    override fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    ) {
         localDataSource.updateRecentProduct(productId, quantity, cartId)
     }
 
@@ -169,7 +173,6 @@ class RepositoryImpl(
         runCatching {
             localDataSource.getMaxCartCount()
         }
-
 
     override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
         remoteDataSource.getCartItemsCounts { result ->

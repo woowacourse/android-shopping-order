@@ -53,7 +53,7 @@ val fakeRepository =
             category: String,
             page: Int,
             size: Int,
-            callback: (Result<List<CartProduct>?>) -> Unit
+            callback: (Result<List<CartProduct>?>) -> Unit,
         ) {
             TODO("Not yet implemented")
         }
@@ -65,11 +65,10 @@ val fakeRepository =
         override fun getCartItems(
             page: Int,
             size: Int,
-            callback: (Result<List<CartProduct>?>) -> Unit
+            callback: (Result<List<CartProduct>?>) -> Unit,
         ) {
             TODO("Not yet implemented")
         }
-
 
         override fun getProductById(id: Int): Result<CartProduct?> {
             TODO("Not yet implemented")
@@ -161,7 +160,11 @@ val fakeRepository =
             return Result.success(1L)
         }
 
-        override fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+        override fun updateRecentProduct(
+            productId: Long,
+            quantity: Int,
+            cartId: Long,
+        ) {
             TODO("Not yet implemented")
         }
 

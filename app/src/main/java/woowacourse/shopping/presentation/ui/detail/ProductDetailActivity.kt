@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.detail
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast

@@ -17,22 +17,26 @@ interface RecentProductDao {
 
     @Query(
         "UPDATE recentproductentity " +
-                "SET quantity = :quantity, cartId = :cartId " +
-                "WHERE productId = :productId",
+            "SET quantity = :quantity, cartId = :cartId " +
+            "WHERE productId = :productId",
     )
-    fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long)
+    fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    )
 
     @Query(
         "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +
-                "FROM recentproductentity " +
-                "ORDER BY createdAt DESC LIMIT :limit",
+            "FROM recentproductentity " +
+            "ORDER BY createdAt DESC LIMIT :limit",
     )
     fun findByLimit(limit: Int): List<RecentProductEntity>
 
     @Query(
         "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +
-                "FROM recentproductentity " +
-                "ORDER BY createdAt DESC",
+            "FROM recentproductentity " +
+            "ORDER BY createdAt DESC",
     )
     fun findOne(): RecentProductEntity?
 }

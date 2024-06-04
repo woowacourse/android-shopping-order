@@ -72,6 +72,7 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
 
     companion object {
         const val EXTRA_CART_PRODUCT = "cartProduct"
+
         fun createIntent(
             context: Context,
             orderItemsId: List<Int>,
@@ -80,6 +81,5 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
                 putIntegerArrayListExtra(EXTRA_CART_PRODUCT, orderItemsId as ArrayList<Int>)
             }
         }
-
     }
 }

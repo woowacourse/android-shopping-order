@@ -67,7 +67,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         thread {
             updateUiModel.add(
                 cartProductUiModel.cartProduct.productId,
-                cartProductUiModel.cartProduct.copy(quantity = 0)
+                cartProductUiModel.cartProduct.copy(quantity = 0),
             )
             repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
@@ -86,7 +86,6 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         return (_carts.value as UiState.Success).data.filter { it.isChecked }
             .map { it.cartProduct.cartId.toInt() }
     }
-
 
     override fun onCheck(
         cartProduct: CartProductUiModel,
@@ -158,7 +157,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                     updateRecentProduct(
                         cartProducts[index].cartProduct.productId,
                         cartProducts[index].cartProduct.quantity,
-                        cartProducts[index].cartProduct.cartId
+                        cartProducts[index].cartProduct.cartId,
                     )
                 }
                 .onFailure {
@@ -186,7 +185,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                     updateRecentProduct(
                         cartProducts[index].cartProduct.productId,
                         cartProducts[index].cartProduct.quantity,
-                        cartProducts[index].cartProduct.cartId
+                        cartProducts[index].cartProduct.cartId,
                     )
                 }
                 .onFailure {
@@ -195,7 +194,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
     }
 
-    private fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+    private fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    ) {
         repository.updateRecentProduct(productId, quantity, cartId)
     }
 

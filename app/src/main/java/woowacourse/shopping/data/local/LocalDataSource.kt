@@ -32,5 +32,9 @@ interface LocalDataSource {
 
     fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long
 
-    fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long)
+    fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    )
 }

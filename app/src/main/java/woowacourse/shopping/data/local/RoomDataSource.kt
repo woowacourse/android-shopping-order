@@ -9,7 +9,7 @@ import woowacourse.shopping.data.local.entity.RecentProductEntity
 
 class RoomDataSource(
     private val cartProductDao: CartProductDao,
-    private val recentProductDao: RecentProductDao
+    private val recentProductDao: RecentProductDao,
 ) : LocalDataSource {
     override fun findProductByPaging(
         offset: Int,
@@ -61,7 +61,11 @@ class RoomDataSource(
         return recentProductEntity.productId
     }
 
-    override fun updateRecentProduct(productId: Long, quantity: Int, cartId: Long) {
+    override fun updateRecentProduct(
+        productId: Long,
+        quantity: Int,
+        cartId: Long,
+    ) {
         recentProductDao.updateRecentProduct(productId, quantity, cartId)
     }
 }

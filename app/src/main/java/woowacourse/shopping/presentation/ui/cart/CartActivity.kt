@@ -23,7 +23,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
     private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }
 
-
     override fun initStartView() {
         initTitle()
         binding.rvCarts.adapter = cartAdapter
@@ -34,7 +33,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         initData()
         initObserver()
     }
-
 
     private fun initData() {
         viewModel.findCartByOffset()

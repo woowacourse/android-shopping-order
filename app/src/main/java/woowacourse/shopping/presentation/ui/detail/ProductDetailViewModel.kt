@@ -43,9 +43,9 @@ class ProductDetailViewModel(
                 DetailCartProduct(
                     isNew = cartProduct.quantity == 0,
                     cartProduct =
-                    cartProduct.copy(
-                        quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
-                    ),
+                        cartProduct.copy(
+                            quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
+                        ),
                 )
             _product.value = UiState.Success(detailCartProduct)
         }
@@ -69,7 +69,7 @@ class ProductDetailViewModel(
         thread {
             updateUiModel.add(
                 detailCartProduct.cartProduct.productId,
-                detailCartProduct.cartProduct
+                detailCartProduct.cartProduct,
             )
 
             if (detailCartProduct.isNew) {
@@ -89,9 +89,9 @@ class ProductDetailViewModel(
                 repository.patchCartItem(
                     id = detailCartProduct.cartProduct.cartId.toInt(),
                     quantityRequest =
-                    QuantityRequest(
-                        detailCartProduct.cartProduct.quantity,
-                    ),
+                        QuantityRequest(
+                            detailCartProduct.cartProduct.quantity,
+                        ),
                 ).onSuccess {
                     _product.postValue(UiState.Success(detailCartProduct))
                     saveRecentProduct(detailCartProduct.cartProduct)
