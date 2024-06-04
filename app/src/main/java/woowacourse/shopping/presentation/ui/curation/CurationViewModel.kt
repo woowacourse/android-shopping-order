@@ -15,6 +15,7 @@ import kotlin.concurrent.thread
 
 class CurationViewModel(
     private val repository: Repository,
+    private val ids: List<Long>,
 ) : ViewModel(), CurationActionHandler {
     private val _cartProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val cartProducts: LiveData<UiState<List<CartProduct>>> get() = _cartProducts
@@ -25,6 +26,9 @@ class CurationViewModel(
     private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
 
+    private var _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
+    val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
+
     init {
         thread {
             repository.getCuration { result ->
@@ -34,17 +38,31 @@ class CurationViewModel(
                     _errorHandler.postValue(EventState(LOAD_ERROR))
                 }
             }
+            repository.getCartItems(0, 1000) { result ->
+                result.onSuccess {
+                    if (it == null) {
+                        _errorHandler.postValue(EventState(LOAD_ERROR))
+                    } else {
+                        val filteredCartItems =
+                            it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                        _orderProducts.postValue(UiState.Success(filteredCartItems))
+                    }
+                }.onFailure {
+                    _errorHandler.postValue(EventState(LOAD_ERROR))
+                }
+            }
         }
     }
 
     override fun order() {
         thread {
-            val orderCartIds =
+            var orderCartIds =
                 (_cartProducts.value as UiState.Success).data.filter {
                     it.quantity > 0
                 }.map {
                     it.cartId.toInt()
                 }
+            orderCartIds = orderCartIds + ids.map { it.toInt() }
             repository.postOrders(
                 OrderRequest(
                     orderCartIds,

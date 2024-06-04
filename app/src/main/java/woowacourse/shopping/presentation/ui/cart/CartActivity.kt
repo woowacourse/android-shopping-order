@@ -2,11 +2,9 @@ package woowacourse.shopping.presentation.ui.cart
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import woowacourse.shopping.R
@@ -16,8 +14,7 @@ import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
-import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
-import kotlin.concurrent.thread
+import woowacourse.shopping.presentation.ui.shopping.NavigateUiState
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
@@ -80,6 +77,22 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                 when (it) {
                     is CartEvent.Update -> {
                         Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+        )
+
+        viewModel.navigateHandler.observe(
+            this,
+            EventObserver {
+                when (it) {
+                    is NavigateUiState.ToOrder -> {
+                        CurationActivity.createIntent(this, it.orderIds).apply {
+                            startActivity(this)
+                        }
+                    }
+
+                    else -> {
                     }
                 }
             },

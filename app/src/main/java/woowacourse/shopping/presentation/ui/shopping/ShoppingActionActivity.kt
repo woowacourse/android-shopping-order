@@ -49,7 +49,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                     viewModel.syncProduct()
                 }
                 viewModel.findAllRecent()
-               viewModel.getCartItemCounts()
+                viewModel.getCartItemCounts()
             }
     }
 
@@ -107,6 +107,8 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
                             CartActivity.createIntent(this),
                         )
                     }
+
+                    else -> {}
                 }
             },
         )

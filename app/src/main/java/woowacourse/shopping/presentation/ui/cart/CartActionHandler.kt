@@ -15,4 +15,6 @@ interface CartActionHandler : CartCountHandler {
     )
 
     fun onCheckAll()
+
+    fun onOrderClick(orderItems: List<CartProductUiModel>)
 }

@@ -3,13 +3,13 @@ package woowacourse.shopping.presentation.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
+import woowacourse.shopping.presentation.ui.shopping.NavigateUiState
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 import kotlin.concurrent.thread
 
@@ -30,10 +30,16 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     private val _eventHandler = MutableLiveData<EventState<CartEvent>>()
     val eventHandler: LiveData<EventState<CartEvent>> get() = _eventHandler
 
+    private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
+    val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
+
     val updateUiModel: UpdateUiModel = UpdateUiModel()
 
     private var _isAllChecked = MutableLiveData<Boolean>(true)
     val isAllChecked: LiveData<Boolean> get() = _isAllChecked
+
+    private var _orderItems = listOf<CartProductUiModel>()
+    val orderItems: List<CartProductUiModel> get() = _orderItems
 
     fun findCartByOffset() {
         repository.getCartItems(offSet, 1000) { result ->
@@ -76,36 +82,6 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
     }
 
-    fun postCheckedItems() {
-        val checkedIds = getCheckedIds()
-
-        thread {
-            repository.postOrders(
-                OrderRequest(
-                    checkedIds,
-                ),
-            ).onSuccess {
-                val currentCarts = (_carts.value as UiState.Success).data
-                val filteredCarts =
-                    currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
-
-                val removedCarts =
-                    currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
-                removedCarts.forEach { cartProduct ->
-                    updateUiModel.add(
-                        cartProduct.cartProduct.productId,
-                        cartProduct.cartProduct.copy(quantity = 0)
-                    )
-                }
-
-                _carts.postValue(UiState.Success(filteredCarts))
-                _eventHandler.postValue(EventState(CartEvent.Update))
-            }.onFailure {
-                _errorHandler.postValue(EventState("ERROR"))
-            }
-        }
-    }
-
     private fun getCheckedIds(): List<Int> {
         return (_carts.value as UiState.Success).data.filter { it.isChecked }
             .map { it.cartProduct.cartId.toInt() }
@@ -140,6 +116,15 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 },
             )
         _isAllChecked.value = !selectAll
+    }
+
+    override fun onOrderClick(orderItems: List<CartProductUiModel>) {
+        val checkedIds = getCheckedIds()
+        val currentCarts = (_carts.value as UiState.Success).data
+        val filteredCarts =
+            currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+        _orderItems = filteredCarts.map { it.copy() }
+        _navigateHandler.value = EventState(NavigateUiState.ToOrder(checkedIds))
     }
 
     override fun onNext() {

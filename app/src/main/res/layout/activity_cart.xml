@@ -56,8 +56,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:onClick="@{() -> viewModel.postCheckedItems()}"
-                android:background="#04C09E">
+                android:background="#04C09E"
+                android:onClick="@{() -> cartActionHandler.onOrderClick(viewModel.orderItems)}">
 
                 <TextView
                     android:id="@+id/tv_order_title"

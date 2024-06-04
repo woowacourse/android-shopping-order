@@ -8,7 +8,7 @@ import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
-class ViewModelFactory : ViewModelProvider.Factory {
+class ViewModelFactory(private val ids: List<Long> = emptyList()) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(ProductDetailViewModel::class.java) -> {
@@ -32,6 +32,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(CurationViewModel::class.java) -> {
                 CurationViewModel(
                     RepositoryInjector.repository,
+                    ids,
                 ) as T
             }
 
