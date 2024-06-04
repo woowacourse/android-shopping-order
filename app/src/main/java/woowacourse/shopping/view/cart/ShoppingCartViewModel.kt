@@ -129,15 +129,16 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         product: Product,
     ) {
-        try {
-            shoppingCartRepository.deleteCartItem(cartItemId)
-            shoppingCart.deleteProduct(cartItemId)
-            _shoppingCartEvent.value =
-                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
-            deleteCheckedItem(CartItem(cartItemId, product))
-        } catch (e: Exception) {
-            handleException(e)
-        }
+        shoppingCartRepository.deleteCartItem(cartItemId)
+            .onSuccess {
+                shoppingCart.deleteProduct(cartItemId)
+                _shoppingCartEvent.value =
+                    ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
+                deleteCheckedItem(CartItem(cartItemId, product))
+            }
+            .onFailure {
+                handleException(it)
+            }
     }
 
     private fun deleteCheckedItem(cartItem: CartItem) {
