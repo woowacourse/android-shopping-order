@@ -63,7 +63,7 @@ class ProductDetailFragment : Fragment() {
     }
 
     private fun initToolbar() {
-        binding.productDetailToolbar.setOnMenuItemClickListener {
+        binding.toolbarProductDetail.setOnMenuItemClickListener {
             navigateToMenuItem(it)
         }
     }
