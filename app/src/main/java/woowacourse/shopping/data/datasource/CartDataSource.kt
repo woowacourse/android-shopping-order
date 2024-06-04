@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.datasource
 
 import retrofit2.Call
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.dto.CartItemRequest
+import woowacourse.shopping.data.dto.CartQuantityDto
+import woowacourse.shopping.data.dto.CartResponse
 
 interface CartDataSource {
     fun getCartItems(
@@ -12,14 +12,14 @@ interface CartDataSource {
         sort: String,
     ): Call<CartResponse>
 
-    fun addCartItem(cartItemRequestBody: CartItemRequestBody): Call<Unit>
+    fun addCartItem(cartItemRequest: CartItemRequest): Call<Unit>
 
     fun deleteCartItem(productId: Int): Call<Unit>
 
     fun updateCartItem(
         productId: Int,
-        cartQuantity: CartQuantity,
+        cartQuantityDto: CartQuantityDto,
     ): Call<Unit>
 
-    fun getCartTotalQuantity(): Call<CartQuantity>
+    fun getCartTotalQuantity(): Call<CartQuantityDto>
 }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 
 interface RecentProductRepository {

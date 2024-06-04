@@ -1,11 +1,9 @@
-package woowacourse.shopping.data.model
-
-import com.google.gson.annotations.SerializedName
+package woowacourse.shopping.domain.model
 
 data class CartItem(
-    @SerializedName("id") val cartItemId: Int,
-    @SerializedName("quantity") val quantity: Int,
-    @SerializedName("product") val product: Product,
+    val cartItemId: Int,
+    val quantity: Int,
+    val product: Product,
 ) {
     val totalPrice: Int
         get() = product.price * quantity

@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class ProductResponse(
+data class CartResponse(
     @SerializedName("content")
-    val products: List<Product>,
+    val cartItems: List<CartItemDto>,
     @SerializedName("empty")
     val empty: Boolean,
     @SerializedName("first")
@@ -16,11 +16,11 @@ data class ProductResponse(
     @SerializedName("numberOfElements")
     val numberOfElements: Int,
     @SerializedName("pageable")
-    val pageable: Pageable,
+    val pageableDto: PageableDto,
     @SerializedName("size")
     val size: Int,
     @SerializedName("sort")
-    val sort: Sort,
+    val sortDto: SortDto,
     @SerializedName("totalElements")
     val totalElements: Int,
     @SerializedName("totalPages")

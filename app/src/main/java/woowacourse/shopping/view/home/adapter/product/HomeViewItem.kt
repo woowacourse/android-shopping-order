@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.home.adapter.product
 
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.domain.model.Product
 
 sealed class HomeViewItem(open val viewType: Int) {
     data class ProductViewItem(

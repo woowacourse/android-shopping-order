@@ -6,7 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.toCartViewItem
+import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -128,7 +130,9 @@ class OrderViewModel(
             val selectedProducts =
                 selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
                     ?: return@onSuccess
-            var sameCategoryProducts = productResponse.getOrNull()?.products ?: return@onSuccess
+            var sameCategoryProducts =
+                productResponse.getOrNull()?.products?.map { productDto -> productDto.toProduct() }
+                    ?: return@onSuccess
             sameCategoryProducts =
                 sameCategoryProducts.filter { sameCategoryProduct ->
                     !selectedProducts.contains(sameCategoryProduct)
@@ -147,7 +151,8 @@ class OrderViewModel(
             cartRepository.getCartResponse(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
         }.onSuccess { cartResponse ->
             cartViewItems.value =
-                cartResponse.getOrNull()?.cartItems?.map(::CartViewItem) ?: emptyList()
+                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartViewItem() }
+                    ?: emptyList()
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
         }.onFailure {
             _cartUiState.value = UiState.Error(it)
@@ -360,7 +365,8 @@ class OrderViewModel(
             cartRepository.addCartItem(product.productId, 1)
             cartRepository.getCartResponse(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
         }.onSuccess { cartResponse ->
-            cartViewItems.value = cartResponse.getOrNull()?.cartItems?.map(::CartViewItem)
+            cartViewItems.value =
+                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartViewItem() }
             val updatedCartItem = getCartViewItemByProductId(product.productId) ?: return
             val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
             val newCartViewItems = cartViewItems.value?.toMutableList() ?: return

@@ -2,9 +2,9 @@ package woowacourse.shopping.data.remote
 
 import retrofit2.Call
 import woowacourse.shopping.data.datasource.CartDataSource
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.dto.CartItemRequest
+import woowacourse.shopping.data.dto.CartQuantityDto
+import woowacourse.shopping.data.dto.CartResponse
 
 class RemoteCartDataSource(
     private val cartService: CartService,
@@ -17,8 +17,8 @@ class RemoteCartDataSource(
         return cartService.getCartItems(page, size, sort)
     }
 
-    override fun addCartItem(cartItemRequestBody: CartItemRequestBody): Call<Unit> {
-        return cartService.addCartItem(cartItemRequestBody)
+    override fun addCartItem(cartItemRequest: CartItemRequest): Call<Unit> {
+        return cartService.addCartItem(cartItemRequest)
     }
 
     override fun deleteCartItem(productId: Int): Call<Unit> {
@@ -27,12 +27,12 @@ class RemoteCartDataSource(
 
     override fun updateCartItem(
         productId: Int,
-        cartQuantity: CartQuantity,
+        cartQuantityDto: CartQuantityDto,
     ): Call<Unit> {
-        return cartService.updateCartItem(productId, cartQuantity)
+        return cartService.updateCartItem(productId, cartQuantityDto)
     }
 
-    override fun getCartTotalQuantity(): Call<CartQuantity> {
+    override fun getCartTotalQuantity(): Call<CartQuantityDto> {
         return cartService.getCartTotalQuantity()
     }
 }

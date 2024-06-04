@@ -2,8 +2,8 @@ package woowacourse.shopping.data.remote
 
 import retrofit2.Call
 import woowacourse.shopping.data.datasource.ProductDataSource
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.ProductResponse
 
 class RemoteProductDataSource(private val productService: ProductService) : ProductDataSource {
     override fun getProducts(
@@ -15,7 +15,7 @@ class RemoteProductDataSource(private val productService: ProductService) : Prod
         return productService.getProducts(category, page, size, sort)
     }
 
-    override fun getProductById(id: Int): Call<Product> {
-        return productService.getProductById(id)
+    override fun getProductById(productId: Int): Call<ProductDto> {
+        return productService.getProductById(productId)
     }
 }

@@ -4,7 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -82,7 +83,7 @@ class DetailViewModel(
         runCatching {
             productRepository.getProductById(productId)
         }.onSuccess { productResult ->
-            val product = productResult.getOrNull() ?: return
+            val product = productResult.getOrNull()?.toProduct() ?: return
             _product.value = product
             _detailUiState.value = UiState.Success(product)
         }.onFailure {

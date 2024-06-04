@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.order.adapter.cart
 
-import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.domain.model.CartItem
 
 sealed class ShoppingCartViewItem(open val viewType: Int) {
     data class CartViewItem(

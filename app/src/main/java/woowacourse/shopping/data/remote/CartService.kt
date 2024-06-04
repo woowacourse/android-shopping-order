@@ -8,9 +8,9 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.dto.CartItemRequest
+import woowacourse.shopping.data.dto.CartQuantityDto
+import woowacourse.shopping.data.dto.CartResponse
 
 interface CartService {
     @GET("/cart-items")
@@ -22,7 +22,7 @@ interface CartService {
 
     @POST("/cart-items")
     fun addCartItem(
-        @Body cartItemRequestBody: CartItemRequestBody,
+        @Body cartItemRequest: CartItemRequest,
     ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
@@ -33,9 +33,9 @@ interface CartService {
     @PATCH("/cart-items/{id}")
     fun updateCartItem(
         @Path("id") id: Int,
-        @Body cartQuantity: CartQuantity,
+        @Body cartQuantityDto: CartQuantityDto,
     ): Call<Unit>
 
     @GET("/cart-items/counts")
-    fun getCartTotalQuantity(): Call<CartQuantity>
+    fun getCartTotalQuantity(): Call<CartQuantityDto>
 }

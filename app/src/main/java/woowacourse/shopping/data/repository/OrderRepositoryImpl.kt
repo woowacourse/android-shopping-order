@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.CartItemIds
+import woowacourse.shopping.data.dto.OrderRequest
 import woowacourse.shopping.data.remote.RemoteOrderDataSource
 import woowacourse.shopping.domain.repository.OrderRepository
 import kotlin.concurrent.thread
@@ -13,7 +13,7 @@ class OrderRepositoryImpl(
         thread {
             result =
                 runCatching {
-                    val response = remoteOrderDataSource.postOrder(CartItemIds(cartItemIds)).execute()
+                    val response = remoteOrderDataSource.postOrder(OrderRequest(cartItemIds)).execute()
                     if (response.isSuccessful) {
                         response.body() ?: throw Exception("No data available")
                     } else {

@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.toCartItem
+import woowacourse.shopping.data.toProduct
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -87,9 +89,9 @@ class HomeViewModel(
         }.onSuccess { productResponse ->
             val products = productResponse.getOrNull()?.products ?: emptyList()
             val productViewItems =
-                products.map { product ->
-                    val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
-                    ProductViewItem(product, quantity)
+                products.map { productDto ->
+                    val quantity = getCartItemByProductId(productDto.productId)?.quantity ?: 0
+                    ProductViewItem(productDto.toProduct(), quantity)
                 }
             _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
             loadedProductViewItems.addAll(productViewItems)
@@ -103,7 +105,9 @@ class HomeViewModel(
         runCatching {
             cartRepository.getCartResponse(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
         }.onSuccess { cartResponse ->
-            cartItems = cartResponse.getOrNull()?.cartItems ?: emptyList()
+            cartItems =
+                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartItem() }
+                    ?: return
             _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity
         }
     }

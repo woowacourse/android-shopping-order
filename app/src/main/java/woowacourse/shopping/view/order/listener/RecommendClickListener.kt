@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.order.listener
 
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.domain.model.Product
 
 interface RecommendClickListener {
     fun onProductClick(productId: Int)

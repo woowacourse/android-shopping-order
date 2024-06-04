@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class CartItemRequestBody(
+data class CartItemRequest(
     @SerializedName("productId") val productId: Int,
     @SerializedName("quantity") val quantity: Int,
 )

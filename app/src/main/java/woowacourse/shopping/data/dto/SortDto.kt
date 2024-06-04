@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class Sort(
+data class SortDto(
     @SerializedName("empty")
     val empty: Boolean,
     @SerializedName("sorted")

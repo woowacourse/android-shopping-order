@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class Pageable(
+data class PageableDto(
     @SerializedName("offset")
     val offset: Int,
     @SerializedName("pageNumber")
@@ -12,7 +12,7 @@ data class Pageable(
     @SerializedName("paged")
     val paged: Boolean,
     @SerializedName("sort")
-    val sort: Sort,
+    val sortDto: SortDto,
     @SerializedName("unpaged")
     val unpaged: Boolean,
 )

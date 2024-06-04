@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.ProductResponse
 import woowacourse.shopping.data.remote.RemoteProductDataSource
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
@@ -30,8 +30,8 @@ class ProductRepositoryImpl(
         return result ?: throw Exception()
     }
 
-    override fun getProductById(id: Int): Result<Product> {
-        var result: Result<Product>? = null
+    override fun getProductById(id: Int): Result<ProductDto> {
+        var result: Result<ProductDto>? = null
         thread {
             result =
                 runCatching {

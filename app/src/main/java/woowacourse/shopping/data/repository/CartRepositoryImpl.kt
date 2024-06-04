@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.dto.CartItemRequest
+import woowacourse.shopping.data.dto.CartQuantityDto
+import woowacourse.shopping.data.dto.CartResponse
 import woowacourse.shopping.data.remote.RemoteCartDataSource
 import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.concurrent.thread
@@ -40,9 +40,9 @@ class CartRepositoryImpl(
         thread {
             result =
                 runCatching {
-                    val cartItemRequestBody = CartItemRequestBody(productId, quantity)
+                    val cartItemRequest = CartItemRequest(productId, quantity)
                     val request =
-                        remoteCartDataSource.addCartItem(cartItemRequestBody)
+                        remoteCartDataSource.addCartItem(cartItemRequest)
                     val response = request.execute()
                     if (response.isSuccessful) {
                         response.body() ?: throw Exception("No data available")
@@ -81,9 +81,9 @@ class CartRepositoryImpl(
         thread {
             result =
                 runCatching {
-                    val cartQuantity = CartQuantity(quantity)
+                    val cartQuantityDto = CartQuantityDto(quantity)
                     val response =
-                        remoteCartDataSource.updateCartItem(cartItemId, cartQuantity)
+                        remoteCartDataSource.updateCartItem(cartItemId, cartQuantityDto)
                             .execute()
                     if (response.isSuccessful) {
                         response.body() ?: throw Exception("No data available")
@@ -96,8 +96,8 @@ class CartRepositoryImpl(
         return result ?: throw Exception()
     }
 
-    override fun getCartTotalQuantity(): Result<CartQuantity> {
-        var result: Result<CartQuantity>? = null
+    override fun getCartTotalQuantity(): Result<CartQuantityDto> {
+        var result: Result<CartQuantityDto>? = null
         thread {
             result =
                 runCatching {

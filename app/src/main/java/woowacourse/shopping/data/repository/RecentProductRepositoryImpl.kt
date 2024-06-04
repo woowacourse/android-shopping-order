@@ -3,8 +3,8 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.db.recent.RecentProductDatabase
 import woowacourse.shopping.data.db.recent.RecentProductEntity
 import woowacourse.shopping.data.db.recent.toRecentProduct
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.toRecentProductEntity
+import woowacourse.shopping.data.toRecentProductEntity
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime

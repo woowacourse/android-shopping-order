@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.home.listener
 
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.domain.model.Product
 
 interface ProductClickListener : QuantityClickListener {
     fun onProductClick(productId: Int)
