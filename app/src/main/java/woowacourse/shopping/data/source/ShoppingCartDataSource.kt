@@ -9,9 +9,9 @@ interface ShoppingCartDataSource {
 
     fun loadAllCartItems(): List<CartItemDto>
 
-    fun addedNewProductsId(productIdsCount: ProductIdsCount): Long
+    fun addNewProduct(productIdsCount: ProductIdsCount)
 
-    fun removedProductsId(productId: Long): Long
+    fun removeCartItem(cartItemId: Long)
 
     fun plusProductsIdCount(
         cartItemId: Long,
@@ -21,5 +21,10 @@ interface ShoppingCartDataSource {
     fun minusProductsIdCount(
         cartItemId: Long,
         quantity: Int,
+    )
+
+    fun updateProductsCount(
+        cartItemId: Long,
+        newQuantity: Int,
     )
 }

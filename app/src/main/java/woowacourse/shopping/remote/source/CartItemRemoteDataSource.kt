@@ -32,24 +32,19 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         }
     }
 
-    override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
-        val call =
-            cartItemApiService.addCartItem(
-                CartItemRequest(
-                    productIdsCount.productId,
-                    productIdsCount.quantity,
-                ),
-            )
+    override fun addNewProduct(productIdsCount: ProductIdsCount) {
+        val call = cartItemApiService.addCartItem(
+            CartItemRequest(
+                productIdsCount.productId,
+                productIdsCount.quantity,
+            ),
+        )
         call.execute()
-
-        // TODO: code 값 확인해서 던지기
-        return productIdsCount.productId
     }
 
     // TODO: 동작 안됨
-    override fun removedProductsId(cartItemId: Long): Long {
+    override fun removeCartItem(cartItemId: Long) {
         cartItemApiService.removeCartItem(cartItemId)
-        return 10
     }
 
     override fun plusProductsIdCount(
@@ -64,6 +59,10 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         quantity: Int,
     ) {
         cartItemApiService.updateCartItemQuantity(cartItemId, quantity).execute()
+    }
+
+    override fun updateProductsCount(cartItemId: Long, newQuantity: Int) {
+        cartItemApiService.updateCartItemQuantity(cartItemId, newQuantity).execute()
     }
 
     companion object {
