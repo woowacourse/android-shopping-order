@@ -11,9 +11,11 @@ import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
+import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.local.datasource.ProductHistoryDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
@@ -70,6 +72,9 @@ class ShoppingApplication : Application() {
     }
 
     private fun initRepositories() {
+        val shoppingCartRepositoryImpl = ShoppingCartRepositoryImpl(dataSource = ShoppingCartDataSource.getInstance())
+        ShoppingCartRepository.setInstance(shoppingCartRepositoryImpl)
+
         val productRepositoryImpl =
             ProductRepositoryImpl(
                 productDataSource = ProductDataSource.getInstance(),
