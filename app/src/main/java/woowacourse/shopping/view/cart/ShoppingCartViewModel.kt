@@ -146,15 +146,11 @@ class ShoppingCartViewModel(
     override fun clickIncrease(product: Product) {
         shoppingCartRepository.increaseCartItem(product).onSuccess {
             shoppingCart.cartItems.value?.find { it.product.id == product.id }?.let { cartItem ->
+                Log.d("ShoppingCartViewModel", "clickIncrease1: ${cartItem.product.id}")
                 cartItem.product.cartItemCounter.increase()
                 Log.d("ShoppingCartViewModel", "clickIncrease: ${cartItem.product.cartItemCounter.itemCount}")
             }
-
-//
-//            _shoppingCartEvent.value =
-//                shoppingCart.cartItems.value?.let {
-//                    ShoppingCartEvent.UpdateProductEvent.Success(it)
-//                }
+            shoppingCart.updateProducts(shoppingCart.cartItems.value!!)
         }.onFailure { e ->
             when (e) {
                 is NoSuchDataException ->
@@ -170,13 +166,9 @@ class ShoppingCartViewModel(
         shoppingCartRepository.decreaseCartItem(product).onSuccess {
             shoppingCart.cartItems.value?.find { it.product.id == product.id }?.let { cartItem ->
                 cartItem.product.cartItemCounter.decrease()
-//                Log.d("ShoppingCartViewModel", "clickDecrease: ${cartItem.product.cartItemCounter.itemCount})")
             }
 
-//            _shoppingCartEvent.value =
-//                shoppingCart.cartItems.value?.let {
-//                    ShoppingCartEvent.UpdateProductEvent.Success(it)
-//                }
+            shoppingCart.updateProducts(shoppingCart.cartItems.value!!)
         }.onFailure {
             when (it) {
                 is NoSuchDataException ->

@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,6 +76,7 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart {
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
+            Log.d("ShoppingCartFragment", "observeData: ${cartItems.size}")
             adapter.submitList(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
