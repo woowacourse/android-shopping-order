@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@drawable/shopping_cart_item_gridview">
+
+        <ImageView
+            android:id="@+id/iv_placeholder_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="48dp"
+            android:background="@color/gray_200"
+            android:textStyle="bold"
+            app:layout_constraintRight_toLeftOf="@id/iv_placeholder_cart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_placeholder_cart"
+            android:layout_width="136dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="18dp"
+            android:background="@color/gray_200"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/iv_placeholder_product_name"
+            app:layout_constraintTop_toBottomOf="@id/iv_placeholder_product_name" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

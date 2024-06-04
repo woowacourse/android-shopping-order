@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Shopping</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="price_format">%1$,d원</string>
+    <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
+    <string name="order_format">주문하기(%d)</string>
 </resources>
