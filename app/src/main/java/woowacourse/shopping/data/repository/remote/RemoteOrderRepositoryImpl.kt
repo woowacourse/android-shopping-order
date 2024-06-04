@@ -4,7 +4,7 @@ import woowacourse.shopping.data.remote.source.OrderDataSourceImpl
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),

@@ -1,6 +1,5 @@
 package woowacourse.shopping.utils.exception
 
-import woowacourse.shopping.view.model.event.ErrorEvent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread

@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.EntityMapper.toCartItem
 import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 import kotlin.concurrent.thread
 
 class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {

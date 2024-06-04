@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.DtoMapper.toProduct
 import woowacourse.shopping.utils.DtoMapper.toProducts
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),

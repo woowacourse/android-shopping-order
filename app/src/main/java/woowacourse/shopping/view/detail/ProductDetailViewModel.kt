@@ -16,7 +16,7 @@ import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,

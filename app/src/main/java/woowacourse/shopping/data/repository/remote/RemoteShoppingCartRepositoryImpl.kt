@@ -14,7 +14,7 @@ import woowacourse.shopping.utils.DtoMapper.toCartItems
 import woowacourse.shopping.utils.DtoMapper.toQuantity
 import woowacourse.shopping.utils.exception.LatchUtils.executeWithLatch
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class RemoteShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),

@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.model.event
+package woowacourse.shopping.utils.exception
 
 sealed class ErrorEvent : Exception() {
     class UpdateCartEvent : ErrorEvent()
@@ -15,6 +15,9 @@ sealed class ErrorEvent : Exception() {
 
     class OrderItemsEvent : ErrorEvent()
 
+    class LoadCouponEvent : ErrorEvent()
+
+
     fun receiveErrorMessage(): String {
         return when (this) {
             is AddCartEvent -> ERROR_ADD_CART_ITEM
@@ -24,6 +27,7 @@ sealed class ErrorEvent : Exception() {
             is MaxPagingDataEvent -> MAX_PAGING_DATA
             is NotKnownError -> ERROR_NOT_KNOWN
             is OrderItemsEvent -> ERROR_ORDER
+            is LoadCouponEvent -> ERROR_LOAD_COUPON
         }
     }
 
@@ -35,5 +39,6 @@ sealed class ErrorEvent : Exception() {
         private const val MAX_PAGING_DATA = "모든 데이터가 로드 되었습니다."
         private const val ERROR_NOT_KNOWN = "알 수 없는 에러가 발생했습니다.."
         private const val ERROR_ORDER = "주문에 실패하였습니다."
+        private const val ERROR_LOAD_COUPON ="쿠폰이 없습니다."
     }
 }

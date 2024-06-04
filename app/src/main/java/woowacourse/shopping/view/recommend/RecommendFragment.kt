@@ -20,7 +20,7 @@ import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts {

@@ -14,7 +14,7 @@ import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.utils.exception.ErrorEvent
 
 class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private var mainActivityListener: MainActivityListener? = null
