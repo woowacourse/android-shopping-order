@@ -9,7 +9,7 @@ import woowacourse.shopping.data.source.OrderDataSource
 class OrderDataSourceImpl(
     private val orderApiService: OrderApiService = NetworkManager.orderService(),
 ) : OrderDataSource {
-    override fun orderItems(ids: List<Int>): Result<Unit> = runCatching {
+    override suspend fun orderItems(ids: List<Int>): Result<Unit> = runCatching {
         orderApiService.orderItems(cartItemIds = CartOrderRequest(ids))
     }
 }

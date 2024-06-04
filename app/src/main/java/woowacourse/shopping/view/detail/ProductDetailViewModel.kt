@@ -2,6 +2,8 @@ package woowacourse.shopping.view.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -34,7 +36,7 @@ class ProductDetailViewModel(
     private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent>()
     val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
 
-    fun addShoppingCartItem(product: Product) {
+    fun addShoppingCartItem(product: Product) = viewModelScope.launch {
         checkValidProduct(product)
         when (cartItemId) {
             DEFAULT_CART_ITEM_ID -> {
@@ -73,7 +75,7 @@ class ProductDetailViewModel(
     }
 
 
-    fun loadProductItem(productId: Long) {
+    fun loadProductItem(productId: Long) = viewModelScope.launch {
         loadProductItemCount(productId)
             .onSuccess { loadItemCounter ->
                 updateLoadProduct(productId, loadItemCounter)
@@ -86,7 +88,7 @@ class ProductDetailViewModel(
     private fun updateLoadProduct(
         productId: Long,
         loadItemCounter: CartItemCounter
-    ) {
+    ) = viewModelScope.launch {
         productRepository.getProduct(productId)
             .onSuccess { product ->
                 product.updateItemSelector(true)
@@ -99,7 +101,7 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
+    private suspend fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
         return runCatching {
             shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
                 .mapCatching { result ->
@@ -132,7 +134,7 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentlyProduct(product: Product) {
+    private fun saveRecentlyProduct(product: Product) = viewModelScope.launch {
         recentlyProductRepository.addRecentlyProduct(
             RecentlyProduct(
                 productId = product.id,
@@ -143,11 +145,11 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) = viewModelScope.launch {
         recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
     }
 
-    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
+    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) = viewModelScope.launch {
         deletePrevRecentlyProduct(recentlyProduct.id)
         productRepository.getProduct(recentlyProduct.productId)
             .onSuccess { product ->
@@ -161,7 +163,7 @@ class ProductDetailViewModel(
     private fun updateLoadRecentlyProduct(
         recentlyProduct: RecentlyProduct,
         product: Product,
-    ) {
+    ) = viewModelScope.launch {
         loadProductItemCount(recentlyProduct.productId)
             .onSuccess { loadItemCounter ->
                 product.updateItemSelector(true)
@@ -175,7 +177,7 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun loadRecentlyProduct(product: Product) {
+    private fun loadRecentlyProduct(product: Product) = viewModelScope.launch {
         recentlyProductRepository.getMostRecentlyProduct()
             .onSuccess { recentlyProduct ->
                 _recentlyProduct.value = recentlyProduct

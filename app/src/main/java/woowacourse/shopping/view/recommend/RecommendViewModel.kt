@@ -2,6 +2,8 @@ package woowacourse.shopping.view.recommend
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
@@ -42,7 +44,7 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun loadRecommendData() {
+    fun loadRecommendData() = viewModelScope.launch {
         recentlyRepository.getMostRecentlyProduct()
             .onSuccess { recentlyProduct ->
                 loadCategoryProducts(recentlyProduct.category)
@@ -52,7 +54,7 @@ class RecommendViewModel(
             }
     }
 
-    private fun loadMyCartItems(categoryProducts: List<Product>) {
+    private fun loadMyCartItems(categoryProducts: List<Product>) = viewModelScope.launch {
         shoppingCartRepository.loadPagingCartItems(
             LOAD_SHOPPING_ITEM_OFFSET,
             LOAD_SHOPPING_ITEM_SIZE,
@@ -71,7 +73,7 @@ class RecommendViewModel(
             }
     }
 
-    private fun loadCategoryProducts(category: String) {
+    private fun loadCategoryProducts(category: String) = viewModelScope.launch {
         productRepository.loadCategoryProducts(
             size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
             category = category,
@@ -84,7 +86,7 @@ class RecommendViewModel(
             }
     }
 
-    private fun orderItems() {
+    private fun orderItems() = viewModelScope.launch {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
             .onSuccess {
@@ -98,7 +100,7 @@ class RecommendViewModel(
     private fun updateCarItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ) {
+    ) = viewModelScope.launch {
         shoppingCartRepository.updateCartItem(
             product,
             updateCartItemType,

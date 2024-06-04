@@ -13,7 +13,7 @@ import woowacourse.shopping.utils.DtoMapper.toProducts
 class ProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),
 ) : ProductDataSource {
-    override fun loadProducts(
+    override suspend fun loadProducts(
         page: Int,
         size: Int,
     ): Result<List<Product>> {
@@ -25,7 +25,7 @@ class ProductDataSourceImpl(
         }
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         page: Int,
         size: Int,
         category: String,
@@ -39,7 +39,7 @@ class ProductDataSourceImpl(
         }
     }
 
-    override fun loadProduct(id: Int): Result<Product> {
+    override suspend fun loadProduct(id: Int): Result<Product> {
         return runCatching {
             productApiService.requestProduct(id = id).toProduct()
         }

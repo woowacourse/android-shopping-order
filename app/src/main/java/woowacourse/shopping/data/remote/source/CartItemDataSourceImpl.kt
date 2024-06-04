@@ -39,15 +39,21 @@ class CartItemDataSourceImpl(
 
     override suspend fun loadCartItemResult(productId: Long): Result<CartItemResult> {
         return runCatching {
-            val cartItem = cartApiService.requestCartItems(
+            cartApiService.requestCartItems(
                 page = DEFAULT_ITEM_OFFSET,
                 size = MAX_CART_ITEM_SIZE,
             ).toCartItems().find { it.product.id == productId } ?: throw ErrorEvent.LoadDataEvent()
-            CartItemResult(
-                cartItemId = cartItem.id,
-                counter = cartItem.product.cartItemCounter,
-            )
         }
+            .mapCatching { cartItem ->
+                CartItemResult(
+                    cartItemId = cartItem.id,
+                    counter = cartItem.product.cartItemCounter,
+                )
+            }
+            .recoverCatching {
+                CartItemResult(CartItem.DEFAULT_CART_ITEM_ID, CartItemCounter())
+            }
+
     }
 
     override suspend fun addCartItem(

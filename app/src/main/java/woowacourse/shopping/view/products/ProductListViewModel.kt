@@ -2,6 +2,8 @@ package woowacourse.shopping.view.products
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.CartItemEntity.Companion.DEFAULT_CART_ITEM_COUNT
 import woowacourse.shopping.data.repository.ProductRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -41,7 +43,7 @@ class ProductListViewModel(
         loadPagingRecentlyProduct()
     }
 
-    fun loadPagingProduct() {
+    fun loadPagingProduct() = viewModelScope.launch {
         val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
         productRepository.loadPagingProducts(itemSize)
             .onSuccess {
@@ -52,7 +54,7 @@ class ProductListViewModel(
             }
     }
 
-    fun loadPagingRecentlyProduct() {
+    fun loadPagingRecentlyProduct() = viewModelScope.launch {
         recentlyProductRepository.getRecentlyProductList()
             .onSuccess {
                 _recentlyProducts.value = it
@@ -65,7 +67,7 @@ class ProductListViewModel(
     private fun updateCarItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ) {
+    ) = viewModelScope.launch {
         shoppingCartRepository.updateCartItem(
             product,
             updateCartItemType,
@@ -119,7 +121,7 @@ class ProductListViewModel(
         _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
     }
 
-    private fun updateTotalCartItemCount() {
+    private fun updateTotalCartItemCount()= viewModelScope.launch {
         shoppingCartRepository.getTotalCartItemCount()
             .onSuccess {
                 _cartItemCount.value = it

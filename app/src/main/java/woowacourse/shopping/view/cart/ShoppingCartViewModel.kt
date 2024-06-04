@@ -2,6 +2,8 @@ package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
@@ -33,7 +35,7 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun loadPagingCartItemList() {
+    fun loadPagingCartItemList() = viewModelScope.launch {
         shoppingCartRepository.loadPagingCartItems(
             LOAD_SHOPPING_ITEM_OFFSET,
             LOAD_SHOPPING_ITEM_SIZE,
@@ -90,7 +92,7 @@ class ShoppingCartViewModel(
     private fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ) {
+    ) = viewModelScope.launch {
         shoppingCartRepository.updateCartItem(
             product,
             updateCartItemType,
@@ -129,7 +131,7 @@ class ShoppingCartViewModel(
     private fun deleteShoppingCartItem(
         cartItemId: Long,
         product: Product,
-    ) {
+    ) = viewModelScope.launch {
         shoppingCartRepository.deleteCartItem(cartItemId)
             .onSuccess {
                 shoppingCart.deleteProduct(cartItemId)
