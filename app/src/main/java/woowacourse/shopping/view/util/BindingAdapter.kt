@@ -1,14 +1,11 @@
-package woowacourse.shopping.data.adapter
+package woowacourse.shopping.view.util
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.view.state.UIState
 
 @BindingAdapter("app:imageUrl")
 fun loadImage(

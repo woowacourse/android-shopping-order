@@ -61,72 +61,8 @@ class CartViewModel(
     val recommendListUiEvent: LiveData<Event<RecommendListUiEvent>>
         get() = _recommendListUiEvent
 
-//    private var selectedCartItemIds: List<Int> = emptyList()
-
     init {
         loadCartItems()
-    }
-
-    fun navigate() {
-        when (currentScreen.value ?: return) {
-            CurrentScreen.CART -> {
-                _cartListUiEvent.value = Event(CartListUiEvent.NavigateToRecommendList)
-                _currentScreen.value = CurrentScreen.RECOMMEND
-            }
-
-            CurrentScreen.RECOMMEND -> {
-                makeOrder()
-            }
-        }
-    }
-
-    private fun makeOrder() {
-        orderRepository.postOrder(
-            cartItemIds = cartUiState.value?.selectedCartItemIds ?: return,
-            onSuccess = {
-                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
-            },
-            onFailure = {
-            },
-        )
-    }
-
-    private fun loadCartItems() {
-        val cartListUiState = cartListUiState.value ?: return
-        _cartListUiState.value = cartListUiState.copy(isLoading = true)
-        println(cartListUiState.currentPageIndex)
-        cartRepository.getCartTotalQuantity(
-            onSuccess = { totalQuantity ->
-                cartRepository.getCartItems(
-                    page = cartListUiState.currentPageIndex,
-                    size = totalQuantity,
-                    sort = "desc",
-                    onSuccess = { cart ->
-                        println("previous enabled : ${cart.first.not()}")
-                        println("next enabled : ${cart.last.not()}")
-                        _cartListUiState.value =
-                            cartListUiState.copy(
-                                isLoading = false,
-                                cartViewItems =
-                                cart.cartItems.map { cartItem ->
-                                    CartViewItem(
-                                        cartItem,
-                                        cartUiState.value?.isEntireCheckboxSelected == true || cartItem.cartItemId in (cartUiState.value?.selectedCartItemIds
-                                            ?: return@getCartItems),
-                                    )
-                                },
-                                previousPageEnabled = cart.first.not(),
-                                nextPageEnabled = cart.last.not(),
-                            )
-                    },
-                    onFailure = {
-                    },
-                )
-            },
-            onFailure = {
-
-            }
-        )
     }
 
     fun loadRecommendedItems() {
@@ -153,20 +89,68 @@ class CartViewModel(
         )
     }
 
-    fun navigateToPreviousPage() {
-        _cartListUiState.value =
-            cartListUiState.value?.copy(
-                currentPageIndex = cartListUiState.value?.currentPageIndex?.minus(1) ?: return,
-            )
-        loadCartItems()
+    fun navigate() {
+        when (currentScreen.value ?: return) {
+            CurrentScreen.CART -> {
+                _cartListUiEvent.value = Event(CartListUiEvent.NavigateToRecommendList)
+                _currentScreen.value = CurrentScreen.RECOMMEND
+            }
+
+            CurrentScreen.RECOMMEND -> {
+                makeOrder()
+            }
+        }
     }
 
-    fun navigateToNextPage() {
-        _cartListUiState.value =
-            cartListUiState.value?.copy(
-                currentPageIndex = cartListUiState.value?.currentPageIndex?.plus(1) ?: return,
-            )
-        loadCartItems()
+    fun navigateBackToHome() {
+        _navigateBackToHome.value = Event(Unit)
+    }
+
+    private fun makeOrder() {
+        orderRepository.postOrder(
+            cartItemIds = cartUiState.value?.selectedCartItemIds ?: return,
+            onSuccess = {
+                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
+            },
+            onFailure = {
+            },
+        )
+    }
+
+    private fun loadCartItems() {
+        val cartListUiState = cartListUiState.value ?: return
+        _cartListUiState.value = cartListUiState.copy(isLoading = true)
+        println(cartListUiState.currentPageIndex)
+        cartRepository.getCartTotalQuantity(
+            onSuccess = { totalQuantity ->
+                cartRepository.getCartItems(
+                    page = cartListUiState.currentPageIndex,
+                    size = totalQuantity,
+                    sort = "desc",
+                    onSuccess = { cart ->
+                        _cartListUiState.value =
+                            cartListUiState.copy(
+                                isLoading = false,
+                                cartViewItems =
+                                cart.cartItems.map { cartItem ->
+                                    CartViewItem(
+                                        cartItem,
+                                        cartUiState.value?.isEntireCheckboxSelected == true || cartItem.cartItemId in (cartUiState.value?.selectedCartItemIds
+                                            ?: return@getCartItems),
+                                    )
+                                },
+                                previousPageEnabled = cart.first.not(),
+                                nextPageEnabled = cart.last.not(),
+                            )
+                    },
+                    onFailure = {
+                    },
+                )
+            },
+            onFailure = {
+
+            }
+        )
     }
 
     override fun onCartItemClick(productId: Int) {
@@ -185,7 +169,8 @@ class CartViewModel(
             cartItemId = itemId,
             onSuccess = {
                 _cartUiState.value = cartUiState.value?.copy(
-                    selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.filter { it != itemId } ?: return@deleteCartItem
+                    selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.filter { it != itemId }
+                        ?: return@deleteCartItem
                 )
                 loadCartItems()
             },
@@ -213,17 +198,23 @@ class CartViewModel(
             cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == itemId }
                 ?: return
         if (isSelected) {
-//            selectedCartItemIds += itemId
-            _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                itemId
-            ) ?: return)
-            addTotalPrice(cartItem.cartItem.totalPrice())
+            _cartUiState.value = cartUiState.value?.copy(
+                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
+                    itemId
+                ) ?: return
+            )
+            // TODO 총 가격 설정하기
+//            addTotalPrice(cartItem.cartItem.totalPrice())
         } else {
-            _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.minus(
-                itemId
-            ) ?: return)
-            subtractTotalPrice(cartItem.cartItem.totalPrice())
+            _cartUiState.value = cartUiState.value?.copy(
+                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.minus(
+                    itemId
+                ) ?: return
+            )
+            // TODO 총 가격 설정하기
+//            subtractTotalPrice(cartItem.cartItem.totalPrice())
         }
+        setTotalPrice()
     }
 
     private fun updateCartQuantity(
@@ -236,16 +227,13 @@ class CartViewModel(
             onSuccess = {
                 val updatedViewItems =
                     cartListUiState.value?.cartViewItems?.map {
-                        if (it.cartItem.cartItemId == cartItemId) {
-                            changedItem
-                        } else {
-                            it
-                        }
+                        if (it.cartItem.cartItemId == cartItemId) changedItem else it
                     } ?: return@updateCartItem
                 _cartListUiState.value =
                     cartListUiState.value?.copy(
                         cartViewItems = updatedViewItems,
                     )
+                setTotalPrice()
             },
             onFailure = {
             },
@@ -277,7 +265,6 @@ class CartViewModel(
                     size = cartListUiState.value?.cartViewItems?.size ?: 0,
                     sort = "asc",
                     onSuccess = { cartDomain ->
-                        println(cartDomain.cartItems.map(CartItemDomain::cartItemId))
                         val products = recommendedListUiState.value?.recommendedProducts
                         val target = products?.firstOrNull {
                             it.product.id == product.id
@@ -289,11 +276,14 @@ class CartViewModel(
                             recommendedListUiState.value?.copy(
                                 recommendedProducts = updatedProducts,
                             )
-                        val cartItemId = cartDomain.cartItems.firstOrNull { it.product.id == product.id }?.cartItemId ?: return@getCartItems
-                        _cartUiState.value = cartUiState.value?.copy(selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                            cartItemId
-                        ) ?: return@getCartItems)
-//                        selectedCartItemIds += cartItemId ?: return@getCartItems
+                        val cartItemId =
+                            cartDomain.cartItems.firstOrNull { it.product.id == product.id }?.cartItemId
+                                ?: return@getCartItems
+                        _cartUiState.value = cartUiState.value?.copy(
+                            selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
+                                cartItemId
+                            ) ?: return@getCartItems
+                        )
                     },
                     onFailure = {
                     },
@@ -309,7 +299,8 @@ class CartViewModel(
             cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
                 ?: return
         val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
-        addTotalPrice(changedItem.cartItem.product.price)
+        // TODO 총 가격 설정하기
+//        addTotalPrice(changedItem.cartItem.product.price)
         updateCartQuantity(cartItemId, changedItem)
     }
 
@@ -319,37 +310,42 @@ class CartViewModel(
                 ?: return
         val changedItem =
             cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
-        subtractTotalPrice(changedItem.cartItem.product.price)
+        // TODO 총 가격 설정하기
+//        subtractTotalPrice(changedItem.cartItem.product.price)
         updateCartQuantity(cartItemId, changedItem)
     }
 
     fun updateEntireCheck(isSelected: Boolean) {
-        val updatedCartViewItems =
-            if (isSelected) {
-                cartListUiState.value?.cartViewItems?.map {
-                    it.copy(isSelected = true)
-                } ?: return
-            } else {
-                cartListUiState.value?.cartViewItems?.map {
-                    it.copy(isSelected = false)
-                } ?: return
-            }
+        val updatedCartViewItems = cartListUiState.value?.cartViewItems?.map {
+            it.copy(isSelected = isSelected)
+        } ?: return
         _cartListUiState.value =
-            cartListUiState.value?.copy(
-                cartViewItems = updatedCartViewItems,
-            )
+            cartListUiState.value?.copy(cartViewItems = updatedCartViewItems)
         _cartUiState.value =
             cartUiState.value?.copy(
                 isEntireCheckboxSelected = isSelected,
                 totalPrice =
-                updatedCartViewItems.sumOf {
-                    if (it.isSelected) {
-                        it.cartItem.totalPrice()
-                    } else {
-                        0
-                    }
-                },
+                    updatedCartViewItems.sumOf {
+                        if (it.isSelected) {
+                            it.cartItem.totalPrice()
+                        } else {
+                            0
+                        }
+                    },
             )
+    }
+
+    private fun setTotalPrice() {
+        val totalPrice = cartListUiState.value?.cartViewItems?.sumOf {
+            if (it.isSelected) {
+                it.cartItem.totalPrice()
+            } else 0
+        } ?: return
+        val isEntirelySelected = cartListUiState.value?.cartViewItems?.all { it.isSelected } ?: return
+        _cartUiState.value = cartUiState.value?.copy(
+            isEntireCheckboxSelected = isEntirelySelected,
+            totalPrice = totalPrice
+        )
     }
 
     private fun addTotalPrice(additionalPrice: Int) {
@@ -366,9 +362,5 @@ class CartViewModel(
             cartUiState.copy(
                 totalPrice = cartUiState.totalPrice - subtractPrice,
             )
-    }
-
-    fun navigateBackToHome() {
-        _navigateBackToHome.value = Event(Unit)
     }
 }
