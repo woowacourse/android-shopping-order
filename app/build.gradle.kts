@@ -1,9 +1,15 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
     id("kotlin-kapt")
     id("kotlin-parcelize")
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -20,6 +26,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "NAME", getApiKey("NAME"))
+        buildConfigField("String", "PASSWORD", getApiKey("PASSWORD"))
     }
 
     buildTypes {
@@ -38,6 +47,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     packaging {
         resources {
             excludes += "META-INF/**"

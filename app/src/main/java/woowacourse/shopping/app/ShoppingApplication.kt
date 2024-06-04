@@ -2,6 +2,7 @@ package woowacourse.shopping.app
 
 import android.app.Application
 import androidx.preference.PreferenceManager
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
 import woowacourse.shopping.data.datasource.remote.OrderDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
@@ -35,8 +36,8 @@ class ShoppingApplication : Application() {
         val preferenceManager = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val authProviderImpl = AuthProviderImpl(preferenceManager)
         authProviderImpl.apply {
-            name = "junjange"
-            password = "password"
+            name = BuildConfig.NAME
+            password = BuildConfig.PASSWORD
         }
         AuthProvider.setInstance(authProviderImpl)
     }
