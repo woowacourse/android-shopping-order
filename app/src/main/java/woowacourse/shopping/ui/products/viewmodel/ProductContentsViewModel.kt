@@ -119,9 +119,10 @@ class ProductContentsViewModel(
             productWithQuantity.value = currentProduct().copy(isLoading = true)
             cartRepository.getAllCartItems()
         }.onSuccess { carts ->
-            handler.postDelayed({
-                cart.value = carts
-            }, 1000)
+//            handler.postDelayed({
+//                cart.value = carts
+//            }, 1000)
+            cart.value = carts
         }
     }
 

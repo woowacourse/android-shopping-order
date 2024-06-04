@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
+import woowacourse.shopping.data.order.OrderRepository
 import woowacourse.shopping.data.product.ProductRepository
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.ProductWithQuantity
@@ -17,13 +18,15 @@ import woowacourse.shopping.ui.cart.item.CartItemsUiState
 import woowacourse.shopping.ui.cart.item.CartUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
+import woowacourse.shopping.ui.utils.MutableSingleLiveData
+import woowacourse.shopping.ui.utils.SingleLiveData
 
 class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val orderRepository: OrderRepository
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
-    private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
 
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val products: LiveData<List<ProductWithQuantity>> = _products
@@ -33,6 +36,7 @@ class CartViewModel(
             it.sumOf { it.quantity.value }
         }
 
+    private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
     val cart: LiveData<CartItemsUiState> = _cart
 
     val totalPrice: MediatorLiveData<Int> =
@@ -57,8 +61,26 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
+    val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
+
+    private fun currentCartState(): CartItemsUiState =
+        _cart.value ?: CartItemsUiState(emptyList(), true)
+
     init {
         loadCartItems()
+    }
+
+    private fun loadCartItems() {
+        runCatching {
+            _cart.value = currentCartState().copy(isLoading = true)
+            cartRepository.getAllCartItemsWithProduct()
+        }.onSuccess { carts ->
+            _cart.value = currentCartState().copy(
+                cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
+                isLoading = false
+            )
+        }
     }
 
     fun loadRecommendProducts() {
@@ -130,6 +152,7 @@ class CartViewModel(
             cartRepository.postCartItems(productId, 1)
         }.onSuccess {
             changeRecommendProductCount(productId)
+            loadCartItems()
         }
     }
 
@@ -141,12 +164,12 @@ class CartViewModel(
                 cartItem.quantity.value.inc(),
             )
         }.onSuccess {
-            if (!requireNotNull(isRecommendPage.value)) {
-                loadCartItems()
-            } else {
+            if (requireNotNull(isRecommendPage.value)) {
                 changeRecommendProductCount(productId)
             }
+            loadCartItems()
         }
+
     }
 
     override fun minusCount(productId: Long) {
@@ -159,12 +182,12 @@ class CartViewModel(
                 )
             }
         }.onSuccess {
-            if (!requireNotNull(isRecommendPage.value)) {
-                loadCartItems()
-            } else {
+            if (requireNotNull(isRecommendPage.value)) {
                 changeRecommendProductCount(productId)
             }
+            loadCartItems()
         }
+
     }
 
     private fun changeRecommendProductCount(productId: Long) {
@@ -191,16 +214,15 @@ class CartViewModel(
         return current
     }
 
-    private fun loadCartItems() {
+    fun order() {
         runCatching {
-            _cart.value =
-                CartItemsUiState(
-                    cartRepository.getAllCartItemsWithProduct().map { it.toUiModel(false) },
-                    isLoading = true,
-                )
+            val cartIds: List<Long> =
+                _cart.value?.cartItems?.filter { it.isChecked }?.map { it.id } ?: emptyList()
+            orderRepository.order(cartIds)
         }.onSuccess {
-            _cart.value =
-                cart.value?.copy(isLoading = false)
+            _isOrderSuccess.setValue(true)
+        }.onFailure {
+            _isOrderSuccess.setValue(false)
         }
     }
 
@@ -219,4 +241,7 @@ class CartViewModel(
             this.product.imageUrl,
             isChecked,
         )
+
+    private fun isAlreadyChecked(productId: Long): Boolean =
+        (_cart.value?.cartItems?.firstOrNull { it.productId == productId }?.isChecked ?: false) || _products.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 }

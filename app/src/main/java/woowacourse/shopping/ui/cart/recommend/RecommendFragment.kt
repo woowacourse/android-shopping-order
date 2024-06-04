@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -28,6 +29,7 @@ class RecommendFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
+            OrderRepositoryImpl()
         )
     }
 
@@ -47,6 +49,7 @@ class RecommendFragment : Fragment() {
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.loadRecommendProducts()
+        viewModel.isRecommendPage.value = true
 
         viewModel.products.observe(viewLifecycleOwner) {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -27,6 +28,7 @@ class CartItemFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
+            OrderRepositoryImpl()
         )
     }
 
@@ -43,6 +45,7 @@ class CartItemFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeCartItems()
         setCartAdapter()
+        viewModel.isRecommendPage.value = false
     }
 
     private fun observeCartItems() {

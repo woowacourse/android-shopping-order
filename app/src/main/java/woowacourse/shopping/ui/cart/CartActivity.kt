@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryImpl
+import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
@@ -26,6 +28,7 @@ class CartActivity : AppCompatActivity() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
+            OrderRepositoryImpl()
         )
     }
 
@@ -39,6 +42,15 @@ class CartActivity : AppCompatActivity() {
         onClickOrderBtn()
 
         onClickTotalCheckBox()
+
+        viewModel.isOrderSuccess.observe(this) { isSuccess ->
+            if (isSuccess) {
+                Toast.makeText(this, "주문에 성공했습니다.",Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this, "주문에 실패했습니다.",Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun initFragment() {
@@ -66,6 +78,8 @@ class CartActivity : AppCompatActivity() {
                     add(R.id.fcv_cart, RecommendFragment())
                     addToBackStack(null)
                 }
+            } else if (supportFragmentManager.findFragmentById(R.id.fcv_cart) is RecommendFragment) {
+                viewModel.order()
             }
 
         }

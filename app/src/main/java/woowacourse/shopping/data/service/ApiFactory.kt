@@ -5,9 +5,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
+import woowacourse.shopping.data.dto.request.RequestPostOrderDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
@@ -30,6 +32,8 @@ object ApiFactory {
     private val productService = retrofit.create(ProductService::class.java)
 
     private val cartItemService = tokenRetrofit.create(CartItemService::class.java)
+
+    private val orderService = tokenRetrofit.create(OrderService::class.java)
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
@@ -60,4 +64,6 @@ object ApiFactory {
     ) = cartItemService.patchCartItem(id = id, request = request).execute().body()
 
     fun getCartItemCounts() = cartItemService.getCartItemCounts().execute().body()
+
+    fun postOrder(request: RequestPostOrderDto) = orderService.postOrders(request = request).execute().body()
 }
