@@ -6,13 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
-class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
+class CartSelectionFragment : Fragment() {
     private var _binding: FragmentCartSelectionBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: CartViewModel by activityViewModels()
 
     private val adapter by lazy { CartAdapter(viewModel) }
 

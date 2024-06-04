@@ -16,11 +16,10 @@ import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
-import kotlin.reflect.KClass
 
 class CartActivity : AppCompatActivity() {
-    private lateinit var cartSelectionFragment: Fragment
-    private lateinit var cartRecommendFragment: Fragment
+    private val cartSelectionFragment: Fragment by lazy { CartSelectionFragment() }
+    private val cartRecommendFragment: Fragment by lazy { CartRecommendFragment() }
 
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
@@ -37,28 +36,17 @@ class CartActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
-        cartSelectionFragment = createFragment(CartSelectionFragment::class)
-        cartRecommendFragment = createFragment(CartRecommendFragment::class)
-
         if (savedInstanceState == null) {
             addFragment(cartSelectionFragment)
         }
 
         initializeView()
-    }
-
-    private fun createFragment(fragmentClass: KClass<out Fragment>): Fragment {
-        return supportFragmentManager.fragmentFactory.instantiate(
-            classLoader,
-            fragmentClass.java.name,
-        )
     }
 
     private fun addFragment(fragment: Fragment) {

@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.databinding.FragmentCartRecommendBinding
 import woowacourse.shopping.ui.cart.adapter.RecommendProductsAdapter
 
-class CartRecommendFragment(val viewModel: CartViewModel) : Fragment() {
+class CartRecommendFragment : Fragment() {
     private var _binding: FragmentCartRecommendBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: CartViewModel by activityViewModels()
 
     private val adapter by lazy {
         RecommendProductsAdapter(
