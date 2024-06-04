@@ -5,13 +5,15 @@
 
     <data>
 
-        <variable
-            name="product"
-            type="woowacourse.shopping.domain.ProductListItem.ShoppingProductItem" />
+        <import type="android.view.View" />
 
         <variable
-            name="quantityHandler"
-            type="woowacourse.shopping.presentation.ui.QuantityHandler" />
+            name="product"
+            type="woowacourse.shopping.presentation.ui.model.ProductModel" />
+
+        <variable
+            name="cartHandler"
+            type="woowacourse.shopping.presentation.ui.cart.CartHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +23,7 @@
 
         <ImageView
             android:id="@+id/img_item"
-            bindLoadImage="@{product.imgUrl}"
+            bindLoadImage="@{product.imageUrl}"
             android:layout_width="154dp"
             android:layout_height="154dp"
             android:scaleType="centerCrop"
@@ -61,7 +63,7 @@
 
         <include
             android:id="@+id/layout_shopping_quantity_control"
-            bindSetVisibility="@{product.quantity>0}"
+            android:visibility="@{product.quantity > 0 ? View.VISIBLE : View.GONE}"
             layout="@layout/include_quantity_control"
             android:layout_width="126dp"
             android:layout_height="42dp"
@@ -69,16 +71,17 @@
             app:layout_constraintBottom_toBottomOf="@id/img_item"
             app:layout_constraintEnd_toEndOf="@id/img_item"
             app:layout_constraintStart_toStartOf="@id/img_item"
-            app:product="@{product}"
-            app:quantityHandler="@{quantityHandler}" />
+            app:productId="@{product.id}"
+            app:count="@{product.quantity}"
+            app:quantityHandler="@{cartHandler}" />
 
         <ImageView
             android:id="@+id/btn_plus"
-            bindSetVisibility="@{0==product.quantity}"
+            android:visibility="@{product.quantity == 0 ? View.VISIBLE : View.GONE}"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="@{()->quantityHandler.onIncreaseQuantity(product)}"
+            android:onClick="@{()->cartHandler.onPlusButtonClick(product.id)}"
             android:src="@drawable/ic_white_plus"
             app:layout_constraintBottom_toBottomOf="@id/img_item"
             app:layout_constraintEnd_toEndOf="@id/img_item" />
