@@ -15,6 +15,8 @@ data class CartUiModel(
 ) {
     fun totalPrice() = price * quantity.count
 
+    fun toCartItem() = CartItem(cartItemId, productId, quantity)
+
     companion object {
         fun from(
             product: Product,

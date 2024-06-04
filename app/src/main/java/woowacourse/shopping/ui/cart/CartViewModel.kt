@@ -190,7 +190,8 @@ class CartViewModel(
         quantity: Quantity = Quantity(1),
     ) {
         val recommendProductUiModels = _recommendProductUiModels.value?.toMutableList() ?: return
-        val recommendProductUiModel = recommendProductUiModels.find { it.productId == productId } ?: return
+        val recommendProductUiModel =
+            recommendProductUiModels.find { it.productId == productId } ?: return
         val position = recommendProductUiModels.indexOf(recommendProductUiModel)
 
         recommendProductUiModels[position] = recommendProductUiModel.copy(quantity = quantity)
@@ -203,7 +204,7 @@ class CartViewModel(
     ) {
         cartRepository.changeQuantity(cartUiModel.cartItemId, quantity) {
             it.onSuccess {
-                loadAllCartItems()
+                loadProduct(cartUiModel.copy(quantity = quantity).toCartItem())
                 if (isRecommendProduct(cartUiModel.productId)) {
                     updateRecommendProducts(cartUiModel.productId, quantity)
                 }

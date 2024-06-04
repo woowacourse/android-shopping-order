@@ -9,7 +9,7 @@ data class CartUiModels(val uiModels: List<CartUiModel> = emptyList()) {
     fun isEmpty() = uiModels.isEmpty()
 
     fun toCartItems(): List<CartItem> {
-        return uiModels.map { CartItem(it.cartItemId, it.productId, it.quantity) }
+        return uiModels.map { it.toCartItem() }
     }
 
     fun find(cartItemId: Int) = uiModels.find { it.cartItemId == cartItemId }
