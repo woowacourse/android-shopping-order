@@ -6,4 +6,8 @@ data class ProductDto(
     val price: Int,
     val imageUrl: String,
     val category: String,
-)
+){
+    companion object {
+        val DEFAULT = ProductDto(0, "", 0, "", "")
+    }
+}

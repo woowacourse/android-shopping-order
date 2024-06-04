@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import android.util.Log
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -72,7 +71,7 @@ class DefaultShoppingProductRepository(
         val cartItem = all.find { it.product.id == id }
 
         if (cartItem == null) {
-            cartSource.addedNewProductsId(ProductIdsCount(id, quantity))
+            cartSource.addNewProduct(ProductIdsCount(id, quantity))
             return
         }
 
@@ -80,7 +79,7 @@ class DefaultShoppingProductRepository(
     }
 
     override fun removeShoppingCartProduct(id: Long) {
-        cartSource.removedProductsId(id)
+        cartSource.removeCartItem(id)
     }
 
     companion object {
