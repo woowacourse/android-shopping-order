@@ -10,10 +10,20 @@ import woowacourse.shopping.BuildConfig
 import java.io.IOException
 
 object ApiClient {
-    fun getApiClient(): Retrofit {
+    fun getApiClient(
+        authorizationUserName: String = BuildConfig.authorization_username,
+        authorizationPassword: String = BuildConfig.authorization_password,
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.base_url)
-            .client(provideOkHttpClient(AppInterceptor()))
+            .client(
+                provideOkHttpClient(
+                    AppInterceptor(
+                        authorizationUserName,
+                        authorizationPassword,
+                    ),
+                ),
+            )
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -24,7 +34,10 @@ object ApiClient {
             build()
         }
 
-    class AppInterceptor : Interceptor {
+    class AppInterceptor(
+        private val authorizationUserName: String,
+        private val authorizationPassword: String,
+    ) : Interceptor {
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response =
             with(chain) {
@@ -32,7 +45,7 @@ object ApiClient {
                     request().newBuilder()
                         .addHeader(
                             "Authorization",
-                            Credentials.basic(BuildConfig.authorization_username, BuildConfig.authorization_password),
+                            Credentials.basic(authorizationUserName, authorizationPassword),
                         )
                         .build()
                 proceed(newRequest)
