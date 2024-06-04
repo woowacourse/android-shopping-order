@@ -12,3 +12,90 @@
   - [x] 해당 카테고리 상품이 10개 미만이라면 해당하는 개수만큼만 노출 
   - [x] 장바구니에 이미 추가된 상품이라면 미노출 
 - [x] 추천된 상품을 해당 화면에서 바로 추가하여 같이 주문할 수 있다.
+
+### Low Level Design 
+
+#### Static
+
+```mermaid
+classDiagram
+  CartSelectViewModel <.. CartSelectFragment
+  CartProductsAdapter <.. CartSelectFragment
+  OrderRecommendViewModel <.. OrderRecommendFragment
+  RecommendAdapter <.. OrderRecommendFragment
+  ProductListViewModel <.. ProductListActivity
+  ProductListAdapter <.. ProductListActivity 
+  ProductHistoryListAdapter <.. ProductListActivity
+  ProductDetailViewModel <.. ProductDetailActivity
+
+  ShoppingCartRepository <.. CartSelectViewModel
+  ProductHistoryRepository <.. OrderRecommendViewModel
+  ShoppingCartRepository <.. OrderRecommendViewModel
+  OrderRepository <.. OrderRecommendViewModel
+  ProductRepository <.. ProductListViewModel
+  ShoppingCartRepository <.. ProductListViewModel
+  ProductHistoryRepository <.. ProductListViewModel
+  ProductRepository <.. ProductDetailViewModel
+  ShoppingCartRepository <.. ProductDetailViewModel
+  ProductHistoryRepository <.. ProductDetailViewModel
+
+  ShoppingCartRepository <-- ShoppingCartRepositoryImpl
+  OrderRepository <-- OrderRepositoryImpl
+  ProductHistoryRepository <-- ProductHistoryRepositoryImpl
+  ProductRepository <-- ProductRepositoryImpl
+  
+  ProductHistoryLocalDataSource <-- ProductHistoryLocalDataSourceImpl
+  OrderRemoteDataSource <-- OrderRemoteDataSourceImpl
+  ProductRemoteDataSource <-- ProductRemoteDataSourceImpl
+  ShoppingRemoteCartDataSource <-- ShoppingRemoteCartDataSourceImpl
+
+  OrderRemoteDataSource <.. OrderRepositoryImpl
+  ProductHistoryLocalDataSource <.. ProductHistoryRepositoryImpl
+  ShoppingCartRepository <.. ProductHistoryRepositoryImpl
+  ProductRemoteDataSource <.. ProductRepositoryImpl
+  ShoppingRemoteCartDataSource <.. ProductRepositoryImpl
+  ShoppingCartRepositoryImpl <.. ShoppingRemoteCartDataSource
+
+  ProductHistoryDao <.. ProductHistoryLocalDataSourceImpl
+  OrderService <.. OrderRemoteDataSourceImpl
+  ProductService <.. ProductRemoteDataSourceImpl
+  CartService <.. ShoppingRemoteCartDataSourceImpl
+
+  class CartSelectFragment
+  class OrderRecommendFragment
+  class ProductListActivity
+  class ProductDetailActivity
+
+  class CartSelectViewModel
+  class OrderRecommendViewModel
+  class ProductListViewModel
+  class ProductDetailViewModel
+
+  <<interface>> ShoppingCartRepository
+  <<interface>> OrderRepository
+  <<interface>> ProductHistoryRepository
+  <<interface>> ProductRepository
+
+  class ShoppingCartRepositoryImpl
+  class OrderRepositoryImpl
+  class ProductHistoryRepositoryImpl
+  class ProductRepositoryImpl
+  
+  <<interface>> ProductHistoryLocalDataSource
+  <<interface>> OrderRemoteDataSource
+  <<interface>> ProductRemoteDataSource
+  <<interface>> ShoppingRemoteCartDataSource
+
+  class ProductHistoryLocalDataSourceImpl
+  class OrderRemoteDataSourceImpl
+  class ProductRemoteDataSourceImpl
+  class ShoppingRemoteCartDataSourceImpl
+
+  <<interface>> ProductHistoryDao
+  <<interface>> CartService
+  <<interface>> OrderService
+  <<interface>> ProductService
+```
+
+#### Dynamic
+
