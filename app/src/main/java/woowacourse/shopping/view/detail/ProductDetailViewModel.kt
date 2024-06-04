@@ -36,58 +36,59 @@ class ProductDetailViewModel(
     private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent>()
     val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
 
-    fun addShoppingCartItem(product: Product) = viewModelScope.launch {
-        checkValidProduct(product)
-        when (cartItemId) {
-            DEFAULT_CART_ITEM_ID -> {
-                shoppingCartRepository.addCartItem(product)
-                    .onSuccess {
-                        _productDetailEvent.setValue(
-                            ProductDetailEvent.AddShoppingCart.Success(
-                                productId = product.id,
-                                count = product.cartItemCounter.itemCount,
-                            ),
-                        )
-                    }
-                    .onFailure {
-                        handleException(ErrorEvent.AddCartEvent())
-                    }
-            }
+    fun addShoppingCartItem(product: Product) =
+        viewModelScope.launch {
+            checkValidProduct(product)
+            when (cartItemId) {
+                DEFAULT_CART_ITEM_ID -> {
+                    shoppingCartRepository.addCartItem(product)
+                        .onSuccess {
+                            _productDetailEvent.setValue(
+                                ProductDetailEvent.AddShoppingCart.Success(
+                                    productId = product.id,
+                                    count = product.cartItemCounter.itemCount,
+                                ),
+                            )
+                        }
+                        .onFailure {
+                            handleException(ErrorEvent.AddCartEvent())
+                        }
+                }
 
-            else -> {
-                shoppingCartRepository.updateCartItem(
-                    product = product,
-                    UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
-                )
-                    .onSuccess {
-                        _productDetailEvent.setValue(
-                            ProductDetailEvent.AddShoppingCart.Success(
-                                productId = product.id,
-                                count = product.cartItemCounter.itemCount,
-                            ),
-                        )
-                    }
-                    .onFailure {
-                        handleException(ErrorEvent.UpdateCartEvent())
-                    }
+                else -> {
+                    shoppingCartRepository.updateCartItem(
+                        product = product,
+                        UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
+                    )
+                        .onSuccess {
+                            _productDetailEvent.setValue(
+                                ProductDetailEvent.AddShoppingCart.Success(
+                                    productId = product.id,
+                                    count = product.cartItemCounter.itemCount,
+                                ),
+                            )
+                        }
+                        .onFailure {
+                            handleException(ErrorEvent.UpdateCartEvent())
+                        }
+                }
             }
         }
-    }
 
-
-    fun loadProductItem(productId: Long) = viewModelScope.launch {
-        loadProductItemCount(productId)
-            .onSuccess { loadItemCounter ->
-                updateLoadProduct(productId, loadItemCounter)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadProductItem(productId: Long) =
+        viewModelScope.launch {
+            loadProductItemCount(productId)
+                .onSuccess { loadItemCounter ->
+                    updateLoadProduct(productId, loadItemCounter)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     private fun updateLoadProduct(
         productId: Long,
-        loadItemCounter: CartItemCounter
+        loadItemCounter: CartItemCounter,
     ) = viewModelScope.launch {
         productRepository.getProduct(productId)
             .onSuccess { product ->
@@ -134,31 +135,34 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentlyProduct(product: Product) = viewModelScope.launch {
-        recentlyProductRepository.addRecentlyProduct(
-            RecentlyProduct(
-                productId = product.id,
-                imageUrl = product.imageUrl,
-                name = product.name,
-                category = product.category,
-            ),
-        )
-    }
+    private fun saveRecentlyProduct(product: Product) =
+        viewModelScope.launch {
+            recentlyProductRepository.addRecentlyProduct(
+                RecentlyProduct(
+                    productId = product.id,
+                    imageUrl = product.imageUrl,
+                    name = product.name,
+                    category = product.category,
+                ),
+            )
+        }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) = viewModelScope.launch {
-        recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
-    }
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) =
+        viewModelScope.launch {
+            recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
+        }
 
-    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) = viewModelScope.launch {
-        deletePrevRecentlyProduct(recentlyProduct.id)
-        productRepository.getProduct(recentlyProduct.productId)
-            .onSuccess { product ->
-                updateLoadRecentlyProduct(recentlyProduct, product)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) =
+        viewModelScope.launch {
+            deletePrevRecentlyProduct(recentlyProduct.id)
+            productRepository.getProduct(recentlyProduct.productId)
+                .onSuccess { product ->
+                    updateLoadRecentlyProduct(recentlyProduct, product)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     private fun updateLoadRecentlyProduct(
         recentlyProduct: RecentlyProduct,
@@ -177,16 +181,17 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun loadRecentlyProduct(product: Product) = viewModelScope.launch {
-        recentlyProductRepository.getMostRecentlyProduct()
-            .onSuccess { recentlyProduct ->
-                _recentlyProduct.value = recentlyProduct
-                _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
-                if (recentlyProduct.productId != product.id) {
-                    saveRecentlyProduct(product)
+    private fun loadRecentlyProduct(product: Product) =
+        viewModelScope.launch {
+            recentlyProductRepository.getMostRecentlyProduct()
+                .onSuccess { recentlyProduct ->
+                    _recentlyProduct.value = recentlyProduct
+                    _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
+                    if (recentlyProduct.productId != product.id) {
+                        saveRecentlyProduct(product)
+                    }
                 }
-            }
-    }
+        }
 
     private fun checkValidProduct(product: Product) {
         if (product.id == DEFAULT_PRODUCT_ID) throw ErrorEvent.LoadDataEvent()

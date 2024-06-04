@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.source
 
-import retrofit2.Call
-import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemResult
@@ -14,9 +12,7 @@ interface CartItemDataSource {
         size: Int,
     ): Result<List<CartItem>>
 
-    suspend fun loadCartItemResult(
-        productId: Long,
-    ): Result<CartItemResult>
+    suspend fun loadCartItemResult(productId: Long): Result<CartItemResult>
 
     suspend fun addCartItem(
         productId: Int,

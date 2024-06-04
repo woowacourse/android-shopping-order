@@ -44,58 +44,62 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun loadRecommendData() = viewModelScope.launch {
-        recentlyRepository.getMostRecentlyProduct()
-            .onSuccess { recentlyProduct ->
-                loadCategoryProducts(recentlyProduct.category)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadRecommendData() =
+        viewModelScope.launch {
+            recentlyRepository.getMostRecentlyProduct()
+                .onSuccess { recentlyProduct ->
+                    loadCategoryProducts(recentlyProduct.category)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
-    private fun loadMyCartItems(categoryProducts: List<Product>) = viewModelScope.launch {
-        shoppingCartRepository.loadPagingCartItems(
-            LOAD_SHOPPING_ITEM_OFFSET,
-            LOAD_SHOPPING_ITEM_SIZE,
-        )
-            .onSuccess { myCartItems ->
-                val recommendData =
-                    getFilteredRandomProducts(
-                        myCartItems = myCartItems,
-                        loadData = categoryProducts,
-                    )
-                _products.value = recommendData
-                updateCheckItemData()
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    private fun loadMyCartItems(categoryProducts: List<Product>) =
+        viewModelScope.launch {
+            shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            )
+                .onSuccess { myCartItems ->
+                    val recommendData =
+                        getFilteredRandomProducts(
+                            myCartItems = myCartItems,
+                            loadData = categoryProducts,
+                        )
+                    _products.value = recommendData
+                    updateCheckItemData()
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
-    private fun loadCategoryProducts(category: String) = viewModelScope.launch {
-        productRepository.loadCategoryProducts(
-            size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-            category = category,
-        )
-            .onSuccess { categoryProducts ->
-                loadMyCartItems(categoryProducts)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    private fun loadCategoryProducts(category: String) =
+        viewModelScope.launch {
+            productRepository.loadCategoryProducts(
+                size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+                category = category,
+            )
+                .onSuccess { categoryProducts ->
+                    loadMyCartItems(categoryProducts)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
-    private fun orderItems() = viewModelScope.launch {
-        val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
-            .onSuccess {
-                _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-            }
-            .onFailure {
-                handleException(ErrorEvent.OrderItemsEvent())
-            }
-    }
+    private fun orderItems() =
+        viewModelScope.launch {
+            val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
+            orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
+                .onSuccess {
+                    _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.OrderItemsEvent())
+                }
+        }
 
     private fun updateCarItem(
         product: Product,
@@ -109,10 +113,11 @@ class RecommendViewModel(
                 when (updateCartItemResult) {
                     UpdateCartItemResult.ADD -> addCartItem(product)
                     is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                    is UpdateCartItemResult.UPDATED -> updateCartItem(
-                        product = product,
-                        itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
-                    )
+                    is UpdateCartItemResult.UPDATED ->
+                        updateCartItem(
+                            product = product,
+                            itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
+                        )
                 }
             }
             .onFailure {
@@ -122,8 +127,8 @@ class RecommendViewModel(
 
     private fun updateCartItem(
         product: Product,
-        itemCount : Int,
-    ){
+        itemCount: Int,
+    ) {
         product.updateCartItemCount(itemCount)
         _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
         updateCheckItemData()

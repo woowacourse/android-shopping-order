@@ -6,7 +6,8 @@ enum class Coupon {
     FIXED5000,
     BOGO,
     FREESHIPPING,
-    MIRACLESALE;
+    MIRACLESALE,
+    ;
 
     companion object {
         fun matchCoupon(code: String): Coupon {

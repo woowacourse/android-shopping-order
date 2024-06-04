@@ -12,9 +12,9 @@ import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
-import woowacourse.shopping.utils.exception.ErrorEvent
 
 class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private var mainActivityListener: MainActivityListener? = null

@@ -15,12 +15,12 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
-import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts {
@@ -169,6 +169,6 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
             }
         }
 
-        private const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
+        const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
     }
 }

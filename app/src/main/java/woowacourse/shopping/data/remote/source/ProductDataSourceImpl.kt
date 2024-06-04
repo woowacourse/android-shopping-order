@@ -1,10 +1,7 @@
 package woowacourse.shopping.data.remote.source
 
-import retrofit2.Call
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.api.ProductApiService
-import woowacourse.shopping.data.remote.dto.product.ProductDto
-import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.utils.DtoMapper.toProduct

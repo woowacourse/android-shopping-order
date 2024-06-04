@@ -14,7 +14,6 @@ import woowacourse.shopping.utils.EntityMapper.toCartItem
 import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
-import kotlin.concurrent.thread
 
 class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     private val cartItemDao = CartItemDatabase.getInstance(context).cartItemDao()
@@ -84,7 +83,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     UpdateCartItemType.DECREASE -> {
                         if (isInValidDecreaseCount(cartItemResult.decreaseCount())) {
                             deleteCartItemResult(cartItemResult)
-                        } else{
+                        } else {
                             cartItemResult.increaseCount()
                             updateCartItemCount(cartItemResult)
                         }
@@ -109,9 +108,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         return changeCartItemResultState == ChangeCartItemResultState.Fail
     }
 
-    private suspend fun addCartItemResult(
-        product: Product,
-    ): UpdateCartItemResult {
+    private suspend fun addCartItemResult(product: Product): UpdateCartItemResult {
         return addCartItem(product)
             .mapCatching {
                 UpdateCartItemResult.ADD
@@ -136,7 +133,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
             }.getOrThrow()
     }
 
-    private suspend fun deleteCartItemResult(cartItemResult: CartItemResult):UpdateCartItemResult {
+    private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
         return deleteCartItem(cartItemResult.cartItemId)
             .mapCatching {
                 UpdateCartItemResult.DELETE(cartItemResult.cartItemId)

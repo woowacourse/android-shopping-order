@@ -43,26 +43,28 @@ class ProductListViewModel(
         loadPagingRecentlyProduct()
     }
 
-    fun loadPagingProduct() = viewModelScope.launch {
-        val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-        productRepository.loadPagingProducts(itemSize)
-            .onSuccess {
-                _products.value = _products.value?.plus(it)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadPagingProduct() =
+        viewModelScope.launch {
+            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+            productRepository.loadPagingProducts(itemSize)
+                .onSuccess {
+                    _products.value = _products.value?.plus(it)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
-    fun loadPagingRecentlyProduct() = viewModelScope.launch {
-        recentlyProductRepository.getRecentlyProductList()
-            .onSuccess {
-                _recentlyProducts.value = it
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadPagingRecentlyProduct() =
+        viewModelScope.launch {
+            recentlyProductRepository.getRecentlyProductList()
+                .onSuccess {
+                    _recentlyProducts.value = it
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     private fun updateCarItem(
         product: Product,
@@ -76,11 +78,12 @@ class ProductListViewModel(
                 when (updateCartItemResult) {
                     UpdateCartItemResult.ADD -> addCartItem(product)
                     is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                    is UpdateCartItemResult.UPDATED -> updateCartItem(
-                        product = product,
-                        itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
-                        updateCartItemType = updateCartItemType,
-                    )
+                    is UpdateCartItemResult.UPDATED ->
+                        updateCartItem(
+                            product = product,
+                            itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
+                            updateCartItemType = updateCartItemType,
+                        )
                 }
             }.onFailure {
                 handleException(ErrorEvent.UpdateCartEvent())
@@ -121,15 +124,16 @@ class ProductListViewModel(
         _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
     }
 
-    private fun updateTotalCartItemCount()= viewModelScope.launch {
-        shoppingCartRepository.getTotalCartItemCount()
-            .onSuccess {
-                _cartItemCount.value = it
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    private fun updateTotalCartItemCount() =
+        viewModelScope.launch {
+            shoppingCartRepository.getTotalCartItemCount()
+                .onSuccess {
+                    _cartItemCount.value = it
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     fun updateProducts(items: Map<Long, Int>) {
         products.value?.forEach { product ->

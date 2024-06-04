@@ -53,7 +53,6 @@ class CartItemDataSourceImpl(
             .recoverCatching {
                 CartItemResult(CartItem.DEFAULT_CART_ITEM_ID, CartItemCounter())
             }
-
     }
 
     override suspend fun addCartItem(
@@ -63,10 +62,10 @@ class CartItemDataSourceImpl(
         return runCatching {
             cartApiService.insertCartItem(
                 cartItemRequest =
-                CartItemRequest(
-                    productId = productId,
-                    quantity = quantity,
-                ),
+                    CartItemRequest(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
             )
         }
     }

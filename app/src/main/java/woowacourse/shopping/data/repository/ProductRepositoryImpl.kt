@@ -5,7 +5,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.service.ProductService
 import woowacourse.shopping.utils.exception.ErrorEvent
-import kotlin.concurrent.thread
 
 class ProductRepositoryImpl : ProductRepository {
     private val mockProductService: ProductService = MockProductService()

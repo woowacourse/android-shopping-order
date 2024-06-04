@@ -109,7 +109,7 @@ class RemoteShoppingCartRepositoryImpl(
             }.getOrThrow()
     }
 
-    private suspend fun deleteCartItemResult(cartItemResult: CartItemResult):UpdateCartItemResult {
+    private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
         return deleteCartItem(cartItemResult.cartItemId)
             .mapCatching {
                 UpdateCartItemResult.DELETE(cartItemResult.cartItemId)

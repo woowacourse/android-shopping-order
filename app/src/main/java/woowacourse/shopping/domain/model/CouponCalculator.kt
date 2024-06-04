@@ -7,11 +7,11 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 class CouponCalculator(
     private val shoppingCart: ShoppingCart,
 ) {
-    private val _discountPrice : MutableLiveData<Int> = MutableLiveData(DEFAULT_PRICE)
+    private val _discountPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_PRICE)
     val discountPrice: LiveData<Int> get() = _discountPrice
 
-    fun selectCoupon(coupon: Coupon){
-        when(coupon){
+    fun selectCoupon(coupon: Coupon) {
+        when (coupon) {
             Coupon.FIXED5000 -> setCouponFIXED5000()
             Coupon.BOGO -> setCouponBOGO()
             Coupon.FREESHIPPING -> setCouponFREESHIPPING()
@@ -19,22 +19,19 @@ class CouponCalculator(
         }
     }
 
-    private fun setCouponFIXED5000(){
-
+    private fun setCouponFIXED5000() {
     }
 
-    private fun setCouponBOGO(){
-
+    private fun setCouponBOGO() {
     }
 
-    private fun setCouponFREESHIPPING(){
+    private fun setCouponFREESHIPPING() {
     }
 
-    private fun setCouponMIRACLESALE(){
-
+    private fun setCouponMIRACLESALE() {
     }
 
-    fun matchCoupon(couponCode:String): Coupon {
+    fun matchCoupon(couponCode: String): Coupon {
         return Coupon.matchCoupon(couponCode)
     }
 

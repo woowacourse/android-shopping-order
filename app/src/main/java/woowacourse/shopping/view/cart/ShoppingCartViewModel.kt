@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -36,19 +35,20 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun loadPagingCartItemList() = viewModelScope.launch {
-        shoppingCartRepository.loadPagingCartItems(
-            LOAD_SHOPPING_ITEM_OFFSET,
-            LOAD_SHOPPING_ITEM_SIZE,
-        )
-            .onSuccess { pagingData ->
-                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
-                setAllCheck()
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadPagingCartItemList() =
+        viewModelScope.launch {
+            shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            )
+                .onSuccess { pagingData ->
+                    shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+                    setAllCheck()
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     private fun setAllCheck() {
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }

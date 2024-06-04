@@ -1,10 +1,9 @@
 package woowacourse.shopping.view
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
-import woowacourse.shopping.utils.exception.ErrorEvent
 
 open class BaseViewModel : ViewModel() {
     private val _errorEvent: MutableSingleLiveData<ErrorEvent> = MutableSingleLiveData()
