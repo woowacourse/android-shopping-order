@@ -19,13 +19,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="@{() -> onProductItemClickListener.onClick(product.id)}"
-        android:padding="10dp">
+        android:paddingHorizontal="4dp">
 
         <ImageView
             android:id="@+id/holder_product_history_img"
             imageUrl="@{product.imgUrl}"
             android:layout_width="98dp"
             android:layout_height="98dp"
+            android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
@@ -34,6 +35,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{product.name}"
