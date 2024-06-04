@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.ShoppingProduct
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class RecommendAdapter(
-    private val recommendItemCountHandler: RecommendItemCountHandler,
+    private val recommendItemCountHandler: CounterHandler,
 ) : RecyclerView.Adapter<RecommendViewHolder>() {
     private var recommendItems: List<ShoppingProduct> = emptyList()
 

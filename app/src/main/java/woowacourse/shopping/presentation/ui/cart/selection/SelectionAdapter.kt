@@ -5,10 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class SelectionAdapter(
     private val selectionEventHandler: SelectionEventHandler,
-    private val selectionCountHandler: SelectionCountHandler,
+    private val selectionCountHandler: CounterHandler,
 ) : RecyclerView.Adapter<SelectionViewHolder>() {
     private var cartItems: List<CartItem> = emptyList()
 

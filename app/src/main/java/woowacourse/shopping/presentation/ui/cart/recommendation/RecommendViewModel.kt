@@ -12,12 +12,13 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class RecommendViewModel(
     private val cartRepository: CartRepository,
     private val shoppingRepository: ShoppingItemsRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), RecommendItemCountHandler {
+) : ViewModel(), CounterHandler {
     private val _order: MutableLiveData<Order> = MutableLiveData()
     val order: LiveData<Order>
         get() = _order

@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingProduct
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 import woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler
-import woowacourse.shopping.presentation.ui.shopping.ShoppingItemCountHandler
 import woowacourse.shopping.presentation.ui.shopping.adapter.viewholder.ShoppingViewHolder
 
 class ShoppingAdapter(
     private val shoppingEventHandler: ShoppingEventHandler,
-    private val shoppingItemCountHandler: ShoppingItemCountHandler,
+    private val shoppingItemCountHandler: CounterHandler,
 ) : ListAdapter<ShoppingProduct, ShoppingViewHolder>(diffCallback) {
     private var products: List<Product> = emptyList()
     private var shoppingProducts: List<ShoppingProduct> = emptyList()

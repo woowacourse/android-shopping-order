@@ -9,12 +9,13 @@ import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class SelectionViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel(),
     SelectionEventHandler,
-    SelectionCountHandler {
+    CounterHandler {
     private val pageSize = PAGE_SIZE
 
     private val _currentPage = MutableLiveData(DEFAULT_PAGE)

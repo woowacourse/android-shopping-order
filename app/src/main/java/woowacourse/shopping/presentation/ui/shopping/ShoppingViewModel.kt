@@ -12,12 +12,13 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class ShoppingViewModel(
     val shoppingItemsRepository: ShoppingItemsRepository,
     val cartItemsRepository: CartRepository,
     val recentProductRepository: RecentProductRepository,
-) : ViewModel(), ShoppingEventHandler, ShoppingItemCountHandler {
+) : ViewModel(), ShoppingEventHandler, CounterHandler {
     private val _products = MutableLiveData<List<Product>>()
 
     val products: LiveData<List<Product>>

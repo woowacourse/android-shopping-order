@@ -9,13 +9,14 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
+import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
     private val shoppingRepository: ShoppingItemsRepository,
     private val recentProductRepository: RecentProductRepository,
     val productId: Long,
-) : ViewModel(), DetailEventHandler, DetailCounterHandler {
+) : ViewModel(), DetailEventHandler, CounterHandler {
     private val _shoppingProduct = MutableLiveData<ShoppingProduct>()
     val shoppingProduct: LiveData<ShoppingProduct>
         get() = _shoppingProduct
