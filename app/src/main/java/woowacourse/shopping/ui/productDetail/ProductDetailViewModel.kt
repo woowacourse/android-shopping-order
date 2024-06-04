@@ -82,10 +82,7 @@ class ProductDetailViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val currentProductCount = _productCount.value
-        if (currentProductCount == 1) {
-            return
-        }
+        if (productCount.value == MINIMUM_QUANTITY) return
         _productCount.value = _productCount.value?.minus(1)
     }
 
@@ -95,6 +92,7 @@ class ProductDetailViewModel(
 
     companion object {
         private const val TAG = "ProductDetailViewModel"
+        private const val MINIMUM_QUANTITY = 1
 
         fun factory(
             productId: Long,
