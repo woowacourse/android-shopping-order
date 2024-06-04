@@ -107,18 +107,7 @@ class ProductListViewModel(
                 cartItemRepository.addCartItem(productId, quantity)
             } finally {
                 val totalCount = productsRepository.shoppingCartProductQuantity()
-
-                uiHandler.post {
-                    _loadedProducts.value =
-                        _loadedProducts.value?.map {
-                            if (it.id == productId) {
-                                it.copy(quantity = it.quantity + 1)
-                            } else {
-                                it
-                            }
-                        }
-                    _cartProductTotalCount.value = totalCount
-                }
+                updateProductQuantity(productId, INCREASE_VARIATION, totalCount)
             }
         }
     }
@@ -129,21 +118,20 @@ class ProductListViewModel(
     ) {
         thread {
             cartItemRepository.decreaseCartProduct(productId, quantity)
-
             val totalCount = productsRepository.shoppingCartProductQuantity()
-
-            uiHandler.post {
-                _loadedProducts.value =
-                    _loadedProducts.value?.map {
-                        if (it.id == productId) {
-                            it.copy(quantity = it.quantity - 1)
-                        } else {
-                            it
-                        }
-                    }
-                _cartProductTotalCount.value = totalCount
-            }
+            updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
             return@thread
+        }
+    }
+
+    private fun updateProductQuantity(productId: Long, variation: Int, totalCount: Int) {
+        uiHandler.post {
+            _loadedProducts.value =
+                loadedProducts.value?.map { product ->
+                    val quantity: Int = product.quantity + variation
+                    product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
+                }
+            _cartProductTotalCount.value = totalCount
         }
     }
 
@@ -151,6 +139,8 @@ class ProductListViewModel(
         private const val TAG = "ProductListViewModel"
         private const val FIRST_PAGE = 1
         private const val PAGE_MOVE_COUNT = 1
+        private const val INCREASE_VARIATION = 1
+        private const val DECREASE_VARIATION = -1
 
         fun factory(
             productRepository: ProductRepository =
