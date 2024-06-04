@@ -176,6 +176,8 @@ class CartViewModel(
                     } else {
                         updateCartItems(selectedCartId, updatedCartItem = selectedItem.copy(quantity = updatedQuantity))
                     }
+                    _changedCartProducts[productId] = updatedQuantity
+                    updateRecommendedProducts(productId, updatedQuantity)
                 }
                 is NetworkResult.Error -> {
                     _error.value = Event(CartError.CartItemsNotModified)
