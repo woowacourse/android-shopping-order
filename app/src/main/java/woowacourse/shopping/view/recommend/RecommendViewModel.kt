@@ -16,12 +16,12 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.utils.exception.ErrorEvent
 
 class RecommendViewModel(
     private val orderRepository: OrderRepository,
@@ -81,9 +81,7 @@ class RecommendViewModel(
 
     private fun orderItems() {
         val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        runCatching {
-            orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
-        }
+        orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
             .onSuccess {
                 _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
             }

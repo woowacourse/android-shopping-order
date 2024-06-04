@@ -28,7 +28,6 @@ class CouponCalculator(
     }
 
     private fun setCouponFREESHIPPING(){
-
     }
 
     private fun setCouponMIRACLESALE(){

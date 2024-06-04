@@ -9,11 +9,5 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
 ) : OrderRepository {
-    override fun orderShoppingCart(ids: List<Int>): Result<Unit> {
-        executeWithLatch {
-            val response = orderDataSource.orderItems(ids = ids).execute()
-            if (!response.isSuccessful) throw ErrorEvent.OrderItemsEvent()
-        }
-        return Result.success(Unit)
-    }
+    override fun orderShoppingCart(ids: List<Int>): Result<Unit> = orderDataSource.orderItems(ids = ids)
 }
