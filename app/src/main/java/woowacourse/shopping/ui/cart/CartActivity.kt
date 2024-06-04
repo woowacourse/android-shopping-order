@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
@@ -84,7 +83,8 @@ class CartActivity : AppCompatActivity() {
                 showToastFailureCreateOrder()
             }
         }
-        viewModel.navigateEvent.observeEvent(this) {
+        viewModel.navigateEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
             if (isVisibleCartSelectionFragment()) {
                 addFragment(cartRecommendFragment)
             } else {
