@@ -1,9 +1,10 @@
 package woowacourse.shopping.data.order
 
 import woowacourse.shopping.data.history.ProductHistoryDataSource
-import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.order.OrderRepository
+import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
 
 class OrderRemoteRepository(
     private val orderDataSource: OrderRemoteDataSource,
@@ -14,8 +15,9 @@ class OrderRemoteRepository(
         orderDataSource.order(cartItemIds)
     }
 
-    override fun recommendedProducts(): List<ProductData> {
+    override fun recommendedProducts(): List<Product> {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
-        return productDataSource.findByCategory(productId)
+        val productsDto = productDataSource.findByCategory(productId)
+        return productsDto.map { productDto -> productDto.toDomain() }
     }
 }

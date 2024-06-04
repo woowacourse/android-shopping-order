@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.order.OrderRemoteRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
@@ -79,9 +78,7 @@ class OrderViewModel(
 
     fun loadRecommendedProducts() {
         thread {
-            _recommendProducts.postValue(
-                orderRepository.recommendedProducts().map { it.toDomain() },
-            )
+            _recommendProducts.postValue(orderRepository.recommendedProducts())
         }
     }
 

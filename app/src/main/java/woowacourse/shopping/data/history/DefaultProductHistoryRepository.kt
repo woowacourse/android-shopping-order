@@ -1,9 +1,10 @@
 package woowacourse.shopping.data.history
 
-import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
+import woowacourse.shopping.remote.product.ProductDto
+import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
 
 class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
@@ -24,12 +25,14 @@ class DefaultProductHistoryRepository(
         val id =
             productHistoryDataSource.loadProductHistory(productId)
                 ?: throw NoSuchElementException("there is no product history with id $productId")
-        return productDataSource.findById(id).toDomain(quantity = 0)
+        val productDto: ProductDto = productDataSource.findById(id)
+        return productDto.toDomain(quantity = 0)
     }
 
     override fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
-        return productDataSource.findById(productId).toDomain(quantity = 0)
+        val productDto: ProductDto = productDataSource.findById(productId)
+        return productDto.toDomain(quantity = 0)
     }
 
     override fun deleteAllProductHistory() {

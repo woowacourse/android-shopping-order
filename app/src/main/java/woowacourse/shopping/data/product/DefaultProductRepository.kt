@@ -4,15 +4,16 @@ import woowacourse.shopping.data.cart.CartItemDataSource
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.product.ProductRepository
+import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
 
 class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
     override fun loadAllProducts(page: Int): List<Product> {
-        val productsData = productDataSource.findByPaged(page)
-        return productsData.map { productData ->
-            productData.toDomain(productQuantity(productData.id))
+        val productsDto = productDataSource.findByPaged(page)
+        return productsDto.map { productDto ->
+            productDto.toDomain(productQuantity(productDto.id))
         }
     }
 

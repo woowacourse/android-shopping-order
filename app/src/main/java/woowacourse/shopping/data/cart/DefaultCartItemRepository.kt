@@ -2,20 +2,14 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
+import woowacourse.shopping.remote.cart.CartItemDto.Companion.toDomain
 import woowacourse.shopping.ui.model.CartItem
 
 class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
     override fun loadPagedCartItem(): List<CartItem> {
-        return cartItemDataSource.loadAllCartItems().map {
-            CartItem(
-                id = it.id,
-                quantity = it.quantity,
-                product = it.product,
-                checked = false,
-            )
-        }
+        return cartItemDataSource.loadAllCartItems().map { cartItemDto -> cartItemDto.toDomain() }
     }
 
     override fun addCartItem(
