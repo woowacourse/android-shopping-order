@@ -6,12 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment
@@ -24,7 +22,7 @@ class ProductListFragment : Fragment() {
         ProductListViewModel.factory()
     }
 
-    private val productsAdapter: ProductRecyclerViewAdapter by lazy { ProductRecyclerViewAdapter(viewModel, viewModel) }
+    private val productsAdapter: ProductListAdapter by lazy { ProductListAdapter(viewModel, viewModel) }
     private val historyAdapter: ProductHistoryAdapter by lazy { ProductHistoryAdapter(viewModel) }
 
     override fun onCreateView(
@@ -77,7 +75,7 @@ class ProductListFragment : Fragment() {
     private fun observeLoadedProducts() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
-                productsAdapter.updateAllLoadedProducts(products)
+                productsAdapter.submitList(products)
                 binding.productDetailList.visibility = View.VISIBLE
                 binding.shimmerProductList.visibility = View.GONE
                 binding.shimmerProductList.stopShimmer()

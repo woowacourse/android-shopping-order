@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.productList
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,8 +52,12 @@ class ProductListViewModel(
 
     fun loadAll() {
         thread {
-            val page = currentPage.value ?: currentPageIsNullException()
-            val result = productsRepository.allProductsUntilPage(page)
+            val page = currentPage.value.also {
+                Log.d(TAG, "page: $it")
+            } ?: currentPageIsNullException()
+            val result = productsRepository.allProductsUntilPage(page).also {
+                Log.d(TAG, "loadAll: $it")
+            }
             val totalCartCount = shoppingCartRepository.shoppingCartProductQuantity()
             val isLastPage = productsRepository.isFinalPage(page)
             val productHistory = productHistoryRepository.loadAllProductHistory()
@@ -72,7 +77,9 @@ class ProductListViewModel(
 
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
             val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.pagedProducts(nextPage)
+            val result = productsRepository.pagedProducts(nextPage).also {
+                Log.d(TAG, "loadNextPageProducts: $it")
+            }
             val totalCount = productsRepository.shoppingCartProductQuantity()
 
             uiHandler.post {
