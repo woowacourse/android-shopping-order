@@ -54,7 +54,7 @@ class CartRepositoryImpl(
             ),
         )
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit> = cartRemoteDataSource.deleteCartItems(id)
+    override fun deleteCartItem(id: Long): Result<Unit> = cartRemoteDataSource.deleteCartItems(id)
 
     override suspend fun getCartItemCounts(): Result<Int> =
         cartRemoteDataSource.getCartItemCounts().mapCatching {

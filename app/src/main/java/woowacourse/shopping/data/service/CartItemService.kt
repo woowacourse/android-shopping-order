@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.service
 
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -25,9 +26,9 @@ interface CartItemService {
     )
 
     @DELETE("/cart-items/{id}")
-    suspend fun deleteCartItem(
+    fun deleteCartItem(
         @Path("id") id: Long,
-    )
+    ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     suspend fun patchCartItem(
