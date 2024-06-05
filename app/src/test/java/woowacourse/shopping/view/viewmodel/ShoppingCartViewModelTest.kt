@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.viewmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,5 +35,4 @@ class ShoppingCartViewModelTest {
         val result = viewModel.shoppingCart.cartItems.getOrAwaitValue()
         Assertions.assertThat(result.size).isEqualTo(3)
     }
-
 }

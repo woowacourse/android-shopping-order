@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.viewmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +26,7 @@ class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
 
     @BeforeEach
-    fun setUp()  {
+    fun setUp() {
         productRepository = MockProductRepository()
         shoppingCartRepository = MockShoppingCartRepository()
         val recentlyProductRepository = MockRecentlyProductRepository()

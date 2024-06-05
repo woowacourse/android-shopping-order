@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.payment.model
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.domain.model.coupon.Coupon

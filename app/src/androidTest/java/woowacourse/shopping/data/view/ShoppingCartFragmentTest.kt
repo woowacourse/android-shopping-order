@@ -32,18 +32,19 @@ class ShoppingCartFragmentTest {
     private lateinit var context: Context
 
     @Before
-    fun setUp() = runTest {
-        context = ApplicationProvider.getApplicationContext()
-        database = CartItemDatabase.getInstance(context)
-        dao = database.cartItemDao()
-        dao.saveCartItem(TestFixture.makeCartItemEntity())
+    fun setUp() =
+        runTest {
+            context = ApplicationProvider.getApplicationContext()
+            database = CartItemDatabase.getInstance(context)
+            dao = database.cartItemDao()
+            dao.saveCartItem(TestFixture.makeCartItemEntity())
 
-        activityRule.scenario.onActivity { activity ->
-            activity.supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ShoppingCartFragment())
-                .commitNow()
+            activityRule.scenario.onActivity { activity ->
+                activity.supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ShoppingCartFragment())
+                    .commitNow()
+            }
         }
-    }
 
     @After
     fun clearDB() {

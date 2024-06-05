@@ -32,18 +32,19 @@ class RecommendFragmentTest {
     private lateinit var context: Context
 
     @Before
-    fun setUp() = runTest {
-        context = ApplicationProvider.getApplicationContext()
-        database = RecentlyProductDatabase.getInstance(context)
-        dao = database.recentlyProductDao()
-        dao.addRecentlyProduct(TestFixture.makeRecentlyProductEntity())
+    fun setUp() =
+        runTest {
+            context = ApplicationProvider.getApplicationContext()
+            database = RecentlyProductDatabase.getInstance(context)
+            dao = database.recentlyProductDao()
+            dao.addRecentlyProduct(TestFixture.makeRecentlyProductEntity())
 
-        activityRule.scenario.onActivity { activity ->
-            activity.supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, RecommendFragment())
-                .commitNow()
+            activityRule.scenario.onActivity { activity ->
+                activity.supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, RecommendFragment())
+                    .commitNow()
+            }
         }
-    }
 
     @After
     fun clearDB() {
