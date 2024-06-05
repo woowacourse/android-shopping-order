@@ -10,12 +10,12 @@ class CouponCalculator(
     private val _discountPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_PRICE)
     val discountPrice: LiveData<Int> get() = _discountPrice
 
-    fun selectCoupon(coupon: Coupon) {
-        when (coupon) {
-            Coupon.FIXED5000 -> setCouponFIXED5000()
-            Coupon.BOGO -> setCouponBOGO()
-            Coupon.FREESHIPPING -> setCouponFREESHIPPING()
-            Coupon.MIRACLESALE -> setCouponMIRACLESALE()
+    fun selectCoupon(couponType: CouponType) {
+        when (couponType) {
+            CouponType.FIXED5000 -> setCouponFIXED5000()
+            CouponType.BOGO -> setCouponBOGO()
+            CouponType.FREESHIPPING -> setCouponFREESHIPPING()
+            CouponType.MIRACLESALE -> setCouponMIRACLESALE()
         }
     }
 
@@ -29,10 +29,6 @@ class CouponCalculator(
     }
 
     private fun setCouponMIRACLESALE() {
-    }
-
-    fun matchCoupon(couponCode: String): Coupon {
-        return Coupon.matchCoupon(couponCode)
     }
 
     companion object {

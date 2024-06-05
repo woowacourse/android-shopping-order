@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class CouponDto(
     @SerializedName("availableTime")
-    val availableTime: AvailableTime? = null,
+    val availableTimeDto: AvailableTimeDto? = null,
     @SerializedName("code")
     val code: String,
     @SerializedName("description")

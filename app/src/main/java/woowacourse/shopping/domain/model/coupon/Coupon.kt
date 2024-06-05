@@ -1,17 +1,14 @@
 package woowacourse.shopping.domain.model.coupon
 
-import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.domain.model.selector.ItemSelector
 
-enum class Coupon {
-    FIXED5000,
-    BOGO,
-    FREESHIPPING,
-    MIRACLESALE,
-    ;
-
-    companion object {
-        fun matchCoupon(code: String): Coupon {
-            return Coupon.entries.find { it.name == code } ?: throw ErrorEvent.LoadCouponEvent()
-        }
-    }
-}
+data class Coupon(
+    val id: Int,
+    val expirationDate: String,
+    val couponType: CouponType,
+    val description: String,
+    val discountType : String,
+    val discount: Int,
+    val availableTime : AvailableTime?,
+    val itemSelector: ItemSelector = ItemSelector(),
+)
