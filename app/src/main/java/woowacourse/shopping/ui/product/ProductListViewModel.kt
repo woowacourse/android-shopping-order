@@ -5,11 +5,11 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.MutableSingleLiveData
+import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.SingleLiveData
-import woowacourse.shopping.UniversalViewModelFactory
-import woowacourse.shopping.currentPageIsNullException
+import woowacourse.shopping.common.SingleLiveData
+import woowacourse.shopping.common.UniversalViewModelFactory
+import woowacourse.shopping.common.currentPageIsNullException
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.history.DefaultProductHistoryRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
@@ -17,8 +17,8 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnProductItemClickListener
 import kotlin.concurrent.thread
 
 class ProductListViewModel(

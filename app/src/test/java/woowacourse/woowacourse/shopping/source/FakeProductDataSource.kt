@@ -1,6 +1,5 @@
 package woowacourse.shopping.source
 
-import woowacourse.shopping.NumberPagingStrategy
 import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.product.ProductDataSource
 

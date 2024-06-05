@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.model.OrderInformation
+import woowacourse.shopping.ui.order.adapter.RecommendProductAdapter
 import java.io.Serializable
 
 class OrderFragment : Fragment() {

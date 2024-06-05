@@ -5,19 +5,19 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.MutableSingleLiveData
+import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.SingleLiveData
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.common.SingleLiveData
+import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
 import woowacourse.shopping.ui.model.CartItem
-import woowacourse.shopping.ui.order.OrderInformation
+import woowacourse.shopping.ui.model.OrderInformation
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(

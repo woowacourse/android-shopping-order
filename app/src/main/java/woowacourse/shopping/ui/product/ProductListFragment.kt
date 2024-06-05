@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.ui.FragmentNavigator
 import woowacourse.shopping.ui.product.adapter.ProductAdapter

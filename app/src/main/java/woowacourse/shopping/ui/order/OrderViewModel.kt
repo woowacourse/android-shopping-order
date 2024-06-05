@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.UniversalViewModelFactory
+import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.order.OrderRemoteRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
@@ -14,8 +14,10 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.OrderInformation
+import woowacourse.shopping.ui.order.listener.OnOrderListener
 import kotlin.concurrent.thread
 
 class OrderViewModel(

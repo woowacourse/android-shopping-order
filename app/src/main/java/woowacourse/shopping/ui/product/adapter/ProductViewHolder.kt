@@ -3,8 +3,8 @@ package woowacourse.shopping.ui.product.adapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderProductBinding
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnProductItemClickListener
 
 class ProductViewHolder(
     private val binding: HolderProductBinding,

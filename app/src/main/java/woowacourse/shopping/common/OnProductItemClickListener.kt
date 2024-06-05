@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.common
 
 interface OnProductItemClickListener {
     fun onClick(productId: Long)

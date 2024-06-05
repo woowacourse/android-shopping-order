@@ -3,7 +3,6 @@ package woowacourse.shopping.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.NumberPagingStrategy
 import woowacourse.shopping.data.product.ProductDataSource
 
 class DummyProductsDataSourceTest {

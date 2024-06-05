@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.HandleResponseResult.handleResponseResult
-import woowacourse.shopping.data.ResponseResult
+import woowacourse.shopping.data.common.HandleResponseResult.handleResponseResult
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.remote.product.ProductDto
 import woowacourse.shopping.remote.product.ProductResponse
 import woowacourse.shopping.remote.product.ProductsApiService

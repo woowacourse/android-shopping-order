@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.common
 
 sealed interface ResponseResult<T : Any> {
     class Success<T : Any>(val data: T) : ResponseResult<T>

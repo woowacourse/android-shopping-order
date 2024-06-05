@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.NumberPagingStrategy
 import woowacourse.shopping.productTestFixture
 
 class DummyShoppingCartItemRepositoryTest {

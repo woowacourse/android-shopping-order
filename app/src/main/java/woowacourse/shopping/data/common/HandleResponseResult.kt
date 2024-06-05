@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.common
 
 import retrofit2.HttpException
 import retrofit2.Response

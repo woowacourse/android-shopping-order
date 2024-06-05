@@ -8,7 +8,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.order.OrderFragment
 import woowacourse.shopping.ui.order.OrderFragment.Companion.ORDER_INFORMATION
-import woowacourse.shopping.ui.order.OrderInformation
+import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.product.ProductListFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment.Companion.PRODUCT_ID

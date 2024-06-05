@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.product
 
-import woowacourse.shopping.data.ResponseResult
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.remote.product.ProductDto
 import woowacourse.shopping.remote.product.ProductResponse
 

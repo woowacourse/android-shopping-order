@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.history
 
-import woowacourse.shopping.data.ResponseResult
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository

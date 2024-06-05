@@ -12,11 +12,11 @@
 
         <variable
             name="onProductItemClickListener"
-            type="woowacourse.shopping.ui.OnProductItemClickListener" />
+            type="woowacourse.shopping.common.OnProductItemClickListener" />
 
         <variable
             name="onItemChargeListener"
-            type="woowacourse.shopping.ui.OnItemQuantityChangeListener" />
+            type="woowacourse.shopping.common.OnItemQuantityChangeListener" />
 
     </data>
 

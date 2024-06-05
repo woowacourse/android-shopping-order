@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order
+package woowacourse.shopping.ui.order.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderProductBinding
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnItemQuantityChangeListener
 
 class RecommendProductAdapter(
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,

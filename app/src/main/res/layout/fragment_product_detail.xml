@@ -19,11 +19,11 @@
 
         <variable
             name="onItemChargeListener"
-            type="woowacourse.shopping.ui.OnItemQuantityChangeListener" />
+            type="woowacourse.shopping.common.OnItemQuantityChangeListener" />
 
         <variable
             name="onProductClickListener"
-            type="woowacourse.shopping.ui.OnProductItemClickListener" />
+            type="woowacourse.shopping.common.OnProductItemClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

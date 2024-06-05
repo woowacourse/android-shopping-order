@@ -16,7 +16,7 @@
 
         <variable
             name="onItemChargeListener"
-            type="woowacourse.shopping.ui.OnItemQuantityChangeListener" />
+            type="woowacourse.shopping.common.OnItemQuantityChangeListener" />
 
         <variable
             name="onCartItemSelectedListener"

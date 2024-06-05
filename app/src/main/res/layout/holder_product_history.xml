@@ -11,7 +11,7 @@
 
         <variable
             name="onProductItemClickListener"
-            type="woowacourse.shopping.ui.OnProductItemClickListener" />
+            type="woowacourse.shopping.common.OnProductItemClickListener" />
 
     </data>
 
