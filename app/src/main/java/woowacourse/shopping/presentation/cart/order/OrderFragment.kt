@@ -13,9 +13,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
-import woowacourse.shopping.data.shopping.ShoppingRepositoryInjector
+import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentOrderProductBinding
-import woowacourse.shopping.domain.RecommendProductsUseCase
+import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultOrderCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
@@ -31,13 +34,15 @@ class OrderFragment :
             arguments?.parcelable<OrderNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
                 ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
-        val shoppingRepository =
-            ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
+        val productRepository =
+            ProductRepositoryInjector.productRepository(requireContext().applicationContext)
         OrderViewModel.factory(
             orders,
-            cartRepository,
+            DefaultOrderCartProductsUseCase.instance(productRepository, cartRepository),
+            DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
+            DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
             RecommendProductsUseCase(
-                shoppingRepository,
+                productRepository,
                 cartRepository,
             ),
         )
@@ -129,10 +134,6 @@ class OrderFragment :
             when (it) {
                 OrderErrorEvent.OrderProducts -> {
                     showToast(R.string.error_msg_order_products)
-                }
-
-                OrderErrorEvent.DeleteCartProduct -> {
-                    showToast(R.string.error_msg_delete_cart_product)
                 }
 
                 OrderErrorEvent.IncreaseCartProduct -> {

@@ -12,8 +12,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
-import woowacourse.shopping.data.shopping.ShoppingRepositoryInjector
+import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
+import woowacourse.shopping.domain.usecase.DefaultCreateCartProductUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
@@ -27,9 +28,9 @@ class ProductDetailFragment :
         val cartRepository =
             CartRepositoryInjector.cartRepository()
         val shoppingRepository =
-            ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
+            ProductRepositoryInjector.productRepository(requireContext().applicationContext)
         ProductDetailViewModel.factory(
-            cartRepository,
+            DefaultCreateCartProductUseCase.instance(cartRepository, shoppingRepository),
             shoppingRepository,
         )
     }
@@ -42,7 +43,7 @@ class ProductDetailFragment :
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             val id = arguments?.getLong(PRODUCT_ID, -1) ?: return
-            viewModel.loadCartProduct(id)
+            viewModel.loadProduct(id)
         }
     }
 
@@ -85,7 +86,7 @@ class ProductDetailFragment :
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) { event ->
             when (event) {
-                ProductDetailErrorEvent.LoadCartProduct -> showToast(R.string.error_msg_load_cart_products)
+                ProductDetailErrorEvent.LoadProduct -> showToast(R.string.error_msg_load_cart_products)
                 ProductDetailErrorEvent.AddCartProduct -> showToast(R.string.error_msg_update_cart_products)
                 ProductDetailErrorEvent.DecreaseCartCount -> showToast(R.string.error_msg_decrease_cart_count_limit)
                 ProductDetailErrorEvent.SaveRecentProduct -> showToast(R.string.error_msg_save_recent_product)

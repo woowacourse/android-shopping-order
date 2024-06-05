@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
-import woowacourse.shopping.data.shopping.ShoppingRepositoryInjector
+import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentProductListBinding
+import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultLoadCartUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
@@ -27,11 +30,16 @@ import woowacourse.shopping.presentation.util.showToast
 class ProductListFragment :
     BindingFragment<FragmentProductListBinding>(R.layout.fragment_product_list) {
     private val viewModel by viewModels<ProductListViewModel> {
-        val shoppingRepository =
-            ShoppingRepositoryInjector.shoppingRepository(requireContext().applicationContext)
+        val productRepository =
+            ProductRepositoryInjector.productRepository(requireContext().applicationContext)
         val cartRepository =
             CartRepositoryInjector.cartRepository()
-        ProductListViewModel.factory(shoppingRepository, cartRepository)
+        ProductListViewModel.factory(
+            productRepository,
+            DefaultLoadCartUseCase.instance(cartRepository),
+            DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
+            DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
+        )
     }
 
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()

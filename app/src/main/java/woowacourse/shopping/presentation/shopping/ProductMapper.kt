@@ -19,5 +19,9 @@ fun Product.toUiModel(): ProductUi {
 }
 
 fun Product.toCartUiModel(initCount: Int = 1): CartProductUi {
-    return CartProductUi(toUiModel(), initCount)
+    return CartProductUi(product = toUiModel(), count = initCount)
+}
+
+fun ProductUi.toDomain(): Product {
+    return Product(id, price, name, imageUrl, category)
 }

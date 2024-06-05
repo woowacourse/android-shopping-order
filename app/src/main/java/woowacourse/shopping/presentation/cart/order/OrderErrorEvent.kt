@@ -5,7 +5,5 @@ sealed interface OrderErrorEvent {
 
     data object DecreaseCartProduct : OrderErrorEvent
 
-    data object DeleteCartProduct : OrderErrorEvent
-
     data object OrderProducts : OrderErrorEvent
 }

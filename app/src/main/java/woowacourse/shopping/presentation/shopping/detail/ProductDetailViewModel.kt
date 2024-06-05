@@ -4,17 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ShoppingRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.usecase.CreateCartProductUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
-import woowacourse.shopping.presentation.cart.toUiModel
+import woowacourse.shopping.presentation.cart.toDomain
 import woowacourse.shopping.presentation.shopping.toCartUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 
 class ProductDetailViewModel(
-    private val cartRepository: CartRepository,
-    private val shoppingRepository: ShoppingRepository,
+    private val createCartUseCase: CreateCartProductUseCase,
+    private val productRepository: ProductRepository,
 ) : ViewModel(), DetailProductListener {
     private val _uiState = MutableLiveData<ProductDetailUiState>(ProductDetailUiState.init())
     val uiState: LiveData<ProductDetailUiState> get() = _uiState
@@ -36,26 +36,22 @@ class ProductDetailViewModel(
         loadRecentProduct()
     }
 
-    fun loadCartProduct(id: Long) {
-        shoppingRepository.saveRecentProduct(id)
-        cartRepository.filterCartProducts(listOf(id)).onSuccess {
-            if (it.isEmpty()) {
-                return loadProduct(id)
-            }
-            // TODO: Page가 0부터 시작인걸 알아야혀
-            _uiState.value = uiState.value?.copy(cartProduct = it.first().toUiModel())
+    fun loadProduct(id: Long) {
+        productRepository.saveRecentProduct(id)
+        productRepository.findProductById(id).onSuccess {
+            _uiState.value = uiState.value?.copy(cartProductUi = it.toCartUiModel())
         }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+            _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
         }
     }
 
     fun refreshCartProduct() {
-        val id = _uiState.value?.cartProduct?.product?.id ?: return
-        loadCartProduct(id)
+        val id = _uiState.value?.cartProductUi?.product?.id ?: return
+        loadProduct(id)
     }
 
     override fun increaseProductCount(id: Long) {
-        val newUiState = uiState.value?.increaseProductCount(INCREMENT_AMOUNT) ?: return
+        val newUiState = uiState.value?.increaseProductCount() ?: return
         _uiState.value = newUiState
     }
 
@@ -63,13 +59,13 @@ class ProductDetailViewModel(
         if (uiState.value?.canDecreaseProductCount() != true) {
             return _errorEvent.setValue(ProductDetailErrorEvent.DecreaseCartCount)
         }
-        val newUiState = uiState.value?.decreaseProductCount(INCREMENT_AMOUNT) ?: return
+        val newUiState = uiState.value?.decreaseProductCount() ?: return
         _uiState.value = newUiState
     }
 
     override fun addCartProduct() {
-        val cartProduct = uiState.value?.cartProduct ?: return
-        cartRepository.updateCartProduct(cartProduct.product.id, cartProduct.count).onSuccess {
+        val cartProduct = uiState.value?.cartProductUi ?: return
+        createCartUseCase(cartProduct.product.id, cartProduct.count).onSuccess {
             _addCartEvent.setValue(Unit)
             _updateCartEvent.setValue(Unit)
         }.onFailure {
@@ -79,51 +75,42 @@ class ProductDetailViewModel(
 
     fun navigateToRecentProduct() {
         val recentId = _uiState.value?.recentProduct?.id ?: return
-        shoppingRepository.saveRecentProduct(recentId).onSuccess {
+        productRepository.saveRecentProduct(recentId).onSuccess {
             _recentProductEvent.setValue(recentId)
         }.onFailure {
             _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
         }
     }
 
-    private fun loadProduct(id: Long) {
-        shoppingRepository.productById(id).onSuccess {
-            _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
-        }
-    }
-
     private fun loadRecentProduct() {
-        shoppingRepository.recentProducts(1).onSuccess {
+        productRepository.loadRecentProducts(1).onSuccess {
             if (it.isEmpty()) return
             _uiState.value = uiState.value?.copy(recentProduct = it.first())
         }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+            _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
         }
     }
 
     companion object {
-        private const val INCREMENT_AMOUNT = 1
-
         fun factory(
-            cartRepository: CartRepository,
-            shoppingRepository: ShoppingRepository,
+            createCartUseCase: CreateCartProductUseCase,
+            productRepository: ProductRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 ProductDetailViewModel(
-                    cartRepository,
-                    shoppingRepository,
+                    createCartUseCase,
+                    productRepository,
                 )
             }
         }
     }
 }
 
-private fun ProductDetailUiState.increaseProductCount(amount: Int): ProductDetailUiState =
-    copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
+private fun ProductDetailUiState.increaseProductCount(): ProductDetailUiState =
+    copy(cartProductUi = cartProductUi.copy(count = cartProductUi.toDomain().increaseCount().count))
 
-private fun ProductDetailUiState.decreaseProductCount(amount: Int): ProductDetailUiState =
-    copy(cartProduct = cartProduct.copy(count = cartProduct.count - amount))
+private fun ProductDetailUiState.decreaseProductCount(): ProductDetailUiState =
+    copy(cartProductUi = cartProductUi.copy(count = cartProductUi.toDomain().decreaseCount().count))
 
-private fun ProductDetailUiState.canDecreaseProductCount(): Boolean = cartProduct.count > 1
+private fun ProductDetailUiState.canDecreaseProductCount(): Boolean =
+    cartProductUi.toDomain().canDecreaseCount()

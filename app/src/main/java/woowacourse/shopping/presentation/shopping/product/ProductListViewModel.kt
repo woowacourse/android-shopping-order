@@ -4,21 +4,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.entity.CartProduct
+import timber.log.Timber
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ShoppingRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.LoadCartUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.shopping.toShoppingUiModel
 import woowacourse.shopping.presentation.shopping.toUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
+import kotlin.concurrent.thread
 
 class ProductListViewModel(
-    private val shoppingRepository: ShoppingRepository,
-    private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
+    private val loadCartUseCase: LoadCartUseCase,
+    private val increaseCartProductUseCase: IncreaseCartProductUseCase,
+    private val decreaseCartProductUseCase: DecreaseCartProductUseCase,
 ) : ViewModel(), ProductItemListener {
-    private val _uiState = MutableLiveData(ProductListUiState(START_PAGE))
+    private val _uiState = MutableLiveData(ProductListUiState(currentPage = START_PAGE))
     val uiState: LiveData<ProductListUiState> get() = _uiState
 
     private val _navigateToDetailEvent = MutableSingleLiveData<Long>()
@@ -27,60 +33,77 @@ class ProductListViewModel(
     val errorEvent: SingleLiveData<ProductListErrorEvent> = _errorEvent
 
     init {
-        _uiState.value = _uiState.value?.copy(isLoading = true)
         loadProducts()
-        loadCartProducts()
         loadRecentProducts()
-        _uiState.value = _uiState.value?.copy(isLoading = false)
     }
 
     override fun loadProducts() {
         val uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
-        shoppingRepository.products(currentPage - 1, PAGE_SIZE)
+        productRepository.loadProducts(currentPage, PAGE_SIZE)
             .onSuccess {
                 val newProducts = it.map(Product::toShoppingUiModel)
-                _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
+                val nextPage = currentPage.plus(1)
+                _uiState.value = uiState.copy(
+                    products = uiState.products + newProducts,
+                    loadMoreModel = getLoadMore(nextPage),
+                )
+                loadCartProducts()
             }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
+                Timber.e(it)
+                _errorEvent.postValue(ProductListErrorEvent.LoadProducts)
             }
     }
 
     fun loadCartProducts() {
         val uiState = uiState.value ?: return
         val ids = uiState.products.map { it.id }
-        cartRepository.filterCartProducts(ids)
-            .onSuccess { newCartProducts ->
-                val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
-                _uiState.value = uiState.updateCartProducts(newProducts)
+        loadCartUseCase(ids).onSuccess { newCart ->
+            val newPage = uiState.currentPage + 1
+            _uiState.value =
+                uiState.updateCartProducts(
+                    newCart,
+                    getLoadMore(newPage)
+                )
+        }.onFailure {
+            Timber.e(it)
+            _errorEvent.postValue(ProductListErrorEvent.LoadCartProducts)
+        }
+    }
+
+    fun loadRecentProducts() {
+        val uiState = _uiState.value ?: return
+        thread {
+            productRepository.loadRecentProducts(RECENT_PRODUCT_COUNT).onSuccess {
+                _uiState.postValue(uiState.copy(recentProducts = it.map(Product::toUiModel)))
             }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
+                Timber.e(it)
+                _errorEvent.postValue(ProductListErrorEvent.LoadRecentProducts)
             }
+        }
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+        thread {
+            val uiState = _uiState.value ?: return@thread
+            increaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess { newCart ->
+                _uiState.postValue(uiState.increaseProductCount(id, newCart))
+            }.onFailure {
+                Timber.e(it)
+                _errorEvent.postValue(ProductListErrorEvent.IncreaseCartCount)
+            }
         }
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+        thread {
+            val uiState = _uiState.value ?: return@thread
+            decreaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess { newCart ->
+                _uiState.postValue(uiState.decreaseProductCount(id, newCart))
+            }.onFailure {
+                Timber.e(it)
+                _errorEvent.postValue(ProductListErrorEvent.DecreaseCartCount)
             }
-            return
-        }
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
         }
     }
 
@@ -88,20 +111,11 @@ class ProductListViewModel(
         _navigateToDetailEvent.setValue(id)
     }
 
-    fun loadRecentProducts() {
-        val uiState = _uiState.value ?: return
-        shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
-            _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
-        }
-    }
-
-    private fun getLoadMore(page: Int): List<ShoppingUiModel.LoadMore> {
-        return if (shoppingRepository.canLoadMore(page - 1, PAGE_SIZE).getOrNull() == true) {
-            listOf(ShoppingUiModel.LoadMore)
+    private fun getLoadMore(page: Int): ShoppingUiModel.LoadMore? {
+        return if (productRepository.canLoadMore(page, PAGE_SIZE).getOrNull() == true) {
+            ShoppingUiModel.LoadMore
         } else {
-            emptyList()
+            null
         }
     }
 
@@ -109,73 +123,72 @@ class ProductListViewModel(
         private const val RECENT_PRODUCT_COUNT = 10
         private const val PAGE_SIZE = 20
         private const val INCREMENT_AMOUNT = 1
-        private const val START_PAGE = 1
+        private const val START_PAGE = 0
 
         fun factory(
-            shoppingRepository: ShoppingRepository,
-            cartRepository: CartRepository,
+            productRepository: ProductRepository,
+            loadCartUseCase: LoadCartUseCase,
+            increaseCartProductUseCase: IncreaseCartProductUseCase,
+            decreaseCartProductUseCase: DecreaseCartProductUseCase,
         ): ViewModelProvider.Factory {
-            return BaseViewModelFactory { ProductListViewModel(shoppingRepository, cartRepository) }
+            return BaseViewModelFactory {
+                ProductListViewModel(
+                    productRepository,
+                    loadCartUseCase,
+                    increaseCartProductUseCase,
+                    decreaseCartProductUseCase
+                )
+            }
         }
     }
 }
 
-private fun ProductListUiState.addProducts(
-    newProducts: List<ShoppingUiModel.Product>,
-    loadMore: List<ShoppingUiModel.LoadMore>,
+private fun ProductListUiState.updateCartProducts(
+    cart: Cart,
+    loadMore: ShoppingUiModel.LoadMore?,
 ): ProductListUiState {
     return copy(
-        currentPage = currentPage + 1,
-        totalProducts = products + newProducts + loadMore,
-    )
-}
-
-private fun ProductListUiState.updateCartProducts(newCartProducts: List<ShoppingUiModel.Product>): ProductListUiState {
-    return copy(
-        totalProducts =
-            products.map { originalProduct ->
-                val newProduct =
-                    newCartProducts.find { newProduct -> newProduct.id == originalProduct.id }
-                        ?: return@map originalProduct.copy(count = 0)
-                originalProduct.copy(count = newProduct.count)
-            } + loadMoreModels,
+        cart = cart,
+        products = products.map { originalProduct ->
+            val cartProduct =
+                cart.findCartProductByProductId(originalProduct.id)
+                    ?: return@map originalProduct.copy(count = 0)
+            originalProduct.copy(count = cartProduct.count)
+        },
+        loadMoreModel = loadMore
     )
 }
 
 private fun ProductListUiState.increaseProductCount(
     productId: Long,
-    amount: Int,
-): ProductListUiState =
-    copy(
-        totalProducts =
-            totalProducts.map {
-                if (it is ShoppingUiModel.Product && it.id == productId) {
-                    it.copy(count = it.count + amount)
-                } else {
-                    it
-                }
-            },
+    newCart: Cart,
+): ProductListUiState {
+    val newProduct = newCart.findCartProductByProductId(productId) ?: return this
+    return copy(
+        cart = newCart,
+        products = products.map {
+            if (it.id == productId) it.copy(count = newProduct.count)
+            else it
+        },
     )
+}
 
 private fun ProductListUiState.decreaseProductCount(
     productId: Long,
-    amount: Int,
+    newCart: Cart,
 ): ProductListUiState {
-    val newProducts =
-        totalProducts.map {
-            if (it is ShoppingUiModel.Product && it.id == productId) {
-                it.copy(count = it.count - amount)
-            } else {
-                it
-            }
-        }
-    return copy(totalProducts = newProducts)
+    val newProduct = newCart.findCartProductByProductId(productId) ?: return copy(
+        newCart,
+        products = products.map {
+            if (it.id == productId) it.copy(count = 0)
+            else it
+        },
+    )
+    return copy(
+        cart = newCart,
+        products = products.map {
+            if (it.id == productId) it.copy(count = newProduct.count)
+            else it
+        },
+    )
 }
-
-private fun ProductListUiState.shouldDeleteFromCart(productId: Long): Boolean {
-    val product = findProduct(productId) ?: return false
-    return product.count <= 1
-}
-
-private fun ProductListUiState.findProduct(productId: Long): ShoppingUiModel.Product? =
-    totalProducts.filterIsInstance<ShoppingUiModel.Product>().find { it.id == productId }

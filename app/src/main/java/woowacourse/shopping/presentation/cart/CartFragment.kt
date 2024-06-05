@@ -12,7 +12,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
+import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentCartBinding
+import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultDeleteCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.DefaultLoadCartUseCase
+import woowacourse.shopping.domain.usecase.DefaultLoadPagingCartUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
@@ -24,7 +30,16 @@ class CartFragment :
     private val viewModel by viewModels<CartViewModel> {
         val cartRepository =
             CartRepositoryInjector.cartRepository()
-        CartViewModel.factory(cartRepository)
+        val productRepository =
+            ProductRepositoryInjector.productRepository(requireContext().applicationContext)
+        CartViewModel.factory(
+            cartRepository,
+            DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
+            DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
+            DefaultDeleteCartProductUseCase.instance(productRepository, cartRepository),
+            DefaultLoadCartUseCase.instance(cartRepository),
+            DefaultLoadPagingCartUseCase.instance(cartRepository),
+        )
     }
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()

@@ -4,18 +4,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.RecommendProductsUseCase
-import woowacourse.shopping.domain.repository.CartRepository
+import timber.log.Timber
+import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.OrderCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.shopping.toCartUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
+import kotlin.concurrent.thread
 
 class OrderViewModel(
     orders: List<CartProductUi>,
-    private val cartRepository: CartRepository,
+    private val orderCartProductsUseCase: OrderCartProductsUseCase,
+    private val decreaseCartProductUseCase: DecreaseCartProductUseCase,
+    private val increaseCartProductCountUseCase: IncreaseCartProductUseCase,
     recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel(), CartItemListener {
     private val _uiState = MutableLiveData(OrderUiState(orders))
@@ -44,53 +50,51 @@ class OrderViewModel(
     }
 
     fun orderProducts() {
-        val uiState = _uiState.value ?: return
-        cartRepository.orderCartProducts(uiState.totalOrderIds)
-            .onSuccess {
-                _updateCartEvent.setValue(Unit)
-                _finishOrderEvent.setValue(Unit)
-            }.onFailure {
-                _errorEvent.setValue(OrderErrorEvent.OrderProducts)
-            }
+        thread {
+            val uiState = _uiState.value ?: return@thread
+            orderCartProductsUseCase(uiState.totalOrderIds)
+                .onSuccess {
+                    _updateCartEvent.postValue(Unit)
+                    _finishOrderEvent.postValue(Unit)
+                }.onFailure {
+                    Timber.e(it)
+                    _errorEvent.postValue(OrderErrorEvent.OrderProducts)
+                }
+        }
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }.onFailure {
-                _errorEvent.setValue(OrderErrorEvent.IncreaseCartProduct)
-            }
+        thread {
+            val uiState = _uiState.value ?: return@thread
+            increaseCartProductCountUseCase(id, INCREMENT_AMOUNT)
+                .onSuccess {
+                    _uiState.postValue(
+                        uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                    )
+                    _updateCartEvent.postValue(Unit)
+                }.onFailure {
+                    Timber.e(it)
+                    _errorEvent.postValue(OrderErrorEvent.IncreaseCartProduct)
+                }
+        }
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value =
+        thread {
+            val uiState = _uiState.value ?: return@thread
+            decreaseCartProductUseCase(id).onSuccess {
+                _uiState.postValue(
                     uiState.decreaseProductCount(
                         id,
                         INCREMENT_AMOUNT,
                     )
-                _updateCartEvent.setValue(Unit)
+                )
+                _updateCartEvent.postValue(Unit)
             }.onFailure {
-                _errorEvent.setValue(OrderErrorEvent.DeleteCartProduct)
+                Timber.e(it)
+                _errorEvent.postValue(OrderErrorEvent.DecreaseCartProduct)
             }
-            return
         }
-        val product = uiState.findProduct(id) ?: return _updateCartEvent.setValue(Unit)
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }.onFailure {
-                _errorEvent.setValue(OrderErrorEvent.DecreaseCartProduct)
-            }
     }
 
     companion object {
@@ -98,13 +102,17 @@ class OrderViewModel(
 
         fun factory(
             orders: List<CartProductUi>,
-            cartRepository: CartRepository,
+            orderCartProductsUseCase: OrderCartProductsUseCase,
+            decreaseCartProductUseCase: DecreaseCartProductUseCase,
+            increaseCartProductCountUseCase: IncreaseCartProductUseCase,
             recommendProductsUseCase: RecommendProductsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 OrderViewModel(
                     orders,
-                    cartRepository,
+                    orderCartProductsUseCase,
+                    decreaseCartProductUseCase,
+                    increaseCartProductCountUseCase,
                     recommendProductsUseCase,
                 )
             }
@@ -141,11 +149,3 @@ private fun OrderUiState.decreaseProductCount(
         }
     return copy(recommendProducts = newProducts)
 }
-
-private fun OrderUiState.shouldDeleteFromCart(productId: Long): Boolean {
-    val product = findProduct(productId) ?: return false
-    return product.count <= 1
-}
-
-private fun OrderUiState.findProduct(productId: Long): CartProductUi? =
-    recommendProducts.find { it.product.id == productId }

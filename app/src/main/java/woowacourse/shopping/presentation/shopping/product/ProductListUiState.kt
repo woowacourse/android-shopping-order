@@ -1,16 +1,19 @@
 package woowacourse.shopping.presentation.shopping.product
 
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.presentation.shopping.detail.ProductUi
 
 data class ProductListUiState(
-    val currentPage: Int = 1,
+    val cart: Cart = Cart(),
+    val currentPage: Int = 0,
     val isLoading: Boolean = false,
-    val totalProducts: List<ShoppingUiModel> = emptyList(),
+    val products: List<ShoppingUiModel.Product> = emptyList(),
+    val loadMoreModel: ShoppingUiModel.LoadMore? = null,
     val recentProducts: List<ProductUi> = emptyList(),
 ) {
-    val products: List<ShoppingUiModel.Product>
-        get() = totalProducts.filterIsInstance<ShoppingUiModel.Product>()
-
-    val loadMoreModels: List<ShoppingUiModel.LoadMore>
-        get() = totalProducts.filterIsInstance<ShoppingUiModel.LoadMore>()
+    val totalProducts: List<ShoppingUiModel>
+        get() {
+            if (loadMoreModel == null) return products
+            return products + loadMoreModel
+        }
 }
