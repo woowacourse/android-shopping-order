@@ -4,31 +4,21 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity
 
 interface CartRepository {
-    fun findByProductId(
-        productId: Int,
-        callback: (Result<CartItem?>) -> Unit,
-    )
+    suspend fun findByProductId(productId: Int): Result<CartItem?>
 
-    fun syncFindByProductId(productId: Int): CartItem?
+    suspend fun findAll(): Result<List<CartItem>>
 
-    fun findAll(callback: (Result<List<CartItem>>) -> Unit)
+    suspend fun delete(id: Int): Result<Unit>
 
-    fun delete(
-        id: Int,
-        callback: (Result<Unit>) -> Unit,
-    )
-
-    fun add(
+    suspend fun add(
         productId: Int,
         quantity: Quantity = Quantity(1),
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun changeQuantity(
+    suspend fun changeQuantity(
         id: Int,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun getTotalQuantity(callback: (Result<Int>) -> Unit)
+    suspend fun getTotalQuantity(): Result<Int>
 }

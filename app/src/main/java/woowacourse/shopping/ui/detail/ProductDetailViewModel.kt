@@ -4,6 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -51,18 +55,19 @@ class ProductDetailViewModel(
     fun loadProduct() {
         productRepository.find(productId) {
             it.onSuccess { product ->
-                _productUiModel.value = product.toProductUiModel()
-                saveRecentProduct()
+                viewModelScope.launch {
+                    _productUiModel.value = product.toProductUiModel(this)
+                    saveRecentProduct()
+                }
             }.onFailure {
                 setError()
             }
         }
     }
 
-    private fun Product.toProductUiModel(): ProductUiModel {
-        val cartItem =
-            cartRepository.syncFindByProductId(id)
-                ?: return ProductUiModel.from(this)
+    private suspend fun Product.toProductUiModel(scope: CoroutineScope): ProductUiModel {
+        val cartItemDeferred = scope.async { cartRepository.findByProductId(id) }
+        val cartItem = cartItemDeferred.await().getOrNull() ?: return ProductUiModel.from(this)
         return ProductUiModel.from(this, cartItem.quantity)
     }
 
@@ -87,24 +92,22 @@ class ProductDetailViewModel(
         _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
     }
 
-    fun addCartProduct() {
-        val productUiModel = _productUiModel.value ?: return
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId)
+    fun addCartProduct() =
+        viewModelScope.launch {
+            val productUiModel = _productUiModel.value ?: return@launch
+            val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
 
-        val addCartCallback: (Result<Unit>) -> Unit = {
-            it.onSuccess {
-                _isSuccessAddCart.value = Event(true)
-            }.onFailure {
-                _isSuccessAddCart.value = Event(false)
-            }
-        }
+            val addCartResult =
+                if (cartItem == null) {
+                    cartRepository.add(productId, productUiModel.quantity)
+                } else {
+                    cartRepository.changeQuantity(cartItem.id, productUiModel.quantity)
+                }
 
-        if (cartItem == null) {
-            cartRepository.add(productId, productUiModel.quantity, addCartCallback)
-            return
+            addCartResult
+                .onSuccess { _isSuccessAddCart.value = Event(true) }
+                .onFailure { _isSuccessAddCart.value = Event(false) }
         }
-        cartRepository.changeQuantity(cartItem.id, productUiModel.quantity, addCartCallback)
-    }
 
     private fun setError() {
         _productLoadError.value = Event(Unit)

@@ -3,6 +3,10 @@ package woowacourse.shopping.ui.products
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -60,17 +64,25 @@ class ProductsViewModel(
         loadIsPageLast()
     }
 
-    private fun updateProductUiModels(products: List<Product>) {
-        val additionalProductUiModels = products.toProductUiModels()
-        val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
-        _productUiModels.value = newProductUiModels
-        updateTotalCount()
+    private fun updateProductUiModels(products: List<Product>) =
+        viewModelScope.launch {
+            val additionalProductUiModels = products.toProductUiModels(this)
+            val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
+            _productUiModels.value = newProductUiModels
+            updateTotalCount()
+        }
+
+    private suspend fun List<Product>.toProductUiModels(scope: CoroutineScope): List<ProductUiModel> {
+        val productUiModelsDeferred = scope.async { map { it.toProductUiModel(scope) } }
+        return productUiModelsDeferred.await()
     }
 
-    private fun List<Product>.toProductUiModels() = map { it.toProductUiModel() }
-
-    private fun Product.toProductUiModel(): ProductUiModel {
-        val cartItem = cartRepository.syncFindByProductId(id)
+    private suspend fun Product.toProductUiModel(scope: CoroutineScope): ProductUiModel {
+        val cartItemDeferred =
+            scope.async {
+                cartRepository.findByProductId(id).getOrNull()
+            }
+        val cartItem = cartItemDeferred.await()
         return if (cartItem == null) {
             ProductUiModel.from(this@toProductUiModel)
         } else {
@@ -95,7 +107,7 @@ class ProductsViewModel(
         productUiModels.forEachIndexed { index, productUiModel ->
             val product =
                 productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
-            productUiModels[index] = product.toProductUiModel()
+            viewModelScope.launch { productUiModels[index] = product.toProductUiModel(this) }
         }
         _isLoadingProducts.value = false
         _productUiModels.value = productUiModels
@@ -145,56 +157,56 @@ class ProductsViewModel(
         val productUiModels = productUiModels()?.toMutableList() ?: return
         productRepository.find(productId) {
             it.onSuccess { product ->
-                val newProductUiModel = product.toProductUiModel()
-                val position = productUiModels.indexOfFirst { it.productId == productId }
-                productUiModels[position] = newProductUiModel
-                _productUiModels.value = productUiModels
-                updateTotalCount()
+                viewModelScope.launch {
+                    val newProductUiModel = product.toProductUiModel(this)
+                    val position =
+                        productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
+                    productUiModels[position] = newProductUiModel
+                    _productUiModels.value = productUiModels
+                    updateTotalCount()
+                }
             }.onFailure {
                 setError()
             }
         }
     }
 
-    private fun updateTotalCount() {
-        cartRepository.getTotalQuantity {
-            it.onSuccess { totalCount ->
-                _cartTotalQuantity.value = totalCount
-            }.onFailure {
-                setError()
+    private fun updateTotalCount() =
+        viewModelScope.launch {
+            cartRepository.getTotalQuantity()
+                .onSuccess { _cartTotalQuantity.value = it }
+                .onFailure { setError() }
+        }
+
+    private fun updateCartQuantity(productUiModel: ProductUiModel) =
+        viewModelScope.launch {
+            val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
+
+            if (cartItem == null) {
+                addCartItem(productUiModel.productId)
+                return@launch
             }
-        }
-    }
 
-    private fun updateCartQuantity(productUiModel: ProductUiModel) {
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId)
+            if (productUiModel.quantity.isMin()) {
+                deleteCartItem(cartItem)
+                return@launch
+            }
 
-        if (cartItem == null) {
-            addCartItem(productUiModel.productId)
-            return
-        }
-
-        if (productUiModel.quantity.isMin()) {
-            deleteCartItem(cartItem)
-            return
+            cartRepository.changeQuantity(cartItem.id, productUiModel.quantity)
+                .onFailure { setError() }
         }
 
-        cartRepository.changeQuantity(cartItem.id, productUiModel.quantity) {
-            it.onFailure { setError() }
+    private fun addCartItem(productId: Int) =
+        viewModelScope.launch {
+            cartRepository.add(productId)
+                .onFailure { setError() }
         }
-    }
 
-    private fun addCartItem(productId: Int) {
-        cartRepository.add(productId) {
-            it.onFailure { setError() }
+    private fun deleteCartItem(cartItem: CartItem) =
+        viewModelScope.launch {
+            cartRepository.delete(cartItem.id)
+                .onFailure { setError() }
         }
-    }
-
-    private fun deleteCartItem(cartItem: CartItem) {
-        cartRepository.delete(cartItem.id) {
-            it.onFailure { setError() }
-        }
-    }
 
     private fun setError() {
         _productsErrorEvent.value = Event(Unit)

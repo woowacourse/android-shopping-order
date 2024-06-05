@@ -1,9 +1,12 @@
 package woowacourse.shopping.ui.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -56,22 +59,23 @@ class CartViewModel(
     private val _totalQuantity = MutableLiveData<Int>(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
-    fun loadAllCartItems() {
-        _isLoadingCart.value = true
-        cartRepository.findAll {
-            it.onSuccess { cartItems ->
-                _isLoadingCart.value = false
-                if (cartItems.isEmpty()) {
-                    _cartUiModels.value = CartUiModels()
-                    return@onSuccess
+    fun loadAllCartItems() =
+        viewModelScope.launch {
+            _isLoadingCart.value = true
+            cartRepository.findAll()
+                .onSuccess { cartItems ->
+                    _isLoadingCart.value = false
+                    if (cartItems.isEmpty()) {
+                        _cartUiModels.value = CartUiModels()
+                        return@onSuccess
+                    }
+                    cartItems.forEach { cartItem -> loadProduct(cartItem) }
                 }
-                cartItems.forEach { cartItem -> loadProduct(cartItem) }
-            }.onFailure {
-                _isLoadingCart.value = false
-                setError()
-            }
+                .onFailure {
+                    setError()
+                }
+            _isLoadingCart.value = false
         }
-    }
 
     private fun loadProduct(cartItem: CartItem) {
         productRepository.find(cartItem.productId) {
@@ -133,18 +137,19 @@ class CartViewModel(
         changeQuantity(cartUiModel, ++newQuantity)
     }
 
-    private fun addCartItem(productId: Int) {
-        cartRepository.add(productId) {
-            it.onSuccess {
-                loadAllCartItems()
-                if (isRecommendProduct(productId)) {
-                    updateRecommendProducts(productId)
+    private fun addCartItem(productId: Int) =
+        viewModelScope.launch {
+            cartRepository.add(productId)
+                .onSuccess {
+                    loadAllCartItems()
+                    if (isRecommendProduct(productId)) {
+                        updateRecommendProducts(productId)
+                    }
                 }
-            }.onFailure {
-                setError()
-            }
+                .onFailure {
+                    setError()
+                }
         }
-    }
 
     override fun decreaseQuantity(productId: Int) {
         _changedCartEvent.value = Event(Unit)
@@ -159,18 +164,24 @@ class CartViewModel(
     }
 
     override fun deleteCartItem(cartItemId: Int) {
-        _changedCartEvent.value = Event(Unit)
-        val cartUiModel = cartUiModels().find(cartItemId) ?: return
+        viewModelScope.launch {
+            _changedCartEvent.value = Event(Unit)
+            val cartUiModel = cartUiModels().find(cartItemId) ?: return@launch
 
-        cartRepository.delete(cartUiModel.cartItemId) {
-            it.onSuccess {
-                updateDeletedCart(cartUiModel)
-                if (isRecommendProduct(cartUiModel.productId)) {
-                    updateRecommendProducts(cartUiModel.productId, Quantity())
+            cartRepository.delete(cartUiModel.cartItemId)
+                .onSuccess {
+                    Log.e("TEST", "삭제성공")
+                    updateDeletedCart(cartUiModel)
+                    if (isRecommendProduct(cartUiModel.productId)) {
+                        updateRecommendProducts(cartUiModel.productId, Quantity())
+                    }
                 }
-            }.onFailure {
-                setError()
-            }
+                .onFailure {
+                    Log.e("TEST", "삭제실패")
+                    Log.e("TEST", "${it.localizedMessage}")
+
+                    setError()
+                }
         }
     }
 
@@ -201,17 +212,17 @@ class CartViewModel(
     private fun changeQuantity(
         cartUiModel: CartUiModel,
         quantity: Quantity,
-    ) {
-        cartRepository.changeQuantity(cartUiModel.cartItemId, quantity) {
-            it.onSuccess {
+    ) = viewModelScope.launch {
+        cartRepository.changeQuantity(cartUiModel.cartItemId, quantity)
+            .onSuccess {
                 loadProduct(cartUiModel.copy(quantity = quantity).toCartItem())
                 if (isRecommendProduct(cartUiModel.productId)) {
                     updateRecommendProducts(cartUiModel.productId, quantity)
                 }
-            }.onFailure {
+            }
+            .onFailure {
                 setError()
             }
-        }
     }
 
     override fun toggleAllCartItem(isSelected: Boolean) {
@@ -268,18 +279,15 @@ class CartViewModel(
         }
     }
 
-    private fun deleteCartItems(cartItemIds: List<Int>) {
-        _changedCartEvent.value = Event(Unit)
-        cartItemIds.forEach { cartItemId ->
-            cartRepository.delete(cartItemId) {
-                it.onSuccess {
-                    deleteCartItem(cartItemId)
-                }.onFailure {
-                    setError()
-                }
+    private fun deleteCartItems(cartItemIds: List<Int>) =
+        viewModelScope.launch {
+            _changedCartEvent.value = Event(Unit)
+            cartItemIds.forEach { cartItemId ->
+                cartRepository.delete(cartItemId)
+                    .onSuccess { deleteCartItem(cartItemId) }
+                    .onFailure { setError() }
             }
         }
-    }
 
     private fun setError() {
         _cartErrorEvent.value = Event(Unit)

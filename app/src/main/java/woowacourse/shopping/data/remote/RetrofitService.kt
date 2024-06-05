@@ -30,29 +30,29 @@ interface RetrofitService {
     ): Call<Content>
 
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
-    ): Call<CartResponse>
+    ): Result<CartResponse>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") id: Int = 0,
-    ): Call<Unit>
+    ): Result<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun setCartItemQuantity(
+    suspend fun setCartItemQuantity(
         @Path("id") id: Int = 0,
         @Body quantity: CartItemQuantityRequest,
-    ): Call<Unit>
+    ): Result<Unit>
 
     @GET("/cart-items/counts")
-    fun requestCartQuantityCount(): Call<CountResponse>
+    suspend fun requestCartQuantityCount(): Result<CountResponse>
 
     @POST("/cart-items")
-    fun requestCartQuantityCount(
+    suspend fun requestCartQuantityCount(
         @Body addCartItemRequest: AddCartItemRequest,
-    ): Call<Unit>
+    ): Result<Unit>
 
     @POST("/orders")
     fun requestCreateOrder(

@@ -20,6 +20,7 @@ object RetrofitClient {
             .client(httpClient)
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(ResultCallAdapter.Factory())
             .build()
             .create(RetrofitService::class.java)
 }
