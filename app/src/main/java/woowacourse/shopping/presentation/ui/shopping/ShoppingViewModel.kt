@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.paging.LoadResult
+import woowacourse.shopping.data.remote.paging.mergeWith
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -32,8 +34,8 @@ class ShoppingViewModel(private val repository: Repository) :
     private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
     val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
 
-    private val _products = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
-    val products: LiveData<UiState<List<CartProduct>>> get() = _products
+    private val _products = MutableLiveData<UiState<LoadResult.Page<CartProduct>>>(UiState.Loading)
+    val products: LiveData<UiState<LoadResult.Page<CartProduct>>> get() = _products
 
     private val _carts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val carts: LiveData<UiState<List<CartProduct>>> get() = _carts
@@ -57,7 +59,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
             // cartProducts 리스트 생성
             val cartProducts =
-                products.map { product ->
+                products.data.map { product ->
                     val cartItem = carts.find { it.productId == product.productId }
                     if (cartItem != null) {
                         product.copy(quantity = cartItem.quantity, cartId = cartItem.cartId)
@@ -71,12 +73,15 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun loadProductsByOffset() =
         thread {
-            repository.getProductsByPaging().onSuccess {
+
+            val offset = if(_products.value is UiState.Success) (_products.value as UiState.Success).data.offset + 1 else 0
+
+            repository.getProductsByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
                 if (_products.value is UiState.Loading) {
                     _products.postValue(UiState.Success(it))
                 } else {
                     _products.postValue(
-                        UiState.Success((_products.value as UiState.Success).data + it),
+                        UiState.Success((_products.value as UiState.Success).data.mergeWith(it)),
                     )
                 }
             }.onFailure {
@@ -218,5 +223,6 @@ class ShoppingViewModel(private val repository: Repository) :
 
     companion object {
         const val FIRST_UPDATE = 1
+        const val DEFAULT_PAGE_SIZE = 20
     }
 }

@@ -3,6 +3,7 @@ package woowacourse.shopping.domain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.paging.LoadResult
 
 interface Repository {
     fun getProducts(
@@ -11,7 +12,7 @@ interface Repository {
         size: Int = 20,
     ): Result<List<CartProduct>>
 
-    fun getProductsByPaging(): Result<List<CartProduct>>
+    fun getProductsByPaging(offset: Int, pageSize: Int): Result<LoadResult.Page<CartProduct>>
 
     fun getCartItems(
         page: Int,

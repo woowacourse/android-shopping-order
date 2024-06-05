@@ -34,10 +34,10 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun getProductsByPaging(): Result<List<CartProduct>> {
-        return when (val data = productPagingSource.load()) {
+    override fun getProductsByPaging(offset: Int, pageSize: Int): Result<LoadResult.Page<CartProduct>> {
+        return when (val data = productPagingSource.load(defaultOffset = offset, defaultPageSize = pageSize)) {
             is LoadResult.Page -> {
-                Result.success(data.data)
+                Result.success(data)
             }
             is LoadResult.Error -> {
                 Result.failure(Throwable(data.errorType.message))
