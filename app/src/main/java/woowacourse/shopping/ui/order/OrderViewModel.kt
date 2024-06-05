@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.order
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,16 +38,13 @@ class OrderViewModel(
     private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
     val event: SingleLiveData<OrderEvent> get() = _event
 
-
-    override fun createOrder() {
+    override fun order() {
         thread {
-            val filter = cartRepository.loadAllCartItems().map { cartItem ->
-                cartItem.id
-            }
+            val filter = orderRepository.orderItems().map { (id, _) -> id }
+
             orderRepository.order(filter)
             _event.postValue(OrderEvent.CompleteOrder)
-        }.join()
-
+        }
     }
 
     fun loadAll() {
@@ -58,9 +54,10 @@ class OrderViewModel(
                     productId = historyRepository.loadLatestProduct().id
                 )
             )
-            _addedProductQuantity.postValue(orderRepository.allOrderItemsTempQuantity())
-            _totalPrice.postValue(orderRepository.tempOrderItemsTotalPrice())
-        }.join()
+            _addedProductQuantity.postValue(orderRepository.allOrderItemsQuantity())
+
+            _totalPrice.postValue(orderRepository.orderItemsTotalPrice())
+        }
     }
 
 
@@ -68,40 +65,16 @@ class OrderViewModel(
         thread {
             try {
                 cartRepository.updateProductQuantity(productId, quantity)
-                orderRepository.saveOrderItemTemp(productId, quantity).also {
-                    Log.d(TAG, "onIncrease: orderRepository: ${orderRepository.loadOrderItemTemp()}")
-                }
-                Log.d(TAG, "onIncrease: updateProductQuantity")
+                orderRepository.saveOrderItem(productId, quantity)
             } catch (e: NoSuchElementException) {
-                Log.d(TAG, "catch NoSuchElementException $e")
                 cartRepository.addShoppingCartProduct(productId, quantity)
-                orderRepository.saveOrderItemTemp(productId, quantity).also {
-                    Log.d(TAG, "onIncrease: orderRepository: ${orderRepository.loadOrderItemTemp()}")
-                }
-                Log.d(TAG, "onIncrease: addShoppingCartProduct")
-            } catch (e: Exception) {
-                Log.d(TAG, "catch Exception $e")
+                orderRepository.saveOrderItem(productId, quantity)
             } finally {
-                _recommendedProducts.postValue(
-                    _recommendedProducts.getValue()?.map {
-                        if (it.id == productId) {
-                            it.copy(quantity = it.quantity + 1)
-                        } else {
-                            it
-                        }
-                    } ?: emptyList()
-                )
-
-                _totalPrice.postValue(
-                    _totalPrice.value?.plus(
-                        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
-                    ) ?: 0
-                )
-
+                updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
+                updateTotalQuantity(productId, INCREASE_AMOUNT)
             }
             _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
-
-        }.join()
+        }
     }
 
     override fun onDecrease(productId: Long, quantity: Int) {
@@ -112,29 +85,37 @@ class OrderViewModel(
 
             cartRepository.updateProductQuantity(productId, item.quantity - 1)
 
-            _recommendedProducts.postValue(
-                _recommendedProducts.getValue()?.map {
-                    if (it.id == productId) {
-                        it.copy(quantity = it.quantity - 1)
-                    } else {
-                        it
-                    }
-                } ?: emptyList()
-            )
-
-            _totalPrice.postValue(
-                _totalPrice.value?.minus(
-                    _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
-                ) ?: 0
-            )
+            updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
+            updateTotalQuantity(productId, DECREASE_AMOUNT)
 
             _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
-        }.join()
+        }
+    }
 
+    private fun updateTotalQuantity(productId: Long, changeAmount: Int) {
+        _totalPrice.postValue(_totalPrice.value?.plus(productQuantity(productId) * changeAmount) ?: 0)
+    }
+
+    private fun productQuantity(productId: Long) =
+        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+
+    private fun updateRecommendProductsQuantity(productId: Long, changeAmount: Int) {
+        _recommendedProducts.postValue(
+            _recommendedProducts.getValue()?.map { product ->
+                if (product.id == productId) {
+                    product.copy(quantity = product.quantity + changeAmount)
+                } else {
+                    product
+                }
+            } ?: emptyList()
+        )
     }
 
     companion object {
         private const val TAG = "OrderViewModel"
+
+        private const val INCREASE_AMOUNT = 1
+        private const val DECREASE_AMOUNT = -1
 
         fun factory(
             orderRepository: OrderRepository = DefaultOrderRepository(

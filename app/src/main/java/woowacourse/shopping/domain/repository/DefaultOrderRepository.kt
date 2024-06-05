@@ -12,15 +12,15 @@ class DefaultOrderRepository(
         orderSource.claer()
     }
 
-    override fun saveOrderItemTemp(cartItemId: Long, quantity: Int) {
+    override fun saveOrderItem(cartItemId: Long, quantity: Int) {
         orderSource.save(cartItemId, quantity)
     }
 
-    override fun loadOrderItemTemp(): Map<Long, Int> = orderSource.load()
+    override fun orderItems(): Map<Long, Int> = orderSource.load()
 
-    override fun allOrderItemsTempQuantity(): Int = orderSource.allQuantity()
+    override fun allOrderItemsQuantity(): Int = orderSource.allQuantity()
 
-    override fun tempOrderItemsTotalPrice(): Int {
+    override fun orderItemsTotalPrice(): Int {
         val orders = orderSource.load()
 
         return orders.map { (id, quantity) ->
