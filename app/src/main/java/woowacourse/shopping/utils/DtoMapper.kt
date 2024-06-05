@@ -14,6 +14,8 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
 import woowacourse.shopping.domain.model.selector.ItemSelector
 import woowacourse.shopping.domain.model.product.Product
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object DtoMapper {
     fun CartItemResponse.toCartItems(): List<CartItem> {
@@ -50,7 +52,7 @@ object DtoMapper {
     fun CouponDto.toCoupon(): Coupon{
        return Coupon(
            id = id,
-           expirationDate = expirationDate,
+           expirationDate = this.formatExpirationDate(),
            couponType = CouponType.matchCoupon(code),
            description = description,
            discountType =discountType,
@@ -65,5 +67,11 @@ object DtoMapper {
             end = end,
             start = start,
         )
+    }
+
+    private fun CouponDto.formatExpirationDate(): String {
+        val couponExpirationDateFormatter = DateTimeFormatter.ofPattern(ShoppingUtils.EXPIRATION_FORMAT)
+        val date = LocalDate.parse(this.expirationDate)
+        return date.format(couponExpirationDateFormatter)
     }
 }
