@@ -1,9 +1,11 @@
 package woowacourse.shopping.domain
 
 import woowacourse.shopping.domain.entity.CartProduct
-import woowacourse.shopping.domain.entity.Product
 
 fun cartProduct(
-    product: Product = product(),
+    productId: Long = 1L,
     count: Int = 1,
-) = CartProduct(product, count)
+) = CartProduct(
+    product(productId),
+    count,
+)

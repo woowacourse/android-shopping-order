@@ -1,33 +1,82 @@
 package woowacourse.shopping.domain.entity
 
 data class Cart(
-    private val productMap: Map<Product, Int> = emptyMap(),
+    val cartProducts: List<CartProduct> = emptyList(),
 ) {
-    constructor(products: List<Product>) : this(products.groupingBy { it }.eachCount())
+    private val cartMapByProductId: Map<Long, CartProduct>
+        get() = cartProducts.associateBy { it.product.id }
 
-    constructor(vararg products: Product) : this(products.toList())
+    private constructor(cartMapByProductId: Map<Long, CartProduct>) : this(
+        cartMapByProductId.values.toList()
+    )
 
+    constructor (vararg cartProducts: CartProduct) : this(cartProducts.toList())
+
+    constructor(vararg products: Product) : this(products.map { CartProduct(it, 1) })
+
+    fun hasProductId(productId: Long): Boolean = cartMapByProductId.containsKey(productId)
+
+    fun addAll(cart: Cart): Cart {
+        val newCartProducts = cartMapByProductId + cart.cartMapByProductId
+        return Cart(newCartProducts)
+    }
+
+    fun add(cartProduct: CartProduct): Cart {
+        val productId = cartProduct.product.id
+        val newCartProducts = cartMapByProductId.plus(productId to cartProduct)
+        return Cart(newCartProducts)
+    }
+
+    fun isEmpty(): Boolean = cartProducts.isEmpty()
+
+    @Deprecated("Use add(cartProduct: CartProduct) instead")
     fun add(product: Product): Cart {
-        val count = productMap.getOrDefault(product, 0) + 1
-        return Cart(productMap.plus(product to count))
+        val productId = product.id
+        require(hasProductId(productId).not()) { ERROR_ALREADY_EXIST_PRODUCT.format(product) }
+        val newCartProduct = CartProduct(product, 1)
+        return Cart(cartProducts + newCartProduct)
     }
 
-    fun remove(product: Product): Cart {
-        if (!productMap.containsKey(product)) return this
-        if (productMap[product] == 1) {
-            return Cart(productMap.minus(product))
-        }
-        val count = productMap[product] ?: return this
-        return Cart(productMap.plus(product to count - 1))
+    fun filterByProductIds(productIds: List<Long>): Cart {
+        val filteredProducts = cartProducts.filter { it.product.id in productIds }
+        return Cart(filteredProducts)
     }
 
-    fun totalPrice(): Int =
-        productMap.map { (product, count) ->
-            product.price * count
-        }.sum()
+    fun findCartProductByProductId(productId: Long): CartProduct? = cartMapByProductId[productId]
 
-    fun cartProducts(): List<CartProduct> =
-        productMap.map { (product, count) ->
-            CartProduct(product, count)
-        }
+    fun delete(productId: Long): Cart {
+        findCartProductByProductId(productId) ?: throw IllegalArgumentException(
+            ERROR_NOT_EXIST_PRODUCT.format(productId)
+        )
+        val newCartProducts = cartMapByProductId - productId
+        return Cart(newCartProducts)
+    }
+
+    fun increaseProductCount(productId: Long, amount: Int = 1): Cart {
+        val cartProduct = findCartProductByProductId(productId) ?: throw IllegalArgumentException(
+            ERROR_NOT_EXIST_PRODUCT.format(productId)
+        )
+        val newCartProduct = cartProduct.increaseCount(amount)
+        val newProductMap = cartMapByProductId.plus(productId to newCartProduct)
+        return Cart(newProductMap)
+    }
+
+    fun canDecreaseProductCount(productId: Long, amount: Int = 1): Boolean {
+        val cartProduct = findCartProductByProductId(productId) ?: return false
+        return cartProduct.canDecreaseCount(amount)
+    }
+
+    fun decreaseProductCount(productId: Long, amount: Int = 1): Cart {
+        val cartProduct = findCartProductByProductId(productId) ?: throw IllegalArgumentException(
+            ERROR_NOT_EXIST_PRODUCT.format(productId)
+        )
+        val newCartProduct = cartProduct.decreaseCount(amount)
+        val newProductMap = cartMapByProductId.plus(productId to newCartProduct)
+        return Cart(newProductMap)
+    }
+
+    companion object {
+        private const val ERROR_ALREADY_EXIST_PRODUCT = "이미 존재하는 상품입니다. %s"
+        private const val ERROR_NOT_EXIST_PRODUCT = "해당 상품이 존재하지 않습니다. %s"
+    }
 }
