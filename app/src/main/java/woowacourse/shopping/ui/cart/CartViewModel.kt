@@ -77,16 +77,16 @@ class CartViewModel(
             _isLoadingCart.value = false
         }
 
-    private fun loadProduct(cartItem: CartItem) {
-        productRepository.find(cartItem.productId) {
-            it.onSuccess { product ->
-                updateCartUiModels(product, cartItem)
-                updateCart()
-            }.onFailure {
-                setError()
-            }
+    private fun loadProduct(cartItem: CartItem) =
+        viewModelScope.launch {
+            productRepository.find(cartItem.productId)
+                .onSuccess { product ->
+                    updateCartUiModels(product, cartItem)
+                    updateCart()
+                }.onFailure {
+                    setError()
+                }
         }
-    }
 
     private fun updateCartUiModels(
         product: Product,
@@ -253,19 +253,19 @@ class CartViewModel(
         _visibleAllToggleView.value = true
     }
 
-    fun loadRecommendProducts() {
-        val recentProductCategory =
-            recentProductRepository.findLastOrNull()?.product?.category ?: return
-        val cartItems = cartUiModels().toCartItems()
+    fun loadRecommendProducts() =
+        viewModelScope.launch {
+            val recentProductCategory =
+                recentProductRepository.findLastOrNull()?.product?.category ?: return@launch
+            val cartItems = cartUiModels().toCartItems()
 
-        productRepository.findRecommendProducts(recentProductCategory, cartItems) {
-            it.onSuccess { recommendProducts ->
-                _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
-            }.onFailure {
-                setError()
-            }
+            productRepository.findRecommendProducts(recentProductCategory, cartItems)
+                .onSuccess { recommendProducts ->
+                    _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
+                }.onFailure {
+                    setError()
+                }
         }
-    }
 
     fun createOrder() {
         val cartItemIds = cartUiModels().selectedCartItemIds()

@@ -18,16 +18,16 @@ import woowacourse.shopping.data.product.remote.ProductResponse
 
 interface RetrofitService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Query("category") category: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
-    ): Call<ProductResponse>
+    ): Result<ProductResponse>
 
     @GET("/products/{id}")
-    fun requestProduct(
+    suspend fun requestProduct(
         @Path("id") id: Int = 0,
-    ): Call<Content>
+    ): Result<Content>
 
     @GET("/cart-items")
     suspend fun requestCartItems(

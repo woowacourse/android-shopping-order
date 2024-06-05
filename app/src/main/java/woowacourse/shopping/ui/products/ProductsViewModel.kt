@@ -49,20 +49,20 @@ class ProductsViewModel(
         loadRecentProducts()
     }
 
-    fun loadPage() {
-        _isLoadingProducts.value = true
-        productRepository.findPage(page, PAGE_SIZE) {
+    fun loadPage() =
+        viewModelScope.launch {
+            _isLoadingProducts.value = true
+            productRepository.findPage(page, PAGE_SIZE)
+                .onSuccess { products ->
+                    updateProductUiModels(products)
+                    _showLoadMore.value = false
+                    page++
+                }.onFailure {
+                    setError()
+                }
             _isLoadingProducts.value = false
-            it.onSuccess { products ->
-                updateProductUiModels(products)
-                _showLoadMore.value = false
-                page++
-            }.onFailure {
-                setError()
-            }
+            loadIsPageLast()
         }
-        loadIsPageLast()
-    }
 
     private fun updateProductUiModels(products: List<Product>) =
         viewModelScope.launch {
@@ -90,48 +90,54 @@ class ProductsViewModel(
         }
     }
 
-    private fun loadIsPageLast() {
-        productRepository.isLastPage(page, PAGE_SIZE) {
-            it.onSuccess { isLastPage ->
-                this.isLastPage.value = isLastPage
-            }.onFailure {
-                setError()
+    private fun loadIsPageLast() =
+        viewModelScope.launch {
+            productRepository.isLastPage(page, PAGE_SIZE)
+                .onSuccess { isLastPage ->
+                    this@ProductsViewModel.isLastPage.value = isLastPage
+                }.onFailure {
+                    setError()
+                }
+        }
+
+    fun loadProducts() =
+        viewModelScope.launch {
+            _isLoadingProducts.value = true
+            val productUiModels = productUiModels()?.toMutableList() ?: return@launch
+
+            productUiModels.forEachIndexed { index, productUiModel ->
+                val product =
+                    productRepository.find(productUiModel.productId).getOrNull() ?: return@launch
+                productUiModels[index] = product.toProductUiModel(this)
             }
+            _isLoadingProducts.value = false
+            _productUiModels.value = productUiModels
+            updateTotalCount()
         }
-    }
-
-    fun loadProducts() {
-        _isLoadingProducts.value = true
-        val productUiModels = productUiModels()?.toMutableList() ?: return
-
-        productUiModels.forEachIndexed { index, productUiModel ->
-            val product =
-                productRepository.syncFind(productUiModel.productId) ?: return@forEachIndexed
-            viewModelScope.launch { productUiModels[index] = product.toProductUiModel(this) }
-        }
-        _isLoadingProducts.value = false
-        _productUiModels.value = productUiModels
-        updateTotalCount()
-    }
 
     fun loadProduct(productId: Int) {
         updateProductUiModel(productId)
     }
 
-    fun loadRecentProducts() {
-        _recentProductUiModels.value =
-            recentProductRepository.findRecentProducts().toRecentProductUiModels()
-    }
+    fun loadRecentProducts() =
+        viewModelScope.launch {
+            _recentProductUiModels.value =
+                recentProductRepository.findRecentProducts().toRecentProductUiModels(this)
+        }
 
-    private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
-        return map {
-            val product = productRepository.syncFind(it.product.id) ?: return null
-            RecentProductUiModel(
-                product.id,
-                product.imageUrl,
-                product.name,
-            )
-        }.ifEmpty { null }
+    private suspend fun List<RecentProduct>.toRecentProductUiModels(scope: CoroutineScope): List<RecentProductUiModel>? {
+        val recentProductUiModelsDeferred =
+            scope.async {
+                map {
+                    val product = productRepository.find(it.product.id).getOrNull() ?: return@async null
+                    RecentProductUiModel(
+                        product.id,
+                        product.imageUrl,
+                        product.name,
+                    )
+                }
+            }
+        return recentProductUiModelsDeferred.await()?.ifEmpty { null }
     }
 
     fun changeSeeMoreVisibility(lastPosition: Int) {
@@ -153,23 +159,23 @@ class ProductsViewModel(
         updateProductUiModel(productId)
     }
 
-    private fun updateProductUiModel(productId: Int) {
-        val productUiModels = productUiModels()?.toMutableList() ?: return
-        productRepository.find(productId) {
-            it.onSuccess { product ->
-                viewModelScope.launch {
-                    val newProductUiModel = product.toProductUiModel(this)
-                    val position =
-                        productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
-                    productUiModels[position] = newProductUiModel
-                    _productUiModels.value = productUiModels
-                    updateTotalCount()
+    private fun updateProductUiModel(productId: Int) =
+        viewModelScope.launch {
+            val productUiModels = productUiModels()?.toMutableList() ?: return@launch
+            productRepository.find(productId)
+                .onSuccess { product ->
+                    viewModelScope.launch {
+                        val newProductUiModel = product.toProductUiModel(this)
+                        val position =
+                            productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
+                        productUiModels[position] = newProductUiModel
+                        _productUiModels.value = productUiModels
+                        updateTotalCount()
+                    }
+                }.onFailure {
+                    setError()
                 }
-            }.onFailure {
-                setError()
-            }
         }
-    }
 
     private fun updateTotalCount() =
         viewModelScope.launch {

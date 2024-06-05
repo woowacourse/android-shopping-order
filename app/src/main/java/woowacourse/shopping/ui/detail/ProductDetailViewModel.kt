@@ -52,18 +52,16 @@ class ProductDetailViewModel(
         loadLastRecentProduct()
     }
 
-    fun loadProduct() {
-        productRepository.find(productId) {
-            it.onSuccess { product ->
-                viewModelScope.launch {
+    fun loadProduct() =
+        viewModelScope.launch {
+            productRepository.find(productId)
+                .onSuccess { product ->
                     _productUiModel.value = product.toProductUiModel(this)
                     saveRecentProduct()
+                }.onFailure {
+                    setError()
                 }
-            }.onFailure {
-                setError()
-            }
         }
-    }
 
     private suspend fun Product.toProductUiModel(scope: CoroutineScope): ProductUiModel {
         val cartItemDeferred = scope.async { cartRepository.findByProductId(id) }
@@ -71,16 +69,16 @@ class ProductDetailViewModel(
         return ProductUiModel.from(this, cartItem.quantity)
     }
 
-    private fun loadLastRecentProduct() {
-        val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
-        productRepository.find(lastRecentProduct.product.id) {
-            it.onSuccess { product ->
-                _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
-            }.onFailure {
-                setError()
-            }
+    private fun loadLastRecentProduct() =
+        viewModelScope.launch {
+            val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return@launch
+            productRepository.find(lastRecentProduct.product.id)
+                .onSuccess { product ->
+                    _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
+                }.onFailure {
+                    setError()
+                }
         }
-    }
 
     private fun increaseQuantity() {
         var quantity = _productUiModel.value?.quantity ?: return
@@ -118,8 +116,9 @@ class ProductDetailViewModel(
         saveRecentProduct()
     }
 
-    private fun saveRecentProduct() {
-        val product = productRepository.syncFind(productId) ?: return
-        recentProductRepository.save(product)
-    }
+    private fun saveRecentProduct() =
+        viewModelScope.launch {
+            val product = productRepository.find(productId).getOrNull() ?: return@launch
+            recentProductRepository.save(product)
+        }
 }
