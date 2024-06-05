@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import androidx.room.PrimaryKey
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ProductDataSource
 
@@ -10,6 +9,7 @@ class DefaultOrderRepository(
 ) : OrderRepository {
     override fun order(cartItemIds: List<Long>) {
         orderSource.order(cartItemIds)
+        _orderSaved.clear()
     }
 
     override fun saveOrderItemTemp(cartItemId: Long, quantity: Int) {

@@ -26,9 +26,7 @@ class OrderFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            factory = OrderViewModel.factory(
-                (it.getSerializable(ORDER_ITEMS_ID) as LongArray).toList(), // TODO: getSerializable 고치기
-            )
+            factory = OrderViewModel.factory()
         }
         viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }

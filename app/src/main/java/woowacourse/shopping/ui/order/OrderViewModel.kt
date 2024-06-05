@@ -21,7 +21,6 @@ import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import kotlin.concurrent.thread
 
 class OrderViewModel(
-    private val orderItemsId: List<Long>,
     private val orderRepository: OrderRepository,
     private val historyRepository: ProductHistoryRepository,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
@@ -37,7 +36,17 @@ class OrderViewModel(
     val totalPrice: LiveData<Int> get() = _totalPrice
 
     override fun createOrder() {
-        orderRepository.order(orderItemsId)
+        thread {
+            val cartItems = cartRepository.loadAllCartItems().map {
+                it.id
+            }
+
+            orderRepository.order(
+                orderRepository.loadOrderItemTemp().map {
+                    it.key
+                }
+            )
+        }.join()
     }
 
     fun loadAll() {
@@ -57,15 +66,20 @@ class OrderViewModel(
         thread {
             try {
                 cartRepository.updateProductQuantity(productId, quantity)
+                orderRepository.saveOrderItemTemp(productId, quantity).also {
+                    Log.d(TAG, "onIncrease: orderRepository: ${orderRepository.loadOrderItemTemp()}")
+                }
                 Log.d(TAG, "onIncrease: updateProductQuantity")
             } catch (e: NoSuchElementException) {
                 Log.d(TAG, "catch NoSuchElementException $e")
                 cartRepository.addShoppingCartProduct(productId, quantity)
+                orderRepository.saveOrderItemTemp(productId, quantity).also {
+                    Log.d(TAG, "onIncrease: orderRepository: ${orderRepository.loadOrderItemTemp()}")
+                }
                 Log.d(TAG, "onIncrease: addShoppingCartProduct")
             } catch (e: Exception) {
                 Log.d(TAG, "catch Exception $e")
             } finally {
-
                 _recommendedProducts.postValue(
                     _recommendedProducts.getValue()?.map {
                         if (it.id == productId) {
@@ -121,7 +135,6 @@ class OrderViewModel(
         private const val TAG = "OrderViewModel"
 
         fun factory(
-            productIds: List<Long>,
             orderRepository: OrderRepository = DefaultOrderRepository(
                 ShoppingApp.orderSource,
                 ShoppingApp.productSource
@@ -142,7 +155,7 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    productIds, orderRepository, historyRepository, productRecommendationRepository, cartRepository
+                    orderRepository, historyRepository, productRecommendationRepository, cartRepository
                 )
             }
         }
