@@ -34,6 +34,7 @@ class OrderViewModel(
                     productId = historyRepository.loadLatestProduct().id
                 )
             )
+
         }.join()
     }
 

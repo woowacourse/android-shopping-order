@@ -22,7 +22,15 @@ class DefaultProductHistoryRepository(
 
     override fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
-        return productDataSource.findById(productId).toDomain(quantity = 0)
+        val productData = productDataSource.findById(productId)
+        return Product(
+            productData.id,
+            productData.imgUrl,
+            productData.name,
+            productData.price,
+            quantity = 0,
+            category = productData.category,
+        )
     }
 
     companion object {

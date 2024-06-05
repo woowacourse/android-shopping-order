@@ -28,6 +28,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
             imgUrl = response.imageUrl,
             name = response.name,
             price = response.price,
+            category = response.category,
         )
     }
 
