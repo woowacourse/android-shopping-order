@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -144,7 +145,11 @@ class ProductDetailViewModel(
                     name = product.name,
                     category = product.category,
                 ),
-            )
+            ).onSuccess {
+                Log.d("sdlfjsdlfsjd", product.name)
+            }.onFailure {
+                Log.d("sdlfjsdlfsjd", "dsfljsdfl")
+            }
         }
 
     private fun deletePrevRecentlyProduct(recentlyProductId: Long) =
@@ -190,6 +195,9 @@ class ProductDetailViewModel(
                     if (recentlyProduct.productId != product.id) {
                         saveRecentlyProduct(product)
                     }
+                }
+                .onFailure {
+                    saveRecentlyProduct(product)
                 }
         }
 
