@@ -10,21 +10,21 @@ data class ProductDetailUiState(
     val isRecentProductVisible: Boolean
         get() =
             (recentProduct != null) &&
-                    (cartProductUi.product.id != recentProduct.id)
+                (cartProductUi.product.id != recentProduct.id)
 
     companion object {
         fun init(): ProductDetailUiState =
             ProductDetailUiState(
                 cartProductUi =
-                CartProductUi(
-                    product =
-                    ProductUi(
-                        id = 0,
-                        name = "상품이 존재하지 않습니다",
-                        price = 0,
-                        imageUrl = "",
+                    CartProductUi(
+                        product =
+                            ProductUi(
+                                id = 0,
+                                name = "상품이 존재하지 않습니다",
+                                price = 0,
+                                imageUrl = "",
+                            ),
                     ),
-                ),
                 recentProduct = null,
             )
     }

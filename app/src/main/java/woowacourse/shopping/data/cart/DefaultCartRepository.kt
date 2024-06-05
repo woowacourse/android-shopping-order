@@ -20,8 +20,9 @@ class DefaultCartRepository(
     }
 
     override fun findCartProduct(productId: Long): Result<CartProduct> {
-        val cartProduct = cachedCart.findCartProductByProductId(productId)
-            ?: return Result.failure(NoSuchElementException("there's no such product"))
+        val cartProduct =
+            cachedCart.findCartProductByProductId(productId)
+                ?: return Result.failure(NoSuchElementException("there's no such product"))
         return Result.success(cartProduct)
     }
 
@@ -49,9 +50,10 @@ class DefaultCartRepository(
         product: Product,
         count: Int,
     ): Result<Cart> {
-        val cartId = cartDataSource.createCartProduct(product.id, count)
-            .onFailure { return Result.failure(it) }
-            .getOrThrow()
+        val cartId =
+            cartDataSource.createCartProduct(product.id, count)
+                .onFailure { return Result.failure(it) }
+                .getOrThrow()
         val newCartProduct = CartProduct(product, count, cartId)
         cachedCart = cachedCart.add(newCartProduct)
         return Result.success(cachedCart)
@@ -61,9 +63,10 @@ class DefaultCartRepository(
         product: Product,
         count: Int,
     ): Result<Cart> {
-        val cartProduct = findCartProduct(product.id).onFailure {
-            return Result.failure(it)
-        }.getOrThrow()
+        val cartProduct =
+            findCartProduct(product.id).onFailure {
+                return Result.failure(it)
+            }.getOrThrow()
         return cartDataSource.updateCartCount(cartProduct.id, count)
             .onFailure {
                 return Result.failure(it)
@@ -74,9 +77,10 @@ class DefaultCartRepository(
     }
 
     override fun deleteCartProduct(productId: Long): Result<Cart> {
-        val cartProduct = findCartProduct(productId).onFailure {
-            return Result.failure(it)
-        }.getOrThrow()
+        val cartProduct =
+            findCartProduct(productId).onFailure {
+                return Result.failure(it)
+            }.getOrThrow()
         val cartId = cartProduct.id
         return cartDataSource.deleteCartProduct(cartId)
             .onFailure {

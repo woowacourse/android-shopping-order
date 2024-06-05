@@ -112,5 +112,4 @@ private fun ProductDetailUiState.increaseProductCount(): ProductDetailUiState =
 private fun ProductDetailUiState.decreaseProductCount(): ProductDetailUiState =
     copy(cartProductUi = cartProductUi.copy(count = cartProductUi.toDomain().decreaseCount().count))
 
-private fun ProductDetailUiState.canDecreaseProductCount(): Boolean =
-    cartProductUi.toDomain().canDecreaseCount()
+private fun ProductDetailUiState.canDecreaseProductCount(): Boolean = cartProductUi.toDomain().canDecreaseCount()

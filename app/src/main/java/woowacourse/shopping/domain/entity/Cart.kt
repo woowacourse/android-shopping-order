@@ -7,7 +7,7 @@ data class Cart(
         get() = cartProducts.associateBy { it.product.id }
 
     private constructor(cartMapByProductId: Map<Long, CartProduct>) : this(
-        cartMapByProductId.values.toList()
+        cartMapByProductId.values.toList(),
     )
 
     constructor (vararg cartProducts: CartProduct) : this(cartProducts.toList())
@@ -44,30 +44,41 @@ data class Cart(
 
     fun delete(productId: Long): Cart {
         findCartProductByProductId(productId) ?: throw IllegalArgumentException(
-            ERROR_NOT_EXIST_PRODUCT.format(productId)
+            ERROR_NOT_EXIST_PRODUCT.format(productId),
         )
         val newCartProducts = cartMapByProductId - productId
         return Cart(newCartProducts)
     }
 
-    fun increaseProductCount(productId: Long, amount: Int = 1): Cart {
-        val cartProduct = findCartProductByProductId(productId) ?: throw IllegalArgumentException(
-            ERROR_NOT_EXIST_PRODUCT.format(productId)
-        )
+    fun increaseProductCount(
+        productId: Long,
+        amount: Int = 1,
+    ): Cart {
+        val cartProduct =
+            findCartProductByProductId(productId) ?: throw IllegalArgumentException(
+                ERROR_NOT_EXIST_PRODUCT.format(productId),
+            )
         val newCartProduct = cartProduct.increaseCount(amount)
         val newProductMap = cartMapByProductId.plus(productId to newCartProduct)
         return Cart(newProductMap)
     }
 
-    fun canDecreaseProductCount(productId: Long, amount: Int = 1): Boolean {
+    fun canDecreaseProductCount(
+        productId: Long,
+        amount: Int = 1,
+    ): Boolean {
         val cartProduct = findCartProductByProductId(productId) ?: return false
         return cartProduct.canDecreaseCount(amount)
     }
 
-    fun decreaseProductCount(productId: Long, amount: Int = 1): Cart {
-        val cartProduct = findCartProductByProductId(productId) ?: throw IllegalArgumentException(
-            ERROR_NOT_EXIST_PRODUCT.format(productId)
-        )
+    fun decreaseProductCount(
+        productId: Long,
+        amount: Int = 1,
+    ): Cart {
+        val cartProduct =
+            findCartProductByProductId(productId) ?: throw IllegalArgumentException(
+                ERROR_NOT_EXIST_PRODUCT.format(productId),
+            )
         val newCartProduct = cartProduct.decreaseCount(amount)
         val newProductMap = cartMapByProductId.plus(productId to newCartProduct)
         return Cart(newProductMap)

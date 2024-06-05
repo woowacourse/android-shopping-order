@@ -5,7 +5,6 @@ data class CartProduct(
     val count: Int,
     val id: Long = -1,
 ) {
-
     init {
         require(count >= MIN_COUNT_LIMIT) { "카트의 수량은 1개 이상이어야 합니다." }
     }

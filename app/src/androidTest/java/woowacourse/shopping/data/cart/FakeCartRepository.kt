@@ -10,10 +10,12 @@ class FakeCartRepository(
     private var cart: Cart = Cart(),
 ) : CartRepository {
     private val products: List<CartProduct> get() = cart.cartProducts
+
     override fun findCartProduct(productId: Long): Result<CartProduct> {
-        val cartProduct = cart.findCartProductByProductId(productId) ?: return Result.failure(
-            NoSuchElementException("Invalid product id"),
-        )
+        val cartProduct =
+            cart.findCartProductByProductId(productId) ?: return Result.failure(
+                NoSuchElementException("Invalid product id"),
+            )
         return Result.success(cartProduct)
     }
 
@@ -45,10 +47,14 @@ class FakeCartRepository(
         return Result.success(cart.filterByProductIds(productIds))
     }
 
-    override fun createCartProduct(product: Product, count: Int): Result<Cart> {
-        cart = cart.add(
-            fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
-        )
+    override fun createCartProduct(
+        product: Product,
+        count: Int,
+    ): Result<Cart> {
+        cart =
+            cart.add(
+                fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
+            )
         return Result.success(cart)
     }
 
@@ -56,9 +62,10 @@ class FakeCartRepository(
         product: Product,
         count: Int,
     ): Result<Cart> {
-        cart = cart.add(
-            fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
-        )
+        cart =
+            cart.add(
+                fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
+            )
         return Result.success(cart)
     }
 

@@ -69,7 +69,7 @@ class OrderViewModel(
             increaseCartProductCountUseCase(id, INCREMENT_AMOUNT)
                 .onSuccess {
                     _uiState.postValue(
-                        uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                        uiState.increaseProductCount(id, INCREMENT_AMOUNT),
                     )
                     _updateCartEvent.postValue(Unit)
                 }.onFailure {
@@ -87,7 +87,7 @@ class OrderViewModel(
                     uiState.decreaseProductCount(
                         id,
                         INCREMENT_AMOUNT,
-                    )
+                    ),
                 )
                 _updateCartEvent.postValue(Unit)
             }.onFailure {
@@ -126,13 +126,13 @@ private fun OrderUiState.increaseProductCount(
 ): OrderUiState =
     copy(
         recommendProducts =
-        recommendProducts.map {
-            if (it.product.id == productId) {
-                it.copy(count = it.count + amount)
-            } else {
-                it
-            }
-        },
+            recommendProducts.map {
+                if (it.product.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
     )
 
 private fun OrderUiState.decreaseProductCount(

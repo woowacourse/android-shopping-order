@@ -23,15 +23,15 @@ class DefaultDeleteCartProductUseCase(
 
     companion object {
         @Volatile
-        private var Instance: DeleteCartProductUseCase? = null
+        private var instance: DeleteCartProductUseCase? = null
 
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
         ): DeleteCartProductUseCase {
-            return Instance ?: synchronized(this) {
-                Instance ?: DefaultDeleteCartProductUseCase(productRepository, cartRepository)
-                    .also { Instance = it }
+            return instance ?: synchronized(this) {
+                instance ?: DefaultDeleteCartProductUseCase(productRepository, cartRepository)
+                    .also { instance = it }
             }
         }
     }

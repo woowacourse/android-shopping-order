@@ -4,28 +4,35 @@ import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository(
-    private val products: List<Product>
+    private val products: List<Product>,
 ) : ProductRepository {
-    override fun loadProducts(currentPage: Int, size: Int): Result<List<Product>> {
+    override fun loadProducts(
+        currentPage: Int,
+        size: Int,
+    ): Result<List<Product>> {
         TODO("Not yet implemented")
     }
 
     override fun loadProducts(
         category: String,
         currentPage: Int,
-        size: Int
+        size: Int,
     ): Result<List<Product>> {
         return Result.success(products)
     }
 
     override fun findProductById(id: Long): Result<Product> {
-        val product = products.find { it.id == id } ?: return Result.failure(
-            NoSuchElementException("Invalid product id"),
-        )
+        val product =
+            products.find { it.id == id } ?: return Result.failure(
+                NoSuchElementException("Invalid product id"),
+            )
         return Result.success(product)
     }
 
-    override fun canLoadMore(page: Int, size: Int): Result<Boolean> {
+    override fun canLoadMore(
+        page: Int,
+        size: Int,
+    ): Result<Boolean> {
         TODO("Not yet implemented")
     }
 

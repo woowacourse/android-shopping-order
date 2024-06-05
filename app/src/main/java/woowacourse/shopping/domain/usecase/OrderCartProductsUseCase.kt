@@ -22,15 +22,15 @@ class DefaultOrderCartProductsUseCase(
 
     companion object {
         @Volatile
-        private var Instance: OrderCartProductsUseCase? = null
+        private var instance: OrderCartProductsUseCase? = null
 
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
         ): OrderCartProductsUseCase {
-            return Instance ?: synchronized(this) {
-                Instance ?: DefaultOrderCartProductsUseCase(productRepository, cartRepository)
-                    .also { Instance = it }
+            return instance ?: synchronized(this) {
+                instance ?: DefaultOrderCartProductsUseCase(productRepository, cartRepository)
+                    .also { instance = it }
             }
         }
     }

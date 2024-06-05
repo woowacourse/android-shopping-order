@@ -12,7 +12,6 @@ interface LoadCartUseCase {
 class DefaultLoadCartUseCase(
     private val cartRepository: CartRepository,
 ) : LoadCartUseCase {
-
     override operator fun invoke(): Result<Cart> {
         return cartRepository.loadCart()
     }
@@ -23,11 +22,11 @@ class DefaultLoadCartUseCase(
 
     companion object {
         @Volatile
-        private var Instance: LoadCartUseCase? = null
+        private var instance: LoadCartUseCase? = null
 
         fun instance(cartRepository: CartRepository): LoadCartUseCase {
-            return Instance ?: synchronized(this) {
-                Instance ?: DefaultLoadCartUseCase(cartRepository).also { Instance = it }
+            return instance ?: synchronized(this) {
+                instance ?: DefaultLoadCartUseCase(cartRepository).also { instance = it }
             }
         }
     }

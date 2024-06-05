@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.domain.fakeCartProduct
 import woowacourse.shopping.domain.entity.Cart
+import woowacourse.shopping.domain.fakeCartProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.DeleteCartProductUseCase
@@ -24,7 +24,6 @@ import woowacourse.shopping.presentation.util.getOrAwaitValue
 class CartViewModelTest {
     @RelaxedMockK
     lateinit var cartRepository: CartRepository
-
 
     @RelaxedMockK
     lateinit var loadCartUseCase: LoadCartUseCase
@@ -47,21 +46,22 @@ class CartViewModelTest {
     @BeforeEach
     fun setUp() {
         every { loadCartUseCase() } returns
-                Result.success(
-                    Cart(fakeCartProduct()),
-                )
+            Result.success(
+                Cart(fakeCartProduct()),
+            )
         every { cartRepository.canLoadMoreCartProducts(any(), PAGE_SIZE) } returns
-                Result.success(
-                    true,
-                )
-        cartViewModel = CartViewModel(
-            cartRepository,
-            increaseCartProductUseCase,
-            decreaseCartProductUseCase,
-            deleteCartProductUseCase,
-            loadCartUseCase,
-            loadPagingCartUseCase,
-        )
+            Result.success(
+                true,
+            )
+        cartViewModel =
+            CartViewModel(
+                cartRepository,
+                increaseCartProductUseCase,
+                decreaseCartProductUseCase,
+                deleteCartProductUseCase,
+                loadCartUseCase,
+                loadPagingCartUseCase,
+            )
     }
 
     @Test
@@ -79,11 +79,11 @@ class CartViewModelTest {
         val serverNextPage = 1
         // given
         every { loadPagingCartUseCase(serverNextPage, PAGE_SIZE) } returns
-                Result.success(
-                    Cart(
-                        fakeCartProduct(),
-                    ),
-                )
+            Result.success(
+                Cart(
+                    fakeCartProduct(),
+                ),
+            )
         // when
         cartViewModel.moveToNextPage()
         // then
@@ -100,11 +100,11 @@ class CartViewModelTest {
         every { cartRepository.canLoadMoreCartProducts(0, PAGE_SIZE) } returns Result.success(true)
         every { cartRepository.canLoadMoreCartProducts(2, PAGE_SIZE) } returns Result.success(true)
         every { loadPagingCartUseCase(serverNextPage, PAGE_SIZE) } returns
-                Result.success(
-                    Cart(
-                        fakeCartProduct(),
-                    ),
-                )
+            Result.success(
+                Cart(
+                    fakeCartProduct(),
+                ),
+            )
         // when
         cartViewModel.moveToNextPage()
         // then

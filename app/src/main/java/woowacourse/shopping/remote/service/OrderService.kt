@@ -14,12 +14,12 @@ interface OrderService {
     ): Call<Unit>
 
     companion object {
-        private var Instance: OrderService? = null
+        private var instance: OrderService? = null
 
         fun instance(): OrderService =
-            Instance ?: synchronized(this) {
-                Instance ?: RetrofitModule.retrofit().create<OrderService>().also {
-                    Instance = it
+            instance ?: synchronized(this) {
+                instance ?: RetrofitModule.retrofit().create<OrderService>().also {
+                    instance = it
                 }
             }
     }

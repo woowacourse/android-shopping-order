@@ -44,10 +44,11 @@ class ProductListViewModel(
             .onSuccess {
                 val newProducts = it.map(Product::toShoppingUiModel)
                 val nextPage = currentPage.plus(1)
-                _uiState.value = uiState.copy(
-                    products = uiState.products + newProducts,
-                    loadMoreModel = getLoadMore(nextPage),
-                )
+                _uiState.value =
+                    uiState.copy(
+                        products = uiState.products + newProducts,
+                        loadMoreModel = getLoadMore(nextPage),
+                    )
                 loadCartProducts()
             }.onFailure {
                 Timber.e(it)
@@ -63,7 +64,7 @@ class ProductListViewModel(
             _uiState.value =
                 uiState.updateCartProducts(
                     newCart,
-                    getLoadMore(newPage)
+                    getLoadMore(newPage),
                 )
         }.onFailure {
             Timber.e(it)
@@ -136,7 +137,7 @@ class ProductListViewModel(
                     productRepository,
                     loadCartUseCase,
                     increaseCartProductUseCase,
-                    decreaseCartProductUseCase
+                    decreaseCartProductUseCase,
                 )
             }
         }
@@ -149,13 +150,14 @@ private fun ProductListUiState.updateCartProducts(
 ): ProductListUiState {
     return copy(
         cart = cart,
-        products = products.map { originalProduct ->
-            val cartProduct =
-                cart.findCartProductByProductId(originalProduct.id)
-                    ?: return@map originalProduct.copy(count = 0)
-            originalProduct.copy(count = cartProduct.count)
-        },
-        loadMoreModel = loadMore
+        products =
+            products.map { originalProduct ->
+                val cartProduct =
+                    cart.findCartProductByProductId(originalProduct.id)
+                        ?: return@map originalProduct.copy(count = 0)
+                originalProduct.copy(count = cartProduct.count)
+            },
+        loadMoreModel = loadMore,
     )
 }
 
@@ -166,10 +168,14 @@ private fun ProductListUiState.increaseProductCount(
     val newProduct = newCart.findCartProductByProductId(productId) ?: return this
     return copy(
         cart = newCart,
-        products = products.map {
-            if (it.id == productId) it.copy(count = newProduct.count)
-            else it
-        },
+        products =
+            products.map {
+                if (it.id == productId) {
+                    it.copy(count = newProduct.count)
+                } else {
+                    it
+                }
+            },
     )
 }
 
@@ -177,18 +183,27 @@ private fun ProductListUiState.decreaseProductCount(
     productId: Long,
     newCart: Cart,
 ): ProductListUiState {
-    val newProduct = newCart.findCartProductByProductId(productId) ?: return copy(
-        newCart,
-        products = products.map {
-            if (it.id == productId) it.copy(count = 0)
-            else it
-        },
-    )
+    val newProduct =
+        newCart.findCartProductByProductId(productId) ?: return copy(
+            newCart,
+            products =
+                products.map {
+                    if (it.id == productId) {
+                        it.copy(count = 0)
+                    } else {
+                        it
+                    }
+                },
+        )
     return copy(
         cart = newCart,
-        products = products.map {
-            if (it.id == productId) it.copy(count = newProduct.count)
-            else it
-        },
+        products =
+            products.map {
+                if (it.id == productId) {
+                    it.copy(count = newProduct.count)
+                } else {
+                    it
+                }
+            },
     )
 }

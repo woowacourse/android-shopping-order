@@ -120,7 +120,7 @@ class CartViewModel(
     private fun updateUiState(
         newUiState: CartUiState,
         currentPage: Int = newUiState.currentPage,
-        isLoading: Boolean = false
+        isLoading: Boolean = false,
     ) {
         val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
         val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
@@ -129,8 +129,8 @@ class CartViewModel(
                 currentPage = currentPage,
                 canLoadPrevPage = canLoadPrevPage,
                 canLoadNextPage = canLoadNextPage,
-                isLoading = isLoading
-            )
+                isLoading = isLoading,
+            ),
         )
     }
 
@@ -219,26 +219,32 @@ private fun CartUiState.toggleAllOrderProducts(): CartUiState {
     val isSelectedAll = isTotalProductsOrdered
     val newPagingProducts =
         pagingProducts.map {
-            it.key to it.value.map { cartProductUi ->
-                cartProductUi.copy(isSelected = !isSelectedAll)
-            }
+            it.key to
+                it.value.map { cartProductUi ->
+                    cartProductUi.copy(isSelected = !isSelectedAll)
+                }
         }.toMap()
     return copy(
         pagingProducts = newPagingProducts,
     )
 }
 
-private fun CartUiState.updateCart(pageSize: Int, newCart: Cart): CartUiState {
+private fun CartUiState.updateCart(
+    pageSize: Int,
+    newCart: Cart,
+): CartUiState {
     val orderedProductsIds = orderedProducts.map { it.product.id }
-    val newCartProducts = newCart.toUiModel().map { newCartProduct ->
-        if (newCartProduct.product.id in orderedProductsIds) {
-            val original = orderedProducts.find { it.product.id == newCartProduct.product.id }
-                ?: return@map newCartProduct
-            newCartProduct.copy(isSelected = original.isSelected)
-        } else {
-            newCartProduct
+    val newCartProducts =
+        newCart.toUiModel().map { newCartProduct ->
+            if (newCartProduct.product.id in orderedProductsIds) {
+                val original =
+                    orderedProducts.find { it.product.id == newCartProduct.product.id }
+                        ?: return@map newCartProduct
+                newCartProduct.copy(isSelected = original.isSelected)
+            } else {
+                newCartProduct
+            }
         }
-    }
     // paging
     val newPagingProducts =
         newCartProducts.chunked(pageSize).mapIndexed { index, chunkedProducts ->

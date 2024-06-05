@@ -65,7 +65,7 @@ class CartFragmentTest {
     @DisplayName("상품이 수량이 1개일 때, 증가 시키면 2개가 된다")
     fun increase_count_test() {
         // given
-        startScenarioWith(fakeCartProduct(productId = 2,count = 1))
+        startScenarioWith(fakeCartProduct(productId = 2, count = 1))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -93,7 +93,7 @@ class CartFragmentTest {
     @DisplayName("상품의 수량이 1개일 때, 감소 시키면 1개이다.")
     fun decrease_count_test() {
         // given
-        startScenarioWith(fakeCartProduct(productId = 4,count = 1))
+        startScenarioWith(fakeCartProduct(productId = 4, count = 1))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -120,7 +120,7 @@ class CartFragmentTest {
     @DisplayName("상품이 1000원이고 수량이 3개일 때, 감소 시키면 총 가격이 2000가 된다")
     fun decrease_count_price_test2() {
         // given
-        startScenarioWith(fakeCartProduct(productId = 6,count = 3, price = 1000))
+        startScenarioWith(fakeCartProduct(productId = 6, count = 3, price = 1000))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -173,7 +173,7 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 총 6개 있을 때, 3번째 상품을 삭제 하면 " +
-                "5 개의 상품이 현재 페이지에 보인다",
+            "5 개의 상품이 현재 페이지에 보인다",
     )
     fun delete_test1() {
         // given
@@ -196,7 +196,7 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 총 6개 있을 때, 3번째 상품을 삭제 하면 " +
-                "5번째 위치에 6 번째 상품이 현재 페이지에 보인다",
+            "5번째 위치에 6 번째 상품이 현재 페이지에 보인다",
     )
     fun delete_test2() {
         // given
@@ -226,7 +226,7 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 5개 있을 때, 3번째 상품을 삭제 하면 " +
-                "4개가 보인다",
+            "4개가 보인다",
     )
     fun delete_test3() {
         // given
