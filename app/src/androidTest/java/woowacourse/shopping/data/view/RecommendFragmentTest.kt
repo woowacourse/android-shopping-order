@@ -67,7 +67,7 @@ class RecommendFragmentTest {
     @Test
     fun `추천_상품_제목을_보여준다`() {
         onView(withId(R.id.tv_subject))
-            .check(matches(withText("이런 상품은 어떠세요?")))
+            .check(matches(withText(context.getString(R.string.recomend_product_subject))))
     }
 
     @Test
