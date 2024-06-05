@@ -8,6 +8,7 @@ data class Product(
     val name: String,
     val price: Int,
     val quantity: Int,
+    val category: String = "",
 ) {
     companion object {
         val NULL =

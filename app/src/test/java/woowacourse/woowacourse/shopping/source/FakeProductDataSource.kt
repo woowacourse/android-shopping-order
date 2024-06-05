@@ -14,6 +14,8 @@ class FakeProductDataSource(
         allProducts.find { it.id == id }
             ?: throw NoSuchElementException("there is no product with id: $id")
 
+    override fun findByCategory(category: String): List<ProductData> = allProducts.filter { it.category == category }
+
     override fun isFinalPage(page: Int): Boolean = pagingStrategy.isFinalPage(page, allProducts)
 
     override fun shutDown(): Boolean {

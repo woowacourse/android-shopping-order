@@ -27,4 +27,5 @@ fun ProductData.toDomain(quantity: Int = 0): Product =
         name,
         price,
         quantity = quantity,
+        category = category,
     )

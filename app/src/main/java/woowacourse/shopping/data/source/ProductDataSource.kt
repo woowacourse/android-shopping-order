@@ -7,6 +7,8 @@ interface ProductDataSource {
 
     fun findById(id: Long): ProductData
 
+    fun findByCategory(category: String): List<ProductData>
+
     fun isFinalPage(page: Int): Boolean
 
     fun shutDown(): Boolean

@@ -31,6 +31,20 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
         )
     }
 
+    override fun findByCategory(category: String): List<ProductData> {
+        val response = productsApiService.requestProducts(category = category).execute().body()?.content
+            ?: throw NoSuchElementException("there is no product with category: $category")
+        return response.map {
+            ProductData(
+                id = it.id,
+                imgUrl = it.imageUrl,
+                name = it.name,
+                price = it.price,
+                category = it.category,
+            )
+        }
+    }
+
     override fun isFinalPage(page: Int): Boolean {
         val totalPage = productsApiService.requestProducts(page = page).execute().body()?.totalPages
         return (page + 1) == totalPage
