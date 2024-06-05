@@ -16,30 +16,23 @@ class DefaultProductHistoryRepository(
 
     override fun loadAllProductHistory(): List<Product> {
         val productIds = productHistoryDataSource.loadAllProductHistory()
-
-        return productIds.map {
-            when(val response = productDataSource.findById(it)) {
-                is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
-                is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-                is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
-            }
-        }
+        return productIds.map { handleResponse(it) }
     }
 
     override fun loadProductHistory(productId: Long): Product {
         val id =
             productHistoryDataSource.loadProductHistory(productId)
                 ?: throw NoSuchElementException("there is no product history with id $productId")
-        return when(val response = productDataSource.findById(id)) {
-            is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
-            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
-        }
+        return handleResponse(id)
     }
 
     override fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
-        return when(val response = productDataSource.findById(productId)) {
+        return handleResponse(productId)
+    }
+
+    private fun handleResponse(productId: Long): Product {
+        return when (val response = productDataSource.findById(productId)) {
             is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")

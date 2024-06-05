@@ -11,11 +11,7 @@ class DefaultCartItemRepository(
 ) : CartItemRepository {
 
     override fun loadCartItems(): List<CartItem> {
-        return when(val response = cartItemDataSource.loadAllCartItems()) {
-            is ResponseResult.Success -> response.data.content.map { cartItemDto -> cartItemDto.toDomain() }
-            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("${response.e}:예기치 않은 오류가 발생했습니다.")
-        }
+        return handleResponse(cartItemDataSource.loadAllCartItems()).content.map { cartItemDto -> cartItemDto.toDomain() }
     }
 
     override fun addCartItem(
@@ -23,11 +19,10 @@ class DefaultCartItemRepository(
         quantity: Int,
     ) {
         val cartItem = loadCartItems().find { it.product.id == id }
-            ?: when(val response = cartItemDataSource.addedNewProductsId(ProductIdsCount(id, quantity))) {
-                is ResponseResult.Success -> return
-                is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-                is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
-            }
+        if (cartItem == null) {
+            handleResponse(cartItemDataSource.addedNewProductsId(ProductIdsCount(id, quantity)))
+            return
+        }
         handleResponse(cartItemDataSource.plusProductsIdCount(cartItem.id, quantity))
     }
 
@@ -58,9 +53,9 @@ class DefaultCartItemRepository(
         handleResponse(cartItemDataSource.plusProductsIdCount(cartItemId, quantity))
     }
 
-    private fun <T : Any> handleResponse(response: ResponseResult<T>) {
-        when(response) {
-            is ResponseResult.Success -> return
+    private fun <T : Any> handleResponse(response: ResponseResult<T>): T {
+        return when(response) {
+            is ResponseResult.Success -> response.data
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
