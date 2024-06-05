@@ -23,7 +23,7 @@ class ProductDetailViewModel(
     private val productId: Long,
     private val shoppingProductsRepository: ShoppingProductsRepository,
     private val productHistoryRepository: ProductHistoryRepository,
-) : ViewModel(), OnItemQuantityChangeListener, OnProductItemClickListener {
+) : ViewModel(), ProductDetailListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private val _currentProduct: MutableLiveData<Product> = MutableLiveData()
@@ -84,7 +84,7 @@ class ProductDetailViewModel(
         _productCount.value = _productCount.value?.minus(1)
     }
 
-    override fun onClick(productId: Long) {
+    override fun navigateToProductDetail(productId: Long) {
         _detailProductDestinationId.setValue(productId)
     }
 
@@ -113,4 +113,5 @@ class ProductDetailViewModel(
             }
         }
     }
+
 }

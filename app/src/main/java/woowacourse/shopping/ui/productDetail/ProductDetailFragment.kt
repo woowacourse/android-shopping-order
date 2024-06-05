@@ -33,8 +33,7 @@ class ProductDetailFragment : Fragment() {
 
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.onItemChargeListener = viewModel
-        binding.onProductClickListener = viewModel
+        binding.listener = viewModel
 
         return binding.root
     }
