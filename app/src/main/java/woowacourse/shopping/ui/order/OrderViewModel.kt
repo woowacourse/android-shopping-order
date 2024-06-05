@@ -33,9 +33,6 @@ class OrderViewModel(
     private val _addedProductQuantity: MutableLiveData<Int> = MutableLiveData()
     val addedProductQuantity: LiveData<Int> get() = _addedProductQuantity
 
-    private val _changedProduct: MutableSingleLiveData<Product> = MutableSingleLiveData()
-    val changedProduct: SingleLiveData<Product> get() = _changedProduct
-
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData()
     val totalPrice: LiveData<Int> get() = _totalPrice
 
@@ -92,7 +89,32 @@ class OrderViewModel(
     }
 
     override fun onDecrease(productId: Long, quantity: Int) {
-        TODO("Not yet implemented")
+        thread {
+            val item = _recommendedProducts.getValue()?.find {
+                it.id == productId
+            } ?: throw NoSuchElementException("There is no product with id: $productId")
+
+            cartRepository.updateProductQuantity(productId, item.quantity - 1)
+
+            _recommendedProducts.postValue(
+                _recommendedProducts.getValue()?.map {
+                    if (it.id == productId) {
+                        it.copy(quantity = it.quantity - 1)
+                    } else {
+                        it
+                    }
+                } ?: emptyList()
+            )
+
+            _totalPrice.postValue(
+                _totalPrice.value?.minus(
+                    _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+                ) ?: 0
+            )
+
+            _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
+        }.join()
+
     }
 
     companion object {
