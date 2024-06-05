@@ -267,17 +267,17 @@ class CartViewModel(
                 }
         }
 
-    fun createOrder() {
-        val cartItemIds = cartUiModels().selectedCartItemIds()
-        orderRepository.createOrder(cartItemIds) {
-            it.onSuccess {
-                _isSuccessCreateOrder.value = Event(true)
-                deleteCartItems(cartItemIds)
-            }.onFailure {
-                _isSuccessCreateOrder.value = Event(false)
-            }
+    fun createOrder() =
+        viewModelScope.launch {
+            val cartItemIds = cartUiModels().selectedCartItemIds()
+            orderRepository.createOrder(cartItemIds)
+                .onSuccess {
+                    _isSuccessCreateOrder.value = Event(true)
+                    deleteCartItems(cartItemIds)
+                }.onFailure {
+                    _isSuccessCreateOrder.value = Event(false)
+                }
         }
-    }
 
     private fun deleteCartItems(cartItemIds: List<Int>) =
         viewModelScope.launch {

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote
 
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -55,7 +54,7 @@ interface RetrofitService {
     ): Result<Unit>
 
     @POST("/orders")
-    fun requestCreateOrder(
+    suspend fun requestCreateOrder(
         @Body createOrderRequest: CreateOrderRequest,
-    ): Call<Unit>
+    ): Result<Unit>
 }
