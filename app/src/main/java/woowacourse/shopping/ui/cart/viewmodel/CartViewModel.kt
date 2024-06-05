@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,9 +24,8 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
-
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val products: LiveData<List<ProductWithQuantity>> = _products
 
@@ -64,8 +62,7 @@ class CartViewModel(
     private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
 
-    private fun currentCartState(): CartItemsUiState =
-        _cart.value ?: CartItemsUiState(emptyList(), true)
+    private fun currentCartState(): CartItemsUiState = _cart.value ?: CartItemsUiState(emptyList(), true)
 
     init {
         loadCartItems()
@@ -76,10 +73,11 @@ class CartViewModel(
             _cart.value = currentCartState().copy(isLoading = true)
             cartRepository.getAllCartItemsWithProduct()
         }.onSuccess { carts ->
-            _cart.value = currentCartState().copy(
-                cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
-                isLoading = false
-            )
+            _cart.value =
+                currentCartState().copy(
+                    cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
+                    isLoading = false,
+                )
         }
     }
 
@@ -167,7 +165,6 @@ class CartViewModel(
             }
             loadCartItems()
         }
-
     }
 
     override fun minusCount(productId: Long) {
@@ -185,7 +182,6 @@ class CartViewModel(
             }
             loadCartItems()
         }
-
     }
 
     private fun changeRecommendProductCount(productId: Long) {
@@ -241,5 +237,9 @@ class CartViewModel(
         )
 
     private fun isAlreadyChecked(productId: Long): Boolean =
-        (_cart.value?.cartItems?.firstOrNull { it.productId == productId }?.isChecked ?: false) || _products.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
+        (
+            _cart.value?.cartItems?.firstOrNull {
+                it.productId == productId
+            }?.isChecked ?: false
+        ) || _products.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 }

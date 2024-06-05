@@ -16,7 +16,6 @@ import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
 
 class CartItemFragment : Fragment() {
-
     private var _binding: FragmentCartItemsBinding? = null
     val binding: FragmentCartItemsBinding
         get() = requireNotNull(_binding) { "${this::class.java.simpleName}에서 에러가 발생했습니다." }
@@ -28,20 +27,23 @@ class CartItemFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl()
+            OrderRepositoryImpl(),
         )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentCartItemsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         observeCartItems()
         setCartAdapter()
@@ -59,5 +61,4 @@ class CartItemFragment : Fragment() {
         adapter = CartAdapter(viewModel)
         binding.rvCart.adapter = adapter
     }
-
 }

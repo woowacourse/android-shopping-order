@@ -5,6 +5,6 @@ data class ProductWithQuantityUiState(
     val isLoading: Boolean = true,
 ) {
     companion object {
-        val DEFAULT:ProductWithQuantityUiState = ProductWithQuantityUiState(emptyList(), true)
+        val DEFAULT: ProductWithQuantityUiState = ProductWithQuantityUiState(emptyList(), true)
     }
 }

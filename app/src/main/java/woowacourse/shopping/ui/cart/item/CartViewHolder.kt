@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart.item
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.ui.cart.item.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 
 class CartViewHolder(

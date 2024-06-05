@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.products.viewmodel
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -30,7 +29,6 @@ class ProductContentsViewModel(
     private val cartRepository: CartRepository,
 ) :
     ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
-
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
 
     private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
@@ -80,9 +78,9 @@ class ProductContentsViewModel(
                 PAGE_SIZE
             )
         }.onSuccess { loadedProducts ->
-            handler.postDelayed({
-                products.value = (products.value ?: emptyList()) + loadedProducts
-            }, 1000)
+
+            products.value = (products.value ?: emptyList()) + loadedProducts
+
         }
     }
 
@@ -139,7 +137,7 @@ class ProductContentsViewModel(
 
         return currentProduct().copy(
             productWithQuantities = updatedList.map { it.toUiModel() },
-            isLoading = false
+            isLoading = false,
         )
     }
 

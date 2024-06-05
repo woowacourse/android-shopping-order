@@ -1,13 +1,15 @@
 package woowacourse.shopping.data.order
 
-import woowacourse.shopping.data.dto.request.RequestPostOrderDto
-import woowacourse.shopping.data.service.ApiFactory
+import woowacourse.shopping.data.datasource.OrderDataSource
+import woowacourse.shopping.data.datasource.impl.OrderDataSourceImpl
+import woowacourse.shopping.data.dto.request.RequestOrderPostDto
 import kotlin.concurrent.thread
 
-class OrderRepositoryImpl:OrderRepository {
+class OrderRepositoryImpl(private val dataSource: OrderDataSource = OrderDataSourceImpl()) :
+    OrderRepository {
     override fun order(cartIds: List<Long>) {
-       thread {
-           ApiFactory.postOrder(RequestPostOrderDto(cartIds))
-       }.join()
+        thread {
+            dataSource.postOrder(RequestOrderPostDto(cartIds))
+        }.join()
     }
 }

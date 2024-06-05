@@ -28,7 +28,7 @@ class CartActivity : AppCompatActivity() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl()
+            OrderRepositoryImpl(),
         )
     }
 
@@ -73,7 +73,6 @@ class CartActivity : AppCompatActivity() {
             } else if (supportFragmentManager.findFragmentById(R.id.fcv_cart) is RecommendFragment) {
                 viewModel.order()
             }
-
         }
     }
 
@@ -95,7 +94,6 @@ class CartActivity : AppCompatActivity() {
             viewModel.totalCheckBoxCheck((it as CheckBox).isChecked)
         }
     }
-
 
     companion object {
         fun startActivity(context: Context) =

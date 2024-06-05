@@ -1,19 +1,21 @@
 package woowacourse.shopping.data.product
 
+import woowacourse.shopping.data.datasource.ProductDataSource
+import woowacourse.shopping.data.datasource.impl.ProductDataSourceImpl
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.data.service.ApiFactory
 import woowacourse.shopping.model.Product
 import kotlin.concurrent.thread
 
-class ProductRepositoryImpl : ProductRepository {
+class ProductRepositoryImpl(private val dataSource: ProductDataSource = ProductDataSourceImpl()) :
+    ProductRepository {
     override fun getProducts(
         page: Int,
         size: Int,
     ): List<Product> {
         var productsDto: ResponseProductsGetDto? = null
         thread {
-            productsDto = ApiFactory.getProductsByOffset(page, size)
+            productsDto = dataSource.getProductsByOffset(page, size)
         }.join()
         val products = productsDto ?: error("상품 정보를 불러오지 못했습니다")
         return products.content.map { product ->
@@ -30,7 +32,7 @@ class ProductRepositoryImpl : ProductRepository {
     override fun find(id: Long): Product {
         var productDto: ResponseProductIdGetDto? = null
         thread {
-            productDto = ApiFactory.getProductsById(id)
+            productDto = dataSource.getProductsById(id)
         }.join()
         val product = productDto ?: error("$id 에 해당하는 productId가 없습니다")
         return Product(

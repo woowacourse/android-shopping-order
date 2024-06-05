@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart.item
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.ui.cart.item.CartUiModel
 
 object CartDiffUtil : DiffUtil.ItemCallback<CartUiModel>() {
     override fun areItemsTheSame(

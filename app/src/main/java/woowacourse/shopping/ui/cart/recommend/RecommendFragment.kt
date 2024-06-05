@@ -17,7 +17,6 @@ import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.products.toUiModel
 
 class RecommendFragment : Fragment() {
-
     private var _binding: FragmentRecommendProductBinding? = null
     val binding: FragmentRecommendProductBinding
         get() = requireNotNull(_binding) { "${this::class.java.simpleName}에서 에러가 발생했습니다." }
@@ -29,25 +28,27 @@ class RecommendFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl()
+            OrderRepositoryImpl(),
         )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentRecommendProductBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         setRecommendProductAdapter()
         initSetting()
         setRecommendProduct()
-
     }
 
     private fun initSetting() {
@@ -68,6 +69,4 @@ class RecommendFragment : Fragment() {
         recommendProductAdapter = RecommendProductAdapter(viewModel)
         binding.rvRecommendProduct.adapter = recommendProductAdapter
     }
-
-
 }
