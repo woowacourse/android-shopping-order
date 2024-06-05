@@ -6,7 +6,6 @@ import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.service.CartItemService
-import kotlin.concurrent.thread
 
 class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemoteDataSource {
     override suspend fun getCartItems(
@@ -22,11 +21,9 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
             service.postCartItem(request = request)
         }
 
-    override fun deleteCartItems(id: Long): Result<Unit> =
+    override suspend fun deleteCartItems(id: Long): Result<Unit> =
         runCatching {
-            thread {
-                service.deleteCartItem(id = id).execute().body()
-            }.join()
+            service.deleteCartItem(id = id)
         }
 
     override suspend fun patchCartItems(

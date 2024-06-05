@@ -13,7 +13,7 @@ interface CartRemoteDataSource {
 
     suspend fun postCartItems(request: RequestCartItemPostDto): Result<Unit>
 
-    fun deleteCartItems(id: Long): Result<Unit>
+    suspend fun deleteCartItems(id: Long): Result<Unit>
 
     suspend fun patchCartItems(
         id: Long,

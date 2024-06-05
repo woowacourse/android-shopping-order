@@ -70,6 +70,8 @@ class CartViewModel(
     private val _order = MutableSingleLiveData<Unit>()
     val order: SingleLiveData<Unit> = _order
 
+    private var removeState: Boolean = true
+
     init {
         loadCartItems()
     }
@@ -106,10 +108,15 @@ class CartViewModel(
     }
 
     override fun removeCartItem(productId: Long) {
+        if (!removeState) return // 아직 아이템이 삭제되지 않은 경우
+
+        removeState = false
         viewModelScope.launch {
             cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
                 updateCartLiveData()
+                removeState = true
             }.onFailure {
+                removeState = false
                 error.setValue(it)
             }
         }
