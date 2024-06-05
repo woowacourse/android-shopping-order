@@ -59,6 +59,7 @@ class ProductDetailFragment :
         initListeners()
         initObservers()
         initErrorEvent()
+        viewModel.refreshDetailProduct()
     }
 
     private fun initListeners() {
@@ -76,9 +77,6 @@ class ProductDetailFragment :
         }
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()
-        }
-        eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {
-            viewModel.refreshDetailProduct()
         }
     }
 
