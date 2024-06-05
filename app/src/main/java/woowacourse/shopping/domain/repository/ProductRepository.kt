@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PagedProducts
+import woowacourse.shopping.domain.Product
 
 interface ProductRepository {
     suspend fun loadWithCategory(

@@ -186,10 +186,10 @@ class CartViewModel(
         }.onFailure {}
     }
 
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        val updatedQuantity = item?.let { it.quantity - 1 } ?: 1
+    override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        val updatedQuantity = product?.let { it.quantity - 1 } ?: 1
         if (updatedQuantity > 0) {
-            item?.let {
+            product?.let {
                 cartRepository.modifyExistCartQuantity(
                     productId = it.id,
                     quantityDelta = -1,
@@ -204,8 +204,8 @@ class CartViewModel(
         }
     }
 
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let {
+    override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product?.let {
             cartRepository.modifyExistCartQuantity(
                 productId = it.id,
                 quantityDelta = 1,

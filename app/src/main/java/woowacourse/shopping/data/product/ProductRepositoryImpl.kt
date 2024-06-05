@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.product.remote.RemoteProductDataSource
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PagedProducts
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSource()) :

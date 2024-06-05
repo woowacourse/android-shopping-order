@@ -121,18 +121,18 @@ class ProductDetailViewModel(
         _moveEvent.value = Event(FromDetailToScreen.ProductDetail(product.productId))
     }
 
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item ?: return
-        val updatedQuantity = item.quantity - 1
+    override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product ?: return
+        val updatedQuantity = product.quantity - 1
         if (updatedQuantity > 0) {
-            _product.value = item.copy(quantity = updatedQuantity)
+            _product.value = product.copy(quantity = updatedQuantity)
         }
     }
 
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item ?: return
+    override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product ?: return
         val updatedItem =
-            item.let {
+            product.let {
                 it.copy(quantity = it.quantity + 1)
             }
         _product.value = updatedItem
