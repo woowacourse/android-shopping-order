@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.cart.CartViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            isVisible="@{vm.uiState.currentPageProducts.size() == 0}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cart_empty"
+                android:theme="@style/H1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_shopping_cart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginBottom="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/layout_page_manager"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="10"
+            tools:listitem="@layout/item_cart_product" />
+
+        <include
+            layout="@layout/layout_skeleton_cart_products"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_page_manager"
+            app:layout_constraintTop_toTopOf="parent"
+            bind:visible="@{vm.uiState.isLoading}" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_page_manager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_order"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/tv_minus_page"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@{vm.uiState.canLoadPrevPage ? @color/mint : @color/gray500}"
+                android:enabled="@{vm.uiState.canLoadPrevPage}"
+                android:onClick="@{()->vm.moveToPrevPage()}"
+                android:text="@string/cart_prev_page"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:theme="@style/H1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:background="@color/mint" />
+
+            <TextView
+                android:id="@+id/tv_current_page"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:text="@{String.valueOf(vm.uiState.currentPage)}"
+                android:textAlignment="center"
+                android:theme="@style/H1"
+                app:layout_constraintStart_toEndOf="@id/tv_minus_page"
+                app:layout_constraintTop_toTopOf="@id/tv_minus_page"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/tv_plus_page"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@{vm.uiState.canLoadNextPage ? @color/mint : @color/gray500}"
+                android:enabled="@{vm.uiState.canLoadNextPage}"
+                android:onClick="@{()->vm.moveToNextPage()}"
+                android:text="@string/cart_next_page"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:theme="@style/H1"
+                app:layout_constraintStart_toEndOf="@id/tv_current_page"
+                app:layout_constraintTop_toTopOf="@id/tv_current_page"
+                tools:background="@color/mint" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <CheckBox
+                android:id="@+id/cb_all_product"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/shape_retangular_4"
+                android:checked="@{vm.uiState.isTotalProductsOrdered}"
+                android:onClick="@{() -> vm.toggleTotalOrderProducts()}"
+                app:layout_constraintBottom_toTopOf="@id/tv_all_product_description"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_all_product_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="15dp"
+                android:text="@string/all_product_description"
+                android:textColor="@color/white"
+                android:theme="@style/B2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="@{@string/price_format(vm.uiState.orderPrice)}"
+                android:textColor="@color/white"
+                android:theme="@style/H1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_order"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/price_format" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/mint"
+                android:onClick="@{() ->vm.navigateToRecommend()}"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="30dp"
+                android:paddingBottom="27dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/order_product_format(vm.uiState.orderedProductCount)}"
+                    android:textColor="@color/white"
+                    android:theme="@style/H1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@string/order_product_format" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
