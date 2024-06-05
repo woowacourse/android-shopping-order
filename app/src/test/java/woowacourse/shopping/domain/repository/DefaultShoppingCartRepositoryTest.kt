@@ -75,4 +75,8 @@ fun cartItemDtoTestFixture(id: Int, quantity: Int = 1, product: ProductDto = Pro
         product = product,
     )
 
-fun cartItemDtosTestFixture(dataCount: Int): List<CartItemDto> = List(dataCount) { cartItemDtoTestFixture(it) }
+fun cartItemDtosTestFixture(dataCount: Int): List<CartItemDto> = List(dataCount) {
+    cartItemDtoTestFixture(
+        id = it + 1
+    )
+}

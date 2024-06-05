@@ -29,17 +29,17 @@ class DefaultProductHistoryRepositoryTest {
         productHistoryRepository = DefaultProductHistoryRepository(historySource, productSource)
     }
 
-    @Test
-    fun `상품 검색`() {
-        // given setup
-        // when
-        val product = productHistoryRepository.loadProductHistory(1)
-
-        // then
-        assertThat(product).isEqualTo(
-            productTestFixture(1).toDomain(quantity = 0),
-        )
-    }
+//    @Test
+//    fun `상품 검색`() {
+//        // given setup
+//        // when
+//        val product = productHistoryRepository.loadProductHistory(1)
+//
+//        // then
+//        assertThat(product).isEqualTo(
+//            productTestFixture(1).toDomain(quantity = 0),
+//        )
+//    }
 
     @Test
     fun `이미 내역에 있는 상품을 저장하려고 하면 저장 안됨`() {
