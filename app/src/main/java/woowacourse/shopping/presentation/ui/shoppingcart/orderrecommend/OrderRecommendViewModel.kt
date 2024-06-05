@@ -14,7 +14,6 @@ import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.model.ProductItemId
-import kotlin.concurrent.thread
 
 class OrderRecommendViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
@@ -36,7 +35,7 @@ class OrderRecommendViewModel(
     }
 
     private fun recommendProductLoad() {
-        thread {
+        launch {
             productHistoryRepository.getRecommendedProducts(10).onSuccess { recommendProducts ->
                 hideError()
                 val state = uiState.value ?: return@onSuccess
@@ -46,16 +45,15 @@ class OrderRecommendViewModel(
     }
 
     fun load(orderCarts: List<Cart>) {
-        _uiState.value?.let { state ->
-            _uiState.value = state.copy(orderCarts = orderCarts)
-        }
+        val state = uiState.value ?: return
+        _uiState.value = state.copy(orderCarts = orderCarts)
     }
 
     override fun retry() {}
 
     fun order() {
-        thread {
-            val state = uiState.value ?: return@thread
+        launch {
+            val state = uiState.value ?: return@launch
             orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
                 hideError()
                 _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
@@ -134,7 +132,7 @@ class OrderRecommendViewModel(
         product: Product,
         quantity: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.postCartItem(
                 productId = product.id,
                 quantity = quantity,
@@ -154,7 +152,7 @@ class OrderRecommendViewModel(
         productId: Long,
         cartId: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.deleteCartItem(
                 cartId = cartId,
             ).onSuccess {
@@ -174,7 +172,7 @@ class OrderRecommendViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.patchCartItem(
                 cartId = cartId,
                 quantity = quantity,
