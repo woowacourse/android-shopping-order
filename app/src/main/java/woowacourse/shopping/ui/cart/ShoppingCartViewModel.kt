@@ -6,17 +6,18 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.ui.util.SingleLiveData
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.util.MutableSingleLiveData
+import woowacourse.shopping.ui.util.SingleLiveData
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
@@ -45,8 +46,8 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
 
-    private var _navigationOrderEvent = MutableSingleLiveData<List<Long>>(emptyList())
-    val navigationOrderEvent: SingleLiveData<List<Long>> get() = _navigationOrderEvent
+    private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ShoppingCartEvent> get() = _event
 
     fun loadAll() {
         thread {
@@ -93,11 +94,7 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-//        _navigationOrderEvent.value = cartItems.value?.filter {
-//            it.checked
-//        }?.map { it.id }
-
-        _navigationOrderEvent.setValue(emptyList())
+        _event.setValue(ShoppingCartEvent.NavigationOrder)
 
         cartItems.value?.forEach {
             orderRepository.saveOrderItemTemp(it.product.id, it.quantity)
@@ -180,6 +177,10 @@ class ShoppingCartViewModel(
             cartItems.value?.filter { it.checked }?.sumOf {
                 it.product.price * it.quantity
             }
+    }
+
+    fun onBackClick() {
+        _event.setValue(ShoppingCartEvent.PopBackStack)
     }
 
     override fun selectedAll() {

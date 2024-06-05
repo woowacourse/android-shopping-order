@@ -7,13 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
@@ -24,7 +23,7 @@ class ShoppingCartFragment : Fragment() {
     private val viewModel: ShoppingCartViewModel by viewModels {
         ShoppingCartViewModel.factory()
     }
-    
+
     private val adapter: CartAdapter by lazy {
         CartAdapter(
             onProductItemClickListener = viewModel,
@@ -96,9 +95,15 @@ class ShoppingCartFragment : Fragment() {
     }
 
     private fun observeOrderNavigation() {
-        viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
-            (requireActivity() as? FragmentNavigator)?.navigateToOrder()
+        viewModel.event.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ShoppingCartEvent.NavigationOrder -> (requireActivity() as? FragmentNavigator)?.navigateToOrder()
+
+                is ShoppingCartEvent.PopBackStack -> (requireActivity() as? FragmentNavigator)?.popBackStack()
+            }
         }
+
+
     }
 
     companion object {
