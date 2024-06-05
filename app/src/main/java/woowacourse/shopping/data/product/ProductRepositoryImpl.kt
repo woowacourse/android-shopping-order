@@ -6,7 +6,7 @@ import woowacourse.shopping.model.Product
 
 class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDataSource) :
     ProductRepository {
-    override fun getProducts(
+    override suspend fun getProducts(
         page: Int,
         size: Int,
     ): Result<List<Product>> =
@@ -14,7 +14,7 @@ class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDa
             it.toProduct()
         }
 
-    override fun find(id: Long): Result<Product> =
+    override suspend fun find(id: Long): Result<Product> =
         productRemoteDataSource.getProductsById(id).mapCatching {
             Product(
                 id = it.id,
@@ -25,7 +25,7 @@ class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDa
             )
         }
 
-    override fun getProductsByCategory(category: String): Result<List<Product>> =
+    override suspend fun getProductsByCategory(category: String): Result<List<Product>> =
         runCatching {
             var page = 0
             val products = mutableListOf<Product>()
@@ -41,7 +41,7 @@ class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDa
             products
         }
 
-    private fun productsWithCategory(
+    private suspend fun productsWithCategory(
         category: String,
         page: Int,
     ): Result<List<Product>> =

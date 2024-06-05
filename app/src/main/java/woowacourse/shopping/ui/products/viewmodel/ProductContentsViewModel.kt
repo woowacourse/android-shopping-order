@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProduct
 import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
@@ -51,11 +50,8 @@ class ProductContentsViewModel(
             }
         }
 
-    private val _recentProducts: MutableLiveData<List<RecentProduct>> = MutableLiveData()
-    val recentProducts: LiveData<List<Product>> =
-        _recentProducts.map { recentProducts ->
-            recentProducts.map { productRepository.find(it.productId).getOrThrow() }
-        }
+    private val _recentProducts: MutableLiveData<List<Product>> = MutableLiveData()
+    val recentProducts: LiveData<List<Product>> = _recentProducts
 
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
@@ -105,19 +101,21 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        productRepository.getProducts(currentOffset++, 20).onSuccess {
-            items.addAll(it)
-            this.products.value = items
-            Timer().schedule(
-                object : TimerTask() {
-                    override fun run() {
-                        productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
-                    }
-                },
-                1000,
-            )
-        }.onFailure {
-            _error.setValue(it)
+        viewModelScope.launch {
+            productRepository.getProducts(currentOffset++, 20).onSuccess {
+                items.addAll(it)
+                products.value = items
+                Timer().schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
+                        }
+                    },
+                    1000,
+                )
+            }.onFailure {
+                _error.setValue(it)
+            }
         }
     }
 
@@ -133,8 +131,10 @@ class ProductContentsViewModel(
     }
 
     fun loadRecentProducts() {
-        recentProductRepository.findAll().onSuccess {
-            _recentProducts.value = it
+        viewModelScope.launch {
+            recentProductRepository.findAll().onSuccess {
+                _recentProducts.value = it.map { productRepository.find(it.productId).getOrThrow() }
+            }
         }
     }
 

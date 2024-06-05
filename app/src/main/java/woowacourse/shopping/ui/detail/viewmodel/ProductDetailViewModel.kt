@@ -51,12 +51,14 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-        productRepository.find(productId).onSuccess {
-            _error.value = false
-            _productWithQuantity.value = ProductWithQuantity(product = it)
-        }.onFailure {
-            _error.value = true
-            _errorMsg.setValue(it.toString())
+        viewModelScope.launch {
+            productRepository.find(productId).onSuccess {
+                _error.value = false
+                _productWithQuantity.value = ProductWithQuantity(product = it)
+            }.onFailure {
+                _error.value = true
+                _errorMsg.setValue(it.toString())
+            }
         }
     }
 
@@ -92,16 +94,18 @@ class ProductDetailViewModel(
     }
 
     private fun loadMostRecentProduct(productId: Long) {
-        recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
-            productRepository.find(recentProduct.productId).onSuccess { product ->
-                _error.value = false
-                _mostRecentProduct.value = product
-                if (!lastSeenProductState) return
-                setMostRecentVisibility(product.id, productId)
-            }.onFailure {
-                _error.value = true
-                _mostRecentProductVisibility.value = false
-                _errorMsg.setValue(it.toString())
+        viewModelScope.launch {
+            recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
+                productRepository.find(recentProduct.productId).onSuccess { product ->
+                    _error.value = false
+                    _mostRecentProduct.value = product
+                    if (!lastSeenProductState) return@launch
+                    setMostRecentVisibility(product.id, productId)
+                }.onFailure {
+                    _error.value = true
+                    _mostRecentProductVisibility.value = false
+                    _errorMsg.setValue(it.toString())
+                }
             }
         }
     }

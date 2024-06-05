@@ -141,25 +141,29 @@ class CartViewModel(
     }
 
     private fun setRecommendProducts(recentProduct: RecentProduct) {
-        productRepository.find(recentProduct.productId).onSuccess { product ->
-            if (isRecommendPage.value == false) {
-                isRecommendPage.value = true
+        viewModelScope.launch {
+            productRepository.find(recentProduct.productId).onSuccess { product ->
+                if (isRecommendPage.value == false) {
+                    isRecommendPage.value = true
+                }
+                setRecommendProducts(product)
+            }.onFailure {
+                error.setValue(it)
             }
-            setRecommendProducts(product)
-        }.onFailure {
-            error.setValue(it)
         }
     }
 
     private fun setRecommendProducts(it: Product) {
-        productRepository.getProductsByCategory(it.category).onSuccess {
-            _products.value =
-                it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
-                    .map { ProductWithQuantity(product = it) }
-                    .subList(0, minOf(it.size, 10))
-            noRecommendProductState.value = false
-        }.onFailure {
-            noRecommendProductState.value = true
+        viewModelScope.launch {
+            productRepository.getProductsByCategory(it.category).onSuccess {
+                _products.value =
+                    it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
+                        .map { ProductWithQuantity(product = it) }
+                        .subList(0, minOf(it.size, 10))
+                noRecommendProductState.value = false
+            }.onFailure {
+                noRecommendProductState.value = true
+            }
         }
     }
 
