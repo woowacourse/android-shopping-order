@@ -8,9 +8,12 @@ import io.mockk.verify
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ShoppingRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.LoadCartUseCase
 import woowacourse.shopping.presentation.shopping.toShoppingUiModel
 import woowacourse.shopping.presentation.util.InstantTaskExecutorExtension
 import woowacourse.shopping.presentation.util.getOrAwaitValue
@@ -18,10 +21,16 @@ import woowacourse.shopping.presentation.util.getOrAwaitValue
 @ExtendWith(InstantTaskExecutorExtension::class, MockKExtension::class)
 class ProductListViewModelTest {
     @RelaxedMockK
-    private lateinit var shoppingRepository: ShoppingRepository
+    private lateinit var productRepository: ProductRepository
 
     @RelaxedMockK
-    private lateinit var cartRepository: CartRepository
+    private lateinit var loadCartUseCase: LoadCartUseCase
+
+    @RelaxedMockK
+    private lateinit var increaseCartProductUseCase: IncreaseCartProductUseCase
+
+    @RelaxedMockK
+    private lateinit var decreaseCartProductUseCase: DecreaseCartProductUseCase
 
     private lateinit var productListViewModel: ProductListViewModel
     private val uiState get() = productListViewModel.uiState.getOrAwaitValue()
@@ -31,19 +40,25 @@ class ProductListViewModelTest {
     fun `init ViewModel`() {
         // given
         val expectProducts = listOf(product().toShoppingUiModel())
-        every { shoppingRepository.products(currentPage = 0, size = 20) } returns
-            Result.success(
-                listOf(product()),
-            )
-        every { cartRepository.filterCartProducts(listOf(1)) } returns Result.success(emptyList())
-        every { shoppingRepository.recentProducts(10) } returns Result.success(emptyList())
+        every { productRepository.loadProducts(currentPage = 0, size = 20) } returns
+                Result.success(
+                    listOf(product()),
+                )
+        every { productRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
+        every { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
+        every { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())
         // when
-        productListViewModel = ProductListViewModel(shoppingRepository, cartRepository)
+        productListViewModel = ProductListViewModel(
+            productRepository,
+            loadCartUseCase,
+            increaseCartProductUseCase,
+            decreaseCartProductUseCase
+        )
         // when
-        verify(exactly = 1) { shoppingRepository.products(currentPage = 0, size = 20) }
-        verify(exactly = 1) { shoppingRepository.canLoadMore(page = 1, size = 20) }
-        verify(exactly = 1) { cartRepository.filterCartProducts(listOf(1)) }
-        verify(exactly = 1) { shoppingRepository.recentProducts(10) }
+        verify(exactly = 1) { productRepository.loadProducts(currentPage = 0, size = 20) }
+        verify(exactly = 2) { productRepository.canLoadMore(page = 1, size = 20) }
+        verify(exactly = 1) { loadCartUseCase(listOf(1)) }
+        verify(exactly = 1) { productRepository.loadRecentProducts(10) }
         uiState.products shouldBe expectProducts
     }
 
@@ -52,20 +67,25 @@ class ProductListViewModelTest {
     fun `init ViewModel2 - show load more btn`() {
         // given
         val expectProducts = listOf(product().toShoppingUiModel(), ShoppingUiModel.LoadMore)
-        every { shoppingRepository.products(currentPage = 0, size = 20) } returns
-            Result.success(
-                listOf(product()),
-            )
+        every { productRepository.loadProducts(currentPage = 0, size = 20) } returns
+                Result.success(
+                    listOf(product()),
+                )
         every {
-            shoppingRepository.canLoadMore(page = 1, size = 20)
+            productRepository.canLoadMore(page = 1, size = 20)
         } returns Result.success(true)
-        every { cartRepository.filterCartProducts(listOf(1)) } returns Result.success(emptyList())
-        every { shoppingRepository.recentProducts(10) } returns Result.success(emptyList())
+        every { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
+        every { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())
         // when
-        productListViewModel = ProductListViewModel(shoppingRepository, cartRepository)
+        productListViewModel = ProductListViewModel(
+            productRepository,
+            loadCartUseCase,
+            increaseCartProductUseCase,
+            decreaseCartProductUseCase
+        )
         // when
-        verify(exactly = 1) { shoppingRepository.products(currentPage = 0, size = 20) }
-        verify(exactly = 1) { shoppingRepository.canLoadMore(page = 1, size = 20) }
+        verify(exactly = 1) { productRepository.loadProducts(currentPage = 0, size = 20) }
+        verify(exactly = 2) { productRepository.canLoadMore(page = 1, size = 20) }
         uiState.totalProducts shouldBe expectProducts
     }
 
@@ -74,18 +94,23 @@ class ProductListViewModelTest {
     fun `init ViewModel3 - cant show load more btn`() {
         // given
         val expectProducts = listOf(product().toShoppingUiModel())
-        every { shoppingRepository.products(currentPage = 0, size = 20) } returns
-            Result.success(
-                listOf(product()),
-            )
-        every { shoppingRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
-        every { cartRepository.filterCartProducts(listOf(1)) } returns Result.success(emptyList())
-        every { shoppingRepository.recentProducts(10) } returns Result.success(emptyList())
+        every { productRepository.loadProducts(currentPage = 0, size = 20) } returns
+                Result.success(
+                    listOf(product()),
+                )
+        every { productRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
+        every { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
+        every { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())
         // when
-        productListViewModel = ProductListViewModel(shoppingRepository, cartRepository)
+        productListViewModel = ProductListViewModel(
+            productRepository,
+            loadCartUseCase,
+            increaseCartProductUseCase,
+            decreaseCartProductUseCase
+        )
         // then
-        verify(exactly = 1) { shoppingRepository.products(currentPage = 0, size = 20) }
-        verify(exactly = 1) { shoppingRepository.canLoadMore(page = 1, size = 20) }
+        verify(exactly = 1) { productRepository.loadProducts(currentPage = 0, size = 20) }
+        verify(exactly = 2) { productRepository.canLoadMore(page = 1, size = 20) }
         uiState.totalProducts shouldBe expectProducts
     }
 }
