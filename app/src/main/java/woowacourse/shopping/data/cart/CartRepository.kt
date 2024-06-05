@@ -26,5 +26,5 @@ interface CartRepository {
         quantity: Int,
     ): Result<Unit>
 
-    suspend fun order(cartItemIds: List<Long>): Result<Unit>
+    suspend fun order(cartItemIds: List<Long>)
 }

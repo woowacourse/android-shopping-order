@@ -65,7 +65,10 @@ class CartRepositoryImpl(
         id: Long,
         quantity: Int,
     ): Result<Unit> {
-        return cartRemoteDataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
+        return cartRemoteDataSource.patchCartItems(
+            id = id,
+            request = RequestCartItemsPatchDto(quantity),
+        )
     }
 
     override suspend fun addProductToCart(
@@ -79,7 +82,9 @@ class CartRepositoryImpl(
         return patchCartItem(cart.id, cart.quantity.value + quantity)
     }
 
-    override suspend fun order(cartItemIds: List<Long>) = orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
+    override suspend fun order(cartItemIds: List<Long>) {
+        orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
+    }
 
     private fun ResponseCartItemsGetDto.Product.toDomain() =
         Product(
