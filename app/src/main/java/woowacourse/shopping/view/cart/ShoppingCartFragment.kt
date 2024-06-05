@@ -106,13 +106,12 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                     )
                 }
                 is ShoppingCartEvent.SendCartItem.Success -> {
-                    navigateOrder(cartState.shoppingCart)
+                    navigateRecommend(cartState.shoppingCart)
                 }
 
-                ShoppingCartEvent.UpdateCheckBox.Success -> {
-                    adapter.notifyDataSetChanged()
-                }
+                ShoppingCartEvent.UpdateCheckBox.Success -> {}
             }
+            adapter.notifyDataSetChanged()
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
@@ -144,7 +143,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         mainActivityListener?.changeFragment(productFragment)
     }
 
-    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
+    private fun navigateRecommend(checkedShoppingCart: ShoppingCart) {
         val recommendFragment =
             RecommendFragment().apply {
                 arguments =

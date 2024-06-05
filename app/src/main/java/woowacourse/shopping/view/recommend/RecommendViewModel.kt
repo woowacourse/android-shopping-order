@@ -25,7 +25,6 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class RecommendViewModel(
-    private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
@@ -86,18 +85,6 @@ class RecommendViewModel(
                 }
                 .onFailure {
                     handleException(ErrorEvent.LoadDataEvent())
-                }
-        }
-
-    private fun orderItems() =
-        viewModelScope.launch {
-            val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-            orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
-                .onSuccess {
-                    _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-                }
-                .onFailure {
-                    handleException(ErrorEvent.OrderItemsEvent())
                 }
         }
 
@@ -195,6 +182,6 @@ class RecommendViewModel(
     }
 
     override fun clickOrder() {
-        orderItems()
+        _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success(checkedShoppingCart))
     }
 }

@@ -120,6 +120,7 @@ class CouponCalculator {
         _discountPrice.value = discountPrice
     }
 
+
     companion object {
         const val DEFAULT_PRICE = 0
     }

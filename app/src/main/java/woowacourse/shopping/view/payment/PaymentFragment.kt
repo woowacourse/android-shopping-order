@@ -89,6 +89,7 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
                 )
                 PaymentEvent.SelectCoupon.Success -> adapter.notifyDataSetChanged()
             }
+            adapter.notifyDataSetChanged()
         }
         paymentViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(

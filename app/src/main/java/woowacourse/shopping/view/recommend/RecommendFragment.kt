@@ -21,6 +21,7 @@ import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.payment.PaymentFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts {
@@ -31,7 +32,6 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         val viewModelFactory =
             ViewModelFactory {
                 RecommendViewModel(
-                    orderRepository = RemoteOrderRepositoryImpl(),
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
                     recentlyRepository = RecentlyProductRepositoryImpl(requireContext()),
@@ -98,8 +98,9 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
                     }
                     adapter.updateProduct(state.product)
                 }
-
-                RecommendEvent.OrderRecommends.Success -> navigateToProduct()
+                is RecommendEvent.OrderRecommends.Success -> {
+                    navigateOrder(state.shoppingCart)
+                }
             }
         }
         recommendViewModel.errorEvent.observe(viewLifecycleOwner) { errorState->
@@ -146,10 +147,6 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         }
     }
 
-    private fun navigateToProduct() {
-        mainActivityListener?.resetFragment()
-    }
-
     private fun loadCheckedShoppingCart() {
         try {
             val shoppingCart = receiveCheckedShoppingCart()
@@ -160,6 +157,15 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
             )
             clickBack()
         }
+    }
+
+    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
+        val paymentFragment =
+            PaymentFragment().apply {
+                arguments =
+                    createBundle(checkedShoppingCart)
+            }
+        mainActivityListener?.changeFragment(paymentFragment)
     }
 
     companion object {

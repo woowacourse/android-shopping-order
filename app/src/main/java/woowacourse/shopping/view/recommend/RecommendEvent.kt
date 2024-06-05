@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.recommend
 
 import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.view.cart.model.ShoppingCart
 
 interface RecommendEvent {
     sealed interface UpdateProductEvent : RecommendEvent {
@@ -8,6 +9,6 @@ interface RecommendEvent {
     }
 
     sealed interface OrderRecommends : RecommendEvent {
-        data object Success : OrderRecommends
+        data class Success(val shoppingCart: ShoppingCart) : OrderRecommends
     }
 }
