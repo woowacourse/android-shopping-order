@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
@@ -14,21 +15,14 @@ class OrderFragment : Fragment() {
     private var _binding: FragmentOrderBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException()
 
-    private lateinit var factory: UniversalViewModelFactory
-    private lateinit var viewModel: OrderViewModel
+    private val viewModel: OrderViewModel by viewModels {
+        OrderViewModel.factory()
+    }
 
     private val recommendedProductsAdapter: RecommendedProductsAdapter by lazy {
         RecommendedProductsAdapter(
             viewModel,
         )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            factory = OrderViewModel.factory()
-        }
-        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     override fun onResume() {

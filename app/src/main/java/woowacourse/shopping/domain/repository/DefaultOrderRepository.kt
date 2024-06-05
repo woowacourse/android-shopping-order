@@ -21,14 +21,11 @@ class DefaultOrderRepository(
     override fun allOrderItemsTempQuantity(): Int = orderSource.allQuantity()
 
     override fun tempOrderItemsTotalPrice(): Int {
-        val load = orderSource.load()
+        val orders = orderSource.load()
 
-        val map = load.map { (id, quantity) ->
+        return orders.map { (id, quantity) ->
             productSource.findById(id).price.times(quantity)
-        }
-
-        return map.sum()
-//        return orderSource.totalPrice()
+        }.sum()
     }
 
 
