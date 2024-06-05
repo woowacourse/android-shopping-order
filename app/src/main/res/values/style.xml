@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="QuantityButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:paddingHorizontal">15dp</item>
+        <item name="android:paddingVertical">5dp</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:textColor">@color/gray_500</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

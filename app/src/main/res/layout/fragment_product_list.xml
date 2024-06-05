@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.ui.product.ProductListViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_product_list"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:backgroundTint="@color/gray_500"
+            android:paddingEnd="20dp"
+            app:layout_constraintBottom_toTopOf="@id/product_list_nested_scroll_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/shopping_description"
+            app:titleTextColor="@color/white">
+
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:background="@drawable/circle_background"
+                android:gravity="center"
+                android:text="@{String.valueOf(vm.cartProductTotalCount > 99 ?  @string/greater_than_99: vm.cartProductTotalCount)}"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:visibility="@{vm.cartProductTotalCount > 0 ? View.VISIBLE : View.GONE}"
+                tools:ignore="SpUsage"
+                tools:text="99" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:importantForAccessibility="no"
+                android:onClick="@{() -> vm.navigateToShoppingCart()}"
+                android:src="@drawable/ic_shopping_cart" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/product_list_nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_product_list">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/product_latest_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@{vm.productsHistory.empty ? @string/product_history_empty : @string/products_history}"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/product_latest_list"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="SpUsage"
+                    tools:text="최근 본 상품" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/product_latest_list"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:overScrollMode="never"
+                    android:paddingHorizontal="16dp"
+                    android:visibility="@{vm.productsHistory.empty ? View.GONE : View.VISIBLE}"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/product_detail_list"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/product_latest_title"
+                    tools:context=".ui.product.ProductListFragment"
+                    tools:itemCount="10"
+                    tools:listitem="@layout/holder_product_history" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_product_list"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:padding="14dp"
+                    android:visibility="@{vm.isLoading ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shimmer_auto_start="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                        <include layout="@layout/item_product_skeleton" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/product_detail_list"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:padding="14dp"
+                    android:visibility="@{vm.isLoading ? View.GONE : View.VISIBLE}"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/load_more_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/product_latest_list"
+                    app:spanCount="2"
+                    tools:itemCount="20"
+                    tools:listitem="@layout/holder_product">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/load_more_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_order_button"
+                    android:onClick="@{() -> vm.loadNextPageProducts()}"
+                    android:text="@string/load_more_products"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:visibility="@{vm.isLastPage == true ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/product_detail_list"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
