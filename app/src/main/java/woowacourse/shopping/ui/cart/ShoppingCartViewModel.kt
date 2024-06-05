@@ -81,20 +81,15 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-        _event.setValue(ShoppingCartEvent.NavigationOrder)
-
-        cartItems.value?.forEach {
-            orderRepository.saveOrderItemTemp(it.product.id, it.quantity)
-        }
-
-
         thread {
-            shoppingCartRepository.loadAllCartItems().also {
-                Log.d(TAG, "loadAllCartItems: $it")
+            _event.postValue(ShoppingCartEvent.NavigationOrder)
+
+            cartItems.value?.forEach { cartItem ->
+                if (cartItem.checked) {
+                    orderRepository.saveOrderItem(cartItem.product.id, cartItem.quantity)
+                }
             }
-        }.join()
-
-
+        }
     }
 
     override fun onRemove(productId: Long) {

@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/shape_order_button"
-            android:onClick="@{() -> onOrderListener.createOrder()}"
+            android:onClick="@{() -> onOrderListener.order()}"
             android:paddingHorizontal="16dp"
             android:text="@{@string/order_items_count(totalCartItemQuantity)}"
             android:textColor="@color/white"
