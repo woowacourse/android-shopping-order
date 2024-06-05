@@ -9,7 +9,6 @@ import woowacourse.shopping.data.remote.dto.request.RequestOrderPostDto
 interface OrderService {
     @POST("/orders")
     fun postOrders(
-        @Header("accept") accept: String = "*/*",
         @Body request: RequestOrderPostDto,
     ): Call<Unit>
 }
