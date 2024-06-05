@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="product"
+            type="woowacourse.shopping.presentation.ui.model.ProductModel" />
+
+        <variable
+            name="cartHandler"
+            type="woowacourse.shopping.presentation.ui.cart.CartHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp">
+
+        <ImageView
+            android:id="@+id/img_item"
+            bindLoadImage="@{product.imageUrl}"
+            android:layout_width="154dp"
+            android:layout_height="154dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{product.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/img_item"
+            app:layout_constraintStart_toStartOf="@id/img_item"
+            app:layout_constraintTop_toBottomOf="@id/img_item"
+            tools:text="상품 이름" />
+
+        <TextView
+            android:id="@+id/tv_price"
+            bindTextFormattedCurrency="@{product.price}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/img_item"
+            app:layout_constraintStart_toStartOf="@id/img_item"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            tools:text="상품 가격" />
+
+        <include
+            android:id="@+id/layout_shopping_quantity_control"
+            android:visibility="@{product.quantity > 0 ? View.VISIBLE : View.GONE}"
+            layout="@layout/include_quantity_control"
+            android:layout_width="126dp"
+            android:layout_height="42dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/img_item"
+            app:layout_constraintEnd_toEndOf="@id/img_item"
+            app:layout_constraintStart_toStartOf="@id/img_item"
+            app:productId="@{product.id}"
+            app:count="@{product.quantity}"
+            app:quantityHandler="@{cartHandler}" />
+
+        <ImageView
+            android:id="@+id/btn_plus"
+            android:visibility="@{product.quantity == 0 ? View.VISIBLE : View.GONE}"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:onClick="@{()->cartHandler.onPlusButtonClick(product.id)}"
+            android:src="@drawable/ic_white_plus"
+            app:layout_constraintBottom_toBottomOf="@id/img_item"
+            app:layout_constraintEnd_toEndOf="@id/img_item" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
