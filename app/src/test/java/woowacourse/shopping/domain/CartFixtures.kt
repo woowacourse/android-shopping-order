@@ -6,4 +6,4 @@ import woowacourse.shopping.domain.entity.Product
 fun cartProduct(
     product: Product = product(),
     count: Int = 1,
-) = CartProduct(product, count)
+) = CartProduct(product, count, -1)
