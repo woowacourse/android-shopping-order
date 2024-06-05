@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.recommend
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 interface RecommendEvent {
     sealed interface UpdateProductEvent : RecommendEvent {

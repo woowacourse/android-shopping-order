@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.db.product.MockProductService
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.service.ProductService
 import woowacourse.shopping.utils.exception.ErrorEvent

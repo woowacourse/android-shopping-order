@@ -1,6 +1,6 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 
 class MockRecentlyProductRepository : RecentlyProductRepository {

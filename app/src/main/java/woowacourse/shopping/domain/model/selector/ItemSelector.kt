@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.selector
 
 class ItemSelector(isSelected: Boolean = DEFAULT_ITEM_SELECTED) {
     var isSelected: Boolean = isSelected

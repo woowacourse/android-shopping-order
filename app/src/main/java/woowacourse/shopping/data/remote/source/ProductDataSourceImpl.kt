@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.source
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.utils.DtoMapper.toProduct
 import woowacourse.shopping.utils.DtoMapper.toProducts
 

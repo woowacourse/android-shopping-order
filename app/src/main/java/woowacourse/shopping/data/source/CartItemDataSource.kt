@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.source
 
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemResult
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItemResult
 
 interface CartItemDataSource {
     suspend fun loadCartItems(): Result<CartItemResponse>

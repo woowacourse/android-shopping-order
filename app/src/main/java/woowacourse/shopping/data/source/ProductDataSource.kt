@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.source
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 interface ProductDataSource {
     suspend fun loadProducts(

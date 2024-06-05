@@ -2,9 +2,9 @@ package woowacourse.shopping.utils
 
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.model.RecentlyProductEntity
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 
 object EntityMapper {
     fun CartItemEntity.toCartItem(): CartItem {

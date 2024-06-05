@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -13,7 +13,7 @@ import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.MainActivityListener

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemRecentlyProductBinding
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.view.products.OnClickProducts
 import woowacourse.shopping.view.products.adapter.viewholder.RecentlyViewHolder
 

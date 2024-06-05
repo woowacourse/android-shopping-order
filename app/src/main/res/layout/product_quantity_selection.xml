@@ -9,7 +9,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.domain.model.Product" />
+            type="woowacourse.shopping.domain.model.product.Product" />
 
         <variable
             name="onClickCartItemCounter"

@@ -12,7 +12,7 @@ import woowacourse.shopping.TestFixture.deleteAll
 import woowacourse.shopping.data.db.cartItem.CartItemDao
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
 import woowacourse.shopping.data.model.CartItemEntity
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)

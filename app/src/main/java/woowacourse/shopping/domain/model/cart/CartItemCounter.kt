@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.cart
 
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 

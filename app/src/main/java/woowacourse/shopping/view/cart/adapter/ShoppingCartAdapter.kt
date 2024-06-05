@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartItemSkeletonBinding
 import woowacourse.shopping.databinding.ItemShoppingCartBinding
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.view.cart.OnClickNavigateShoppingCart
 import woowacourse.shopping.view.cart.OnClickShoppingCart
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartSkeletonViewHolder

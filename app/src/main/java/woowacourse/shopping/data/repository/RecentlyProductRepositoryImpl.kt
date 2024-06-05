@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import android.content.Context
 import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProduct
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProductEntity

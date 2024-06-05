@@ -2,13 +2,13 @@ package woowacourse.shopping.data.repository
 
 import android.content.Context
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
-import woowacourse.shopping.domain.model.CartItemCounter
-import woowacourse.shopping.domain.model.CartItemResult
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
+import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.cart.CartItemResult
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.EntityMapper.toCartItem
 import woowacourse.shopping.utils.EntityMapper.toCartItemEntity

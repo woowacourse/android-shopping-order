@@ -6,9 +6,9 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.source.CartItemDataSource
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter
-import woowacourse.shopping.domain.model.CartItemResult
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.cart.CartItemResult
 import woowacourse.shopping.utils.DtoMapper.toCartItems
 import woowacourse.shopping.utils.DtoMapper.toQuantity
 import woowacourse.shopping.utils.exception.ErrorEvent

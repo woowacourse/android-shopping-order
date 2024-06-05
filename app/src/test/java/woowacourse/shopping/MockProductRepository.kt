@@ -1,8 +1,6 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.db.product.ProductDatabase.products
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Product.Companion.defaultProduct
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class MockProductRepository : ProductRepository {

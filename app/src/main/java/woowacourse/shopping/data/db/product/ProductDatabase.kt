@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.db.product
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 object ProductDatabase {
     val products =

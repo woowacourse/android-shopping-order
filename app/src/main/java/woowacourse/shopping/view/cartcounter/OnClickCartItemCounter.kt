@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.cartcounter
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 interface OnClickCartItemCounter {
     fun clickIncrease(product: Product)

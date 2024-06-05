@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class RemoteProductRepositoryImpl(

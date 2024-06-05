@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 
 interface RecentlyProductRepository {
     suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Unit>

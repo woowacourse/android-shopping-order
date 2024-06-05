@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.products
 
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 
 interface OnClickProducts {
     fun clickProductItem(productId: Long)

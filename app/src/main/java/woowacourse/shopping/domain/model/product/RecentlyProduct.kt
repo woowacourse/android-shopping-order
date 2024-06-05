@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.product
 
 data class RecentlyProduct(
     val id: Long = DEFAULT_RECENTLY_PRODUCT_ID,

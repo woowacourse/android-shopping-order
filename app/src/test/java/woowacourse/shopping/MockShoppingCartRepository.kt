@@ -1,11 +1,11 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter
-import woowacourse.shopping.domain.model.CartItemResult
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.cart.CartItemResult
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class MockShoppingCartRepository : ShoppingCartRepository {

@@ -9,8 +9,8 @@ import woowacourse.shopping.MockProductRepository
 import woowacourse.shopping.MockRecentlyProductRepository
 import woowacourse.shopping.MockShoppingCartRepository
 import woowacourse.shopping.TestFixture.getOrAwaitValue
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.view.detail.ProductDetailViewModel
