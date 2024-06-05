@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
@@ -18,6 +20,7 @@ class ProductDetailViewModel(
     private val productId: Long,
     private val shoppingProductsRepository: ShoppingProductsRepository,
     private val productHistoryRepository: ProductHistoryRepository,
+    private val cartRepository: ShoppingCartRepository,
 ) : ViewModel(), ProductDetailListener {
     private val _currentProduct: MutableLiveData<Product> = MutableLiveData()
     val currentProduct: LiveData<Product> get() = _currentProduct
@@ -51,7 +54,7 @@ class ProductDetailViewModel(
     fun addProductToCart() {
         val productCount = productCount.value ?: return
         thread {
-            shoppingProductsRepository.addShoppingCartProduct(productId, productCount)
+            cartRepository.addShoppingCartProduct(productId, productCount)
         }
     }
 
@@ -94,12 +97,17 @@ class ProductDetailViewModel(
                     productHistoryDataSource = ShoppingApp.historySource,
                     productDataSource = ShoppingApp.productSource,
                 ),
+            cartRepository: ShoppingCartRepository =
+                DefaultShoppingCartRepository(
+                    cartSource = ShoppingApp.cartSource,
+                )
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 ProductDetailViewModel(
                     productId = productId,
                     shoppingProductsRepository = shoppingProductsRepository,
                     productHistoryRepository = historyRepository,
+                    cartRepository = cartRepository,
                 )
             }
         }

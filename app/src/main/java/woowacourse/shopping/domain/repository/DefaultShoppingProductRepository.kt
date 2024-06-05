@@ -25,68 +25,12 @@ class DefaultShoppingProductRepository(
         }
     }
 
-    override fun loadPagedCartItem(): List<CartItem> {
-        return cartSource.loadAllCartItems().map {
-            CartItem(
-                id = it.id,
-                quantity = it.quantity,
-                product = it.product,
-                checked = false,
-            )
-        }
-    }
-
     override fun loadProduct(id: Long): Product = productsSource.findById(id).toDomain(productQuantity(id))
 
     override fun isFinalPage(page: Int): Boolean = productsSource.isFinalPage(page)
 
-    override fun shoppingCartProductQuantity(): Int = cartSource.loadAllCartItems().sumOf { it.quantity }
-
-    override fun increaseInShoppingCart(cartItemId: Long, quantity: Int) {
-        cartSource.plusProductsIdCount(cartItemId, quantity)
-    }
-
-    override fun decreaseInShoppingCart(cartItemId: Long, quantity: Int) {
-        cartSource.minusProductsIdCount(cartItemId, quantity)
-    }
-
     private fun productQuantity(productId: Long): Int {
         return cartSource.findByProductId(productId)?.quantity ?: 0
-    }
-
-    override fun increaseShoppingCartProduct(
-        id: Long,
-        quantity: Int,
-    ) {
-        val all = cartSource.loadAllCartItems()
-        val cartItem = all.find { it.product.id == id } ?: throw NoSuchElementException()
-        cartSource.plusProductsIdCount(cartItem.id, quantity)
-    }
-
-    override fun decreaseShoppingCartProduct(
-        id: Long,
-        quantity: Int,
-    ) {
-        cartSource.minusProductsIdCount(id, quantity)
-    }
-
-    override fun addShoppingCartProduct(
-        id: Long,
-        quantity: Int,
-    ) {
-        val all = cartSource.loadAllCartItems()
-        val cartItem = all.find { it.product.id == id }
-
-        if (cartItem == null) {
-            cartSource.addNewProduct(ProductIdsCount(id, quantity))
-            return
-        }
-
-        cartSource.plusProductsIdCount(cartItem.id, quantity = cartItem.quantity + quantity)
-    }
-
-    override fun removeShoppingCartProduct(id: Long) {
-        cartSource.removeCartItem(id)
     }
 
     companion object {
