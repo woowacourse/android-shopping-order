@@ -90,7 +90,9 @@ class ProductDetailViewModel(
 
     private fun addToRecentProduct() {
         loadMostRecentProduct(productId)
-        recentProductRepository.insert(productId)
+        viewModelScope.launch {
+            recentProductRepository.insert(productId)
+        }
     }
 
     private fun loadMostRecentProduct(productId: Long) {

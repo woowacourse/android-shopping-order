@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductLocalDataSource: RecentProductLocalDataSource) :
     RecentProductRepository {
-        override fun insert(productId: Long): Result<Long> =
+        override suspend fun insert(productId: Long): Result<Long> =
             recentProductLocalDataSource.insert(
                 RecentProduct(
                     productId = productId,
@@ -13,11 +13,11 @@ class RecentProductRepositoryImpl private constructor(private val recentProductL
                 ),
             )
 
-        override fun findMostRecentProduct(): Result<RecentProduct> = recentProductLocalDataSource.findMostRecentProduct()
+        override suspend fun findMostRecentProduct(): Result<RecentProduct> = recentProductLocalDataSource.findMostRecentProduct()
 
-        override fun findAll(): Result<List<RecentProduct>> = recentProductLocalDataSource.findAll()
+        override suspend fun findAll(): Result<List<RecentProduct>> = recentProductLocalDataSource.findAll()
 
-        override fun deleteAll(): Result<Unit> = recentProductLocalDataSource.deleteAll()
+        override suspend fun deleteAll(): Result<Unit> = recentProductLocalDataSource.deleteAll()
 
         companion object {
             private var instance: RecentProductRepository? = null

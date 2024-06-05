@@ -3,11 +3,11 @@ package woowacourse.shopping.data.datasource
 import woowacourse.shopping.data.recentproduct.RecentProduct
 
 interface RecentProductLocalDataSource {
-    fun insert(recentProduct: RecentProduct): Result<Long>
+    suspend fun insert(recentProduct: RecentProduct): Result<Long>
 
-    fun findMostRecentProduct(): Result<RecentProduct>
+    suspend fun findMostRecentProduct(): Result<RecentProduct>
 
-    fun findAll(): Result<List<RecentProduct>>
+    suspend fun findAll(): Result<List<RecentProduct>>
 
-    fun deleteAll(): Result<Unit>
+    suspend fun deleteAll(): Result<Unit>
 }

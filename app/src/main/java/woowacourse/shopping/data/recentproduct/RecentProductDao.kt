@@ -8,14 +8,14 @@ import androidx.room.Query
 @Dao
 interface RecentProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(recentProduct: RecentProduct): Long
+    suspend fun insert(recentProduct: RecentProduct): Long
 
     @Query("SELECT * FROM recent_products ORDER BY recentTime DESC LIMIT 1")
-    fun findMostRecentProduct(): RecentProduct?
+    suspend fun findMostRecentProduct(): RecentProduct?
 
     @Query("SELECT * FROM recent_products ORDER BY recentTime DESC")
-    fun findAll(): List<RecentProduct>
+    suspend fun findAll(): List<RecentProduct>
 
     @Query("DELETE FROM recent_products")
-    fun deleteAll()
+    suspend fun deleteAll()
 }
