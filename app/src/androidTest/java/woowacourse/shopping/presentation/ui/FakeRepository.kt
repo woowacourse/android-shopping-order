@@ -1,8 +1,8 @@
 package woowacourse.shopping.presentation.ui
 
-import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -33,10 +33,10 @@ class FakeRepository : Repository {
         TODO("Not yet implemented")
     }
 
-    override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> {
+    override fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> {
         carts.add(
             CartProduct(
-                productId = cartItemRequest.productId.toLong(),
+                productId = cartItemRequestDto.productId.toLong(),
                 name = "",
                 imgUrl = "",
                 price = 1000L,
@@ -45,12 +45,12 @@ class FakeRepository : Repository {
                 cartId = 0L,
             ),
         )
-        return Result.success(cartItemRequest.productId)
+        return Result.success(cartItemRequestDto.productId)
     }
 
     override fun patchCartItem(
         id: Int,
-        quantityRequest: QuantityRequest,
+        quantityRequestDto: QuantityRequestDto,
     ): Result<Unit> {
         carts.add(
             CartProduct(
@@ -70,7 +70,7 @@ class FakeRepository : Repository {
         TODO("Not yet implemented")
     }
 
-    override fun postOrders(orderRequest: OrderRequest): Result<Unit> {
+    override fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> {
         TODO("Not yet implemented")
     }
 

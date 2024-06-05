@@ -1,23 +1,23 @@
 package woowacourse.shopping.data.remote
 
 import retrofit2.Response
-import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
-import woowacourse.shopping.data.remote.dto.request.ProductRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.CartResponse
+import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.response.CartResponseDto
 import woowacourse.shopping.data.remote.dto.response.Product
-import woowacourse.shopping.data.remote.dto.response.ProductResponse
-import woowacourse.shopping.data.remote.dto.response.QuantityResponse
+import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
+import woowacourse.shopping.data.remote.dto.response.QuantityResponseDto
 
 interface RemoteDataSource {
     fun getProducts(
         category: String? = null,
         page: Int = 0,
         size: Int = 20,
-    ): Response<ProductResponse>
+    ): Response<ProductResponseDto>
 
-    fun postProduct(productRequest: ProductRequest): Response<Unit>
+    fun postProduct(productRequestDto: ProductRequestDto): Response<Unit>
 
     fun getProductById(id: Int): Response<Product>
 
@@ -26,18 +26,18 @@ interface RemoteDataSource {
     fun getCartItems(
         page: Int = 0,
         size: Int = 20,
-    ): Response<CartResponse>
+    ): Response<CartResponseDto>
 
-    fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit>
+    fun postCartItem(cartItemRequestDto: CartItemRequestDto): Response<Unit>
 
     fun deleteCartItem(id: Int): Response<Unit>
 
     fun patchCartItem(
         id: Int,
-        quantityRequest: QuantityRequest,
+        quantityRequestDto: QuantityRequestDto,
     ): Response<Unit>
 
-    fun getCartItemsCounts(): Response<QuantityResponse>
+    fun getCartItemsCounts(): Response<QuantityResponseDto>
 
-    fun postOrders(orderRequest: OrderRequest): Response<Unit>
+    fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit>
 }

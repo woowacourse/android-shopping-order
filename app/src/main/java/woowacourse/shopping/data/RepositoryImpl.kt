@@ -5,9 +5,9 @@ import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.data.remote.RemoteDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
-import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.domain.CartProduct
@@ -66,9 +66,9 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
+    override fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> =
         runCatching {
-            val response = remoteDataSource.postCartItem(cartItemRequest)
+            val response = remoteDataSource.postCartItem(cartItemRequestDto)
             if (response.isSuccessful) {
                 return Result.success(
                     response.toIdOrNull() ?: 0,
@@ -79,10 +79,10 @@ class RepositoryImpl(
 
     override fun patchCartItem(
         id: Int,
-        quantityRequest: QuantityRequest,
+        quantityRequestDto: QuantityRequestDto,
     ): Result<Unit> =
         runCatching {
-            val response = remoteDataSource.patchCartItem(id, quantityRequest)
+            val response = remoteDataSource.patchCartItem(id, quantityRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
@@ -98,9 +98,9 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun postOrders(orderRequest: OrderRequest): Result<Unit> =
+    override fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> =
         runCatching {
-            val response = remoteDataSource.postOrders(orderRequest)
+            val response = remoteDataSource.postOrders(orderRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }

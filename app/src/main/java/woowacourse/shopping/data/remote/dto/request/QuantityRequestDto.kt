@@ -3,6 +3,6 @@ package woowacourse.shopping.data.remote.dto.request
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QuantityRequest(
+data class QuantityRequestDto(
     val quantity: Int,
 )

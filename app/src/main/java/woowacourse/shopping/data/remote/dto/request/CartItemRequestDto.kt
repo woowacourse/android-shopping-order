@@ -4,13 +4,13 @@ import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.CartProduct
 
 @Serializable
-data class CartItemRequest(
+data class CartItemRequestDto(
     val productId: Int,
     val quantity: Int,
 ) {
     companion object {
-        fun fromCartProduct(cartProduct: CartProduct): CartItemRequest {
-            return CartItemRequest(
+        fun fromCartProduct(cartProduct: CartProduct): CartItemRequestDto {
+            return CartItemRequestDto(
                 productId = cartProduct.productId.toInt(),
                 quantity = cartProduct.quantity,
             )

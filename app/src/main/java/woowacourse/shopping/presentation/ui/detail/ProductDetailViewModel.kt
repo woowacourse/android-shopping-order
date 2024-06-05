@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.mapper.toCartProduct
-import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -60,7 +60,7 @@ class ProductDetailViewModel(
         thread {
             when (detailCartProduct.isNew) {
                 true -> {
-                    repository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
+                    repository.postCartItem(CartItemRequestDto.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
                             _cartProduct.postValue(UiState.Success(detailCartProduct))
                             saveRecentProduct(detailCartProduct.cartProduct)
@@ -72,8 +72,8 @@ class ProductDetailViewModel(
                 false -> {
                     repository.patchCartItem(
                         id = detailCartProduct.cartProduct.cartId.toInt(),
-                        quantityRequest =
-                            QuantityRequest(
+                        quantityRequestDto =
+                            QuantityRequestDto(
                                 detailCartProduct.cartProduct.quantity,
                             ),
                     ).onSuccess {

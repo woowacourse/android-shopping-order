@@ -3,8 +3,8 @@ package woowacourse.shopping.presentation.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
@@ -71,7 +71,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
         thread {
             repository.postOrders(
-                OrderRequest(
+                OrderRequestDto(
                     checkedIds,
                 ),
             ).onSuccess {
@@ -150,7 +150,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
+                quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
@@ -173,7 +173,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
+                quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))

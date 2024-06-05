@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain
 
-import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
-import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 
 interface Repository {
     fun getProducts(
@@ -20,16 +20,16 @@ interface Repository {
 
     fun getProductById(id: Int): Result<CartProduct?>
 
-    fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>
+    fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int>
 
     fun patchCartItem(
         id: Int,
-        quantityRequest: QuantityRequest,
+        quantityRequestDto: QuantityRequestDto,
     ): Result<Unit>
 
     fun deleteCartItem(id: Int): Result<Unit>
 
-    fun postOrders(orderRequest: OrderRequest): Result<Unit>
+    fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit>
 
     fun findByLimit(limit: Int): Result<List<RecentProduct>>
 
