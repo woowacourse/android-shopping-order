@@ -1,22 +1,17 @@
 package woowacourse.shopping.ui.productDetail
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.ui.util.SingleLiveData
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.util.MutableSingleLiveData
+import woowacourse.shopping.ui.util.SingleLiveData
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
@@ -24,8 +19,6 @@ class ProductDetailViewModel(
     private val shoppingProductsRepository: ShoppingProductsRepository,
     private val productHistoryRepository: ProductHistoryRepository,
 ) : ViewModel(), ProductDetailListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
     private val _currentProduct: MutableLiveData<Product> = MutableLiveData()
     val currentProduct: LiveData<Product> get() = _currentProduct
 
@@ -41,20 +34,17 @@ class ProductDetailViewModel(
     fun loadAll() {
         thread {
             val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
-            val latestProduct =
-                try {
-                    productHistoryRepository.loadLatestProduct()
-                } catch (e: NoSuchElementException) {
-                    Product.NULL
-                }
-
-            uiHandler.post {
-                _currentProduct.value = currentProduct
-                _productCount.value = 1
-                _latestProduct.value = latestProduct
+            val latestProduct = try {
+                productHistoryRepository.loadLatestProduct()
+            } catch (e: NoSuchElementException) {
+                Product.NULL
             }
 
             productHistoryRepository.saveProductHistory(productId)
+
+            _currentProduct.postValue(currentProduct)
+            _productCount.postValue(FIRST_AMOUNT)
+            _latestProduct.postValue(latestProduct)
         }
     }
 
@@ -69,19 +59,17 @@ class ProductDetailViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        _productCount.value = _productCount.value?.plus(1)
-        Log.d(TAG, "onIncrease: productCount: ${productCount.value}")
+        _productCount.value = _productCount.value?.plus(CHANGE_AMOUNT)
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        val currentProductCount = _productCount.value
-        if (currentProductCount == 1) {
+        if (productCount.value == FIRST_AMOUNT) {
             return
         }
-        _productCount.value = _productCount.value?.minus(1)
+        _productCount.value = _productCount.value?.minus(CHANGE_AMOUNT)
     }
 
     override fun navigateToProductDetail(productId: Long) {
@@ -90,6 +78,9 @@ class ProductDetailViewModel(
 
     companion object {
         private const val TAG = "ProductDetailViewModel"
+
+        private const val FIRST_AMOUNT = 1
+        private const val CHANGE_AMOUNT = 1
 
         fun factory(
             productId: Long,
@@ -113,5 +104,4 @@ class ProductDetailViewModel(
             }
         }
     }
-
 }
