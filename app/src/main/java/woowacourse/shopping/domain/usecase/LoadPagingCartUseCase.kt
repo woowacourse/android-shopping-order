@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.usecase
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 
-fun interface LoadPagingCartUseCase {
+interface LoadPagingCartUseCase {
     operator fun invoke(currentPage: Int, pageSize: Int): Result<Cart>
 }
 

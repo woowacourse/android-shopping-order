@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
-fun interface CreateCartProductUseCase {
+interface CreateCartProductUseCase {
     operator fun invoke(productId: Long, count: Int): Result<Cart>
 }
 

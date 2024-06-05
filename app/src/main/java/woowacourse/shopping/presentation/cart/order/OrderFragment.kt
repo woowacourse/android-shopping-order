@@ -18,7 +18,7 @@ import woowacourse.shopping.databinding.FragmentOrderProductBinding
 import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.DefaultOrderCartProductsUseCase
-import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
+import woowacourse.shopping.domain.usecase.DefaultRecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
@@ -41,7 +41,7 @@ class OrderFragment :
             DefaultOrderCartProductsUseCase.instance(productRepository, cartRepository),
             DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
             DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
-            RecommendProductsUseCase(
+            DefaultRecommendProductsUseCase.instance(
                 productRepository,
                 cartRepository,
             ),

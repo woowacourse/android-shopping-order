@@ -4,11 +4,15 @@ import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class RecommendProductsUseCase(
+interface RecommendProductsUseCase {
+    operator fun invoke(): List<Product>
+}
+
+class DefaultRecommendProductsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-) {
-    operator fun invoke(): List<Product> {
+) : RecommendProductsUseCase {
+    override operator fun invoke(): List<Product> {
         val recentProducts = productRepository.loadRecentProducts(1).getOrNull() ?: emptyList()
         val firstProduct = recentProducts.firstOrNull()
         val category = firstProduct?.category
@@ -31,5 +35,18 @@ class RecommendProductsUseCase(
     companion object {
         const val RECOMMEND_PRODUCT_SIZE = 10
         const val PRODUCT_SIZE = 1000
+
+        @Volatile
+        private var instance: RecommendProductsUseCase? = null
+
+        fun instance(
+            productRepository: ProductRepository,
+            cartRepository: CartRepository,
+        ): RecommendProductsUseCase {
+            return instance ?: synchronized(this) {
+                instance ?: DefaultRecommendProductsUseCase(productRepository, cartRepository)
+                    .also { instance = it }
+            }
+        }
     }
 }
