@@ -121,8 +121,8 @@ class ProductsViewModel(
 
     fun loadRecentProducts() =
         viewModelScope.launch {
-            _recentProductUiModels.value =
-                recentProductRepository.findRecentProducts().toRecentProductUiModels(this)
+            val recentProducts = recentProductRepository.findRecentProducts().getOrNull() ?: return@launch
+            _recentProductUiModels.value = recentProducts.toRecentProductUiModels(this)
         }
 
     private suspend fun List<RecentProduct>.toRecentProductUiModels(scope: CoroutineScope): List<RecentProductUiModel>? {

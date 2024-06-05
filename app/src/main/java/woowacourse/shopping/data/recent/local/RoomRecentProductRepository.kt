@@ -6,28 +6,23 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 class RoomRecentProductRepository(private val recentProductDao: RecentProductDao) :
     RecentProductRepository {
-    override fun findLastOrNull(): RecentProduct? {
-        var lastRecentProductEntity: RecentProductEntity? = null
-        thread {
-            lastRecentProductEntity = recentProductDao.findRange(1).firstOrNull()
-        }.join()
-        return lastRecentProductEntity?.toRecentProduct()
+    override suspend fun findLastOrNull(): Result<RecentProduct?> {
+        return runCatching {
+            recentProductDao.findRange(1).firstOrNull()?.toRecentProduct()
+        }
     }
 
-    override fun findRecentProducts(): List<RecentProduct> {
-        var lastRecentProductEntity: List<RecentProductEntity> = emptyList()
-        thread {
-            lastRecentProductEntity = recentProductDao.findRange(FIND_RECENT_PRODUCTS_COUNT)
-        }.join()
-        return lastRecentProductEntity.toRecentProducts()
+    override suspend fun findRecentProducts(): Result<List<RecentProduct>> {
+        return runCatching {
+            recentProductDao.findRange(FIND_RECENT_PRODUCTS_COUNT).toRecentProducts()
+        }
     }
 
-    override fun save(product: Product) {
-        thread {
+    override suspend fun save(product: Product): Result<Unit> {
+        return runCatching {
             if (recentProductDao.findOrNullByProductId(product.id) == null) {
                 recentProductDao.insert(
                     RecentProductEntity(
@@ -35,10 +30,10 @@ class RoomRecentProductRepository(private val recentProductDao: RecentProductDao
                         seenDateTime = LocalDateTime.now(),
                     ),
                 )
-                return@thread
+                return@runCatching
             }
             recentProductDao.update(product.id, LocalDateTime.now())
-        }.join()
+        }
     }
 
     companion object {

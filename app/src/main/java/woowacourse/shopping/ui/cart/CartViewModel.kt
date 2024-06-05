@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -170,16 +169,12 @@ class CartViewModel(
 
             cartRepository.delete(cartUiModel.cartItemId)
                 .onSuccess {
-                    Log.e("TEST", "삭제성공")
                     updateDeletedCart(cartUiModel)
                     if (isRecommendProduct(cartUiModel.productId)) {
                         updateRecommendProducts(cartUiModel.productId, Quantity())
                     }
                 }
                 .onFailure {
-                    Log.e("TEST", "삭제실패")
-                    Log.e("TEST", "${it.localizedMessage}")
-
                     setError()
                 }
         }
@@ -255,8 +250,8 @@ class CartViewModel(
 
     fun loadRecommendProducts() =
         viewModelScope.launch {
-            val recentProductCategory =
-                recentProductRepository.findLastOrNull()?.product?.category ?: return@launch
+            val recentProduct = recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
+            val recentProductCategory = recentProduct.product.category
             val cartItems = cartUiModels().toCartItems()
 
             productRepository.findRecommendProducts(recentProductCategory, cartItems)

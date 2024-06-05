@@ -4,9 +4,9 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 
 interface RecentProductRepository {
-    fun findLastOrNull(): RecentProduct?
+    suspend fun findLastOrNull(): Result<RecentProduct?>
 
-    fun findRecentProducts(): List<RecentProduct>
+    suspend fun findRecentProducts(): Result<List<RecentProduct>>
 
-    fun save(product: Product)
+    suspend fun save(product: Product): Result<Unit>
 }

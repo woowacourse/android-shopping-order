@@ -71,7 +71,7 @@ class ProductDetailViewModel(
 
     private fun loadLastRecentProduct() =
         viewModelScope.launch {
-            val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return@launch
+            val lastRecentProduct = recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
             productRepository.find(lastRecentProduct.product.id)
                 .onSuccess { product ->
                     _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
