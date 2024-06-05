@@ -1,9 +1,7 @@
 package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.ResponseResult
-import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.cart.CartItemDto
 import woowacourse.shopping.remote.cart.CartItemResponse
 
 interface CartItemDataSource {

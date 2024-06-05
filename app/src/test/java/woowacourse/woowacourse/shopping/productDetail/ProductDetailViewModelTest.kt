@@ -119,7 +119,7 @@ class ProductDetailViewModelTest {
         viewModel.loadAll()
 
         // when
-        viewModel.onDecrease(productId)
+        viewModel.onDecrease(productId, 1)
 
         // then
         val actualCount = viewModel.productCount.getOrAwaitValue()
@@ -139,7 +139,7 @@ class ProductDetailViewModelTest {
         viewModel.loadAll()
 
         // when
-        viewModel.onDecrease(productId)
+        viewModel.onDecrease(productId, quantity = 1)
 
         // then
         val actualCount = viewModel.productCount.getOrAwaitValue()

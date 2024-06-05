@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.HandleResponseResult.handleResponseResult
 import woowacourse.shopping.data.ResponseResult
-import woowacourse.shopping.data.handleResponseResult
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.remote.cart.CartItemApiService
 import woowacourse.shopping.remote.cart.CartItemRequest
@@ -9,12 +9,15 @@ import woowacourse.shopping.remote.cart.CartItemResponse
 
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
     CartItemDataSource {
-
     override fun loadAllCartItems(): ResponseResult<CartItemResponse> =
         handleResponseResult { cartItemApiService.requestCartItems().execute() }
 
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): ResponseResult<Unit> =
-        handleResponseResult { cartItemApiService.addCartItem(CartItemRequest(productIdsCount.productId, productIdsCount.quantity)).execute() }
+        handleResponseResult {
+            cartItemApiService.addCartItem(
+                CartItemRequest(productIdsCount.productId, productIdsCount.quantity),
+            ).execute()
+        }
 
     override fun removedProductsId(cartItemId: Long): ResponseResult<Unit> =
         handleResponseResult { cartItemApiService.removeCartItem(cartItemId).execute() }

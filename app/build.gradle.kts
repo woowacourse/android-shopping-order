@@ -8,9 +8,10 @@ plugins {
     id("kotlin-kapt")
 }
 
-val properties = Properties().apply {
-    load(FileInputStream(rootProject.file("local.properties")))
-}
+val properties =
+    Properties().apply {
+        load(FileInputStream(rootProject.file("local.properties")))
+    }
 
 android {
     namespace = "woowacourse.shopping"
@@ -29,8 +30,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
-        buildConfigField("String","USERNAME", "${properties["username"]}")
-        buildConfigField("String","PASSWORD", "${properties["password"]}")
+        buildConfigField("String", "USERNAME", "${properties["username"]}")
+        buildConfigField("String", "PASSWORD", "${properties["password"]}")
     }
 
     buildTypes {

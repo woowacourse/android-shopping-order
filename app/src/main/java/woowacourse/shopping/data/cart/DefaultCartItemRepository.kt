@@ -9,7 +9,6 @@ import woowacourse.shopping.ui.model.CartItem
 class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
-
     override fun loadCartItems(): List<CartItem> {
         return handleResponse(cartItemDataSource.loadAllCartItems()).content.map { cartItemDto -> cartItemDto.toDomain() }
     }
@@ -54,7 +53,7 @@ class DefaultCartItemRepository(
     }
 
     private fun <T : Any> handleResponse(response: ResponseResult<T>): T {
-        return when(response) {
+        return when (response) {
             is ResponseResult.Success -> response.data
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")

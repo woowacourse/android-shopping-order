@@ -89,9 +89,8 @@ class ShoppingCartViewModel(
                 productIds,
                 orderAmount,
                 ordersCount,
-            )
+            ),
         )
-
     }
 
     override fun delete(cartItemId: Long) {

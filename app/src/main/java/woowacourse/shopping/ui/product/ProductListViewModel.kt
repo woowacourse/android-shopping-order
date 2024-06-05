@@ -124,7 +124,11 @@ class ProductListViewModel(
         }
     }
 
-    private fun updateProductQuantity(productId: Long, variation: Int, totalCount: Int) {
+    private fun updateProductQuantity(
+        productId: Long,
+        variation: Int,
+        totalCount: Int,
+    ) {
         uiHandler.post {
             _loadedProducts.value =
                 loadedProducts.value?.map { product ->

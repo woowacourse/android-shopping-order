@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.remote.product.ProductDto
 import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
-import woowacourse.shopping.ui.model.CartItem
 
 class OrderRemoteRepository(
     private val orderDataSource: OrderRemoteDataSource,
@@ -16,7 +15,6 @@ class OrderRemoteRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : OrderRepository {
-
     override fun order(cartItemIds: List<Long>) {
         handleResponse(orderDataSource.order(cartItemIds))
     }
@@ -31,7 +29,7 @@ class OrderRemoteRepository(
     }
 
     private fun <T : Any> handleResponse(response: ResponseResult<T>): T {
-        return when(response) {
+        return when (response) {
             is ResponseResult.Success -> response.data
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
