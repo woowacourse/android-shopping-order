@@ -60,6 +60,17 @@ class ProductListViewModel(
             }
     }
 
+    fun loadRecentProducts() {
+        viewModelScope.launch {
+            shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
+                val uiState = _uiState.value ?: return@launch
+                _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
+            }
+        }
+    }
+
     override fun increaseProductCount(id: Long) {
         val uiState = _uiState.value ?: return
         val product = uiState.findProduct(id) ?: return
@@ -88,17 +99,6 @@ class ProductListViewModel(
 
     override fun navigateToDetail(id: Long) {
         _navigateToDetailEvent.setValue(id)
-    }
-
-    fun loadRecentProducts() {
-        viewModelScope.launch {
-            val uiState = _uiState.value ?: return@launch
-            shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
-                _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
-            }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
-            }
-        }
     }
 
     private fun getLoadMore(page: Int): List<ShoppingUiModel.LoadMore> {
