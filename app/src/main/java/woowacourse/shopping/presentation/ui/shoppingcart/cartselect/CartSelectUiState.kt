@@ -11,6 +11,8 @@ data class CartSelectUiState(
 
     val isAllChecked get() = totalElements == orderCartList.size
 
+    val isAnyChecked get() = orderCartList.values.count { it.isChecked } > 0
+
     val totalQuantity get() = orderCartList.values.sumOf { it.quantity }
 }
 
