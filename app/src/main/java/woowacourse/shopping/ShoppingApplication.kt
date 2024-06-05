@@ -1,8 +1,8 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.data.cart.CartDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.local.room.cart.CartDatabase
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 
 class ShoppingApplication : Application() {
     override fun onCreate() {

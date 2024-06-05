@@ -8,7 +8,7 @@
 
         <variable
             name="cartUiModel"
-            type="woowacourse.shopping.ui.cart.item.CartUiModel" />
+            type="woowacourse.shopping.ui.cart.cartitem.CartUiModel" />
 
         <variable
             name="vm"

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.products
 
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.Product
 
 sealed interface ProductUiModel
 

@@ -4,10 +4,10 @@ import android.os.Handler
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
-import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.data.service.ApiResult
-import woowacourse.shopping.data.service.ShoppingRetrofit
+import woowacourse.shopping.data.remote.api.ApiResult
+import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
+import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
+import woowacourse.shopping.data.remote.api.ShoppingRetrofit
 
 class HandlerProductDataSource {
     fun getProductsByOffset(
