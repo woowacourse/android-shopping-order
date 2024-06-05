@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="cartItemClickListener"
+            type="woowacourse.shopping.view.cart.list.CartItemClickListener" />
+
+
+        <variable
+            name="quantityClickListener"
+            type="woowacourse.shopping.view.cart.QuantityEventListener" />
+
+        <variable
+            name="cartViewItem"
+            type="woowacourse.shopping.view.cart.list.ShoppingCartViewItem.CartViewItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@drawable/shopping_cart_item_gridview"
+        android:onClick="@{() -> cartItemClickListener.onCartItemClick(cartViewItem.cartItem.product.id)}">
+
+        <CheckBox
+            android:id="@+id/checkbox_cart"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="18dp"
+            android:checked="@{cartViewItem.isSelected}"
+            android:onCheckedChanged="@{(view, isChecked) -> cartItemClickListener.onSelectChanged(cartViewItem.cartItem.cartItemId, isChecked)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
+
+        <TextView
+            android:id="@+id/tv_product_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{cartViewItem.cartItem.product.name}"
+            android:textColor="@color/gray_500"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_cart"
+            app:layout_constraintLeft_toRightOf="@id/checkbox_cart"
+            app:layout_constraintRight_toLeftOf="@id/btn_clear"
+            app:layout_constraintTop_toTopOf="@id/checkbox_cart"
+            tools:text="상품명" />
+
+        <ImageView
+            android:id="@+id/iv_cart"
+            android:layout_width="136dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="18dp"
+            android:scaleType="fitXY"
+            app:imageUrl="@{cartViewItem.cartItem.product.imageUrl}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/checkbox_cart"
+            app:layout_constraintTop_toBottomOf="@+id/tv_product_name"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/tv_cart_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:textColor="@color/gray_500"
+            android:textSize="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_cart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:price="@{cartViewItem.cartItem.totalPrice()}"
+            tools:text="10,000원" />
+
+        <include
+            android:id="@+id/btn_quantity_control"
+            layout="@layout/btn_quantity_control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="12dp"
+            app:clickListener="@{quantityClickListener}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:itemId="@{cartViewItem.cartItem.cartItemId}"
+            app:quantity="@{cartViewItem.cartItem.quantity}" />
+
+        <ImageView
+            android:id="@+id/btn_clear"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="12dp"
+            android:onClick="@{() -> cartItemClickListener.onDeleteButtonClick(cartViewItem.cartItem.cartItemId)}"
+            android:src="@drawable/ic_back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/gray_100" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
