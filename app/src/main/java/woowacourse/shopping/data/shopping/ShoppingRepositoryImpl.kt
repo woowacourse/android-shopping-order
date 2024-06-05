@@ -58,7 +58,7 @@ class ShoppingRepositoryImpl(
         return Result.success(canLoadMore)
     }
 
-    override fun recentProducts(size: Int): Result<List<Product>> {
+    override suspend fun recentProducts(size: Int): Result<List<Product>> {
         val result = recentProductDataSource.recentProducts(size)
         return result.mapCatching {
             it.map { product ->

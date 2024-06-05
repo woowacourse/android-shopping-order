@@ -21,7 +21,7 @@ interface ShoppingRepository {
         size: Int,
     ): Result<Boolean>
 
-    fun recentProducts(size: Int): Result<List<Product>>
+    suspend fun recentProducts(size: Int): Result<List<Product>>
 
     fun saveRecentProduct(id: Long): Result<Long>
 }

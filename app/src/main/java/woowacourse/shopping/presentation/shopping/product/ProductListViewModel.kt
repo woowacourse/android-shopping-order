@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -89,11 +91,13 @@ class ProductListViewModel(
     }
 
     fun loadRecentProducts() {
-        val uiState = _uiState.value ?: return
-        shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
-            _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
+            shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
+                _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
+            }
         }
     }
 
