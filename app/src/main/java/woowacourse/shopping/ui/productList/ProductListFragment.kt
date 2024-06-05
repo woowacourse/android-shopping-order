@@ -39,7 +39,7 @@ class ProductListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            delay(300)
+            delay(100)
             viewModel.loadAll()
         }
     }
@@ -55,10 +55,14 @@ class ProductListFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        showSkeletonUi()
         observeNavigationShoppingCart()
         observeDetailProductDestination()
-        showSkeletonUi()
         observeLoadedProducts()
+        observeProductHistory()
+    }
+
+    private fun observeProductHistory() {
         viewModel.productsHistory.observe(viewLifecycleOwner) {
             historyAdapter.submitList(it)
         }

@@ -1,15 +1,9 @@
 package woowacourse.shopping.ui.productList
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.ui.util.SingleLiveData
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.currentPageIsNullException
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
@@ -20,6 +14,10 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
+import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.util.MutableSingleLiveData
+import woowacourse.shopping.ui.util.SingleLiveData
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import kotlin.concurrent.thread
 
 class ProductListViewModel(
@@ -30,8 +28,6 @@ class ProductListViewModel(
 ) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener {
     private val currentPage: LiveData<Int> get() = _currentPage
 
-    private val uiHandler = Handler(Looper.getMainLooper())
-
     private val _loadedProducts: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val loadedProducts: LiveData<List<Product>> get() = _loadedProducts
 
@@ -41,53 +37,42 @@ class ProductListViewModel(
     private val _cartProductTotalCount: MutableLiveData<Int> = MutableLiveData()
     val cartProductTotalCount: LiveData<Int> get() = _cartProductTotalCount
 
-    private var _isLastPage: MutableLiveData<Boolean> = MutableLiveData()
+    private val _isLastPage: MutableLiveData<Boolean> = MutableLiveData()
     val isLastPage: LiveData<Boolean> get() = _isLastPage
 
-    private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
+    private val _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
 
-    private var _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
+    private val _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
 
-    fun loadAll() {
-        thread {
-            val page = currentPage.value.also {
-                Log.d(TAG, "page: $it")
-            } ?: currentPageIsNullException()
-            val result = productsRepository.allProductsUntilPage(page).also {
-                Log.d(TAG, "loadAll: $it")
-            }
-            val totalCartCount = shoppingCartRepository.shoppingCartProductQuantity()
-            val isLastPage = productsRepository.isFinalPage(page)
-            val productHistory = productHistoryRepository.loadAllProductHistory()
+    private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
+    private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
 
-            uiHandler.post {
-                _loadedProducts.value = result
-                _cartProductTotalCount.value = totalCartCount
-                _isLastPage.value = isLastPage
-                _productsHistory.value = productHistory
-            }
-        }
+    fun loadAll() {
+        val page = currentPage.value ?: currentPageIsNullException()
+
+        thread {
+            _loadedProducts.postValue(productsRepository.allProductsUntilPage(page))
+            _cartProductTotalCount.postValue(shoppingCartRepository.shoppingCartProductQuantity())
+            _isLastPage.postValue(productsRepository.isFinalPage(page))
+            _productsHistory.postValue(productHistoryRepository.loadAllProductHistory())
+            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+        }.join()
     }
 
     fun loadNextPageProducts() {
+        if (isLastPage.value == true) return
+
+        val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
+
         thread {
-            if (isLastPage.value == true) return@thread
-
-            val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
             val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.pagedProducts(nextPage).also {
-                Log.d(TAG, "loadNextPageProducts: $it")
-            }
-            val totalCount = productsRepository.shoppingCartProductQuantity()
+            val result = productsRepository.pagedProducts(nextPage)
 
-            uiHandler.post {
-                _currentPage.value = nextPage
-                _isLastPage.value = isLastPage
-                _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(result) }
-                _cartProductTotalCount.value = totalCount
-            }
+            _currentPage.postValue(nextPage)
+            _isLastPage.postValue(isLastPage)
+            _loadedProducts.postValue(_loadedProducts.value?.toMutableList()?.apply { addAll(result) })
         }
     }
 
@@ -103,58 +88,80 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            try {
-                productsRepository.increaseShoppingCartProduct(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                productsRepository.addShoppingCartProduct(productId, quantity)
-            } catch (_: Exception) {
-            } finally {
-                val totalCount = productsRepository.shoppingCartProductQuantity()
+        try {
+            val foundCartItem = foundCartItem(productId)
+            updateProductQuantity(foundCartItem, INCREASE_AMOUNT)
+        } catch (e: NoSuchElementException) {
+            addNewProduct(productId)
 
-                uiHandler.post {
-                    _loadedProducts.value =
-                        _loadedProducts.value?.map {
-                            if (it.id == productId) {
-                                it.copy(quantity = it.quantity + 1)
-                            } else {
-                                it
-                            }
-                        }
-                    _cartProductTotalCount.value = totalCount
-                }
-            }
+        } finally {
+
+            thread {
+                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+            }.join()
+
+            updateProductsTotalCount()
+
+            updateLoadedProduct(productId, INCREASE_AMOUNT)
         }
+    }
+
+    private fun addNewProduct(productId: Long) {
+        thread {
+            shoppingCartRepository.addShoppingCartProduct(productId, FIRST_AMOUNT)
+        }.join()
+    }
+
+    private fun foundCartItem(productId: Long) =
+        (cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
+            ?: throw NoSuchElementException())
+
+    private fun updateLoadedProduct(productId: Long, changeAmount: Int) {
+        _loadedProducts.postValue(
+            loadedProducts.value?.map { product ->
+                if (product.id == productId) {
+                    product.copy(quantity = product.quantity + changeAmount)
+                } else {
+                    product
+                }
+            },
+        )
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
+        val find = foundCartItem(productId)
+        updateProductQuantity(find, DECREASE_AMOUNT)
+
         thread {
-            productsRepository.decreaseShoppingCartProduct(productId, quantity)
+            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+        }.join()
 
-            val totalCount = productsRepository.shoppingCartProductQuantity()
+        updateLoadedProduct(productId, DECREASE_AMOUNT)
+        updateProductsTotalCount()
+    }
 
-            uiHandler.post {
-                _loadedProducts.value =
-                    _loadedProducts.value?.map {
-                        if (it.id == productId) {
-                            it.copy(quantity = it.quantity - 1)
-                        } else {
-                            it
-                        }
-                    }
-                _cartProductTotalCount.value = totalCount
-            }
-            return@thread
-        }
+    private fun updateProductQuantity(find: CartItem, changeAmount: Int) {
+        thread {
+            shoppingCartRepository.updateProductQuantity(find.id, find.quantity + changeAmount)
+        }.join()
+    }
+
+    private fun updateProductsTotalCount() {
+        thread {
+            _cartProductTotalCount.postValue(shoppingCartRepository.shoppingCartProductQuantity())
+        }.join()
     }
 
     companion object {
         private const val TAG = "ProductListViewModel"
         private const val FIRST_PAGE = 1
         private const val PAGE_MOVE_COUNT = 1
+        private const val INCREASE_AMOUNT = 1
+        private const val DECREASE_AMOUNT = -1
+        private const val FIRST_AMOUNT = 1
 
         fun factory(
             productRepository: ShoppingProductsRepository =
