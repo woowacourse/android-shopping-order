@@ -12,62 +12,64 @@ import kotlin.concurrent.thread
 
 class HandlerProductRepository(private val dataSource: HandlerProductDataSource = HandlerProductDataSource()) :
     ProductRepository {
-    override fun getProducts(page: Int, size: Int): List<Product> {
-
+    override fun getProducts(
+        page: Int,
+        size: Int,
+    ): List<Product> {
         val response: MutableLiveData<List<Product>> = MutableLiveData()
 
-        val handler = Handler(Looper.getMainLooper()) { msg ->
-            when (val apiResult = msg.obj) {
-                is ApiResult.Success -> response.value =
-                    (apiResult.result as ResponseProductsGetDto).content.map { it.toDomain() }
+        val handler =
+            Handler(Looper.getMainLooper()) { msg ->
+                when (val apiResult = msg.obj) {
+                    is ApiResult.Success ->
+                        response.value =
+                            (apiResult.result as ResponseProductsGetDto).content.map { it.toDomain() }
 
-                is ApiResult.Fail -> throw IllegalStateException()
-                is ApiResult.Error -> throw apiResult.e
+                    is ApiResult.Fail -> throw IllegalStateException()
+                    is ApiResult.Error -> throw apiResult.e
+                }
+                true
             }
-            true
-        }
 
         thread {
             dataSource.getProductsByOffset(page, size, handler)
         }
 
         return response.value ?: emptyList()
-
     }
 
     override fun find(id: Long): Product {
-
         val response: MutableLiveData<Product> = MutableLiveData()
 
-        val handler = Handler(Looper.getMainLooper()) { msg ->
-            when (val apiResult = msg.obj) {
-                is ApiResult.Success -> {
-                    val product = (apiResult.result as ResponseProductIdGetDto)
-                    response.value = Product(
-                        id = product.id,
-                        imageUrl = product.imageUrl,
-                        name = product.name,
-                        price = product.price,
-                        category = product.category,
-                    )
-                }
+        val handler =
+            Handler(Looper.getMainLooper()) { msg ->
+                when (val apiResult = msg.obj) {
+                    is ApiResult.Success -> {
+                        val product = (apiResult.result as ResponseProductIdGetDto)
+                        response.value =
+                            Product(
+                                id = product.id,
+                                imageUrl = product.imageUrl,
+                                name = product.name,
+                                price = product.price,
+                                category = product.category,
+                            )
+                    }
 
-                is ApiResult.Fail -> throw IllegalStateException()
-                is ApiResult.Error -> throw apiResult.e
+                    is ApiResult.Fail -> throw IllegalStateException()
+                    is ApiResult.Error -> throw apiResult.e
+                }
+                true
             }
-            true
-        }
 
         thread {
             dataSource.getProductsById(id, handler)
         }
 
         return response.value ?: Product(0, "", "", 0, "")
-
     }
 
     override fun productsByCategory(category: String): List<Product> {
-
         val response: MutableLiveData<List<Product>> = MutableLiveData()
 
         thread {
@@ -76,15 +78,13 @@ class HandlerProductRepository(private val dataSource: HandlerProductDataSource 
 
         return response.value ?: emptyList()
     }
-
-
 }
 
-private fun ResponseProductsGetDto.Product.toDomain(): Product = Product(
-    id = id,
-    imageUrl = imageUrl,
-    name = name,
-    price = price,
-    category = category,
-)
-
+private fun ResponseProductsGetDto.Product.toDomain(): Product =
+    Product(
+        id = id,
+        imageUrl = imageUrl,
+        name = name,
+        price = price,
+        category = category,
+    )

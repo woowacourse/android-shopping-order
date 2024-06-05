@@ -18,4 +18,3 @@ object ShoppingOkHttpClient {
         return tokenInterceptor
     }
 }
-

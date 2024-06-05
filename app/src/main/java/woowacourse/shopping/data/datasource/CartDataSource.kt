@@ -6,10 +6,9 @@ import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
 
 interface CartDataSource {
-
     fun getCartItems(
         page: Int,
-        size: Int
+        size: Int,
     ): ResponseCartItemsGetDto?
 
     fun postCartItems(request: RequestCartItemPostDto)
@@ -18,7 +17,7 @@ interface CartDataSource {
 
     fun patchCartItems(
         id: Long,
-        request: RequestCartItemsPatchDto
+        request: RequestCartItemsPatchDto,
     )
 
     fun getCartItemCounts(): ResponseCartItemCountsGetDto?

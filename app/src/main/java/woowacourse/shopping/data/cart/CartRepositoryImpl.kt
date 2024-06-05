@@ -13,9 +13,10 @@ import kotlin.concurrent.thread
 class CartRepositoryImpl(private val dataSource: CartDataSource = CartDataSourceImpl()) :
     CartRepository {
     override fun getCartItem(productId: Long): CartWithProduct {
-        val cart = getAllCartItemsWithProduct().firstOrNull { it.product.id == productId } ?: error(
-            "장바구니 정보를 불러올 수 없습니다."
-        )
+        val cart =
+            getAllCartItemsWithProduct().firstOrNull { it.product.id == productId } ?: error(
+                "장바구니 정보를 불러올 수 없습니다.",
+            )
         return cart
     }
 
@@ -98,11 +99,12 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = CartDataSource
         patchCartItem(cart.id, cart.quantity.value + quantity)
     }
 
-    private fun ResponseCartItemsGetDto.Product.toDomain() = Product(
-        id = this.id,
-        imageUrl = this.imageUrl,
-        name = this.name,
-        price = this.price,
-        category = this.category,
-    )
+    private fun ResponseCartItemsGetDto.Product.toDomain() =
+        Product(
+            id = this.id,
+            imageUrl = this.imageUrl,
+            name = this.name,
+            price = this.price,
+            category = this.category,
+        )
 }

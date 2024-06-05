@@ -20,5 +20,4 @@ object ShoppingRetrofit {
     val cartItemService: CartItemService = retrofit.create(CartItemService::class.java)
 
     val orderService: OrderService = retrofit.create(OrderService::class.java)
-
 }

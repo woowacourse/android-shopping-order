@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.products.viewmodel
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -62,8 +60,7 @@ class ProductContentsViewModel(
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
-    private fun currentProduct(): ProductWithQuantityUiState =
-        productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
+    private fun currentProduct(): ProductWithQuantityUiState = productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
 
     init {
         loadProducts()
@@ -74,7 +71,7 @@ class ProductContentsViewModel(
             productWithQuantity.value = currentProduct().copy(isLoading = true)
             productRepository.getProducts(
                 currentProduct().productWithQuantities.size / PAGE_SIZE,
-                PAGE_SIZE
+                PAGE_SIZE,
             )
         }.onSuccess { loadedProducts ->
             products.value = (products.value ?: emptyList()) + loadedProducts

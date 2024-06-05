@@ -6,7 +6,10 @@ import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.data.service.ShoppingRetrofit
 
 class ProductDataSourceImpl : ProductDataSource {
-    override fun getProductsByOffset(page: Int, size: Int): ResponseProductsGetDto? =
+    override fun getProductsByOffset(
+        page: Int,
+        size: Int,
+    ): ResponseProductsGetDto? =
         ShoppingRetrofit.productService.getProductsByOffset(page = page, size = size).execute()
             .body()
 
