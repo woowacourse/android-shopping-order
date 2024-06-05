@@ -1,8 +1,12 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -55,14 +59,16 @@ class OrderRecommendViewModel(
     override fun retry() {}
 
     fun order() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.value?.let { state ->
                 orderRepository.insertOrderByIds(state.orderCarts.keys.toList())
                     .onSuccess {
                         hideError()
+                        Log.d("HELLO1", "order: ")
                         _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
                     }.onFailure { e ->
                         showError(e)
+                        Log.d("HELLO2", "order: ")
                     }
             }
         }

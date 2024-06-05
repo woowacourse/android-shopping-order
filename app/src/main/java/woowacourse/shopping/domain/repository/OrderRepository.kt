@@ -1,5 +1,5 @@
 package woowacourse.shopping.domain.repository
 
 interface OrderRepository {
-    fun insertOrderByIds(cartItemsIds: List<Int>): Result<Unit>
+    suspend fun insertOrderByIds(cartItemIds: List<Int>): Result<Unit>
 }

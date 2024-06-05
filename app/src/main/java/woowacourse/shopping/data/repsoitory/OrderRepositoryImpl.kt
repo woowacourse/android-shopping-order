@@ -6,8 +6,8 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : OrderRepository {
-    override fun insertOrderByIds(cartItemsIds: List<Int>): Result<Unit> =
+    override suspend fun insertOrderByIds(cartItemIds: List<Int>): Result<Unit> =
         runCatching {
-            orderRemoteDataSource.postOrderByIds(cartItemsIds)
+            orderRemoteDataSource.postOrderByIds(cartItemIds)
         }
 }
