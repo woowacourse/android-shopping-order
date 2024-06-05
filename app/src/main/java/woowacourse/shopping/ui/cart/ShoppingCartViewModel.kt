@@ -64,17 +64,30 @@ class ShoppingCartViewModel(
         }.join()
 
         thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems()
+            val currentItems = shoppingCartRepository.loadAllCartItems().also {
+                Log.d(TAG, "deleteItem, currentItems $it")
+            }
             uiHandler.post {
                 _cartItems.value = currentItems
             }
         }.join()
 
+        _cartItems.value = cartItems.value?.filter {
+            it.id != cartItemId
+        }
+
+        updateTotalPrice()
         updateSelectedCartItemsCount()
     }
 
     private fun updateSelectedCartItemsCount() {
-        _selectedCartItemsCount.value = cartItems.value?.count { it.checked }
+        _selectedCartItemsCount.value = cartItems.value?.sumOf { cartItem: CartItem ->
+            if (cartItem.checked) {
+                cartItem.quantity
+            } else {
+                0
+            }
+        }
     }
 
     override fun navigateToOrder() {
@@ -104,6 +117,7 @@ class ShoppingCartViewModel(
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
+                updateSelectedCartItemsCount()
             }
         }
     }
