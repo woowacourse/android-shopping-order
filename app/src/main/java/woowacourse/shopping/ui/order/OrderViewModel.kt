@@ -25,7 +25,7 @@ class OrderViewModel(
     private val historyRepository: ProductHistoryRepository,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
     private val cartRepository: ShoppingCartRepository,
-) : ViewModel(), OnOrderListener, OnItemQuantityChangeListener {
+) : ViewModel(), OrderListener {
     private val _recommendedProducts: MutableSingleLiveData<List<Product>> = MutableSingleLiveData()
     val recommendedProducts: SingleLiveData<List<Product>> get() = _recommendedProducts
 
