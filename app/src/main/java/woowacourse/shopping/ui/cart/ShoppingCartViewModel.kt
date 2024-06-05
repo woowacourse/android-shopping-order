@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -61,19 +60,19 @@ class ShoppingCartViewModel(
             _cartItems.postValue(currentItems)
         }.join()
 
-
         updateTotalPrice()
         updateSelectedCartItemsCount()
     }
 
     private fun updateSelectedCartItemsCount() {
-        _selectedCartItemsCount.value = cartItems.value?.sumOf { cartItem: CartItem ->
-            if (cartItem.checked) {
-                cartItem.quantity
-            } else {
-                0
+        _selectedCartItemsCount.value =
+            cartItems.value?.sumOf { cartItem: CartItem ->
+                if (cartItem.checked) {
+                    cartItem.quantity
+                } else {
+                    0
+                }
             }
-        }
     }
 
     override fun navigateToOrder() {
@@ -100,8 +99,9 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            val item = cartItems.value?.find { it.id == productId }
-                ?: throw NoSuchElementException("There is no product with id: $productId")
+            val item =
+                cartItems.value?.find { it.id == productId }
+                    ?: throw NoSuchElementException("There is no product with id: $productId")
             shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity + 1)
             val currentItems = shoppingCartRepository.loadAllCartItems()
 
@@ -119,9 +119,9 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-
-            val item = cartItems.value?.find { it.id == productId }
-                ?: throw NoSuchElementException("There is no product with id: $productId")
+            val item =
+                cartItems.value?.find { it.id == productId }
+                    ?: throw NoSuchElementException("There is no product with id: $productId")
             shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity - 1)
 
             val currentItems = shoppingCartRepository.loadAllCartItems()
@@ -202,8 +202,8 @@ class ShoppingCartViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource,
-                    productSource = ShoppingApp.productSource
-                )
+                    productSource = ShoppingApp.productSource,
+                ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
                 ShoppingCartViewModel(shoppingCartRepository, orderRepository)

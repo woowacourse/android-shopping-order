@@ -11,5 +11,4 @@ interface ProductDetailListener : OnItemQuantityChangeListener, OnProductItemCli
     override fun onClick(productId: Long) {
         // Do nothing
     }
-
 }

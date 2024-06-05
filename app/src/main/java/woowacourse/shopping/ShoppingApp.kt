@@ -2,19 +2,19 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.source.OrderDataSource
-import woowacourse.shopping.local.source.LocalHistoryProductDataSource
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.local.history.HistoryProductDao
 import woowacourse.shopping.local.history.HistoryProductDatabase
+import woowacourse.shopping.local.source.LocalHistoryProductDataSource
+import woowacourse.shopping.remote.RetrofitService
 import woowacourse.shopping.remote.service.CartItemApiService
-import woowacourse.shopping.remote.source.CartItemRemoteDataSource
 import woowacourse.shopping.remote.service.OrderApiService
+import woowacourse.shopping.remote.service.ProductsApiService
+import woowacourse.shopping.remote.source.CartItemRemoteDataSource
 import woowacourse.shopping.remote.source.OrderRemoteDataSource
 import woowacourse.shopping.remote.source.ProductRemoteDataSource
-import woowacourse.shopping.remote.service.ProductsApiService
-import woowacourse.shopping.remote.RetrofitService
 
 class ShoppingApp : Application() {
     private val productsApi: ProductsApiService by lazy { RetrofitService.retrofitService.create(ProductsApiService::class.java) }

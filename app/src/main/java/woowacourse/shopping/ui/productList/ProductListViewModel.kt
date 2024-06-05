@@ -93,9 +93,7 @@ class ProductListViewModel(
             updateProductQuantity(foundCartItem, INCREASE_AMOUNT)
         } catch (e: NoSuchElementException) {
             addNewProduct(productId)
-
         } finally {
-
             thread {
                 _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
             }.join()
@@ -113,10 +111,15 @@ class ProductListViewModel(
     }
 
     private fun foundCartItem(productId: Long) =
-        (cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
-            ?: throw NoSuchElementException())
+        (
+            cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
+                ?: throw NoSuchElementException()
+        )
 
-    private fun updateLoadedProduct(productId: Long, changeAmount: Int) {
+    private fun updateLoadedProduct(
+        productId: Long,
+        changeAmount: Int,
+    ) {
         _loadedProducts.postValue(
             loadedProducts.value?.map { product ->
                 if (product.id == productId) {
@@ -143,7 +146,10 @@ class ProductListViewModel(
         updateProductsTotalCount()
     }
 
-    private fun updateProductQuantity(find: CartItem, changeAmount: Int) {
+    private fun updateProductQuantity(
+        find: CartItem,
+        changeAmount: Int,
+    ) {
         thread {
             shoppingCartRepository.updateProductQuantity(find.id, find.quantity + changeAmount)
         }.join()

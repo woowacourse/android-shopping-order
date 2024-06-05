@@ -11,9 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ProductDetailFragment : Fragment() {
     private var _binding: FragmentProductDetailBinding? = null
@@ -77,8 +77,7 @@ class ProductDetailFragment : Fragment() {
         }
     }
 
-    private fun navigateToProductDetail(id: Long) =
-        (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
+    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
 
     private fun navigateToMenuItem(it: MenuItem) =
         when (it.itemId) {
@@ -98,6 +97,5 @@ class ProductDetailFragment : Fragment() {
     companion object {
         const val PRODUCT_ID = "productId"
         const val TAG = "ProductDetailFragment"
-
     }
 }

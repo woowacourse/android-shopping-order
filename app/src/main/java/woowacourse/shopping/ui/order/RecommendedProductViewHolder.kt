@@ -14,4 +14,3 @@ class RecommendedProductViewHolder(
         binding.onItemChargeListener = onItemQuantityChangeListener
     }
 }
-

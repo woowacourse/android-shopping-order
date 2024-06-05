@@ -7,8 +7,7 @@ import woowacourse.shopping.ui.model.CartItem
 
 class ShoppingCartItemViewHolder(
     private val binding: HolderCartBinding,
-    private val shoppingCartItemListener: ShoppingCartItemListener
-
+    private val shoppingCartItemListener: ShoppingCartItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(cartItem: CartItem) {
         binding.cartItem = cartItem

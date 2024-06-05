@@ -6,5 +6,4 @@ interface ProductHistoryDataSource {
     fun loadLatestProduct(): Long
 
     fun loadAllProductHistory(): List<Long>
-
 }

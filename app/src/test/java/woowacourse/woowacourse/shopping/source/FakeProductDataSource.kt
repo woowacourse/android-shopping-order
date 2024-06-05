@@ -10,6 +10,10 @@ class FakeProductDataSource(
 ) : ProductDataSource {
     override fun findByPaged(page: Int): List<ProductData> = pagingStrategy.loadPagedData(page, allProducts)
 
+    override fun findAllUntilPage(page: Int): List<ProductData> {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: Long): ProductData =
         allProducts.find { it.id == id }
             ?: throw NoSuchElementException("there is no product with id: $id")

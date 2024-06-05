@@ -56,7 +56,10 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
     override fun navigateToOrder() {
         supportFragmentManager.commit {
             replace(
-                R.id.container, OrderFragment::class.java, null, OrderFragment.TAG
+                R.id.container,
+                OrderFragment::class.java,
+                null,
+                OrderFragment.TAG,
             )
         }
     }

@@ -51,8 +51,8 @@ class OrderViewModel(
         thread {
             _recommendedProducts.postValue(
                 productsRecommendationRepository.recommendedProducts(
-                    productId = historyRepository.loadLatestProduct().id
-                )
+                    productId = historyRepository.loadLatestProduct().id,
+                ),
             )
             _addedProductQuantity.postValue(orderRepository.allOrderItemsQuantity())
 
@@ -60,7 +60,10 @@ class OrderViewModel(
         }
     }
 
-    override fun onIncrease(productId: Long, quantity: Int) {
+    override fun onIncrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         thread {
             try {
                 cartRepository.updateProductQuantity(productId, quantity)
@@ -76,11 +79,15 @@ class OrderViewModel(
         }
     }
 
-    override fun onDecrease(productId: Long, quantity: Int) {
+    override fun onDecrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         thread {
-            val item = _recommendedProducts.getValue()?.find {
-                it.id == productId
-            } ?: throw NoSuchElementException("There is no product with id: $productId")
+            val item =
+                _recommendedProducts.getValue()?.find {
+                    it.id == productId
+                } ?: throw NoSuchElementException("There is no product with id: $productId")
 
             cartRepository.updateProductQuantity(productId, item.quantity - 1)
 
@@ -91,14 +98,19 @@ class OrderViewModel(
         }
     }
 
-    private fun updateTotalQuantity(productId: Long, changeAmount: Int) {
+    private fun updateTotalQuantity(
+        productId: Long,
+        changeAmount: Int,
+    ) {
         _totalPrice.postValue(_totalPrice.value?.plus(productQuantity(productId) * changeAmount) ?: 0)
     }
 
-    private fun productQuantity(productId: Long) =
-        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+    private fun productQuantity(productId: Long) = _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
 
-    private fun updateRecommendProductsQuantity(productId: Long, changeAmount: Int) {
+    private fun updateRecommendProductsQuantity(
+        productId: Long,
+        changeAmount: Int,
+    ) {
         _recommendedProducts.postValue(
             _recommendedProducts.getValue()?.map { product ->
                 if (product.id == productId) {
@@ -106,7 +118,7 @@ class OrderViewModel(
                 } else {
                     product
                 }
-            } ?: emptyList()
+            } ?: emptyList(),
         )
     }
 
@@ -117,18 +129,20 @@ class OrderViewModel(
         private const val DECREASE_AMOUNT = -1
 
         fun factory(
-            orderRepository: OrderRepository = DefaultOrderRepository(
-                ShoppingApp.orderSource,
-                ShoppingApp.productSource
-            ),
-            historyRepository: ProductHistoryRepository = DefaultProductHistoryRepository(
-                ShoppingApp.historySource,
-                ShoppingApp.productSource
-            ),
+            orderRepository: OrderRepository =
+                DefaultOrderRepository(
+                    ShoppingApp.orderSource,
+                    ShoppingApp.productSource,
+                ),
+            historyRepository: ProductHistoryRepository =
+                DefaultProductHistoryRepository(
+                    ShoppingApp.historySource,
+                    ShoppingApp.productSource,
+                ),
             productRecommendationRepository: ProductsRecommendationRepository =
                 CategoryBasedProductRecommendationRepository(
                     ShoppingApp.productSource,
-                    ShoppingApp.cartSource
+                    ShoppingApp.cartSource,
                 ),
             cartRepository: ShoppingCartRepository =
                 DefaultShoppingCartRepository(
@@ -137,10 +151,12 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    orderRepository, historyRepository, productRecommendationRepository, cartRepository
+                    orderRepository,
+                    historyRepository,
+                    productRecommendationRepository,
+                    cartRepository,
                 )
             }
         }
-
     }
 }

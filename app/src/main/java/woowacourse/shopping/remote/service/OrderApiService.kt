@@ -8,6 +8,6 @@ import woowacourse.shopping.remote.model.OrderRequest
 interface OrderApiService {
     @POST("/orders")
     fun createOrder(
-        @Body cartItemIds: OrderRequest
+        @Body cartItemIds: OrderRequest,
     ): Call<Unit>
 }

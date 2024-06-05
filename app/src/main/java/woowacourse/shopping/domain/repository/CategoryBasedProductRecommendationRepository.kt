@@ -18,12 +18,12 @@ class CategoryBasedProductRecommendationRepository(
 
         val productsWithCategory: List<ProductData> = productsSource.findByCategory(latest.category)
 
-        val filteredProducts = productsWithCategory.filterNot { productData ->
-            allCartItemProductIds.contains(productData.id)
-        }
+        val filteredProducts =
+            productsWithCategory.filterNot { productData ->
+                allCartItemProductIds.contains(productData.id)
+            }
 
         val minimumCount = min(filteredProducts.size, 10)
-
 
         return filteredProducts.map { productData ->
             productData.toDomain()
@@ -33,5 +33,4 @@ class CategoryBasedProductRecommendationRepository(
     companion object {
         private const val TAG = "CategoryBasedProductRecommendationRepository"
     }
-
 }

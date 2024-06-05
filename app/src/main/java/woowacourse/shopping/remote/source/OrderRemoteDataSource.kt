@@ -10,7 +10,10 @@ class OrderRemoteDataSource(private val orderApiService: OrderApiService) : Orde
         orderApiService.createOrder(orderRequest).execute()
     }
 
-    override fun save(cartItemId: Long, quantity: Int) {
+    override fun save(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
         _orderSaved[cartItemId] = quantity
     }
 
@@ -22,16 +25,12 @@ class OrderRemoteDataSource(private val orderApiService: OrderApiService) : Orde
         _orderSaved.clear()
     }
 
-
     companion object {
         private const val TAG = "OrderRemoteDataSource"
-
 
         // TODO: 주석 제거
         // id 와 개수 id 는 상품 아이디? (장바구니 아이디가 아니라)
         private val _orderSaved: MutableMap<Long, Int> = mutableMapOf()
         val orderSaved: Map<Long, Int> get() = _orderSaved
-
     }
 }
-

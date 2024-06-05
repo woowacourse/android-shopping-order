@@ -37,11 +37,12 @@ class ProductDetailViewModel(
     fun loadAll() {
         thread {
             val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
-            val latestProduct = try {
-                productHistoryRepository.loadLatestProduct()
-            } catch (e: NoSuchElementException) {
-                Product.NULL
-            }
+            val latestProduct =
+                try {
+                    productHistoryRepository.loadLatestProduct()
+                } catch (e: NoSuchElementException) {
+                    Product.NULL
+                }
 
             productHistoryRepository.saveProductHistory(productId)
 
@@ -100,7 +101,7 @@ class ProductDetailViewModel(
             cartRepository: ShoppingCartRepository =
                 DefaultShoppingCartRepository(
                     cartSource = ShoppingApp.cartSource,
-                )
+                ),
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 ProductDetailViewModel(

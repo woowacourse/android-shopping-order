@@ -11,13 +11,19 @@ import woowacourse.shopping.ui.OnItemQuantityChangeListener
 class RecommendedProductsAdapter(
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
 ) : ListAdapter<Product, RecommendedProductViewHolder>(productComparator) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecommendedProductViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecommendedProductViewHolder =
         RecommendedProductViewHolder(
             HolderProductBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onItemQuantityChangeListener
+            onItemQuantityChangeListener,
         )
 
-    override fun onBindViewHolder(holder: RecommendedProductViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecommendedProductViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 

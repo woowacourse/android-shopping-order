@@ -14,5 +14,4 @@ interface OnItemQuantityChangeListener {
     fun onRemove(productId: Long) {
         // Do nothing
     }
-
 }

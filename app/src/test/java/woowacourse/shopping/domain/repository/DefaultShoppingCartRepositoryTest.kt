@@ -21,9 +21,10 @@ class DefaultShoppingCartRepositoryTest {
     @Test
     fun `모든 장바구니 상품을 불러온다`() {
         // given
-        castSource = FakeShoppingCartDataSource(
-            cartItemDtosTestFixture(10)
-        )
+        castSource =
+            FakeShoppingCartDataSource(
+                cartItemDtosTestFixture(10),
+            )
         repository = DefaultShoppingCartRepository(castSource)
 
         // when
@@ -36,9 +37,10 @@ class DefaultShoppingCartRepositoryTest {
     @Test
     fun `장바구니 상품의 총 개수를 계산한다`() {
         // given
-        castSource = FakeShoppingCartDataSource(
-            cartItemDtosTestFixture(10) + cartItemDtoTestFixture(id = 10, quantity = 9)
-        )
+        castSource =
+            FakeShoppingCartDataSource(
+                cartItemDtosTestFixture(10) + cartItemDtoTestFixture(id = 10, quantity = 9),
+            )
         repository = DefaultShoppingCartRepository(castSource)
 
         // when
@@ -51,32 +53,38 @@ class DefaultShoppingCartRepositoryTest {
     @Test
     fun `상품의 개수를 변경한다`() {
         // given
-        castSource = FakeShoppingCartDataSource(
-            cartItemDtosTestFixture(10)
-        )
+        castSource =
+            FakeShoppingCartDataSource(
+                cartItemDtosTestFixture(10),
+            )
         repository = DefaultShoppingCartRepository(castSource)
 
         // when
         repository.updateProductQuantity(1, 10)
 
         // then
-        val actual = castSource.loadAllCartItems().find { it.id == 1L }?.quantity
-            ?: throw NoSuchElementException("there is no product")
+        val actual =
+            castSource.loadAllCartItems().find { it.id == 1L }?.quantity
+                ?: throw NoSuchElementException("there is no product")
         assertThat(actual).isEqualTo(10)
     }
 }
 
-
 // test fixture for CartItemDto
-fun cartItemDtoTestFixture(id: Int, quantity: Int = 1, product: ProductDto = ProductDto.DEFAULT): CartItemDto =
+fun cartItemDtoTestFixture(
+    id: Int,
+    quantity: Int = 1,
+    product: ProductDto = ProductDto.DEFAULT,
+): CartItemDto =
     CartItemDto(
         id = id.toLong(),
         quantity = quantity,
         product = product,
     )
 
-fun cartItemDtosTestFixture(dataCount: Int): List<CartItemDto> = List(dataCount) {
-    cartItemDtoTestFixture(
-        id = it + 1
-    )
-}
+fun cartItemDtosTestFixture(dataCount: Int): List<CartItemDto> =
+    List(dataCount) {
+        cartItemDtoTestFixture(
+            id = it + 1,
+        )
+    }

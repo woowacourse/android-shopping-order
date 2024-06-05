@@ -91,7 +91,6 @@ class ProductListFragment : Fragment() {
         }
     }
 
-
     companion object {
         const val TAG = "ProductListFragment"
     }

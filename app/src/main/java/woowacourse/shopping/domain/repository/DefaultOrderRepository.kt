@@ -12,7 +12,10 @@ class DefaultOrderRepository(
         orderSource.claer()
     }
 
-    override fun saveOrderItem(cartItemId: Long, quantity: Int) {
+    override fun saveOrderItem(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
         orderSource.save(cartItemId, quantity)
     }
 
@@ -27,7 +30,6 @@ class DefaultOrderRepository(
             productSource.findById(id).price.times(quantity)
         }.sum()
     }
-
 
     companion object {
         private const val TAG = "OrderRepository"

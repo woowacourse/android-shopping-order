@@ -7,7 +7,10 @@ interface ShoppingCartRepository {
 
     fun shoppingCartProductQuantity(): Int
 
-    fun updateProductQuantity(cartItemId: Long, quantity: Int)
+    fun updateProductQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    )
 
     fun addShoppingCartProduct(
         productId: Long,
@@ -15,5 +18,4 @@ interface ShoppingCartRepository {
     )
 
     fun removeShoppingCartProduct(cartItemId: Long)
-
 }

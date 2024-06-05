@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +16,9 @@ import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 class ShoppingCartFragment : Fragment() {
     private var _binding: FragmentCartListBinding? = null
     private val binding
-        get() = _binding
-            ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
+        get() =
+            _binding
+                ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
     private val viewModel: ShoppingCartViewModel by viewModels {
         ShoppingCartViewModel.factory()
@@ -99,8 +99,6 @@ class ShoppingCartFragment : Fragment() {
                 is ShoppingCartEvent.PopBackStack -> (requireActivity() as? FragmentNavigator)?.popBackStack()
             }
         }
-
-
     }
 
     companion object {

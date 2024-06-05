@@ -7,4 +7,22 @@ class FakeOrderDataSource : OrderDataSource {
         // TODO: not implemented
     }
 
+    override fun save(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun load(): Map<Long, Int> {
+        TODO("Not yet implemented")
+    }
+
+    override fun allQuantity(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun claer() {
+        TODO("Not yet implemented")
+    }
 }

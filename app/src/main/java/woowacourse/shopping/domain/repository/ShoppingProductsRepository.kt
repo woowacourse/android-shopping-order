@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.model.CartItem
 
 interface ShoppingProductsRepository {
     fun pagedProducts(page: Int): List<Product>

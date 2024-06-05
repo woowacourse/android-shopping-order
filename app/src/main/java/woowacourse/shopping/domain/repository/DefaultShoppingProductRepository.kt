@@ -4,8 +4,6 @@ import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingProductRepository(
     private val productsSource: ProductDataSource,

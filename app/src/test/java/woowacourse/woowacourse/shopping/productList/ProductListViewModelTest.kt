@@ -7,13 +7,10 @@ import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -21,13 +18,10 @@ import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
-import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
 import woowacourse.shopping.source.FakeProductDataSource
 import woowacourse.shopping.source.FakeProductHistorySource
 import woowacourse.shopping.source.FakeShoppingCartDataSource
-import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 import woowacourse.shopping.ui.productList.ProductListViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
