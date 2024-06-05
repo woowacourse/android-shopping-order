@@ -11,17 +11,17 @@ class CartTest {
         // given
         val cart = Cart()
         // when
-        val actual = cart.add(cartProduct())
+        val actual = cart.add(fakeCartProduct())
         // then
-        val expect = Cart(cartProduct())
+        val expect = Cart(fakeCartProduct())
         actual shouldBe expect
     }
 
     @Test
     fun `product id 가 같은 상품을 추가 하면, 덮어 씌워진다`() {
         // given
-        val cart = Cart(cartProduct(productId = 1))
-        val newCartProduct = cartProduct(productId = 1, count = 3)
+        val cart = Cart(fakeCartProduct(productId = 1))
+        val newCartProduct = fakeCartProduct(productId = 1, count = 3)
         // when
         val actual = cart.add(newCartProduct)
         // then
@@ -32,33 +32,33 @@ class CartTest {
     @Test
     fun `카트에 새 카트를 추가할 수 있다`() {
         // given
-        val cart = Cart(cartProduct(productId = 1))
-        val newCart = Cart(cartProduct(productId = 2, count = 3))
+        val cart = Cart(fakeCartProduct(productId = 1))
+        val newCart = Cart(fakeCartProduct(productId = 2, count = 3))
         // when
         val actual = cart.addAll(newCart)
         // then
-        val expect = Cart(cartProduct(productId = 1), cartProduct(productId = 2, count = 3))
+        val expect = Cart(fakeCartProduct(productId = 1), fakeCartProduct(productId = 2, count = 3))
         actual shouldBe expect
     }
 
     @Test
     fun `카트에 새로운 카트를 추가할 때, product id 가 같은 상품이 있으면 덮어씌워진다`() {
         // given
-        val cart = Cart(cartProduct(productId = 1))
+        val cart = Cart(fakeCartProduct(productId = 1))
         val newCart =
-            Cart(cartProduct(productId = 1, count = 3), cartProduct(productId = 2, count = 1))
+            Cart(fakeCartProduct(productId = 1, count = 3), fakeCartProduct(productId = 2, count = 1))
         // when
         val actual = cart.addAll(newCart)
         // then
         val expect =
-            Cart(cartProduct(productId = 1, count = 3), cartProduct(productId = 2, count = 1))
+            Cart(fakeCartProduct(productId = 1, count = 3), fakeCartProduct(productId = 2, count = 1))
         actual shouldBe expect
     }
 
     @Test
     fun `해당 상품이 쇼핑 카트에 있을 때, 상품 삭제`() {
         // given
-        val cartProduct = cartProduct()
+        val cartProduct = fakeCartProduct()
         val cart = Cart(cartProduct)
         // when
         val actual = cart.delete(cartProduct.product.id)
@@ -82,11 +82,11 @@ class CartTest {
         // given
         val amount = 2
         val productId = 1L
-        val cart = Cart(cartProduct(productId = productId, count = 1))
+        val cart = Cart(fakeCartProduct(productId = productId, count = 1))
         // when
         val actual = cart.increaseProductCount(productId, amount)
         // then
-        val expect = Cart(cartProduct(productId = productId, count = 3))
+        val expect = Cart(fakeCartProduct(productId = productId, count = 3))
         actual shouldBe expect
     }
 
@@ -105,11 +105,11 @@ class CartTest {
         // given
         val amount = 1
         val productId = 1L
-        val cart = Cart(cartProduct(productId = productId, count = 2))
+        val cart = Cart(fakeCartProduct(productId = productId, count = 2))
         // when
         val actual = cart.decreaseProductCount(productId, amount)
         // then
-        val expect = Cart(cartProduct(productId = productId, count = 1))
+        val expect = Cart(fakeCartProduct(productId = productId, count = 1))
         actual shouldBe expect
     }
 

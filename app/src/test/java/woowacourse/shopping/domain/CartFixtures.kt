@@ -2,7 +2,7 @@ package woowacourse.shopping.domain
 
 import woowacourse.shopping.domain.entity.CartProduct
 
-fun cartProduct(
+fun fakeCartProduct(
     productId: Long = 1L,
     count: Int = 1,
 ) = CartProduct(

@@ -8,10 +8,10 @@ class CartProductTest {
     @Test
     fun `카트 상품의 수량은 1 이상이다`() {
         shouldThrow<IllegalArgumentException> {
-            cartProduct(count = 0)
+            fakeCartProduct(count = 0)
         }
         shouldNotThrow<IllegalArgumentException> {
-            cartProduct(count = 1)
+            fakeCartProduct(count = 1)
         }
     }
 }

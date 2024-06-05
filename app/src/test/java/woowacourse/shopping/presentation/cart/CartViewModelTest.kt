@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.domain.cartProduct
+import woowacourse.shopping.domain.fakeCartProduct
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
@@ -48,7 +48,7 @@ class CartViewModelTest {
     fun setUp() {
         every { loadCartUseCase() } returns
                 Result.success(
-                    Cart(cartProduct()),
+                    Cart(fakeCartProduct()),
                 )
         every { cartRepository.canLoadMoreCartProducts(any(), PAGE_SIZE) } returns
                 Result.success(
@@ -81,7 +81,7 @@ class CartViewModelTest {
         every { loadPagingCartUseCase(serverNextPage, PAGE_SIZE) } returns
                 Result.success(
                     Cart(
-                        cartProduct(),
+                        fakeCartProduct(),
                     ),
                 )
         // when
@@ -102,7 +102,7 @@ class CartViewModelTest {
         every { loadPagingCartUseCase(serverNextPage, PAGE_SIZE) } returns
                 Result.success(
                     Cart(
-                        cartProduct(),
+                        fakeCartProduct(),
                     ),
                 )
         // when

@@ -12,8 +12,6 @@ data class Cart(
 
     constructor (vararg cartProducts: CartProduct) : this(cartProducts.toList())
 
-    constructor(vararg products: Product) : this(products.map { CartProduct(it, 1) })
-
     fun hasProductId(productId: Long): Boolean = cartMapByProductId.containsKey(productId)
 
     fun addAll(cart: Cart): Cart {
