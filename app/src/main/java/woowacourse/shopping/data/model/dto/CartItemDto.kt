@@ -1,15 +1,17 @@
 package woowacourse.shopping.data.model.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class CartItemDto(
-    val content: List<ContentDto>,
-    val empty: Boolean,
-    val first: Boolean,
-    val last: Boolean,
-    val number: Int,
-    val numberOfElements: Int,
-    val pageable: PageableDto,
-    val size: Int,
-    val sort: SortDto,
-    val totalElements: Int,
-    val totalPages: Int,
+    @SerializedName("sort") val content: List<ContentDto>,
+    @SerializedName("empty") val empty: Boolean,
+    @SerializedName("first") val first: Boolean,
+    @SerializedName("last") val last: Boolean,
+    @SerializedName("number") val number: Int,
+    @SerializedName("numberOfElements") val numberOfElements: Int,
+    @SerializedName("pageable") val pageable: PageableDto,
+    @SerializedName("size") val size: Int,
+    @SerializedName("sort") val sort: SortDto,
+    @SerializedName("totalElements") val totalElements: Int,
+    @SerializedName("totalPages") val totalPages: Int,
 )

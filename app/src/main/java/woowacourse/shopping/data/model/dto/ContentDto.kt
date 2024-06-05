@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.model.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class ContentDto(
-    val id: Long,
-    val product: ProductDto,
-    val quantity: Int,
+    @SerializedName("id") val id: Long,
+    @SerializedName("product") val product: ProductDto,
+    @SerializedName("quantity") val quantity: Int,
 )

@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.model.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class CartItemsDto(
-    val cartItemIds: List<Long>,
+    @SerializedName("cartItemIds") val cartItemIds: List<Long>,
 )
