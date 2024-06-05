@@ -47,7 +47,8 @@ class DefaultCartItemRepository(
         id: Long,
         quantity: Int,
     ) {
-        handleResponse(cartItemDataSource.minusProductsIdCount(id, quantity))
+        val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
+        handleResponse(cartItemDataSource.minusProductsIdCount(cartItem.id, quantity))
     }
 
     override fun increaseCartItem(
