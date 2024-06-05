@@ -27,14 +27,6 @@ data class Cart(
 
     fun isEmpty(): Boolean = cartProducts.isEmpty()
 
-    @Deprecated("Use add(cartProduct: CartProduct) instead")
-    fun add(product: Product): Cart {
-        val productId = product.id
-        require(hasProductId(productId).not()) { ERROR_ALREADY_EXIST_PRODUCT.format(product) }
-        val newCartProduct = CartProduct(product, 1)
-        return Cart(cartProducts + newCartProduct)
-    }
-
     fun filterByProductIds(productIds: List<Long>): Cart {
         val filteredProducts = cartProducts.filter { it.product.id in productIds }
         return Cart(filteredProducts)
