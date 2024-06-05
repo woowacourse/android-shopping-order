@@ -8,6 +8,12 @@ class RecommendProductsUseCase(
     private val productRepository: ShoppingRepository,
     private val cartRepository: CartRepository,
 ) {
+    private val cartProducts: List<Product>
+        get() {
+            val cart = cartRepository.totalCartProducts().getOrNull() ?: emptyList()
+            return cart.map { it.product }
+        }
+
     operator fun invoke(): List<Product> {
         val recentProducts = productRepository.recentProducts(1).getOrNull() ?: emptyList()
         val firstProduct = recentProducts.firstOrNull()
@@ -23,13 +29,8 @@ class RecommendProductsUseCase(
             }
         return products.filterNot {
             // 카트에 있는 상품은 추천 상품에서 제외한다.
-            obtainCartProducts().contains(it)
+            cartProducts.contains(it)
         }.take(RECOMMEND_PRODUCT_SIZE)
-    }
-
-    private fun obtainCartProducts(): List<Product> {
-        val cart = cartRepository.totalCartProducts().getOrNull() ?: emptyList()
-        return cart.map { it.product }
     }
 
     companion object {
