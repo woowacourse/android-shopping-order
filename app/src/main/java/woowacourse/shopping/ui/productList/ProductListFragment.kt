@@ -62,7 +62,7 @@ class ProductListFragment : Fragment() {
         showSkeletonUi()
         observeLoadedProducts()
         viewModel.productsHistory.observe(viewLifecycleOwner) {
-            historyAdapter.update(it)
+            historyAdapter.submitList(it)
         }
     }
 

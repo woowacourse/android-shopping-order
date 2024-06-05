@@ -17,7 +17,7 @@ interface HistoryProductDao {
     @Query("SELECT * from history_products ORDER BY timestamp DESC LIMIT 1")
     fun findLatest(): HistoryProduct?
 
-    @Query("SELECT * from history_products ORDER BY timestamp ASC")
+    @Query("SELECT * from history_products ORDER BY timestamp DESC")
     fun findAll(): List<HistoryProduct>
 
     @Delete
