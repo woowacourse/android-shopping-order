@@ -16,7 +16,6 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity.Companion.EXTRA_UPDATED_PRODUCT
 import woowacourse.shopping.utils.getParcelableExtraCompat
-import kotlin.concurrent.thread
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int

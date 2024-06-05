@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.presentation.ui.UiState
 
 @BindingAdapter("curationPrice")
-fun TextView.setPrice(uiState: UiState<List<CartProduct>>) {
+fun TextView.setPrice(uiState: UiState<List<CartProduct>>?) {
     if (uiState is UiState.Success) {
         this.text =
             this.context.getString(
@@ -20,7 +20,7 @@ fun TextView.setPrice(uiState: UiState<List<CartProduct>>) {
 }
 
 @BindingAdapter("curationOrderCount")
-fun TextView.setOrderCount(uiState: UiState<List<CartProduct>>) {
+fun TextView.setOrderCount(uiState: UiState<List<CartProduct>>?) {
     if (uiState is UiState.Success) {
         this.text =
             uiState.data.sumOf {
