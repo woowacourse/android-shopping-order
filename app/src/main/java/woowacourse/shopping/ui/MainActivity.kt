@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
             replace(
                 R.id.container, OrderFragment::class.java, null, OrderFragment.TAG
             )
-            addToBackStack(OrderFragment.TAG)
         }
     }
 

@@ -23,8 +23,7 @@ class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
-    ShoppingCartListener
-{
+    ShoppingCartListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _cartItems = MutableLiveData<List<CartItem>>()
@@ -48,10 +47,7 @@ class ShoppingCartViewModel(
     fun loadAll() {
         thread {
             val currentItems = shoppingCartRepository.loadAllCartItems()
-
-            uiHandler.post {
-                _cartItems.value = currentItems
-            }
+            _cartItems.postValue(currentItems)
         }
     }
 
@@ -62,16 +58,11 @@ class ShoppingCartViewModel(
 
         thread {
             val currentItems = shoppingCartRepository.loadAllCartItems().also {
-                Log.d(TAG, "deleteItem, currentItems $it")
+                Log.d(TAG, "deleteItem: currentItems: $it")
             }
-            uiHandler.post {
-                _cartItems.value = currentItems
-            }
+            _cartItems.postValue(currentItems)
         }.join()
 
-        _cartItems.value = cartItems.value?.filter {
-            it.id != cartItemId
-        }
 
         updateTotalPrice()
         updateSelectedCartItemsCount()
@@ -95,6 +86,15 @@ class ShoppingCartViewModel(
         cartItems.value?.forEach {
             orderRepository.saveOrderItemTemp(it.product.id, it.quantity)
         }
+
+
+        thread {
+            shoppingCartRepository.loadAllCartItems().also {
+                Log.d(TAG, "loadAllCartItems: $it")
+            }
+        }.join()
+
+
     }
 
     override fun onRemove(productId: Long) {

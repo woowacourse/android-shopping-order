@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductsRecommendationRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.ui.order.event.OrderEvent
 import woowacourse.shopping.ui.order.listener.OrderListener
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
@@ -35,14 +36,19 @@ class OrderViewModel(
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData()
     val totalPrice: LiveData<Int> get() = _totalPrice
 
+    private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<OrderEvent> get() = _event
+
+
     override fun createOrder() {
         thread {
-            orderRepository.order(
-                orderRepository.loadOrderItemTemp().map {
-                    it.key
-                }
-            )
+            val filter = cartRepository.loadAllCartItems().map { cartItem ->
+                cartItem.id
+            }
+            orderRepository.order(filter)
+            _event.postValue(OrderEvent.CompleteOrder)
         }.join()
+
     }
 
     fun loadAll() {

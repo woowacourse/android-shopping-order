@@ -14,7 +14,7 @@ import woowacourse.shopping.remote.model.CartItemResponse
 interface CartItemApiService {
     @GET("/cart-items")
     fun requestCartItems(
-        @Query("page") page: Int = 0,
+        @Query("page") page: Int? = 0,
         @Query("size") size: Int? = null,
     ): Call<CartItemResponse>
 

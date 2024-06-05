@@ -47,7 +47,7 @@ class ProductListViewModel(
     private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
 
-    private var _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
+    private var _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
 
     fun loadAll() {
