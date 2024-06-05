@@ -121,6 +121,7 @@ class OrderViewModel(
                     ShoppingApp.orderSource,
                     ShoppingApp.productSource,
                     ShoppingApp.historySource,
+                    ShoppingApp.cartSource
                 ),
             cartItemRepository: CartItemRepository =
                 DefaultCartItemRepository(
