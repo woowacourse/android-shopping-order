@@ -53,13 +53,9 @@ class CartItemDaoTest {
         }
 
     @Test
-    fun `특정_ID로_장바구니_아이템을_불러올_수_있다`() {
+    fun `특정_ID로_장바구니_아이템을_불러올_수_있다`() = runTest {
         val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
-        var itemId = -1L
-        thread {
-            itemId = dao.saveCartItem(item)
-        }.join()
-
+        val itemId = dao.saveCartItem(item)
         val actual = dao.findCartItemById(itemId)
         val expected = item.copy(id = itemId)
         assertThat(actual).isNotNull()
@@ -67,13 +63,10 @@ class CartItemDaoTest {
     }
 
     @Test
-    fun `특정_ID로_장바구니_아이템을_삭제할_수_있다`() {
+    fun `특정_ID로_장바구니_아이템을_삭제할_수_있다`() = runTest {
         val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
-        var itemId = -1L
-        thread {
-            itemId = dao.saveCartItem(item)
-            dao.deleteCartItemById(itemId)
-        }.join()
+        val itemId = dao.saveCartItem(item)
+        dao.deleteCartItemById(itemId)
 
         val deletedItem = item.copy(id = itemId)
         assertThat(dao.findAll().contains(deletedItem)).isEqualTo(false)

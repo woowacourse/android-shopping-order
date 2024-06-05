@@ -1,15 +1,20 @@
 package woowacourse.shopping.view.viewmodel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.MockShoppingCartRepository
 import woowacourse.shopping.TestFixture.getOrAwaitValue
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.view.cart.ShoppingCartViewModel
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ShoppingCartViewModelTest {
     private lateinit var shoppingCartRepository: ShoppingCartRepository
@@ -32,15 +37,4 @@ class ShoppingCartViewModelTest {
         Assertions.assertThat(result.size).isEqualTo(3)
     }
 
-//    @Test
-//    fun `장바구니_id로_장바구니_목록을_삭제하면_전체_상품에서_해당_id와_일치하는_아이템이_삭제되어야_한다`() {
-//        viewModel.loadPagingCartItemList()
-//        val before = viewModel.shoppingCart.cartItems.getOrAwaitValue()
-//        Assertions.assertThat(before.size).isEqualTo(3)
-//
-//        viewModel.deleteShoppingCartItem(0L, Product(0L,"",1,"","", CartItemCounter(1), ItemSelector(true)))
-//
-//        val result = viewModel.shoppingCart.cartItems.getOrAwaitValue()
-//        Assertions.assertThat(result.size).isEqualTo(2)
-//    }
 }

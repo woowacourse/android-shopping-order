@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -31,13 +32,11 @@ class RecommendFragmentTest {
     private lateinit var context: Context
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         context = ApplicationProvider.getApplicationContext()
         database = RecentlyProductDatabase.getInstance(context)
         dao = database.recentlyProductDao()
-        thread {
-            dao.addRecentlyProduct(TestFixture.makeRecentlyProductEntity())
-        }.join()
+        dao.addRecentlyProduct(TestFixture.makeRecentlyProductEntity())
 
         activityRule.scenario.onActivity { activity ->
             activity.supportFragmentManager.beginTransaction()

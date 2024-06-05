@@ -8,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -31,13 +32,11 @@ class ShoppingCartFragmentTest {
     private lateinit var context: Context
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         context = ApplicationProvider.getApplicationContext()
         database = CartItemDatabase.getInstance(context)
         dao = database.cartItemDao()
-        thread {
-            dao.saveCartItem(TestFixture.makeCartItemEntity())
-        }.join()
+        dao.saveCartItem(TestFixture.makeCartItemEntity())
 
         activityRule.scenario.onActivity { activity ->
             activity.supportFragmentManager.beginTransaction()
