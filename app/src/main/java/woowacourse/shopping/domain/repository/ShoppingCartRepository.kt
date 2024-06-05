@@ -4,26 +4,26 @@ import woowacourse.shopping.domain.model.CartItemId
 import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingCartRepository {
-    fun postCartItem(
+    suspend fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemId>
 
-    fun patchCartItem(
+    suspend fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit>
 
-    fun getCartProductsPaged(
+    suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
     ): Result<Carts>
 
-    fun getCartItemsCount(): Result<Int>
+    suspend fun getCartItemsCount(): Result<Int>
 
-    fun deleteCartItem(cartId: Int): Result<Unit>
+    suspend fun deleteCartItem(cartId: Int): Result<Unit>
 
-    fun getAllCarts(): Result<Carts>
+    suspend fun getAllCarts(): Result<Carts>
 
     companion object {
         private var instance: ShoppingCartRepository? = null

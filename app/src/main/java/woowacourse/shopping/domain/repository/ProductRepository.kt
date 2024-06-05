@@ -4,9 +4,9 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Products
 
 interface ProductRepository {
-    fun findCartByProductId(id: Long): Result<Cart>
+    suspend fun findCartByProductId(id: Long): Result<Cart>
 
-    fun getPagingProduct(
+    suspend fun getPagingProduct(
         page: Int,
         pageSize: Int,
     ): Result<Products>

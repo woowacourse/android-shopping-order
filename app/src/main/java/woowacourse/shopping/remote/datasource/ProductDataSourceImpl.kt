@@ -7,18 +7,16 @@ import woowacourse.shopping.remote.api.ProductService
 import woowacourse.shopping.remote.mapper.toData
 
 class ProductDataSourceImpl(private val productService: ProductService) : ProductDataSource {
-    override fun findProductById(id: Long): Result<ProductDto> =
+    override suspend fun findProductById(id: Long): Result<ProductDto> =
         runCatching {
-            productService.getProductsById(id = id.toInt()).execute().body()?.toData()
-                ?: throw IllegalArgumentException()
+            productService.getProductsById(id = id.toInt()).toData()
         }
 
-    override fun getPagingProduct(
+    override suspend fun getPagingProduct(
         page: Int,
         pageSize: Int,
     ): Result<ProductsDto> =
         runCatching {
-            productService.getProducts(page = page, size = pageSize).execute().body()?.toData()
-                ?: throw IllegalArgumentException()
+            productService.getProducts(page = page, size = pageSize).toData()
         }
 }

@@ -10,7 +10,7 @@ import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
 
 class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCartDataSource {
-    override fun postCartItem(
+    override suspend fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemIdDto> =
@@ -20,41 +20,39 @@ class ShoppingCartDataSourceImpl(private val service: CartService) : ShoppingCar
                     productId = productId.toInt(),
                     quantity = quantity,
                 )
-            service.postCartItem(body).execute().toCartItemIdDto()
+            service.postCartItem(body).toCartItemIdDto()
         }
 
-    override fun patchCartItem(
+    override suspend fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit> =
         runCatching {
             val body = PatchCartItemRequest(quantity = quantity)
-            service.patchCartItem(id = cartId, body = body).execute()
+            service.patchCartItem(id = cartId, body = body)
         }
 
-    override fun getCartProductsPaged(
+    override suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
     ): Result<CartsDto> =
         runCatching {
-            service.getCartItems(page = page, size = size).execute().body()?.toData()
-                ?: throw IllegalArgumentException()
+            service.getCartItems(page = page, size = size).toData()
         }
 
-    override fun getCartProductTotalElements(): Result<Int> =
+    override suspend fun getCartProductTotalElements(): Result<Int> =
         runCatching {
-            service.getCartItems(page = FIRST_PAGE, size = FIRST_SIZE).execute().body()
-                ?.toData()?.totalElements ?: 0
+            service.getCartItems(page = FIRST_PAGE, size = FIRST_SIZE).toData().totalElements
         }
 
-    override fun getCartItemsCount(): Result<Int> =
+    override suspend fun getCartItemsCount(): Result<Int> =
         runCatching {
-            service.getCartItemsCount().execute().body()?.quantity ?: 0
+            service.getCartItemsCount().quantity
         }
 
-    override fun deleteCartItem(cartId: Int): Result<Unit> =
+    override suspend fun deleteCartItem(cartId: Int): Result<Unit> =
         runCatching {
-            service.deleteCartItem(id = cartId).execute().body()
+            service.deleteCartItem(id = cartId)
         }
 
     companion object {

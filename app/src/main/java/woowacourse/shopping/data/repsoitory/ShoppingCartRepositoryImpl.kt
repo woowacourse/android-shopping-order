@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource) :
     ShoppingCartRepository {
-    override fun postCartItem(
+    override suspend fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemId> =
@@ -17,23 +17,23 @@ class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartDataSource)
             quantity = quantity,
         ).mapCatching { it.toDomain() }
 
-    override fun patchCartItem(
+    override suspend fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit> = dataSource.patchCartItem(cartId = cartId, quantity = quantity)
 
-    override fun getCartProductsPaged(
+    override suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
     ): Result<Carts> =
         dataSource.getCartProductsPaged(page = page, size = size)
             .mapCatching { result -> result.toDomain() }
 
-    override fun getCartItemsCount(): Result<Int> = dataSource.getCartItemsCount()
+    override suspend fun getCartItemsCount(): Result<Int> = dataSource.getCartItemsCount()
 
-    override fun deleteCartItem(cartId: Int): Result<Unit> = dataSource.deleteCartItem(cartId = cartId)
+    override suspend fun deleteCartItem(cartId: Int): Result<Unit> = dataSource.deleteCartItem(cartId = cartId)
 
-    override fun getAllCarts(): Result<Carts> {
+    override suspend fun getAllCarts(): Result<Carts> {
         val totalElements =
             dataSource.getCartProductsPaged(
                 page = ProductRepositoryImpl.FIRST_PAGE,

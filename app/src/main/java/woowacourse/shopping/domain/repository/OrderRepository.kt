@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 interface OrderRepository {
-    fun insertOrder(cartItemsIds: List<Int>): Result<Unit>
+    suspend fun insertOrder(cartItemsIds: List<Int>): Result<Unit>
 
     companion object {
         private var instance: OrderRepository? = null

@@ -8,7 +8,7 @@ import woowacourse.shopping.local.model.ProductHistoryEntity
 import java.time.LocalDateTime
 
 class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : ProductHistoryDataSource {
-    override fun insertProductHistory(
+    override suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -29,27 +29,27 @@ class ProductHistoryDataSourceImpl(private val dao: ProductHistoryDao) : Product
             dao.insertProductHistory(productHistoryEntity = productHistoryEntity)
         }
 
-    override fun findProductHistory(productId: Long): Result<ProductHistoryDto> =
+    override suspend fun findProductHistory(productId: Long): Result<ProductHistoryDto> =
         runCatching {
             dao.findProductHistory(productId = productId).toData()
         }
 
-    override fun getProductHistoriesByCategory(category: String): Result<List<ProductHistoryDto>> =
+    override suspend fun getProductHistoriesByCategory(category: String): Result<List<ProductHistoryDto>> =
         runCatching {
             dao.getProductHistoriesByCategory(category = category).map { it.toData() }
         }
 
-    override fun getProductHistory(size: Int): Result<List<ProductHistoryDto>> =
+    override suspend fun getProductHistory(size: Int): Result<List<ProductHistoryDto>> =
         runCatching {
             dao.getProductHistoryPaged(size = size).map { it.toData() }
         }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> =
+    override suspend fun deleteProductHistory(productId: Long): Result<Unit> =
         runCatching {
             dao.deleteProductHistory(productId = -productId)
         }
 
-    override fun deleteAllProductHistory(): Result<Unit> =
+    override suspend fun deleteAllProductHistory(): Result<Unit> =
         runCatching {
             dao.deleteAllProductHistory()
         }

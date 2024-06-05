@@ -11,7 +11,7 @@ class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val shoppingCartDataSource: ShoppingCartDataSource,
 ) : ProductRepository {
-    override fun findCartByProductId(id: Long): Result<Cart> {
+    override suspend fun findCartByProductId(id: Long): Result<Cart> {
         val totalElements = shoppingCartDataSource.getCartProductTotalElements().getOrThrow()
 
         val cartsDto =
@@ -28,7 +28,7 @@ class ProductRepositoryImpl(
         }
     }
 
-    override fun getPagingProduct(
+    override suspend fun getPagingProduct(
         page: Int,
         pageSize: Int,
     ): Result<Products> =
