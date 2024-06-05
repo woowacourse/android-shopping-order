@@ -5,32 +5,34 @@ import woowacourse.shopping.data.source.ProductDataSource
 
 class DefaultOrderRepository(
     private val orderSource: OrderDataSource,
-    private val productDataSource: ProductDataSource,
+    private val productSource: ProductDataSource,
 ) : OrderRepository {
     override fun order(cartItemIds: List<Long>) {
         orderSource.order(cartItemIds)
-        _orderSaved.clear()
+        orderSource.claer()
     }
 
     override fun saveOrderItemTemp(cartItemId: Long, quantity: Int) {
-        _orderSaved[cartItemId] = quantity
+        orderSource.save(cartItemId, quantity)
     }
 
-    override fun loadOrderItemTemp(): Map<Long, Int> = orderSaved
+    override fun loadOrderItemTemp(): Map<Long, Int> = orderSource.load()
 
-    override fun allOrderItemsTempQuantity(): Int = orderSaved.values.sum()
+    override fun allOrderItemsTempQuantity(): Int = orderSource.allQuantity()
 
-    override fun tempOrderItemsTotalPrice(): Int = orderSaved.map { (id, quantity) ->
-        productDataSource.findById(id).price.times(quantity)
-    }.sum()
+    override fun tempOrderItemsTotalPrice(): Int {
+        val load = orderSource.load()
+
+        val map = load.map { (id, quantity) ->
+            productSource.findById(id).price.times(quantity)
+        }
+
+        return map.sum()
+//        return orderSource.totalPrice()
+    }
 
 
     companion object {
         private const val TAG = "OrderRepository"
-
-        // TODO: 주석 제거
-        // id 와 개수 id 는 상품 아이디? (장바구니 아이디가 아니라)
-        private val _orderSaved: MutableMap<Long, Int> = mutableMapOf()
-        val orderSaved: Map<Long, Int> get() = _orderSaved
     }
 }

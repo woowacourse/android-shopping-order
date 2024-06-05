@@ -37,10 +37,6 @@ class OrderViewModel(
 
     override fun createOrder() {
         thread {
-            val cartItems = cartRepository.loadAllCartItems().map {
-                it.id
-            }
-
             orderRepository.order(
                 orderRepository.loadOrderItemTemp().map {
                     it.key

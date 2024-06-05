@@ -211,7 +211,7 @@ class ShoppingCartViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource,
-                    productDataSource = ShoppingApp.productSource
+                    productSource = ShoppingApp.productSource
                 )
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
