@@ -31,28 +31,28 @@ class RepositoryImpl(
             localDataSource.findProductByPaging(offset, pageSize).map { it.toDomain() }
         }
 
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    ) {
-        remoteDataSource.getProducts(category, page, size) { result ->
-            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
-                .onFailure { callback(Result.failure(it)) }
-        }
+    ): Result<List<CartProduct>?> {
+        return remoteDataSource.getProducts(category, page, size)
+            .mapCatching {
+                it.map { it.toDomain() }
+            }
+            .recoverCatching {
+                throw it
+            }
     }
+    override suspend fun getProductsByPaging(): Result<List<CartProduct>?> {
+        val data = productPagingSource.load()
+        return when (data) {
+            is LoadResult.Page -> {
+                Result.success(data.data)
+            }
 
-    override fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit) {
-        productPagingSource.load { result ->
-            when (result) {
-                is LoadResult.Page -> {
-                    callback(Result.success(result.data))
-                }
-
-                is LoadResult.Error -> {
-                    callback(Result.failure(Throwable(result.message)))
-                }
+            is LoadResult.Error -> {
+                Result.failure(Throwable(data.message))
             }
         }
     }
@@ -67,15 +67,6 @@ class RepositoryImpl(
                 .onFailure { callback(Result.failure(it)) }
         }
     }
-
-    override fun getProductById(id: Int): Result<CartProduct?> =
-        runCatching {
-            val response = remoteDataSource.getProductById(id = id)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.toDomain())
-            }
-            return Result.failure(Throwable())
-        }
 
     override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
         runCatching {
@@ -136,10 +127,6 @@ class RepositoryImpl(
             localDataSource.findOne()?.toDomain()
         }
 
-    override fun findProductById(id: Long): Result<CartProduct?> =
-        runCatching {
-            localDataSource.findProductById(id)?.toDomain()
-        }
 
     override fun saveCart(cart: Cart): Result<Long> =
         runCatching {
@@ -180,37 +167,38 @@ class RepositoryImpl(
         }
     }
 
+    // todo cartApi
     override fun getCuration(callback: (Result<List<CartProduct>>) -> Unit) {
-        localDataSource.findOne()?.toDomain()?.let {
-            remoteDataSource.getProducts(it.category, 0, 10) { productResult ->
-                productResult.onSuccess { products ->
-                    remoteDataSource.getCartItems(0, 1000) { cartResult ->
-                        cartResult.onSuccess { cartItems ->
-                            val cartProductIds = cartItems.content.map { it.product.id }.toSet()
+        /*  localDataSource.findOne()?.toDomain()?.let {
+              remoteDataSource.getProducts(it.category, 0, 10) { productResult ->
+                  productResult.onSuccess { products ->
+                      remoteDataSource.getCartItems(0, 1000) { cartResult ->
+                          cartResult.onSuccess { cartItems ->
+                              val cartProductIds = cartItems.content.map { it.product.id }.toSet()
 
-                            val filteredProducts =
-                                products.content.filter { product -> product.id !in cartProductIds }
+                              val filteredProducts =
+                                  products.content.filter { product -> product.id !in cartProductIds }
 
-                            val cartProducts =
-                                filteredProducts.map { product ->
-                                    val cart =
-                                        cartItems.content.find { it.product.id == product.id }
+                              val cartProducts =
+                                  filteredProducts.map { product ->
+                                      val cart =
+                                          cartItems.content.find { it.product.id == product.id }
 
-                                    CartProduct(
-                                        productId = product.id.toLong(),
-                                        name = product.name,
-                                        imgUrl = product.imageUrl,
-                                        price = product.price.toLong(),
-                                        category = product.category,
-                                        cartId = cart?.id?.toLong() ?: 0,
-                                        quantity = cart?.quantity ?: 0,
-                                    )
-                                }
-                            callback(Result.success(cartProducts))
-                        }
-                    }
-                }
-            }
-        }
+                                      CartProduct(
+                                          productId = product.id.toLong(),
+                                          name = product.name,
+                                          imgUrl = product.imageUrl,
+                                          price = product.price.toLong(),
+                                          category = product.category,
+                                          cartId = cart?.id?.toLong() ?: 0,
+                                          quantity = cart?.quantity ?: 0,
+                                      )
+                                  }
+                              callback(Result.success(cartProducts))
+                          }
+                      }
+                  }
+              }
+          }*/
     }
 }

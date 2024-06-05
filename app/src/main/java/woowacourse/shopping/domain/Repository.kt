@@ -11,22 +11,19 @@ interface Repository {
         pageSize: Int,
     ): Result<List<CartProduct>>
 
-    fun getProducts(
+    suspend fun getProducts(
         category: String,
         page: Int = 0,
         size: Int = 20,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    )
+    ): Result<List<CartProduct>?>
 
-    fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit)
+    suspend fun getProductsByPaging(): Result<List<CartProduct>?>
 
     fun getCartItems(
         page: Int,
         size: Int,
         callback: (Result<List<CartProduct>?>) -> Unit,
     )
-
-    fun getProductById(id: Int): Result<CartProduct?>
 
     fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>
 
@@ -47,8 +44,6 @@ interface Repository {
     fun findByLimit(limit: Int): Result<List<RecentProduct>>
 
     fun findOne(): Result<RecentProduct?>
-
-    fun findProductById(id: Long): Result<CartProduct?>
 
     fun saveCart(cart: Cart): Result<Long>
 

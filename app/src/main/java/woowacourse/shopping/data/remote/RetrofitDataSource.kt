@@ -14,52 +14,54 @@ import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.data.remote.service.CartItemApi
 import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
+import woowacourse.shopping.domain.CartProduct
 
 class RetrofitDataSource(
     private val productApi: ProductApi = RetrofitModule.productApi,
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
     private val orderApi: OrderApi = RetrofitModule.orderApi,
 ) : RemoteDataSource {
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
-        callback: (Result<ProductResponse>) -> Unit,
-    ) {
-        productApi.getProducts(category = category, page = page, size = size)
-            .enqueue(
-                object : Callback<ProductResponse> {
-                    override fun onResponse(
-                        call: Call<ProductResponse>,
-                        response: Response<ProductResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            response.body()?.let { callback(Result.success(it)) }
-                        } else {
-                            callback(Result.failure(Exception("Error: ${response.code()}")))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<ProductResponse>,
-                        t: Throwable,
-                    ) {
-                        callback(Result.failure(t))
-                    }
-                },
-            )
+    ): Result<List<Product>> = runCatching {
+        productApi.getProducts(category = category, page = page, size = size).content
     }
 
-    override fun addProduct(productRequest: ProductRequest): Response<Unit> {
-        return productApi.addProduct(productRequest = productRequest).execute()
+    /*   productApi.getProducts(category = category, page = page, size = size)
+           .enqueue(
+               object : Callback<ProductResponse> {
+                   override fun onResponse(
+                       call: Call<ProductResponse>,
+                       response: Response<ProductResponse>,
+                   ) {
+                       if (response.isSuccessful) {
+                           response.body()?.let { callback(Result.success(it)) }
+                       } else {
+                           callback(Result.failure(Exception("Error: ${response.code()}")))
+                       }
+                   }
+
+                   override fun onFailure(
+                       call: Call<ProductResponse>,
+                       t: Throwable,
+                   ) {
+                       callback(Result.failure(t))
+                   }
+               },
+           )*/
+
+    override suspend fun addProduct(productRequest: ProductRequest) {
+        productApi.addProduct(productRequest = productRequest)
     }
 
-    override fun getProductById(id: Int): Response<Product> {
-        return productApi.getProductById(id = id).execute()
+    override suspend fun getProductById(id: Int): Result<Product> = runCatching {
+        productApi.getProductById(id = id)
     }
 
-    override fun deleteProductById(id: Int): Response<Unit> {
-        return productApi.deleteProductById(id = id).execute()
+    override suspend fun deleteProductById(id: Int) {
+        productApi.deleteProductById(id = id)
     }
 
     override fun getCartItems(

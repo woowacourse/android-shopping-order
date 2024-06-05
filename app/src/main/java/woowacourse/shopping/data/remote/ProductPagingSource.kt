@@ -9,27 +9,16 @@ class ProductPagingSource(
     var offset: Int = 0
     val pageSize: Int = 20
 
-    fun load(
-        offsetInput: Int = offset,
-        callback: (LoadResult<List<CartProduct>>) -> Unit,
-    ) {
-        remoteDataSource.getProducts(page = offset, size = pageSize) {
-            if (it.isSuccess) {
-                val body = it.getOrNull()
-                if (body == null) {
-                    callback(LoadResult.Error(""))
-                } else {
-                    offset++
-                    callback(
-                        LoadResult.Page(
-                            offset = offsetInput,
-                            data = body.content.map { it.toDomain() },
-                        ),
-                    )
-                }
-            } else {
-                callback(LoadResult.Error(""))
-            }
+    suspend fun load(offsetInput: Int = offset): LoadResult<List<CartProduct>> {
+        return try {
+            val products = remoteDataSource.getProducts(page = offset, size = pageSize)
+            offset++
+            LoadResult.Page(
+                offset = offsetInput,
+                data = products.getOrNull()?.map { it.toDomain() } ?: emptyList(),
+            )
+        } catch (e: Exception) {
+            LoadResult.Error(e.message ?: "Unknown error")
         }
     }
 }

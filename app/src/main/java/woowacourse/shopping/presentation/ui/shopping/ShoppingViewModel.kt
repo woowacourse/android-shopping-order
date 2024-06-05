@@ -69,24 +69,19 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun loadProductByOffset() {
-        repository.getProductsByPaging { result ->
-            result.onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
-                } else {
-                    if (_products.value is UiState.Loading) {
-                        _products.postValue(UiState.Success(it))
-                    } else {
-                        _products.postValue(
-                            UiState.Success((_products.value as UiState.Success).data + it),
-                        )
-                    }
-                }
-            }.onFailure {
+    fun loadProductByOffset()  = viewModelScope.launch {
+        repository.getProductsByPaging().onSuccess { it ->
+            if (it == null) {
                 _errorHandler.postValue(EventState(LOAD_ERROR))
+            } else {
+                if (_products.value is UiState.Loading) {
+                    _products.postValue(UiState.Success(it))
+                } else {
+                    _products.postValue(UiState.Success((_products.value as UiState.Success).data + it))
+                }
+
             }
-        }
+        }.onFailure { _errorHandler.postValue(EventState(LOAD_ERROR)) }
     }
 
     fun loadCartByOffset() {
@@ -132,7 +127,9 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     override fun loadMore() {
-        loadProductByOffset()
+        viewModelScope.launch {
+            loadProductByOffset()
+        }
     }
 
     override fun onPlus(cartProduct: CartProduct) {
