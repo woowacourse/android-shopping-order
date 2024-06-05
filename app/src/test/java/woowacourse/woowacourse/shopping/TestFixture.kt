@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.AfterEachCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import woowacourse.shopping.data.model.ProductData
+import woowacourse.shopping.ui.util.Event
+import woowacourse.shopping.ui.util.SingleLiveData
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -22,7 +24,8 @@ fun productTestFixture(
     name: String = "$id name",
     imageUrl: String = "1",
     price: Int = 1,
-): ProductData = ProductData(id, imageUrl, name, price)
+    category: String = "",
+): ProductData = ProductData(id, imageUrl, name, price, category)
 
 fun mockProductsTestFixture(
     count: Int,
@@ -56,6 +59,35 @@ fun <T> LiveData<T>.getOrAwaitValue(
     // Don't wait indefinitely if the LiveData is not set.
     if (!latch.await(time, timeUnit)) {
         throw TimeoutException("LiveData value was never set.")
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return data as T
+}
+
+fun <T> SingleLiveData<T>.getOrAwaitValue(
+    time: Long = 2,
+    timeUnit: TimeUnit = TimeUnit.SECONDS,
+): T {
+    var data: T? = null
+    val latch = CountDownLatch(1)
+    val observer =
+        object : Observer<Event<T>> {
+            override fun onChanged(value: Event<T>) {
+                if (value != null) {
+                    data = value.getContentIfNotHandled()
+                    latch.countDown()
+                    this@getOrAwaitValue.liveData.removeObserver(this)
+                }
+            }
+        }
+
+    this.liveData.observeForever(observer)
+
+    // Don't wait indefinitely if the LiveData is not set.
+    if (!latch.await(time, timeUnit)) {
+        this.liveData.removeObserver(observer)
+        throw TimeoutException("SingleLiveData value was never set.")
     }
 
     @Suppress("UNCHECKED_CAST")

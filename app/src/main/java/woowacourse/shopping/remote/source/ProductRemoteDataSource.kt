@@ -11,7 +11,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
                 ?: throw NoSuchElementException("there is no product with page: $page")
         return response.map {
             ProductData(
-                id = it.id.toLong(),
+                id = it.id,
                 imgUrl = it.imageUrl,
                 name = it.name,
                 price = it.price,
@@ -24,7 +24,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
             productsApiService.requestProduct(id.toInt()).execute().body()
                 ?: throw NoSuchElementException("there is no product with id: $id")
         return ProductData(
-            id = response.id.toLong(),
+            id = response.id,
             imgUrl = response.imageUrl,
             name = response.name,
             price = response.price,
