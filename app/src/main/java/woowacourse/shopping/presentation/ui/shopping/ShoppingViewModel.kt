@@ -84,9 +84,9 @@ class ShoppingViewModel(
         productRepository.load(
             currentPage,
             PAGE_SIZE,
-            onSuccess = { products ->
+            onSuccess = { products, isLast ->
                 currentPage++
-                addShoppingProducts(products)
+                addShoppingProducts(products, isLast)
             },
             onFailure = {
                 _error.value = Event(ShoppingError.ProductItemsNotFound)
@@ -94,7 +94,14 @@ class ShoppingViewModel(
         )
     }
 
-    private fun addShoppingProducts(products: List<Product>) {
+    private fun addShoppingProducts(
+        products: List<Product>,
+        isLast: Boolean,
+    ) {
+        if (isLast && products.isEmpty()) {
+            _error.value = Event(ShoppingError.AllProductsLoaded)
+            return
+        }
         val state = shoppingProducts.value ?: return
         val originShoppingProducts =
             when (state) {

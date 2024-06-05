@@ -45,7 +45,7 @@ class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDa
     override fun load(
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (List<Product>, Boolean) -> Unit,
         onFailure: () -> Unit,
     ) {
         remoteProductDataSource.load(startPage, pageSize).enqueue(
@@ -55,9 +55,9 @@ class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDa
                     response: Response<ProductResponse>,
                 ) {
                     if (response.isSuccessful) {
-                        response.body()?.let {
-                            onSuccess(it.content.map { it.toProduct() })
-                        } ?: onSuccess(emptyList())
+                        response.body()?.let { response ->
+                            onSuccess(response.content.map { it.toProduct() }, response.last)
+                        }
                     }
                 }
 

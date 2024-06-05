@@ -14,7 +14,7 @@ interface ProductRepository {
     fun load(
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (List<Product>, Boolean) -> Unit,
         onFailure: () -> Unit,
     )
 
