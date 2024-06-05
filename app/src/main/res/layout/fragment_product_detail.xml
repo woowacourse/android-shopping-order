@@ -28,7 +28,7 @@
 
                 <ImageView
                     android:id="@+id/iv_product"
-                    imageUrl="@{vm.uiState.cartProduct.product.imageUrl}"
+                    imageUrl="@{vm.uiState.cartProductUi.product.imageUrl}"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     app:layout_constraintDimensionRatio="1"
@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
                     android:layout_marginTop="16dp"
-                    android:text="@{vm.uiState.cartProduct.product.name}"
+                    android:text="@{vm.uiState.cartProductUi.product.name}"
                     android:theme="@style/H1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
                     android:layout_marginTop="33dp"
-                    android:text="@{@string/price_format(vm.uiState.cartProduct.totalPrice)}"
+                    android:text="@{@string/price_format(vm.uiState.cartProductUi.totalPrice)}"
                     android:textSize="20sp"
                     android:theme="@style/B2"
                     app:layout_constraintStart_toStartOf="parent"
@@ -78,10 +78,10 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_product_price"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_product_price"
-                    bind:count="@{vm.uiState.cartProduct.count}"
+                    bind:count="@{vm.uiState.cartProductUi.count}"
                     bind:counterListener="@{vm}"
-                    bind:id="@{vm.uiState.cartProduct.product.id}"
-                    bind:visible="@{vm.uiState.cartProduct.visible}"
+                    bind:id="@{vm.uiState.cartProductUi.product.id}"
+                    bind:visible="@{vm.uiState.cartProductUi.visible}"
                     tools:text="4만원" />
 
                 <LinearLayout
