@@ -6,7 +6,6 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.order.OrderFragment
-import woowacourse.shopping.ui.order.OrderFragment.Companion.ORDER_ITEMS_ID
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment.Companion.PRODUCT_ID
 import woowacourse.shopping.ui.productList.ProductListFragment
@@ -22,25 +21,19 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
     }
 
     private fun initFragment() {
-        supportFragmentManager.commit {
-            replace(R.id.container, ProductListFragment::class.java, null, ProductListFragment.TAG)
-            addToBackStack(ProductListFragment.TAG)
-        }
+        navigateToProductList()
     }
 
     override fun navigateToProductList() {
-        removeBackStack()
-
         supportFragmentManager.commit {
             replace(R.id.container, ProductListFragment::class.java, null, ProductListFragment.TAG)
         }
     }
 
     override fun navigateToShoppingCart() {
-        removeBackStack()
-
         supportFragmentManager.commit {
             replace(R.id.container, ShoppingCartFragment::class.java, null, ShoppingCartFragment.TAG)
+            addToBackStack(ProductListFragment.TAG)
         }
     }
 
@@ -60,16 +53,17 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         }
     }
 
-    override fun navigateToOrder(cartItems: List<Long>) {
-        removeBackStack()
-
+    override fun navigateToOrder() {
         supportFragmentManager.commit {
             replace(
-                R.id.container, OrderFragment::class.java, Bundle().apply {
-                putSerializable(ORDER_ITEMS_ID, cartItems.toLongArray())
-            }, OrderFragment.TAG)
+                R.id.container, OrderFragment::class.java, null, OrderFragment.TAG
+            )
             addToBackStack(OrderFragment.TAG)
         }
+    }
+
+    override fun popBackStack() {
+        supportFragmentManager.popBackStack()
     }
 
     private fun removeBackStack() {
@@ -87,5 +81,7 @@ interface FragmentNavigator {
 
     fun navigateToProductDetail(productId: Long)
 
-    fun navigateToOrder(cartItems: List<Long>)
+    fun navigateToOrder()
+
+    fun popBackStack()
 }

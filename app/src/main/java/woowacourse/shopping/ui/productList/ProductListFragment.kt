@@ -9,10 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentProductListBinding
-import woowacourse.shopping.ui.cart.ShoppingCartFragment
-import woowacourse.shopping.ui.productDetail.ProductDetailFragment
+import woowacourse.shopping.ui.FragmentNavigator
 
 class ProductListFragment : Fragment() {
     private var _binding: FragmentProductListBinding? = null
@@ -41,7 +39,7 @@ class ProductListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            delay(1000)
+            delay(300)
             viewModel.loadAll()
         }
     }
@@ -68,7 +66,7 @@ class ProductListFragment : Fragment() {
 
     private fun observeNavigationShoppingCart() {
         viewModel.shoppingCartDestination.observe(viewLifecycleOwner) {
-            navigateToShoppingCart()
+            (requireActivity() as FragmentNavigator).navigateToShoppingCart()
         }
     }
 
@@ -85,23 +83,10 @@ class ProductListFragment : Fragment() {
 
     private fun observeDetailProductDestination() {
         viewModel.detailProductDestinationId.observe(viewLifecycleOwner) { productId ->
-            navigateToProductDetail(productId)
+            (requireActivity() as FragmentNavigator).navigateToProductDetail(productId)
         }
     }
 
-    private fun navigateToShoppingCart() {
-        navigateToFragment(ShoppingCartFragment())
-    }
-
-    private fun navigateToProductDetail(id: Long) = navigateToFragment(ProductDetailFragment.newInstance(id))
-
-    private fun navigateToFragment(fragment: Fragment) {
-        parentFragmentManager.beginTransaction().apply {
-            replace(R.id.container, fragment)
-            addToBackStack(null)
-            commit()
-        }
-    }
 
     companion object {
         const val TAG = "ProductListFragment"

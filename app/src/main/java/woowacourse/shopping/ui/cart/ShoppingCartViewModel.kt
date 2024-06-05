@@ -45,8 +45,8 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
 
-    private var _navigationOrderEvent = MutableLiveData<List<Long>>(emptyList())
-    val navigationOrderEvent: LiveData<List<Long>> get() = _navigationOrderEvent
+    private var _navigationOrderEvent = MutableSingleLiveData<List<Long>>(emptyList())
+    val navigationOrderEvent: SingleLiveData<List<Long>> get() = _navigationOrderEvent
 
     fun loadAll() {
         thread {
@@ -93,9 +93,11 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-        _navigationOrderEvent.value = cartItems.value?.filter {
-            it.checked
-        }?.map { it.id }
+//        _navigationOrderEvent.value = cartItems.value?.filter {
+//            it.checked
+//        }?.map { it.id }
+
+        _navigationOrderEvent.setValue(emptyList())
 
         cartItems.value?.forEach {
             orderRepository.saveOrderItemTemp(it.product.id, it.quantity)

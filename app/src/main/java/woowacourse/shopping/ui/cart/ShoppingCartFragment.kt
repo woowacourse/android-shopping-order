@@ -24,15 +24,7 @@ class ShoppingCartFragment : Fragment() {
     private val viewModel: ShoppingCartViewModel by viewModels {
         ShoppingCartViewModel.factory()
     }
-
-//    private val adapter: CartItemRecyclerViewAdapter by lazy {
-//        CartItemRecyclerViewAdapter(
-//            onProductItemClickListener = viewModel,
-//            onItemQuantityChangeListener = viewModel,
-//            onCartItemSelectedListener = viewModel,
-//        )
-//    }
-
+    
     private val adapter: CartAdapter by lazy {
         CartAdapter(
             onProductItemClickListener = viewModel,
@@ -96,7 +88,6 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeItemsInCurrentPage() {
         viewModel.cartItems.observe(viewLifecycleOwner) { products ->
-//            adapter.updateData(products)
             adapter.submitList(products)
             binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
@@ -106,10 +97,7 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeOrderNavigation() {
         viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderItemsIds ->
-            if (orderItemsIds.isNotEmpty()) {
-                Log.d(TAG, "observeOrderNavigation: orderItemsIds: ${orderItemsIds}")
-                (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderItemsIds)
-            }
+            (requireActivity() as? FragmentNavigator)?.navigateToOrder()
         }
     }
 

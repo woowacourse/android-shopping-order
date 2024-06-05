@@ -49,7 +49,6 @@ class OrderFragment : Fragment() {
     }
 
     companion object {
-        const val ORDER_ITEMS_ID = "OrderItemId"
         const val TAG = "OrderFragment"
     }
 }

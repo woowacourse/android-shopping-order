@@ -78,12 +78,13 @@ class ProductDetailFragment : Fragment() {
         }
     }
 
-    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
+    private fun navigateToProductDetail(id: Long) =
+        (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
 
     private fun navigateToMenuItem(it: MenuItem) =
         when (it.itemId) {
             R.id.action_x -> {
-                (requireActivity() as? FragmentNavigator)?.navigateToProductList()
+                (requireActivity() as? FragmentNavigator)?.popBackStack()
                 true
             }
 
@@ -99,11 +100,5 @@ class ProductDetailFragment : Fragment() {
         const val PRODUCT_ID = "productId"
         const val TAG = "ProductDetailFragment"
 
-        fun newInstance(productId: Long): ProductDetailFragment {
-            val fragment = ProductDetailFragment()
-            val bundle = Bundle().apply { putLong(PRODUCT_ID, productId) }
-            fragment.arguments = bundle
-            return fragment
-        }
     }
 }
