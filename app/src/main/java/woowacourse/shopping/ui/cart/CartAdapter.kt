@@ -5,21 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.HolderCartBinding
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.model.CartItem
 
 class CartAdapter(
-    private val onProductItemClickListener: OnProductItemClickListener,
-    private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
-    private val onCartItemSelectedListener: OnCartItemSelectedListener,
+    private val shoppingCartItemListener: ShoppingCartItemListener,
 ) : ListAdapter<CartItem, ShoppingCartItemViewHolder>(cartItemComparator) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShoppingCartItemViewHolder =
         ShoppingCartItemViewHolder(
             HolderCartBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onProductItemClickListener,
-            onItemQuantityChangeListener,
-            onCartItemSelectedListener
+            shoppingCartItemListener
         )
 
     override fun onBindViewHolder(holder: ShoppingCartItemViewHolder, position: Int) {

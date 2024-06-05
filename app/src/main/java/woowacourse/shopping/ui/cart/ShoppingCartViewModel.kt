@@ -11,8 +11,6 @@ import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.util.MutableSingleLiveData
@@ -24,9 +22,7 @@ class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
-    OnProductItemClickListener,
-    OnItemQuantityChangeListener,
-    OnCartItemSelectedListener,
+    ShoppingCartItemListener,
     OnAllCartItemSelectedListener,
     OnNavigationOrderListener {
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -101,8 +97,8 @@ class ShoppingCartViewModel(
         }
     }
 
-    override fun onClick(productId: Long) {
-        Log.d(TAG, "onClick: delete id: $productId")
+    override fun onRemove(productId: Long) {
+        Log.d(TAG, "onRemove: delete id: $productId")
         _deletedItemId.setValue(productId)
     }
 

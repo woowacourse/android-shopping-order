@@ -10,4 +10,9 @@ interface OnItemQuantityChangeListener {
         productId: Long,
         quantity: Int,
     )
+
+    fun onRemove(productId: Long) {
+        // Do nothing
+    }
+
 }

@@ -26,9 +26,7 @@ class ShoppingCartFragment : Fragment() {
 
     private val adapter: CartAdapter by lazy {
         CartAdapter(
-            onProductItemClickListener = viewModel,
-            onItemQuantityChangeListener = viewModel,
-            onCartItemSelectedListener = viewModel,
+            shoppingCartItemListener = viewModel,
         )
     }
 
