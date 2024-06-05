@@ -25,8 +25,16 @@ class ShoppingCartFragment : Fragment() {
         ShoppingCartViewModel.factory()
     }
 
-    private val adapter: CartItemRecyclerViewAdapter by lazy {
-        CartItemRecyclerViewAdapter(
+//    private val adapter: CartItemRecyclerViewAdapter by lazy {
+//        CartItemRecyclerViewAdapter(
+//            onProductItemClickListener = viewModel,
+//            onItemQuantityChangeListener = viewModel,
+//            onCartItemSelectedListener = viewModel,
+//        )
+//    }
+
+    private val adapter: CartAdapter by lazy {
+        CartAdapter(
             onProductItemClickListener = viewModel,
             onItemQuantityChangeListener = viewModel,
             onCartItemSelectedListener = viewModel,
@@ -88,7 +96,8 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeItemsInCurrentPage() {
         viewModel.cartItems.observe(viewLifecycleOwner) { products ->
-            adapter.updateData(products)
+//            adapter.updateData(products)
+            adapter.submitList(products)
             binding.cartList.visibility = View.VISIBLE
             binding.shimmerCartList.stopShimmer()
             binding.shimmerCartList.visibility = View.GONE
