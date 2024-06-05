@@ -1,23 +1,32 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
+import woowacourse.shopping.domain.entity.Product
 
 interface CartRepository {
-    fun cartProducts(
+    fun findCartProduct(productId: Long): Result<CartProduct>
+
+    fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
-    ): Result<List<CartProduct>>
+    ): Result<Cart>
 
-    fun totalCartProducts(): Result<List<CartProduct>>
+    fun loadCart(): Result<Cart>
 
-    fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>>
+    fun filterCartProducts(productIds: List<Long>): Result<Cart>
+
+    fun createCartProduct(
+        product: Product,
+        count: Int,
+    ): Result<Cart>
 
     fun updateCartProduct(
-        productId: Long,
+        product: Product,
         count: Int,
-    ): Result<Unit>
+    ): Result<Cart>
 
-    fun deleteCartProduct(productId: Long): Result<Unit>
+    fun deleteCartProduct(productId: Long): Result<Cart>
 
     fun canLoadMoreCartProducts(
         currentPage: Int,

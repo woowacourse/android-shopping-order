@@ -5,19 +5,19 @@ import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
 import woowacourse.shopping.data.shopping.recent.RecentProductData
 import woowacourse.shopping.data.shopping.recent.RecentProductDataSource
 import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.domain.repository.ShoppingRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-class DefaultShoppingRepository(
+class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
     private val recentProductDataSource: RecentProductDataSource,
-) : ShoppingRepository {
+) : ProductRepository {
     private val cachedPagingProducts = ConcurrentHashMap<Int, List<Product>>()
     private val cachedProductsById = ConcurrentHashMap<Long, Product>()
     private var cachedPageData: ProductPageData? = null
 
-    override fun products(
+    override fun loadProducts(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>> {
@@ -34,7 +34,7 @@ class DefaultShoppingRepository(
             }
     }
 
-    override fun products(
+    override fun loadProducts(
         category: String,
         currentPage: Int,
         size: Int,
@@ -43,7 +43,7 @@ class DefaultShoppingRepository(
             .mapCatching { it.products }
     }
 
-    override fun productById(id: Long): Result<Product> {
+    override fun findProductById(id: Long): Result<Product> {
         val cachedProduct = cachedProductsById[id] ?: return productDataSource.productById(id)
         return Result.success(cachedProduct)
     }
@@ -58,7 +58,7 @@ class DefaultShoppingRepository(
         return Result.success(canLoadMore)
     }
 
-    override fun recentProducts(size: Int): Result<List<Product>> {
+    override fun loadRecentProducts(size: Int): Result<List<Product>> {
         val result = recentProductDataSource.recentProducts(size)
         return result.mapCatching {
             it.map { product ->

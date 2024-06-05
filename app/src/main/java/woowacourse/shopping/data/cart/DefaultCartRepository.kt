@@ -1,84 +1,89 @@
 package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.cart.datasource.CartDataSource
-import woowacourse.shopping.data.cart.model.CartItemData
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.cart.order.OrderDataSource
-import woowacourse.shopping.data.shopping.product.datasource.ProductDataSource
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
+import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import java.util.concurrent.ConcurrentHashMap
 
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource,
-    private val productDataSource: ProductDataSource,
     private val orderDataSource: OrderDataSource,
 ) : CartRepository {
     private var cartPageData: CartPageData? = null
-    private val cartProductMapByProductId = ConcurrentHashMap<Long, CartItemData>()
+    private var cachedCart: Cart = Cart()
 
     init {
-        totalCartProducts()
+        loadCart()
     }
 
-    override fun cartProducts(
+    override fun findCartProduct(productId: Long): Result<CartProduct> {
+        val cartProduct = cachedCart.findCartProductByProductId(productId)
+            ?: return Result.failure(NoSuchElementException("there's no such product"))
+        return Result.success(cartProduct)
+    }
+
+    override fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
-    ): Result<List<CartProduct>> {
+    ): Result<Cart> {
         return cartDataSource
             .loadCarts(currentPage, pageSize)
-            .toCartProducts()
+            .concatCart()
     }
 
-    override fun totalCartProducts(): Result<List<CartProduct>> {
+    override fun loadCart(): Result<Cart> {
         return cartDataSource.loadTotalCarts()
-            .toCartProducts()
+            .toCart()
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
+    override fun filterCartProducts(productIds: List<Long>): Result<Cart> {
         return runCatching {
-            productIds
-                .asSequence()
-                .filter { productId -> cartProductMapByProductId.containsKey(productId) }
-                .mapNotNull { cartProductMapByProductId[it]?.toDomain() }
-                .toList()
+            cachedCart.filterByProductIds(productIds)
         }
+    }
+
+    override fun createCartProduct(
+        product: Product,
+        count: Int,
+    ): Result<Cart> {
+        val cartId = cartDataSource.createCartProduct(product.id, count)
+            .onFailure { return Result.failure(it) }
+            .getOrThrow()
+        val newCartProduct = CartProduct(product, count, cartId)
+        cachedCart = cachedCart.add(newCartProduct)
+        return Result.success(cachedCart)
     }
 
     override fun updateCartProduct(
-        productId: Long,
+        product: Product,
         count: Int,
-    ): Result<Unit> {
-        if (count < 1) return Result.failure(IllegalArgumentException("Count(=$count) 는 0이상 이여야 합니다."))
-        if (cartProductMapByProductId.containsKey(productId).not()) {
-            // Create CartProduct
-            val product = productDataSource.productById(productId).getOrThrow()
-            return cartDataSource.createCartProduct(productId, count).onSuccess { cartId ->
-                cartProductMapByProductId[productId] = CartItemData(cartId, count, product)
-            }.mapCatching { Unit }
-        }
-        // patch CartProduct
-        val cartDetailData =
-            cartProductMapByProductId[productId] ?: return Result.failure(
-                NoSuchElementException("No has productId($productId)"),
-            )
-        val cartId = cartDetailData.cartId
-        return cartDataSource.updateCartCount(cartId, count).onSuccess {
-            cartProductMapByProductId[productId] = cartDetailData.copy(count = count)
-        }
+    ): Result<Cart> {
+        val cartProduct = findCartProduct(product.id).onFailure {
+            return Result.failure(it)
+        }.getOrThrow()
+        return cartDataSource.updateCartCount(cartProduct.id, count)
+            .onFailure {
+                return Result.failure(it)
+            }.map {
+                val newCartProduct = cartProduct.copy(count = count)
+                cachedCart.add(newCartProduct).also { cachedCart = it }
+            }
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Unit> {
-        val cartDetailData =
-            cartProductMapByProductId[productId] ?: return Result.failure(
-                NoSuchElementException("there's no any CartProducts response to $productId"),
-            )
-        val cartId = cartDetailData.cartId
-        return cartDataSource.deleteCartProduct(cartId).onSuccess {
-            cartProductMapByProductId.remove(productId)
-            val totalPage = cartPageData?.totalPageSize ?: 0
-            cartPageData = cartPageData?.copy(totalProductSize = totalPage - 1)
-        }
+    override fun deleteCartProduct(productId: Long): Result<Cart> {
+        val cartProduct = findCartProduct(productId).onFailure {
+            return Result.failure(it)
+        }.getOrThrow()
+        val cartId = cartProduct.id
+        return cartDataSource.deleteCartProduct(cartId)
+            .onFailure {
+                return Result.failure(it)
+            }.map {
+                cachedCart.delete(productId).also { cachedCart = it }
+            }
     }
 
     override fun canLoadMoreCartProducts(
@@ -95,24 +100,28 @@ class DefaultCartRepository(
     }
 
     override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
-        val cartIds =
-            productIds.mapNotNull {
-                cartProductMapByProductId[it]?.cartId
-            }
+        val cart = cachedCart.filterByProductIds(productIds)
+        val cartIds = cart.cartProducts.map { it.id }
         return orderDataSource.orderProducts(cartIds).onSuccess {
-            cartProductMapByProductId.clear()
-            totalCartProducts()
+            loadCart()
         }
     }
 
-    private fun Result<CartPageData>.toCartProducts(): Result<List<CartProduct>> {
-        return mapCatching {
-            cartPageData = it
-            it.cartItems.forEach { cartItem ->
-                val productId = cartItem.product.id
-                cartProductMapByProductId[productId] = cartItem
+    private fun Result<CartPageData>.toCart(): Result<Cart> {
+        return mapCatching { cartData ->
+            cartPageData = cartData
+            cartData.toDomain().also { newCart ->
+                cachedCart = newCart
             }
-            it.toDomain()
+        }
+    }
+
+    private fun Result<CartPageData>.concatCart(): Result<Cart> {
+        return mapCatching { cartData ->
+            cartPageData = cartData
+            cartData.toDomain().also { newCart ->
+                cachedCart = cachedCart.addAll(newCart)
+            }
         }
     }
 }

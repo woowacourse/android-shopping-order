@@ -3,6 +3,7 @@ package woowacourse.shopping.data.cart
 import woowacourse.shopping.data.cart.model.CartItemData
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.shopping.product.toProduct
+import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.remote.dto.response.CartItemResponse
 import woowacourse.shopping.remote.dto.response.CartItemsResponse
@@ -25,8 +26,8 @@ fun CartItemsResponse.toData(): CartPageData {
     )
 }
 
-fun CartPageData.toDomain(): List<CartProduct> {
-    return cartItems.map { it.toDomain() }
+fun CartPageData.toDomain(): Cart {
+    return cartItems.map { it.toDomain() }.let(::Cart)
 }
 
 fun CartItemData.toDomain(): CartProduct {

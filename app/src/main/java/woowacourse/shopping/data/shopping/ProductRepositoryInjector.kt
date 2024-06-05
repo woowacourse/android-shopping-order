@@ -4,23 +4,23 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import woowacourse.shopping.data.shopping.product.datasource.ProductDataSourceInjector
 import woowacourse.shopping.data.shopping.recent.RecentProductDataSourceInjector
-import woowacourse.shopping.domain.repository.ShoppingRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
-object ShoppingRepositoryInjector {
+object ProductRepositoryInjector {
     @Volatile
-    private var instance: ShoppingRepository? = null
+    private var instance: ProductRepository? = null
 
-    fun shoppingRepository(context: Context): ShoppingRepository =
+    fun productRepository(context: Context): ProductRepository =
         instance ?: synchronized(this) {
-            instance ?: DefaultShoppingRepository(
+            instance ?: DefaultProductRepository(
                 ProductDataSourceInjector.productDataSource(),
                 RecentProductDataSourceInjector.recentProductDataSource(context),
             ).also { instance = it }
         }
 
     @VisibleForTesting
-    fun setShoppingRepository(shoppingRepository: ShoppingRepository) {
-        instance = shoppingRepository
+    fun setShoppingRepository(productRepository: ProductRepository) {
+        instance = productRepository
     }
 
     @VisibleForTesting
